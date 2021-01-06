@@ -1,6 +1,5 @@
 package com.blockchain.sunriver
 
-import com.blockchain.account.BalanceAndMin
 import com.blockchain.fees.FeeType
 import com.blockchain.logging.CustomEventBuilder
 import com.blockchain.logging.EventLogger

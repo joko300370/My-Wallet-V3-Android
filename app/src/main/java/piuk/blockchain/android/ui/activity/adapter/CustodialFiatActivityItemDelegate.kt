@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.layout_fiat_activity_item.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.android.util.extensions.toFormattedDate
+import piuk.blockchain.android.util.toFormattedDate
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import java.util.Date
 

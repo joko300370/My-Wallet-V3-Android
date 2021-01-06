@@ -46,5 +46,5 @@ internal class SettingsEmailAndSyncUpdater(
 }
 
 private fun Observable<Settings>.toJustEmail() =
-    map { Email(it.email ?: "", it.isEmailVerified) }
+    map { Email(it.email, it.isEmailVerified) }
         .single(Email("", false))

@@ -58,6 +58,7 @@ public class QrCodeDataManagerTest extends RxTest {
                 "phrase",
                 180).test();
         getTestScheduler().triggerActions();
+
         // Assert
         Bitmap bitmap = observer.values().get(0);
         assertNotNull(bitmap);

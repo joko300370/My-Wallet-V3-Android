@@ -9,6 +9,7 @@ import org.spongycastle.util.encoders.Hex;
 import java.nio.charset.StandardCharsets;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -21,15 +22,14 @@ public class QrCodeDataManager {
     }
 
     /**
-     * Generates a QR code in Bitmap format from a given URI to specified dimensions, wrapped in an
-     * Observable. Will throw an error if the Bitmap is null.
+     * Generates a QR code in Bitmap format from a given URI to specified square dimensions
      *
      * @param uri        A string to be encoded
      * @param dimensions The dimensions of the QR code to be returned
-     * @return An Observable wrapping the generate Bitmap operation
+     * @return An Single wrapping the generate Bitmap operation
      */
-    public Observable<Bitmap> generateQrCode(String uri, int dimensions) {
-        return generateQrCodeObservable(uri, dimensions)
+    public Single<Bitmap> generateQrCode(String uri, int dimensions) {
+        return generateQrCodeSingle(uri, dimensions)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -52,6 +52,13 @@ public class QrCodeDataManager {
 
     private Observable<Bitmap> generateQrCodeObservable(String uri, int dimensions) {
         return Observable.fromCallable(() -> {
+            QRCodeEncoder qrCodeEncoder = new QRCodeEncoder(uri, dimensions);
+            return qrCodeEncoder.encodeAsBitmap();
+        });
+    }
+
+    private Single<Bitmap> generateQrCodeSingle(String uri, int dimensions) {
+        return Single.fromCallable(() -> {
             QRCodeEncoder qrCodeEncoder = new QRCodeEncoder(uri, dimensions);
             return qrCodeEncoder.encodeAsBitmap();
         });

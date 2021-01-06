@@ -13,6 +13,7 @@ import com.blockchain.wallet.DefaultLabels
 import org.amshove.kluent.mock
 import org.junit.Rule
 import org.junit.Test
+import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -44,23 +45,25 @@ class XlmAssetUriParseTest {
     private val environmentConfig: EnvironmentConfig = mock()
     private val walletPreferences: WalletStatus = mock()
     private val eligibilityProvider: EligibilityProvider = mock()
+    private val offlineCache: OfflineAccountUpdater = mock()
 
     private val subject = XlmAsset(
-        payloadManager,
-        xlmDataManager,
-        xlmFeesFetcher,
-        walletOptionsDataManager,
-        custodialManager,
-        exchangeRates,
-        historicRates,
-        currencyPrefs,
-        labels,
-        pitLinking,
-        crashLogger,
-        tiersService,
-        environmentConfig,
-        walletPreferences,
-        eligibilityProvider
+        payloadManager = payloadManager,
+        xlmDataManager = xlmDataManager,
+        xlmFeesFetcher = xlmFeesFetcher,
+        walletOptionsDataManager = walletOptionsDataManager,
+        custodialManager = custodialManager,
+        exchangeRates = exchangeRates,
+        historicRates = historicRates,
+        currencyPrefs = currencyPrefs,
+        labels = labels,
+        pitLinking = pitLinking,
+        crashLogger = crashLogger,
+        tiersService = tiersService,
+        environmentConfig = environmentConfig,
+        walletPreferences = walletPreferences,
+        offlineAccounts = offlineCache,
+        eligibilityProvider = eligibilityProvider
     )
 
     @Test

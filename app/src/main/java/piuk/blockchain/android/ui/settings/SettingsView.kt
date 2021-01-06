@@ -4,7 +4,6 @@ import androidx.annotation.StringRes
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import piuk.blockchain.androidcoreui.ui.base.View
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 
 interface SettingsView : View {
 
@@ -18,19 +17,21 @@ interface SettingsView : View {
 
     fun showNoFingerprintsAddedDialog()
 
-    fun showProgressDialog(@StringRes message: Int)
+    fun showProgress()
 
-    fun hideProgressDialog()
+    fun hideProgress()
 
-    fun showToast(@StringRes message: Int, @ToastCustom.ToastType toastType: String)
+    fun showError(@StringRes message: Int)
 
     fun setGuidSummary(summary: String)
 
     fun setKycState(kycTiers: KycTiers)
 
-    fun setEmailSummary(summary: String)
+    fun setEmailSummary(email: String, isVerified: Boolean)
+    fun setEmailUnknown()
 
-    fun setSmsSummary(summary: String)
+    fun setSmsSummary(summary: String, isVerified: Boolean)
+    fun setSmsUnknown()
 
     fun setFiatSummary(summary: String)
 

@@ -297,6 +297,10 @@ class BchOnChainTxEngine(
             Timber.e(e)
         }
     }
+
+    override fun doPostExecute(txResult: TxResult): Completable =
+        super.doPostExecute(txResult)
+            .doOnComplete { bchSource.forceRefresh() }
 }
 
 private val PendingTx.totalSent: Money

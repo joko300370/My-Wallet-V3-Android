@@ -9,6 +9,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.data.Settings.Companion.UNIT_FIAT
 import info.blockchain.wallet.crypto.AESUtil
 import piuk.blockchain.androidcore.BuildConfig
+import piuk.blockchain.androidcore.utils.PersistentPrefs.Companion.KEY_SWIPE_TO_RECEIVE_ENABLED
 import java.util.Currency
 import java.util.Locale
 
@@ -338,8 +339,7 @@ class PrefsUtil(
         }
 
     override fun hasBackup(): Boolean =
-        backupEnabled &&
-                backupStore.getString(KEY_ENCRYPTED_GUID, "").isNullOrEmpty().not()
+        backupEnabled && backupStore.getString(KEY_ENCRYPTED_GUID, "").isNullOrEmpty().not()
 
     @SuppressLint("ApplySharedPref")
     override fun clearBackup() {
@@ -354,6 +354,31 @@ class PrefsUtil(
             .commit()
 
         BackupManager.dataChanged(BuildConfig.APPLICATION_ID)
+    }
+
+    // SwipeToReceive
+    override var offlineCacheData: String?
+        get() = getValue(OFFLINE_CACHE_KEY)
+        set(value) {
+            if (value != null) {
+                setValue(OFFLINE_CACHE_KEY, value)
+            } else {
+                clearLegacyCacheData()
+                removeValue(OFFLINE_CACHE_KEY)
+            }
+        }
+
+    override var offlineCacheEnabled: Boolean
+        get() = getValue(KEY_SWIPE_TO_RECEIVE_ENABLED, true)
+        set(value) = setValue(KEY_SWIPE_TO_RECEIVE_ENABLED, value)
+
+    private fun clearLegacyCacheData() {
+        removeValue(KEY_SWIPE_RECEIVE_BTC_ADDRESSES)
+        removeValue(KEY_SWIPE_RECEIVE_ETH_ADDRESS)
+        removeValue(KEY_SWIPE_RECEIVE_BCH_ADDRESSES)
+        removeValue(KEY_SWIPE_RECEIVE_XLM_ADDRESS)
+        removeValue(KEY_SWIPE_RECEIVE_BTC_ACCOUNT_NAME)
+        removeValue(KEY_SWIPE_RECEIVE_BCH_ACCOUNT_NAME)
     }
 
     // Raw accessors
@@ -488,5 +513,16 @@ class PrefsUtil(
         // Rating
         private const val HAS_SEEN_RATING = "has_seen_rating"
         private const val PRE_RATING_ACTION_COMPLETED_TIMES = "pre_rating_action_completed_times"
+
+        // Swipe to receive
+        // Legacy keys. Only clear, add new data with new key
+        private const val KEY_SWIPE_RECEIVE_BTC_ADDRESSES = "swipe_receive_addresses"
+        private const val KEY_SWIPE_RECEIVE_ETH_ADDRESS = "swipe_receive_eth_address"
+        private const val KEY_SWIPE_RECEIVE_BCH_ADDRESSES = "swipe_receive_bch_addresses"
+        private const val KEY_SWIPE_RECEIVE_XLM_ADDRESS = "key_swipe_receive_xlm_address"
+        private const val KEY_SWIPE_RECEIVE_BTC_ACCOUNT_NAME = "swipe_receive_account_name"
+        private const val KEY_SWIPE_RECEIVE_BCH_ACCOUNT_NAME = "swipe_receive_bch_account_name"
+        // New key
+        private const val OFFLINE_CACHE_KEY = "key_offline_address_cache"
     }
 }

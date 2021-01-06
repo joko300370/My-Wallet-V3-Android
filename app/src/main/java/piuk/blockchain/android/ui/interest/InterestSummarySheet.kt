@@ -1,12 +1,13 @@
 package piuk.blockchain.android.ui.interest
 
+import android.content.DialogInterface
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.notifications.analytics.InterestAnalytics
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
@@ -26,11 +27,10 @@ import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.drawableResFilled
-import piuk.blockchain.android.util.extensions.secondsToDays
+import piuk.blockchain.android.util.secondsToDays
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import timber.log.Timber
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -79,21 +79,25 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
             interest_details_activity_cta.setOnClickListener {
                 host.gotoActivityFor(account as BlockchainAccount)
             }
-
-            if (account.actions.contains(AssetAction.Deposit)) {
-                interest_details_deposit_cta.text =
-                    getString(R.string.tx_title_deposit, cryptoCurrency.displayTicker)
-                interest_details_deposit_cta.setOnClickListener {
-                    // TODO how do we select accounts from here? For now choose default non-custodial
-                    coincore[cryptoCurrency].accountGroup(AssetFilter.NonCustodial).subscribe {
-                        val defaultAccount = it.accounts.first { acc -> acc.isDefault }
-                        analytics.logEvent(InterestAnalytics.INTEREST_SUMMARY_DEPOSIT_CTA)
-                        host.goToDeposit(defaultAccount, account, AssetAction.Deposit)
+            disposables += account.actions
+                .map { it.contains(AssetAction.Deposit) }
+                .onErrorReturn { false }
+                .subscribeBy {
+                    if (it) {
+                        interest_details_deposit_cta.text =
+                            getString(R.string.tx_title_deposit, cryptoCurrency.displayTicker)
+                        interest_details_deposit_cta.setOnClickListener {
+                            // TODO how do we select accounts from here? For now choose default non-custodial
+                            disposables += coincore[cryptoCurrency].accountGroup(AssetFilter.NonCustodial).subscribe {
+                                val defaultAccount = it.accounts.first { acc -> acc.isDefault }
+                                analytics.logEvent(InterestAnalytics.INTEREST_SUMMARY_DEPOSIT_CTA)
+                                host.goToDeposit(defaultAccount, account, AssetAction.Deposit)
+                            }
+                        }
+                    } else {
+                        interest_details_deposit_cta.gone()
                     }
                 }
-            } else {
-                interest_details_deposit_cta.gone()
-            }
         }
 
         disposables += Singles.zip(
@@ -106,7 +110,8 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
                 pendingInterest = details.pendingInterest,
                 balance = details.balance,
                 lockupDuration = limits.interestLockUpDuration.secondsToDays(),
-                interestRate = interestRate
+                interestRate = interestRate,
+                nextInterestPayment = limits.nextInterestPayment
             )
         }.observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -125,14 +130,9 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
             add(InterestSummaryInfoItem(getString(R.string.interest_summary_total),
                 composite.totalInterest.toStringWithSymbol()))
 
-            // TODO this will be returned by the API sometime soon, for now show 1st of next month
-            val calendar = Calendar.getInstance()
-            calendar.add(Calendar.MONTH, 1)
-            calendar.set(Calendar.DAY_OF_MONTH, 1)
-            val sdf = SimpleDateFormat("MMM d, YYYY", Locale.getDefault())
-            val formattedDate = sdf.format(calendar.time)
-            add(InterestSummaryInfoItem(getString(R.string.interest_summary_next_payment),
-                formattedDate))
+            val sdf = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
+            val formattedDate = sdf.format(composite.nextInterestPayment)
+            add(InterestSummaryInfoItem(getString(R.string.interest_summary_next_payment), formattedDate))
 
             add(InterestSummaryInfoItem(getString(R.string.interest_summary_accrued),
                 composite.pendingInterest.toStringWithSymbol()))
@@ -147,7 +147,7 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
             view.apply {
                 interest_details_crypto_value.text = toStringWithSymbol()
                 interest_details_fiat_value.text = toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
-                        .toStringWithSymbol()
+                    .toStringWithSymbol()
             }
         }
 
@@ -174,8 +174,18 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
         val balance: CryptoValue,
         val totalInterest: CryptoValue,
         val pendingInterest: CryptoValue,
-        var nextInterestPayment: Date? = null,
+        var nextInterestPayment: Date,
         val lockupDuration: Int,
         val interestRate: Double
     )
+
+    override fun dismiss() {
+        super.dismiss()
+        disposables.clear()
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        super.onCancel(dialog)
+        disposables.clear()
+    }
 }

@@ -24,6 +24,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
+import piuk.blockchain.android.coincore.AssetOrdering
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
@@ -48,7 +49,7 @@ class DashboardInteractor(
     private val simpleBuyPrefs: SimpleBuyPrefs,
     private val analytics: Analytics,
     private val crashLogger: CrashLogger,
-    private val assetOrdering: AssetOrderingConfig
+    private val assetOrdering: AssetOrdering
 ) {
 
     // We have a problem here, in that pax init depends on ETH init

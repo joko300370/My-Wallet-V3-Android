@@ -371,6 +371,10 @@ class BtcOnChainTxEngine(
         }
     }
 
+    override fun doPostExecute(txResult: TxResult): Completable =
+        super.doPostExecute(txResult)
+            .doOnComplete { btcSource.forceRefresh() }
+
     companion object {
         const val LARGE_TX_FIAT = "USD"
         const val LARGE_TX_FEE = 0.5

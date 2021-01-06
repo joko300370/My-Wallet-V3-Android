@@ -20,6 +20,7 @@ import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxEngine
+import piuk.blockchain.android.coincore.impl.AccountRefreshTrigger
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.transactionFetchCount
 import piuk.blockchain.android.coincore.impl.transactionFetchOffset
@@ -42,7 +43,8 @@ internal class BtcCryptoWalletAccount(
     private val internalAccount: JsonSerializableAccount,
     val isHDAccount: Boolean,
     private val walletPreferences: WalletStatus,
-    private val custodialWalletManager: CustodialWalletManager
+    private val custodialWalletManager: CustodialWalletManager,
+    private val refreshTrigger: AccountRefreshTrigger
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BTC) {
 
     private val hasFunds = AtomicBoolean(false)
@@ -119,13 +121,11 @@ internal class BtcCryptoWalletAccount(
             walletPreferences = walletPreferences
         )
 
-    override val actions: AvailableActions
-        get() = super.actions.run {
+    override val actions: Single<AvailableActions>
+        get() = super.actions.map {
             if (!isHDAccount) {
-                toMutableSet().apply { remove(AssetAction.Receive) }.toSet()
-            } else {
-                this
-            }
+                it.toMutableSet().apply { remove(AssetAction.Receive) }.toSet()
+            } else it
         }
 
     override fun updateLabel(newLabel: String): Completable {
@@ -155,6 +155,7 @@ internal class BtcCryptoWalletAccount(
             .doOnError { setArchivedBits(isArchived) } // Revert
             .then { payloadDataManager.updateAllTransactions() }
             .then { getAccountBalance(true).ignoreElement() }
+            .doOnComplete { forceRefresh() }
     }
 
     private fun setArchivedBits(newIsArchived: Boolean) {
@@ -175,6 +176,7 @@ internal class BtcCryptoWalletAccount(
         payloadDataManager.setDefaultIndex(hdAccountIndex)
         return payloadDataManager.syncPayloadWithServer()
             .doOnError { payloadDataManager.setDefaultIndex(revertDefault) }
+            .doOnComplete { forceRefresh() }
     }
 
     override val xpubAddress: String
@@ -204,7 +206,7 @@ internal class BtcCryptoWalletAccount(
                         legacyAddress = internalAccount as LegacyAddress,
                         secondPassword = password
                     ) ?: throw IllegalStateException("Private key not found for legacy BTC address"))
-                )
+            )
         }
     }
 
@@ -225,8 +227,17 @@ internal class BtcCryptoWalletAccount(
         }
     }
 
+    fun getReceiveAddressAtPosition(position: Int): String? {
+        require(isHDAccount)
+        return payloadDataManager.getReceiveAddressAtPosition(internalAccount as Account, position)
+    }
+
     override fun matches(other: CryptoAccount): Boolean =
         other is BtcCryptoWalletAccount && other.xpubAddress == xpubAddress
+
+    internal fun forceRefresh() {
+        refreshTrigger.forceAccountsRefresh()
+    }
 
     companion object {
         fun createHdAccount(
@@ -238,7 +249,8 @@ internal class BtcCryptoWalletAccount(
             exchangeRates: ExchangeRateDataManager,
             networkParameters: NetworkParameters,
             walletPreferences: WalletStatus,
-            custodialWalletManager: CustodialWalletManager
+            custodialWalletManager: CustodialWalletManager,
+            refreshTrigger: AccountRefreshTrigger
         ) = BtcCryptoWalletAccount(
             payloadManager = payloadManager,
             hdAccountIndex = hdAccountIndex,
@@ -249,7 +261,8 @@ internal class BtcCryptoWalletAccount(
             internalAccount = jsonAccount,
             isHDAccount = true,
             walletPreferences = walletPreferences,
-            custodialWalletManager = custodialWalletManager
+            custodialWalletManager = custodialWalletManager,
+            refreshTrigger = refreshTrigger
         )
 
         fun createLegacyAccount(
@@ -260,7 +273,8 @@ internal class BtcCryptoWalletAccount(
             exchangeRates: ExchangeRateDataManager,
             networkParameters: NetworkParameters,
             walletPreferences: WalletStatus,
-            custodialWalletManager: CustodialWalletManager
+            custodialWalletManager: CustodialWalletManager,
+            refreshTrigger: AccountRefreshTrigger
         ) = BtcCryptoWalletAccount(
             payloadManager = payloadManager,
             hdAccountIndex = LEGACY_ACCOUNT_NO_INDEX,
@@ -271,7 +285,8 @@ internal class BtcCryptoWalletAccount(
             internalAccount = legacyAccount,
             isHDAccount = false,
             walletPreferences = walletPreferences,
-            custodialWalletManager = custodialWalletManager
+            custodialWalletManager = custodialWalletManager,
+            refreshTrigger = refreshTrigger
         )
 
         private const val LEGACY_ACCOUNT_NO_INDEX = -1

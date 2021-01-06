@@ -76,10 +76,15 @@ internal class FiatCustodialAccount(
             }
         }
 
-    override val actions: AvailableActions =
-        if (fiatCurrency != "USD") setOf(AssetAction.ViewActivity, AssetAction.Deposit, AssetAction.Withdraw)
+    override val actions: Single<AvailableActions> =
+        if (fiatCurrency != "USD") Single.just(
+            setOf(AssetAction.ViewActivity,
+                AssetAction.Deposit,
+                AssetAction.Withdraw
+            )
+        )
         else
-            setOf(AssetAction.ViewActivity)
+            Single.just(setOf(AssetAction.ViewActivity))
 
     override val isFunded: Boolean
         get() = hasFunds.get()
@@ -128,11 +133,13 @@ class FiatAccountGroup(
         }
 
     // The intersection of the actions for each account
-    override val actions: AvailableActions
+    override val actions: Single<AvailableActions>
         get() = if (accounts.isEmpty()) {
-            emptySet()
+            Single.just(emptySet())
         } else {
-            accounts.map { it.actions }.reduce { a, b -> a.intersect(b) }
+            Single.zip(accounts.map { it.actions }) { t: Array<Any> ->
+                t.filterIsInstance<AvailableActions>().flatten().toSet()
+            }
         }
 
     // if _any_ of the accounts have transactions

@@ -85,7 +85,6 @@ class FingerprintHelper constructor(
                 null
             }
         }
-
         return null
     }
 

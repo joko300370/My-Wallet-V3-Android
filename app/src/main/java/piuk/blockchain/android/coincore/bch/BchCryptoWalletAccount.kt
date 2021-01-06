@@ -15,6 +15,7 @@ import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxEngine
+import piuk.blockchain.android.coincore.impl.AccountRefreshTrigger
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.transactionFetchCount
 import piuk.blockchain.android.coincore.impl.transactionFetchOffset
@@ -38,7 +39,8 @@ internal class BchCryptoWalletAccount private constructor(
     private val sendDataManager: SendDataManager,
     private val internalAccount: GenericMetadataAccount,
     private val walletPreferences: WalletStatus,
-    private val custodialWalletManager: CustodialWalletManager
+    private val custodialWalletManager: CustodialWalletManager,
+    private val refreshTrigger: AccountRefreshTrigger
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BCH) {
 
     private val hasFunds = AtomicBoolean(false)
@@ -149,6 +151,13 @@ internal class BchCryptoWalletAccount private constructor(
     override fun matches(other: CryptoAccount): Boolean =
         other is BchCryptoWalletAccount && other.xpubAddress == xpubAddress
 
+    fun getReceiveAddressAtPosition(position: Int) =
+        bchManager.getReceiveAddressAtPosition(addressIndex, position)
+
+    internal fun forceRefresh() {
+        refreshTrigger.forceAccountsRefresh()
+    }
+
     companion object {
         fun createBchAccount(
             payloadManager: PayloadDataManager,
@@ -160,7 +169,8 @@ internal class BchCryptoWalletAccount private constructor(
             feeDataManager: FeeDataManager,
             sendDataManager: SendDataManager,
             walletPreferences: WalletStatus,
-            custodialWalletManager: CustodialWalletManager
+            custodialWalletManager: CustodialWalletManager,
+            refreshTrigger: AccountRefreshTrigger
         ) = BchCryptoWalletAccount(
             payloadManager = payloadManager,
             bchManager = bchManager,
@@ -171,7 +181,8 @@ internal class BchCryptoWalletAccount private constructor(
             sendDataManager = sendDataManager,
             internalAccount = jsonAccount,
             walletPreferences = walletPreferences,
-            custodialWalletManager = custodialWalletManager
+            custodialWalletManager = custodialWalletManager,
+            refreshTrigger = refreshTrigger
         )
     }
 }

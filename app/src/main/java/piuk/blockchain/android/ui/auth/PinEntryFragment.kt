@@ -247,14 +247,7 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         if (presenter?.isForValidatingPinForResult == true) {
             finishWithResultCanceled()
         } else if (presenter?.allowExit() == true) {
-            if (backPressed + BuildConfig.EXIT_APP_COOLDOWN_MILLIS > System.currentTimeMillis()) {
-                presenter.clearLoginState()
-                return
-            } else {
-                showToast(R.string.exit_confirm, ToastCustom.TYPE_GENERAL)
-            }
-
-            backPressed = System.currentTimeMillis()
+            presenter.clearLoginState()
         }
     }
 

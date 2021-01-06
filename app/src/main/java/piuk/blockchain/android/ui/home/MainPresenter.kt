@@ -73,7 +73,6 @@ interface MainView : MvpView, HomeNavigator {
 class MainPresenter internal constructor(
     private val prefs: PersistentPrefs,
     private val accessState: AccessState,
-    private val credentialsWiper: CredentialsWiper,
     private val payloadDataManager: PayloadDataManager,
     private val exchangeRateFactory: ExchangeRateDataManager,
     private val qrProcessor: QrScanResultProcessor,
@@ -88,7 +87,7 @@ class MainPresenter internal constructor(
     private val simpleBuySync: SimpleBuySyncFactory,
     private val crashLogger: CrashLogger,
     private val analytics: Analytics,
-    private val cacheCredentialsWiper: CacheCredentialsWiper,
+    private val credentialsWiper: CredentialsWiper,
     nabuToken: NabuToken
 ) : MvpPresenter<MainView>() {
 
@@ -306,8 +305,7 @@ class MainPresenter internal constructor(
 
     internal fun unPair() {
         view?.clearAllDynamicShortcuts()
-        credentialsWiper.unload()
-        cacheCredentialsWiper.wipe()
+        credentialsWiper.wipe()
     }
 
     internal fun updateTicker() {

@@ -11,6 +11,7 @@ import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.alg.AlgoCryptoWalletAccount
 import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.android.coincore.impl.TxProcessorFactory
+import piuk.blockchain.android.ui.transfer.AccountsSorter
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import timber.log.Timber
 
@@ -60,16 +61,33 @@ class Coincore internal constructor(
     fun allWallets(includeArchived: Boolean = false): Single<AccountGroup> =
         Maybe.concat(
             allAssets.map {
-                it.accountGroup().map { grp -> grp.accounts }.map { list ->
-                    list.filter { account ->
-                        (includeArchived || account !is CryptoAccount) || !account.isArchived
+                it.accountGroup().map { grp -> grp.accounts }
+                    .map { list ->
+                        list.filter { account ->
+                            (includeArchived || account !is CryptoAccount) || !account.isArchived
+                        }
                     }
-                }
             }
         ).reduce { a, l -> a + l }
             .map { list ->
                 AllWalletsAccount(list, defaultLabels) as AccountGroup
             }.toSingle()
+
+    fun allWalletsWithActions(
+        actions: Set<AssetAction>,
+        sorter: AccountsSorter
+    ): Single<SingleAccountList> =
+        allWallets()
+            .flattenAsObservable { it.accounts }
+            .flatMapMaybe { account ->
+                account.actions.flatMapMaybe { availableActions ->
+                    if (availableActions.containsAll(actions)) Maybe.just(account) else Maybe.empty()
+                }
+            }
+            .toList()
+            .flatMap { list ->
+                sorter(list)
+            }
 
     fun getTransactionTargets(
         sourceAccount: CryptoAccount,
@@ -107,12 +125,12 @@ class Coincore internal constructor(
             AssetAction.Swap -> {
                 {
                     it is CryptoAccount &&
-                        it.asset != sourceAccount.asset &&
-                        it !is FiatAccount &&
-                        it !is InterestAccount &&
-                        // fixme special case we should remove once receive is implemented
-                        it !is AlgoCryptoWalletAccount &&
-                        if (sourceAccount.isCustodial()) it.isCustodial() else true
+                            it.asset != sourceAccount.asset &&
+                            it !is FiatAccount &&
+                            it !is InterestAccount &&
+                            // fixme special case we should remove once receive is implemented
+                            it !is AlgoCryptoWalletAccount &&
+                            if (sourceAccount.isCustodial()) it.isCustodial() else true
                 }
             }
             AssetAction.Send -> {

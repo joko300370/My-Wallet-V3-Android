@@ -8,7 +8,7 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import kotlinx.android.synthetic.main.swap_pending_item_layout.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.util.extensions.toFormattedDate
+import piuk.blockchain.android.util.toFormattedDate
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
