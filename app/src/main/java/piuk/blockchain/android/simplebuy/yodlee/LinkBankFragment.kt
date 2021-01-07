@@ -154,7 +154,7 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
         link_bank_btn.visible()
         link_bank_btn.setOnClickListener {
             logRetryAnalytics(state)
-            navigator().pop()
+            navigator().retry()
         }
         link_bank_cancel.visible()
         link_bank_cancel.setOnClickListener {

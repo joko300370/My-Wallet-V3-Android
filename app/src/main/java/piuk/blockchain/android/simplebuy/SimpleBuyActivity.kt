@@ -276,6 +276,10 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
         goToCheckOutScreen(false)
     }
 
+    override fun retry() {
+        pop()
+    }
+
     companion object {
         const val KYC_STARTED = 6788
         const val RESULT_KYC_SIMPLE_BUY_COMPLETE = 7854

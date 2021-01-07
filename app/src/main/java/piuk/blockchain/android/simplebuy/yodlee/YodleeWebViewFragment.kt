@@ -115,7 +115,7 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
                     yodlee_status_label.gone()
                     yodlee_subtitle.gone()
                     yodlee_retry.gone()
-                    navigator().pop()
+                    navigator().retry()
                 }
                 FastLinkInterfaceHandler.FastLinkFlowError.JSON_PARSING -> {
                     analytics.logEvent(SimpleBuyAnalytics.ACH_ERROR)
