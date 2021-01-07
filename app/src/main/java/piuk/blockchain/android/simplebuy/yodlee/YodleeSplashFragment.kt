@@ -11,14 +11,12 @@ import kotlinx.android.synthetic.main.fragment_simple_buy_yodlee_splash.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.simplebuy.BankPartnerTypes
-import piuk.blockchain.android.simplebuy.SimpleBuyNavigator
-import piuk.blockchain.android.simplebuy.SimpleBuyScreen
 import piuk.blockchain.android.simplebuy.bankLinkingSplashCta
 import piuk.blockchain.android.simplebuy.bankLinkingSplashShown
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.util.StringUtils
 
-class YodleeSplashFragment : Fragment(R.layout.fragment_simple_buy_yodlee_splash), SimpleBuyScreen {
+class YodleeSplashFragment : Fragment(R.layout.fragment_simple_buy_yodlee_splash) {
 
     private val stringUtils: StringUtils by inject()
     private val analytics: Analytics by inject()
@@ -68,9 +66,7 @@ class YodleeSplashFragment : Fragment(R.layout.fragment_simple_buy_yodlee_splash
             }
     }
 
-    override fun navigator(): SimpleBuyNavigator =
-        (activity as? SimpleBuyNavigator)
-            ?: throw IllegalStateException("Parent must implement SimpleBuyNavigator")
-
-    override fun onBackPressed(): Boolean = true
+    private fun navigator(): YodleeLinkingFlowNavigator =
+        (activity as? YodleeLinkingFlowNavigator)
+        ?: throw IllegalStateException("Parent must implement YodleeLinkingFlowNavigator")
 }

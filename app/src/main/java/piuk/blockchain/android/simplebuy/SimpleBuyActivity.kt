@@ -20,16 +20,17 @@ import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.cards.CardDetailsActivity
+import piuk.blockchain.android.simplebuy.yodlee.LinkBankFragment
 import piuk.blockchain.android.simplebuy.yodlee.YodleeSplashFragment
 import piuk.blockchain.android.simplebuy.yodlee.YodleeWebViewFragment
 import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
-import piuk.blockchain.androidcore.utils.helperfunctions.consume
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 
 class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
     override val alwaysDisableScreenshots: Boolean
@@ -265,6 +266,18 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
             .replace(R.id.content_frame, LinkBankFragment.newInstance(errorState))
             .addToBackStack(LinkBankFragment::class.simpleName)
             .commitAllowingStateLoss()
+    }
+
+    override fun bankLinkingCancelled() {
+        exitSimpleBuyFlow()
+    }
+
+    override fun bankLinkingFinished() {
+        goToCheckOutScreen(false)
+    }
+
+    override fun retry() {
+        pop()
     }
 
     companion object {
