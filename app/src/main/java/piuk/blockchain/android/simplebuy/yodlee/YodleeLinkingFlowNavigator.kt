@@ -10,4 +10,6 @@ interface YodleeLinkingFlowNavigator {
     fun launchBankLinking(accountProviderId: String, accountId: String)
     fun launchBankLinkingWithError(errorState: ErrorState)
     fun pop()
+    fun bankLinkingFinished()
+    fun bankLinkingCancelled()
 }
