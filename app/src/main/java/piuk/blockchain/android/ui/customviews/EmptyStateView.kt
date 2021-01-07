@@ -9,7 +9,7 @@ import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_SUPPORT_PORTAL
 import kotlinx.android.synthetic.main.view_empty_state.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
+import piuk.blockchain.android.util.visibleIf
 
 class EmptyStateView @JvmOverloads constructor(
     context: Context,

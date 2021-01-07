@@ -21,16 +21,14 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
-import piuk.blockchain.android.simplebuy.SimpleBuyNavigator
-import piuk.blockchain.android.simplebuy.SimpleBuyScreen
 import piuk.blockchain.android.ui.base.setupToolbar
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 import timber.log.Timber
 import java.net.URLEncoder
 
 class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLinkInterfaceHandler.FastLinkListener,
-    YodleeWebClient.YodleeWebClientInterface, SimpleBuyScreen {
+    YodleeWebClient.YodleeWebClientInterface {
 
     private val analytics: Analytics by inject()
 
@@ -103,9 +101,9 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
         }
     }
 
-    override fun flowSuccess(providerAccountId: String) {
+    override fun flowSuccess(providerAccountId: String, accountId: String) {
         analytics.logEvent(SimpleBuyAnalytics.ACH_SUCCESS)
-        navigator().launchBankLinking(providerAccountId)
+        navigator().launchBankLinking(accountProviderId = providerAccountId, accountId = accountId)
     }
 
     override fun flowError(error: FastLinkInterfaceHandler.FastLinkFlowError, reason: String?) {
@@ -117,7 +115,7 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
                     yodlee_status_label.gone()
                     yodlee_subtitle.gone()
                     yodlee_retry.gone()
-                    navigator().pop()
+                    navigator().retry()
                 }
                 FastLinkInterfaceHandler.FastLinkFlowError.JSON_PARSING -> {
                     analytics.logEvent(SimpleBuyAnalytics.ACH_ERROR)
@@ -149,11 +147,9 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
         yodlee_loading_group.gone()
     }
 
-    override fun navigator(): SimpleBuyNavigator =
-        (activity as? SimpleBuyNavigator)
-            ?: throw IllegalStateException("Parent must implement SimpleBuyNavigator")
-
-    override fun onBackPressed(): Boolean = true
+    private fun navigator(): YodleeLinkingFlowNavigator =
+        (activity as? YodleeLinkingFlowNavigator)
+            ?: throw IllegalStateException("Parent must implement YodleeLinkingFlowNavigator")
 
     companion object {
         private const val FAST_LINK_URL: String = "FAST_LINK_URL"
@@ -201,7 +197,7 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
     private val gson = Gson()
 
     interface FastLinkListener {
-        fun flowSuccess(providerAccountId: String)
+        fun flowSuccess(providerAccountId: String, accountId: String)
         fun flowError(error: FastLinkFlowError, reason: String? = null)
         fun openExternalUrl(url: String)
     }
@@ -266,7 +262,7 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
     private fun MessageData.handleMessageStatus(status: MessageStatus, reason: String?) {
         when (status) {
             MessageStatus.FLOW_SUCCESS -> {
-                listener.flowSuccess(providerAccountId)
+                listener.flowSuccess(providerAccountId = providerAccountId, accountId = accountId)
             }
             MessageStatus.FLOW_ABANDONED,
             MessageStatus.FLOW_CLOSED,
@@ -279,9 +275,15 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
     private fun handleMessageStatusFromSite(status: MessageStatus, site: SiteData) {
         when (status) {
             MessageStatus.FLOW_SUCCESS -> {
-                site.providerAccountId?.let {
-                    listener.flowSuccess(it)
-                } ?: listener.flowError(FastLinkFlowError.OTHER, "Provider ID not found")
+                val pId = site.providerAccountId ?: kotlin.run {
+                    listener.flowError(FastLinkFlowError.OTHER, "Provide ID not found")
+                    return
+                }
+                val acId = site.accountId ?: kotlin.run {
+                    listener.flowError(FastLinkFlowError.OTHER, "Account ID not found")
+                    return
+                }
+                listener.flowSuccess(accountId = acId, providerAccountId = pId)
             }
             MessageStatus.FLOW_ABANDONED,
             MessageStatus.FLOW_CLOSED,
@@ -301,10 +303,13 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
     private enum class MessageStatus {
         @SerializedName("SUCCESS")
         FLOW_SUCCESS,
+
         @SerializedName("ACTION_ABANDONED")
         FLOW_ABANDONED,
+
         @SerializedName("USER_CLOSE_ACTION")
         FLOW_CLOSED,
+
         @SerializedName("FAILED")
         FLOW_FAILED
     }
@@ -319,6 +324,7 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
         val status: MessageStatus?,
         val sites: List<SiteData>?,
         val providerAccountId: String,
+        val accountId: String,
         val providerName: String?,
         val additionalStatus: String?,
         @SerializedName("url")
@@ -331,6 +337,7 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
         val status: MessageStatus?,
         val providerId: String?,
         val providerAccountId: String?,
+        val accountId: String?,
         val providerName: String?
     )
 }

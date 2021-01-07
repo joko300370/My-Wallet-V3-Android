@@ -57,8 +57,6 @@ interface SettingsView : View {
 
     fun updateCards(cards: List<PaymentMethod.Card>)
 
-    fun updateBanks(linkedAndSupportedCurrencies: LinkedBanksAndSupportedCurrencies)
-
     fun updateLinkableBanks(linkableBanks: Set<LinkableBank>, linkedBanksCount: Int)
 
     fun updateLinkedBanks(banks: Set<Bank>)

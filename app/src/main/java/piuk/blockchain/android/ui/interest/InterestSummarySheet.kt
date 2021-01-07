@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.interest
 
+import android.content.DialogInterface
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -27,7 +28,7 @@ import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.drawableResFilled
 import piuk.blockchain.android.util.secondsToDays
-import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.android.util.gone
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -78,21 +79,25 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
             interest_details_activity_cta.setOnClickListener {
                 host.gotoActivityFor(account as BlockchainAccount)
             }
-
-            if (account.actions.contains(AssetAction.Deposit)) {
-                interest_details_deposit_cta.text =
-                    getString(R.string.tx_title_deposit, cryptoCurrency.displayTicker)
-                interest_details_deposit_cta.setOnClickListener {
-                    // TODO how do we select accounts from here? For now choose default non-custodial
-                    coincore[cryptoCurrency].accountGroup(AssetFilter.NonCustodial).subscribe {
-                        val defaultAccount = it.accounts.first { acc -> acc.isDefault }
-                        analytics.logEvent(InterestAnalytics.INTEREST_SUMMARY_DEPOSIT_CTA)
-                        host.goToDeposit(defaultAccount, account, AssetAction.Deposit)
+            disposables += account.actions
+                .map { it.contains(AssetAction.Deposit) }
+                .onErrorReturn { false }
+                .subscribeBy {
+                    if (it) {
+                        interest_details_deposit_cta.text =
+                            getString(R.string.tx_title_deposit, cryptoCurrency.displayTicker)
+                        interest_details_deposit_cta.setOnClickListener {
+                            // TODO how do we select accounts from here? For now choose default non-custodial
+                            disposables += coincore[cryptoCurrency].accountGroup(AssetFilter.NonCustodial).subscribe {
+                                val defaultAccount = it.accounts.first { acc -> acc.isDefault }
+                                analytics.logEvent(InterestAnalytics.INTEREST_SUMMARY_DEPOSIT_CTA)
+                                host.goToDeposit(defaultAccount, account, AssetAction.Deposit)
+                            }
+                        }
+                    } else {
+                        interest_details_deposit_cta.gone()
                     }
                 }
-            } else {
-                interest_details_deposit_cta.gone()
-            }
         }
 
         disposables += Singles.zip(
@@ -142,7 +147,7 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
             view.apply {
                 interest_details_crypto_value.text = toStringWithSymbol()
                 interest_details_fiat_value.text = toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
-                        .toStringWithSymbol()
+                    .toStringWithSymbol()
             }
         }
 
@@ -173,4 +178,14 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
         val lockupDuration: Int,
         val interestRate: Double
     )
+
+    override fun dismiss() {
+        super.dismiss()
+        disposables.clear()
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        super.onCancel(dialog)
+        disposables.clear()
+    }
 }

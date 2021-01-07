@@ -36,7 +36,6 @@ import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataStore
 import piuk.blockchain.androidcore.data.erc20.datastores.Erc20DataStore
-import piuk.blockchain.androidcore.data.ethereum.EthereumAccountWrapper
 import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
@@ -107,7 +106,9 @@ val coreModule = module {
             )
         }
 
-        scoped { MoshiMetadataRepositoryAdapter(get(), get()) as MetadataRepository }
+        scoped {
+            MoshiMetadataRepositoryAdapter(get(), get())
+        }.bind(MetadataRepository::class)
 
         scoped { EthDataStore() }
 
@@ -225,8 +226,6 @@ val coreModule = module {
         else
             NullLogger
     }
-
-    factory { EthereumAccountWrapper() }
 
     single {
         AccessStateImpl(

@@ -28,8 +28,8 @@ class AllWalletsAccount(
     override val activity: Single<ActivitySummaryList>
         get() = allActivities()
 
-    override val actions: AvailableActions
-        get() = setOf(AssetAction.ViewActivity)
+    override val actions: Single<AvailableActions>
+        get() = Single.just(setOf(AssetAction.ViewActivity))
 
     override val isFunded: Boolean
         get() = true

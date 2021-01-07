@@ -133,7 +133,7 @@ interface CustodialWalletManager {
 
     fun linkToABank(fiatCurrency: String): Single<LinkBankTransfer>
 
-    fun updateAccountProviderId(linkingId: String, providerAccountId: String): Completable
+    fun updateAccountProviderId(linkingId: String, providerAccountId: String, accountId: String): Completable
 
     fun fetchSuggestedPaymentMethod(
         fiatCurrency: String,

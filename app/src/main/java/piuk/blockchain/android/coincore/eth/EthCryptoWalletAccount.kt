@@ -7,7 +7,6 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import info.blockchain.wallet.ethereum.EthereumAccount
 import io.reactivex.Single
-import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxEngine
@@ -61,7 +60,7 @@ internal class EthCryptoWalletAccount(
             .doOnSuccess {
                 hasFunds.set(it > CryptoValue.ZeroEth)
             }
-            .map { it as Money }
+            .map { it }
 
     override val actionableBalance: Single<Money>
         get() = accountBalance
@@ -89,7 +88,7 @@ internal class EthCryptoWalletAccount(
                                 latestBlock.number.toLong(),
                                 exchangeRates,
                                 account = this
-                            ) as ActivitySummaryItem
+                            )
                         }
                     }
                     .flatMap {

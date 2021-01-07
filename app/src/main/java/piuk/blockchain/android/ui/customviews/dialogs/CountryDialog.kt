@@ -13,7 +13,7 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_select_country.*
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.android.util.gone
 import timber.log.Timber
 import java.util.SortedMap
 import java.util.concurrent.TimeUnit

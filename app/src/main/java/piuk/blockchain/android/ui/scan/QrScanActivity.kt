@@ -54,8 +54,8 @@ import piuk.blockchain.android.ui.scan.camera.CameraManager
 import piuk.blockchain.android.util.windowRect
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.extensions.toast
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
+import piuk.blockchain.androidcoreui.ui.customviews.toast
+import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 import java.io.IOException
 import java.util.EnumSet
@@ -376,7 +376,7 @@ class QrScanActivity : BlockchainActivity(), SurfaceHolder.Callback {
                     SCAN_URI_RESULT
                 )
             } else {
-                fragment.context?.toast(R.string.camera_unavailable, ToastCustom.TYPE_ERROR)
+                fragment.toast(R.string.camera_unavailable, ToastCustom.TYPE_ERROR)
             }
 
         private fun doStart(activity: Activity, expect: Set<QrExpected>) =

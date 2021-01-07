@@ -101,21 +101,21 @@ internal abstract class CryptoAssetBase(
 
     private fun loadInterestAccounts(): Single<SingleAccountList> =
         custodialManager.getInterestAvailabilityForAsset(asset)
-        .map {
-            if (it) {
-                listOf(
-                    CryptoInterestAccount(
-                        asset,
-                        labels.getDefaultInterestWalletLabel(asset),
-                        custodialManager,
-                        exchangeRates,
-                        environmentConfig
+            .map {
+                if (it) {
+                    listOf(
+                        CryptoInterestAccount(
+                            asset,
+                            labels.getDefaultInterestWalletLabel(asset),
+                            custodialManager,
+                            exchangeRates,
+                            environmentConfig
+                        )
                     )
-                )
-            } else {
-                emptyList()
+                } else {
+                    emptyList()
+                }
             }
-        }
 
     override fun interestRate(): Single<Double> = custodialManager.getInterestAccountRates(asset)
 
@@ -206,8 +206,16 @@ internal abstract class CryptoAssetBase(
     private fun getNonCustodialTargets(exclude: SingleAccount? = null): Maybe<SingleAccountList> =
         getNonCustodialAccountList()
             .map { ll ->
-                ll.filter { a -> a !== exclude && a.actions.contains(AssetAction.Receive) }
-            }.toMaybe()
+                ll.filter { a -> a !== exclude }
+            }.flattenAsObservable {
+                it
+            }.flatMapMaybe { account ->
+                account.actions.flatMapMaybe {
+                    if (it.contains(AssetAction.Receive)) {
+                        Maybe.just(account)
+                    } else Maybe.empty()
+                }
+            }.toList().toMaybe()
 
     final override fun transactionTargets(account: SingleAccount): Single<SingleAccountList> {
         require(account is CryptoAccount)
@@ -248,7 +256,9 @@ internal class ActiveAccountList(
     private var interestEnabled = false
     private val forceRefreshOnNext = AtomicBoolean(true)
 
-    fun setForceRefresh() { forceRefreshOnNext.set(true) }
+    fun setForceRefresh() {
+        forceRefreshOnNext.set(true)
+    }
 
     fun fetchAccountList(
         loader: () -> Single<SingleAccountList>

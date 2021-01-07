@@ -8,7 +8,7 @@ interface KycTierSplashView : piuk.blockchain.androidcoreui.ui.base.View {
 
     fun navigateTo(directions: NavDirections, tier: Int)
 
-    fun showErrorToast(@StringRes message: Int)
+    fun showError(@StringRes message: Int)
 
     fun renderTiersList(tiers: KycTiers)
 }

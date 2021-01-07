@@ -10,8 +10,8 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.androidcoreui.utils.extensions.context
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.util.context
+import piuk.blockchain.android.util.inflate
 import java.util.concurrent.TimeUnit
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 

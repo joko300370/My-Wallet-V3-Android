@@ -7,7 +7,7 @@ import kotlinx.android.parcel.Parcelize
 import kotlinx.android.synthetic.main.dialog_sheet_wallet_mercury_linking.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.customviews.ErrorBottomDialog
-import piuk.blockchain.androidcoreui.utils.extensions.goneIf
+import piuk.blockchain.android.util.goneIf
 
 class PitStateBottomDialog : ErrorBottomDialog() {
     @Parcelize

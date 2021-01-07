@@ -36,8 +36,8 @@ internal class AlgoCryptoWalletAccount(
     override val isFunded: Boolean
         get() = false
 
-    override val actions: AvailableActions
-        get() = setOf(AssetAction.ViewActivity)
+    override val actions: Single<AvailableActions>
+        get() = Single.just(setOf(AssetAction.ViewActivity))
 
     override fun createTxEngine(): TxEngine {
         TODO("Not yet implemented")

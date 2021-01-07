@@ -64,6 +64,7 @@ import piuk.blockchain.android.cards.RemoveCardBottomSheet
 import piuk.blockchain.android.simplebuy.RemovePaymentMethodBottomSheetHost
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import piuk.blockchain.android.simplebuy.linkBankEventWithCurrency
+import piuk.blockchain.android.simplebuy.yodlee.YodleeLinkingFlowNavigator
 import piuk.blockchain.android.simplebuy.yodlee.YodleeSplashFragment
 import piuk.blockchain.android.ui.auth.KEY_VALIDATING_PIN_FOR_RESULT
 import piuk.blockchain.android.ui.auth.PinEntryActivity
@@ -87,9 +88,9 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.AndroidUtils
-import piuk.blockchain.androidcoreui.utils.ViewUtils
-import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
+import piuk.blockchain.android.util.AndroidUtils
+import piuk.blockchain.android.util.ViewUtils
+import piuk.blockchain.android.util.AfterTextChangedWatcher
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.util.Locale
@@ -351,7 +352,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
     private fun goToPlayStore() {
         val flags = Intent.FLAG_ACTIVITY_NO_HISTORY or
-                Intent.FLAG_ACTIVITY_MULTIPLE_TASK or Intent.FLAG_ACTIVITY_NEW_DOCUMENT
+            Intent.FLAG_ACTIVITY_MULTIPLE_TASK or Intent.FLAG_ACTIVITY_NEW_DOCUMENT
         try {
             val appPackageName = requireActivity().packageName
             Intent(
@@ -469,27 +470,27 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         thePit?.setValue(isLinked)
     }
 
-/*    override fun updateBanks(linkedAndSupportedCurrencies: LinkedBanksAndSupportedCurrencies) {
-        val existingBanks = prefsExistingBanks()
+    /*    override fun updateBanks(linkedAndSupportedCurrencies: LinkedBanksAndSupportedCurrencies) {
+            val existingBanks = prefsExistingBanks()
 
-        val newBanks = linkedAndSupportedCurrencies.beneficiaries.filterNot { existingBanks.contains(it.id) }
+            val newBanks = linkedAndSupportedCurrencies.beneficiaries.filterNot { existingBanks.contains(it.id) }
 
-        newBanks.forEach { bank ->
-            banksPref?.addPreference(
-                BankPreference(context = requireContext(), bank = bank, fiatCurrency = bank.currency).apply {
-                    onClick {
-                        removeBank(bank)
+            newBanks.forEach { bank ->
+                banksPref?.addPreference(
+                    BankPreference(context = requireContext(), bank = bank, fiatCurrency = bank.currency).apply {
+                        onClick {
+                            removeBank(bank)
+                        }
+                        key = bank.id
                     }
-                    key = bank.id
-                }
-            )
-        }
+                )
+            }
 
-        addOrUpdateLinkBankForCurrencies(
-            linkedAndSupportedCurrencies.beneficiaries.size + 1,
-            linkedAndSupportedCurrencies.supportedCurrencies.filterNot { it == "USD" }
-        )
-    }*/
+            addOrUpdateLinkBankForCurrencies(
+                linkedAndSupportedCurrencies.beneficiaries.size + 1,
+                linkedAndSupportedCurrencies.supportedCurrencies.filterNot { it == "USD" }
+            )
+        }*/
 
     override fun updateLinkableBanks(linkableBanks: Set<LinkableBank>, linkedBanksCount: Int) {
         if (linkableBanks.isEmpty()) {
@@ -526,25 +527,25 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             )
         }
     }
-/*
-    private fun addOrUpdateLinkBankForCurrencies(firstIndex: Int, currencies: List<String>) {
-        if (currencies.isEmpty()) {
-            banksPref?.isVisible = false
-        } else {
-            currencies.forEach { currency ->
-                banksPref?.findPreference<BankPreference>(LINK_BANK_KEY.plus(currency))?.let {
-                    it.order = it.order + firstIndex + currencies.indexOf(currency)
-                } ?: banksPref?.addPreference(
-                    BankPreference(context = requireContext(), fiatCurrency = currency).apply {
-                        onClick {
-                            linkBankWithCurrency(currency)
+    /*
+        private fun addOrUpdateLinkBankForCurrencies(firstIndex: Int, currencies: List<String>) {
+            if (currencies.isEmpty()) {
+                banksPref?.isVisible = false
+            } else {
+                currencies.forEach { currency ->
+                    banksPref?.findPreference<BankPreference>(LINK_BANK_KEY.plus(currency))?.let {
+                        it.order = it.order + firstIndex + currencies.indexOf(currency)
+                    } ?: banksPref?.addPreference(
+                        BankPreference(context = requireContext(), fiatCurrency = currency).apply {
+                            onClick {
+                                linkBankWithCurrency(currency)
+                            }
+                            key = LINK_BANK_KEY.plus(currency)
                         }
-                        key = LINK_BANK_KEY.plus(currency)
-                    }
-                )
+                    )
+                }
             }
-        }
-    }*/
+        }*/
 
     private fun removeBank(bank: Bank) {
         //   RemoveLinkedBankBottomSheet.newInstance(bank).show(childFragmentManager, BOTTOM_SHEET)
@@ -573,7 +574,6 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     private fun showDialogForLinkBankMethodChooser(linkableBank: LinkableBank) {
-        
     }
 
     override fun updateCards(cards: List<PaymentMethod.Card>) {
@@ -629,7 +629,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
         for (i in (0 until (banksPref?.preferenceCount ?: 0))) {
             existingBanks.add(banksPref?.getPreference(i)?.key.takeIf { it?.contains(LINK_BANK_KEY)?.not() ?: false }
-                ?: continue)
+                              ?: continue)
         }
         return existingBanks
     }
@@ -868,7 +868,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         val dialog = AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
             .setTitle(R.string.verify_mobile)
             .setMessage(R.string.verify_sms_summary)
-            .setView(ViewUtils.getAlertDialogPaddedView(activity, editText))
+            .setView(ViewUtils.getAlertDialogPaddedView(requireContext(), editText))
             .setCancelable(false)
             .setPositiveButton(R.string.verify, null)
             .setNegativeButton(android.R.string.cancel, null)
@@ -1187,11 +1187,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     private fun launchYodleeSplash(fastlinkUrl: String, accessToken: String, configName: String) {
-        fragmentManager?.let {
-            it.beginTransaction()
-                .replace(R.id.content_frame, YodleeSplashFragment.newInstance(fastlinkUrl, accessToken, configName))
-                .addToBackStack(YodleeSplashFragment::class.simpleName).commitAllowingStateLoss()
-        }
+        (activity as? YodleeLinkingFlowNavigator)?.launchYodleeSplash(
+            fastLinkUrl = fastlinkUrl,
+            accessToken = accessToken,
+            configName = configName
+        )
     }
 }
 
@@ -1217,8 +1217,3 @@ enum class ReviewAnalytics : AnalyticsEvent {
     override val params: Map<String, String>
         get() = emptyMap()
 }
-
-data class LinkedBanksAndSupportedCurrencies(
-    val beneficiaries: List<Beneficiary>,
-    val supportedCurrencies: List<String>
-)

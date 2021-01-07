@@ -16,6 +16,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.InterestAccount
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.impl.CryptoAccountCustodialGroup
@@ -123,12 +124,21 @@ class AssetDetailsFlow(
     ): Single<List<BlockchainAccount>> =
         coincore[cryptoCurrency].accountGroup(AssetFilter.NonCustodial)
             .map { it.accounts }.toSingle(emptyList())
-            .map {
-                it.filter { a ->
-                    (action == AssetAction.Receive || a.isFunded) && (a.actions.contains(action)) ||
-                            action == AssetAction.Deposit
+            .flattenAsObservable { it }
+            .flatMapSingle { account ->
+                account.actions.map { actions ->
+                    if (
+                        (action == AssetAction.Receive || account.isFunded) &&
+                        (actions.contains(action)) ||
+                        action == AssetAction.Deposit
+                    ) {
+                        account
+                    } else NullCryptoAccount()
                 }
             }
+            .filter { it !is NullCryptoAccount }
+            .map { it as BlockchainAccount }
+            .toList()
 
     private fun handleHostAction(
         newState: AssetDetailsState,

@@ -25,9 +25,9 @@ import org.junit.Test
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.coinswebsocket.service.MessagesSocketHandler
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
+import piuk.blockchain.android.util.AssetResourceFactory
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
-import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -58,6 +58,7 @@ class CoinsWebSocketStrategyTest {
         on { getErc20TokenData(CryptoCurrency.USDT) } `it returns` Erc20TokenData.createUsdtTokenData("")
         on { fetchEthAddress() } `it returns` Observable.just(CombinedEthModel(EthAddressResponseMap()))
         on { getEthWalletAddress() } `it returns` "0x4058a004dd718babab47e14dd0d744742e5b9903"
+        on { refreshErc20Model(any()) } `it returns` Completable.complete()
     }
 
     private val stringUtils: StringUtils = mock {
@@ -67,18 +68,8 @@ class CoinsWebSocketStrategyTest {
         on { getString(R.string.received_usdt) } `it returns` "Received Tether"
         on { getString(R.string.received_dgld) } `it returns` "Received Wrapped-DGLD"
         on { getString(R.string.common_from) } `it returns` "From"
-    }
-
-    private val paxAccount: Erc20Account = mock {
-        on { fetchAddressCompletable() } `it returns` Completable.complete()
-    }
-
-    private val usdtAccount: Erc20Account = mock {
-        on { fetchAddressCompletable() } `it returns` Completable.complete()
-    }
-
-    private val dgldAccount: Erc20Account = mock {
-        on { fetchAddressCompletable() } `it returns` Completable.complete()
+        on { getString(R.string.received_erc20_marquee) } itReturns "Received %1\$s %2\$s"
+        on { getString(R.string.received_erc20_text) } itReturns "Received %1\$s %2\$s from %3\$s"
     }
 
     private val rxBus: RxBus = mock()
@@ -109,6 +100,11 @@ class CoinsWebSocketStrategyTest {
         on { getValue(PersistentPrefs.KEY_WALLET_GUID, "") } `it returns` "1234"
     }
 
+    private val assetResources: AssetResourceFactory = mock() {
+        on { assetName(CryptoCurrency.USDT) } itReturns "Tether"
+        on { assetName(CryptoCurrency.PAX) } itReturns "USD Digital"
+    }
+
     private val mockWebSocket: WebSocket<String, String> = mock()
     private val webSocket = FakeWebSocket(mockWebSocket)
 
@@ -117,15 +113,13 @@ class CoinsWebSocketStrategyTest {
         ethDataManager = ethDataManager,
         stringUtils = stringUtils,
         gson = Gson(),
-        paxAccount = paxAccount,
-        usdtAccount = usdtAccount,
-        dgldAccount = dgldAccount,
         bchDataManager = bchDataManager,
         payloadDataManager = payloadDataManager,
         accessState = mock(),
         appUtil = mock(),
         prefs = prefs,
-        rxBus = rxBus
+        rxBus = rxBus,
+        assetResources = assetResources
     )
 
     @Before
@@ -158,8 +152,7 @@ class CoinsWebSocketStrategyTest {
 
         verify(mockWebSocket).open()
         verify(ethDataManager).fetchEthAddress()
-        verify(paxAccount, never()).fetchAddressCompletable()
-        verify(usdtAccount, never()).fetchAddressCompletable()
+        verify(ethDataManager, never()).refreshErc20Model(any())
         verify(messagesSocketHandler).sendBroadcast(any())
     }
 
@@ -169,7 +162,7 @@ class CoinsWebSocketStrategyTest {
 
         verify(mockWebSocket).open()
         verify(ethDataManager, never()).fetchEthAddress()
-        verify(paxAccount).fetchAddressCompletable()
+        verify(ethDataManager).refreshErc20Model(CryptoCurrency.PAX)
         verify(messagesSocketHandler).triggerNotification("Blockchain",
             "Received USD Digital 1.21 USD-D",
             "Received USD Digital 1.21 USD-D from 0x4058a004dd718babab47e14dd0d744742e5b9903")
@@ -182,7 +175,7 @@ class CoinsWebSocketStrategyTest {
 
         verify(mockWebSocket).open()
         verify(ethDataManager, never()).fetchEthAddress()
-        verify(usdtAccount).fetchAddressCompletable()
+        verify(ethDataManager).refreshErc20Model(CryptoCurrency.USDT)
         verify(messagesSocketHandler).triggerNotification("Blockchain",
             "Received Tether 1.21 USDT",
             "Received Tether 1.21 USDT from 0x4058a004dd718babab47e14dd0d744742e5b9903")

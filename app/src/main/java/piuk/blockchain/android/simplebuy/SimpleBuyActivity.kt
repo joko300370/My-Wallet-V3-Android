@@ -20,16 +20,17 @@ import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.cards.CardDetailsActivity
+import piuk.blockchain.android.simplebuy.yodlee.LinkBankFragment
 import piuk.blockchain.android.simplebuy.yodlee.YodleeSplashFragment
 import piuk.blockchain.android.simplebuy.yodlee.YodleeWebViewFragment
 import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
+import piuk.blockchain.android.util.ViewUtils
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.utils.ViewUtils
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
     override val alwaysDisableScreenshots: Boolean
@@ -236,7 +237,7 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
         progress.gone()
     }
 
-    private fun launchYodleeSplash(fastLinkUrl: String, accessToken: String, configName: String) {
+    override fun launchYodleeSplash(fastLinkUrl: String, accessToken: String, configName: String) {
         ViewUtils.hideKeyboard(this)
         supportFragmentManager.beginTransaction()
             .replace(R.id.content_frame, YodleeSplashFragment.newInstance(fastLinkUrl, accessToken, configName))
@@ -251,9 +252,10 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
             .commitAllowingStateLoss()
     }
 
-    override fun launchBankLinking(accountProviderId: String) {
+    override fun launchBankLinking(accountProviderId: String, accountId: String) {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.content_frame, LinkBankFragment.newInstance(accountProviderId))
+            .replace(R.id.content_frame,
+                LinkBankFragment.newInstance(accountProviderId = accountProviderId, accountId = accountId))
             .addToBackStack(LinkBankFragment::class.simpleName)
             .commitAllowingStateLoss()
     }
@@ -263,6 +265,18 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
             .replace(R.id.content_frame, LinkBankFragment.newInstance(errorState))
             .addToBackStack(LinkBankFragment::class.simpleName)
             .commitAllowingStateLoss()
+    }
+
+    override fun bankLinkingCancelled() {
+        exitSimpleBuyFlow()
+    }
+
+    override fun bankLinkingFinished() {
+        goToCheckOutScreen(false)
+    }
+
+    override fun retry() {
+        pop()
     }
 
     companion object {
@@ -279,9 +293,9 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
             launchFromNavigationBar: Boolean = false,
             launchKycResume: Boolean = false
         ) = Intent(context, SimpleBuyActivity::class.java).apply {
-                putExtra(STARTED_FROM_NAVIGATION_KEY, launchFromNavigationBar)
-                putExtra(CRYPTOCURRENCY_KEY, cryptoCurrency)
-                putExtra(STARTED_FROM_KYC_RESUME, launchKycResume)
-            }
+            putExtra(STARTED_FROM_NAVIGATION_KEY, launchFromNavigationBar)
+            putExtra(CRYPTOCURRENCY_KEY, cryptoCurrency)
+            putExtra(STARTED_FROM_KYC_RESUME, launchKycResume)
+        }
     }
 }

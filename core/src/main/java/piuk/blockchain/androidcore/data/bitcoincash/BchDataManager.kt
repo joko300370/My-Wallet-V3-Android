@@ -43,7 +43,7 @@ class BchDataManager(
     /**
      * Clears the currently stored BCH wallet from memory.
      */
-    fun clearBchAccountDetails() {
+    fun clearAccountDetails() {
         bchDataStore.clearData()
     }
 

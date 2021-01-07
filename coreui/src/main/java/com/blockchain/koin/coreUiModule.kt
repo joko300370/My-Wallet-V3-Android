@@ -28,7 +28,7 @@ val coreUiModule = module {
         .bind(RemoteConfig::class)
         .bind(ABTestExperiment::class)
 
-    factory { InjectableLogging(get()) as EventLogger }
+    factory { InjectableLogging(get()) }.bind(EventLogger::class)
 
     single {
         CrashLoggerImpl(BuildConfig.DEBUG)

@@ -227,3 +227,10 @@ internal class ResourceDefaultLabels(
     override fun getDefaultCustodialFiatWalletLabel(fiatCurrency: String): String =
         resources.getString(R.string.currency_wallet, fiatCurrency)
 }
+
+class AssetResourceFactory(
+    private val resources: Resources
+) {
+    fun assetName(asset: CryptoCurrency): String =
+        resources.getString(asset.assetName())
+}

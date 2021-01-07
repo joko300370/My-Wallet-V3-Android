@@ -34,7 +34,8 @@ internal class FiatCustodialAccount(
 
     override val accountBalance: Single<Money>
         get() = assetBalancesRepository.getTotalBalanceForAsset(fiatCurrency)
-            .toSingle(FiatValue.zero(fiatCurrency)).map {
+            .toSingle(FiatValue.zero(fiatCurrency))
+            .map {
                 it as Money
             }.doOnSuccess {
                 hasFunds.set(it.isPositive)
@@ -42,7 +43,8 @@ internal class FiatCustodialAccount(
 
     override val actionableBalance: Single<Money>
         get() = assetBalancesRepository.getActionableBalanceForAsset(fiatCurrency)
-            .toSingle(FiatValue.zero(fiatCurrency)).map {
+            .toSingle(FiatValue.zero(fiatCurrency))
+            .map {
                 it as Money
             }.doOnSuccess {
                 hasFunds.set(it.isPositive)
@@ -59,27 +61,34 @@ internal class FiatCustodialAccount(
         private set
 
     override val activity: Single<ActivitySummaryList>
-        get() = custodialWalletManager.getTransactions(fiatCurrency).doOnSuccess {
-            setHasTransactions(it.isEmpty().not())
-        }.map {
-            it.map { fiatTransaction ->
-                FiatActivitySummaryItem(
-                    currency = fiatCurrency,
-                    exchangeRates = exchangesRatesDataManager,
-                    txId = fiatTransaction.id,
-                    timeStampMs = fiatTransaction.date.time,
-                    value = fiatTransaction.amount,
-                    account = this,
-                    state = fiatTransaction.state,
-                    type = fiatTransaction.type
-                )
+        get() = custodialWalletManager.getTransactions(fiatCurrency)
+            .doOnSuccess {
+                setHasTransactions(it.isEmpty().not())
+            }.map {
+                it.map { fiatTransaction ->
+                    FiatActivitySummaryItem(
+                        currency = fiatCurrency,
+                        exchangeRates = exchangesRatesDataManager,
+                        txId = fiatTransaction.id,
+                        timeStampMs = fiatTransaction.date.time,
+                        value = fiatTransaction.amount,
+                        account = this,
+                        state = fiatTransaction.state,
+                        type = fiatTransaction.type
+                    )
+                }
             }
-        }
 
-    override val actions: AvailableActions =
-        if (fiatCurrency != "USD") setOf(AssetAction.ViewActivity, AssetAction.Deposit, AssetAction.Withdraw)
+    override val actions: Single<AvailableActions> =
+        if (fiatCurrency != "USD") Single.just(
+            setOf(
+                AssetAction.ViewActivity,
+                AssetAction.Deposit,
+                AssetAction.Withdraw
+            )
+        )
         else
-            setOf(AssetAction.ViewActivity)
+            Single.just(setOf(AssetAction.ViewActivity))
 
     override val isFunded: Boolean
         get() = hasFunds.get()
@@ -128,11 +137,15 @@ class FiatAccountGroup(
         }
 
     // The intersection of the actions for each account
-    override val actions: AvailableActions
+    override val actions: Single<AvailableActions>
         get() = if (accounts.isEmpty()) {
-            emptySet()
+            Single.just(emptySet())
         } else {
-            accounts.map { it.actions }.reduce { a, b -> a.intersect(b) }
+            Single.zip(
+                accounts.map { it.actions }
+            ) { t: Array<Any> ->
+                t.filterIsInstance<AvailableActions>().flatten().toSet()
+            }
         }
 
     // if _any_ of the accounts have transactions

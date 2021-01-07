@@ -13,7 +13,6 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.NetworkParameters
-import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
@@ -73,7 +72,7 @@ internal class BtcCryptoWalletAccount(
             .doOnSuccess {
                 hasFunds.set(it > CryptoValue.ZeroBtc)
             }
-            .map { it as Money }
+            .map { it }
 
     override val actionableBalance: Single<Money>
         get() = accountBalance
@@ -102,7 +101,7 @@ internal class BtcCryptoWalletAccount(
                     payloadDataManager,
                     exchangeRates,
                     this
-                ) as ActivitySummaryItem
+                )
             }
             .flatMap {
                 appendTradeActivity(custodialWalletManager, asset, it)
@@ -121,13 +120,11 @@ internal class BtcCryptoWalletAccount(
             walletPreferences = walletPreferences
         )
 
-    override val actions: AvailableActions
-        get() = super.actions.run {
+    override val actions: Single<AvailableActions>
+        get() = super.actions.map {
             if (!isHDAccount) {
-                toMutableSet().apply { remove(AssetAction.Receive) }.toSet()
-            } else {
-                this
-            }
+                it.toMutableSet().apply { remove(AssetAction.Receive) }.toSet()
+            } else it
         }
 
     override fun updateLabel(newLabel: String): Completable {
@@ -208,7 +205,7 @@ internal class BtcCryptoWalletAccount(
                         legacyAddress = internalAccount as LegacyAddress,
                         secondPassword = password
                     ) ?: throw IllegalStateException("Private key not found for legacy BTC address"))
-                )
+            )
         }
     }
 

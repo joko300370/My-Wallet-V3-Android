@@ -236,6 +236,10 @@
     <string name="next">Next</string>
     <string name="received_ethereum">Received Ether</string>
 
+    <!-- "Received {ETHER} {10.2 ETH}" -->
+    <string name="received_erc20_marquee">Received %1$s %2$s</string>
+    <!-- "Received {ETHER} {2.89 ETH} from {an address}" -->
+    <string name="received_erc20_text">Received %1$s %2$s from %3$s</string>
     <string name="received_usd_pax_1">Received USD Digital</string>
     <string name="received_usdt">Received Tether</string>
     <string name="received_dgld">Received Wrapped-DGLD</string>
@@ -1808,4 +1812,16 @@
     <string name="instantly_available">Instantly Available</string>
     <string name="dotted_suffixed_string" translatable="false">•••• %1s</string>
     <string name="failed_to_link_bank">Bank Link Failed</string>
+
+    <!-- lockbox -->
+    <string name="lockbox_title">Lockbox</string>
+    <string name="lockbox_landing_get_yours_title">Get Your Lockbox</string>
+    <string name="lockbox_landing_get_yours_message">Safely store your cryptocurrency offline.</string>
+    <string name="lockbox_landing_get_yours_button">Buy now</string>
+    <string name="lockbox_landing_already_owned_title">Already own one?</string>
+    <string name="lockbox_landing_already_owned_message">From your computer, log into blockchain.com and connect your lockbox.</string>
+    <string name="lockbox_landing_learn_more">Want to learn more? Tap here to visit\n%1$s</string>
+    <string name="lockbox_landing_coming_soon_title">Balances Coming Soon</string>
+    <string name="lockbox_landing_coming_soon_message">We are unable to display your Lockbox balance at this time. Don\'t worry, your funds are safe. We\'ll be adding this feature soon. While you wait, you can check your balance on the web.</string>
+    <string name="lockbox_landing_coming_soon_button">Check my balance</string>
 </resources>

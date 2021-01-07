@@ -10,9 +10,10 @@ import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapper
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.util.inflate
 
-class ConfirmInfoItemDelegate<in T>(private val mapper: TxConfirmReadOnlyMapper) : AdapterDelegate<T> {
+class ConfirmInfoItemDelegate<in T>(private val mapper: TxConfirmReadOnlyMapper) :
+    AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
         return (items[position] as? TxConfirmationValue)?.confirmation == TxConfirmation.READ_ONLY
     }

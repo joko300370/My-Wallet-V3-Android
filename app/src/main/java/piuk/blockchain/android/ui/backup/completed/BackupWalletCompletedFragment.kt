@@ -11,9 +11,9 @@ import kotlinx.android.synthetic.main.fragment_backup_complete.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.backup.start.BackupWalletStartingFragment
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.setOnClickListenerDebounced
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.setOnClickListenerDebounced
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

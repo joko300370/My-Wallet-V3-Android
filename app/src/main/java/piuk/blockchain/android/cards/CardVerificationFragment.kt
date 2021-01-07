@@ -11,7 +11,7 @@ import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import kotlinx.android.synthetic.main.fragment_card_verification.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.mvi.MviFragment
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.util.inflate
 
 class CardVerificationFragment : MviFragment<CardModel, CardIntent, CardState>(), AddCardFlowFragment {
     override fun onCreateView(

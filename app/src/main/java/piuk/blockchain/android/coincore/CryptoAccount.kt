@@ -19,7 +19,7 @@ interface BlockchainAccount {
 
     val activity: Single<ActivitySummaryList>
 
-    val actions: AvailableActions
+    val actions: Single<AvailableActions>
 
     val isFunded: Boolean
 
@@ -124,7 +124,7 @@ class NullCryptoAccount(
     override val activity: Single<ActivitySummaryList>
         get() = Single.just(emptyList())
 
-    override val actions: AvailableActions = emptySet()
+    override val actions: Single<AvailableActions> = Single.just(emptySet())
 
     override val isFunded: Boolean = false
     override val hasTransactions: Boolean = false
@@ -170,7 +170,7 @@ object NullFiatAccount : FiatAccount {
     override val activity: Single<ActivitySummaryList>
         get() = Single.just(emptyList())
 
-    override val actions: AvailableActions = emptySet()
+    override val actions: Single<AvailableActions> = Single.just(emptySet())
     override val isFunded: Boolean = false
     override val hasTransactions: Boolean = false
 

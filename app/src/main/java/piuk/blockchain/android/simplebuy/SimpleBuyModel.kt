@@ -126,16 +126,18 @@ class SimpleBuyModel(
 
             is SimpleBuyIntent.UpdateAccountProvider -> {
                 interactor.updateAccountProviderId(
-                    previousState.selectedPaymentMethod?.id ?: throw IllegalStateException(
-                        "Missing required payment method ID"), intent.accountProviderId)
-                    .subscribeBy(
-                        onComplete = {
-                            process(SimpleBuyIntent.StartPollingForLinkStatus)
-                        },
-                        onError = {
-                            process(SimpleBuyIntent.ProviderAccountIdUpdateError)
-                        }
-                    )
+                    linkingId = previousState.selectedPaymentMethod?.id ?: throw IllegalStateException(
+                        "Missing required payment method ID"),
+                    providerAccountId = intent.accountProviderId,
+                    accountId = intent.accountId
+                ).subscribeBy(
+                    onComplete = {
+                        process(SimpleBuyIntent.StartPollingForLinkStatus)
+                    },
+                    onError = {
+                        process(SimpleBuyIntent.ProviderAccountIdUpdateError)
+                    }
+                )
             }
 
             is SimpleBuyIntent.StartPollingForLinkStatus -> {

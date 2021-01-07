@@ -15,10 +15,10 @@ import kotlinx.android.synthetic.main.enter_fiat_crypto_layout.view.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcoreui.utils.DecimalDigitsInputFilter
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visible
-import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
+import piuk.blockchain.android.ui.customviews.inputview.DecimalDigitsInputFilter
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.AfterTextChangedWatcher
 import java.text.DecimalFormatSymbols
 import java.util.Currency
 import java.util.Locale
