@@ -21,8 +21,6 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
-import piuk.blockchain.android.simplebuy.SimpleBuyNavigator
-import piuk.blockchain.android.simplebuy.SimpleBuyScreen
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
@@ -30,7 +28,7 @@ import timber.log.Timber
 import java.net.URLEncoder
 
 class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLinkInterfaceHandler.FastLinkListener,
-    YodleeWebClient.YodleeWebClientInterface, SimpleBuyScreen {
+    YodleeWebClient.YodleeWebClientInterface {
 
     private val analytics: Analytics by inject()
 
@@ -117,7 +115,7 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
                     yodlee_status_label.gone()
                     yodlee_subtitle.gone()
                     yodlee_retry.gone()
-                    navigator().pop()
+                    navigator().retry()
                 }
                 FastLinkInterfaceHandler.FastLinkFlowError.JSON_PARSING -> {
                     analytics.logEvent(SimpleBuyAnalytics.ACH_ERROR)
@@ -149,11 +147,9 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
         yodlee_loading_group.gone()
     }
 
-    override fun navigator(): SimpleBuyNavigator =
-        (activity as? SimpleBuyNavigator)
-            ?: throw IllegalStateException("Parent must implement SimpleBuyNavigator")
-
-    override fun onBackPressed(): Boolean = true
+    private fun navigator(): YodleeLinkingFlowNavigator =
+        (activity as? YodleeLinkingFlowNavigator)
+            ?: throw IllegalStateException("Parent must implement YodleeLinkingFlowNavigator")
 
     companion object {
         private const val FAST_LINK_URL: String = "FAST_LINK_URL"

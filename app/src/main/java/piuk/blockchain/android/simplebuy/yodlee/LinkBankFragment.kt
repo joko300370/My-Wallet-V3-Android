@@ -1,4 +1,4 @@
-package piuk.blockchain.android.simplebuy
+package piuk.blockchain.android.simplebuy.yodlee
 
 import android.net.Uri
 import android.os.Bundle
@@ -11,15 +11,33 @@ import com.blockchain.ui.urllinks.URL_YODLEE_SUPPORT_LEARN_MORE
 import kotlinx.android.synthetic.main.fragment_link_a_bank.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.simplebuy.BankPartnerTypes
+import piuk.blockchain.android.simplebuy.ErrorState
+import piuk.blockchain.android.simplebuy.SimpleBuyIntent
+import piuk.blockchain.android.simplebuy.SimpleBuyModel
+import piuk.blockchain.android.simplebuy.SimpleBuyState
+import piuk.blockchain.android.simplebuy.accountMismatchError
+import piuk.blockchain.android.simplebuy.accountMismatchErrorCtaCancel
+import piuk.blockchain.android.simplebuy.accountMismatchErrorCtaRetry
+import piuk.blockchain.android.simplebuy.bankLinkingAlreadyCtaCancel
+import piuk.blockchain.android.simplebuy.bankLinkingAlreadyCtaRetry
+import piuk.blockchain.android.simplebuy.bankLinkingAlreadyLinked
+import piuk.blockchain.android.simplebuy.bankLinkingGenericError
+import piuk.blockchain.android.simplebuy.bankLinkingGenericErrorCtaCancel
+import piuk.blockchain.android.simplebuy.bankLinkingGenericErrorCtaRetry
+import piuk.blockchain.android.simplebuy.bankLinkingIncorrectAccount
+import piuk.blockchain.android.simplebuy.bankLinkingIncorrectCtaCancel
+import piuk.blockchain.android.simplebuy.bankLinkingIncorrectCtaRetry
+import piuk.blockchain.android.simplebuy.bankLinkingSuccess
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.visible
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 
-class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(), SimpleBuyScreen {
+class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>() {
 
     override val model: SimpleBuyModel by scopedInject()
     private val stringUtils: StringUtils by inject()
@@ -80,21 +98,24 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
             }
             ErrorState.LinkedBankAlreadyLinked -> {
                 analytics.logEvent(
-                    bankLinkingAlreadyLinked(BankPartnerTypes.ACH.name))
+                    bankLinkingAlreadyLinked(BankPartnerTypes.ACH.name)
+                )
                 link_bank_btn.text = getString(R.string.yodlee_linking_try_different_account)
                 link_bank_title.text = getString(R.string.yodlee_linking_generic_error_title)
                 link_bank_subtitle.text = getString(R.string.yodlee_linking_already_linked_error_subtitle)
             }
             ErrorState.LinkedBankAccountUnsupported -> {
                 analytics.logEvent(
-                    bankLinkingIncorrectAccount(BankPartnerTypes.ACH.name))
+                    bankLinkingIncorrectAccount(BankPartnerTypes.ACH.name)
+                )
                 link_bank_btn.text = getString(R.string.yodlee_linking_try_different_bank)
                 link_bank_title.text = getString(R.string.yodlee_linking_checking_error_title)
                 link_bank_subtitle.text = getString(R.string.yodlee_linking_checking_error_subtitle)
             }
             ErrorState.LinkedBankNamesMismatched -> {
                 analytics.logEvent(
-                    accountMismatchError(BankPartnerTypes.ACH.name))
+                    accountMismatchError(BankPartnerTypes.ACH.name)
+                )
 
                 link_bank_btn.text = getString(R.string.yodlee_linking_try_different_bank)
                 link_bank_title.text = getString(R.string.yodlee_linking_is_this_your_bank)
@@ -133,23 +154,26 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
         link_bank_btn.visible()
         link_bank_btn.setOnClickListener {
             logRetryAnalytics(state)
-            navigator().pop()
+            navigator().retry()
         }
         link_bank_cancel.visible()
         link_bank_cancel.setOnClickListener {
             logCancelAnalytics(state)
-            navigator().exitSimpleBuyFlow()
+            navigator().bankLinkingCancelled()
         }
     }
 
     private fun logRetryAnalytics(state: ErrorState) {
         when (state) {
             ErrorState.LinkedBankAlreadyLinked -> analytics.logEvent(
-                bankLinkingAlreadyCtaRetry(BankPartnerTypes.ACH.name))
+                bankLinkingAlreadyCtaRetry(BankPartnerTypes.ACH.name)
+            )
             ErrorState.LinkedBankAccountUnsupported -> analytics.logEvent(
-                bankLinkingIncorrectCtaRetry(BankPartnerTypes.ACH.name))
+                bankLinkingIncorrectCtaRetry(BankPartnerTypes.ACH.name)
+            )
             ErrorState.LinkedBankNamesMismatched -> analytics.logEvent(
-                accountMismatchErrorCtaRetry(BankPartnerTypes.ACH.name))
+                accountMismatchErrorCtaRetry(BankPartnerTypes.ACH.name)
+            )
             else -> analytics.logEvent(bankLinkingGenericErrorCtaRetry(BankPartnerTypes.ACH.name))
         }
     }
@@ -157,11 +181,14 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
     private fun logCancelAnalytics(state: ErrorState) {
         when (state) {
             ErrorState.LinkedBankAlreadyLinked -> analytics.logEvent(
-                bankLinkingAlreadyCtaCancel(BankPartnerTypes.ACH.name))
+                bankLinkingAlreadyCtaCancel(BankPartnerTypes.ACH.name)
+            )
             ErrorState.LinkedBankAccountUnsupported -> analytics.logEvent(
-                bankLinkingIncorrectCtaCancel(BankPartnerTypes.ACH.name))
+                bankLinkingIncorrectCtaCancel(BankPartnerTypes.ACH.name)
+            )
             ErrorState.LinkedBankNamesMismatched -> analytics.logEvent(
-                accountMismatchErrorCtaCancel(BankPartnerTypes.ACH.name))
+                accountMismatchErrorCtaCancel(BankPartnerTypes.ACH.name)
+            )
             else -> analytics.logEvent(bankLinkingGenericErrorCtaCancel(BankPartnerTypes.ACH.name))
         }
     }
@@ -184,17 +211,15 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
         link_bank_state_indicator.visible()
         link_bank_btn.visible()
         link_bank_btn.setOnClickListener {
-            navigator().goToCheckOutScreen(false)
+            navigator().bankLinkingFinished()
         }
         link_bank_title.text = getString(R.string.yodlee_linking_success_title)
         link_bank_subtitle.text = getString(R.string.yodlee_linking_success_subtitle, label)
     }
 
-    override fun navigator(): SimpleBuyNavigator =
-        (activity as? SimpleBuyNavigator)
-            ?: throw IllegalStateException("Parent must implement SimpleBuyNavigator")
-
-    override fun onBackPressed(): Boolean = true
+    private fun navigator(): YodleeLinkingFlowNavigator =
+        (activity as? YodleeLinkingFlowNavigator)
+            ?: throw IllegalStateException("Parent must implement YodleeLinkingFlowNavigator")
 
     companion object {
         private const val ACCOUNT_PROVIDER_ID = "ACCOUNT_PROVIDER_ID"
