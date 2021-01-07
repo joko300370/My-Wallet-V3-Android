@@ -30,7 +30,7 @@ import timber.log.Timber
 import java.net.URLEncoder
 
 class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLinkInterfaceHandler.FastLinkListener,
-    YodleeWebClient.YodleeWebClientInterface, SimpleBuyScreen {
+    YodleeWebClient.YodleeWebClientInterface {
 
     private val analytics: Analytics by inject()
 
@@ -149,11 +149,9 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
         yodlee_loading_group.gone()
     }
 
-    override fun navigator(): SimpleBuyNavigator =
-        (activity as? SimpleBuyNavigator)
-            ?: throw IllegalStateException("Parent must implement SimpleBuyNavigator")
-
-    override fun onBackPressed(): Boolean = true
+    private fun navigator(): YodleeLinkingFlowNavigator =
+        (activity as? YodleeLinkingFlowNavigator)
+            ?: throw IllegalStateException("Parent must implement YodleeLinkingFlowNavigator")
 
     companion object {
         private const val FAST_LINK_URL: String = "FAST_LINK_URL"

@@ -9,4 +9,5 @@ interface YodleeLinkingFlowNavigator {
     fun linkBankWithPartner(bankTransfer: LinkBankTransfer)
     fun launchBankLinking(accountProviderId: String, accountId: String)
     fun launchBankLinkingWithError(errorState: ErrorState)
+    fun pop()
 }

@@ -18,7 +18,7 @@ interface SimpleBuyNavigator : SlidingModalBottomDialog.Host, YodleeLinkingFlowN
     fun goToKycVerificationScreen(addToBackStack: Boolean = true)
     fun goToPendingOrderScreen()
     fun startKyc()
-    fun pop()
+    override fun pop()
     fun hasMoreThanOneFragmentInTheStack(): Boolean
     fun goToCardPaymentScreen(addToBackStack: Boolean = true)
     fun launchIntro()
