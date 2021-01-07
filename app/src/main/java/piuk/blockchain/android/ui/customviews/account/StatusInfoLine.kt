@@ -7,7 +7,7 @@ import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.view_status_line_info.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
+import piuk.blockchain.android.util.visibleIf
 
 class StatusInfoLine @JvmOverloads constructor(
     ctx: Context,

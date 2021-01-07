@@ -134,18 +134,8 @@
             android:name=".ui.ssl.SSLVerifyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.swapold.detail.TradeDetailActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.swapold.exchange.history.TradeHistoryActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.swapold.exchange.detail.HomebrewTradeDetailActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.swapold.exchange.host.HomebrewNavHostActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:launchMode="singleTask" />
+            android:name=".ui.lockbox.ui.LockboxLandingActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
         <activity
             android:name=".ui.thepit.PitPermissionsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />

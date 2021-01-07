@@ -15,7 +15,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.simplebuy.RemovePaymentMethodBottomSheetHost
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
+import piuk.blockchain.android.util.visibleIf
 
 class RemoveCardBottomSheet : SlidingModalBottomDialog() {
 

@@ -16,8 +16,8 @@ import kotlinx.android.synthetic.main.view_account_fiat_overview.view.*
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.FiatAccount
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 
 class AccountInfoFiat @JvmOverloads constructor(
     ctx: Context,

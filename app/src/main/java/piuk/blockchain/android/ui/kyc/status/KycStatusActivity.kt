@@ -20,11 +20,11 @@ import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.ui.customviews.toast
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.toast
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 import kotlinx.android.synthetic.main.activity_kyc_status.button_kyc_status_next as buttonNext
 import kotlinx.android.synthetic.main.activity_kyc_status.constraint_layout_kyc_status as constraintLayout
 import kotlinx.android.synthetic.main.activity_kyc_status.image_view_kyc_status as imageView

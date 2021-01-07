@@ -10,8 +10,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import kotlinx.android.synthetic.main.view_transaction_progress.view.*
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 
 class TransactionProgressView(context: Context, attrs: AttributeSet) :
     ConstraintLayout(context, attrs), KoinComponent {

@@ -12,7 +12,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.transfer.receive.TransferReceiveFragment
 import piuk.blockchain.android.ui.transfer.send.TransferSendFragment
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.util.inflate
 
 class TransferFragment : Fragment() {
 

@@ -21,7 +21,7 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.setThrottledCheckedChange
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.util.inflate
 
 class ConfirmAgreementToTransferItemDelegate<in T>(
     private val model: TransactionModel,

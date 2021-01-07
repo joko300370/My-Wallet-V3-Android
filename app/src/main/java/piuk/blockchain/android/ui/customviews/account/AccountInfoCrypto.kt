@@ -26,8 +26,8 @@ import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.setCoinIcon
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 import timber.log.Timber
 
 class AccountInfoCrypto @JvmOverloads constructor(

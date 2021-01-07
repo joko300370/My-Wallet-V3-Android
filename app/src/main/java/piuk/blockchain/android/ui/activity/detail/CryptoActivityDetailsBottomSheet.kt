@@ -25,8 +25,8 @@ import piuk.blockchain.android.ui.activity.detail.adapter.ActivityDetailsDelegat
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.util.makeBlockExplorerUrl
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 
 class CryptoActivityDetailsBottomSheet :
     MviBottomSheet<ActivityDetailsModel, ActivityDetailsIntents, ActivityDetailState>() {

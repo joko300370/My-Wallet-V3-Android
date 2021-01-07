@@ -17,15 +17,17 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
+import piuk.blockchain.android.util.inflate
 import timber.log.Timber
 import kotlinx.android.synthetic.main.fragment_kyc_resubmission_splash
     .button_kyc_resubmission_splash_next as buttonContinue
 
 class KycResubmissionSplashFragment : Fragment() {
 
-    private val progressListener: KycProgressListener by ParentActivityDelegate(this)
+    private val progressListener: KycProgressListener by ParentActivityDelegate(
+        this
+    )
 
     private val kycNavigator: KycNavigator by inject()
 

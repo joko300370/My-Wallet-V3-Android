@@ -7,7 +7,6 @@ import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
-import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
@@ -82,7 +81,7 @@ class Erc20NonCustodialAccount(
                         exchangeRates = exchangeRates,
                         lastBlockNumber = latestBlockNumber.number,
                         account = this
-                    ) as ActivitySummaryItem
+                    )
                 }
             }.flatMap {
                 appendTradeActivity(custodialWalletManager, asset, it)

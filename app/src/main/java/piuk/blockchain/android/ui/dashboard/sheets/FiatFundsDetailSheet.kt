@@ -23,8 +23,8 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NullFiatAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 
 class FiatFundsDetailSheet : SlidingModalBottomDialog() {

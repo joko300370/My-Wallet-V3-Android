@@ -25,13 +25,15 @@ import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
 import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import piuk.blockchain.android.ui.kyc.navigate
-import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
+import piuk.blockchain.android.util.inflate
 import timber.log.Timber
 
 class ApplicationCompleteFragment : Fragment() {
 
-    private val progressListener: KycProgressListener by ParentActivityDelegate(this)
+    private val progressListener: KycProgressListener by ParentActivityDelegate(
+        this
+    )
     private val compositeDisposable = CompositeDisposable()
     private val analytics: Analytics by inject()
     private val tierService: TierService by scopedInject()

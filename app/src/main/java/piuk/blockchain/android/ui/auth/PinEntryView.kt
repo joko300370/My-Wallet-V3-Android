@@ -5,7 +5,7 @@ import android.widget.ImageView
 import androidx.annotation.StringRes
 import piuk.blockchain.androidcoreui.ui.base.View
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.ViewUtils
+import piuk.blockchain.android.util.ViewUtils
 
 interface PinEntryView : View {
 

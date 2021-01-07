@@ -17,8 +17,8 @@ import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.impl.AllWalletsAccount
-import piuk.blockchain.androidcoreui.utils.extensions.invisible
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.invisible
+import piuk.blockchain.android.util.visible
 import timber.log.Timber
 
 class AccountInfoGroup @JvmOverloads constructor(

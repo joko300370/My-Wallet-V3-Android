@@ -33,7 +33,7 @@ import piuk.blockchain.android.ui.activity.detail.Value
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.toFormattedString
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.util.inflate
 
 class ActivityDetailInfoItemDelegate<in T> : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {

@@ -35,7 +35,7 @@ import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import piuk.blockchain.androidcoreui.utils.AndroidUtils
+import piuk.blockchain.android.util.AndroidUtils
 import timber.log.Timber
 
 class SettingsPresenter(

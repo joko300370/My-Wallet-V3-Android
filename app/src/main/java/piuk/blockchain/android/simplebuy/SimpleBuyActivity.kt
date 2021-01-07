@@ -27,9 +27,9 @@ import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.utils.ViewUtils
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.ViewUtils
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 
 class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
     override val alwaysDisableScreenshots: Boolean

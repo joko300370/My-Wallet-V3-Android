@@ -34,7 +34,7 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.androidcoreui.ui.customviews.toast
 import timber.log.Timber
 
 class AccountActivity : MvpActivity<AccountView, AccountPresenter>(),
@@ -222,9 +222,8 @@ class AccountActivity : MvpActivity<AccountView, AccountPresenter>(),
             cancelText = R.string.polite_no
         )
 
-    override fun showError(@StringRes message: Int) {
+    override fun showError(@StringRes message: Int) =
         toast(message, ToastCustom.TYPE_ERROR)
-    }
 
     override fun showSuccess(@StringRes message: Int) {
         toast(message, ToastCustom.TYPE_OK)

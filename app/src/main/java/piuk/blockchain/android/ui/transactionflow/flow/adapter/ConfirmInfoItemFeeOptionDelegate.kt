@@ -36,8 +36,8 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.flow.formatWithExchange
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.assetName
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
+import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.AfterTextChangedWatcher
 
 class ConfirmInfoItemFeeOptionDelegate<in T>(
     private val model: TransactionModel,
