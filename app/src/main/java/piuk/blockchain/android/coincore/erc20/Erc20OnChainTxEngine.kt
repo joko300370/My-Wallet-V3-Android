@@ -124,7 +124,7 @@ open class Erc20OnChainTxEngine(
         ethDataManager.fetchEthAddress()
             .singleOrError()
             .map { CryptoValue(CryptoCurrency.ETHER, it.getTotalBalance()) }
-            .map { it as Money }
+            .map { it }
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         validateAmounts(pendingTx)

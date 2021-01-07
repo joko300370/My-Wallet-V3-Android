@@ -8,7 +8,7 @@ import androidx.appcompat.widget.AppCompatEditText
 import com.blockchain.preferences.WalletStatus
 import info.blockchain.wallet.api.data.Settings
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcoreui.utils.ViewUtils
+import piuk.blockchain.android.util.ViewUtils
 
 fun getTwoFactorDialog(
     context: Context,

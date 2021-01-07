@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import piuk.blockchain.android.ui.kyc.countryselection.util.CountryDisplayModel
 import kotlinx.android.synthetic.main.item_country.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcoreui.utils.extensions.autoNotify
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.util.autoNotify
+import piuk.blockchain.android.util.inflate
 import kotlin.properties.Delegates
 
 class CountryCodeAdapter(

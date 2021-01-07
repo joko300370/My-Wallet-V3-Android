@@ -24,7 +24,7 @@ interface VeriffSplashView : View {
 
     fun setUiState(@UiState.UiStateDef state: Int)
 
-    fun showErrorToast(message: Int)
+    fun showError(message: Int)
 
     fun showProgressDialog(cancelable: Boolean)
 

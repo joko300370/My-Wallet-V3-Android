@@ -9,7 +9,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.activity.detail.ActivityDetailsType
 import piuk.blockchain.android.ui.activity.detail.CancelAction
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.util.inflate
 
 class ActivityDetailCancelActionItemDelegate<in T>(
     private val onCancelActionItemClicked: () -> Unit

@@ -4,7 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.annotation.StringRes
 import com.blockchain.extensions.exhaustive
-import com.blockchain.lockbox.data.LockboxDataManager
+import com.blockchain.lockbox.LockboxDataManager
 import com.blockchain.logging.CrashLogger
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents

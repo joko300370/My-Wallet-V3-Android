@@ -28,9 +28,9 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.coinIconWhite
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.utils.extensions.invisible
-import piuk.blockchain.androidcoreui.utils.extensions.setAnimationListener
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.invisible
+import piuk.blockchain.android.util.setAnimationListener
+import piuk.blockchain.android.util.visible
 
 class ExpandableCurrencyHeader @JvmOverloads constructor(
     context: Context,

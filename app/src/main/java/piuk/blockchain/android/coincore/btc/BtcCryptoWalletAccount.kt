@@ -13,7 +13,6 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.NetworkParameters
-import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
@@ -73,7 +72,7 @@ internal class BtcCryptoWalletAccount(
             .doOnSuccess {
                 hasFunds.set(it > CryptoValue.ZeroBtc)
             }
-            .map { it as Money }
+            .map { it }
 
     override val actionableBalance: Single<Money>
         get() = accountBalance
@@ -102,7 +101,7 @@ internal class BtcCryptoWalletAccount(
                     payloadDataManager,
                     exchangeRates,
                     this
-                ) as ActivitySummaryItem
+                )
             }
             .flatMap {
                 appendTradeActivity(custodialWalletManager, asset, it)

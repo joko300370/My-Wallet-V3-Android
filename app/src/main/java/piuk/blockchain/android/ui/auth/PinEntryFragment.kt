@@ -3,7 +3,6 @@ package piuk.blockchain.android.ui.auth
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.content.IntentSender
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -51,13 +50,13 @@ import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.ui.start.PasswordRequiredActivity
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.copyHashOnLongClick
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.annotations.Thunk
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.ViewUtils
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
+import piuk.blockchain.android.util.ViewUtils
+import piuk.blockchain.android.util.copyHashOnLongClick
+import piuk.blockchain.android.util.visibleIf
 
 internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(),
     PinEntryView {
@@ -329,17 +328,18 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
     }
 
     override fun showValidationDialog() {
-        if (context != null) {
-            val password = AppCompatEditText(context!!)
-            password.inputType =
-                InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD or
-                        InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+        context?.let { ctx ->
+            val password = AppCompatEditText(ctx)
+            password.inputType = InputType.TYPE_CLASS_TEXT or
+                InputType.TYPE_TEXT_VARIATION_PASSWORD or
+                InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+
             password.setHint(R.string.password)
 
-            AlertDialog.Builder(context!!, R.style.AlertDialogStyle)
+            AlertDialog.Builder(ctx, R.style.AlertDialogStyle)
                 .setTitle(R.string.app_name)
                 .setMessage(getString(R.string.password_entry))
-                .setView(ViewUtils.getAlertDialogPaddedView(context, password))
+                .setView(ViewUtils.getAlertDialogPaddedView(ctx, password))
                 .setCancelable(false)
                 .setNegativeButton(android.R.string.cancel) { _, _ ->
                     restartApp()
@@ -465,12 +465,10 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
                 appUpdateInfoTask.result.isUpdateTypeAllowed(updateAvailabilityType)
     }
 
-    @Throws(IntentSender.SendIntentException::class)
     private fun updateFlexibleNatively(
         appUpdateManager: AppUpdateManager,
         appUpdateInfo: AppUpdateInfo
     ) {
-
         val updatedListener = object : InstallStateUpdatedListener {
             override fun onStateUpdate(installState: InstallState) {
                 if (installState.installStatus() == InstallStatus.DOWNLOADED) {
@@ -496,7 +494,6 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
                 installStatus == InstallStatus.FAILED
     }
 
-    @Throws(IntentSender.SendIntentException::class)
     private fun updateForcedNatively(
         appUpdateManager: AppUpdateManager,
         appUpdateInfo: AppUpdateInfo

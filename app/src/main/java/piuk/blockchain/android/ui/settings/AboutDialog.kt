@@ -12,7 +12,7 @@ import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.util.copyHashOnLongClick
-import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.android.util.gone
 import timber.log.Timber
 import java.util.Calendar
 

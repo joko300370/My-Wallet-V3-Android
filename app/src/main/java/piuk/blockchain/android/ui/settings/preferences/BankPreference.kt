@@ -10,8 +10,8 @@ import com.blockchain.nabu.datamanagers.Beneficiary
 import kotlinx.android.synthetic.main.preference_bank_layout.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.util.loadInterMedium
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 
 class BankPreference(
     fiatCurrency: String,

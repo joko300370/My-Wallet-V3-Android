@@ -42,7 +42,6 @@ import piuk.blockchain.android.coincore.OfflineAccountCache
 import piuk.blockchain.android.coincore.impl.OfflineBalanceCall
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.android.data.api.bitpay.BitPayService
-import piuk.blockchain.android.data.cache.DynamicFeeCache
 import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
@@ -93,6 +92,7 @@ import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
 import piuk.blockchain.android.ui.launcher.DeepLinkPersistence
 import piuk.blockchain.android.ui.launcher.LauncherPresenter
 import piuk.blockchain.android.ui.launcher.Prerequisites
+import piuk.blockchain.android.ui.lockbox.LockboxLandingPresenter
 import piuk.blockchain.android.ui.onboarding.OnboardingPresenter
 import piuk.blockchain.android.ui.pairingcode.PairingCodePresenter
 import piuk.blockchain.android.ui.recover.RecoverFundsPresenter
@@ -562,6 +562,13 @@ val applicationModule = module {
         }
 
         factory {
+            LockboxLandingPresenter(
+                lockboxDataManager = get(),
+                walletOptionsDataManager = get()
+            )
+        }
+
+        factory {
             PinEntryPresenter(
                 authDataManager = get(),
                 appUtil = get(),
@@ -659,8 +666,6 @@ val applicationModule = module {
                 settingsDataManager = get(),
                 coincore = get(),
                 crashLogger = get(),
-                dynamicFeeCache = get(),
-                feeDataManager = get(),
                 simpleBuySync = get(),
                 rxBus = get(),
                 walletCredentialsUpdater = get()
@@ -731,8 +736,6 @@ val applicationModule = module {
             accessState = get()
         )
     }.bind(PrngFixer::class)
-
-    single { DynamicFeeCache() }
 
     single {
         ConnectionApi(retrofit = get(explorerRetrofit))

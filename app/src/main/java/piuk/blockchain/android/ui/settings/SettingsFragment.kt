@@ -82,9 +82,9 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.AndroidUtils
-import piuk.blockchain.androidcoreui.utils.ViewUtils
-import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
+import piuk.blockchain.android.util.AndroidUtils
+import piuk.blockchain.android.util.ViewUtils
+import piuk.blockchain.android.util.AfterTextChangedWatcher
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.util.Locale
@@ -806,7 +806,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         val dialog = AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
             .setTitle(R.string.verify_mobile)
             .setMessage(R.string.verify_sms_summary)
-            .setView(ViewUtils.getAlertDialogPaddedView(activity, editText))
+            .setView(ViewUtils.getAlertDialogPaddedView(requireContext(), editText))
             .setCancelable(false)
             .setPositiveButton(R.string.verify, null)
             .setNegativeButton(android.R.string.cancel, null)

@@ -23,9 +23,9 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.dashboard.assetdetails.selectFirstAccount
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.drawableResFilled
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.visible
 
 class TrendingPairsView(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs) {
 

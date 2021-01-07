@@ -17,7 +17,7 @@ import piuk.blockchain.android.ui.shortcuts.receive.ReceiveQrActivity
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.utils.AndroidUtils
+import piuk.blockchain.android.util.AndroidUtils
 import piuk.blockchain.androidcoreui.utils.logging.launcherShortcutEvent
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 

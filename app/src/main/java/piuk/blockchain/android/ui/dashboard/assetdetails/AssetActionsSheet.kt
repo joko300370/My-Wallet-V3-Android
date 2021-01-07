@@ -35,7 +35,7 @@ import piuk.blockchain.android.ui.customviews.account.removePossibleBottomView
 import piuk.blockchain.android.util.assetFilter
 import piuk.blockchain.android.util.assetTint
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.util.inflate
 import timber.log.Timber
 
 class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, AssetDetailsState>() {

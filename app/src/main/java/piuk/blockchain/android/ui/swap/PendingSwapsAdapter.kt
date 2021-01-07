@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.swap_pending_item_layout.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.util.toFormattedDate
 import piuk.blockchain.android.util.setAssetIconColours
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.util.inflate
 
 class PendingSwapsAdapter(
     private val orders: List<CustodialOrder>,

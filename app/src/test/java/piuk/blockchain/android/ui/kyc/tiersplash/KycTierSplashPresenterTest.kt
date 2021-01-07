@@ -56,7 +56,7 @@ class KycTierSplashPresenterTest {
             .tier1Selected()
         verify(tierUpdater).setUserTier(1)
         verify(view, never()).navigateTo(any(), any())
-        verify(view).showErrorToast(R.string.kyc_non_specific_server_error)
+        verify(view).showError(R.string.kyc_non_specific_server_error)
     }
 
     @Test
@@ -106,7 +106,7 @@ class KycTierSplashPresenterTest {
             .tier2Selected()
         verify(tierUpdater).setUserTier(2)
         verify(view, never()).navigateTo(any(), any())
-        verify(view).showErrorToast(R.string.kyc_non_specific_server_error)
+        verify(view).showError(R.string.kyc_non_specific_server_error)
     }
 
     @Test

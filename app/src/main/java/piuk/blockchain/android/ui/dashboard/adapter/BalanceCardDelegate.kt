@@ -18,9 +18,10 @@ import piuk.blockchain.android.ui.dashboard.BalanceState
 import piuk.blockchain.android.ui.dashboard.asDeltaPercent
 import piuk.blockchain.android.ui.dashboard.setDeltaColour
 import piuk.blockchain.android.util.colorRes
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.util.inflate
 
-class BalanceCardDelegate<in T>(private val selectedFiat: String, private val coincore: Coincore) : AdapterDelegate<T> {
+class BalanceCardDelegate<in T>(private val selectedFiat: String, private val coincore: Coincore) :
+    AdapterDelegate<T> {
 
     override fun isForViewType(items: List<T>, position: Int): Boolean =
         items[position] is BalanceState
