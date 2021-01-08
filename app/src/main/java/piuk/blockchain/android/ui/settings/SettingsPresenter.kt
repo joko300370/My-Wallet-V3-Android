@@ -40,6 +40,7 @@ import piuk.blockchain.androidcore.utils.extensions.thenSingle
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.android.util.AndroidUtils
 import timber.log.Timber
+import java.io.Serializable
 
 class SettingsPresenter(
     private val fingerprintHelper: FingerprintHelper,
@@ -176,8 +177,8 @@ class SettingsPresenter(
         custodialWalletManager.getEligiblePaymentMethodTypes(fiat).map { methods ->
             val bankPaymentMethods = methods.filter {
                 it.paymentMethodType == PaymentMethodType.BANK_TRANSFER ||
-                        // Bank linking through deposit has not been implemented for USD
-                        (it.paymentMethodType == PaymentMethodType.FUNDS && it.currency != "USD")
+                // Bank linking through deposit has not been implemented for USD
+                (it.paymentMethodType == PaymentMethodType.FUNDS && it.currency != "USD")
             }
 
             bankPaymentMethods.map { method ->
@@ -473,13 +474,13 @@ class SettingsPresenter(
 
     private fun Settings.isNotificationTypeEnabled(type: Int): Boolean {
         return isNotificationsOn && (notificationsType.contains(type) ||
-                notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL))
+                                     notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL))
     }
 
     private fun Settings.isNotificationTypeDisabled(type: Int): Boolean {
         return notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_NONE) ||
-                (!notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL) &&
-                        !notificationsType.contains(type))
+               (!notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL) &&
+                !notificationsType.contains(type))
     }
 
     /**
@@ -604,6 +605,7 @@ class SettingsPresenter(
 
     fun linkBank(currency: String) {
         compositeDisposable += custodialWalletManager.linkToABank(currency)
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(onSuccess = {
                 view?.linkBankWithPartner(it)
             }, onError = {
@@ -615,4 +617,4 @@ class SettingsPresenter(
 data class LinkableBank(
     val currency: String,
     val linkMethods: List<PaymentMethodType>
-)
+) : Serializable

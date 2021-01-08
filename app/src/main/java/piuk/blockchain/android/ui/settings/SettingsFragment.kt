@@ -68,6 +68,7 @@ import piuk.blockchain.android.ui.base.mvi.MviFragment.Companion.BOTTOM_SHEET
 import piuk.blockchain.android.ui.customviews.PasswordStrengthView
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
+import piuk.blockchain.android.ui.dashboard.sheets.LinkBankMethodChooserBottomSheet
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog
 import piuk.blockchain.android.ui.fingerprint.FingerprintStage
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
@@ -93,7 +94,8 @@ import java.util.Locale
 import java.lang.IllegalStateException
 import kotlin.math.roundToInt
 
-class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePaymentMethodBottomSheetHost, ReviewHost {
+class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePaymentMethodBottomSheetHost, BankLinkingHost,
+    ReviewHost {
 
     // Profile
     private val kycStatusPref by lazy {
@@ -547,7 +549,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         //   RemoveLinkedBankBottomSheet.newInstance(bank).show(childFragmentManager, BOTTOM_SHEET)
     }
 
-    private fun linkFundsBankWithCurrency(currency: String) {
+    override fun linkBankWithWireTransfer(currency: String) {
         LinkBankAccountDetailsBottomSheet.newInstance(currency).show(childFragmentManager, BOTTOM_SHEET)
         analytics.logEvent(linkBankEventWithCurrency(SimpleBuyAnalytics.LINK_BANK_CLICKED, currency))
     }
@@ -558,18 +560,19 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             showDialogForLinkBankMethodChooser(linkableBank)
         } else {
             when (linkableBank.linkMethods[0]) {
-                PaymentMethodType.FUNDS -> linkFundsBankWithCurrency(linkableBank.currency)
-                PaymentMethodType.BANK_TRANSFER -> linkableBankWithBankTransfer(linkableBank.currency)
+                PaymentMethodType.FUNDS -> linkBankWithWireTransfer(linkableBank.currency)
+                PaymentMethodType.BANK_TRANSFER -> linkBankWithBankTransfer(linkableBank.currency)
                 else -> throw IllegalStateException("Not valid linkable bank type")
             }
         }
     }
 
-    private fun linkableBankWithBankTransfer(currency: String) {
+    override fun linkBankWithBankTransfer(currency: String) {
         settingsPresenter.linkBank(currency)
     }
 
     private fun showDialogForLinkBankMethodChooser(linkableBank: LinkableBank) {
+        LinkBankMethodChooserBottomSheet.newInstance(linkableBank).show(childFragmentManager, BOTTOM_SHEET)
     }
 
     override fun updateCards(cards: List<PaymentMethod.Card>) {
@@ -1199,4 +1202,9 @@ enum class ReviewAnalytics : AnalyticsEvent {
         get() = name.toLowerCase(Locale.ENGLISH)
     override val params: Map<String, String>
         get() = emptyMap()
+}
+
+interface BankLinkingHost {
+    fun linkBankWithWireTransfer(currency: String)
+    fun linkBankWithBankTransfer(currency: String)
 }
