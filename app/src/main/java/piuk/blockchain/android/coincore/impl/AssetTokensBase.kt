@@ -2,11 +2,10 @@ package piuk.blockchain.android.coincore.impl
 
 import androidx.annotation.VisibleForTesting
 import com.blockchain.logging.CrashLogger
-import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligibilityProvider
-import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.service.TierService
+import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
@@ -121,14 +120,16 @@ internal abstract class CryptoAssetBase(
 
     open fun loadCustodialAccount(): Single<SingleAccountList> =
         Single.just(
-            listOf(CustodialTradingAccount(
-                asset = asset,
-                label = labels.getDefaultCustodialWalletLabel(asset),
-                exchangeRates = exchangeRates,
-                custodialWalletManager = custodialManager,
-                environmentConfig = environmentConfig,
-                eligibilityProvider = eligibilityProvider
-            ))
+            listOf(
+                CustodialTradingAccount(
+                    asset = asset,
+                    label = labels.getDefaultCustodialWalletLabel(asset),
+                    exchangeRates = exchangeRates,
+                    custodialWalletManager = custodialManager,
+                    environmentConfig = environmentConfig,
+                    eligibilityProvider = eligibilityProvider
+                )
+            )
         )
 
     final override fun accountGroup(filter: AssetFilter): Maybe<AccountGroup> =
@@ -188,8 +189,8 @@ internal abstract class CryptoAssetBase(
             }
 
     private fun getInterestTargets(): Maybe<SingleAccountList> =
-        tiersService.tiers().flatMapMaybe { tier ->
-            if (tier.isApprovedFor(KycTierLevel.GOLD)) {
+        custodialManager.getInterestEligibilityForAsset(asset).flatMapMaybe { eligibility ->
+            if (eligibility.eligible) {
                 accounts.flatMapMaybe {
                     Maybe.just(it.filterIsInstance<CryptoInterestAccount>())
                 }
