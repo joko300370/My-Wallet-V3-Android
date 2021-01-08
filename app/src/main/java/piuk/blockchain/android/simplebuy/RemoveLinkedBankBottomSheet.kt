@@ -33,7 +33,7 @@ class RemoveLinkedBankBottomSheet : SlidingModalBottomDialog() {
 
     override fun initControls(view: View) {
         with(view) {
-            title.text = resources.getString(R.string.common_spaced_strings, bank.title, bank.currency)
+            title.text = resources.getString(R.string.common_spaced_strings, bank.name, bank.currency)
             end_digits.text = bank.account
             rmv_bank_btn.setOnClickListener {
                 compositeDisposable += custodialWalletManager.deleteBank(bank.id)

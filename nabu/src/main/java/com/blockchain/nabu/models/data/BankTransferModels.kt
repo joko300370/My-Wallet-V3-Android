@@ -32,15 +32,13 @@ data class LinkedBank(
     override val id: String,
     override val currency: String,
     val partner: BankPartner,
-    val name: String,
+    override val name: String,
     val accountNumber: String,
     val state: LinkedBankState,
     val errorStatus: LinkedBankErrorState
 ) : Bank {
     override val account: String
         get() = accountNumber
-    override val title: String
-        get() = name
     override val paymentMethod: PaymentMethodType
         get() = PaymentMethodType.BANK_TRANSFER
 }
@@ -63,7 +61,7 @@ enum class LinkedBankState {
 interface Bank : Serializable {
     val currency: String
     val account: String
-    val title: String
+    val name: String
     val id: String
     val paymentMethod: PaymentMethodType
 }

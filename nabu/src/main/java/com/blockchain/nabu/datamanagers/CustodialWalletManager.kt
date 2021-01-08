@@ -296,7 +296,7 @@ data class OrderOutput(private val symbol: String, private val amount: String? =
 
 data class Beneficiary(
     override val id: String,
-    override val title: String,
+    override val name: String,
     override val account: String,
     override val currency: String
 ) : Bank {

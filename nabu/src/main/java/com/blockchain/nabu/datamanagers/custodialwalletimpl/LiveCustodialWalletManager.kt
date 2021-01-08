@@ -363,7 +363,7 @@ class LiveCustodialWalletManager(
             it.map { beneficiary ->
                 Beneficiary(
                     id = beneficiary.id,
-                    title = "${beneficiary.name} ${beneficiary.agent.account}",
+                    name = "${beneficiary.name} ${beneficiary.agent.account}",
                     // address is returned from the api as ****6810
                     account = beneficiary.address.replace("*", ""),
                     currency = beneficiary.currency

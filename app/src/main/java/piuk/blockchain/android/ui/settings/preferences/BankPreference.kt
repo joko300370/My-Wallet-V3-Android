@@ -25,7 +25,7 @@ class BankPreference(
 
         this.title = title // Forces setting fonts when Title is set via XML
 
-        title = bank?.title ?: context.getString(R.string.add_bank_title, fiatCurrency)
+        title = bank?.name ?: context.getString(R.string.add_bank_title, fiatCurrency)
         summary = bank?.currency ?: ""
         icon = getContext().getDrawable(R.drawable.ic_bank_transfer)
     }
