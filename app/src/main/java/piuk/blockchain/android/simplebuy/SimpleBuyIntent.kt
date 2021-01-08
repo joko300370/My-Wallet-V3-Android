@@ -204,7 +204,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
         )
     }
 
-    object StartPollingForLinkStatus : SimpleBuyIntent() {
+    data class StartPollingForLinkStatus(val bankId: String) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(isLoading = true)
     }
@@ -216,7 +216,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
             )
     }
 
-    class FiatCurrencyUpdated(private val fiatCurrency: String) : SimpleBuyIntent() {
+    data class FiatCurrencyUpdated(private val fiatCurrency: String) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(fiatCurrency = fiatCurrency, amount = null)
     }
@@ -248,7 +248,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
                 selectedCryptoCurrency = selectedCryptoCurrency,
                 predefinedAmounts = oldState.predefinedAmounts.filter {
                     it.valueMinor >= (minValueForSelectedPair ?: 0) && it.valueMinor <= (maxValueForSelectedPair
-                        ?: 0)
+                                                                                         ?: 0)
                 }
             )
         }
@@ -311,7 +311,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
         override fun isValidFor(oldState: SimpleBuyState): Boolean {
             return oldState.orderState < OrderState.PENDING_CONFIRMATION ||
-                    oldState.orderState > OrderState.PENDING_EXECUTION
+                   oldState.orderState > OrderState.PENDING_EXECUTION
         }
     }
 
@@ -434,9 +434,9 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
         override fun isValidFor(oldState: SimpleBuyState): Boolean {
             return oldState.selectedCryptoCurrency != null &&
-                    oldState.order.amount != null &&
-                    oldState.orderState != OrderState.AWAITING_FUNDS &&
-                    oldState.orderState != OrderState.PENDING_EXECUTION
+                   oldState.order.amount != null &&
+                   oldState.orderState != OrderState.AWAITING_FUNDS &&
+                   oldState.orderState != OrderState.PENDING_EXECUTION
         }
     }
 

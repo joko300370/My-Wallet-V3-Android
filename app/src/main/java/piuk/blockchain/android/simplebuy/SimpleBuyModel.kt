@@ -134,7 +134,7 @@ class SimpleBuyModel(
                     accountId = intent.accountId
                 ).subscribeBy(
                     onComplete = {
-                        process(SimpleBuyIntent.StartPollingForLinkStatus)
+                        process(SimpleBuyIntent.StartPollingForLinkStatus(intent.linkingBankId))
                     },
                     onError = {
                         process(SimpleBuyIntent.ProviderAccountIdUpdateError)
@@ -143,46 +143,41 @@ class SimpleBuyModel(
             }
 
             is SimpleBuyIntent.StartPollingForLinkStatus -> {
-                interactor.pollForLinkedBankState(
-                    previousState.selectedPaymentMethod?.id ?: throw IllegalStateException(
-                        "Missing required payment method ID"
-                    )
-                )
-                    .subscribeBy(
-                        onSuccess = {
-                            when (it.state) {
-                                LinkedBankState.ACTIVE -> {
-                                    process(SimpleBuyIntent.LinkedBankStateSuccess(it))
-                                }
-                                LinkedBankState.BLOCKED,
-                                LinkedBankState.UNKNOWN -> {
-                                    when (it.errorStatus) {
-                                        LinkedBankErrorState.ACCOUNT_ALREADY_LINKED -> {
-                                            process(SimpleBuyIntent.LinkedBankStateAlreadyLinked)
-                                        }
-                                        LinkedBankErrorState.UNKNOWN -> {
-                                            process(SimpleBuyIntent.LinkedBankStateError)
-                                        }
-                                        LinkedBankErrorState.ACCOUNT_TYPE_UNSUPPORTED -> {
-                                            process(SimpleBuyIntent.LinkedBankStateUnsupportedAccount)
-                                        }
-                                        LinkedBankErrorState.NAMES_MISS_MATCHED -> {
-                                            process(SimpleBuyIntent.LinkedBankStateNamesMissMatch)
-                                        }
-                                        LinkedBankErrorState.NONE -> {
-                                            // do nothing
-                                        }
+                interactor.pollForLinkedBankState(intent.bankId).subscribeBy(
+                    onSuccess = {
+                        when (it.state) {
+                            LinkedBankState.ACTIVE -> {
+                                process(SimpleBuyIntent.LinkedBankStateSuccess(it))
+                            }
+                            LinkedBankState.BLOCKED,
+                            LinkedBankState.UNKNOWN -> {
+                                when (it.errorStatus) {
+                                    LinkedBankErrorState.ACCOUNT_ALREADY_LINKED -> {
+                                        process(SimpleBuyIntent.LinkedBankStateAlreadyLinked)
+                                    }
+                                    LinkedBankErrorState.UNKNOWN -> {
+                                        process(SimpleBuyIntent.LinkedBankStateError)
+                                    }
+                                    LinkedBankErrorState.ACCOUNT_TYPE_UNSUPPORTED -> {
+                                        process(SimpleBuyIntent.LinkedBankStateUnsupportedAccount)
+                                    }
+                                    LinkedBankErrorState.NAMES_MISS_MATCHED -> {
+                                        process(SimpleBuyIntent.LinkedBankStateNamesMissMatch)
+                                    }
+                                    LinkedBankErrorState.NONE -> {
+                                        // do nothing
                                     }
                                 }
-                                LinkedBankState.PENDING -> {
-                                    process(SimpleBuyIntent.LinkedBankStateTimeout)
-                                }
                             }
-                        },
-                        onError = {
-                            process(SimpleBuyIntent.LinkedBankStateError)
+                            LinkedBankState.PENDING -> {
+                                process(SimpleBuyIntent.LinkedBankStateTimeout)
+                            }
                         }
-                    )
+                    },
+                    onError = {
+                        process(SimpleBuyIntent.LinkedBankStateError)
+                    }
+                )
             }
 
             is SimpleBuyIntent.UpdateExchangeRate -> interactor.exchangeRate(intent.currency)
