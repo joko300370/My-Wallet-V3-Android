@@ -2,8 +2,6 @@ package piuk.blockchain.android.ui.settings
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligiblePaymentMethodType
-import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.responses.nabu.KycTierState
 import com.blockchain.nabu.models.responses.nabu.NabuApiException.Companion.fromResponseBody
 import com.blockchain.notifications.NotificationTokenManager

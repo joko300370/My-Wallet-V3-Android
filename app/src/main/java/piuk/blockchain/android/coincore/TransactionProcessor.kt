@@ -161,7 +161,7 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
 
     data class Description(val text: String = "") : TxConfirmationValue(TxConfirmation.DESCRIPTION)
 
-    data class Memo(val text: String?, val isRequired: Boolean, val id: Long?) :
+    data class Memo(val text: String?, val isRequired: Boolean, val id: Long?, val editable: Boolean = true) :
         TxConfirmationValue(TxConfirmation.MEMO)
 
     data class NetworkFee(

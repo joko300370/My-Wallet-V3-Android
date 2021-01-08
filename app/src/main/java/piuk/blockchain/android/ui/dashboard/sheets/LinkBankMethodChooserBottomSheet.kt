@@ -55,8 +55,7 @@ class LinkBankMethodChooserBottomSheet : SlidingModalBottomDialog() {
 class LinkBankMethodChooserAdapter(
     private val paymentMethods: List<PaymentMethodType>,
     private val onClick: (PaymentMethodType) -> Unit
-) :
-    RecyclerView.Adapter<LinkBankMethodChooserAdapter.LinkBankMethodViewHolder>() {
+) : RecyclerView.Adapter<LinkBankMethodChooserAdapter.LinkBankMethodViewHolder>() {
 
     class LinkBankMethodViewHolder(private val parent: View) : RecyclerView.ViewHolder(parent) {
         fun bind(paymentMethod: PaymentMethodType, onClick: (PaymentMethodType) -> Unit) {
@@ -68,7 +67,7 @@ class LinkBankMethodChooserAdapter(
                 payment_method_root.setOnClickListener {
                     onClick(paymentMethod)
                 }
-                badge.visibleIf { paymentMethod== PaymentMethodType.BANK_TRANSFER }
+                badge.visibleIf { paymentMethod == PaymentMethodType.BANK_TRANSFER }
             }
         }
     }
@@ -101,7 +100,7 @@ private fun PaymentMethodType.toLinkBankMethodItemUI(): LinkBankMethodItem =
             title = R.string.link_a_bank,
             subtitle = R.string.link_a_bank_bank_transfer,
             icon = R.drawable.ic_bank_transfer,
-            )
+        )
         else -> throw IllegalStateException("Not supported linking method")
     }
 

@@ -2,9 +2,9 @@ package piuk.blockchain.android.simplebuy
 
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import info.blockchain.balance.CryptoCurrency
-import piuk.blockchain.android.ui.linkbank.yodlee.YodleeLinkingFlowNavigator
 import piuk.blockchain.android.ui.base.FlowFragment
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.linkbank.yodlee.YodleeLinkingFlowNavigator
 
 interface SimpleBuyScreen : SlidingModalBottomDialog.Host, FlowFragment {
     fun navigator(): SimpleBuyNavigator
