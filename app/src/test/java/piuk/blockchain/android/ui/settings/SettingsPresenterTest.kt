@@ -136,6 +136,8 @@ class SettingsPresenterTest {
         whenever(custodialWalletManager.getSupportedFundsFiats(any(), any())).thenReturn(Single.just(emptyList()))
         whenever(custodialWalletManager.updateSupportedCardTypes(ArgumentMatchers.anyString())).thenReturn(
             Completable.complete())
+        whenever(custodialWalletManager.getLinkedBanks()).thenReturn(Single.just(emptyList()))
+        whenever(custodialWalletManager.getEligiblePaymentMethodTypes(any())).thenReturn(Single.just(emptyList()))
         // Act
         subject.onViewReady()
         // Assert
@@ -165,6 +167,8 @@ class SettingsPresenterTest {
         whenever(custodialWalletManager.fetchUnawareLimitsCards(ArgumentMatchers.anyList()))
             .thenReturn(Single.just(emptyList()))
         whenever(custodialWalletManager.getLinkedBeneficiaries()).thenReturn(Single.just(emptyList()))
+        whenever(custodialWalletManager.getLinkedBanks()).thenReturn(Single.just(emptyList()))
+        whenever(custodialWalletManager.getEligiblePaymentMethodTypes(any())).thenReturn(Single.just(emptyList()))
 
         // Act
         subject.onViewReady()

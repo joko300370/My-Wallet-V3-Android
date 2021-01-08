@@ -134,9 +134,6 @@
             android:name=".ui.ssl.SSLVerifyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.lockbox.ui.LockboxLandingActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"/>
-        <activity
             android:name=".ui.thepit.PitPermissionsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity

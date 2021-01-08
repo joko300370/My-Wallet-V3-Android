@@ -154,7 +154,7 @@ interface CustodialWalletManager {
     ): Single<List<PaymentMethod.Card>> // fetches the available
 
     fun confirmOrder(orderId: String, attributes: CardPartnerAttributes?, paymentMethodId: String?):
-            Single<BuySellOrder>
+        Single<BuySellOrder>
 
     fun getInterestAccountBalance(crypto: CryptoCurrency): Maybe<CryptoValue>
 
@@ -299,7 +299,7 @@ data class Beneficiary(
     override val title: String,
     override val account: String,
     override val currency: String
-) : Serializable, Bank {
+) : Bank {
 
     override val paymentMethod: PaymentMethodType
         get() = PaymentMethodType.FUNDS

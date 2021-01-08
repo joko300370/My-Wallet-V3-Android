@@ -58,6 +58,7 @@ import piuk.blockchain.android.R.string.success
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.cards.CardDetailsActivity
 import piuk.blockchain.android.cards.RemoveCardBottomSheet
+import piuk.blockchain.android.simplebuy.RemoveLinkedBankBottomSheet
 import piuk.blockchain.android.simplebuy.RemovePaymentMethodBottomSheetHost
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import piuk.blockchain.android.simplebuy.linkBankEventWithCurrency
@@ -468,28 +469,6 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         thePit?.setValue(isLinked)
     }
 
-    /*    override fun updateBanks(linkedAndSupportedCurrencies: LinkedBanksAndSupportedCurrencies) {
-            val existingBanks = prefsExistingBanks()
-
-            val newBanks = linkedAndSupportedCurrencies.beneficiaries.filterNot { existingBanks.contains(it.id) }
-
-            newBanks.forEach { bank ->
-                banksPref?.addPreference(
-                    BankPreference(context = requireContext(), bank = bank, fiatCurrency = bank.currency).apply {
-                        onClick {
-                            removeBank(bank)
-                        }
-                        key = bank.id
-                    }
-                )
-            }
-
-            addOrUpdateLinkBankForCurrencies(
-                linkedAndSupportedCurrencies.beneficiaries.size + 1,
-                linkedAndSupportedCurrencies.supportedCurrencies.filterNot { it == "USD" }
-            )
-        }*/
-
     override fun updateLinkableBanks(linkableBanks: Set<LinkableBank>, linkedBanksCount: Int) {
         if (linkableBanks.isEmpty()) {
             banksPref?.isVisible = false
@@ -525,28 +504,9 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             )
         }
     }
-    /*
-        private fun addOrUpdateLinkBankForCurrencies(firstIndex: Int, currencies: List<String>) {
-            if (currencies.isEmpty()) {
-                banksPref?.isVisible = false
-            } else {
-                currencies.forEach { currency ->
-                    banksPref?.findPreference<BankPreference>(LINK_BANK_KEY.plus(currency))?.let {
-                        it.order = it.order + firstIndex + currencies.indexOf(currency)
-                    } ?: banksPref?.addPreference(
-                        BankPreference(context = requireContext(), fiatCurrency = currency).apply {
-                            onClick {
-                                linkBankWithCurrency(currency)
-                            }
-                            key = LINK_BANK_KEY.plus(currency)
-                        }
-                    )
-                }
-            }
-        }*/
 
     private fun removeBank(bank: Bank) {
-        //   RemoveLinkedBankBottomSheet.newInstance(bank).show(childFragmentManager, BOTTOM_SHEET)
+        RemoveLinkedBankBottomSheet.newInstance(bank).show(childFragmentManager, BOTTOM_SHEET)
     }
 
     override fun linkBankWithWireTransfer(currency: String) {

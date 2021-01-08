@@ -60,7 +60,7 @@ enum class LinkedBankState {
     UNKNOWN
 }
 
-interface Bank {
+interface Bank : Serializable {
     val currency: String
     val account: String
     val title: String

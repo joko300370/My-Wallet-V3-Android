@@ -29,12 +29,18 @@ class LinkBankMethodChooserBottomSheet : SlidingModalBottomDialog() {
             recycler.layoutManager = LinearLayoutManager(activity)
             recycler.adapter = LinkBankMethodChooserAdapter(bank.linkMethods) {
                 when (it) {
-                    PaymentMethodType.BANK_TRANSFER -> (parentFragment as? BankLinkingHost)?.linkBankWithBankTransfer(
-                        bank.currency
-                    )
-                    PaymentMethodType.FUNDS -> (parentFragment as? BankLinkingHost)?.linkBankWithWireTransfer(
-                        bank.currency
-                    )
+                    PaymentMethodType.BANK_TRANSFER -> kotlin.run {
+                        (parentFragment as? BankLinkingHost)?.linkBankWithBankTransfer(
+                            bank.currency
+                        )
+                        dismiss()
+                    }
+                    PaymentMethodType.FUNDS -> kotlin.run {
+                        (parentFragment as? BankLinkingHost)?.linkBankWithWireTransfer(
+                            bank.currency
+                        )
+                        dismiss()
+                    }
                     else -> throw IllegalStateException("Not supported linking method")
                 }
             }
