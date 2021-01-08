@@ -1,7 +1,7 @@
 package piuk.blockchain.android.simplebuy
 
 import info.blockchain.balance.CryptoCurrency
-import piuk.blockchain.android.simplebuy.yodlee.YodleeLinkingFlowNavigator
+import piuk.blockchain.android.ui.linkbank.yodlee.YodleeLinkingFlowNavigator
 import piuk.blockchain.android.ui.base.FlowFragment
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 

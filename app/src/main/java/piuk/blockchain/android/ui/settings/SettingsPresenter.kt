@@ -127,7 +127,7 @@ class SettingsPresenter(
 
     private fun updateBanks() {
         compositeDisposable +=
-            linkableBanks(fiatUnit).zipWith(linkedBanks())
+            linkableBanks(fiatUnit).zipWith(linkedBanks().onErrorReturn { emptySet() })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onSuccess = { (linkableBanks, linkedBanks) ->

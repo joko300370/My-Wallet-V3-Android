@@ -1,4 +1,4 @@
-package piuk.blockchain.android.simplebuy.yodlee
+package piuk.blockchain.android.ui.linkbank.yodlee
 
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import piuk.blockchain.android.simplebuy.ErrorState

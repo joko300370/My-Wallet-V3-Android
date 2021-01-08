@@ -1,4 +1,4 @@
-package piuk.blockchain.android.simplebuy.yodlee
+package piuk.blockchain.android.ui.linkbank.yodlee
 
 import android.annotation.SuppressLint
 import android.content.Intent

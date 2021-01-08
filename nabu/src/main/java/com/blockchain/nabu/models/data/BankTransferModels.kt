@@ -2,8 +2,9 @@ package com.blockchain.nabu.models.data
 
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.responses.banktransfer.LinkBankAttrsResponse
+import java.io.Serializable
 
-data class LinkBankTransfer(val id: String, val partner: BankPartner, val attributes: LinkBankAttributes)
+data class LinkBankTransfer(val id: String, val partner: BankPartner, val attributes: LinkBankAttributes) : Serializable
 
 enum class BankPartner {
     YODLEE;
@@ -24,7 +25,8 @@ enum class BankPartner {
 
 interface LinkBankAttributes
 
-class YodleeAttributes(val fastlinkUrl: String, val token: String, val configName: String) : LinkBankAttributes
+class YodleeAttributes(val fastlinkUrl: String, val token: String, val configName: String) : LinkBankAttributes,
+    Serializable
 
 data class LinkedBank(
     override val id: String,

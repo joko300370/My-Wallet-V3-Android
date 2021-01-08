@@ -20,9 +20,9 @@ import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.cards.CardDetailsActivity
-import piuk.blockchain.android.simplebuy.yodlee.LinkBankFragment
-import piuk.blockchain.android.simplebuy.yodlee.YodleeSplashFragment
-import piuk.blockchain.android.simplebuy.yodlee.YodleeWebViewFragment
+import piuk.blockchain.android.ui.linkbank.yodlee.LinkBankFragment
+import piuk.blockchain.android.ui.linkbank.yodlee.YodleeSplashFragment
+import piuk.blockchain.android.ui.linkbank.yodlee.YodleeWebViewFragment
 import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
