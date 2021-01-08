@@ -49,7 +49,7 @@ class InterestDepositTxEngine(
         }.flatMap {
             if (it.hasOption(TxConfirmation.MEMO)) {
                 it.getOption<TxConfirmationValue.Memo>(TxConfirmation.MEMO)?.let { memo ->
-                    onChainTxEngine.doOptionUpdateRequest(it, memo.copy(text = txTarget.label, editable = false))
+                    onChainTxEngine.doOptionUpdateRequest(it, memo.copy(editable = false))
                 }
             } else {
                 Single.just(it)
