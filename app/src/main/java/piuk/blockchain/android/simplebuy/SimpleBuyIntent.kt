@@ -118,7 +118,8 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
                         is PaymentMethod.UndefinedFunds -> PaymentMethodType.FUNDS
                         else -> PaymentMethodType.PAYMENT_CARD
                     }
-                ))
+                )
+            )
     }
 
     class UpdateExchangeRate(val currency: CryptoCurrency) : SimpleBuyIntent() {
@@ -193,7 +194,11 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
         )
     }
 
-    class UpdateAccountProvider(val accountProviderId: String, val accountId: String) : SimpleBuyIntent() {
+    class UpdateAccountProvider(
+        val accountProviderId: String,
+        val accountId: String,
+        val linkingBankId: String
+    ) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState.copy(
             isLoading = true
         )
@@ -230,12 +235,12 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
             val minValueForSelectedPair = supportedPairsAndLimits.firstOrNull { pairs ->
                 pairs.fiatCurrency == oldState.fiatCurrency &&
-                        pairs.cryptoCurrency == selectedCryptoCurrency
+                pairs.cryptoCurrency == selectedCryptoCurrency
             }?.buyLimits?.minLimit(oldState.fiatCurrency)?.valueMinor
 
             val maxValueForSelectedPair = supportedPairsAndLimits.firstOrNull { pairs ->
                 pairs.fiatCurrency == oldState.fiatCurrency &&
-                        pairs.cryptoCurrency == selectedCryptoCurrency
+                pairs.cryptoCurrency == selectedCryptoCurrency
             }?.buyLimits?.maxLimit(oldState.fiatCurrency)?.valueMinor
 
             return oldState.copy(
@@ -324,9 +329,11 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
     object KycStarted : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(kycStartedButNotCompleted = true,
+            oldState.copy(
+                kycStartedButNotCompleted = true,
                 currentScreen = FlowScreen.KYC,
-                kycVerificationState = null)
+                kycVerificationState = null
+            )
     }
 
     class ErrorIntent(private val error: ErrorState = ErrorState.GenericError) : SimpleBuyIntent() {
@@ -379,7 +386,8 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
         private val showInAppRating: Boolean = false
     ) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(orderState = buyOrder.state,
+            oldState.copy(
+                orderState = buyOrder.state,
                 expirationDate = buyOrder.expires,
                 id = buyOrder.id,
                 fee = buyOrder.fee,

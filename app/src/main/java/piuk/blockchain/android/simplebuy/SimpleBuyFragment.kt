@@ -1,5 +1,6 @@
 package piuk.blockchain.android.simplebuy
 
+import com.blockchain.nabu.models.data.LinkBankTransfer
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.ui.linkbank.yodlee.YodleeLinkingFlowNavigator
 import piuk.blockchain.android.ui.base.FlowFragment
@@ -19,6 +20,7 @@ interface SimpleBuyNavigator : SlidingModalBottomDialog.Host, YodleeLinkingFlowN
     fun goToPendingOrderScreen()
     fun startKyc()
     fun pop()
+    fun linkBankWithPartner(bankTransfer: LinkBankTransfer)
     fun hasMoreThanOneFragmentInTheStack(): Boolean
     fun goToCardPaymentScreen(addToBackStack: Boolean = true)
     fun launchIntro()

@@ -37,9 +37,7 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.Bank
-import com.blockchain.nabu.models.data.BankPartner
 import com.blockchain.nabu.models.data.LinkBankTransfer
-import com.blockchain.nabu.models.data.YodleeAttributes
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.blockchain.ui.urllinks.URL_PRIVACY_POLICY
@@ -63,7 +61,6 @@ import piuk.blockchain.android.cards.RemoveCardBottomSheet
 import piuk.blockchain.android.simplebuy.RemovePaymentMethodBottomSheetHost
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import piuk.blockchain.android.simplebuy.linkBankEventWithCurrency
-import piuk.blockchain.android.ui.linkbank.yodlee.YodleeLinkingFlowNavigator
 import piuk.blockchain.android.ui.auth.KEY_VALIDATING_PIN_FOR_RESULT
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.auth.REQUEST_CODE_VALIDATE_PIN
@@ -74,6 +71,7 @@ import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomS
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog
 import piuk.blockchain.android.ui.fingerprint.FingerprintStage
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
+import piuk.blockchain.android.ui.linkbank.LinkBankActivity
 import piuk.blockchain.android.ui.settings.preferences.BankPreference
 import piuk.blockchain.android.ui.settings.preferences.CardPreference
 import piuk.blockchain.android.ui.settings.preferences.KycStatusPreference
@@ -1176,20 +1174,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     override fun linkBankWithPartner(linkBankTransfer: LinkBankTransfer) {
-        when (linkBankTransfer.partner) {
-            BankPartner.YODLEE -> {
-                val attributes = linkBankTransfer.attributes as YodleeAttributes
-                launchYodleeSplash(attributes.fastlinkUrl, attributes.token, attributes.configName)
-            }
-        }
-    }
-
-    private fun launchYodleeSplash(fastlinkUrl: String, accessToken: String, configName: String) {
-        (activity as? YodleeLinkingFlowNavigator)?.launchYodleeSplash(
-            fastLinkUrl = fastlinkUrl,
-            accessToken = accessToken,
-            configName = configName
-        )
+        startActivity(LinkBankActivity.newInstance(linkBankTransfer, requireContext()))
     }
 }
 

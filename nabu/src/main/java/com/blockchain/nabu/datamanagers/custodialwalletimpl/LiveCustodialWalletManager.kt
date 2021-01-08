@@ -53,7 +53,6 @@ import com.blockchain.nabu.models.responses.banktransfer.LinkedBankTransferRespo
 import com.blockchain.nabu.models.responses.banktransfer.ProviderAccountAttrs
 import com.blockchain.nabu.models.responses.banktransfer.UpdateProviderAccountBody
 import com.blockchain.nabu.models.responses.cards.CardResponse
-import com.blockchain.nabu.models.responses.cards.Limits
 import com.blockchain.nabu.models.responses.cards.PaymentMethodResponse
 import com.blockchain.nabu.models.responses.interest.InterestAccountDetailsResponse
 import com.blockchain.nabu.models.responses.interest.InterestActivityItemResponse

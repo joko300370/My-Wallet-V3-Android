@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.View
 import androidx.fragment.app.Fragment
+import com.blockchain.nabu.models.data.YodleeAttributes
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.ui.urllinks.YODLEE_LEARN_MORE
 import kotlinx.android.synthetic.main.fragment_simple_buy_yodlee_splash.*
@@ -21,16 +22,12 @@ class YodleeSplashFragment : Fragment(R.layout.fragment_simple_buy_yodlee_splash
     private val stringUtils: StringUtils by inject()
     private val analytics: Analytics by inject()
 
-    private val fastLinkUrl: String by lazy {
-        arguments?.getString(FAST_LINK_URL) ?: ""
+    private val attributes: YodleeAttributes by lazy {
+        arguments?.getSerializable(ATTRS_KEY) as YodleeAttributes
     }
 
-    private val accessToken: String by lazy {
-        arguments?.getString(ACCESS_TOKEN) ?: ""
-    }
-
-    private val configName: String by lazy {
-        arguments?.getString(CONFIG_NAME) ?: ""
+    private val linkingBankId: String by lazy {
+        arguments?.getString(LINKING_BANK_ID) ?: ""
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -45,23 +42,21 @@ class YodleeSplashFragment : Fragment(R.layout.fragment_simple_buy_yodlee_splash
 
         yodlee_splash_cta.setOnClickListener {
             analytics.logEvent(bankLinkingSplashCta(BankPartnerTypes.ACH.name))
-            navigator().launchYodleeWebview(fastLinkUrl, accessToken, configName)
+            navigator().launchYodleeWebview(attributes, linkingBankId)
         }
 
         analytics.logEvent(bankLinkingSplashShown(BankPartnerTypes.ACH.name))
     }
 
     companion object {
-        private const val FAST_LINK_URL: String = "FAST_LINK_URL"
-        private const val ACCESS_TOKEN: String = "ACCESS_TOKEN"
-        private const val CONFIG_NAME: String = "CONFIG_NAME"
+        private const val ATTRS_KEY: String = "ATTRS_KEY"
+        private const val LINKING_BANK_ID: String = "LINKING_BANK_ID"
 
-        fun newInstance(fastLinkUrl: String, accessToken: String, configName: String): YodleeSplashFragment =
+        fun newInstance(attributes: YodleeAttributes, bankId: String): YodleeSplashFragment =
             YodleeSplashFragment().apply {
                 arguments = Bundle().apply {
-                    putString(FAST_LINK_URL, fastLinkUrl)
-                    putString(ACCESS_TOKEN, accessToken)
-                    putString(CONFIG_NAME, configName)
+                    putSerializable(ATTRS_KEY, attributes)
+                    putString(LINKING_BANK_ID, bankId)
                 }
             }
     }

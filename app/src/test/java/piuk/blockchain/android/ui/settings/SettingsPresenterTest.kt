@@ -146,8 +146,6 @@ class SettingsPresenterTest {
         verify(activity).setUpUi()
         verify(activity).setPitLinkingState(false)
         verify(activity, Mockito.times(2)).updateCards(emptyList())
-        verify(activity, Mockito.times(2))
-            .updateBanks(LinkedBanksAndSupportedCurrencies(emptyList(), emptyList()))
     }
 
     @Test
@@ -178,8 +176,6 @@ class SettingsPresenterTest {
         verify(activity).hideProgress()
         verify(activity).setUpUi()
         verify(activity, times(2)).updateCards(emptyList())
-        verify(activity, Mockito.times(2))
-            .updateBanks(LinkedBanksAndSupportedCurrencies(emptyList(), emptyList()))
     }
 
     @Test
@@ -611,51 +607,6 @@ class SettingsPresenterTest {
         verify(activity).setPushNotificationPref(false)
         verify(notificationTokenManager).disableNotifications()
         verifyNoMoreInteractions(notificationTokenManager)
-    }
-
-    @Test
-    fun testEligibleBanks() {
-        // Arrange
-        val mockSettings: Settings = mock {
-            on { isNotificationsOn } `it returns` true
-            on { notificationsType } `it returns` listOf(1, 32)
-            on { smsNumber } `it returns` "sms"
-            on { email } `it returns` "email"
-        }
-
-        whenever(settingsDataManager.fetchSettings()).thenReturn(Observable.just(mockSettings))
-        whenever(prefsUtil.selectedFiatCurrency).thenReturn("USD")
-        whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(mockSettings))
-        whenever(kycStatusHelper.getSettingsKycStateTier())
-            .thenReturn(Single.just(tiers(KycTierState.None, KycTierState.None)))
-        whenever(pitLinkState.isLinked).thenReturn(false)
-        whenever(custodialWalletManager.fetchUnawareLimitsCards(ArgumentMatchers.anyList()))
-            .thenReturn(Single.just(emptyList()))
-        whenever(pitLinking.state).thenReturn(Observable.just(pitLinkState))
-
-        whenever(featureFlag.enabled).thenReturn(Single.just(true))
-        whenever(cardsFeatureFlag.enabled).thenReturn(Single.just(true))
-        whenever(fundsFeatureFlag.enabled).thenReturn(Single.just(true))
-        whenever(custodialWalletManager.getLinkedBeneficiaries()).thenReturn(Single.just(emptyList()))
-        whenever(custodialWalletManager.getSupportedFundsFiats(any(), any())).thenReturn(Single.just(emptyList()))
-        whenever(custodialWalletManager.updateSupportedCardTypes(ArgumentMatchers.anyString())).thenReturn(
-            Completable.complete())
-        whenever(custodialWalletManager.getEligiblePaymentMethodTypes(any())).thenReturn(
-            Single.just(
-                listOf(
-                    EligiblePaymentMethodType(PaymentMethodType.FUNDS, "USD"),
-                    EligiblePaymentMethodType(PaymentMethodType.BANK_TRANSFER, "USD"),
-                    EligiblePaymentMethodType(PaymentMethodType.BANK_TRANSFER, "EUR"),
-                ))
-        )
-        subject.onViewReady()
-
-        verify(activity).updateBanks(
-            setOf(
-                LinkableBank("USD", setOf(PaymentMethodType.FUNDS,PaymentMethodType.BANK_TRANSFER)),
-                LinkableBank("EUR", setOf(PaymentMethodType.BANK_TRANSFER)),
-            )
-        )
     }
 
     private fun assertClickLaunchesKyc(status1: KycTierState, status2: KycTierState) {

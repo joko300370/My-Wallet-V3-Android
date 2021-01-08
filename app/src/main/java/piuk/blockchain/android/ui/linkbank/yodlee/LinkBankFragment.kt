@@ -50,6 +50,10 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
         arguments?.getString(ACCOUNT_ID) ?: ""
     }
 
+    private val linkingBankId: String by lazy {
+        arguments?.getString(LINKING_BANK_ID) ?: ""
+    }
+
     private val errorState: ErrorState? by unsafeLazy {
         arguments?.getSerializable(ERROR_STATE) as? ErrorState
     }
@@ -63,7 +67,7 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (savedInstanceState == null && accountProviderId.isNotEmpty() && accountId.isNotEmpty()) {
-            model.process(SimpleBuyIntent.UpdateAccountProvider(accountProviderId, accountId))
+            model.process(SimpleBuyIntent.UpdateAccountProvider(accountProviderId, accountId, linkingBankId))
         }
         activity.setupToolbar(R.string.link_a_bank, false)
     }
@@ -219,19 +223,22 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
 
     private fun navigator(): YodleeLinkingFlowNavigator =
         (activity as? YodleeLinkingFlowNavigator)
-            ?: throw IllegalStateException("Parent must implement YodleeLinkingFlowNavigator")
+        ?: throw IllegalStateException("Parent must implement YodleeLinkingFlowNavigator")
 
     companion object {
         private const val ACCOUNT_PROVIDER_ID = "ACCOUNT_PROVIDER_ID"
         private const val ACCOUNT_ID = "ACCOUNT_ID"
+        private const val LINKING_BANK_ID = "LINKING_BANK_ID"
         private const val ERROR_STATE = "ERROR_STATE"
 
-        fun newInstance(accountProviderId: String, accountId: String) = LinkBankFragment().apply {
-            arguments = Bundle().apply {
-                putString(ACCOUNT_PROVIDER_ID, accountProviderId)
-                putString(ACCOUNT_ID, accountId)
+        fun newInstance(accountProviderId: String, accountId: String, linkingBankId: String) =
+            LinkBankFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ACCOUNT_PROVIDER_ID, accountProviderId)
+                    putString(ACCOUNT_ID, accountId)
+                    putString(LINKING_BANK_ID, linkingBankId)
+                }
             }
-        }
 
         fun newInstance(errorState: ErrorState) = LinkBankFragment().apply {
             arguments = Bundle().apply {
