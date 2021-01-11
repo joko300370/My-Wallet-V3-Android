@@ -247,8 +247,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
                 supportedPairsAndLimits = supportedPairsAndLimits,
                 selectedCryptoCurrency = selectedCryptoCurrency,
                 predefinedAmounts = oldState.predefinedAmounts.filter {
-                    it.valueMinor >= (minValueForSelectedPair ?: 0) && it.valueMinor <= (maxValueForSelectedPair
-                                                                                         ?: 0)
+                    it.valueMinor >= (minValueForSelectedPair ?: 0) && it.valueMinor <= (maxValueForSelectedPair ?: 0)
                 }
             )
         }

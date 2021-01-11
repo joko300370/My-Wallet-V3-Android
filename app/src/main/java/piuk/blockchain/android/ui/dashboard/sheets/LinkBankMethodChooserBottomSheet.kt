@@ -105,7 +105,7 @@ private fun PaymentMethodType.toLinkBankMethodItemUI(): LinkBankMethodItem =
         PaymentMethodType.BANK_TRANSFER -> LinkBankMethodItem(
             title = R.string.link_a_bank,
             subtitle = R.string.link_a_bank_bank_transfer,
-            icon = R.drawable.ic_bank_transfer,
+            icon = R.drawable.ic_bank_transfer
         )
         else -> throw IllegalStateException("Not supported linking method")
     }
@@ -113,5 +113,5 @@ private fun PaymentMethodType.toLinkBankMethodItemUI(): LinkBankMethodItem =
 data class LinkBankMethodItem(
     @StringRes val title: Int,
     @StringRes val subtitle: Int,
-    @DrawableRes val icon: Int,
+    @DrawableRes val icon: Int
 )

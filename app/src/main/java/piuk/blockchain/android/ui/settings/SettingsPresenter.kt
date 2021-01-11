@@ -473,14 +473,13 @@ class SettingsPresenter(
     }
 
     private fun Settings.isNotificationTypeEnabled(type: Int): Boolean {
-        return isNotificationsOn && (notificationsType.contains(type) ||
-                                     notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL))
+        return isNotificationsOn &&
+               (notificationsType.contains(type) || notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL))
     }
 
     private fun Settings.isNotificationTypeDisabled(type: Int): Boolean {
         return notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_NONE) ||
-               (!notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL) &&
-                !notificationsType.contains(type))
+               (!notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL) && !notificationsType.contains(type))
     }
 
     /**

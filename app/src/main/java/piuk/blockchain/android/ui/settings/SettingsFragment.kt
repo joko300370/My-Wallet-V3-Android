@@ -587,8 +587,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         val existingBanks = mutableListOf<String>()
 
         for (i in (0 until (banksPref?.preferenceCount ?: 0))) {
-            existingBanks.add(banksPref?.getPreference(i)?.key.takeIf { it?.contains(LINK_BANK_KEY)?.not() ?: false }
-                              ?: continue)
+            existingBanks.add(
+                banksPref?.getPreference(i)?.key.takeIf {
+                    it?.contains(LINK_BANK_KEY)?.not() ?: false
+                } ?: continue
+            )
         }
         return existingBanks
     }
