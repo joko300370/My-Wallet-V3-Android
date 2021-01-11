@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.blockchain.swap.nabu.datamanagers.LinkedBank
+import com.blockchain.nabu.datamanagers.Beneficiary
 import kotlinx.android.synthetic.main.layout_linked_bank.view.*
 import kotlinx.android.synthetic.main.simple_buy_crypto_currency_chooser.view.*
 import piuk.blockchain.android.R
@@ -20,8 +20,8 @@ import java.io.Serializable
 
 class BankChooserBottomSheet : SlidingModalBottomDialog() {
 
-    private val linkedBanks: List<LinkedBank> by unsafeLazy {
-        arguments?.getSerializable(LINKED_BANKS) as? List<LinkedBank>
+    private val beneficiaries: List<Beneficiary> by unsafeLazy {
+        arguments?.getSerializable(LINKED_BANKS) as? List<Beneficiary>
             ?: emptyList()
     }
     private val currency: String by unsafeLazy {
@@ -34,7 +34,7 @@ class BankChooserBottomSheet : SlidingModalBottomDialog() {
     override fun initControls(view: View) {
         view.recycler.adapter =
             BanksAdapter(
-                linkedBanks
+                beneficiaries
                     .map {
                         it.toBankItem()
                     }.let {
@@ -49,7 +49,7 @@ class BankChooserBottomSheet : SlidingModalBottomDialog() {
         view.recycler.layoutManager = LinearLayoutManager(context)
     }
 
-    private fun LinkedBank.toBankItem(): BankChooserItem.BankItem =
+    private fun Beneficiary.toBankItem(): BankChooserItem.BankItem =
         BankChooserItem.BankItem(this) {
             dismiss()
             (parentFragment as? BankChooserHost)?.onNewBankSelected(
@@ -60,10 +60,10 @@ class BankChooserBottomSheet : SlidingModalBottomDialog() {
     companion object {
         private const val LINKED_BANKS = "linked_banks_key"
         private const val CURRENCY = "currency_key"
-        fun newInstance(linkedBanks: List<LinkedBank>, currency: String):
+        fun newInstance(beneficiaries: List<Beneficiary>, currency: String):
                 BankChooserBottomSheet {
             val bundle = Bundle()
-            bundle.putSerializable(LINKED_BANKS, linkedBanks as Serializable)
+            bundle.putSerializable(LINKED_BANKS, beneficiaries as Serializable)
             bundle.putString(CURRENCY, currency)
             return BankChooserBottomSheet().apply {
                 arguments = bundle
@@ -86,7 +86,7 @@ private class BanksAdapter(adapterItems: List<BankChooserItem>) :
 }
 
 sealed class BankChooserItem(val clickAction: () -> Unit) {
-    class BankItem(val bank: LinkedBank, clickAction: () -> Unit) : BankChooserItem(clickAction)
+    class BankItem(val bank: Beneficiary, clickAction: () -> Unit) : BankChooserItem(clickAction)
     class AddBankItem(clickAction: () -> Unit) : BankChooserItem(clickAction)
 }
 

@@ -46,6 +46,17 @@
         app:layout_constraintTop_toBottomOf="@+id/payment_method_title"
         tools:text="$5,000 USD Limit" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/payment_method_details"
+        style="@style/Text.Semibold.16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/small_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="1234" />
+
     <View
         style="@style/Separator"
         android:layout_width="0dp"

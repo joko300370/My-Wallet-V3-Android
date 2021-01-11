@@ -5,6 +5,7 @@ import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import io.reactivex.Maybe
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.alg.AlgoCryptoWalletAccount
@@ -56,10 +57,14 @@ class Coincore internal constructor(
     fun validateSecondPassword(secondPassword: String) =
         payloadManager.validateSecondPassword(secondPassword)
 
-    fun allWallets(): Single<AccountGroup> =
+    fun allWallets(includeArchived: Boolean = false): Single<AccountGroup> =
         Maybe.concat(
             allAssets.map {
-                it.accountGroup().map { grp -> grp.accounts }
+                it.accountGroup().map { grp -> grp.accounts }.map { list ->
+                    list.filter { account ->
+                        (includeArchived || account !is CryptoAccount) || !account.isArchived
+                    }
+                }
             }
         ).reduce { a, l -> a + l }
             .map { list ->
@@ -70,12 +75,12 @@ class Coincore internal constructor(
         sourceAccount: CryptoAccount,
         action: AssetAction
     ): Single<SingleAccountList> {
-        // We only support transfers between similar assets and (soon; to - but not from - fiat)
-        // at this time. If and when, say, swap is supported this will need revisiting
         val sameCurrencyTransactionTargets =
             get(sourceAccount.asset).transactionTargets(sourceAccount)
 
-        val fiatTargets = fiatAsset.transactionTargets(sourceAccount)
+        val fiatTargets = fiatAsset.accountGroup(AssetFilter.All).map {
+            it.accounts
+        }.toSingle(emptyList())
 
         val sameCurrencyPlusFiat = sameCurrencyTransactionTargets.zipWith(fiatTargets) { crypto, fiat ->
             crypto + fiat
@@ -102,12 +107,12 @@ class Coincore internal constructor(
             AssetAction.Swap -> {
                 {
                     it is CryptoAccount &&
-                            it.asset != sourceAccount.asset &&
-                            it !is FiatAccount &&
-                            it !is InterestAccount &&
-                            // fixme special case we should remove once receive is implemented
-                            it !is AlgoCryptoWalletAccount &&
-                            if (sourceAccount.isCustodial()) it.isCustodial() else true
+                        it.asset != sourceAccount.asset &&
+                        it !is FiatAccount &&
+                        it !is InterestAccount &&
+                        // fixme special case we should remove once receive is implemented
+                        it !is AlgoCryptoWalletAccount &&
+                        if (sourceAccount.isCustodial()) it.isCustodial() else true
                 }
             }
             AssetAction.Send -> {
@@ -163,4 +168,15 @@ class Coincore internal constructor(
             target,
             action
         )
+
+    @Suppress("SameParameterValue")
+    private fun allAccounts(includeArchived: Boolean = false): Observable<SingleAccount> =
+        allWallets(includeArchived).map { it.accounts }
+            .flattenAsObservable { it }
+
+    fun isLabelUnique(label: String): Single<Boolean> =
+        allAccounts(true)
+            .filter { a -> a.label.compareTo(label, true) == 0 }
+            .toList()
+            .map { it.isEmpty() }
 }

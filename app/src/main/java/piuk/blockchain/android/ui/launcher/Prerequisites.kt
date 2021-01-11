@@ -5,7 +5,7 @@ import com.google.gson.Gson
 import info.blockchain.wallet.api.WalletApi
 import info.blockchain.wallet.api.data.Settings
 import io.reactivex.Completable
-import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.data.api.ReceiveAddresses
@@ -74,11 +74,11 @@ class Prerequisites(
         return Gson().toJson(coinAddresses)
     }
 
-    fun initSettings(guid: String, sharedKey: String): Observable<Settings> =
+    fun initSettings(guid: String, sharedKey: String): Single<Settings> =
         settingsDataManager.initSettings(
             guid,
             sharedKey
-        )
+        ).singleOrError()
 
     private fun feesCompletable(): Completable =
         feeDataManager.btcFeeOptions

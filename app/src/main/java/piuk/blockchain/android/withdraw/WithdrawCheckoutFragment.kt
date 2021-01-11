@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvent
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
-import com.blockchain.notifications.analytics.withdrawEventWithCurrency
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
+import piuk.blockchain.android.simplebuy.withdrawEventWithCurrency
 import kotlinx.android.synthetic.main.fragment_checkout.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.simplebuy.CheckoutAdapter

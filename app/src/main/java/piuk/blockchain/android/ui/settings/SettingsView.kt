@@ -1,12 +1,12 @@
 package piuk.blockchain.android.ui.settings
 
 import androidx.annotation.StringRes
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.models.nabu.KycTiers
+import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.models.responses.nabu.KycTiers
 import piuk.blockchain.androidcoreui.ui.base.View
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 
-internal interface SettingsView : View {
+interface SettingsView : View {
 
     fun setUpUi()
 
@@ -34,6 +34,10 @@ internal interface SettingsView : View {
 
     fun setFiatSummary(summary: String)
 
+    fun showEmailDialog(currentEmail: String, emailVerified: Boolean)
+
+    fun showDialogTwoFA(authType: Int, smsVerified: Boolean)
+
     fun setEmailNotificationsVisibility(visible: Boolean)
 
     fun setEmailNotificationPref(enabled: Boolean)
@@ -50,7 +54,7 @@ internal interface SettingsView : View {
 
     fun updateCards(cards: List<PaymentMethod.Card>)
 
-    fun updateBanks(linkedAndSupportedCurrencies: SettingsFragment.LinkedBanksAndSupportedCurrencies)
+    fun updateBanks(linkedAndSupportedCurrencies: LinkedBanksAndSupportedCurrencies)
 
     fun cardsEnabled(enabled: Boolean)
 
@@ -61,6 +65,8 @@ internal interface SettingsView : View {
     fun showDialogEmailVerification()
 
     fun showDialogVerifySms()
+
+    fun showDialogMobile(authType: Int, isSmsVerified: Boolean, smsNumber: String)
 
     fun showDialogSmsVerified()
 
@@ -75,6 +81,4 @@ internal interface SettingsView : View {
     fun showWarningDialog(@StringRes message: Int)
 
     fun launchKycFlow()
-
-    fun isPitEnabled(enabled: Boolean)
 }

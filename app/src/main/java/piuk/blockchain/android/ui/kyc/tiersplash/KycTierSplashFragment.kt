@@ -18,15 +18,13 @@ import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.KYCAnalyticsEvents
 import com.blockchain.notifications.analytics.kycTierStart
 import com.blockchain.notifications.analytics.logEvent
-import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.swap.nabu.models.nabu.KycTierLevel
-import com.blockchain.swap.nabu.models.nabu.KycTierState
-import com.blockchain.swap.nabu.models.nabu.KycTiers
-import com.blockchain.swap.nabu.models.nabu.Tier
+import com.blockchain.nabu.models.responses.nabu.KycTierLevel
+import com.blockchain.nabu.models.responses.nabu.KycTierState
+import com.blockchain.nabu.models.responses.nabu.KycTiers
+import com.blockchain.nabu.models.responses.nabu.Tier
 import com.blockchain.ui.extensions.throttledClicks
 import com.blockchain.ui.urllinks.URL_CONTACT_SUPPORT
 import com.blockchain.ui.urllinks.URL_LEARN_MORE_REJECTED
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
@@ -40,8 +38,6 @@ import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
 import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import piuk.blockchain.android.ui.kyc.navigate
-import piuk.blockchain.android.ui.swap.SwapTypeSwitcher
-import piuk.blockchain.android.ui.swapold.exchange.host.HomebrewNavHostActivity
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.util.setImageDrawable
@@ -60,9 +56,6 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
     private val presenter: KycTierSplashPresenter by scopedInject()
     private val analytics: Analytics by inject()
     private val progressListener: KycProgressListener by ParentActivityDelegate(this)
-    private val currencyPrefs: CurrencyPrefs by inject()
-    private val newSwapSwitcher: SwapTypeSwitcher by scopedInject()
-    private val compositeDisposable = CompositeDisposable()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -268,28 +261,14 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
     }
 
     private fun startSwap() {
-        compositeDisposable += newSwapSwitcher.shouldShowNewSwap()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = {
-                    if (it) {
-                        TransactionFlow(
-                            action = AssetAction.Swap
-                        ).apply {
-                            startFlow(
-                                fragmentManager = childFragmentManager,
-                                host = this@KycTierSplashFragment
-                            )
-                        }
-                    } else {
-                        HomebrewNavHostActivity.start(
-                            context!!,
-                            currencyPrefs.selectedFiatCurrency
-                        )
-                        activity?.finish()
-                    }
-                }
+        TransactionFlow(
+            action = AssetAction.Swap
+        ).apply {
+            startFlow(
+                fragmentManager = childFragmentManager,
+                host = this@KycTierSplashFragment
             )
+        }
     }
 
     override fun onPause() {

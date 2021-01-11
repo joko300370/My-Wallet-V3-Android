@@ -1,13 +1,13 @@
 package piuk.blockchain.android.simplebuy
 
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.models.nabu.KycTierLevel
-import com.blockchain.swap.nabu.service.TierService
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.models.responses.nabu.KycTierLevel
+import com.blockchain.nabu.service.TierService
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Observable
 import io.reactivex.Single
-import java.lang.IllegalStateException
 
 class SimpleBuyFlowNavigator(
     private val simpleBuyModel: SimpleBuyModel,
@@ -20,7 +20,7 @@ class SimpleBuyFlowNavigator(
         startedFromKycResume: Boolean,
         startedFromNavigationBar: Boolean,
         preselectedCrypto: CryptoCurrency?
-    ): Single<BuyNavigation.FlowScreenWithCurrency> =
+    ): Single<BuyNavigation> =
         simpleBuyModel.state.flatMap {
             val cryptoCurrency = preselectedCrypto ?: it.selectedCryptoCurrency
             ?: throw IllegalStateException("CryptoCurrency is not available")
@@ -40,10 +40,16 @@ class SimpleBuyFlowNavigator(
                     }
                 }
             } else {
-                if (startedFromNavigationBar) {
-                    Observable.just(BuyNavigation.FlowScreenWithCurrency(FlowScreen.ENTER_AMOUNT, cryptoCurrency))
-                } else {
-                    Observable.just(BuyNavigation.FlowScreenWithCurrency(it.currentScreen, cryptoCurrency))
+                when {
+                    it.orderState == OrderState.AWAITING_FUNDS -> {
+                        Observable.just(BuyNavigation.PendingOrderScreen)
+                    }
+                    startedFromNavigationBar -> {
+                        Observable.just(BuyNavigation.FlowScreenWithCurrency(FlowScreen.ENTER_AMOUNT, cryptoCurrency))
+                    }
+                    else -> {
+                        Observable.just(BuyNavigation.FlowScreenWithCurrency(it.currentScreen, cryptoCurrency))
+                    }
                 }
             }
         }.firstOrError()
@@ -73,4 +79,5 @@ class SimpleBuyFlowNavigator(
 sealed class BuyNavigation {
     data class CurrencySelection(val currencies: List<String>) : BuyNavigation()
     data class FlowScreenWithCurrency(val flowScreen: FlowScreen, val cryptoCurrency: CryptoCurrency) : BuyNavigation()
+    object PendingOrderScreen : BuyNavigation()
 }

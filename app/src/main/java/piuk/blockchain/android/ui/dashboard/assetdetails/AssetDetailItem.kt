@@ -11,14 +11,14 @@ import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.synthetic.main.dialog_dashboard_asset_label_item.view.*
 import kotlinx.android.synthetic.main.view_account_crypto_overview.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.accounts.CellDecorator
-import piuk.blockchain.android.accounts.addViewToBottomWithConstraints
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
+import piuk.blockchain.android.ui.customviews.account.CellDecorator
+import piuk.blockchain.android.ui.customviews.account.addViewToBottomWithConstraints
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.androidcoreui.utils.extensions.context

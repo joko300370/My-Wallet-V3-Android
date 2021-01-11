@@ -151,14 +151,18 @@ operator fun FiatValue?.div(exchangeRate: ExchangeRate.CryptoToFiat?) =
     this?.let { exchangeRate?.inverse()?.applyRate(it) }
 
 fun ExchangeRate?.percentageDelta(previous: ExchangeRate?): Double =
-    if (this != null && previous != null && previous.rate != BigDecimal.ZERO) {
-        val current = rate
-        val prev = previous.rate
+    try {
+        if (this != null && previous != null && previous.rate.signum() != 0) {
+            val current = rate
+            val prev = previous.rate
 
-        (current - prev)
-            .divide(prev, 4, RoundingMode.HALF_EVEN)
-            .movePointRight(2)
-            .toDouble()
-    } else {
+            (current - prev)
+                .divide(prev, 4, RoundingMode.HALF_EVEN)
+                .movePointRight(2)
+                .toDouble()
+        } else {
+            Double.NaN
+        }
+    } catch (t: ArithmeticException) {
         Double.NaN
     }

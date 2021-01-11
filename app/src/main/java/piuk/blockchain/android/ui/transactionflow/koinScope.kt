@@ -19,6 +19,9 @@ internal fun createTransactionScope(): Scope =
 internal fun transactionScope(): Scope =
     KoinJavaComponent.getKoin().getScope(SCOPE_ID)
 
+internal fun transactionScopeOrNull(): Scope? =
+    KoinJavaComponent.getKoin().getScopeOrNull(SCOPE_ID)
+
 internal fun closeTransactionScope() =
     try {
         transactionScope().close()

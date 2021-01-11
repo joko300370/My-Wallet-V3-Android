@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.item_dashboard_balance_card.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.Coincore
@@ -114,8 +113,8 @@ private class BalanceCardViewHolder internal constructor(
             if (entries.all { it.value == 0.0f }) {
                 populateEmptyPieChart()
             } else {
-                val sliceColours = CryptoCurrency.activeCurrencies().map {
-                    ContextCompat.getColor(itemView.context, it.colorRes())
+                val sliceColours = coincore.cryptoAssets.map {
+                    ContextCompat.getColor(itemView.context, (it as CryptoAsset).asset.colorRes())
                 }.toMutableList()
 
                 // Add colour for Funds

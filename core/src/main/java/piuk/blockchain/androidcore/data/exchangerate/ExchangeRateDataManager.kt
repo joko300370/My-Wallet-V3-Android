@@ -12,6 +12,7 @@ import piuk.blockchain.androidcore.data.exchangerate.datastore.ExchangeRateDataS
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import java.lang.IllegalStateException
+import java.math.BigDecimal
 import java.math.RoundingMode
 
 /**
@@ -30,10 +31,10 @@ class ExchangeRateDataManager(
             .subscribeOn(Schedulers.io())
 
     override fun getLastPrice(cryptoCurrency: CryptoCurrency, currencyName: String) =
-            exchangeRateDataStore.getLastPrice(cryptoCurrency, currencyName)
+        BigDecimal(exchangeRateDataStore.getLastPrice(cryptoCurrency, currencyName))
 
     override fun getLastPriceOfFiat(targetFiat: String, sourceFiat: String) =
-        exchangeRateDataStore.getFiatLastPrice(targetFiat = targetFiat, sourceFiat = sourceFiat)
+        BigDecimal(exchangeRateDataStore.getFiatLastPrice(targetFiat = targetFiat, sourceFiat = sourceFiat))
 
     fun getHistoricPrice(value: Money, fiat: String, timeInSeconds: Long): Single<FiatValue> =
         exchangeRateDataStore.getHistoricPrice(
@@ -57,13 +58,13 @@ fun FiatValue.toCryptoOrNull(exchangeRateDataManager: ExchangeRates, cryptoCurre
     if (isZero) {
         CryptoValue.zero(cryptoCurrency)
     } else {
-        val rate = exchangeRateDataManager.getLastPrice(cryptoCurrency, this.currencyCode).toBigDecimal()
+        val rate = exchangeRateDataManager.getLastPrice(cryptoCurrency, this.currencyCode)
         if (rate.signum() == 0) {
             null
         } else {
             CryptoValue.fromMajor(
                 cryptoCurrency,
-                toBigDecimal().divide(rate, cryptoCurrency.dp, RoundingMode.HALF_UP)
+                this.toBigDecimal().divide(rate, cryptoCurrency.dp, RoundingMode.HALF_UP)
             )
         }
     }

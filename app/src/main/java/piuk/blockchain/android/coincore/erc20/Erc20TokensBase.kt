@@ -2,9 +2,9 @@ package piuk.blockchain.android.coincore.erc20
 
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
-import com.blockchain.swap.nabu.service.TierService
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import io.reactivex.Completable
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase

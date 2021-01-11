@@ -219,10 +219,14 @@ class EthDataManager(
         } ?: Completable.error { IllegalStateException("ETH Wallet is null") }
             .applySchedulers()
 
-    fun updateErc20TransactionNotes(hash: String, note: String): Completable = rxPinning.call {
-        getErc20TokenData(CryptoCurrency.PAX).putTxNote(hash, note)
-        return@call save()
-    }.applySchedulers()
+    fun updateErc20TransactionNotes(hash: String, note: String, asset: CryptoCurrency): Completable {
+        require(asset.hasFeature(IS_ERC20))
+
+        return rxPinning.call {
+            getErc20TokenData(asset).putTxNote(hash, note)
+            return@call save()
+        }.applySchedulers()
+    }
 
     /**
      * Fetches EthereumWallet stored in metadata. If metadata entry doesn't exists it will be created.

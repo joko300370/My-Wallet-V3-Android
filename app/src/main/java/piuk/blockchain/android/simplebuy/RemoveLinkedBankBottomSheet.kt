@@ -4,9 +4,8 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.LinkedBank
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.Beneficiary
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -27,8 +26,8 @@ class RemoveLinkedBankBottomSheet : SlidingModalBottomDialog() {
     private val compositeDisposable = CompositeDisposable()
     private val custodialWalletManager: CustodialWalletManager by scopedInject()
 
-    private val bank: LinkedBank by unsafeLazy {
-        arguments?.getSerializable(BANK_KEY) as? LinkedBank ?: throw IllegalStateException("No card provided")
+    private val bank: Beneficiary by unsafeLazy {
+        arguments?.getSerializable(BANK_KEY) as? Beneficiary ?: throw IllegalStateException("No card provided")
     }
     override val layoutResource: Int = R.layout.remove_bank_bottom_sheet
 
@@ -68,7 +67,7 @@ class RemoveLinkedBankBottomSheet : SlidingModalBottomDialog() {
     companion object {
         private const val BANK_KEY = "BANK_KEY"
 
-        fun newInstance(bank: LinkedBank) =
+        fun newInstance(bank: Beneficiary) =
             RemoveLinkedBankBottomSheet().apply {
                 arguments = Bundle().apply {
                     putSerializable(BANK_KEY, bank)

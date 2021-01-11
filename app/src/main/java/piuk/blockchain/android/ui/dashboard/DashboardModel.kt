@@ -95,7 +95,6 @@ data class FiatAssetState(
 
 enum class DashboardSheet {
     STX_AIRDROP_COMPLETE,
-    SIMPLE_BUY_PAYMENT,
     BACKUP_BEFORE_SEND,
     SIMPLE_BUY_CANCEL_ORDER,
     FIAT_FUNDS_DETAILS,

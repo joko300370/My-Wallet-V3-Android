@@ -7,7 +7,6 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.remoteconfig.FeatureFlag
 import info.blockchain.wallet.api.Environment
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import info.blockchain.wallet.api.data.Settings
@@ -38,7 +37,6 @@ class LauncherPresenter(
     private val settingsDataManager: SettingsDataManager,
     private val notificationTokenManager: NotificationTokenManager,
     private val envSettings: EnvironmentConfig,
-    private val featureFlag: FeatureFlag,
     private val currencyPrefs: CurrencyPrefs,
     private val analytics: Analytics,
     private val prerequisites: Prerequisites,
@@ -127,15 +125,20 @@ class LauncherPresenter(
     @SuppressLint("CheckResult")
     private fun initSettings() {
 
-        val settings = prerequisites.initSettings(
-            payloadDataManager.wallet!!.guid,
-            payloadDataManager.wallet!!.sharedKey).doOnNext {
-            // If the account is new, we need to check if we should launch Simple buy flow
-            // (in that case, currency will be selected by user manually)
-            // or select the default from device Locale
-            if (!isNewAccount())
-                setCurrencyUnits(it)
-        }.singleOrError()
+        val settings = Single.defer {
+            Single.just(payloadDataManager.wallet!!)
+        }.flatMap { wallet ->
+            prerequisites.initSettings(
+                wallet.guid,
+                wallet.sharedKey
+            ).doOnSuccess {
+                // If the account is new, we need to check if we should launch Simple buy flow
+                // (in that case, currency will be selected by user manually)
+                // or select the default from device Locale
+                if (!isNewAccount())
+                    setCurrencyUnits(it)
+            }
+        }
 
         val metadata = prerequisites.initMetadataAndRelatedPrerequisites()
         val updateFiatWithDefault = settingsDataManager.updateFiatUnit(currencyPrefs.defaultFiatCurrency)
@@ -148,9 +151,7 @@ class LauncherPresenter(
                 if (!shouldCheckForSimpleBuyLaunching())
                     Single.just(false)
                 else {
-                    featureFlag.enabled.map { simpleBuyFeatureFlagEnabled ->
-                        simpleBuyFeatureFlagEnabled && walletJustCreated()
-                    }
+                    Single.just(walletJustCreated())
                 }
             }.flatMap { simpleBuyShouldLaunched ->
                 if (!simpleBuyShouldLaunched && noCurrencySet())
@@ -159,36 +160,36 @@ class LauncherPresenter(
                     Single.just(simpleBuyShouldLaunched)
                 }
             }
-                .doOnSuccess { accessState.isLoggedIn = true }
-                .doOnSuccess { notificationTokenManager.registerAuthEvent() }
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe { view.updateProgressVisibility(true) }
-                .subscribeBy(
-                    onSuccess = { simpleBuyShouldLaunched ->
-                        view.updateProgressVisibility(false)
-                        if (simpleBuyShouldLaunched) {
-                            launchBuySellIntro()
+            .doOnSuccess { accessState.isLoggedIn = true }
+            .doOnSuccess { notificationTokenManager.registerAuthEvent() }
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { view.updateProgressVisibility(true) }
+            .subscribeBy(
+                onSuccess = { simpleBuyShouldLaunched ->
+                    view.updateProgressVisibility(false)
+                    if (simpleBuyShouldLaunched) {
+                        launchBuySellIntro()
+                    } else {
+                        startMainActivity()
+                    }
+                }, onError = { throwable ->
+                    view.updateProgressVisibility(false)
+                    if (throwable is InvalidCredentialsException || throwable is HDWalletException) {
+                        if (payloadDataManager.isDoubleEncrypted) {
+                            // Wallet double encrypted and needs to be decrypted to set up ether wallet, contacts etc
+                            view?.showSecondPasswordDialog()
                         } else {
-                            startMainActivity()
-                        }
-                    }, onError = { throwable ->
-                        view.updateProgressVisibility(false)
-                        if (throwable is InvalidCredentialsException || throwable is HDWalletException) {
-                            if (payloadDataManager.isDoubleEncrypted) {
-                                // Wallet double encrypted and needs to be decrypted to set up ether wallet, contacts etc
-                                view?.showSecondPasswordDialog()
-                            } else {
-                                view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
-                                view.onRequestPin()
-                            }
-                        } else {
-                            view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
+                        view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
                             view.onRequestPin()
                         }
-                        logException(throwable)
+                    } else {
+                        view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
+                        view.onRequestPin()
                     }
-                )
-    }
+                    logException(throwable)
+                }
+            )
+        }
 
     private fun isNewAccount(): Boolean = accessState.isNewlyCreated
 

@@ -1,7 +1,7 @@
 package piuk.blockchain.android.withdraw.mvi
 
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.repositories.AssetBalancesRepository
 import info.blockchain.balance.FiatValue
 
 class WithdrawInteractor(
@@ -14,7 +14,7 @@ class WithdrawInteractor(
             .defaultIfEmpty(FiatValue.zero(currency))
 
     fun fetchLinkedBanks(currency: String) =
-        custodialWalletManager.getLinkedBanks().map { banks ->
+        custodialWalletManager.getLinkedBeneficiaries().map { banks ->
             banks.filter { it.currency == currency }
         }
 

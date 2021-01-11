@@ -1,6 +1,6 @@
 package piuk.blockchain.android.coincore
 
-import com.blockchain.swap.nabu.models.interest.DisabledReason
+import com.blockchain.nabu.models.responses.interest.DisabledReason
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
@@ -68,6 +68,8 @@ interface CryptoAccount : SingleAccount {
         get() = Single.just(CryptoValue.zero(asset))
 
     fun requireSecondPassword(): Single<Boolean>
+
+    fun matches(other: CryptoAccount): Boolean
 }
 
 interface FiatAccount : SingleAccount {
@@ -128,6 +130,9 @@ class NullCryptoAccount(
     override val hasTransactions: Boolean = false
 
     override fun requireSecondPassword(): Single<Boolean> = Single.just(false)
+
+    override fun matches(other: CryptoAccount): Boolean =
+        other is NullCryptoAccount
 
     override fun fiatBalance(
         fiatCurrency: String,

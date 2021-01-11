@@ -3,20 +3,19 @@ package piuk.blockchain.android.ui.recover
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.inputmethod.EditorInfo
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
-import android.view.inputmethod.EditorInfo
 import com.blockchain.annotations.CommonCode
 import com.blockchain.koin.scopedInject
 import kotlinx.android.synthetic.main.activity_recover_funds.*
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
-import piuk.blockchain.android.ui.createwallet.CreateWalletActivity
-import com.blockchain.ui.dialog.MaterialProgressDialog
 import piuk.blockchain.android.ui.auth.PinEntryActivity
+import piuk.blockchain.android.ui.createwallet.CreateWalletActivity
+import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
+import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.ViewUtils
-
 import java.util.Locale
 
 internal class RecoverFundsActivity :

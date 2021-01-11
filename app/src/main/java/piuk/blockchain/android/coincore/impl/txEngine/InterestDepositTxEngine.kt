@@ -1,7 +1,7 @@
 package piuk.blockchain.android.coincore.impl.txEngine
 
 import com.blockchain.koin.scopedInject
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single

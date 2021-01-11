@@ -7,8 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
+import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.dialog_activities_tx_item.view.*
 import piuk.blockchain.android.R
@@ -63,12 +63,9 @@ private class CustodialTradingActivityItemViewHolder(
             setTextColours(tx.status)
 
             asset_balance_fiat.text = tx.fundedFiat.toStringWithSymbol()
-            if (tx.status == OrderState.FINISHED) {
-                asset_balance_crypto.text = tx.value.toStringWithSymbol()
-            } else {
-                asset_balance_crypto.text =
-                    context.getString(R.string.activity_custodial_pending_value)
-            }
+
+            asset_balance_crypto.text = tx.value.toStringWithSymbol()
+
             setOnClickListener {
                 onAccountClicked(tx.cryptoCurrency, tx.txId, CryptoActivityType.CUSTODIAL_TRADING)
             }

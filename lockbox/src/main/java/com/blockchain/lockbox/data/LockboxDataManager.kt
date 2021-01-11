@@ -35,10 +35,6 @@ class LockboxDataManager(
             .defaultIfEmpty(emptyList())
             .toSingle()
 
-    override fun defaultAccountReference(): AccountReference {
-        TODO("not implemented - not used")
-    }
-
     override fun defaultAccount(): Single<AccountReference> {
         TODO("not implemented - not used")
     }

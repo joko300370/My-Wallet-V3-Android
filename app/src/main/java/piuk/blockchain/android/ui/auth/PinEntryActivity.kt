@@ -3,18 +3,19 @@ package piuk.blockchain.android.ui.auth
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentPagerAdapter
 import android.view.MotionEvent
 import android.view.Window
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
 import androidx.viewpager.widget.ViewPager
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService
 import piuk.blockchain.android.databinding.ActivityPinEntryBinding
+import piuk.blockchain.android.ui.customviews.dialogs.OverlayDetection
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveFragment
 import piuk.blockchain.android.util.OSUtil
 import piuk.blockchain.androidcore.data.access.AccessState
@@ -23,7 +24,6 @@ import piuk.blockchain.androidcore.utils.annotations.Thunk
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.OverlayDetection
 
 class PinEntryActivity : BaseAuthActivity(), PinEntryFragment.OnPinEntryFragmentInteractionListener,
     ViewPager.OnPageChangeListener {

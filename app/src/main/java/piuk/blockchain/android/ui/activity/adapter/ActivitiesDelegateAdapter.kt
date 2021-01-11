@@ -22,6 +22,7 @@ class ActivitiesDelegateAdapter(
             addAdapterDelegate(NonCustodialActivityItemDelegate(disposables, prefs, onCryptoItemClicked))
             addAdapterDelegate(SwapActivityItemDelegate(onCryptoItemClicked))
             addAdapterDelegate(CustodialTradingActivityItemDelegate(onCryptoItemClicked))
+            addAdapterDelegate(SellActivityItemDelegate(onCryptoItemClicked))
             addAdapterDelegate(CustodialFiatActivityItemDelegate(onFiatItemClicked))
             addAdapterDelegate(CustodialInterestActivityItemDelegate(disposables, prefs, onCryptoItemClicked))
         }

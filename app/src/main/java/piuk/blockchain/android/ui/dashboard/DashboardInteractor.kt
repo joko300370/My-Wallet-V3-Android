@@ -2,15 +2,16 @@ package piuk.blockchain.android.ui.dashboard
 
 import com.blockchain.logging.CrashLogger
 import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.Money
 import info.blockchain.wallet.payload.PayloadManager
+import info.blockchain.wallet.prices.TimeAgo
 import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.prices.data.PriceDatum
 import io.reactivex.Maybe
@@ -183,11 +184,10 @@ class DashboardInteractor(
             )
 
     fun refreshPrices(model: DashboardModel, crypto: CryptoCurrency): Disposable {
-        val oneDayAgo = (System.currentTimeMillis() / 1000) - ONE_DAY
 
         return Singles.zip(
             coincore[crypto].exchangeRate(),
-            coincore[crypto].historicRate(oneDayAgo)
+            coincore[crypto].historicRate(TimeAgo.ONE_DAY.epoch)
         ) { rate, day -> PriceUpdate(crypto, rate, day) }
             .subscribeBy(
                 onSuccess = { model.process(it) },
@@ -280,7 +280,6 @@ class DashboardInteractor(
     }
 
     companion object {
-        private const val ONE_DAY = 24 * 60 * 60L
         private val FLATLINE_CHART = listOf(
             PriceDatum(price = 1.0, timestamp = 0),
             PriceDatum(price = 1.0, timestamp = System.currentTimeMillis() / 1000)

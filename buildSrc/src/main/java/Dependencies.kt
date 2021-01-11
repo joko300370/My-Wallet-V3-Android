@@ -6,8 +6,8 @@ object Versions {
     const val minSdk = 21
     const val targetSdk = 29
     const val compileSdk = 28
-    const val versionCode = 589
-    const val versionName = "8.1.1"
+    const val versionCode = 597
+    const val versionName = "8.4.0"
     const val buildTools = "28.0.3"
 
     // Build tools and languages
@@ -21,7 +21,7 @@ object Versions {
     const val javaCompatibilityVersion = 1.8
 
     // Androidx Libraries
-    const val appCompact = "1.1.0"
+    const val appCompat = "1.2.0"
     const val recyclerview = "1.1.0"
     const val cardview = "1.0.0"
     const val gridlayout = "1.0.0"
@@ -93,7 +93,7 @@ object Versions {
     const val sparkline = "1.2.0"
 
     // Third Party SDKs
-    const val veriff = "3.4.0"
+    const val veriff = "3.9.0"
     const val probity = "1.0.0"
     const val sift = "0.10.5"
     const val cardForm = "4.2.0"
@@ -137,7 +137,7 @@ object Libraries {
     const val ktlint = "com.github.shyiko:ktlint:${Versions.ktlint}"
 
     // Support Libraries
-    const val appCompat = "androidx.appcompat:appcompat:${Versions.appCompact}"
+    const val appCompat = "androidx.appcompat:appcompat:${Versions.appCompat}"
     const val recyclerView = "androidx.recyclerview:recyclerview:${Versions.recyclerview}"
     const val cardView = "androidx.cardview:cardview:${Versions.cardview}"
     const val gridLayout = "androidx.gridlayout:gridlayout:${Versions.gridlayout}"
@@ -184,6 +184,7 @@ object Libraries {
     const val moshiKotlin = "com.squareup.moshi:moshi-kotlin:${Versions.moshi}"
     const val moshiAdapters = "com.squareup.moshi:moshi-adapters:${Versions.moshi}"
     const val jacksonCore = "com.fasterxml.jackson.core:jackson-core:${Versions.jacksonCore}"
+    const val jacksonKotlin = "com.fasterxml.jackson.module:jackson-module-kotlin:${Versions.jacksonCore}"
     const val gson = "com.google.code.gson:gson:${Versions.gson}"
     const val koin = "org.koin:koin-core:${Versions.koin}"
     const val koinAndroid = "org.koin:koin-android:${Versions.koin}"

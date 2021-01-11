@@ -61,9 +61,6 @@ class AppUtil(
     }
 
     companion object {
-        private const val REGEX_UUID =
-            "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
-
         const val INTENT_EXTRA_VERIFIED = "verified"
         const val INTENT_EXTRA_IS_AFTER_WALLET_CREATION = "is_after_wallet_creation"
     }

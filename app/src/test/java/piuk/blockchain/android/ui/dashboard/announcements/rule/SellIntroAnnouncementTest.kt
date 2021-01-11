@@ -2,7 +2,7 @@ package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.remoteconfig.FeatureFlag
-import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.EligibilityProvider
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
@@ -35,7 +35,6 @@ class SellIntroAnnouncementTest {
             SellIntroAnnouncement(
                 dismissRecorder = dismissRecorder,
                 eligibilityProvider = eligibilityProvider,
-                sellFeatureFlag = sellFeatureFlag,
                 coincore = coincore,
                 analytics = analytics
             )

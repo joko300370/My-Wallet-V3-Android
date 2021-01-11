@@ -164,8 +164,8 @@
 -keep public class info.blockchain.wallet.ethereum.** { *; }
 -keep public class info.blockchain.wallet.ethereum.data.** { *; }
 -keep public class info.blockchain.wallet.prices.data.** { *; }
--keep public class com.blockchain.swap.nabu.api.** { *; }
--keep public class com.blockchain.swap.nabu.models.** { *; }
+-keep public class com.blockchain.nabu.api.** { *; }
+-keep public class com.blockchain.nabu.models.** { *; }
 -keepclasseswithmembernames class android.support.v4.widget.DrawerLayout { *; }
 
 # Javapoet

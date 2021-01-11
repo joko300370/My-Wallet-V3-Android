@@ -14,6 +14,8 @@ import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.ui.customviews.CurrencyType
+import piuk.blockchain.android.ui.customviews.account.CellDecorator
+import piuk.blockchain.android.ui.customviews.account.DefaultCellDecorator
 import piuk.blockchain.android.ui.customviews.account.StatusDecorator
 import piuk.blockchain.android.ui.swap.SwapAccountSelectSheetFeeDecorator
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionErrorState
@@ -35,6 +37,7 @@ interface TransactionFlowCustomiser {
     fun selectTargetSubtitle(state: TransactionState): String
     fun selectTargetSourceLabel(state: TransactionState): String
     fun selectTargetDestinationLabel(state: TransactionState): String
+    fun selectTargetStatusDecorator(state: TransactionState, account: BlockchainAccount): CellDecorator
     fun enterAmountTitle(state: TransactionState): String
     fun enterAmountActionIcon(state: TransactionState): Int
     fun enterAmountActionIconCustomisation(state: TransactionState): Boolean
@@ -141,6 +144,12 @@ class TransactionFlowCustomiserImpl(
         when (state.action) {
             AssetAction.Swap -> resources.getString(R.string.common_receive)
             else -> resources.getString(R.string.common_to)
+        }
+
+    override fun selectTargetStatusDecorator(state: TransactionState, account: BlockchainAccount): CellDecorator =
+        when (state.action) {
+            AssetAction.Swap -> SwapAccountSelectSheetFeeDecorator(account)
+            else -> DefaultCellDecorator()
         }
 
     override fun selectTargetShowManualEnterAddress(state: TransactionState): Boolean =
@@ -328,7 +337,7 @@ class TransactionFlowCustomiserImpl(
 
     override fun selectSourceAccountTitle(state: TransactionState): String {
         return when (state.action) {
-            AssetAction.Swap -> resources.getString(R.string.swap)
+            AssetAction.Swap -> resources.getString(R.string.common_swap)
             else -> ""
         }
     }
@@ -456,7 +465,8 @@ class TransactionFlowCustomiserImpl(
         state.action != AssetAction.Swap
 
     override fun defInputType(state: TransactionState): CurrencyType =
-        if (state.action == AssetAction.Swap) CurrencyType.Fiat else CurrencyType.Crypto
+        if (state.action == AssetAction.Swap || state.action == AssetAction.Sell)
+            CurrencyType.Fiat else CurrencyType.Crypto
 
     override fun sourceAccountSelectionStatusDecorator(state: TransactionState): StatusDecorator =
         when (state.action) {

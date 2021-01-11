@@ -1,7 +1,7 @@
 package piuk.blockchain.android.simplebuy
 
-import com.blockchain.swap.nabu.datamanagers.BuySellLimits
-import com.blockchain.swap.nabu.datamanagers.BuySellPair
+import com.blockchain.nabu.datamanagers.BuySellLimits
+import com.blockchain.nabu.datamanagers.BuySellPair
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import org.junit.Test

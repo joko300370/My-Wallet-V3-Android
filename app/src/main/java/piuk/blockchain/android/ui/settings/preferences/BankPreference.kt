@@ -6,28 +6,25 @@ import android.text.TextUtils
 import android.widget.TextView
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
-import com.blockchain.swap.nabu.datamanagers.LinkedBank
+import com.blockchain.nabu.datamanagers.Beneficiary
 import kotlinx.android.synthetic.main.preference_bank_layout.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.util.loadInterMedium
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
-import piuk.blockchain.androidcoreui.utils.helperfunctions.CustomFont
-import piuk.blockchain.androidcoreui.utils.helperfunctions.loadFont
 
 class BankPreference(
     fiatCurrency: String,
-    private val bank: LinkedBank? = null,
+    private val bank: Beneficiary? = null,
     context: Context
 ) : Preference(context, null, R.attr.preferenceStyle, 0) {
-    private var typeface: Typeface? = null
+    private val typeface: Typeface = context.loadInterMedium()
 
     init {
         widgetLayoutResource = R.layout.preference_bank_layout
 
-        loadFont(context, CustomFont.MONTSERRAT_REGULAR) {
-            typeface = it
-            this.title = title // Forces setting fonts when Title is set via XML
-        }
+        this.title = title // Forces setting fonts when Title is set via XML
+
         title = bank?.title ?: context.getString(R.string.add_bank_title, fiatCurrency)
         summary = bank?.currency ?: ""
         icon = getContext().getDrawable(R.drawable.ic_bank_transfer)
@@ -38,9 +35,7 @@ class BankPreference(
     }
 
     override fun setTitle(title: CharSequence?) {
-        typeface?.let {
-            super.setTitle(title?.applyFont(typeface))
-        } ?: super.setTitle(title)
+        super.setTitle(title?.applyFont(typeface))
     }
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {

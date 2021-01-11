@@ -1,6 +1,6 @@
 package piuk.blockchain.android.ui.interest
 
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.disposables.CompositeDisposable
 import piuk.blockchain.android.coincore.Coincore

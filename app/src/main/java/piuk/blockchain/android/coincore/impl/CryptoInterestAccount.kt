@@ -1,10 +1,11 @@
 package piuk.blockchain.android.coincore.impl
 
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.InterestActivityItem
-import com.blockchain.swap.nabu.datamanagers.InterestState
-import com.blockchain.swap.nabu.datamanagers.Product
-import com.blockchain.swap.nabu.models.interest.DisabledReason
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.InterestActivityItem
+import com.blockchain.nabu.datamanagers.InterestState
+import com.blockchain.nabu.datamanagers.Product
+import com.blockchain.nabu.models.responses.interest.DisabledReason
+import com.blockchain.nabu.datamanagers.TransferDirection
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -14,10 +15,11 @@ import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
 import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.SwapActivitySummaryItem
+import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
@@ -33,7 +35,6 @@ internal class CryptoInterestAccount(
     private val environmentConfig: EnvironmentConfig
 ) : CryptoAccountBase(), InterestAccount {
 
-    private val nabuAccountExists = AtomicBoolean(false)
     private val hasFunds = AtomicBoolean(false)
 
     override val receiveAddress: Single<ReceiveAddress>
@@ -62,8 +63,14 @@ internal class CryptoInterestAccount(
             }
         }
 
+    override val directions: Set<TransferDirection>
+        get() = emptySet()
+
     override fun requireSecondPassword(): Single<Boolean> =
         Single.just(false)
+
+    override fun matches(other: CryptoAccount): Boolean =
+        other is CryptoInterestAccount && other.asset == asset
 
     override val accountBalance: Single<Money>
         get() = custodialWalletManager.getInterestAccountBalance(asset)
@@ -115,17 +122,9 @@ internal class CryptoInterestAccount(
 
     // No swaps on interest accounts, so just return the activity list unmodified
     override fun reconcileSwaps(
-        swaps: List<SwapActivitySummaryItem>,
+        tradeItems: List<TradeActivitySummaryItem>,
         activity: List<ActivitySummaryItem>
     ): List<ActivitySummaryItem> = activity
-
-    fun isInterestSupported() = custodialWalletManager.getInterestAvailabilityForAsset(asset)
-        .map {
-            nabuAccountExists.set(it)
-        }
-
-    val isConfigured: Boolean
-        get() = nabuAccountExists.get()
 
     override val isFunded: Boolean
         get() = hasFunds.get()
@@ -133,25 +132,22 @@ internal class CryptoInterestAccount(
     override val isDefault: Boolean = false // Default is, presently, only ever a non-custodial account.
 
     override val sourceState: Single<TxSourceState>
-        get() = Single.just(
-            if (nabuAccountExists.get()) {
-                TxSourceState.CAN_TRANSACT
-            } else {
-                TxSourceState.NOT_SUPPORTED
-            }
-        )
+        get() = Single.just(TxSourceState.CAN_TRANSACT)
 
     override val isEnabled: Single<Boolean>
-        get() = custodialWalletManager.getInterestEligibilityForAsset(asset).map { (enabled, _) ->
-            enabled
-        }
+        get() = custodialWalletManager.getInterestEligibilityForAsset(asset)
+            .map { (enabled, _) ->
+                enabled
+            }
 
     override val disabledReason: Single<DisabledReason>
-        get() = custodialWalletManager.getInterestEligibilityForAsset(asset).map { (_, reason) ->
-            reason
-        }
+        get() = custodialWalletManager.getInterestEligibilityForAsset(asset)
+            .map { (_, reason) ->
+                reason
+            }
 
-    override val actions: AvailableActions = setOf(AssetAction.Deposit, AssetAction.Summary, AssetAction.ViewActivity)
+    override val actions: AvailableActions =
+        setOf(AssetAction.Deposit, AssetAction.Summary, AssetAction.ViewActivity)
 
     companion object {
         private val displayedStates = setOf(

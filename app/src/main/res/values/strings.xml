@@ -26,36 +26,31 @@
     <string name="common_empty_cta">Tap to refresh</string>
     <string name="common_pending">Pending</string>
     <string name="common_free">Free</string>
+    <string name="common_zero">0</string>
+    <string name="common_retry">Retry</string>
+    <string name="common_continue">Continue</string>
+    <string name="common_try_again">Try Again</string>
+    <string name="common_oops">Oops! Something went wrong.</string>
 
     <plurals name="transfer_label_plural">
         <item quantity="one">1 imported address</item>
         <item quantity="other">%d imported addresses</item>
     </plurals>
     <string name="upgrade_wallet">Upgrade</string>
-
     <string name="backup_wallet">Backup funds</string>
-
-    <string name="current_price_btc">1 BTC = %1$s</string>
-
     <string name="action_settings">Settings</string>
 
     <!-- nav menu -->
-    <string name="all_accounts">All Wallets</string>
     <string name="please_wait">Please wait</string>
-    <string name="item_buy">Buy Crypto</string>
     <string name="item_backup">Backup funds</string>
     <string name="item_lockbox">Lockbox</string>
     <string name="item_the_exchange">Exchange</string>
-    <string name="item_simple_buy">Simple buy</string>
     <string name="item_airdrops">Airdrops</string>
     <string name="item_debug_homebrew" translatable="false">Debug Homebrew</string>
 
     <!-- toolbar -->
     <string name="toolbar_cmd_home">Home</string>
-    <string name="toolbar_cmd_send">@string/send</string>
-    <string name="toolbar_cmd_receive_crypto">Receive</string>
     <string name="toolbar_cmd_activity">Activity</string>
-    <string name="toolbar_cmd_view_activity">View Activity</string>
 
     <string name="toolbar_cmd_swap">Swap</string>
     <string name="toolbar_cmd_transfer">Transfer</string>
@@ -64,19 +59,6 @@
 
     <string name="done">Done</string>
     <string name="btn_close">Close</string>
-    <string name="pax_fee_1">USD-D FEE</string>
-    <string name="sending">Sending</string>
-    <string name="receiving">Receiving</string>
-    <string name="tx_sent">Sent</string>
-    <string name="tx_received">Received</string>
-    <string name="tx_moved">Transferred</string>
-    <string name="tx_swapped">Swapped</string>
-    <string name="tx_bought">Bought</string>
-    <string name="tx_sold">Sold</string>
-    <string name="edit_transaction_hint">Edit transaction description</string>
-    <string name="pie_chart_content">pie chart</string>
-
-    <string name="paid">Paid</string>
 
     <string name="copied_to_clipboard">Copied to clipboard</string>
 
@@ -90,7 +72,6 @@
 
     <string name="select_currency">Select Currency</string>
     <string name="options_currency">Local Currency</string>
-    <string name="options_units">Bitcoin Unit</string>
 
     <string name="options_tos">Terms of Service</string>
     <string name="options_privacy">Privacy Policy</string>
@@ -126,22 +107,6 @@
     <string name="account_locked_message">Your account has been locked temporarily as a precaution.
         Please check your email for more information and try again later.
     </string>
-    <string name="pin_box_0">Pin Box 0</string>
-    <string name="pin_box_1">Pin Box 1</string>
-    <string name="pin_box_2">Pin Box 2</string>
-    <string name="pin_box_3">Pin Box 3</string>
-    <string name="fingerprint_logo">Fingerprint Logo</string>
-    <string name="keyboard_input_1">Keyboard Input 1</string>
-    <string name="keyboard_input_2">Keyboard Input 2</string>
-    <string name="keyboard_input_3">Keyboard Input 3</string>
-    <string name="keyboard_input_4">Keyboard Input 4</string>
-    <string name="keyboard_input_5">Keyboard Input 5</string>
-    <string name="keyboard_input_6">Keyboard Input 6</string>
-    <string name="keyboard_input_7">Keyboard Input 7</string>
-    <string name="keyboard_input_8">Keyboard Input 8</string>
-    <string name="keyboard_input_9">Keyboard Input 9</string>
-
-    <string name="keyboard_input_0">Keyboard Input 0</string>
 
     <string name="keyboard_input_delete">Keyboard Input Delete</string>
 
@@ -189,9 +154,9 @@
     <string name="new_account_title">Create an Account</string>
     <string name="strength_weak">Weak</string>
     <string name="strength_medium">Regular</string>
-
+    <string name="strength_normal">Good</string>
     <string name="strength_strong">Strong</string>
-    <string name="strength_normal">Normal</string>
+    <string name="strength_hint">Use at least 8 characters, a mix of letters, numbers and symbols.</string>
 
     <string name="btn_continue">Continue</string>
     <string name="btn_forgot_password">Forgot Password?"</string>
@@ -199,21 +164,16 @@
     <string name="SEND">Send</string>
 
     <!--BitPay-->
-    <string name="max_available">Use total spendable balance:</string>
 
     <string name="bitpay_remaining_time">Remaining time</string>
     <string name="bitpay_invoice_expired">BitPay Invoice Expired</string>
-    <string name="bitpay_invoice_expired_message">An invoice is only valid for 15 minutes. Return to the merchant if you would like to resubmit a payment.</string>
 
     <string name="bitpay_announcement_body">With BitPay, you can now use your Blockchain wallet for purchases with supporting retailers.</string>
     <string name="transaction_failed">Transaction Failed</string>
 
-    <string name="invalid_bitcoin_address">Invalid Bitcoin address</string>
-
     <string name="error_scan_failed_general">Scan failed. Please try again.</string>
     <string name="error_scan_failed_bitpay">Unable to retrieve BitPay invoice. Has it expired?</string>
 
-    <string name="invalid_amount">Invalid amount</string>
     <string name="enter_double_encryption_pw">Please enter double encryption password</string>
     <string name="support">Support</string>
     <string name="rate_us">Rate us</string>
@@ -230,9 +190,7 @@
     <string name="support_leaving_app_warning">This will leave the app and take you to your browser.
         Continue?
     </string>
-    <string name="weak_password">The selected password is too weak to secure your funds. We strongly
-        suggest you select a different one. Would you like to define a new password?
-    </string>
+    <string name="weak_password">The selected password is too weak to secure your funds. Please define a different password.</string>
 
     <string name="confirm_details">Confirm Payment</string>
 
@@ -248,20 +206,13 @@
 
     <string name="hd_error">HD wallet error</string>
 
-    <string name="scan_not_recognized">Scan cannot be decoded</string>
     <string name="imported_addresses">Imported Addresses</string>
 
     <string name="remote_save_ok">Successfully saved</string>
-    <string name="remote_save_ko">Save unsuccessful</string>
+    <string name="remote_save_failed">Save unsuccessful</string>
 
     <string name="change_pin_code">Change PIN</string>
-    <string name="enter_current_pin">Please enter current PIN.</string>
-    <string name="addresses_bitcoin">Bitcoin Addresses</string>
-    <string name="addresses_bitcoin_cash">Bitcoin Cash Addresses</string>
     <string name="drawer_addresses">Addresses</string>
-    <string name="create_new">Create New</string>
-    <string name="import_address">Import Address</string>
-    <string name="wallet">Wallet</string>
 
     <string name="wallets">Wallets</string>
     <string name="save_name">Save name</string>
@@ -281,11 +232,8 @@
     </string>
     <string name="description">Description</string>
     <string name="name">Name</string>
-    <string name="content_desc_edit_account_label">Edit Account Label</string>
 
-    <string name="save">Save</string>
     <string name="next">Next</string>
-    <string name="received_bitcoin">Received Bitcoin</string>
     <string name="received_ethereum">Received Ether</string>
 
     <string name="received_usd_pax_1">Received USD Digital</string>
@@ -294,19 +242,10 @@
 
     <string name="received_bitcoin_cash">Received Bitcoin Cash</string>
 
-    <string name="verification_failed">Verification Failed</string>
-
     <string name="send">Send</string>
-    <string name="send_payment">Send Payment</string>
     <string name="share">Share Receive Address</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="check_email_to_auth_login">Please check your email to approve this login attempt.</string>
-    <string name="transaction_fee">Transaction Fee</string>
-    <string name="your_transactions">No Transactions</string>
-    <string name="transaction_occur_when_bitcoin">Transactions occur when you receive and send bitcoin.</string>
-    <string name="transaction_occur_when_eth">Transactions occur when you receive and send ether.</string>
-    <string name="transaction_occur_when_bitcoin_cash">Transactions occur when you receive and send bitcoin cash.</string>
-    <string name="transaction_occur_when_lumens">Transactions occur when you receive and send Stellar.</string>
 
     <string name="address_book_label">(address book)</string>
 
@@ -341,11 +280,6 @@
         your wallet or create a new one.
     </string>
 
-    <string name="watchonly_address_receive_warning">You are about to receive bitcoin to a
-        non-spendable address. You can only spend these funds if you have access to the private key.
-        Continue?
-    </string>
-
     <string name="camera_unavailable">The camera is currently opened by another application. Please
         close other application and try again.
     </string>
@@ -375,7 +309,6 @@
         use our Bitcoin wallet on this device we recommend that you use double encryption on your
         Blockchain account.
     </string>
-    <string name="address_already_in_wallet">Your wallet already contains this address.</string>
 
     <string name="saving_address">Saving address…</string>
     <string name="edit">Edit</string>
@@ -420,21 +353,11 @@
     <string name="archive_are_you_sure">Are you sure you want to archive this item?</string>
     <string name="unarchive_are_you_sure">Are you sure you want to unarchive this item?</string>
     <string name="make_default">Make default</string>
-    <string name="privx_required">Private Key Needed</string>
-    <string name="watch_only_spend_instructions">This action requires the private key for the
-        Bitcoin address %1$s. Please scan the QR code.
-    </string>
-    <string name="invalid_private_key">Invalid private key</string>
     <string name="watch_only_not_supported">Importing a non-spendable address (an address or public key script
         without the corresponding private key) is not supported. Please try again with
         an address and private key.
     </string>
-    <string name="scan_private_key">Scan private key</string>
     <string name="private_key_successfully_imported">Private key successfully imported.</string>
-    <string name="private_key_not_matching_address">NOTE: The scanned private key does not
-        correspond to your non-spendable address. To spend your funds from this address, please scan
-        the correct private key.
-    </string>
     <string name="watch_only">Non-Spendable</string>
     <string name="extended_public_key_description">If you are a merchant, show your xPub and use the
         Blockchain Merchant app to receive funds safely and privately.\n\nKeep your xPub private.
@@ -443,12 +366,8 @@
     <string name="extended_public_key_description_bch_only">Keep your xPub private. Someone with
         access to your xPub will be able to see all your funds and transactions.
     </string>
-    <string name="watch_only_description">This is a non-spendable address. To spend your funds from
-        this wallet, please scan your private key.
-    </string>
     <string name="success">Success</string>
     <string name="default_label">Default</string>
-    <string name="import_try_again">Try Again</string>
 
     <!-- FUNDS TRANSFER -->
     <string name="transfer">Transfer</string>
@@ -457,26 +376,15 @@
         recommend transferring these balances to your Blockchain.com non-custodial Wallet.
     </string>
 
-    <string name="transfer_confirmed">Transfer Confirmed</string>
-    <string name="transfer_confirm">Confirm Transfer</string>
     <string name="transfer_all">Transfer all</string>
     <string name="transfer_amount">Transfer Amount</string>
-    <string name="transfer_archive_message">Archive imported addresses after transfer</string>
-    <string name="transfer_archive">Archive Confirmed</string>
     <string name="dont_ask_again">Don’t ask me again.</string>
 
     <string name="amount">Amount</string>
     <string name="not_now">Not now</string>
 
-    <string name="no_confirmed_funds">No confirmed funds to spend.</string>
-
-    <string name="transaction_surge">The Bitcoin mining network is currently experiencing a high
-        volume of activity, resulting in recommended fees that are higher than usual.
-    </string>
     <string name="unsupported_encryption_version">Wallet version %1$s not supported.</string>
     <string name="logout">Logout</string>
-    <string name="to_field_helper">Enter BTC address or select</string>
-    <string name="to_field_helper_no_dropdown">Enter bitcoin address</string>
     <string name="update">Update</string>
 
     <!-- SETTINGS -->
@@ -487,12 +395,9 @@
     <string name="resend">Resend</string>
     <string name="verified">verified</string>
     <string name="unverified">unverified</string>
-    <string name="allow">Allow</string>
-    <string name="block">Block</string>
     <string name="security">Security</string>
     <string name="enable">Enable</string>
     <string name="disable">Disable</string>
-    <string name="sms">SMS</string>
     <string name="setting_the_exchange">Exchange</string>
 
     <string name="disable_2fa_first">Please disable 2-step Verification via SMS in the security
@@ -501,7 +406,6 @@
     <string name="disable_online_only">Please login to your wallet in the web browser to disable
         2FA.
     </string>
-    <string name="settings_field_cant_be_empty">Field can’t be empty.</string>
     <string name="settings_error_updating">Error updating settings, please try again</string>
     <string name="request_camera_permission">Camera access is required.</string>
 
@@ -538,11 +442,6 @@
     <string name="enable_screenshots_summary">Some screens within the application can display
         sensitive data. Other applications will be able to access these screenshots.
     </string>
-    <string name="password_hint_summary">Your Blockchain Wallet never communicates your password to
-        our servers. This means we have no idea what your password is and we cannot reset it if you
-        forget it. Create a memorable password hint that we can send to your verified email address
-        in case you forget your password.
-    </string>
 
     <string name="change_password">Change Password</string>
     <string name="change_password_summary">Your password is never shared with our servers, which
@@ -577,7 +476,6 @@
     <string name="rate_yes">Yes, rate Blockchain Wallet</string>
     <string name="rate_no">No, thanks</string>
     <string name="rate_later">Remind me later</string>
-    <string name="information">Information</string>
     <string name="learn_more">Learn More</string>
     <string name="pairing_code_log_in">Log in to Web Wallet</string>
     <string name="pairing_code_instruction_1">Go to %1$s on your computer.</string>
@@ -599,7 +497,6 @@
     <string name="email_request_body_eth">Please send ETH to the Ether address %1$s.</string>
     <string name="email_request_body_pax_1">Please send USD-D to the USD Digital address %1$s.</string>
     <string name="email_request_body_usdt_1">Please send USDT to the Tether address %1$s.</string>
-    <string name="email_request_body_dgld">Please send wDGLD to the Wrapped-DGLD address %1$s.</string>
     <string name="email_request_body_bch">Please send BCH to the Bitcoin Cash address %1$s.</string>
     <string name="email_request_body_xlm">Please send XLM to the Stellar address %1$s.</string>
     <string name="email_request_body_fallback">attached</string>
@@ -607,6 +504,7 @@
         or text.
     </string>
     <string name="common_pin_dialog_title">Warning</string>
+    <string name="share_failed">Unable to share with %1$s</string>
 
     <!-- COMMON PIN CODES -->
     <string name="common_pin_dialog_message">The PIN you have selected is extremely common and may
@@ -637,10 +535,6 @@
 
     <!-- FEE WARNING -->
     <string name="accept_higher_fee">Accept higher fee</string>
-    <string name="password_reveal_warning">Be careful! Revealing this text allows your password to
-        be copied to the clipboard, which can then be read by all applications on your device. Also
-        be aware of people standing behind you!
-    </string>
     <string name="push_notifications">Push Notifications</string>
 
     <string name="push_notifications_summary">Enable notifications to receive a popup notification
@@ -660,26 +554,7 @@
     <string name="tx_title_interest">%1$s Interest Earned</string>
 
     <!-- TRANSACTION DETAILS -->
-    <string name="transaction_detail_title">Transaction</string>
-    <string name="transaction_detail_description_hint">What’s this for?</string>
-    <string name="transaction_detail_date">Date</string>
-    <string name="transaction_detail_status">Status</string>
-    <string name="transaction_detail_confirmed">Confirmed</string>
-    <string name="transaction_detail_pending">Pending (%1$s/%2$s Confirmations)</string>
-    <string name="transaction_detail_fee">"Transaction fee: %1$s"</string>
-    <string name="transaction_detail_value_at_time_received">Value when received:\u0020</string>
-    <string name="transaction_detail_value_at_time_transferred">Value when transferred:\u0020</string>
-    <string name="transaction_detail_value_at_time_swapped">Value when swapped:\u0020</string>
-    <string name="transaction_detail_value_at_time_bought">Value when bought:\u0020</string>
-    <string name="transaction_detail_value_at_time_sold">Value when sold:\u0020</string>
-    <string name="transaction_detail_value_at_time_sent">Value when sent:\u0020</string>
-    <string name="transaction_detail_value">Value:\u0020</string>
     <string name="transaction_detail_coinbase">No Inputs (Newly Generated Coins)</string>
-    <string name="transaction_detail_double_spend">May be at risk for a double spend.</string>
-    <string name="transaction_detail_verify">Verify on Blockchain.com</string>
-    <string name="transaction_detail_verify_stellar_chain">Verify on StellarChain.io</string>
-    <string name="transaction_detail_share_chooser">Share transaction details</string>
-    <string name="transaction_detail_contact_note">Note</string>
 
     <!-- SECURITY CENTRE -->
     <string name="security_centre_email_check">Check email</string>
@@ -783,14 +658,6 @@
     <string name="onboarding_qr_codes">QR Codes</string>
 
     <!-- BUY BITCOIN -->
-    <string name="onboarding_get_bitcoin">Get Bitcoin</string>
-    <string name="onboarding_get_eth">Get Ether</string>
-    <string name="onboarding_get_bitcoin_cash">Get Bitcoin Cash</string>
-    <string name="onboarding_get_lumens">Get Stellar</string>
-
-    <string name="trade_complete">Trade Complete</string>
-    <string name="trade_complete_details">Your Buy Bitcoin trade has been completed!</string>
-    <string name="view_details">View details</string>
 
     <string name="two_factor_dialog_title">Enter 2FA code</string>
 
@@ -809,7 +676,6 @@
     <string name="two_factor_retries_exceeded">Exceeded retries, please wait 60 seconds before trying again</string>
 
     <!-- CONFIRM PAYMENT -->
-    <string name="confirm_payment_fee_sync_error">Error getting fee options</string>
 
     <!-- FEE OPTIONS -->
     <string name="fee_options_regular">Regular</string>
@@ -826,21 +692,14 @@
     <string name="fee_options_sat_byte_min_error">Minimum 1 sat/byte required</string>
     <string name="fee_options_invalid_amount">Invalid fee</string>
 
-    <string name="dismiss">Dismiss</string>
     <string name="second_password_dlg_title">Enter password</string>
 
     <!-- ETHEREUM BALANCE -->
     <string name="eth_second_password_prompt">To use this service, we require you to enter your
         second password.
     </string>
-    <string name="ether">Ether</string>
-    <string name="bitcoin">Bitcoin</string>
 
     <!-- PAX/ERC 20 -->
-    <string name="pax_to_field_helper_no_dropdown_1">Enter USD-D/ETH address</string>
-    <string name="pax_invalid_address_1">Invalid USD-D address</string>
-    <string name="usdt_to_field_helper_no_dropdown_1">Enter TETHER/ETH address</string>
-    <string name="usdt_invalid_address_1">Invalid TETHER address</string>
 
     <!-- DASHBOARD -->
     <string name="dashboard_title">Dashboard</string>
@@ -857,7 +716,6 @@
 
     <string name="metadata_load_failure">Error loading full wallet functionality. Service might temporarily be unavailable.</string>
     <string name="dashboard_price_for_asset">Current %1$s Price</string>
-    <string name="dashboard_buy_for_asset">Buy %1$s</string>
     <string name="dashboard_asset_error">Could not load %1$s at this time</string>
 
     <string name="dashboard_asset_balance_total">Total Balance</string>
@@ -877,8 +735,6 @@
     <string name="asset_details_exchange_load_failed_toast">Failed to exchange rate information, please try again</string>
     <string name="dashboard_asset_actions_tx_in_progress">There is already a transaction in progress, please wait until it completes</string>
 
-    <string name="more">More</string>
-
     <string name="force_upgrade_message">The version of the app you are using is no longer
         supported. Please update the app and try again.
     </string>
@@ -890,20 +746,11 @@
     <string name="tx_decode_error">Unable to decode address</string>
 
     <!-- TRANSACTIONS -->
-    <string name="bch_all_accounts">All Bitcoin Cash Wallets</string>
 
     <!-- BCH UPDATE -->
-    <string name="bch_imported_addresses">Imported Bitcoin Cash Addresses</string>
-    <string name="transaction_detail_verify_bch">Verify on Blockchain.com</string>
-    <string name="bch_to_field_helper">Enter BCH address or select</string>
-    <string name="bch_to_field_helper_no_dropdown">Enter bitcoin cash address</string>
-    <string name="xlm_to_field_helper">Enter Stellar address or select</string>
-    <string name="xlm_to_field_helper_no_dropdown">Enter Stellar address</string>
     <string name="bch_address_warning">Are you sure this is a Bitcoin Cash address?</string>
     <string name="bch_address_warning_subtext">Sending funds to a bitcoin address by accident will result in loss of funds.</string>
-    <string name="bch_invalid_address">Invalid Bitcoin Cash address</string>
     <string name="confirm_currency">Confirm currency</string>
-    <string name="confirm_currency_message">Please select which currency’s QR code you are scanning.</string>
 
     <string name="testnet_warning">Warning! This is the testnet3 blockchain.</string>
 
@@ -916,129 +763,24 @@
         profile to be eligible for future airdrops and access trading.
     </string>
     <string name="sunriver_generic_error">Oops! We had trouble processing your airdrop. Please try again.</string>
-    <string name="sunriver_set_memo">Set memo</string>
-
-    <string name="stablecoin_announcement_introducing_title">Digital US Dollars</string>
 
     <!--STABLECOIN-->
-    <string name="stablecoin_announcement_introducing_description_1">Introducing USD Digital, a safe and stable crypto asset you can use to store value. 1 USD-D = 1 USD.</string>
-    <string name="stablecoin_announcement_introducing_link_1">Get USD Digital</string>
 
     <!-- Airdrop Program Card -->
-    <string name="pax_no_transactions_message_1">Your USD Digital transactions will show up here once you
-        make your first transaction.
-    </string>
 
     <!-- PAX No Transactions Screen -->
-    <string name="pax_learn_more_link_1">Learn more about USD Digital</string>
-    <string name="pax_swap_now_1">Swap For USD Digital Now</string>
-    <string name="swap_announcement_title">Trade Crypto</string>
-    <string name="swap_announcement_description">Trade one crypto for another without ever leaving your wallet. Get competitive, real-time prices and fast on-chain settlement.</string>
 
     <!-- Claim Your Free Crypto Card -->
-    <string name="swap_announcement_introducing_link">Check out Swap</string>
-
-    <string name="pax_title_1">USD Digital</string>
-    <string name="pax_wallet_name_1">My USD Digital Wallet</string>
-    <string name="usdt_wallet_name">My Tether Wallet</string>
-
-    <string name="morph_exchange">Swap</string>
 
     <!-- HISTORY -->
-    <string name="morph_order_history">Order history</string>
-    <string name="morph_deposit_from">Deposit from ShapeShift</string>
-    <string name="morph_deposit_to">Deposited to ShapeShift</string>
-    <string name="morph_error">Error</string>
-    <string name="morph_new_exchange">New Swap</string>
 
     <!-- CONFIRMATION -->
-    <string name="morph_transaction_fee">Transaction Fee</string>
     <string name="morph_exchange_rate">Exchange Rate</string>
-    <string name="morph_time_remaining">Quote expires in %1$s</string>
-    <string name="morph_deposit_title">%1$s to deposit</string>
-    <string name="morph_receive_title">%1$s to be received</string>
-    <string name="morph_exchange_rate_formatted">1 %1$s = %2$s %3$s</string>
-    <string name="morph_exchange_rate_placeholder">%1$s -> %2$s</string>
-    <string name="morph_balance_title">Available %1$s</string>
-    <string name="morph_amount_to_low">%1$s %2$s required to Swap</string>
-    <string name="morph_confirmation_eth_pending">Ether transaction failed, please wait until your
-        previous transaction confirms.
-    </string>
-    <string name="morph_failed_explanation">This trade has failed. Please return to the Swap tab to
-        start a new trade
-    </string>
-    <string name="morph_refunded_explanation">This trade has expired as we have still not received
-        your funds. If we receive your funds we will complete your trade. If you require further
-        assistance please contact support.
-    </string>
-
-    <!-- IN PROGRESS -->
-    <string name="morph_sending_title">Sending Funds</string>
-    <string name="morph_in_progress_title">In Progress</string>
-    <string name="morph_complete_title">Complete</string>
-    <string name="morph_failed_title">Failed</string>
-    <string name="morph_refunded_title">Expired</string>
-    <string name="morph_step_number">Step %1$s of 3</string>
-    <string name="morph_confirm">Confirm</string>
-    <string name="morph_success_dlg_text">Success! Your exchange has\nbeen started!</string>
-    <string name="morph_success_for_first_gold_pax_trade_title">Your Exchange has been started!</string>
-
-    <string name="morph_success_for_first_gold_pax_trade_description_1">Even better, since you need
-        ETH to make USD-D trades, we just airdropped enough ETH into your Wallet to cover your
-        first 3 transactions\n🙌
-    </string>
-    <string name="morph_success_dlg_button">View Order Details</string>
-    <string name="morph_order_id_title">Order ID</string>
-    <string name="morph_trade_not_found">Trade not found</string>
-
-    <!-- ORDER DETAIL -->
-    <string name="morph_in_progress_summary">Swap in Progress</string>
-    <string name="morph_failed_summary">Swap Failed</string>
-    <string name="morph_refunded_summary">Swap Expired</string>
-    <string name="locked_disclaimer_message">The amounts you send and receive may change slightly
-        due to market activity. Once an order starts, we are unable to stop it
-    </string>
-    <string name="send_to">Send To</string>
-    <string name="value">Value</string>
-    <string name="status">Status</string>
-
-    <string name="order_detail">Order Detail</string>
     <string name="swap_now">Swap Now</string>
-    <string name="order_history">Order History</string>
-    <string name="no_orders_found">No Orders Found</string>
-    <string name="confirm_swap">Confirm Swap</string>
+    <string name="min_with_value">%1$s Min</string>
+    <string name="max_with_value">%1$s Max</string>
 
-    <string name="status_inprogress_detail">Thanks for placing your trade! Funds will usually reach
-        your wallet within 2 hours and we’ll send you a notification when that happens. Keep track
-        of your trade’s progress in the Order History area.
-    </string>
-    <string name="status_failed_expired_detail">Most exchanges on Swap are completed seamlessly in
-        two hours. Please contact us. Together, we can figure this out.
-    </string>
-    <string name="failed_expired_status_title">Hmm, something’s not right. 👀</string>
-    <string name="status_request_refund">Contact Support</string>
-    <string name="morph_status_in_progress">In progress</string>
-    <string name="morph_status_complete">Complete</string>
-
-    <!-- ORDER STATUS -->
-    <string name="morph_status_expired">Expired</string>
-    <string name="morph_status_failed">Failed</string>
-    <string name="morph_status_refunded">Refunded</string>
-    <string name="morph_status_refund_in_progress">Refund in Progress</string>
-    <string name="morph_status_refund_unknown">Unknown</string>
-    <string name="morph_status_refund_received">Received</string>
-    <string name="morph_status_refund_resolved">Resolved</string>
-    <string name="execution_error_title">Error executing trade</string>
-
-    <!-- EXECUTION -->
-    <string name="homebrew_confirmation_error_fetching_fee">Error fetching fee</string>
-    <string name="under_limit">Under limit</string>
-
-    <!-- Help -->
-    <string name="swap_info_contact_support">Contact Support</string>
-    <string name="swap_info_swap_limits">Swap Limits</string>
-    <string name="swap_info_order_history">Order History</string>
-
+    <!-- Exchange announcement -->
     <string name="the_exchange_announcement_title">Introducing the Exchange</string>
     <string name="the_exchange_announcement_body">It’s time to Level Up to a better crypto exchange. Buy, sell, and trade more digital assets in the Blockchain.com Exchange.</string>
     <string name="the_exchange_announcement_cta_text">Checkout the Exchange</string>
@@ -1053,16 +795,12 @@
     <string name="the_exchange_bill_kyc_promo">Deposit &amp; Withdraw\nEuros/Dollars</string>
     <string name="the_exchange_permission_app_can">Our Exchange will be able to:</string>
     <string name="the_exchange_permission_app_cant">Will Not:</string>
-    <string name="the_exchange_permission_subtitle">Will not be able to:</string>
     <string name="the_exchange_permission_1">Sync addresses with your Wallet so you can securely sweep crypto between accounts</string>
     <string name="the_exchange_permission_2">Share your Gold or Silver Level status for unlimited trading</string>
-    <string name="the_exchange_permission_3">Add your linked banks</string>
     <string name="the_exchange_permission_4">Access the crypto in your wallet, access your keys, or view your password.</string>
     <string name="the_exchange_connect_now">Connect Now</string>
 
     <string name="the_exchange_title">Exchange</string>
-    <string name="crypto_exchange">Crypto Exchange</string>
-    <string name="crypto_trading">Crypto Trading</string>
 
     <string name="the_exchange_setting_connect">Connect</string>
     <string name="the_exchange_setting_connected">Connected</string>
@@ -1073,7 +811,6 @@
     <string name="the_exchange_verify_email_title">Verify Your Email</string>
     <string name="the_exchange_verify_email_description">We just sent you a verification email. Your email address needs to be verified before you can connect to the Exchange.</string>
     <string name="the_exchange_open_email_app">Open Email App</string>
-    <string name="the_exchange_two_fa_unavailable">Please enable 2FA on your Exchange account to complete deposit</string>
     <string name="the_exchange_did_not_get_email">Didn’t get the email?</string>
     <string name="the_exchange_send_again">Send again</string>
     <string name="mail_resent_succeed">Email sent. Check your inbox to continue.</string>
@@ -1084,20 +821,6 @@
     <string name="the_exchange_connection_error_description">We could not connect your Wallet to the Exchange. Please go back to the Exchange and try again.</string>
     <string name="the_exchange_connection_success_title">Success!</string>
     <string name="the_exchange_connection_success_description">You have connected your Blockchain Wallet to the Exchange. Go back and finish signing up!</string>
-
-    <!-- Swap intro -->
-    <string name="swap_intro_title">Swap</string>
-    <string name="swap_intro_title_page_one">Welcome to Swap!</string>
-    <string name="swap_intro_title_page_two">Real-time Exchange Rates</string>
-    <string name="swap_intro_title_page_three">100%% On-Chain</string>
-    <string name="swap_intro_title_page_four">You Control Your Key</string>
-    <string name="swap_intro_title_page_five">Manage Risk Better</string>
-    <string name="swap_intro_description_page_one">The easiest way to exchange one crypto for another without leaving your wallet.</string>
-    <string name="swap_intro_description_page_two">Access competitive crypto prices right at your fingertips.</string>
-    <string name="swap_intro_description_page_three">All Swap trades are confirmed and settled directly on-chain.</string>
-    <string name="swap_intro_description_page_four">With Swap your crypto is safe, secure, and your keys are always intact.</string>
-    <string name="swap_intro_description_page_five_1">Introducing Digital Dollars (USD-D) to de-risk your crypto investment or lock-in gains.</string>
-    <string name="swap_intro_get_started">Get Started</string>
 
     <!-- intro tour -->
     <string name="tour_card_title">Welcome to Blockchain!</string>
@@ -1121,9 +844,6 @@
     <string name="cloud_backup_card_cta">Learn More</string>
 
     <!-- Buy Bitcoin announcement -->
-    <string name="buy_btc_card_title">Buy Bitcoin</string>
-    <string name="buy_btc_card_body">Buy Bitcoin with your credit card or bank account to kickstart your crypto portfolio.</string>
-    <string name="buy_btc_card_cta">Buy Bitcoin</string>
 
     <string name="buy_crypto_card_title">Buy Crypto</string>
     <string name="buy_crypto_card_body">We can help you buy in just a few simple steps.</string>
@@ -1176,7 +896,7 @@
 
     <!-- WDGLD announcement -->
     <string name="wdgld_available_card_title">Trade wDGLD Now</string>
-    <string name="wdgld_available_card_body">Wrapped Digital Gold (wDGLD) in an ERC-20 tokenized version of DGLD, combining a gold-backed token with the power and flexibility of Ethereum.</string>
+    <string name="wdgld_available_card_body">Wrapped Digital Gold (wDGLD) is an ERC-20 tokenized version of DGLD, combining a gold-backed token with the power and flexibility of Ethereum.</string>
     <string name="wdgld_available_card_cta">Trade wDGLD now</string>
 
     <!-- Airdrop Status bottom sheet -->
@@ -1214,33 +934,13 @@
     <string name="backup_before_send_now_label">You must backup before sending</string>
 
     <!-- basic transfer to wallet -->
-    <string name="basic_transfer_title">Send to %1s</string>
-    <string name="basic_transfer_body">Blockchain.com only allows sending your Wallet’s total amount at this time.</string>
-    <string name="basic_transfer_cta">Send</string>
-    <string name="basic_transfer_lock_warn">Your available balance to withdraw is %1s. The remaining balance %2s will be available to be withdrawn within 7 days.</string>
-    <string name="basic_transfer_lock_learn_more"><annotation link="balance_lock">Learn more</annotation>.</string>
 
     <!-- basic transfer complete -->
-    <string name="basic_transfer_complete_title">Success! %1s Sent.</string>
-    <string name="basic_transfer_complete_body">It may take up to 1 hour for your transaction to be processed.</string>
-    <string name="basic_transfer_complete_cta">OK</string>
 
     <!-- basic transfer error -->
-    <string name="basic_transfer_error_title">Oops!</string>
-    <string name="basic_transfer_error_body">Something went wrong. Please go back and try again.</string>
-
-    <string name="basic_transfer_error_in_progress_title">Send In Progress</string>
-    <string name="basic_transfer_error_in_progress_body">There is a transaction in progress. We’ll let you know once the funds reach your wallet.</string>
-
-    <string name="basic_transfer_error_insufficient_funds_title">Insufficient Funds</string>
-    <string name="basic_transfer_error_insufficient_funds">You have insufficient funds in your account to complete this transaction.</string>
-
-    <string name="basic_transfer_error_locked_funds">Your crypto will be available to be withdrawn within 7 days. <annotation link="balance_lock">Learn more</annotation>.</string>
 
     <string name="airdrop_status_date_active">Drops on %1s</string>
     <string name="airdrop_status_date_inactive">Ended on %1s</string>
-
-    <string name="submit">Submit</string>
 
     <string name="kyc_non_specific_server_error">Error, please try again</string>
 
@@ -1253,7 +953,6 @@
 
     <!-- Splash Screen -->
     <string name="kyc_splash_message">Announcing Swap by Blockchain - the faster, smarter way to trade your crypto.</string>
-    <string name="kyc_splash_terms_and_conditions">By tapping Begin Now, you agree to Blockchain’s</string>
     <string name="kyc_splash_terms_and_conditions_submit">By tapping Submit, you agree to Blockchain’s</string>
     <string name="kyc_splash_terms_and_conditions_terms">Terms of Service</string>
     <string name="kyc_splash_terms_and_conditions_privacy">Privacy Policy</string>
@@ -1307,7 +1006,6 @@
     <string name="kyc_address_address_zip_code_hint">Zip Code</string>
     <string name="kyc_address_address_city_hint">City</string>
     <string name="kyc_address_address_state_hint">State</string>
-    <string name="kyc_address_address_county_hint">County</string>
     <string name="kyc_address_address_country_hint">Country</string>
     <string name="kyc_address_google_not_available">Google Play Services are not available on this device.</string>
     <string name="kyc_address_error_saving">Error saving address, please try again</string>
@@ -1325,7 +1023,6 @@
 
     <!-- Email Validation -->
     <string name="kyc_email_did_not_see_email">Didn’t see email? <annotation link="send_again">Send again</annotation></string>
-    <string name="kyc_email_send_again_hyperlink">Send again</string>
     <string name="kyc_email_email_was_resent">Email was resent</string>
     <string name="kyc_phone_number_title">Verify Your Device</string>
     <string name="kyc_phone_number_message">This will help us to verify your identity today, and also keep your account secure in the future. To do this an SMS will be sent to your phone with a verification code.</string>
@@ -1342,8 +1039,6 @@
     <!-- Phone Number Validation -->
     <string name="kyc_phone_number_validation_error_incorrect">Verification code incorrect. Please double check the code we sent you and try again.</string>
     <string name="kyc_phone_number_error_resending">Error sending Code, please try again</string>
-    <string name="kyc_onfido_splash_header">Let’s Confirm It’s You</string>
-    <string name="kyc_onfido_splash_verification_error">Error verifying ID, please try again</string>
 
     <!-- Veriff Splash -->
     <string name="kyc_veriff_splash_country_supported_header">Is my country supported?</string>
@@ -1371,7 +1066,6 @@
     <string name="kyc_complete_country_selected">Country Selected</string>
     <string name="kyc_complete_profile_created">Profile Created</string>
     <string name="kyc_complete_home_address">Home Address Added</string>
-    <string name="kyc_complete_device_verified">Device Verified</string>
     <string name="kyc_complete_id_uploaded">ID Uploaded</string>
     <string name="kyc_complete_video_uploaded">Video uploaded</string>
     <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
@@ -1382,14 +1076,11 @@
     <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
     <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
     <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
-    <string name="kyc_settings_identity_verification">Identity Verification</string>
-    <string name="kyc_settings_status_none">Unverified</string>
 
     <!-- Settings -->
     <string name="kyc_settings_status_rejected">Failed</string>
     <string name="kyc_settings_status_verified">Verified</string>
     <string name="kyc_settings_swap_limit">Swap Limit</string>
-    <string name="kyc_settings_accounts_limit">Account Limits</string>
     <string name="kyc_settings_tier_status_locked">Locked</string>
 
     <!-- Tier status -->
@@ -1402,7 +1093,6 @@
     <string name="kyc_status_title_in_progress">Verification In Progress</string>
 
     <!-- KYC Status -->
-    <string name="kyc_status_title_approved">Account Approved</string>
     <string name="kyc_status_title_failed">Verification Failed</string>
     <string name="kyc_status_title_in_review">Verification Under Review</string>
     <string name="kyc_status_subtitle">What happens next?</string>
@@ -1415,7 +1105,6 @@
     <string name="kyc_status_button_notifications_enabled_title">Notifications enabled</string>
     <string name="kyc_status_button_notifications_enabled_message">We’ll let you know as soon as your identity has been verified.</string>
     <string name="kyc_status_button_notifications_error">Error enabling notifications</string>
-    <string name="kyc_status_button_notifications_enabled">Notifications enabled</string>
     <string name="kyc_more_info_splash_title">More Info Needed</string>
     <string name="kyc_more_info_splash_header">We Need Some More Information to Complete Your Profile</string>
 
@@ -1463,7 +1152,6 @@
     <string name="stacks_airdrop_registered_mini_card_body">We’re airdropping you free crypto in 2020</string>
 
     <!-- Blockstack airdrop share message -->
-    <string name="stacks_airdrop_share_msg">Hey! I just secured my spot for Blockchain’s latest airdrop with Blockstack. Sign up and get verified to get free stacks! \n http://blockchain.com/getcrypto</string>
 
     <!-- KYC Tiers -->
     <string name="gold_level">Gold Level</string>
@@ -1510,14 +1198,7 @@
     <string name="tour_step_three_body">To receive crypto to your wallet, get a unique address for each crypto here that you can share with the sender.</string>
 
     <string name="tour_step_three_btn">Next</string>
-    <string name="tour_step_four_title">Swap</string>
-    <string name="tour_step_four_body">Trade crypto with low fees while keeping control of your keys. Expand your portfolio, take risk off, or simply exchange into the crypto you need.</string>
 
-    <string name="tour_step_four_btn">Next</string>
-    <string name="tour_step_five_title">Buy &amp; Sell</string>
-    <string name="tour_step_five_body">Buy Bitcoin with your credit card or bank account to kickstart your crypto portfolio.</string>
-
-    <string name="tour_step_five_btn">Done</string>
     <string name="dashboard_total_balance">Total Balance</string>
     <string name="asset_card_rate_period">24hrs</string>
 
@@ -1544,46 +1225,20 @@
     <string name="need_some_help">Need some help?</string>
 
     <!--More eth needed-->
-    <string name="pax_need_more_eth_error_body_1">You’ll need ETH to send your USD-D</string>
-    <string name="erc20_need_more_eth_error_body_1">You’ll need ETH to send your %1$s</string>
-    <string name="pax_need_more_eth_error_title">More ETH Needed</string>
 
     <!-- send -->
-    <string name="invalid_address">Invalid address</string>
-    <string name="transaction_failed_min_send">The minimum you can send is %1$s</string>
-    <string name="xlm_transaction_failed_min_balance_new_account">Minimum of %1$s needed for new accounts</string>
 
-    <string name="transaction_submitted">Transaction complete</string>
     <string name="insufficient_funds">Insufficient funds</string>
-
-    <string name="insufficient_eth_for_fees">Not enough ETH for transaction fees</string>
-
-    <string name="not_enough_funds_with_currency">Not enough %1$s</string>
 
     <!-- XLM memo dlg -->
     <string name="xlm_memo_text">Memo Text</string>
-    <string name="xlm_memo">Memo</string>
     <string name="xlm_memo_id">Memo ID</string>
-    <string name="xlm_memo_hash">Memo Hash</string>
-    <string name="xlm_memo_return">Memo Return Hash</string>
 
-    <string name="xlm_memo_explain">Memos are used to communicate optional information to the recipient.</string>
-
-    <string name="xlm_memo_text_hint">@string/xlm_memo</string>
-    <string name="xlm_memo_id_hint">Numeric ID</string>
-    <string name="xlm_memo_hash_hint">32 Byte Hexadecimal Hash</string>
     <string name="airdrop_activity_title">Airdrops</string>
 
     <string-array name="xlm_memo_types_manual">
         <item>@string/xlm_memo_text</item>
         <item>@string/xlm_memo_id</item>
-    </string-array>
-
-    <string-array name="xlm_memo_types_all">
-        <item>@string/xlm_memo_text</item>
-        <item>@string/xlm_memo_id</item>
-        <item>@string/xlm_memo_hash</item>
-        <item>@string/xlm_memo_return</item>
     </string-array>
 
     <!--Simple buy-->
@@ -1621,27 +1276,14 @@
     <string name="add_credit_or_debit_card">Add a Credit or Debit Card</string>
     <string name="select_payment_method">Select a Payment Method</string>
     <string name="payment_method_limit">%1$s Limit</string>
-    <string name="too_high">Too high</string>
-    <string name="use_min">Use MIN</string>
-    <string name="too_low">Too low</string>
     <string name="checkout">Checkout</string>
     <string name="order_details">Order Details</string>
-    <string name="checkout_subtitle">Please review and confirm your %1$s buy.</string>
-    <string name="total_cost">Total Cost</string>
     <string name="fees">Fees</string>
-    <string name="estimated_amount">Est. Amount</string>
-    <string name="buying_fee">Buying Fee</string>
     <string name="date">Date</string>
     <string name="purchase_bank_note">Once we receive your funds, we’ll start your %1$s buy order. Note, your final amount might change to due market activity. Fees may apply.</string>
     <string name="purchase_card_note_1">Your final amount might change due to market activity.</string>
     <string name="purchase_card_note_2">Your crypto will be available to be withdrawn within</string>
-    <plurals name="lock_days">
-        <item quantity="one">&#160;%d day.&#160;</item>
-        <item quantity="other">&#160;%d days.&#160;</item>
-    </plurals>
     <string name="complete_payment">Complete Payment</string>
-    <string name="buy_crypto">Buy %1$s</string>
-    <string name="buy_any_crypto">Buy Crypto</string>
     <string name="kyc_verifying_info">Verifying your information</string>
     <string name="kyc_verifying_time_info">Usually takes less than a minute.</string>
     <string name="kyc_verifying_manual_review_required_info">You’ve successfully submitted your application. A Blockchain Support Member will review your information.</string>
@@ -1649,7 +1291,6 @@
     <string name="kyc_pending_review">Pending Review</string>
     <string name="kyc_veriff_but_not_eligible_review">Successful Application</string>
     <string name="kyc_veriff_but_not_eligible_review_info">Your identity has been successfully verified. You’re now Gold Level and can trade up to $25000 a day. \n\n Buy is not available in your region yet, we’ll let you know as soon as this happens.</string>
-    <string name="continue_to_wallet">Continue to wallet</string>
     <string name="simple_buy_securely_transfer">Securely transfer %1$s from your bank account to Blockchain. Depending on the transfer method and availability of funds, this may take up to 1 business day.</string>
     <string name="simple_buy_bank_account_sheet_instructions">Please transfer %1$s from your bank account to Blockchain.com. Once we receive the funds, we’ll create your %2$s buy order.</string>
     <string name="simple_buy_amount_to_send">Amount to send</string>
@@ -1659,11 +1300,7 @@
     <string name="by_depositing_funds_terms_and_conds">By depositing funds to this account, you agree to <annotation link="modular_terms_and_conditions">Terms &amp; Conditions of Modulr</annotation>, our banking partner.</string>
     <string name="add_bank_with_currency">Add a %1s Bank </string>
     <string name="deposit_currency">Deposit %1s</string>
-    <string name="currency_bank_transfer">Bank Transfer</string>
-    <string name="link_transfer_instructions">Please transfer %1s from your personal bank to Blockchain.com. This will securely link your bank account.</string>
     <string name="recipient_name_must_match">Only send funds from a bank account in your name. If not, your deposit could be delayed or rejected.</string>
-    <string name="simple_buy_no_currencies_available_title">No currencies available</string>
-    <string name="simple_buy_no_currencies_available">Unfortunately, currently there are no currencies that you can trade :( </string>
     <string name="are_ypu_sure">Are you sure?</string>
     <string name="cancel_order">Cancel Order</string>
     <string name="cancel_order_do_cancel">Cancel Order</string>
@@ -1732,7 +1369,6 @@
     <string name="linking_card_title">Securely Linking Your Card</string>
     <string name="linking_card_subtitle">This could take up to 1 minute.</string>
     <string name="linking_card_error_title">Oops! Something Went Wrong.</string>
-    <string name="card_error_subtitle">Please go back and try again.</string>
     <string name="order_error_subtitle">Don’t worry. Your money is safe. Please try again or contact our Suppport Team for help.</string>
     <string name="card_expiry_date">Exp: %1s</string>
     <string name="card_buying">Buying %1s</string>
@@ -1754,7 +1390,6 @@
     <string name="billing_address_zip">ZIP</string>
     <string name="billing_address_postcode">Postcode</string>
     <string name="billing_address_state">State</string>
-    <string name="billing_address_country">Country</string>
     <string name="currency_not_supported_title">Your Currency is Not Supported</string>
     <string name="currency_not_supported_1">Currently we don’t support buying crypto with %1s</string>
     <string name="activity_no_activity_title">You Have No Activity</string>
@@ -1763,7 +1398,6 @@
     <string name="checkout_bank_transfer_label">Bank Transfer</string>
     <string name="currency_funds_wallet">My %1s Wallet</string>
     <string name="checkout_funds_label">Funds</string>
-    <string name="checkout_funds_transfer_label">My %1s Wallet</string>
     <string name="activity_loading_error">Failed to load activity, please try again later</string>
 
     <!-- Activity Details -->
@@ -1790,7 +1424,7 @@
     <string name="activity_details_title_received">Receive</string>
     <string name="activity_details_title_sent">Send</string>
     <string name="activity_details_title_buy">Buy</string>
-    <string name="activity_details_title_sell">Sell</string>
+    <string name="activity_details_title_sell_1">Sell %1$s</string>
     <string name="activity_details_title_swap">Swap</string>
     <string name="activity_details_title_deposit">Transfer</string>
     <string name="activity_details_title_interest_earned">Interest Earned</string>
@@ -1831,26 +1465,21 @@
     <string name="remove_card">Remove Card</string>
     <string name="remove_bank">Remove Bank</string>
     <string name="save_my_card">Save My Card</string>
-    <string name="custodial_activity_not_supported">Trading Wallet activity details are not supported in this release</string>
     <string name="card_already_saved">This card has already been saved.</string>
 
     <string name="pounds">Pounds</string>
     <string name="euros">Euros</string>
     <string name="us_dollars">US Dollars</string>
     <string name="deposit_cash">Deposit Cash</string>
-    <string name="send_me_instructions">Send Me the Instructions</string>
     <string name="bank_transfer_only">Bank Transfer Only</string>
     <string name="bank_transfer_only_subtitle">Only send funds from a bank account in your name. If not, your deposit could be delayed or rejected.</string>
     <string name="processing_time">Processing Time</string>
     <string name="processing_time_subtitle_eur">Funds will be credited to your EUR wallet as soon as we receive them. SEPA transfers usually take around 1 business day to reach us.</string>
     <string name="processing_time_subtitle_gbp">Funds will be credited to your GBP wallet as soon as we receive them. In the UK Faster Payments Network, this can take a couple of hours.</string>
-    <string name="deposit_limits">Deposit Limits</string>
-    <string name="deposit_limits_subtitle">Please be aware that if you deposit more than your daily withdrawal limit, you wil not be able to withdraw all of your funds at once.</string>
     <string name="unable_to_load_bank_details">We were unable to load our bank deposit details.</string>
     <string name="most_popular">Most Popular</string>
 
     <!-- Fiat Funds -->
-    <string name="fiat_funds_detail_deposit_title">Deposit</string>
     <string name="fiat_funds_detail_withdraw_title">Withdraw</string>
     <string name="fiat_funds_detail_deposit_details">Add Cash from Your Bank</string>
     <string name="fiat_funds_detail_withdraw_details">Cashout to Your Bank</string>
@@ -1911,15 +1540,10 @@
     <string name="send_error_tx_option_invalid">An error has occurred</string>
     <string name="too_many_pending_orders_error_message">Your %1$s Wallet has too many swaps in-progress. Please select a different wallet.</string>
     <string name="send_confirmation_title">Send %1$s</string>
-    <string name="swap_confirmation_title">Swap %1$s</string>
     <string name="send_confirmation_fee">Fee - Regular</string>
-    <string name="send_confirmation_regular_estimation">(ETA 60 Minutes)</string>
     <string name="send_confirmation_tx_fee">Transaction Fee</string>
     <string name="send_confirmation_insufficient_fee">Not enough funds for priority fee, please adjust your sending amount.</string>
-    <string name="send_confirmation_fee_loading">Loading…</string>
-    <string name="send_confirmation_fee_error">Error loading fee</string>
     <string name="send_confirmation_add_note_hint">Add a note</string>
-    <string name="send_confirmation_add_note_success">Note successfully added</string>
     <string name="send_confirmation_cta_button">Send %1$s</string>
     <string name="swap_confirmation_cta_button">Swap %1$s for %2$s</string>
     <string name="swap_confirmation_disclaimer">The amounts you send and receive may change slightly due to market activity. Once an order starts, we are unable to stop it.</string>
@@ -1968,8 +1592,6 @@
     <string name="send_to_exchange_xlm_link"><annotation link="send_memo_link">Learn more about balance requirements.</annotation></string>
     <string name="send_confirm_memo_text_hint">Add a memo (max 28 chars)</string>
     <string name="send_confirm_memo_id_hint">Add an ID</string>
-    <string name="send_invalid_option_dsc_memo">Invalid description/memo</string>
-    <string name="swap_enter_amount_title">Swap %1$s</string>
     <string name="swap_enter_amount_source">Swap: %1$s</string>
     <string name="swap_enter_amount_target">Receive: %1$s</string>
     <string name="swap_enter_amount_max">Swap Max</string>
@@ -2031,8 +1653,6 @@
     <string name="sell_crypto_subtitle">Verify your identity to sell crypto for cash.</string>
     <string name="sell_for_cash">Sell Crypto for Cash</string>
     <string name="select_wallet_to_sell">Select a wallet to sell from.</string>
-    <string name="common_to_coloned">To:</string>
-    <string name="common_from_coloned">From:</string>
     <string name="common_sell">Sell</string>
     <string name="sell_quote_price">%1$s Price</string>
     <string name="purchase_funds_note">Your final amount may change due to market activity.</string>
@@ -2042,6 +1662,9 @@
     <string name="sell_info_blurb_2">&#160;Trading Wallets.&#160;</string>
     <string name="sell_info_blurb_3">Once that send completes, sell that crypto for cash.</string>
     <string name="sell_info_action">Send Now →</string>
+    <string name="sell_intro_empty_title">No Wallets to Sell from</string>
+    <string name="sell_intro_empty_label">Looks like you have no Wallets with a balance you can Sell, try funding some Wallets first.</string>
+
 
     <string name="scan_mismatch_transaction_target">The scanned code is not a %1$s QR code.</string>
     <string name="scan_failed">QR code not recognised, please try again.</string>
@@ -2050,7 +1673,6 @@
     <string name="could_not_activate_card">We could not activate your card. Please contact support.</string>
     <string name="card_still_pending">We waited two minutes and did not receive an update from our card provider. Your card may still be approved later. Please contact support if you have any questions.</string>
     <string name="card_link_failed">Card failed to link. Please try again or contact support if you believe this occurred in error.</string>
-    <string name="tx_view_locked_funds_1">These funds will be available to sell into a %1$s Fiat wallet immediately, but you will not be able to send or withdraw these funds from Blockchain.com for up to %2$s&#160;</string>
     <string name="unable_to_verify_id">Unable to Verify Your ID</string>
     <string name="unable_to_verify_id_description">We were unable to verify your identity. This can happen for a few reasons.</string>
     <string name="invalid_id">Invalid ID</string>
@@ -2058,7 +1680,6 @@
     <string name="information_missmatch">Information Mismatch</string>
     <string name="information_missmatch_description">All information must appear exactly as it does on your legal documents. note: Please do not use a nickname.</string>
     <string name="blocked_by_local_laws">Blocked by Local Laws</string>
-    <string name="blocked_by_local_laws_description">At Blockchain.com, we strive to adhere to any and all local laws. Based on your location, we cannot allow the buying or selling digital currencies at this time.</string>
     <string name="error_contact_support">If you think this was a mistake or would like a manual review of your account, please contact support.</string>
     <string name="sell_is_coming_soon">Buy &amp; Sell Coming Soon</string>
     <string name="sell_is_coming_soon_description">Currently, we don’t support buying or selling crypto in your region. We’ll send you an update when we do.</string>
@@ -2076,8 +1697,8 @@
     <string name="swap_kyc_3_title">Start Swapping</string>
     <string name="swap_kyc_3_label">Once verified, come back to Swap and exchange your crypto.</string>
     <string name="swap_cta">New Swap</string>
-    <string name="swap_account_select">Swap</string>
     <string name="swap_account_select_subtitle">Which wallet do you want to Swap from?</string>
+    <string name="upgrade_now">Upgrade now</string>
     <string name="select_target_account_for_swap">Which wallet do you want to Receive into?</string>
 
     <string name="swap_low_fees">Low Fees</string>
@@ -2101,7 +1722,6 @@
     <string name="trending_swap">Swap %1$s</string>
     <string name="trending_empty">Fund your Trading Wallets to see Trending Swaps with lower fees.</string>
     <string name="trending_receive">Receive %1$s</string>
-    <string name="show_more_accounts">Show more</string>
     <string name="select_a_wallet">Select a Wallet</string>
 
     <!-- Transaction Flow confirmation screen -->
@@ -2126,7 +1746,63 @@
     <string name="qr_activity_hint_pairing_code">Scan a web pairing QR code</string>
     <string name="qr_activity_hint_new_web_login">Log in to web</string>
 
-    <string name="security_locked_funds_explanation">For your security, first time card purchases are subject to a %1$s day holding period before you can send or withdraw your purchased crypto. We will notify you when the hold is lifted.\n\nIn the meantime, you can sell into Cash, swap, and trade within Blockchain.com.</string>
+    <string name="security_locked_card_funds_explanation">For your security, first time card purchases are subject to a %1$s day holding period before you can send or withdraw your purchased crypto. We will notify you when the hold is lifted.\n\nIn the meantime, you can sell into Cash, swap, and trade within Blockchain.com.</string>
+    <string name="security_locked_funds_bank_transfer_explanation">Your final amount might change due to market activity. For your security, buy orders with a bank account are subject up to a %1$s day holding period. You can Swap or Sell during this time. We will notify you once the funds are fully available.</string>
+    <string name="security_locked_funds_bank_transfer_payment_screen_explanation">These funds are available now to Sell &amp; Swap.\n\nNote: You will not be able to Send or Withdraw these funds from your Wallet for the next %1$s days.\n</string>
 
+    <!-- content descriptor IDs -->
+    <string name="content_desc_enter_amount">Enter Amount</string>
+    <string name="content_desc_edit_account_label">Edit Account Label</string>
+    <string name="pin_box_0">Pin Box 0</string>
+    <string name="pin_box_1">Pin Box 1</string>
+    <string name="pin_box_2">Pin Box 2</string>
+    <string name="pin_box_3">Pin Box 3</string>
+    <string name="fingerprint_logo">Fingerprint Logo</string>
+    <string name="keyboard_input_1">Keyboard Input 1</string>
+    <string name="keyboard_input_2">Keyboard Input 2</string>
+    <string name="keyboard_input_3">Keyboard Input 3</string>
+    <string name="keyboard_input_4">Keyboard Input 4</string>
+    <string name="keyboard_input_5">Keyboard Input 5</string>
+    <string name="keyboard_input_6">Keyboard Input 6</string>
+    <string name="keyboard_input_7">Keyboard Input 7</string>
+    <string name="keyboard_input_8">Keyboard Input 8</string>
+    <string name="keyboard_input_9">Keyboard Input 9</string>
+    <string name="keyboard_input_0">Keyboard Input 0</string>
+    <string name="swap_faster_cheaper">Swap Faster. Cheaper. Better.</string>
+    <string name="swap_better">Swap better.</string>
+    <string name="swap_hot">Swap it like it’s hot.</string>
+    <string name="swap_upgrade_to_gold">Upgrade to Gold and Swap faster, with higher limits, lower fees, and a better experience.</string>
+    <string name="swap_better_experience">We’ve updated Swap with a new look and better experience.</string>
+    <string name="swap_faster_cheaper_better">Faster. Cheaper. Better. Our new Swap experience lets you exchange crypto in fewer taps.</string>
+    <string name="link_a_bank">Link a Bank</string>
+    <string name="instantly_buy_crypto_with_link_a_bank">Link your bank and instantly buy crypto at anytime.</string>
+    <string name="add_payment_method">Add a Payment Method</string>
+    <string name="pay_with_my">Pay with my</string>
 
+    <!-- Yodlee splash -->
+    <string name="yodlee_splash_title">Secure Connection</string>
+    <string name="yodlee_splash_blurb">Yodlee securely stores your credentials adhering to leading industry practices for data security, regulatory compliance and privacy.\n <annotation link="yodlee_learn_more">Learn more</annotation></string>
+    <string name="yodlee_connection_title">Taking you to Yodlee…</string>
+    <string name="yodlee_connection_subtitle">This could take up to 30 seconds.</string>
+    <string name="yodlee_linking_title">Taking you back to your Wallet…</string>
+    <string name="yodlee_linking_subtitle">This could take up to 30 seconds. Please do not go back or close the app.</string>
+    <string name="yodlee_linking_generic_error_title">Oops! Something went wrong</string>
+    <string name="yodlee_linking_is_this_your_bank">Is this your bank?</string>
+    <string name="yodlee_linking_generic_error_subtitle">Please try linking your bank again. If this keeps happening please contact support.</string>
+    <string name="yodlee_linking_timeout_error_subtitle">It’s taking too long to link your bank, please try again.</string>
+    <string name="yodlee_linking_already_linked_error_subtitle">We noticed <annotation font="bold">the names don’t match.</annotation> The bank you link must have a matching legal first &amp; last name as your Blockchain.com Account. <annotation link="yodlee_names_dont_match_learn_more">Learn more \u2192</annotation></string>
+    <string name="yodlee_linking_checking_error_title">Please link a Checking Account.</string>
+    <string name="yodlee_linking_checking_error_subtitle">Your bank may charge you extra fees if you buy crypto without a checking account.</string>
+    <string name="yodlee_linking_success_title">Bank Linked!</string>
+    <string name="yodlee_linking_success_subtitle">Your %1$s account is now linked to your Blockchain.com Wallet.</string>
+    <string name="yodlee_linking_try_different_bank">Try a Different Bank</string>
+    <string name="yodlee_linking_try_different_account">Try a Different Account</string>
+    <string name="yodlee_parsing_error">There was an issue linking with Yodlee, please try again or contact support.</string>
+    <string name="yodlee_flow_exited">Yodlee linking exited, would you like to try again?</string>
+    <string name="yodlee_unexpected_error">Oops, something went wrong while linking with Yodlee, please try again.</string>
+    <string name="yodlee_linking_cancel">Cancel &amp; Go Back</string>
+    <string name="please_try_linking_your_bank_again">Please try linking your bank again. If this keeps happening, please contact support.</string>
+    <string name="available_to_trade">Available to Trade</string>
+    <string name="instantly">Instantly</string>
+    <string name="instantly_available">Instantly Available</string>
 </resources>

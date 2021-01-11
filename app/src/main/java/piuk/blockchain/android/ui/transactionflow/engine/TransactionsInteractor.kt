@@ -1,8 +1,10 @@
 package piuk.blockchain.android.ui.transactionflow.engine
 
-import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
-import com.blockchain.swap.nabu.datamanagers.SwapPair
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapRepository
+import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.nabu.datamanagers.CurrencyPair
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.repositories.swap.CustodialRepository
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
@@ -16,6 +18,7 @@ import piuk.blockchain.android.coincore.AddressParseError
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.ReceiveAddress
@@ -31,7 +34,9 @@ import timber.log.Timber
 class TransactionInteractor(
     private val coincore: Coincore,
     private val addressFactory: AddressFactory,
-    private val swapRepository: SwapRepository,
+    private val custodialRepository: CustodialRepository,
+    private val custodialWalletManager: CustodialWalletManager,
+    private val currencyPrefs: CurrencyPrefs,
     private val eligibilityProvider: EligibilityProvider
 ) {
     private var transactionProcessor: TransactionProcessor? = null
@@ -84,27 +89,54 @@ class TransactionInteractor(
         transactionProcessor?.updateAmount(amount) ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun getTargetAccounts(sourceAccount: CryptoAccount, action: AssetAction): Single<SingleAccountList> =
-        if (action != AssetAction.Swap)
-            coincore.getTransactionTargets(sourceAccount, action)
-        else
-            Singles.zip(
-                coincore.getTransactionTargets(sourceAccount, action),
-                swapRepository.getSwapAvailablePairs(),
-                eligibilityProvider.isEligibleForSimpleBuy()
-            ).map { (accountList, pairs, eligible) ->
-                accountList.filterIsInstance(CryptoAccount::class.java)
-                    .filter { account ->
-                        pairs.any { it.source == sourceAccount.asset && account.asset == it.destination }
-                    }.filter { account ->
-                        eligible or (account is NonCustodialAccount)
+        when (action) {
+            AssetAction.Swap -> swapTargets(sourceAccount)
+            AssetAction.Sell -> sellTargets(sourceAccount)
+            else -> coincore.getTransactionTargets(sourceAccount, action)
+        }
+
+    private fun sellTargets(sourceAccount: CryptoAccount): Single<List<SingleAccount>> {
+        val availableFiats =
+            custodialWalletManager.getSupportedFundsFiats(currencyPrefs.selectedFiatCurrency, true)
+        val apiPairs = custodialWalletManager.getSupportedBuySellCryptoCurrencies()
+            .zipWith(availableFiats) { supportedPairs, fiats ->
+                supportedPairs.pairs.filter { fiats.contains(it.fiatCurrency) }
+                    .map {
+                        CurrencyPair.CryptoToFiatCurrencyPair(it.cryptoCurrency,
+                            it.fiatCurrency)
                     }
+            }
+
+        return Singles.zip(
+            coincore.getTransactionTargets(sourceAccount, AssetAction.Sell),
+            apiPairs
+        ).map { (accountList, pairs) ->
+            accountList.filterIsInstance(FiatAccount::class.java)
+                .filter { account ->
+                    pairs.any { it.source == sourceAccount.asset && account.fiatCurrency == it.destination }
                 }
+        }
+    }
+
+    private fun swapTargets(sourceAccount: CryptoAccount): Single<List<SingleAccount>> =
+        Singles.zip(
+            coincore.getTransactionTargets(sourceAccount, AssetAction.Swap),
+            custodialRepository.getSwapAvailablePairs(),
+            eligibilityProvider.isEligibleForSimpleBuy()
+        ).map { (accountList, pairs, eligible) ->
+            accountList.filterIsInstance(CryptoAccount::class.java)
+                .filter { account ->
+                    pairs.any { it.source == sourceAccount.asset && account.asset == it.destination }
+                }.filter { account ->
+                    eligible or (account is NonCustodialAccount)
+                }
+        }
 
     fun getAvailableSourceAccounts(action: AssetAction): Single<List<CryptoAccount>> {
         require(action == AssetAction.Swap) { "Source account should be preselected for action $action" }
         return coincore.allWallets()
             .zipWith(
-                swapRepository.getSwapAvailablePairs()
+                custodialRepository.getSwapAvailablePairs()
             ).map { (accountGroup, pairs) ->
                 accountGroup.accounts.filter { account ->
                     (account as? CryptoAccount)?.isAvailableToSwapFrom(pairs) ?: false
@@ -114,7 +146,7 @@ class TransactionInteractor(
                     account.actions.contains(AssetAction.Swap)
                 }
             }
-        }
+    }
 
     fun verifyAndExecute(secondPassword: String): Completable =
         transactionProcessor?.execute(secondPassword) ?: throw IllegalStateException("TxProcessor not initialised")
@@ -138,7 +170,7 @@ class TransactionInteractor(
     }
 }
 
-private fun CryptoAccount.isAvailableToSwapFrom(pairs: List<SwapPair>): Boolean =
+private fun CryptoAccount.isAvailableToSwapFrom(pairs: List<CurrencyPair.CryptoCurrencyPair>): Boolean =
     pairs.any { it.source == this.asset }
 
 private val Throwable.isUnexpectedContractError

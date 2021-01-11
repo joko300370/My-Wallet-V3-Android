@@ -1,12 +1,12 @@
 package piuk.blockchain.android.simplebuy
 
-import com.blockchain.swap.nabu.datamanagers.BankAccount
-import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.Partner
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.datamanagers.CustodialQuote
-import com.blockchain.swap.nabu.datamanagers.BuySellPair
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.datamanagers.BuySellPair
+import com.blockchain.nabu.datamanagers.CustodialQuote
+import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.datamanagers.Partner
+import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.models.data.LinkBankTransfer
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
@@ -15,6 +15,7 @@ import piuk.blockchain.android.ui.base.mvi.MviState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import java.io.Serializable
 import java.math.BigInteger
 import java.util.Date
 import java.util.regex.Pattern
@@ -36,7 +37,6 @@ data class SimpleBuyState(
     val custodialQuote: CustodialQuote? = null,
     val kycStartedButNotCompleted: Boolean = false,
     val kycVerificationState: KycState? = null,
-    val bankAccount: BankAccount? = null,
     val currentScreen: FlowScreen = FlowScreen.ENTER_AMOUNT,
     val selectedPaymentMethod: SelectedPaymentMethod? = null,
     val orderExchangePrice: FiatValue? = null,
@@ -51,6 +51,7 @@ data class SimpleBuyState(
     val paymentSucceeded: Boolean = false,
     val showRating: Boolean = false,
     val withdrawalLockPeriod: BigInteger = BigInteger.ZERO,
+    @Transient val linkBankTransfer: LinkBankTransfer? = null,
     @Transient val paymentPending: Boolean = false,
     // we use this flag to avoid navigating back and forth, reset after navigating
     @Transient val confirmationActionRequested: Boolean = false,
@@ -170,16 +171,23 @@ enum class KycState {
 }
 
 enum class FlowScreen {
-    ENTER_AMOUNT, KYC, KYC_VERIFICATION, CHECKOUT, BANK_DETAILS, ADD_CARD
+    ENTER_AMOUNT, KYC, KYC_VERIFICATION, CHECKOUT, ADD_CARD
 }
 
 enum class InputError {
     BELOW_MIN, ABOVE_MAX
 }
 
-sealed class ErrorState {
+sealed class ErrorState : Serializable {
     object GenericError : ErrorState()
     object NoAvailableCurrenciesToTrade : ErrorState()
+    object BankLinkingUpdateFailed : ErrorState()
+    object BankLinkingFailed : ErrorState()
+    object BankLinkingTimeout : ErrorState()
+    object LinkedBankAlreadyLinked : ErrorState()
+    object LinkedBankAccountUnsupported : ErrorState()
+    object LinkedBankNamesMismatched : ErrorState()
+    object LinkedBankNotSupported : ErrorState()
 }
 
 data class SimpleBuyOrder(
@@ -192,7 +200,8 @@ data class SimpleBuyOrder(
 data class PaymentOptions(
     val availablePaymentMethods: List<PaymentMethod> = emptyList(),
     val canAddCard: Boolean = false,
-    val canLinkFunds: Boolean = false
+    val canLinkFunds: Boolean = false,
+    val canLinkBank: Boolean = false
 )
 
 data class SelectedPaymentMethod(
@@ -201,7 +210,19 @@ data class SelectedPaymentMethod(
     val label: String? = "",
     val paymentMethodType: PaymentMethodType
 ) {
-    fun isBank() = paymentMethodType == PaymentMethodType.BANK_ACCOUNT
     fun isCard() = paymentMethodType == PaymentMethodType.PAYMENT_CARD
+    fun isBank() = paymentMethodType == PaymentMethodType.BANK_TRANSFER
     fun isFunds() = paymentMethodType == PaymentMethodType.FUNDS
+
+    fun concreteId(): String? =
+        if (isDefinedBank() || isDefinedCard()) id else null
+
+    private fun isDefinedCard() = paymentMethodType == PaymentMethodType.PAYMENT_CARD &&
+            id != PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
+
+    private fun isDefinedBank() = paymentMethodType == PaymentMethodType.BANK_TRANSFER &&
+            id != PaymentMethod.UNDEFINED_BANK_TRANSFER_PAYMENT_ID
+
+    fun isActive() =
+        concreteId() != null || (paymentMethodType == PaymentMethodType.FUNDS && id == PaymentMethod.FUNDS_PAYMENT_ID)
 }

@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.ActivityAnalytics
-import com.blockchain.swap.nabu.datamanagers.InterestState
+import com.blockchain.nabu.datamanagers.InterestState
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -22,19 +22,14 @@ import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.activity.detail.adapter.ActivityDetailsDelegateAdapter
-import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.util.makeBlockExplorerUrl
+import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class CryptoActivityDetailsBottomSheet :
     MviBottomSheet<ActivityDetailsModel, ActivityDetailsIntents, ActivityDetailState>() {
-
-    interface Host : SlidingModalBottomDialog.Host {
-        fun onShowBankDetailsSelected()
-        fun onShowBankCancelOrder()
-    }
 
     override val host: Host by lazy {
         super.host as? Host
@@ -49,8 +44,7 @@ class CryptoActivityDetailsBottomSheet :
     private val listAdapter: ActivityDetailsDelegateAdapter by lazy {
         ActivityDetailsDelegateAdapter(
             onActionItemClicked = { onActionItemClicked() },
-            onDescriptionItemUpdated = { onDescriptionItemClicked(it) },
-            onCancelActionItemClicked = { onCancelActionItemClicked() }
+            onDescriptionItemUpdated = { onDescriptionItemClicked(it) }
         )
     }
 
@@ -62,12 +56,17 @@ class CryptoActivityDetailsBottomSheet :
         get() = this?.getSerializable(ARG_CRYPTO_CURRENCY) as? CryptoCurrency
             ?: throw IllegalArgumentException("Cryptocurrency should not be null")
 
+    private val Bundle?.activityType
+        get() = this?.getSerializable(ARG_ACTIVITY_TYPE) as? CryptoActivityType
+            ?: throw IllegalArgumentException("ActivityDetailsType should not be null")
+
     private lateinit var currentState: ActivityDetailState
 
     private val simpleBuySync: SimpleBuySyncFactory by scopedInject()
     private val compositeDisposable = CompositeDisposable()
 
     override fun initControls(view: View) {
+        loadActivityDetails(arguments.cryptoCurrency, arguments.txId, arguments.activityType)
         view.details_list.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             addItemDecoration(BlockchainListDividerDecor(requireContext()))
@@ -138,7 +137,7 @@ class CryptoActivityDetailsBottomSheet :
 
     private fun showTransactionTypeUi(state: ActivityDetailState, view: View) {
         if (state.transactionType == TransactionSummary.TransactionType.BUY) {
-            showBuyUi(state, view)
+            showBuyUi(view, state)
         } else if (state.transactionType == TransactionSummary.TransactionType.INTEREST_EARNED ||
             state.transactionType == TransactionSummary.TransactionType.DEPOSIT ||
             state.transactionType == TransactionSummary.TransactionType.WITHDRAW
@@ -149,30 +148,24 @@ class CryptoActivityDetailsBottomSheet :
     }
 
     private fun showBuyUi(
-        state: ActivityDetailState,
-        view: View
+        view: View,
+        state: ActivityDetailState
     ) {
         if (state.isPending || state.isPendingExecution) {
-            view.custodial_tx_button.text =
-                getString(R.string.activity_details_view_bank_transfer_details)
-            view.custodial_tx_button.setOnClickListener {
-                host.onShowBankDetailsSelected()
-                dismiss()
-            }
-        } else {
-            view.custodial_tx_button.text =
-                getString(R.string.activity_details_buy_again)
-            view.custodial_tx_button.setOnClickListener {
-                analytics.logEvent(ActivityAnalytics.DETAILS_BUY_PURCHASE_AGAIN)
-                compositeDisposable += simpleBuySync.performSync().onErrorComplete().observeOn(
-                    AndroidSchedulers.mainThread())
-                    .subscribe {
-                        startActivity(SimpleBuyActivity.newInstance(requireContext(), arguments.cryptoCurrency, true))
-                        dismiss()
-                    }
-            }
+            view.custodial_tx_button.gone()
+            return
         }
-
+        view.custodial_tx_button.text =
+            getString(R.string.activity_details_buy_again)
+        view.custodial_tx_button.setOnClickListener {
+            analytics.logEvent(ActivityAnalytics.DETAILS_BUY_PURCHASE_AGAIN)
+            compositeDisposable += simpleBuySync.performSync().onErrorComplete().observeOn(
+                AndroidSchedulers.mainThread())
+                .subscribe {
+                    startActivity(SimpleBuyActivity.newInstance(requireContext(), arguments.cryptoCurrency, true))
+                    dismiss()
+                }
+        }
         view.custodial_tx_button.visible()
     }
 
@@ -203,11 +196,12 @@ class CryptoActivityDetailsBottomSheet :
 
                 status.text = getString(when {
                     transactionType == TransactionSummary.TransactionType.SENT ||
-                        transactionType == TransactionSummary.TransactionType.TRANSFERRED -> {
+                            transactionType == TransactionSummary.TransactionType.TRANSFERRED -> {
                         analytics.logEvent(ActivityAnalytics.DETAILS_SEND_CONFIRMING)
                         R.string.activity_details_label_confirming
                     }
-                    isFeeTransaction || transactionType == TransactionSummary.TransactionType.SWAP -> {
+                    isFeeTransaction || transactionType == TransactionSummary.TransactionType.SWAP ||
+                            transactionType == TransactionSummary.TransactionType.SELL -> {
                         if (isFeeTransaction) {
                             analytics.logEvent(ActivityAnalytics.DETAILS_FEE_PENDING)
                         } else {
@@ -215,8 +209,7 @@ class CryptoActivityDetailsBottomSheet :
                         }
                         R.string.activity_details_label_pending
                     }
-                    transactionType == TransactionSummary.TransactionType.BUY ||
-                        transactionType == TransactionSummary.TransactionType.SELL ->
+                    transactionType == TransactionSummary.TransactionType.BUY ->
                         if (pending && !pendingExecution) {
                             analytics.logEvent(ActivityAnalytics.DETAILS_BUY_AWAITING_FUNDS)
                             R.string.activity_details_label_waiting_on_funds
@@ -275,12 +268,6 @@ class CryptoActivityDetailsBottomSheet :
             UpdateDescriptionIntent(arguments.txId, arguments.cryptoCurrency, description))
     }
 
-    private fun onCancelActionItemClicked() {
-        analytics.logEvent(ActivityAnalytics.DETAILS_BUY_CANCEL)
-        host.onShowBankCancelOrder()
-        dismiss()
-    }
-
     private fun onActionItemClicked() {
         val explorerUri = arguments.cryptoCurrency.makeBlockExplorerUrl(arguments.txId)
         logAnalyticsForExplorer()
@@ -298,7 +285,8 @@ class CryptoActivityDetailsBottomSheet :
                 R.string.activity_details_title_received)
             TransactionSummary.TransactionType.SENT -> getString(R.string.activity_details_title_sent)
             TransactionSummary.TransactionType.BUY -> getString(R.string.activity_details_title_buy)
-            TransactionSummary.TransactionType.SELL -> getString(R.string.activity_details_title_sell)
+            TransactionSummary.TransactionType.SELL -> getString(R.string.activity_details_title_sell_1,
+                arguments.cryptoCurrency.displayTicker)
             TransactionSummary.TransactionType.SWAP -> getString(R.string.activity_details_title_swap)
             TransactionSummary.TransactionType.DEPOSIT -> getString(
                 R.string.activity_details_title_deposit)
@@ -355,6 +343,7 @@ class CryptoActivityDetailsBottomSheet :
 
     companion object {
         private const val ARG_CRYPTO_CURRENCY = "crypto_currency"
+        private const val ARG_ACTIVITY_TYPE = "activity_type"
         private const val ARG_TRANSACTION_HASH = "tx_hash"
 
         fun newInstance(
@@ -366,9 +355,8 @@ class CryptoActivityDetailsBottomSheet :
                 arguments = Bundle().apply {
                     putSerializable(ARG_CRYPTO_CURRENCY, cryptoCurrency)
                     putString(ARG_TRANSACTION_HASH, txHash)
+                    putSerializable(ARG_ACTIVITY_TYPE, activityType)
                 }
-
-                loadActivityDetails(cryptoCurrency, txHash, activityType)
             }
         }
     }
