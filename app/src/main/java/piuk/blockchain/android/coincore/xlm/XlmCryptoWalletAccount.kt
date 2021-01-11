@@ -3,7 +3,7 @@ package piuk.blockchain.android.coincore.xlm
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.XlmFeesFetcher
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -66,7 +66,7 @@ internal class XlmCryptoWalletAccount(
                     account = this
                 ) as ActivitySummaryItem
             }.flatMap {
-                appendSwapActivity(custodialWalletManager, asset, nonCustodialSwapDirections, it)
+                appendTradeActivity(custodialWalletManager, asset, it)
             }.doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 
     override fun createTxEngine(): TxEngine =

@@ -8,14 +8,13 @@ import com.blockchain.lockbox.data.LockboxDataManager
 import com.blockchain.logging.CrashLogger
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
-import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.sunriver.XlmDataManager
-import com.blockchain.swap.nabu.NabuToken
-import com.blockchain.swap.nabu.datamanagers.NabuDataManager
-import com.blockchain.swap.nabu.models.nabu.CampaignData
-import com.blockchain.swap.nabu.models.nabu.KycState
-import com.blockchain.swap.nabu.models.nabu.NabuApiException
-import com.blockchain.swap.nabu.models.nabu.NabuErrorCodes
+import com.blockchain.nabu.NabuToken
+import com.blockchain.nabu.datamanagers.NabuDataManager
+import com.blockchain.nabu.models.responses.nabu.CampaignData
+import com.blockchain.nabu.models.responses.nabu.KycState
+import com.blockchain.nabu.models.responses.nabu.NabuApiException
+import com.blockchain.nabu.models.responses.nabu.NabuErrorCodes
 import info.blockchain.wallet.api.Environment
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
@@ -26,7 +25,6 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.SunriverCampaignRegistration
 import piuk.blockchain.android.campaign.SunriverCardType
-import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoTarget
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerifiedLinkState
@@ -60,12 +58,10 @@ interface MainView : MvpView, HomeNavigator {
     fun showProgressDialog(@StringRes message: Int)
     fun hideProgressDialog()
     fun clearAllDynamicShortcuts()
-    fun setPitEnabled(enabled: Boolean)
     fun showHomebrewDebugMenu()
     fun enableSwapButton(isEnabled: Boolean)
     fun displayLockboxMenu(lockboxAvailable: Boolean)
     fun showTestnetWarning()
-    fun launchSwapIntro()
     fun launchPendingVerificationScreen(campaignType: CampaignType)
     fun shouldIgnoreDeepLinking(): Boolean
     fun displayDialog(@StringRes title: Int, @StringRes message: Int)
@@ -87,7 +83,6 @@ class MainPresenter internal constructor(
     private val deepLinkProcessor: DeepLinkProcessor,
     private val sunriverCampaignRegistration: SunriverCampaignRegistration,
     private val xlmDataManager: XlmDataManager,
-    private val pitFeatureFlag: FeatureFlag,
     private val pitLinking: PitLinking,
     private val nabuDataManager: NabuDataManager,
     private val simpleBuySync: SimpleBuySyncFactory,
@@ -119,15 +114,10 @@ class MainPresenter internal constructor(
             checkLockboxAvailability()
             lightSimpleBuySync()
             doPushNotifications()
-            checkPitAvailability()
         }
     }
 
     override fun onViewDetached() {}
-
-    private fun checkPitAvailability() {
-        compositeDisposable += pitFeatureFlag.enabled.subscribeBy { view?.setPitEnabled(it) }
-    }
 
     private fun checkLockboxAvailability() {
         compositeDisposable += lockboxDataManager.isLockboxAvailable()
@@ -333,32 +323,6 @@ class MainPresenter internal constructor(
 
     internal fun clearLoginState() {
         accessState.logout()
-    }
-
-    internal fun startSwapOrKyc(source: CryptoAccount?, target: CryptoAccount?) {
-        compositeDisposable += nabuUser.observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onError = { it.printStackTrace() }, onSuccess = { nabuUser ->
-                if (nabuUser.tiers?.current ?: 0 > 0) {
-                    view?.launchSwap(
-                        sourceAccount = source,
-                        targetAccount = target
-                    )
-                } else {
-                    if (
-                        nabuUser.kycState == KycState.Rejected ||
-                        nabuUser.kycState == KycState.UnderReview ||
-                        nabuUser.kycState == KycState.Pending
-                    )
-                        view?.launchPendingVerificationScreen(CampaignType.Swap)
-                    else if (nabuUser.kycState == KycState.None) {
-                        if (!prefs.swapIntroCompleted) {
-                            view?.launchSwapIntro()
-                        } else {
-                            view?.launchKyc(CampaignType.Swap)
-                        }
-                    }
-                }
-            })
     }
 
     fun onThePitMenuClicked() {

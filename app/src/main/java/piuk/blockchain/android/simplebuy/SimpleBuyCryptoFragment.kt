@@ -10,14 +10,10 @@ import android.view.WindowManager
 import android.widget.TextView
 import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.CurrencyChangedFromBuyForm
-import com.blockchain.notifications.analytics.PaymentMethodSelected
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
-import com.blockchain.notifications.analytics.buyConfirmClicked
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import io.reactivex.disposables.CompositeDisposable
@@ -54,7 +50,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     private val exchangeRateDataManager: ExchangeRateDataManager by scopedInject()
 
     private var lastState: SimpleBuyState? = null
-    private val compositeDesposable = CompositeDisposable()
+    private val compositeDisposable = CompositeDisposable()
 
     private val cryptoCurrency: CryptoCurrency by unsafeLazy {
         arguments?.getSerializable(ARG_CRYPTO_CURRENCY) as? CryptoCurrency
@@ -86,7 +82,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         model.process(SimpleBuyIntent.FetchSupportedFiatCurrencies)
         analytics.logEvent(SimpleBuyAnalytics.BUY_FORM_SHOWN)
 
-        compositeDesposable += input_amount.amount.subscribe {
+        compositeDisposable += input_amount.amount.subscribe {
             when (it) {
                 is FiatValue -> model.process(SimpleBuyIntent.AmountUpdated(it))
                 else -> throw IllegalStateException("CryptoValue is not supported as input yet")
@@ -98,15 +94,14 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         }
 
         payment_method_details_root.setOnClickListener {
-            lastState?.paymentOptions?.let {
-                showBottomSheet(PaymentMethodChooserBottomSheet.newInstance(it.availablePaymentMethods.filterNot {
-                    it is PaymentMethod.Undefined
-                },
-                    it.canAddCard, it.canLinkFunds))
-            }
+            showPaymentMethodsBottomSheet(
+                if (lastState?.paymentOptions?.availablePaymentMethods?.any { it.canUsedForPaying() } == true)
+                    PaymentMethodsChooserState.AVAILABLE_TO_PAY
+                else PaymentMethodsChooserState.AVAILABLE_TO_ADD
+            )
         }
 
-        compositeDesposable += input_amount.onImeAction.subscribe {
+        compositeDisposable += input_amount.onImeAction.subscribe {
             when (it) {
                 PrefixedOrSuffixedEditText.ImeOptions.NEXT -> {
                     startBuy()
@@ -115,6 +110,24 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                     // do nothing
                 }
             }
+        }
+    }
+
+    override fun showAvailableToAddPaymentMethods() {
+        showPaymentMethodsBottomSheet(PaymentMethodsChooserState.AVAILABLE_TO_ADD)
+    }
+
+    private fun showPaymentMethodsBottomSheet(state: PaymentMethodsChooserState) {
+        lastState?.paymentOptions?.let {
+            showBottomSheet(PaymentMethodChooserBottomSheet.newInstance(
+                when (state) {
+                    PaymentMethodsChooserState.AVAILABLE_TO_PAY -> it.availablePaymentMethods.filter { method ->
+                        method.canUsedForPaying()
+                    }
+                    PaymentMethodsChooserState.AVAILABLE_TO_ADD -> it.availablePaymentMethods.filter { method ->
+                        method.canBeAdded()
+                    }
+                }))
         }
     }
 
@@ -145,7 +158,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         lastState = newState
 
         if (newState.errorState != null) {
-            showErrorState(newState.errorState)
+            handleErrorState(newState.errorState)
             return
         }
 
@@ -205,10 +218,12 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                 }
                 // We have done kyc and are verified
                 KycState.VERIFIED_AND_ELIGIBLE -> {
-                    if (newState.selectedPaymentMethod?.paymentMethodType != PaymentMethodType.UNKNOWN) {
+                    if (newState.selectedPaymentMethod?.isActive() == true) {
                         navigator().goToCheckOutScreen()
                     } else
-                        goToAddNewPaymentMethod(newState.selectedPaymentMethod.id)
+                        newState.selectedPaymentMethod?.paymentMethodType?.let {
+                            goToAddNewPaymentMethod(it)
+                        }
                 }
             }.exhaustive
         }
@@ -236,6 +251,12 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                     ))
                 }
             }.exhaustive
+            model.process(SimpleBuyIntent.DepositFundsHandled)
+        }
+
+        newState.linkBankTransfer?.let {
+            model.process(SimpleBuyIntent.ResetLinkBankTransfer)
+            navigator().linkBankWithPartner(it)
         }
     }
 
@@ -246,13 +267,16 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         analytics.logEvent(SimpleBuyAnalytics.START_GOLD_FLOW)
     }
 
-    private fun goToAddNewPaymentMethod(selectedPaymentMethodId: String) {
-        when (selectedPaymentMethodId) {
-            PaymentMethod.UNDEFINED_CARD_PAYMENT_ID -> {
+    private fun goToAddNewPaymentMethod(paymentMethod: PaymentMethodType) {
+        when (paymentMethod) {
+            PaymentMethodType.PAYMENT_CARD -> {
                 addPaymentMethod(PaymentMethodType.PAYMENT_CARD)
             }
-            PaymentMethod.UNDEFINED_FUNDS_PAYMENT_ID -> {
+            PaymentMethodType.FUNDS -> {
                 addPaymentMethod(PaymentMethodType.FUNDS)
+            }
+            PaymentMethodType.BANK_TRANSFER -> {
+                addPaymentMethod(PaymentMethodType.BANK_TRANSFER)
             }
             else -> {
             }
@@ -273,10 +297,13 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             is PaymentMethod.Undefined -> {
                 payment_method_icon.setImageResource(R.drawable.ic_add_payment_method)
             }
-            is PaymentMethod.BankTransfer -> renderBankPayment(selectedPaymentMethod)
             is PaymentMethod.Card -> renderCardPayment(selectedPaymentMethod)
             is PaymentMethod.Funds -> renderFundsPayment(selectedPaymentMethod)
+            is PaymentMethod.Bank -> renderBankPayment(selectedPaymentMethod)
             is PaymentMethod.UndefinedCard -> renderUndefinedCardPayment(selectedPaymentMethod)
+            is PaymentMethod.UndefinedBankTransfer -> renderUndefinedBankTransfer(selectedPaymentMethod)
+            else -> {
+            }
         }
         payment_method.visible()
         payment_method_separator.visible()
@@ -296,6 +323,13 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             getString(R.string.payment_method_limit, paymentMethod.limits.max.toStringWithSymbol())
     }
 
+    private fun renderBankPayment(paymentMethod: PaymentMethod.Bank) {
+        payment_method_icon.setImageResource(R.drawable.ic_bank_transfer)
+        payment_method_title.text = paymentMethod.bankName
+        payment_method_limit.text =
+            getString(R.string.payment_method_limit, paymentMethod.limits.max.toStringWithSymbol())
+    }
+
     private fun renderUndefinedCardPayment(selectedPaymentMethod: PaymentMethod.UndefinedCard) {
         payment_method_icon.setImageResource(R.drawable.ic_payment_card)
         payment_method_title.text = getString(R.string.credit_or_debit_card)
@@ -303,16 +337,16 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             getString(R.string.payment_method_limit, selectedPaymentMethod.limits.max.toStringWithSymbol())
     }
 
-    private fun renderCardPayment(selectedPaymentMethod: PaymentMethod.Card) {
-        payment_method_icon.setImageResource(selectedPaymentMethod.cardType.icon())
-        payment_method_title.text = selectedPaymentMethod.uiLabelWithDigits()
+    private fun renderUndefinedBankTransfer(selectedPaymentMethod: PaymentMethod.UndefinedBankTransfer) {
+        payment_method_icon.setImageResource(R.drawable.ic_bank_transfer)
+        payment_method_title.text = getString(R.string.link_a_bank)
         payment_method_limit.text =
             getString(R.string.payment_method_limit, selectedPaymentMethod.limits.max.toStringWithSymbol())
     }
 
-    private fun renderBankPayment(selectedPaymentMethod: PaymentMethod.BankTransfer) {
-        payment_method_title.text = getString(R.string.bank_wire_transfer)
-        payment_method_icon.setImageResource(R.drawable.ic_bank_transfer)
+    private fun renderCardPayment(selectedPaymentMethod: PaymentMethod.Card) {
+        payment_method_icon.setImageResource(selectedPaymentMethod.cardType.icon())
+        payment_method_title.text = selectedPaymentMethod.detailedLabel()
         payment_method_limit.text =
             getString(R.string.payment_method_limit, selectedPaymentMethod.limits.max.toStringWithSymbol())
     }
@@ -321,8 +355,14 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         input_amount.hideLabels()
     }
 
-    private fun showErrorState(errorState: ErrorState) {
-        showBottomSheet(ErrorSlidingBottomDialog.newInstance(activity))
+    private fun handleErrorState(errorState: ErrorState) {
+        if (errorState == ErrorState.LinkedBankNotSupported) {
+            model.process(SimpleBuyIntent.ClearError)
+            model.process(SimpleBuyIntent.ClearAnySelectedPaymentMethods)
+            navigator().launchBankLinkingWithError(errorState)
+        } else {
+            showBottomSheet(ErrorSlidingBottomDialog.newInstance(activity))
+        }
     }
 
     private fun handleError(error: InputError, state: SimpleBuyState) {
@@ -358,18 +398,18 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     }
 
     override fun onPaymentMethodChanged(paymentMethod: PaymentMethod) {
-        model.process(SimpleBuyIntent.SelectedPaymentMethodUpdate(paymentMethod))
-        analytics.logEvent(PaymentMethodSelected(
-            when (paymentMethod) {
-                is PaymentMethod.BankTransfer -> PaymentMethodType.BANK_ACCOUNT.toAnalyticsString()
-                is PaymentMethod.Card -> PaymentMethodType.PAYMENT_CARD.toAnalyticsString()
-                is PaymentMethod.Funds -> PaymentMethodType.FUNDS.toAnalyticsString()
-                else -> ""
+        when (paymentMethod) {
+            is PaymentMethod.UndefinedFunds -> depositFundsRequested()
+            else -> {
+                model.process(SimpleBuyIntent.SelectedPaymentMethodUpdate(paymentMethod))
+                analytics.logEvent(PaymentMethodSelected(
+                    paymentMethod.toAnalyticsString()
+                ))
             }
-        ))
+        }
     }
 
-    override fun addPaymentMethod(type: PaymentMethodType) {
+    private fun addPaymentMethod(type: PaymentMethodType) {
         when (type) {
             PaymentMethodType.PAYMENT_CARD -> {
                 val intent = Intent(activity, CardDetailsActivity::class.java)
@@ -380,13 +420,16 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                     lastState?.fiatCurrency ?: return
                 ))
             }
+            PaymentMethodType.BANK_TRANSFER -> {
+                model.process(SimpleBuyIntent.LinkBankTransferRequested)
+            }
             else -> {
             }
         }
         analytics.logEvent(PaymentMethodSelected(type.toAnalyticsString()))
     }
 
-    override fun depositFundsRequested() {
+    private fun depositFundsRequested() {
         model.process(SimpleBuyIntent.DepositFundsRequested)
     }
 
@@ -423,12 +466,15 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             }
         }
     }
+
+    private enum class PaymentMethodsChooserState {
+        AVAILABLE_TO_PAY, AVAILABLE_TO_ADD
+    }
 }
 
 interface PaymentMethodChangeListener {
     fun onPaymentMethodChanged(paymentMethod: PaymentMethod)
-    fun addPaymentMethod(type: PaymentMethodType)
-    fun depositFundsRequested()
+    fun showAvailableToAddPaymentMethods()
 }
 
 interface ChangeCurrencyHost : SimpleBuyScreen {

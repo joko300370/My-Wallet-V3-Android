@@ -7,10 +7,11 @@ import android.widget.ImageView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.blockchain.nabu.datamanagers.CurrencyPair
 import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.dialog_activities_tx_item.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.SwapActivitySummaryItem
+import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.extensions.toFormattedDate
@@ -24,7 +25,9 @@ class SwapActivityItemDelegate<in T>(
 ) : AdapterDelegate<T> {
 
     override fun isForViewType(items: List<T>, position: Int): Boolean =
-        items[position] is SwapActivitySummaryItem
+        (items[position] as? TradeActivitySummaryItem)?.let {
+            it.currencyPair is CurrencyPair.CryptoCurrencyPair
+        } ?: false
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
         SwapActivityItemViewHolder(parent.inflate(R.layout.dialog_activities_tx_item))
@@ -34,7 +37,7 @@ class SwapActivityItemDelegate<in T>(
         position: Int,
         holder: RecyclerView.ViewHolder
     ) = (holder as SwapActivityItemViewHolder).bind(
-        items[position] as SwapActivitySummaryItem,
+        items[position] as TradeActivitySummaryItem,
         onItemClicked
     )
 }
@@ -44,29 +47,32 @@ private class SwapActivityItemViewHolder(
 ) : RecyclerView.ViewHolder(itemView) {
 
     fun bind(
-        tx: SwapActivitySummaryItem,
+        tx: TradeActivitySummaryItem,
         onAccountClicked: (CryptoCurrency, String, CryptoActivityType) -> Unit
     ) {
         with(itemView) {
 
-            if (tx.state.isPending) {
-                icon.setIsConfirming()
-            } else {
-                icon.setImageResource(R.drawable.ic_tx_swap)
-                icon.setAssetIconColours(tx.sendingAsset, context)
-            }
-
             status_date.text = Date(tx.timeStampMs).toFormattedDate()
-            tx_type.text = context.resources.getString(R.string.tx_title_swap, tx.sendingAsset.displayTicker,
-                tx.receivingAsset.displayTicker)
+            (tx.currencyPair as? CurrencyPair.CryptoCurrencyPair)?.let {
+                tx_type.text = context.resources.getString(
+                    R.string.tx_title_swap,
+                    it.source.displayTicker,
+                    it.destination.displayTicker
+                )
+                if (tx.state.isPending) {
+                    icon.setIsConfirming()
+                } else {
+                    icon.setImageResource(R.drawable.ic_tx_swap)
+                    icon.setAssetIconColours(it.source, context)
+                }
+                setOnClickListener { onAccountClicked(tx.currencyPair.source, tx.txId, CryptoActivityType.SWAP) }
+            }
 
             setTextColours(tx.state.isPending)
 
             asset_balance_crypto.text = tx.value.toStringWithSymbol()
             asset_balance_fiat.text = tx.fiatValue.toStringWithSymbol()
             asset_balance_fiat.visible()
-
-            setOnClickListener { onAccountClicked(tx.sendingAsset, tx.txId, CryptoActivityType.SWAP) }
         }
     }
 

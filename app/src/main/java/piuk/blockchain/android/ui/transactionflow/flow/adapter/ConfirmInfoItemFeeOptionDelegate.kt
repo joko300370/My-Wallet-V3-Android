@@ -136,7 +136,7 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
                 val networkText = context.getString(R.string.tx_confirmation_fee_learn_more_2,
                     context.getString(item.asset.assetName()))
 
-                val linkedText = stringUtils.getStringWithMappedLinks(
+                val linkedText = stringUtils.getStringWithMappedAnnotations(
                     R.string.tx_confirmation_fee_learn_more_3,
                     linksMap,
                     activityContext

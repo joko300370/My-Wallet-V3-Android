@@ -14,6 +14,8 @@ import org.bitcoinj.core.ECKey;
 
 import java.io.IOException;
 
+import javax.annotation.Nonnull;
+
 import info.blockchain.wallet.BlockchainFramework;
 import info.blockchain.wallet.api.PersistentUrls;
 
@@ -74,7 +76,10 @@ public class LegacyAddress implements JsonSerializableAccount {
     }
 
     public String getLabel() {
-        return label;
+        if(label != null)
+            return label;
+        else
+            return address;
     }
 
     public long getCreatedTime() {

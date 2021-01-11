@@ -3,9 +3,9 @@ package piuk.blockchain.android.coincore.bch
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
-import com.blockchain.swap.nabu.service.TierService
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -13,14 +13,12 @@ import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.thepit.PitLinking
-import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -35,7 +33,6 @@ private const val BCH_URL_PREFIX = "bitcoincash:"
 internal class BchAsset(
     payloadManager: PayloadDataManager,
     private val bchDataManager: BchDataManager,
-    private val stringUtils: StringUtils,
     custodialManager: CustodialWalletManager,
     private val environmentSettings: EnvironmentConfig,
     private val feeDataManager: FeeDataManager,
@@ -66,7 +63,7 @@ internal class BchAsset(
         get() = CryptoCurrency.BCH
 
     override fun initToken(): Completable =
-        bchDataManager.initBchWallet(stringUtils.getString(R.string.bch_default_account_label))
+        bchDataManager.initBchWallet(labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.BCH))
             .doOnError { Timber.e("Unable to init BCH, because: $it") }
             .onErrorComplete()
 
@@ -80,14 +77,12 @@ internal class BchAsset(
                             jsonAccount = a,
                             bchManager = bchDataManager,
                             addressIndex = i,
-                            isDefault = i == getDefaultAccountPosition(),
                             exchangeRates = exchangeRates,
                             networkParams = environmentSettings.bitcoinCashNetworkParameters,
                             feeDataManager = feeDataManager,
                             sendDataManager = sendDataManager,
                             walletPreferences = walletPreferences,
-                            custodialWalletManager = custodialManager,
-                            isArchived = a.isArchived
+                            custodialWalletManager = custodialManager
                         )
                     }
             }
@@ -103,11 +98,16 @@ internal class BchAsset(
             }
         }
 
-    private fun isValidAddress(address: String): Boolean =
+    override fun isValidAddress(address: String): Boolean =
         FormatsUtil.isValidBCHAddress(
             environmentSettings.bitcoinCashNetworkParameters,
             address
         )
+
+    fun createAccount(xpub: String): Completable {
+        bchDataManager.createAccount(xpub)
+        return bchDataManager.syncWithServer().doOnComplete { forceAccountRefresh() }
+    }
 }
 
 internal class BchAddress(

@@ -24,6 +24,7 @@
     <color name="orange_100">#FAE4CD</color>
     <color name="orange_300">#FFC994</color>
     <color name="orange_400">#FFB266</color>
+    <color name="orange_600">#F28B24</color>
     <color name="orange_800">#B34400</color>
 
     <color name="green_000">#E6FAEC</color>
@@ -97,6 +98,7 @@
     <color name="xrp">#000000</color>
     <color name="algo">#000000</color>
     <color name="dgld">#FFE738</color>
+    <color name="dgld_chart">#000000</color>
 
 </resources>
 

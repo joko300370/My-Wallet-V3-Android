@@ -52,27 +52,14 @@ android {
         ]
 
         resConfigs 'en',
-                'cs',
                 'de',
                 'es',
                 'fr',
-                'id',
                 'it',
-                'ja',
-                'ko',
-                'ms',
-                'nl',
-                'pl',
                 'pt',
                 'pt-rBR',
-                'ro',
                 'ru',
-                'sv',
-                'th',
-                'tr',
-                'uk',
-                'vi',
-                'zh-rCN'
+                'tr'
     }
     buildTypes {
         release {
@@ -281,7 +268,6 @@ dependencies {
     implementation project(':coreui')
     implementation project(':notifications')
     implementation project(':nabu')
-    implementation project(':swap')
     implementation project(':sunriver')
     implementation project(':lockbox')
 

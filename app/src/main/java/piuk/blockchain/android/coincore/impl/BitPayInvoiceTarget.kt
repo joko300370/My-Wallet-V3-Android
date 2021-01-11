@@ -1,6 +1,6 @@
 package piuk.blockchain.android.coincore.impl
 
-import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
+import com.blockchain.nabu.extensions.fromIso8601ToUtc
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.util.FormatsUtil

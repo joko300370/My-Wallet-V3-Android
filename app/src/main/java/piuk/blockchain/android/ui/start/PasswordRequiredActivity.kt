@@ -56,6 +56,11 @@ class PasswordRequiredActivity : MvpActivity<PasswordRequiredView, PasswordRequi
         button_recover.setOnClickListener { launchRecoveryFlow() }
     }
 
+    override fun onResume() {
+        super.onResume()
+        presenter.loadWalletGuid()
+    }
+
     override fun showToast(@StringRes messageId: Int, @ToastCustom.ToastType toastType: String) {
         ToastCustom.makeText(this, getString(messageId), ToastCustom.LENGTH_SHORT, toastType)
     }
@@ -72,6 +77,10 @@ class PasswordRequiredActivity : MvpActivity<PasswordRequiredView, PasswordRequi
 
     override fun resetPasswordField() {
         if (!isFinishing) field_password.setText("")
+    }
+
+    override fun showWalletGuid(guid: String) {
+        wallet_identifier.text = guid
     }
 
     override fun goToPinPage() {

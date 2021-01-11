@@ -80,7 +80,7 @@ class BchOnChainTxEngine(
         require(amount.currency == CryptoCurrency.BCH)
 
         return Singles.zip(
-            getUnspentApiResponse(bchSource.internalAccount.xpub),
+            getUnspentApiResponse(bchSource.xpubAddress),
             getDynamicFeePerKb(pendingTx)
         ) { coins, feePerKb ->
             updatePendingTx(amount, pendingTx, feePerKb, coins)
@@ -260,7 +260,7 @@ class BchOnChainTxEngine(
 
     private fun getBchChangeAddress(): Single<String> {
         val position =
-            bchDataManager.getAccountMetadataList().indexOfFirst { it.xpub == bchSource.internalAccount.xpub }
+            bchDataManager.getAccountMetadataList().indexOfFirst { it.xpub == bchSource.xpubAddress }
         return bchDataManager.getNextChangeCashAddress(position).singleOrError()
     }
 
@@ -272,8 +272,8 @@ class BchOnChainTxEngine(
 
         val hdAccountList = bchDataManager.getAccountList()
         val acc = hdAccountList.find {
-            it.node.serializePubB58(networkParams) == bchSource.internalAccount.xpub
-        } ?: throw HDWalletException("No matching private key found for ${bchSource.internalAccount.xpub}")
+            it.node.serializePubB58(networkParams) == bchSource.xpubAddress
+        } ?: throw HDWalletException("No matching private key found for ${bchSource.xpubAddress}")
 
         return Single.just(
             bchDataManager.getHDKeysForSigning(
@@ -284,7 +284,7 @@ class BchOnChainTxEngine(
     }
 
     private fun incrementBchReceiveAddress(pendingTx: PendingTx) {
-        val xpub = bchSource.internalAccount.xpub
+        val xpub = bchSource.xpubAddress
         bchDataManager.incrementNextChangeAddress(xpub)
         bchDataManager.incrementNextReceiveAddress(xpub)
         updateInternalBchBalances(pendingTx, xpub)

@@ -79,7 +79,7 @@ class PitPermissionsActivity : PitPermissionsView, BaseMvpActivity<PitPermission
                 ErrorBottomDialog.Content(
                     title = getString(R.string.the_exchange_connection_error_title),
                     description = getString(R.string.the_exchange_connection_error_description),
-                    ctaButtonText = R.string.try_again,
+                    ctaButtonText = R.string.common_try_again,
                     dismissText = 0,
                     icon = R.drawable.vector_pit_request_failure), false
             )).apply {

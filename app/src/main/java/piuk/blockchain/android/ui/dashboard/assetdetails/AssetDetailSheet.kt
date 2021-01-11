@@ -9,7 +9,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.CustodialBalanceClicked
+import piuk.blockchain.android.simplebuy.CustodialBalanceClicked
 import com.blockchain.preferences.CurrencyPrefs
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
@@ -24,7 +24,6 @@ import info.blockchain.wallet.prices.data.PriceDatum
 import kotlinx.android.synthetic.main.dialog_sheet_dashboard_asset_details.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.accounts.PendingBalanceAccountDecorator
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
@@ -32,8 +31,10 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
+import piuk.blockchain.android.ui.customviews.account.PendingBalanceAccountDecorator
 import piuk.blockchain.android.ui.dashboard.setDeltaColour
 import piuk.blockchain.android.util.getDecimalPlaces
+import piuk.blockchain.android.util.loadInterMedium
 import piuk.blockchain.androidcore.data.exchangerate.PriceSeries
 import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
@@ -41,8 +42,6 @@ import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom.TYPE_ERROR
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import piuk.blockchain.androidcoreui.utils.extensions.visible
-import piuk.blockchain.androidcoreui.utils.helperfunctions.CustomFont
-import piuk.blockchain.androidcoreui.utils.helperfunctions.loadFont
 import piuk.blockchain.androidcoreui.utils.helperfunctions.setOnTabSelectedListener
 import java.math.RoundingMode
 import java.text.NumberFormat
@@ -352,13 +351,9 @@ class AssetDetailSheet :
             xAxis.isGranularityEnabled = true
             setExtraOffsets(8f, 0f, 0f, 10f)
             setNoDataTextColor(ContextCompat.getColor(context, R.color.primary_grey_medium))
-            loadFont(
-                context,
-                CustomFont.MONTSERRAT_LIGHT
-            ) {
-                xAxis.typeface = it
-                axisLeft.typeface = it
-            }
+            val typeFace = context.loadInterMedium()
+            xAxis.typeface = typeFace
+            axisLeft.typeface = typeFace
         }
     }
 

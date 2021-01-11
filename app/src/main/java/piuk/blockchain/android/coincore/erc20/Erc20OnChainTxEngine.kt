@@ -208,7 +208,7 @@ open class Erc20OnChainTxEngine(
             .flatMap { ethDataManager.setLastTxHashNowSingle(it) }
             .flatMap { hash ->
                 pendingTx.getOption<TxConfirmationValue.Description>(TxConfirmation.DESCRIPTION)?.let { notes ->
-                    ethDataManager.updateErc20TransactionNotes(hash, notes.text)
+                    ethDataManager.updateErc20TransactionNotes(hash, notes.text, asset)
                 }?.toSingle {
                     hash
                 } ?: Single.just(hash)

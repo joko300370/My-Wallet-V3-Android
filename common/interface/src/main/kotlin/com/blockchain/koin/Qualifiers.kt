@@ -3,19 +3,14 @@ package com.blockchain.koin
 import org.koin.core.qualifier.StringQualifier
 import org.koin.core.qualifier.named
 
-val pitFeatureFlag = StringQualifier("ff_pit_linking")
-val simpleBuyFeatureFlag = StringQualifier("ff_simple_buy")
-val simpleBuyFundsFeatureFlag = StringQualifier("ff_simple_buy_funds")
-val sellFeatureFlag = StringQualifier("ff_sell")
-val cardPaymentsFeatureFlag = StringQualifier("ff_card_payments")
 val coinifyUsersToKyc = StringQualifier("ff_notify_coinify_users_to_kyc")
 val coinifyFeatureFlag = StringQualifier("ff_coinify")
-val pitAnnouncementFeatureFlag = StringQualifier("ff_pit_announcement")
 val smsVerifFeatureFlag = StringQualifier("ff_sms_verification")
 val sunriver = StringQualifier("sunriver")
 val interestAccountFeatureFlag = StringQualifier("ff_interest_account")
-val newSwapFeatureFlag = StringQualifier("ff_new_swap")
 val dgldFeatureFlag = StringQualifier("ff_wdgld")
+val achFeatureFlag = StringQualifier("ff_ach")
+val bankLinkingFeatureFlag = StringQualifier("ff_bank_linking")
 val moshiExplorerRetrofit = StringQualifier("moshi_explorer")
 val nabu = StringQualifier("nabu")
 val kotlinApiRetrofit = StringQualifier("kotlin-api")

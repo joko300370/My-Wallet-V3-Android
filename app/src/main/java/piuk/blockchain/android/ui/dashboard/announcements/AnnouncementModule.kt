@@ -3,8 +3,6 @@ package piuk.blockchain.android.ui.dashboard.announcements
 import com.blockchain.koin.coinifyUsersToKyc
 import com.blockchain.koin.payloadScope
 import com.blockchain.koin.payloadScopeQualifier
-import com.blockchain.koin.pitAnnouncementFeatureFlag
-import com.blockchain.koin.sellFeatureFlag
 import com.blockchain.koin.dgldFeatureFlag
 import io.reactivex.android.schedulers.AndroidSchedulers
 import org.koin.dsl.bind
@@ -21,15 +19,14 @@ import piuk.blockchain.android.ui.dashboard.announcements.rule.KycForAirdropsAnn
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycIncompleteAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycMoreInfoAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycResubmissionAnnouncement
+import piuk.blockchain.android.ui.dashboard.announcements.rule.SwapAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.PitAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.RegisterFingerprintsAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.RegisteredForAirdropMiniAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SellIntroAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyAddCardAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyFinishSignupAnnouncement
-import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyPendingBuyAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.StxCompleteAnnouncement
-import piuk.blockchain.android.ui.dashboard.announcements.rule.SwapAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.TransferCryptoAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.TwoFAAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.VerifyEmailAnnouncement
@@ -94,7 +91,6 @@ val dashboardAnnouncementsModule = module {
             PitAnnouncement(
                 pitLink = get(),
                 dismissRecorder = get(),
-                featureFlag = get(pitAnnouncementFeatureFlag),
                 analytics = get()
             )
         }.bind(AnnouncementRule::class)
@@ -115,14 +111,6 @@ val dashboardAnnouncementsModule = module {
         }.bind(AnnouncementRule::class)
 
         factory {
-            SwapAnnouncement(
-                dataManager = get(),
-                queries = get(),
-                dismissRecorder = get()
-            )
-        }.bind(AnnouncementRule::class)
-
-        factory {
             VerifyEmailAnnouncement(
                 dismissRecorder = get(),
                 walletSettings = get()
@@ -138,6 +126,14 @@ val dashboardAnnouncementsModule = module {
         }.bind(AnnouncementRule::class)
 
         factory {
+            SwapAnnouncement(
+                dismissRecorder = get(),
+                queries = get(),
+                eligibilityProvider = get()
+            )
+        }.bind(AnnouncementRule::class)
+
+        factory {
             BackupPhraseAnnouncement(
                 dismissRecorder = get(),
                 walletStatus = get()
@@ -146,8 +142,7 @@ val dashboardAnnouncementsModule = module {
 
         factory {
             BuyBitcoinAnnouncement(
-                dismissRecorder = get(),
-                simpleBuyAvailability = get()
+                dismissRecorder = get()
             )
         }.bind(AnnouncementRule::class)
 
@@ -195,14 +190,6 @@ val dashboardAnnouncementsModule = module {
         }.bind(AnnouncementRule::class)
 
         factory {
-            SimpleBuyPendingBuyAnnouncement(
-                dismissRecorder = get(),
-                analytics = get(),
-                queries = get()
-            )
-        }.bind(AnnouncementRule::class)
-
-        factory {
             SimpleBuyAddCardAnnouncement(
                 dismissRecorder = get(),
                 analytics = get(),
@@ -229,7 +216,6 @@ val dashboardAnnouncementsModule = module {
             SellIntroAnnouncement(
                 dismissRecorder = get(),
                 eligibilityProvider = get(),
-                sellFeatureFlag = get(sellFeatureFlag),
                 coincore = get(),
                 analytics = get()
             )

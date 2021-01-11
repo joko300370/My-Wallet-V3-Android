@@ -3,10 +3,11 @@ package piuk.blockchain.android.coincore.eth
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.SwapDirection
-import com.blockchain.swap.nabu.datamanagers.SwapOrderState
-import com.blockchain.swap.nabu.datamanagers.repositories.swap.SwapTransactionItem
+import com.blockchain.nabu.datamanagers.CurrencyPair
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.TransferDirection
+import com.blockchain.nabu.datamanagers.CustodialOrderState
+import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
@@ -23,7 +24,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.spy
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
-import piuk.blockchain.android.coincore.SwapActivitySummaryItem
+import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -85,24 +86,23 @@ class EthAccountActivityTest {
         whenever(ethDataManager.getEthResponseModel())
             .thenReturn(ethModel)
 
-        val swapSummary = SwapTransactionItem(
+        val swapSummary = TradeTransactionItem(
             "hash",
             1L,
-            SwapDirection.ON_CHAIN,
+            TransferDirection.ON_CHAIN,
             "sendingAddress",
             "receivingAddress",
-            SwapOrderState.FINISHED,
+            CustodialOrderState.FINISHED,
             CryptoValue.ZeroEth,
             CryptoValue.ZeroBtc,
             CryptoValue.ZeroBtc,
-            CryptoCurrency.ETHER,
-            CryptoCurrency.BTC,
+            CurrencyPair.CryptoCurrencyPair(CryptoCurrency.ETHER, CryptoCurrency.BTC),
             FiatValue.zero("USD"),
             "USD"
         )
 
         val summaryList = listOf(swapSummary)
-        whenever(custodialWalletManager.getSwapActivityForAsset(any(), any()))
+        whenever(custodialWalletManager.getCustodialActivityForAsset(any(), any()))
             .thenReturn(Single.just(summaryList))
 
         doReturn(false).`when`(subject).isErc20FeeTransaction(any())
@@ -113,18 +113,18 @@ class EthAccountActivityTest {
             .assertNoErrors()
             .assertValue {
                 it.size == 1 &&
-                    it[0].run {
-                        this is SwapActivitySummaryItem &&
-                            txId == swapSummary.txId &&
-                            direction == swapSummary.direction &&
-                            sendingAsset == swapSummary.sendingAsset &&
-                            receivingAsset == swapSummary.receivingAsset &&
-                            sendingAddress == swapSummary.sendingAddress &&
-                            receivingAddress == swapSummary.receivingAddress &&
-                            state == swapSummary.state &&
-                            fiatValue == swapSummary.fiatValue &&
-                            fiatCurrency == swapSummary.fiatCurrency
-                    }
+                        it[0].run {
+                            this is TradeActivitySummaryItem &&
+                                    txId == swapSummary.txId &&
+                                    direction == swapSummary.direction &&
+                                    currencyPair == CurrencyPair.CryptoCurrencyPair(CryptoCurrency.ETHER,
+                                CryptoCurrency.BTC) &&
+                                    sendingAddress == swapSummary.sendingAddress &&
+                                    receivingAddress == swapSummary.receivingAddress &&
+                                    state == swapSummary.state &&
+                                    fiatValue == swapSummary.fiatValue &&
+                                    fiatCurrency == swapSummary.fiatCurrency
+                        }
             }
 
         verify(ethDataManager).getLatestBlockNumber()
@@ -152,24 +152,23 @@ class EthAccountActivityTest {
         whenever(ethDataManager.getEthResponseModel())
             .thenReturn(ethModel)
 
-        val swapSummary = SwapTransactionItem(
+        val swapSummary = TradeTransactionItem(
             "123",
             1L,
-            SwapDirection.ON_CHAIN,
+            TransferDirection.ON_CHAIN,
             "sendingAddress",
             "receivingAddress",
-            SwapOrderState.FINISHED,
+            CustodialOrderState.FINISHED,
             CryptoValue.ZeroEth,
             CryptoValue.ZeroBtc,
             CryptoValue.ZeroBtc,
-            CryptoCurrency.ETHER,
-            CryptoCurrency.BTC,
+            CurrencyPair.CryptoCurrencyPair(CryptoCurrency.ETHER, CryptoCurrency.BTC),
             FiatValue.zero("USD"),
             "USD"
         )
 
         val summaryList = listOf(swapSummary)
-        whenever(custodialWalletManager.getSwapActivityForAsset(any(), any()))
+        whenever(custodialWalletManager.getCustodialActivityForAsset(any(), any()))
             .thenReturn(Single.just(summaryList))
 
         doReturn(false).`when`(subject).isErc20FeeTransaction(to)
@@ -180,9 +179,9 @@ class EthAccountActivityTest {
             .assertNoErrors()
             .assertValue {
                 it.size == 1 &&
-                it[0].run {
-                    this is EthActivitySummaryItem
-                }
+                        it[0].run {
+                            this is EthActivitySummaryItem
+                        }
             }
 
         verify(ethDataManager).getLatestBlockNumber()
@@ -206,7 +205,7 @@ class EthAccountActivityTest {
 
         doReturn(true).`when`(subject).isErc20FeeTransaction(ethTransaction.to)
 
-        whenever(custodialWalletManager.getSwapActivityForAsset(any(), any()))
+        whenever(custodialWalletManager.getCustodialActivityForAsset(any(), any()))
             .thenReturn(Single.just(emptyList()))
 
         subject.activity
@@ -240,7 +239,7 @@ class EthAccountActivityTest {
         whenever(ethDataManager.getEthTransactions())
             .thenReturn(Single.just(listOf(ethTransaction)))
 
-        whenever(custodialWalletManager.getSwapActivityForAsset(any(), any()))
+        whenever(custodialWalletManager.getCustodialActivityForAsset(any(), any()))
             .thenReturn(Single.just(emptyList()))
 
         subject.activity

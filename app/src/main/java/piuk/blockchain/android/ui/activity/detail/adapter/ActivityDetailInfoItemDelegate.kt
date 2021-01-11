@@ -3,7 +3,7 @@ package piuk.blockchain.android.ui.activity.detail.adapter
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.PaymentMethod
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import kotlinx.android.extensions.LayoutContainer
@@ -25,7 +25,7 @@ import piuk.blockchain.android.ui.activity.detail.From
 import piuk.blockchain.android.ui.activity.detail.HistoricValue
 import piuk.blockchain.android.ui.activity.detail.SellCryptoWallet
 import piuk.blockchain.android.ui.activity.detail.SellPurchaseAmount
-import piuk.blockchain.android.ui.activity.detail.SwapFee
+import piuk.blockchain.android.ui.activity.detail.NetworkFee
 import piuk.blockchain.android.ui.activity.detail.SwapReceiveAmount
 import piuk.blockchain.android.ui.activity.detail.To
 import piuk.blockchain.android.ui.activity.detail.TransactionId
@@ -96,7 +96,7 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
             is SellCryptoWallet -> parent.context.getString(R.string.activity_details_buy_sending_to)
             is BuyPaymentMethod -> parent.context.getString(R.string.activity_details_buy_payment_method)
             is SwapReceiveAmount -> parent.context.getString(R.string.activity_details_swap_for)
-            is SwapFee -> parent.context.getString(R.string.tx_confirmation_network_fee,
+            is NetworkFee -> parent.context.getString(R.string.tx_confirmation_network_fee,
                 (infoType.feeValue as CryptoValue).currency.displayTicker)
             else -> parent.context.getString(R.string.empty)
         }
@@ -131,12 +131,9 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
             is BuyCryptoWallet -> parent.context.getString(R.string.custodial_wallet_default_label,
                 parent.context.getString(infoType.crypto.assetName()))
             is SellCryptoWallet -> parent.context.getString(R.string.currency_funds_wallet, infoType.currency)
-            is SellPurchaseAmount -> infoType.fundedFiat.toStringWithSymbol()
+            is SellPurchaseAmount -> infoType.value.toStringWithSymbol()
             is BuyPaymentMethod -> {
                 when {
-                    infoType.paymentDetails.paymentMethodId == PaymentMethod.BANK_PAYMENT_ID -> {
-                        parent.context.getString(R.string.checkout_bank_transfer_label)
-                    }
                     infoType.paymentDetails.endDigits != null &&
                         infoType.paymentDetails.label != null -> {
                         parent.context.getString(R.string.common_hyphenated_strings,
@@ -152,7 +149,7 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
                 }
             }
             is SwapReceiveAmount -> infoType.receivedAmount.toStringWithSymbol()
-            is SwapFee -> infoType.feeValue.toStringWithSymbol()
+            is NetworkFee -> infoType.feeValue.toStringWithSymbol()
             else -> ""
         }
 }

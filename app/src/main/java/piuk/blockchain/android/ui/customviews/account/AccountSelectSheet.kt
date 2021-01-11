@@ -9,7 +9,6 @@ import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.dialog_sheet_account_selector.*
 import kotlinx.android.synthetic.main.dialog_sheet_account_selector.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.accounts.DefaultCellDecorator
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog

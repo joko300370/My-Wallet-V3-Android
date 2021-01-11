@@ -34,7 +34,6 @@ import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
@@ -50,8 +49,8 @@ import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.android.scan.QrScanResultProcessor
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
-import piuk.blockchain.android.ui.account.AccountActivity
 import piuk.blockchain.android.ui.activity.ActivitiesFragment
+import piuk.blockchain.android.ui.addresses.AccountActivity
 import piuk.blockchain.android.ui.airdrops.AirdropCentreActivity
 import piuk.blockchain.android.ui.backup.BackupWalletActivity
 import piuk.blockchain.android.ui.base.MvpActivity
@@ -64,23 +63,19 @@ import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity
 import piuk.blockchain.android.ui.pairingcode.PairingCodeActivity
 import piuk.blockchain.android.ui.scan.QrExpected
+import piuk.blockchain.android.ui.scan.QrScanActivity
+import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
 import piuk.blockchain.android.ui.sell.BuySellFragment
 import piuk.blockchain.android.ui.settings.SettingsActivity
 import piuk.blockchain.android.ui.swap.SwapFragment
-import piuk.blockchain.android.ui.swap.SwapTypeSwitcher
-import piuk.blockchain.android.ui.swapintro.SwapIntroFragment
-import piuk.blockchain.android.ui.swapold.exchange.host.HomebrewNavHostActivity
 import piuk.blockchain.android.ui.thepit.PitLaunchBottomDialog
 import piuk.blockchain.android.ui.thepit.PitPermissionsActivity
 import piuk.blockchain.android.ui.tour.IntroTourAnalyticsEvent
 import piuk.blockchain.android.ui.tour.IntroTourHost
 import piuk.blockchain.android.ui.tour.IntroTourStep
-import piuk.blockchain.android.ui.tour.SwapTourFragment
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.transfer.TransferFragment
-import piuk.blockchain.android.ui.scan.QrScanActivity
-import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.android.util.getAccount
 import piuk.blockchain.android.withdraw.WithdrawActivity
@@ -100,7 +95,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     override val presenter: MainPresenter by scopedInject()
     private val qrProcessor: QrScanResultProcessor by scopedInject()
-    private val newSwapSwitcher: SwapTypeSwitcher by scopedInject()
     private val compositeDisposable = CompositeDisposable()
 
     override val view: MainView = this
@@ -194,7 +188,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         toolbar_general.navigationIcon = ContextCompat.getDrawable(this, R.drawable.vector_menu)
         toolbar_general.title = ""
         setSupportActionBar(toolbar_general)
-
         // Styling
         bottom_navigation.apply {
             addItems(toolbarNavigationItems())
@@ -211,7 +204,15 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
             // Select Dashboard by default
             setOnTabSelectedListener(tabSelectedListener)
-            currentItem = if (intent.getBooleanExtra(START_BUY_SELL_INTRO_KEY, false)) ITEM_BUY_SELL else ITEM_HOME
+
+            if (savedInstanceState == null) {
+                currentItem = if (intent.getBooleanExtra(START_BUY_SELL_INTRO_KEY, false)) ITEM_BUY_SELL
+                else ITEM_HOME
+            }
+        }
+
+        if (intent.hasExtra(SHOW_SWAP) && intent.getBooleanExtra(SHOW_SWAP, false)) {
+            startSwapFlow()
         }
     }
 
@@ -310,7 +311,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
             }
             f is DashboardFragment -> f.onBackPressed()
             f is BuySellFragment -> f.onBackPressed()
-            f is SwapIntroFragment -> f.onBackPressed()
             else -> {
                 // Switch to dashboard fragment - it's not clear, though,
                 // how we can ever wind up here...
@@ -382,10 +382,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     override fun launchThePit() {
         PitLaunchBottomDialog.launch(this)
-    }
-
-    override fun setPitEnabled(enabled: Boolean) {
-        setPitVisible(enabled)
     }
 
     override fun launchBackupFunds(fragment: Fragment?, requestCode: Int) {
@@ -470,45 +466,15 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         sourceAccount: CryptoAccount?,
         targetAccount: CryptoAccount?
     ) {
-        compositeDisposable += newSwapSwitcher.shouldShowNewSwap()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = {
-                    if (it) {
-                        startSwapFlow(sourceAccount, targetAccount)
-                    } else {
-                        presenter.startSwapOrKyc(sourceAccount, targetAccount)
-                    }
-                }
-            )
+        startSwapFlow(sourceAccount, targetAccount)
     }
 
     override fun launchSwap(sourceAccount: CryptoAccount?, targetAccount: CryptoAccount?) {
-        compositeDisposable += newSwapSwitcher.shouldShowNewSwap()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = {
-                    if (it) {
-                        startSwapFlow(sourceAccount, targetAccount)
-                    } else {
-                        HomebrewNavHostActivity.start(
-                            context = this,
-                            defaultCurrency = presenter.defaultCurrency,
-                            toCryptoCurrency = targetAccount?.asset,
-                            fromCryptoCurrency = sourceAccount?.asset
-                        )
-                    }
-                }
-            )
+        startSwapFlow(sourceAccount, targetAccount)
     }
 
     override fun getStartIntent(): Intent {
         return intent
-    }
-
-    private fun setPitVisible(visible: Boolean) {
-        val menu = menu
-        menu.findItem(R.id.nav_the_exchange).isVisible = visible
     }
 
     override fun clearAllDynamicShortcuts() {
@@ -619,7 +585,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     private fun startSwapFlow(sourceAccount: CryptoAccount? = null, destinationAccount: CryptoAccount? = null) {
         if (sourceAccount == null && destinationAccount == null) {
             setCurrentTabItem(ITEM_SWAP)
-            toolbar_general.title = getString(R.string.swap)
+            toolbar_general.title = getString(R.string.common_swap)
             val swapFragment = SwapFragment.newInstance()
             replaceContentFragment(swapFragment)
         } else if (sourceAccount != null) {
@@ -698,18 +664,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         _refreshAnnouncements.onNext(Unit)
     }
 
-    override fun launchKycIntro() {
-        val swapIntroFragment = SwapIntroFragment.newInstance()
-        replaceContentFragment(swapIntroFragment)
-    }
-
-    override fun launchSwapIntro() {
-        setCurrentTabItem(ITEM_SWAP)
-
-        val swapIntroFragment = SwapIntroFragment.newInstance()
-        replaceContentFragment(swapIntroFragment)
-    }
-
     override fun launchPendingVerificationScreen(campaignType: CampaignType) {
         KycStatusActivity.start(this, campaignType)
     }
@@ -737,6 +691,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
         val TAG: String = MainActivity::class.java.simpleName
         const val START_BUY_SELL_INTRO_KEY = "START_BUY_SELL_INTRO_KEY"
+        const val SHOW_SWAP = "SHOW_SWAP"
         const val ACCOUNT_EDIT = 2008
         const val SETTINGS_EDIT = 2009
         const val KYC_STARTED = 2011
@@ -815,18 +770,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 msgTitle = R.string.tour_step_three_title,
                 msgBody = R.string.tour_step_three_body,
                 msgButton = R.string.tour_step_three_btn
-            ),
-            IntroTourStep(
-                name = "Step_Four",
-                lookupTriggerView = { bottom_navigation.getViewAtPosition(ITEM_SWAP) },
-                triggerClick = {
-                    replaceContentFragment(SwapTourFragment.newInstance())
-                },
-                analyticsEvent = IntroTourAnalyticsEvent.IntroSwapViewedAnalytics,
-                msgIcon = R.drawable.ic_vector_toolbar_swap,
-                msgTitle = R.string.tour_step_four_title,
-                msgBody = R.string.tour_step_four_body,
-                msgButton = R.string.tour_step_four_btn
             )
         )
 

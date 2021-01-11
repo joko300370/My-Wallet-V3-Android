@@ -2,7 +2,7 @@ package piuk.blockchain.android.ui.dashboard.sheets
 
 import android.content.DialogInterface
 import android.view.View
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import com.blockchain.preferences.DashboardPrefs
 import kotlinx.android.synthetic.main.dialog_backup_for_send.view.*
 import kotlinx.android.synthetic.main.dialog_custodial_intro.view.cta_button

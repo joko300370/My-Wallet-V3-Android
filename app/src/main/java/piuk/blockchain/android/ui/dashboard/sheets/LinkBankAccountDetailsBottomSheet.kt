@@ -5,11 +5,11 @@ import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.View
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
-import com.blockchain.notifications.analytics.linkBankEventWithCurrency
-import com.blockchain.notifications.analytics.linkBankFieldCopied
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
+import piuk.blockchain.android.simplebuy.linkBankEventWithCurrency
+import piuk.blockchain.android.simplebuy.linkBankFieldCopied
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.ui.urllinks.MODULAR_TERMS_AND_CONDITIONS
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -101,7 +101,7 @@ class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog() {
                     "modular_terms_and_conditions" to Uri.parse(MODULAR_TERMS_AND_CONDITIONS)
                 )
                 bank_deposit_instruction.text =
-                    stringUtils.getStringWithMappedLinks(
+                    stringUtils.getStringWithMappedAnnotations(
                         R.string.by_depositing_funds_terms_and_conds,
                         linksMap,
                         requireActivity()

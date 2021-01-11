@@ -1,6 +1,8 @@
 package piuk.blockchain.android.repositories
 
-import com.blockchain.swap.nabu.datamanagers.repositories.ExpiringRepository
+import com.blockchain.nabu.datamanagers.CurrencyPair
+import com.blockchain.nabu.datamanagers.TransactionType
+import com.blockchain.nabu.datamanagers.repositories.ExpiringRepository
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Maybe
 import io.reactivex.Observable
@@ -13,8 +15,11 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoActivitySummaryItem
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
+import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
-import piuk.blockchain.android.coincore.SwapActivitySummaryItem
+import piuk.blockchain.android.coincore.TradeActivitySummaryItem
+import piuk.blockchain.android.coincore.TradingAccount
+import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.android.coincore.impl.CryptoInterestAccount
 import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
@@ -57,8 +62,34 @@ class AssetActivityRepository(
                             account == item.account
                         }
                     }
+                }
+            }.map { filteredList ->
+                if (account is AllWalletsAccount) {
+                    reconcileTransfersAndBuys(filteredList)
+                } else {
+                    filteredList
                 }.sorted()
             }
+    }
+
+    private fun reconcileTransfersAndBuys(list: ActivitySummaryList): List<ActivitySummaryItem> {
+        val custodialWalletActivity = list.filter {
+            it.account is TradingAccount && it is CustodialTradingActivitySummaryItem
+        }
+        val activityList = list.toMutableList()
+
+        custodialWalletActivity.forEach { custodialItem ->
+            val item = custodialItem as CustodialTradingActivitySummaryItem
+            val matchingItem = activityList.find { a ->
+                a.txId.contains(item.depositPaymentId)
+            } as? FiatActivitySummaryItem
+
+            if (matchingItem?.type == TransactionType.DEPOSIT) {
+                activityList.remove(matchingItem)
+            }
+        }
+
+        return activityList.toList().sorted()
     }
 
     fun findCachedItem(cryptoCurrency: CryptoCurrency, txHash: String): ActivitySummaryItem? =
@@ -66,9 +97,13 @@ class AssetActivityRepository(
             it.cryptoCurrency == cryptoCurrency && it.txId == txHash
         }
 
-    fun findCachedSwapItem(cryptoCurrency: CryptoCurrency, txHash: String): SwapActivitySummaryItem? =
-        transactionCache.filterIsInstance<SwapActivitySummaryItem>().find {
-            it.sendingAsset == cryptoCurrency && it.txId == txHash
+    fun findCachedTradeItem(cryptoCurrency: CryptoCurrency, txHash: String): TradeActivitySummaryItem? =
+        transactionCache.filterIsInstance<TradeActivitySummaryItem>().find {
+            when (it.currencyPair) {
+                is CurrencyPair.CryptoCurrencyPair -> it.currencyPair.source == cryptoCurrency && it.txId == txHash
+                is CurrencyPair.CryptoToFiatCurrencyPair ->
+                    it.currencyPair.source == cryptoCurrency && it.txId == txHash
+            }
         }
 
     fun findCachedItem(currency: String, txHash: String): FiatActivitySummaryItem? =

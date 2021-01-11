@@ -7,6 +7,7 @@ import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
+import com.nhaarman.mockito_kotlin.verifyZeroInteractions
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.wallet.payload.data.Wallet
 import io.reactivex.Observable
@@ -16,6 +17,7 @@ import org.mockito.Mockito
 import piuk.blockchain.android.R
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.data.access.AccessState
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.PrngFixer
@@ -31,6 +33,7 @@ class CreateWalletPresenterTest {
     private var prngFixer: PrngFixer = mock()
     private var analytics: Analytics = mock()
     private var walletPrefs: WalletStatus = mock()
+    private var environmentConfig: EnvironmentConfig = mock()
 
     @Before
     fun setUp() {
@@ -41,7 +44,8 @@ class CreateWalletPresenterTest {
             accessState = accessState,
             prngFixer = prngFixer,
             analytics = analytics,
-            walletPrefs = walletPrefs
+            walletPrefs = walletPrefs,
+            environmentConfig = environmentConfig
         )
         subject.initView(view)
     }
@@ -225,9 +229,9 @@ class CreateWalletPresenterTest {
     }
 
     @Test
-    fun `validateCredentials weak password`() {
+    fun `validateCredentials weak password running on non debug modde`() {
         // Arrange
-
+        whenever(environmentConfig.isRunningInDebugMode()).thenReturn(false)
         // Act
         subject.passwordStrength = 20
         val result = subject.validateCredentials("john@snow.com", "aaaaaa", "aaaaaa")
@@ -235,5 +239,17 @@ class CreateWalletPresenterTest {
         assert(!result)
         verify(view).warnWeakPassword(any(), any())
         verifyNoMoreInteractions(view)
+    }
+
+    @Test
+    fun `validateCredentials weak password running on  debug modde`() {
+        // Arrange
+        whenever(environmentConfig.isRunningInDebugMode()).thenReturn(true)
+        // Act
+        subject.passwordStrength = 5
+        val result = subject.validateCredentials("john@snow.com", "aaaaaa", "aaaaaa")
+        // Assert
+        assert(result)
+        verifyZeroInteractions(view)
     }
 }

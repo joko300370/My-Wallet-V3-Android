@@ -269,7 +269,7 @@ abstract class TxEngine : KoinComponent {
             ExchangeRate.CryptoToFiat(
                 sourceAccount.asset,
                 userFiat,
-                rate.toBigDecimal()
+                rate
             )
         }
 

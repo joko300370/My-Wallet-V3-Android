@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.sell
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,7 +10,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.blockchain.koin.payloadScope
 import com.blockchain.koin.scopedInject
-import com.blockchain.ui.trackLoading
+import com.blockchain.ui.trackProgress
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -20,6 +19,7 @@ import kotlinx.android.synthetic.main.fragment_buy_sell.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
+import piuk.blockchain.android.simplebuy.SimpleBuyCheckoutFragment
 import piuk.blockchain.android.simplebuy.SimpleBuySelectCurrencyFragment
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
@@ -31,6 +31,7 @@ import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.inflate
 import piuk.blockchain.androidcoreui.utils.extensions.visible
+import kotlin.properties.Delegates
 
 class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIntroHost,
     SlidingModalBottomDialog.Host {
@@ -66,7 +67,7 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
             .doOnSubscribe {
                 buy_sell_empty.gone()
             }
-            .trackLoading(appUtil.activityIndicator)
+            .trackProgress(appUtil.activityIndicator)
             .subscribeBy(
                 onSuccess = {
                     renderBuySellFragments(it)
@@ -85,7 +86,7 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
                 goToCurrencySelection(it.supportedCurrencies)
             is BuySellIntroAction.DisplayBuySellIntro -> {
                 if (!it.isGoldButNotEligible) {
-                    renderBuySellUi(it.sellEnabled)
+                    renderBuySellUi(it.hasPendingBuy)
                 } else {
                     renderNotEligibleUi()
                 }
@@ -112,28 +113,28 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
         not_eligible_description.visible()
     }
 
-    private fun renderBuySellUi(sellEnabled: Boolean) {
-        if (sellEnabled) {
-            tab_layout.setupWithViewPager(pager)
-            activity?.setupToolbar(R.string.buy_and_sell)
-        } else {
-            tab_layout.gone()
-            activity?.setupToolbar(R.string.buy)
-        }
-
-        pager.adapter = ViewPagerAdapter(
+    private val pagerAdapter: ViewPagerAdapter by lazy {
+        ViewPagerAdapter(
             listOf(getString(R.string.buy), getString(R.string.sell)),
-            sellEnabled,
             childFragmentManager
         )
+    }
 
-        when (showView) {
-            BuySellViewType.TYPE_BUY -> pager.setCurrentItem(
-                BuySellViewType.TYPE_BUY.ordinal, true)
-            BuySellViewType.TYPE_SELL -> pager.setCurrentItem(
-                BuySellViewType.TYPE_SELL.ordinal, true)
+    private fun renderBuySellUi(hasPendingBuy: Boolean) {
+        tab_layout.setupWithViewPager(pager)
+        activity?.setupToolbar(R.string.buy_and_sell)
+
+        if (pager.adapter == null) {
+            pager.adapter = pagerAdapter
+            when (showView) {
+                BuySellViewType.TYPE_BUY -> pager.setCurrentItem(
+                    BuySellViewType.TYPE_BUY.ordinal, true)
+                BuySellViewType.TYPE_SELL -> pager.setCurrentItem(
+                    BuySellViewType.TYPE_SELL.ordinal, true)
+            }
         }
 
+        pagerAdapter.showPendingBuy = hasPendingBuy
         pager.visible()
         not_eligible_icon.gone()
         not_eligible_title.gone()
@@ -176,6 +177,10 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
         navigator().goToTransfer()
     }
 
+    override fun onSellListEmptyCta() {
+        pager.setCurrentItem(BuySellViewType.TYPE_BUY.ordinal, true)
+    }
+
     override fun onResume() {
         super.onResume()
         subscribeForNavigation()
@@ -187,20 +192,23 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
     override fun onBackPressed(): Boolean = false
 }
 
-@SuppressLint("WrongConstant")
-class ViewPagerAdapter(
+internal class ViewPagerAdapter(
     private val titlesList: List<String>,
-    private val sellEnabled: Boolean,
     fragmentManager: FragmentManager
-) :
-    FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+) : FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
-    override fun getCount(): Int = if (sellEnabled) titlesList.size else 1
+    override fun getCount(): Int = titlesList.size
     override fun getPageTitle(position: Int): CharSequence =
         titlesList[position]
 
+    var showPendingBuy: Boolean by Delegates.observable(false) { _, oldV, newV ->
+        if (newV != oldV)
+            notifyDataSetChanged()
+    }
+
     override fun getItem(position: Int): Fragment = when (position) {
-        0 -> BuyIntroFragment.newInstance()
+        0 -> if (!showPendingBuy) BuyIntroFragment.newInstance() else
+            SimpleBuyCheckoutFragment.newInstance(isForPending = true, showOnlyOrderData = true)
         else -> SellIntroFragment.newInstance()
     }
 }

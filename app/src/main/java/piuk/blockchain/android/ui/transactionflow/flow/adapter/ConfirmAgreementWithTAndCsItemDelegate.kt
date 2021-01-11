@@ -62,7 +62,7 @@ private class AgreementItemViewHolder(val parent: View) : RecyclerView.ViewHolde
         )
 
         itemView.apply {
-            confirm_details_checkbox_text.text = stringUtils.getStringWithMappedLinks(
+            confirm_details_checkbox_text.text = stringUtils.getStringWithMappedAnnotations(
                 R.string.send_confirmation_interest_tos_pp,
                 linksMap,
                 activityContext

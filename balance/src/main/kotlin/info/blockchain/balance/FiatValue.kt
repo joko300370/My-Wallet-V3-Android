@@ -82,7 +82,7 @@ data class FiatValue private constructor(
         exchangeRates.getLastPriceOfFiat(
             sourceFiat = this.currencyCode,
             targetFiat = fiatCurrency
-        ).toBigDecimal() * toBigDecimal()
+        ) * this.toBigDecimal()
     )
 
     override fun add(other: Money): FiatValue {

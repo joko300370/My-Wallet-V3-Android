@@ -10,15 +10,14 @@ import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.blockchain.koin.scopedInject
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.models.responses.nabu.KycTierLevel
+import com.blockchain.nabu.service.TierService
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.EligibilityProvider
-import com.blockchain.swap.nabu.models.nabu.KycTierLevel
-import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.ui.urllinks.URL_CONTACT_SUPPORT
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
@@ -31,16 +30,15 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.sell_intro_fragment.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.accounts.CellDecorator
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.ui.customviews.ButtonOptions
 import piuk.blockchain.android.ui.customviews.IntroHeaderView
 import piuk.blockchain.android.ui.customviews.VerifyIdentityBenefit
+import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.home.HomeNavigator
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
@@ -52,6 +50,7 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     interface SellIntroHost {
         fun onSellFinished()
         fun onSellInfoClicked()
+        fun onSellListEmptyCta()
     }
 
     private val host: SellIntroHost by lazy {
@@ -108,9 +107,20 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
 
     private fun renderSellError() {
         accounts_list.gone()
-        sell_info_group.gone()
         sell_empty.setDetails {
             loadSellDetails()
+        }
+        sell_empty.visible()
+    }
+
+    private fun renderSellEmpty() {
+        accounts_list.gone()
+        sell_empty.setDetails(
+            R.string.sell_intro_empty_title,
+            R.string.sell_intro_empty_label,
+            ctaText = R.string.buy_now
+        ) {
+            host.onSellListEmptyCta()
         }
         sell_empty.visible()
     }
@@ -118,7 +128,6 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     private fun renderRejectedKycedUserUi() {
         kyc_benefits.visible()
         accounts_list.gone()
-        sell_info_group.gone()
 
         kyc_benefits.initWithBenefits(
             benefits = listOf(
@@ -149,7 +158,6 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     private fun renderNonKycedUserUi() {
         kyc_benefits.visible()
         accounts_list.gone()
-        sell_info_group.gone()
 
         kyc_benefits.initWithBenefits(
             benefits = listOf(
@@ -193,8 +201,8 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
 
                 accounts_list.initialise(
                     coincore.allWallets().map {
-                        it.accounts.filter { account ->
-                            account is CustodialTradingAccount &&
+                        it.accounts.filterIsInstance<CryptoAccount>().filter { account ->
+                            account.actions.contains(AssetAction.Sell) &&
                                     supportedCryptos.contains(account.asset)
                         }
                     },
@@ -209,14 +217,16 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
                         startSellFlow(it)
                     }
                 }
+
+                accounts_list.onEmptyList = {
+                    renderSellEmpty()
+                }
             }, onError = {
                 renderSellError()
             })
     }
 
     private fun renderSellInfo() {
-        sell_info_group.visible()
-
         val sellInfoIntro = getString(R.string.sell_info_blurb_1)
         val sellInfoBold = getString(R.string.sell_info_blurb_2)
         val sellInfoEnd = getString(R.string.sell_info_blurb_3)
@@ -227,12 +237,6 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
             .append(sellInfoEnd)
         sb.setSpan(StyleSpan(Typeface.BOLD), sellInfoIntro.length, sellInfoIntro.length + sellInfoBold.length,
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-
-        sell_info_blurb.setText(sb, TextView.BufferType.SPANNABLE)
-        sell_info_action.setOnClickListener {
-            analytics.logEvent(SellAnalytics.SellTabInfo)
-            host.onSellInfoClicked()
-        }
     }
 
     private fun statusDecorator(account: BlockchainAccount): CellDecorator = SellCellDecorator(account)
@@ -270,5 +274,6 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
 
     override fun onFlowFinished() {
         host.onSellFinished()
+        loadSellDetails()
     }
 }

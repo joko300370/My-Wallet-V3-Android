@@ -33,7 +33,6 @@ interface HomeNavigator {
     )
 
     fun launchKyc(campaignType: CampaignType)
-    fun launchKycIntro()
     fun launchThePitLinking(linkId: String = "")
     fun launchThePit()
     fun launchBackupFunds(fragment: Fragment? = null, requestCode: Int = 0)

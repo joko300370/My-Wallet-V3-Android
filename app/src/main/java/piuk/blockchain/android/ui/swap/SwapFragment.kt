@@ -11,12 +11,12 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.SwapLimits
-import com.blockchain.swap.nabu.datamanagers.SwapOrder
-import com.blockchain.swap.nabu.models.nabu.KycTierLevel
-import com.blockchain.swap.nabu.models.nabu.KycTiers
-import com.blockchain.swap.nabu.service.TierService
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.models.responses.nabu.KycTierLevel
+import com.blockchain.nabu.models.responses.nabu.KycTiers
+import com.blockchain.nabu.datamanagers.TransferLimits
+import com.blockchain.nabu.datamanagers.CustodialOrder
+import com.blockchain.nabu.service.TierService
 import info.blockchain.balance.Money
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -69,7 +69,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
         super.onViewCreated(view, savedInstanceState)
 
         swap_error.setDetails {
-            loadSwapOrKyc()
+            loadSwapOrKyc(true)
         }
 
         swap_cta.apply {
@@ -89,7 +89,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
             DividerItemDecoration.VERTICAL
         ))
 
-        loadSwapOrKyc()
+        loadSwapOrKyc(showLoading = true)
     }
 
     private fun startSwap() {
@@ -117,14 +117,14 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
         startSwap()
     }
 
-    private fun loadSwapOrKyc() {
+    private fun loadSwapOrKyc(showLoading: Boolean) {
         compositeDisposable +=
             Singles.zip(
                 kycTierService.tiers(),
                 trendingPairsProvider.getTrendingPairs(),
                 walletManager.getSwapLimits(currencyPrefs.selectedFiatCurrency),
                 walletManager.getSwapTrades().onErrorReturn { emptyList() }
-            ) { tiers: KycTiers, pairs: List<TrendingPair>, limits: SwapLimits, orders: List<SwapOrder> ->
+            ) { tiers: KycTiers, pairs: List<TrendingPair>, limits: TransferLimits, orders: List<CustodialOrder> ->
                 SwapComposite(
                     tiers,
                     pairs,
@@ -134,7 +134,8 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
             }
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe {
-                    showLoadingUi()
+                    if (showLoading)
+                        showLoadingUi()
                 }
                 .subscribeBy(
                     onSuccess = { composite ->
@@ -151,7 +152,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
                                 onSwapPairClicked = onPairClicked
                             )
 
-                            if (!composite.tiers.isApprovedFor(KycTierLevel.GOLD)) {
+                            if (!composite.tiers.isInitialisedFor(KycTierLevel.GOLD)) {
                                 showKycUpsellIfEligible(composite.limits)
                             }
                         } else {
@@ -173,7 +174,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
                     })
     }
 
-    private fun showKycUpsellIfEligible(limits: SwapLimits) {
+    private fun showKycUpsellIfEligible(limits: TransferLimits) {
         val usedUpLimitPercent = (limits.maxLimit / limits.maxOrder).toFloat() * 100
         if (usedUpLimitPercent >= KYC_UPSELL_PERCENTAGE && !walletPrefs.hasSeenSwapPromo) {
             analytics.logEvent(SwapAnalyticsEvents.SwapSilverLimitSheet)
@@ -246,7 +247,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
         swap_error.visible()
     }
 
-    private fun showSwapUi(orders: List<SwapOrder>) {
+    private fun showSwapUi(orders: List<CustodialOrder>) {
         val pendingOrders = orders.filter { it.state.isPending }
         val hasPendingOrder = pendingOrders.isNotEmpty()
         swap_loading_indicator.gone()
@@ -281,14 +282,14 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
     }
 
     override fun onFlowFinished() {
-        loadSwapOrKyc()
+        loadSwapOrKyc(showLoading = false)
     }
 
     private data class SwapComposite(
         val tiers: KycTiers,
         val pairs: List<TrendingPair>,
-        val limits: SwapLimits,
-        val orders: List<SwapOrder>
+        val limits: TransferLimits,
+        val orders: List<CustodialOrder>
     )
 
     override fun onDestroyView() {

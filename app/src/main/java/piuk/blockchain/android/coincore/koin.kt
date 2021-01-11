@@ -56,7 +56,8 @@ val coincoreModule = module {
                 labels = get(),
                 tiersService = get(),
                 walletPreferences = get(),
-                eligibilityProvider = get()
+                eligibilityProvider = get(),
+                coinsWebsocket = get()
             )
         }
 
@@ -68,7 +69,6 @@ val coincoreModule = module {
                 historicRates = get(),
                 currencyPrefs = get(),
                 crashLogger = get(),
-                stringUtils = get(),
                 custodialManager = get(),
                 environmentSettings = get(),
                 feeDataManager = get(),

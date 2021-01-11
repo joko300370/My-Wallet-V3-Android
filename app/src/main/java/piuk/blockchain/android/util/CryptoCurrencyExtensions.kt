@@ -30,7 +30,19 @@ fun CryptoCurrency.colorRes(): Int =
     }
 
 @ColorInt
-fun CryptoCurrency.getColor(context: Context) = ContextCompat.getColor(context, colorRes())
+fun CryptoCurrency.chartLineColour(context: Context) =
+    ContextCompat.getColor(context,
+        when (this) {
+            CryptoCurrency.BTC -> R.color.color_bitcoin_logo
+            CryptoCurrency.ETHER -> R.color.color_ether_logo
+            CryptoCurrency.BCH -> R.color.color_bitcoin_cash_logo
+            CryptoCurrency.XLM -> R.color.color_stellar_logo
+            CryptoCurrency.PAX -> R.color.color_pax_logo
+            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+            CryptoCurrency.ALGO -> R.color.color_algo_logo
+            CryptoCurrency.USDT -> R.color.color_usdt_logo
+            CryptoCurrency.DGLD -> R.color.dgld_chart
+        })
 
 @DrawableRes
 fun CryptoCurrency.drawableResFilled(): Int =

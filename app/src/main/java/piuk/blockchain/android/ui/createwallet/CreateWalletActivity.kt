@@ -1,35 +1,32 @@
 package piuk.blockchain.android.ui.createwallet
 
-import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.core.content.ContextCompat
-import androidx.appcompat.app.AlertDialog
 import android.text.method.LinkMovementMethod
 import android.view.MenuItem
 import android.view.View
-import android.view.animation.DecelerateInterpolator
 import android.view.inputmethod.EditorInfo
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.transition.TransitionManager
 import com.blockchain.koin.scopedInject
-import com.blockchain.ui.urllinks.URL_TOS_POLICY
 import com.blockchain.ui.urllinks.URL_PRIVACY_POLICY
+import com.blockchain.ui.urllinks.URL_TOS_POLICY
 import com.jakewharton.rxbinding2.widget.RxTextView
 import kotlinx.android.synthetic.main.activity_create_wallet.*
-import kotlinx.android.synthetic.main.include_entropy_meter.view.*
 import kotlinx.android.synthetic.main.toolbar_general.*
+import kotlinx.android.synthetic.main.view_password_strength.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.auth.PinEntryActivity
+import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
+import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
-import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
-import com.blockchain.ui.dialog.MaterialProgressDialog
-import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.ViewUtils
 import piuk.blockchain.androidcoreui.utils.extensions.getTextString
@@ -43,20 +40,6 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
     private val createWalletPresenter: CreateWalletPresenter by scopedInject()
     private var progressDialog: MaterialProgressDialog? = null
     private var applyConstraintSet: ConstraintSet = ConstraintSet()
-
-    private val strengthVerdicts = intArrayOf(
-        R.string.strength_weak,
-        R.string.strength_medium,
-        R.string.strength_normal,
-        R.string.strength_strong
-    )
-
-    private val strengthColors = intArrayOf(
-        R.drawable.progress_red,
-        R.drawable.progress_orange,
-        R.drawable.progress_blue,
-        R.drawable.progress_green
-    )
 
     private val recoveryPhrase: String by unsafeLazy {
         intent.getStringExtra(RECOVERY_PHRASE) ?: ""
@@ -122,7 +105,7 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
             "privacy" to Uri.parse(URL_PRIVACY_POLICY)
         )
 
-        val tosText = stringUtils.getStringWithMappedLinks(
+        val tosText = stringUtils.getStringWithMappedAnnotations(
             R.string.you_agree_terms_of_service,
             linksMap,
             this
@@ -153,7 +136,7 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
 
     private fun hideEntropyContainer() {
         TransitionManager.beginDelayedTransition(mainConstraintLayout)
-        applyConstraintSet.setVisibility(R.id.entropy_container, ConstraintSet.INVISIBLE)
+        applyConstraintSet.setVisibility(R.id.entropy_container, ConstraintSet.GONE)
         applyConstraintSet.applyTo(mainConstraintLayout)
     }
 
@@ -181,23 +164,11 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
     }
 
     override fun setEntropyStrength(score: Int) {
-        ObjectAnimator.ofInt(
-            entropy_container.pass_strength_bar,
-            "progress",
-            entropy_container.pass_strength_bar.progress,
-            score * 10
-        ).apply {
-            duration = 300
-            interpolator = DecelerateInterpolator()
-            start()
-        }
+        entropy_container.setStrengthProgress(score)
     }
 
     override fun setEntropyLevel(level: Int) {
-        entropy_container.pass_strength_verdict.setText(strengthVerdicts[level])
-        entropy_container.pass_strength_bar.progressDrawable =
-            ContextCompat.getDrawable(this, strengthColors[level])
-        entropy_container.pass_strength_verdict.setText(strengthVerdicts[level])
+        entropy_container.updateLevelUI(level)
     }
 
     override fun showError(message: Int) {
@@ -208,13 +179,10 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
         AlertDialog.Builder(this, R.style.AlertDialogStyle)
             .setTitle(R.string.app_name)
             .setMessage(R.string.weak_password)
-            .setPositiveButton(R.string.common_yes) { _, _ ->
+            .setPositiveButton(R.string.common_retry) { _, _ ->
                 wallet_pass.setText("")
                 wallet_pass_confirm.setText("")
                 wallet_pass.requestFocus()
-            }
-            .setNegativeButton(R.string.common_no) { _, _ ->
-                presenter.createOrRestoreWallet(email, password, recoveryPhrase)
             }.show()
     }
 

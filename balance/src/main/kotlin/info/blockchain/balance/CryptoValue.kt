@@ -26,7 +26,7 @@ data class CryptoValue(
     override fun toFiat(exchangeRates: ExchangeRates, fiatCurrency: String): FiatValue =
         FiatValue.fromMajor(
             fiatCurrency,
-            exchangeRates.getLastPrice(currency, fiatCurrency).toBigDecimal() * toBigDecimal()
+            exchangeRates.getLastPrice(currency, fiatCurrency) * this.toBigDecimal()
         )
 
     /**
