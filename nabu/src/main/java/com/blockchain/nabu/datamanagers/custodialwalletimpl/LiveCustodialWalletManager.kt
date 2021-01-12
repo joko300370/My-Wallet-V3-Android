@@ -317,9 +317,14 @@ class LiveCustodialWalletManager(
             nabuService.deleteCard(it, cardId)
         }
 
-    override fun deleteBank(bankId: String): Completable =
+    override fun removeBeneficiary(bankId: String): Completable =
         authenticator.authenticateCompletable {
-            nabuService.deleteBank(it, bankId)
+            nabuService.removeBeneficiary(it, bankId)
+        }
+
+    override fun removLinkedBank(bankId: String): Completable =
+        authenticator.authenticateCompletable {
+            nabuService.removeLinkedBank(it, bankId)
         }
 
     override fun getTotalBalanceForAsset(crypto: CryptoCurrency): Maybe<CryptoValue> =

@@ -124,12 +124,16 @@ class SettingsPresenter(
             )
     }
 
-    private fun updateBanks() {
+    fun updateBanks() {
         compositeDisposable +=
             linkableBanks(fiatUnit).zipWith(linkedBanks().onErrorReturn { emptySet() })
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe {
+                    view?.banksEnabled(false)
+                }
                 .subscribeBy(
                     onSuccess = { (linkableBanks, linkedBanks) ->
+                        view?.banksEnabled(linkedBanks.isNotEmpty() or linkableBanks.isNotEmpty())
                         view?.updateLinkedBanks(linkedBanks)
                         view?.updateLinkableBanks(linkableBanks, linkedBanks.size)
                     },
@@ -137,25 +141,6 @@ class SettingsPresenter(
                         Timber.i(it)
                     }
                 )
-        /*           .doOnSuccess {
-                       view?.banksEnabled(it.isNotEmpty())
-                   }.zipWith(
-                       custodialWalletManager.getLinkedBeneficiaries()
-                   ) { supportedCurrencies, linkedBeneficiaries ->
-                       LinkedBanksAndSupportedCurrencies(linkedBeneficiaries, supportedCurrencies)
-                   }
-           }.observeOn(AndroidSchedulers.mainThread())
-           .doOnSubscribe {
-               view?.banksEnabled(false)
-               view?.updateBanks(LinkedBanksAndSupportedCurrencies(emptyList(), emptyList()))
-           }.subscribeBy(
-               onSuccess = {
-                   view?.updateBanks(it)
-               },
-               onError = {
-                   Timber.i(it)
-               }
-           )*/
     }
 
     private fun onCardsUpdated(cards: List<PaymentMethod.Card>) {

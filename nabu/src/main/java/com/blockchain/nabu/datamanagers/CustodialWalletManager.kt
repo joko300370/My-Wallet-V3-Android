@@ -119,7 +119,9 @@ interface CustodialWalletManager {
 
     fun deleteCard(cardId: String): Completable
 
-    fun deleteBank(bankId: String): Completable
+    fun removeBeneficiary(bankId: String): Completable
+
+    fun removLinkedBank(bankId: String): Completable
 
     fun transferFundsToWallet(amount: CryptoValue, walletAddress: String): Single<String>
 
