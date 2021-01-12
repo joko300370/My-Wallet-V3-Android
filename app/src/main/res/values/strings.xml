@@ -1810,6 +1810,8 @@
     <string name="available_to_trade">Available to Trade</string>
     <string name="instantly">Instantly</string>
     <string name="instantly_available">Instantly Available</string>
+    <string name="dotted_suffixed_string" translatable="false">•••• %1s</string>
+    <string name="failed_to_link_bank">Bank Link Failed</string>
 
     <!-- lockbox -->
     <string name="lockbox_title">Lockbox</string>
@@ -1822,4 +1824,9 @@
     <string name="lockbox_landing_coming_soon_title">Balances Coming Soon</string>
     <string name="lockbox_landing_coming_soon_message">We are unable to display your Lockbox balance at this time. Don\'t worry, your funds are safe. We\'ll be adding this feature soon. While you wait, you can check your balance on the web.</string>
     <string name="lockbox_landing_coming_soon_button">Check my balance</string>
+    <string name="add_a_bank_account">Add a Bank Account</string>
+    <string name="wire_transfer">Wire Transfer</string>
+    <string name="link_a_bank_wire_transfer">Link a bank to your Wallet by sending any amount via wire transfer. Note: This is much slower and high bank fees may apply.</string>
+    <string name="link_a_bank_bank_transfer">Securely link a bank to buy crypto, deposit cash and withdraw back to your bank at anytime.</string>
+
 </resources>

@@ -161,7 +161,7 @@ class WithdrawEnterAmountFragment : MviFragment<WithdrawModel, WithdrawIntent, W
 
     private fun renderUiForBank(bank: Beneficiary, banks: List<Beneficiary>, currency: String) {
         bank_icon.setImageResource(R.drawable.ic_bank_transfer)
-        bank_title.text = bank.title.plus(" ${bank.account}")
+        bank_title.text = bank.name.plus(" ${bank.account}")
         bank_details_root.setOnClickListener {
             openBankChooserBottomSheet(banks, currency)
         }
