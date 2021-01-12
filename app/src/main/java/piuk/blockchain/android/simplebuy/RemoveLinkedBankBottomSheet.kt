@@ -5,25 +5,20 @@ import android.os.Bundle
 import android.view.View
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.Bank
-import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.remove_bank_bottom_sheet.*
 import kotlinx.android.synthetic.main.remove_bank_bottom_sheet.view.*
 import kotlinx.android.synthetic.main.remove_bank_bottom_sheet.view.end_digits
 import kotlinx.android.synthetic.main.remove_bank_bottom_sheet.view.icon
 import kotlinx.android.synthetic.main.remove_bank_bottom_sheet.view.progress
 import kotlinx.android.synthetic.main.remove_bank_bottom_sheet.view.title
-import kotlinx.android.synthetic.main.remove_card_bottom_sheet.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.android.util.visibleIf
-import java.lang.IllegalStateException
 
 class RemoveLinkedBankBottomSheet : SlidingModalBottomDialog() {
 

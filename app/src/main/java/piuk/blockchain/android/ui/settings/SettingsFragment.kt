@@ -869,7 +869,8 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                 CardDetailsActivity.ADD_CARD_REQUEST_CODE -> {
                     updateCards(
                         listOf(
-                            (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as? PaymentMethod.Card) ?: return
+                            (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as? PaymentMethod.Card)
+                                ?: return
                         )
                     )
                 }

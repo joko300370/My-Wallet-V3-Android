@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.linkbank
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
