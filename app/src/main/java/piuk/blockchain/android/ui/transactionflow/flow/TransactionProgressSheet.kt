@@ -34,14 +34,16 @@ class TransactionProgressSheet : TransactionFlowSheet() {
                 )
             }
             is TxExecutionStatus.Error -> {
-                analyticsHooks.onTransactionFailure(newState, newState.executionStatus.message)
+                val exceptionTitle = customiser.transactionProgressExceptionMessage(newState)
+                analyticsHooks.onTransactionFailure(newState, exceptionTitle)
                 dialogView.tx_progress_view.showTxError(
-                    getString(R.string.send_progress_error_title),
+                    exceptionTitle,
                     getString(R.string.send_progress_error_subtitle)
                 )
             }
             else -> {
-            } // do nothing
+                // do nothing
+            }
         }
         cacheState(newState)
     }

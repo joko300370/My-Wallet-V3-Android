@@ -1,7 +1,7 @@
 package com.blockchain.nabu.service
 
 import com.blockchain.nabu.api.nabu.Nabu
-import com.blockchain.nabu.datamanagers.SimpleBuyError
+import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.extensions.wrapErrorMessage
 import com.blockchain.nabu.models.responses.banktransfer.CreateLinkBankRequestBody
@@ -245,10 +245,10 @@ class NabuService(retrofit: Retrofit) {
         quoteRequest
     ).wrapErrorMessage()
 
-    internal fun createSwapOrder(
+    internal fun createCustodialOrder(
         sessionToken: NabuSessionTokenResponse,
         createOrderRequest: CreateOrderRequest
-    ): Single<CustodialOrderResponse> = service.createSwapOrder(
+    ): Single<CustodialOrderResponse> = service.createCustodialOrder(
         sessionToken.authHeader,
         createOrderRequest
     ).wrapErrorMessage()
@@ -333,7 +333,7 @@ class NabuService(retrofit: Retrofit) {
         authorization = sessionToken.authHeader, action = action, order = order
     ).onErrorResumeNext {
         if (it is HttpException && it.code() == 409) {
-            Single.error(SimpleBuyError.OrderLimitReached)
+            Single.error(TransactionError.OrderLimitReached)
         } else {
             Single.error(it)
         }
@@ -403,7 +403,7 @@ class NabuService(retrofit: Retrofit) {
         sessionToken.authHeader, orderId
     ).onErrorResumeNext {
         if (it is HttpException && it.code() == 409) {
-            Completable.error(SimpleBuyError.OrderNotCancelable)
+            Completable.error(TransactionError.OrderNotCancelable)
         } else {
             Completable.error(it)
         }
@@ -489,11 +489,11 @@ class NabuService(retrofit: Retrofit) {
         when (it.code()) {
             200 -> it.body()?.id ?: ""
             403 -> if (it.body()?.code == TransferFundsResponse.ERROR_WITHDRAWL_LOCKED)
-                throw SimpleBuyError.WithdrawalBalanceLocked
+                throw TransactionError.WithdrawalBalanceLocked
             else
-                throw SimpleBuyError.WithdrawalAlreadyPending
-            409 -> throw SimpleBuyError.WithdrawalInsufficientFunds
-            else -> throw SimpleBuyError.UnexpectedError
+                throw TransactionError.WithdrawalAlreadyPending
+            409 -> throw TransactionError.WithdrawalInsufficientFunds
+            else -> throw TransactionError.UnexpectedError
         }
     }.wrapErrorMessage()
 

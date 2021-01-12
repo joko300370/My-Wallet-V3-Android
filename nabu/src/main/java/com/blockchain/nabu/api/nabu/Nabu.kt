@@ -436,7 +436,7 @@ internal interface Nabu {
     ): Single<QuoteResponse>
 
     @POST(NABU_SWAP_ORDER)
-    fun createSwapOrder(
+    fun createCustodialOrder(
         @Header("authorization") authorization: String,
         @Body order: CreateOrderRequest
     ): Single<CustodialOrderResponse>

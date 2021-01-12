@@ -22,7 +22,6 @@ import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import timber.log.Timber
-import java.lang.IllegalStateException
 import java.util.Stack
 
 enum class TransactionStep(val addToBackStack: Boolean = false) {
@@ -60,7 +59,7 @@ sealed class TxExecutionStatus {
     object NotStarted : TxExecutionStatus()
     object InProgress : TxExecutionStatus()
     object Completed : TxExecutionStatus()
-    data class Error(val message: String) : TxExecutionStatus()
+    data class Error(val exception: Throwable) : TxExecutionStatus()
 }
 
 data class TransactionState(
@@ -306,7 +305,7 @@ class TransactionModel(
                 }
             )
 
-    private fun processExecuteTransaction(secondPassword: String): Disposable? =
+    private fun processExecuteTransaction(secondPassword: String): Disposable =
         interactor.verifyAndExecute(secondPassword)
             .subscribeBy(
                 onComplete = {

@@ -22,6 +22,7 @@ import com.blockchain.nabu.datamanagers.NabuDataUserProvider
 import com.blockchain.nabu.datamanagers.NabuDataUserProviderNabuDataManagerAdapter
 import com.blockchain.nabu.datamanagers.NabuUserReporter
 import com.blockchain.nabu.datamanagers.NabuUserSyncUpdateUserWalletInfoWithJWT
+import com.blockchain.nabu.datamanagers.TransactionErrorMapper
 import com.blockchain.nabu.datamanagers.UniqueAnalyticsNabuUserReporter
 import com.blockchain.nabu.datamanagers.UniqueAnalyticsWalletReporter
 import com.blockchain.nabu.datamanagers.WalletReporter
@@ -107,9 +108,14 @@ val nabuModule = module {
                 interestRepository = get(),
                 custodialRepository = get(),
                 extraAttributesProvider = get(),
-                bankLinkingEnabledProvider = get()
+                bankLinkingEnabledProvider = get(),
+                transactionErrorMapper = get()
             )
         }.bind(CustodialWalletManager::class)
+
+        factory {
+            TransactionErrorMapper()
+        }
 
         factory {
             ExtraAttributesProviderImpl()

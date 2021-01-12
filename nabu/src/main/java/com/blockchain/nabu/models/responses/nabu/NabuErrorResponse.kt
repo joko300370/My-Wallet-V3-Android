@@ -2,7 +2,7 @@ package com.blockchain.nabu.models.responses.nabu
 
 import android.annotation.SuppressLint
 import com.squareup.moshi.Moshi
-import retrofit2.Response
+import retrofit2.HttpException
 
 private data class NabuErrorResponse(
     /**
@@ -38,26 +38,32 @@ class NabuApiException private constructor(message: String) : Throwable(message)
     fun getErrorDescription(): String = _errorDescription
 
     companion object {
-
         @SuppressLint("SyntheticAccessor")
-        fun fromResponseBody(response: Response<*>?): NabuApiException {
+        fun fromResponseBody(exception: Throwable?): NabuApiException {
             val moshi = Moshi.Builder().build()
             val adapter = moshi.adapter(NabuErrorResponse::class.java)
-            val errorResponse = adapter.fromJson(response?.errorBody()!!.string())!!
+            return if (exception is HttpException) {
+                exception.response()?.errorBody()?.string()?.let { errorBody ->
+                    val errorResponse = adapter.fromJson(errorBody)
+                    errorResponse?.let {
+                        val httpErrorCode = exception.code()
+                        val error = it.type
+                        val errorDescription = it.description
+                        val errorCode = it.code
+                        val path = exception.response()?.raw()?.request?.url?.pathSegments?.joinToString(" , ")
 
-            val httpErrorCode = response.code()
-            val error = errorResponse.type
-            val errorDescription = errorResponse.description
-            val errorCode = errorResponse.code
-            val path = response.raw().request.url.pathSegments.joinToString(" , ")
-
-            return NabuApiException("$httpErrorCode: $error - $errorDescription - $errorCode - $path")
-                .apply {
-                    _httpErrorCode = httpErrorCode
-                    _error = error
-                    _errorCode = errorCode
-                    _errorDescription = errorDescription
-                }
+                        NabuApiException("$httpErrorCode: $error - $errorDescription - $errorCode - $path")
+                            .apply {
+                                _httpErrorCode = httpErrorCode
+                                _error = error
+                                _errorCode = errorCode
+                                _errorDescription = errorDescription
+                            }
+                    }
+                } ?: NabuApiException(exception.message())
+            } else {
+                NabuApiException(exception?.message ?: "Unknown exception")
+            }
         }
 
         fun withErrorCode(errorCode: Int): NabuApiException {

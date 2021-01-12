@@ -393,7 +393,7 @@ class SettingsPresenter(
             .subscribeOn(Schedulers.io())
             .onErrorResumeNext { throwable: Throwable? ->
                 if (throwable is NabuApiException && throwable.getErrorStatusCode() ==
-                    NabuErrorStatusCodes.AlreadyRegistered
+                    NabuErrorStatusCodes.Conflict
                 )
                     Completable.complete()
                 else Completable.error(throwable)

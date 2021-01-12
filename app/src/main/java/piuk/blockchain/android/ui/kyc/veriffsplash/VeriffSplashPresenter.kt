@@ -92,7 +92,7 @@ class VeriffSplashPresenter(
             // announcements etc
             NabuErrorStatusCodes.PreIDVCheckFailed,
             // Or did we try to register with a duplicate email?
-            NabuErrorStatusCodes.AlreadyRegistered -> {
+            NabuErrorStatusCodes.Conflict -> {
                 prefs.devicePreIDVCheckFailed = true
                 updateUiState(UiState.FAILURE)
             }
