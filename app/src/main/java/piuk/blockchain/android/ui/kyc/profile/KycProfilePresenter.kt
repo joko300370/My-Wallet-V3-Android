@@ -81,7 +81,7 @@ class KycProfilePresenter(
                     },
                     onError = {
                         if (it is NabuApiException &&
-                            it.getErrorStatusCode() == NabuErrorStatusCodes.AlreadyRegistered
+                            it.getErrorStatusCode() == NabuErrorStatusCodes.Conflict
                         ) {
                             view.showErrorToast(stringUtils.getString(R.string.kyc_profile_error_conflict))
                         } else {

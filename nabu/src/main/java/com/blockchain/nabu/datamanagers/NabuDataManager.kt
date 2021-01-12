@@ -324,7 +324,7 @@ internal class NabuDataManagerImpl(
         (throwable as? NabuApiException?)?.getErrorStatusCode() == NabuErrorStatusCodes.TokenExpired
 
     private fun userRestored(throwable: Throwable) =
-        (throwable as? NabuApiException?)?.getErrorStatusCode() == NabuErrorStatusCodes.AlreadyRegistered
+        (throwable as? NabuApiException?)?.getErrorStatusCode() == NabuErrorStatusCodes.Conflict
 
     // TODO: Refactor this logic into a reusable, thoroughly tested class - see AND-1335
     override fun <T> authenticate(

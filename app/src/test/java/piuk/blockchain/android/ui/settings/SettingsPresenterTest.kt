@@ -42,6 +42,7 @@ import piuk.blockchain.androidcore.data.settings.Email
 import piuk.blockchain.androidcore.data.settings.EmailSyncUpdater
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
+import retrofit2.HttpException
 import retrofit2.Response.error
 
 class SettingsPresenterTest {
@@ -298,7 +299,7 @@ class SettingsPresenterTest {
             settingsDataManager.disableNotification(Settings.NOTIFICATION_TYPE_SMS, notifications))
             .thenReturn(Observable.just(mockSettings))
         val responseBody = ResponseBody.create("application/json".toMediaTypeOrNull(), "{}")
-        val error = fromResponseBody(error<Any>(409, responseBody))
+        val error = fromResponseBody(HttpException(error<Any>(409, responseBody)))
         whenever(kycStatusHelper.syncPhoneNumberWithNabu()).thenReturn(Completable.error(error))
 
         // Act

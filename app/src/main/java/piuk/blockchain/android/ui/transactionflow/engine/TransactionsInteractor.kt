@@ -1,10 +1,10 @@
 package piuk.blockchain.android.ui.transactionflow.engine
 
-import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligibilityProvider
 import com.blockchain.nabu.datamanagers.repositories.swap.CustodialRepository
+import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money

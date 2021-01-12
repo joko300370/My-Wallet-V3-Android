@@ -14,12 +14,15 @@ enum class NabuErrorStatusCodes(val code: Int) {
     /**
      * Conflict. The user's data you're trying to save already exists.
      */
-    AlreadyRegistered(409),
+    Conflict(409),
 
     /**
      * Error type not yet specified.
      */
-    Unknown(-1);
+    Unknown(-1),
+    InternalServerError(500),
+    BadRequest(400),
+    Forbidden(403);
 
     companion object {
 
@@ -98,20 +101,30 @@ enum class NabuErrorCodes(val code: Int) {
     WeeklyLimitExceeded(46),
     AnnualLimitExceeded(47),
     NotCryptoToCryptoCurrencyPair(48),
+    TradingTemporarilyDisabled(51),
 
     // Campaign Related Errors - These errors are specific
     // to users opting into an air drop campaign. Currently they're
     // used when a user deep links into the application from a campaign
     // related link.
+    PendingOrdersLimitReached(53),
     InvalidCampaign(54),
     InvalidCampaignUser(55),
-    PendingOrdersLimitReached(53),
     CampaignUserAlreadyRegistered(56),
     CampaignExpired(57),
     InvalidCampaignInfo(58),
     CampaignWithdrawalFailed(59),
     TradeForceExecuteError(60),
-    CampaignInfoAlreadyUsed(61);
+    CampaignInfoAlreadyUsed(61),
+
+    InvalidCryptoAddress(93),
+    InvalidCryptoCurrency(94),
+    InsufficientBalance(131),
+    InvalidFiatCurrency(149),
+    OrderDirectionDisabled(151),
+    InvalidOrExpiredQuote(155),
+    IneligibleForSwap(156),
+    InvalidDestinationAmount(157);
 
     companion object {
 

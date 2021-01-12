@@ -355,6 +355,7 @@ class BtcOnChainTxEngine(
 
     override fun doOnTransactionFailed(pendingTx: PendingTx, e: Throwable) {
         Timber.e("BTC Send failed: $e")
+        crashLogger.logException(e)
     }
 
     // Update balance immediately after spend - until refresh from server
