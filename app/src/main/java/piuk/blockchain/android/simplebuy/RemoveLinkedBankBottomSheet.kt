@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.Bank
 import io.reactivex.Completable
@@ -41,7 +40,7 @@ class RemoveLinkedBankBottomSheet : SlidingModalBottomDialog() {
             title.text = resources.getString(R.string.common_spaced_strings, bank.name, bank.currency)
             end_digits.text = resources.getString(R.string.dotted_suffixed_string, bank.account)
             rmv_bank_btn.setOnClickListener {
-                compositeDisposable += bank.remove()
+                compositeDisposable += custodialWalletManager.removeBank(bank)
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSubscribe {
                         updateUi(true)
@@ -57,13 +56,6 @@ class RemoveLinkedBankBottomSheet : SlidingModalBottomDialog() {
             }
         }
     }
-
-    private fun Bank.remove(): Completable =
-        when (this.paymentMethod) {
-            PaymentMethodType.FUNDS -> custodialWalletManager.removeBeneficiary(id)
-            PaymentMethodType.BANK_TRANSFER -> custodialWalletManager.removLinkedBank(id)
-            else -> Completable.error(IllegalStateException("Unknown Bank type"))
-        }
 
     private fun updateUi(isLoading: Boolean) {
         dialogView.progress.visibleIf { isLoading }
