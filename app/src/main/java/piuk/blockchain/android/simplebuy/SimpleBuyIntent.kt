@@ -235,12 +235,12 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
             val minValueForSelectedPair = supportedPairsAndLimits.firstOrNull { pairs ->
                 pairs.fiatCurrency == oldState.fiatCurrency &&
-                pairs.cryptoCurrency == selectedCryptoCurrency
+                    pairs.cryptoCurrency == selectedCryptoCurrency
             }?.buyLimits?.minLimit(oldState.fiatCurrency)?.valueMinor
 
             val maxValueForSelectedPair = supportedPairsAndLimits.firstOrNull { pairs ->
                 pairs.fiatCurrency == oldState.fiatCurrency &&
-                pairs.cryptoCurrency == selectedCryptoCurrency
+                    pairs.cryptoCurrency == selectedCryptoCurrency
             }?.buyLimits?.maxLimit(oldState.fiatCurrency)?.valueMinor
 
             return oldState.copy(
@@ -310,7 +310,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
         override fun isValidFor(oldState: SimpleBuyState): Boolean {
             return oldState.orderState < OrderState.PENDING_CONFIRMATION ||
-                   oldState.orderState > OrderState.PENDING_EXECUTION
+                oldState.orderState > OrderState.PENDING_EXECUTION
         }
     }
 
@@ -433,9 +433,9 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
         override fun isValidFor(oldState: SimpleBuyState): Boolean {
             return oldState.selectedCryptoCurrency != null &&
-                   oldState.order.amount != null &&
-                   oldState.orderState != OrderState.AWAITING_FUNDS &&
-                   oldState.orderState != OrderState.PENDING_EXECUTION
+                oldState.order.amount != null &&
+                oldState.orderState != OrderState.AWAITING_FUNDS &&
+                oldState.orderState != OrderState.PENDING_EXECUTION
         }
     }
 
