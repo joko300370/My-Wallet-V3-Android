@@ -70,6 +70,11 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
         }
     }
 
+    override fun showLogWithMessage(message: String) {
+        webview_logs.visible()
+        webview_logs.text = message
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
     private fun setupWebView() {
         val settings: WebSettings = yodlee_webview.settings
@@ -151,7 +156,7 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
 
     override fun navigator(): SimpleBuyNavigator =
         (activity as? SimpleBuyNavigator)
-            ?: throw IllegalStateException("Parent must implement SimpleBuyNavigator")
+        ?: throw IllegalStateException("Parent must implement SimpleBuyNavigator")
 
     override fun onBackPressed(): Boolean = true
 
@@ -204,6 +209,7 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
         fun flowSuccess(providerAccountId: String, accountId: String)
         fun flowError(error: FastLinkFlowError, reason: String? = null)
         fun openExternalUrl(url: String)
+        fun showLogWithMessage(message: String)
     }
 
     enum class FastLinkFlowError {
@@ -214,6 +220,10 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
 
     @JavascriptInterface
     fun postMessage(data: String?) {
+        data?.let {
+            listener.showLogWithMessage(it)
+        }
+
         try {
             val message = gson.fromJson(data, FastLinkMessage::class.java)
 
