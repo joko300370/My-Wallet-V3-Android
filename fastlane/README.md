@@ -12,35 +12,45 @@ Install _fastlane_ using
 ```
 [sudo] gem install fastlane -NV
 ```
-or alternatively using `brew cask install fastlane`
+or alternatively using `brew install fastlane`
 
 # Available Actions
 ## Android
-### android build_tag_and_upload_release
+### android build
 ```
-fastlane android build_tag_and_upload_release
+fastlane android build
 ```
-Runs our entire release process from start to finish. Tests the app, increments version code and updates version name, commits changes to build.gradle, and then tags + signs + generates changelog, uploads to Drive, uploads to Alpha, posts to Slack.
+Builds using the given environment and build type
 ### android test
 ```
 fastlane android test
 ```
 Runs all tests
-### android generate_apks
-```
-fastlane android generate_apks
-```
-Generate release builds for both staging and production
-### android archive
-```
-fastlane android archive
-```
-Upload APK to Google Drive
 ### android alpha
 ```
 fastlane android alpha
 ```
 Submit a release Alpha build to the Play Store. This won't publish, just upload.
+### android upload_to_appcenter
+```
+fastlane android upload_to_appcenter
+```
+Upload to AppCenter.
+### android ci_test
+```
+fastlane android ci_test
+```
+Tests to run on CI
+### android ci_build
+```
+fastlane android ci_build
+```
+Build to run on CI
+### android ci_lint
+```
+fastlane android ci_lint
+```
+Checks to run on CI
 
 ----
 
