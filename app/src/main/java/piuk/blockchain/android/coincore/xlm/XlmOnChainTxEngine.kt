@@ -232,6 +232,8 @@ class XlmOnChainTxEngine(
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
         createTransaction(pendingTx).flatMap { sendDetails ->
             xlmDataManager.sendFunds(sendDetails, secondPassword)
+        }.onErrorResumeNext {
+            Single.error(onChainExecutionError)
         }.map {
             TxResult.HashedTxResult(it.txHash, pendingTx.amount)
         }

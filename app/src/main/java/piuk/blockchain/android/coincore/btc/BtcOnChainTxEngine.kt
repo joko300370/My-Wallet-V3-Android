@@ -324,6 +324,8 @@ class BtcOnChainTxEngine(
                 doOnTransactionSuccess(pendingTx)
             }.doOnError { e ->
                 doOnTransactionFailed(pendingTx, e)
+            }.onErrorResumeNext {
+                Single.error(onChainExecutionError)
             }.map {
                 TxResult.HashedTxResult(it, pendingTx.amount)
             }
