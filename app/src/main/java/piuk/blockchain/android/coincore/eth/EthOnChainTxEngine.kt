@@ -152,6 +152,8 @@ open class EthOnChainTxEngine(
                 }?.toSingle {
                     hash
                 } ?: Single.just(hash)
+            }.onErrorResumeNext {
+                Single.error(onChainExecutionError)
             }.map {
                 TxResult.HashedTxResult(it, pendingTx.amount)
             }

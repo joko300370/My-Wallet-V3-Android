@@ -244,6 +244,8 @@ class BchOnChainTxEngine(
         }.doOnError { e ->
             Timber.e("BCH Send failed: $e")
             // logPaymentSentEvent(false, BCH.BTC, pendingTransaction.bigIntAmount)
+        }.onErrorResumeNext {
+            Single.error(onChainExecutionError)
         }.map {
             TxResult.HashedTxResult(it, pendingTx.amount)
         }

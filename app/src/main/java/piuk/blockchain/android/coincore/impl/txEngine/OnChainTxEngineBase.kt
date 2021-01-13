@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.impl.txEngine
 
+import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.data.FeeOptions
@@ -73,6 +74,8 @@ abstract class OnChainTxEngineBase(
             }
         }
 
+    protected val onChainExecutionError = TransactionError.ExecutionFailed(asset)
+
     protected fun updateFeeSelection(
         cryptoCurrency: CryptoCurrency,
         pendingTx: PendingTx,
@@ -80,10 +83,12 @@ abstract class OnChainTxEngineBase(
     ): Single<PendingTx> {
         setFeeType(cryptoCurrency, newConfirmation.selectedLevel)
 
-        return doUpdateAmount(pendingTx.amount, pendingTx.copy(
-            feeLevel = newConfirmation.selectedLevel,
-            customFeeAmount = newConfirmation.customFeeAmount
-        ))
+        return doUpdateAmount(
+            pendingTx.amount, pendingTx.copy(
+                feeLevel = newConfirmation.selectedLevel,
+                customFeeAmount = newConfirmation.customFeeAmount
+            )
+        )
             .flatMap { pTx -> doValidateAmount(pTx) }
             .flatMap { pTx -> doBuildConfirmations(pTx) }
     }
