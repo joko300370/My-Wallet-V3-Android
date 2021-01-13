@@ -15,7 +15,6 @@ import kotlinx.android.synthetic.main.remove_bank_bottom_sheet.view.end_digits
 import kotlinx.android.synthetic.main.remove_bank_bottom_sheet.view.icon
 import kotlinx.android.synthetic.main.remove_bank_bottom_sheet.view.progress
 import kotlinx.android.synthetic.main.remove_bank_bottom_sheet.view.title
-import kotlinx.android.synthetic.main.remove_card_bottom_sheet.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -36,7 +35,7 @@ class RemoveLinkedBankBottomSheet : SlidingModalBottomDialog() {
             title.text = resources.getString(R.string.common_spaced_strings, bank.name, bank.currency)
             end_digits.text = resources.getString(R.string.dotted_suffixed_string, bank.account)
             rmv_bank_btn.setOnClickListener {
-                compositeDisposable += custodialWalletManager.deleteBank(bank.id)
+                compositeDisposable += custodialWalletManager.removeBank(bank)
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSubscribe {
                         updateUi(true)
@@ -54,9 +53,9 @@ class RemoveLinkedBankBottomSheet : SlidingModalBottomDialog() {
     }
 
     private fun updateUi(isLoading: Boolean) {
-        view?.progress.visibleIf { isLoading }
-        view?.icon.visibleIf { !isLoading }
-        view?.rmv_card_btn?.isEnabled = !isLoading
+        dialogView.progress.visibleIf { isLoading }
+        dialogView.icon.visibleIf { !isLoading }
+        dialogView.rmv_bank_btn.isEnabled = !isLoading
     }
 
     override fun onDismiss(dialog: DialogInterface) {

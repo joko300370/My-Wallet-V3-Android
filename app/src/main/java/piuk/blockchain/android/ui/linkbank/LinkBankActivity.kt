@@ -77,6 +77,8 @@ class LinkBankActivity : BlockchainActivity(), YodleeLinkingFlowNavigator {
     }
 
     override fun bankLinkingFinished() {
+        val data = Intent()
+        setResult(RESULT_OK, data)
         finish()
     }
 
@@ -86,6 +88,7 @@ class LinkBankActivity : BlockchainActivity(), YodleeLinkingFlowNavigator {
 
     companion object {
         private const val LINK_BANK_TRANSFER_KEY = "LINK_BANK_TRANSFER_KEY"
+        const val LINK_BANK_REQUEST_CODE = 999
 
         fun newInstance(linkBankTransfer: LinkBankTransfer, context: Context): Intent {
             val intent = Intent(context, LinkBankActivity::class.java)

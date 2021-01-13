@@ -862,14 +862,21 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK)
-            if (requestCode == REQUEST_CODE_VALIDATE_PIN) {
-                settingsPresenter.pinCodeValidatedForChange()
-            } else if (requestCode == CardDetailsActivity.ADD_CARD_REQUEST_CODE) {
-                updateCards(
-                    listOf(
-                        (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as? PaymentMethod.Card) ?: return
+            when (requestCode) {
+                REQUEST_CODE_VALIDATE_PIN -> {
+                    settingsPresenter.pinCodeValidatedForChange()
+                }
+                CardDetailsActivity.ADD_CARD_REQUEST_CODE -> {
+                    updateCards(
+                        listOf(
+                            (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as? PaymentMethod.Card)
+                                ?: return
+                        )
                     )
-                )
+                }
+                LinkBankActivity.LINK_BANK_REQUEST_CODE -> {
+                    settingsPresenter.updateBanks()
+                }
             }
     }
 
@@ -1140,7 +1147,9 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     override fun linkBankWithPartner(linkBankTransfer: LinkBankTransfer) {
-        startActivity(LinkBankActivity.newInstance(linkBankTransfer, requireContext()))
+        startActivityForResult(
+            LinkBankActivity.newInstance(linkBankTransfer, requireContext()), LinkBankActivity.LINK_BANK_REQUEST_CODE
+        )
     }
 }
 

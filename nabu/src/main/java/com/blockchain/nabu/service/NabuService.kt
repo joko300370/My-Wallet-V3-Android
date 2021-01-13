@@ -423,10 +423,17 @@ class NabuService(retrofit: Retrofit) {
         sessionToken.authHeader, cardId
     ).wrapErrorMessage()
 
-    fun deleteBank(
+    fun removeBeneficiary(
         sessionToken: NabuSessionTokenResponse,
         id: String
-    ) = service.deleteBank(
+    ) = service.removeBeneficiary(
+        sessionToken.authHeader, id
+    ).wrapErrorMessage()
+
+    fun removeLinkedBank(
+        sessionToken: NabuSessionTokenResponse,
+        id: String
+    ) = service.removeLinkedBank(
         sessionToken.authHeader, id
     ).wrapErrorMessage()
 
