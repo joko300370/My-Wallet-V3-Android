@@ -321,7 +321,7 @@ abstract class TxEngine : KoinComponent {
 }
 
 class TransactionProcessor(
-    sourceAccount: CryptoAccount,
+    private val sourceAccount: CryptoAccount,
     txTarget: TransactionTarget,
     exchangeRates: ExchangeRateDataManager,
     private val engine: TxEngine
@@ -440,6 +440,10 @@ class TransactionProcessor(
             ValidationState.CAN_EXECUTE -> {
                 engine.doExecute(pendingTx, secondPassword).flatMapCompletable { result ->
                     engine.doPostExecute(result)
+                }.onErrorResumeNext {
+                    if (it !is TransactionError)
+                        Completable.error(TransactionError.ExecutionFailed(sourceAccount.asset))
+                    else Completable.error(it)
                 }
             }
             ValidationState.UNINITIALISED -> Completable.error(TransactionError.UnexpectedError)

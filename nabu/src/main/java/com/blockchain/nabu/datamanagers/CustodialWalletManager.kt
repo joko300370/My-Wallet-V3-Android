@@ -150,7 +150,7 @@ interface CustodialWalletManager {
     ): Single<List<PaymentMethod.Card>> // fetches the available
 
     fun confirmOrder(orderId: String, attributes: CardPartnerAttributes?, paymentMethodId: String?):
-            Single<BuySellOrder>
+        Single<BuySellOrder>
 
     fun getInterestAccountBalance(crypto: CryptoCurrency): Maybe<CryptoValue>
 
@@ -406,7 +406,9 @@ sealed class TransactionError : Throwable() {
     object InvalidOrExpiredQuote : TransactionError()
     object IneligibleForSwap : TransactionError()
     object InvalidDestinationAmount : TransactionError()
+    class ExecutionFailed(val currency: CryptoCurrency) : TransactionError()
 }
+
 sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val order: Int) :
     Serializable {
     object Undefined : PaymentMethod(UNDEFINED_PAYMENT_ID, null, UNDEFINED_PAYMENT_METHOD_ORDER)
