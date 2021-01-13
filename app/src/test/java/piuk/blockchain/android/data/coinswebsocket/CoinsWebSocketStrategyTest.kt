@@ -56,6 +56,7 @@ class CoinsWebSocketStrategyTest {
         on { getEthWallet() } `it returns` wallet
         on { getErc20TokenData(CryptoCurrency.PAX) } `it returns` Erc20TokenData.createPaxTokenData("")
         on { getErc20TokenData(CryptoCurrency.USDT) } `it returns` Erc20TokenData.createUsdtTokenData("")
+        on { getErc20TokenData(CryptoCurrency.DGLD) } `it returns` Erc20TokenData.createDgldTokenData("")
         on { fetchEthAddress() } `it returns` Observable.just(CombinedEthModel(EthAddressResponseMap()))
         on { getEthWalletAddress() } `it returns` "0x4058a004dd718babab47e14dd0d744742e5b9903"
         on { refreshErc20Model(any()) } `it returns` Completable.complete()
@@ -103,6 +104,7 @@ class CoinsWebSocketStrategyTest {
     private val assetResources: AssetResourceFactory = mock() {
         on { assetName(CryptoCurrency.USDT) } itReturns "Tether"
         on { assetName(CryptoCurrency.PAX) } itReturns "USD Digital"
+        on { assetName(CryptoCurrency.DGLD) } itReturns "Wrapped-DGLD"
     }
 
     private val mockWebSocket: WebSocket<String, String> = mock()
@@ -183,6 +185,19 @@ class CoinsWebSocketStrategyTest {
     }
 
     @Test
+    fun `wdgld transaction should be update wdgld transactions and broadcasted`() {
+        webSocket.send(wdgldTransaction)
+
+        verify(mockWebSocket).open()
+        verify(ethDataManager, never()).fetchEthAddress()
+        verify(ethDataManager).refreshErc20Model(CryptoCurrency.DGLD)
+        verify(messagesSocketHandler).triggerNotification("Blockchain",
+            "Received Wrapped-DGLD 0.0121 wDGLD",
+            "Received Wrapped-DGLD 0.0121 wDGLD from 0x4058a004dd718babab47e14dd0d744742e5b9903")
+        verify(messagesSocketHandler).sendBroadcast(any())
+    }
+
+    @Test
     fun `btc transaction should be update btc balance and transactions`() {
         webSocket.send(btcTransaction)
         verify(mockWebSocket).open()
@@ -259,6 +274,15 @@ class CoinsWebSocketStrategyTest {
     private val usdtTransaction =
         "{\"coin\":\"eth\",\"entity\":\"token_account\",\"param\":{\"accountAddress\":\"0x4058a004dd718babab47e14dd0" +
             "d744742e5b9903\",\"tokenAddress\":\"0xdAC17F958D2ee523a2206206994597C13D831ec7\"},\"tokenTransf" +
+            "er\":{\"blockHash\":\"0x1293676c93d91660ca4ec40df09b6ec4fa080138d975c19813b914befc1187c\",\"transact" +
+            "ionHash\":\"0x3cd2e95358c58af6e9ecd2f0af6739c3db945e2259bf2a4bc91fb5e2f397ad89\",\"blockNumber\":83" +
+            "62036,\"tokenHash\":\"0x8e870d67f660d95d5be530380d0ec0bd388289e1\",\"logIndex\":67,\"from\":\"0x4058" +
+            "a004dd718babab47e14dd0d744742e5b9903\",\"to\":\"0x4058a004dd718babab47e14dd0d744742e5b9903\",\"val" +
+            "ue\":1210000,\"decimals\":6,\"timestamp\":0}}"
+
+    private val wdgldTransaction =
+        "{\"coin\":\"eth\",\"entity\":\"token_account\",\"param\":{\"accountAddress\":\"0x4058a004dd718babab47e14dd0" +
+            "d744742e5b9903\",\"tokenAddress\":\"0x123151402076fc819b7564510989e475c9cd93ca\"},\"tokenTransf" +
             "er\":{\"blockHash\":\"0x1293676c93d91660ca4ec40df09b6ec4fa080138d975c19813b914befc1187c\",\"transact" +
             "ionHash\":\"0x3cd2e95358c58af6e9ecd2f0af6739c3db945e2259bf2a4bc91fb5e2f397ad89\",\"blockNumber\":83" +
             "62036,\"tokenHash\":\"0x8e870d67f660d95d5be530380d0ec0bd388289e1\",\"logIndex\":67,\"from\":\"0x4058" +
