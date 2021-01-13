@@ -39,7 +39,7 @@ Install System Packages
     brew install gpg
 
     # Install Pinentry for storing the passphrase in the keychain
-    npm install pinentry-mac
+    brew install pinentry-mac
 
 Generate the key via `gpg --full-generate-key`
 When asked:
@@ -49,7 +49,8 @@ When asked:
 * Add your name on GitHub
 * Add your blockchain email address
 
-###Configuring Git to sign automatically
+### Configuring Git to sign automatically
+
 Take the second line below “pub”, i.e. long string with hex string (this is the `key_id`)
 
     git config --global user.signingKey key_id
@@ -62,13 +63,66 @@ Take the second line below “pub”, i.e. long string with hex string (this is 
     # You may need to restart the agent
     gpgconf --kill gpg-agent
     
-###Configuring Github to recognize the key
+### Configuring Github to recognize the key
 
 Go to `GitHub -> Profile -> Settings -> SSH and GPG keys -> new GPG key`
 Get your public key by running
 
     # where key_id as before
     gpg --armor --export key_id | pbcopy
+    
+## Install XCode command line tools
+
+This is required in order to be able to use fastlane bundle commands
+
+    xcode-select --install
+    
+## Setting up fastlane
+
+We use fastlane for automating building, signing, testing and uploading to Appcenter and to the Play Store.
+The settings are stored in the `fastlane` directory. The preferred way of installing fastlane is via the `Gemfile`
+
+    [sudo] bundle install
+    
+To update fastlane use
+
+    [sudo] bundle update fastlane
+
+after which you need to commit the changes (typically the `Gemfile`, `Gemfile.lock` and the configuration files
+in the `fastlane` directory).    
+    
+Alternatively you can install it via Homebrew
+
+    brew install fastlane
+    
+    fastlane init
+    
+Once fastlane is setup, you can find the available lane commands and their description in `./fastlane/README.md` file.
+
+### Using fastlane
+
+You can run any of the lane tasks defined in the `./fastlane/FastFile` (summary in the fastlane `README.md`)
+
+    # The <options> are given in the format of key1:value1 key2:value2 and so on
+    bundle exec fastlane <lane> <options>
+    
+    # Alternative, the bundle is preferred
+    fastlane <lane> <options>
+    
+Runing the unit tests
+
+    bundle exec fastlane execute_tests
+    
+### Troubleshooting
+
+Sometimes the XCode developer tools doesn't find the relevant headers to build and install the necessary
+gems. In this case use the following command to compile the required gem:
+
+    sudo xcrun gem install <gem_name> -v <gem_version> --source 'https://rubygems.org/'
+
+Example:
+
+    sudo xcrun gem install unf_ext -v '0.0.7.7' --source 'https://rubygems.org/'
 
 ## Building
 
@@ -111,10 +165,6 @@ Use git change log style.
 
 Where you have access to Jira, you should apply the git hooks with `./gradlew installGitHooks`. This enforces the
 git change log style with Jira references.
-
-## Tests
-
-Unit tests for the project can be run via `scripts/ci_unit_tests.sh`. This also generates coverage reports.
 
 ### Security
 
