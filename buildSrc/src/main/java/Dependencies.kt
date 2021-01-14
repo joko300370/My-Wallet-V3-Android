@@ -50,7 +50,7 @@ object Versions {
     const val mockWebServer = "v0.1.8"
     const val moshi = "1.8.0"
     const val gson = "2.8.5"
-    const val jacksonCore = "2.10.0"
+    const val jacksonCore = "2.9.6"
     const val koin = "2.1.5"
     const val rxJava = "2.2.20"
     const val rxKotlin = "2.4.0"
