@@ -26,6 +26,7 @@ import piuk.blockchain.android.simplebuy.SimpleBuyScreen
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import timber.log.Timber
 import java.net.URLEncoder
 
@@ -94,7 +95,7 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
 
     private fun loadYodlee() {
         requireActivity().runOnUiThread {
-            yodlee_loading_group.visible()
+            updateViewsVisibility(true)
             yodlee_webview.clearCache(true)
             yodlee_webview.gone()
             yodlee_retry.gone()
@@ -133,7 +134,10 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
 
     private fun showError(errorText: String) {
         yodlee_webview.gone()
+        yodlee_icon.gone()
+        yodlee_progress.gone()
         yodlee_status_label.text = errorText
+        yodlee_status_label.visible()
         yodlee_subtitle.gone()
         yodlee_retry.visible()
         yodlee_retry.setOnClickListener { loadYodlee() }
@@ -146,7 +150,14 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
 
     override fun pageFinishedLoading() {
         yodlee_webview.visible()
-        yodlee_loading_group.gone()
+        updateViewsVisibility(false)
+    }
+
+    private fun updateViewsVisibility(visible: Boolean) {
+        yodlee_progress.visibleIf { visible }
+        yodlee_status_label.visibleIf { visible }
+        yodlee_subtitle.visibleIf { visible }
+        yodlee_icon.visibleIf { visible }
     }
 
     override fun navigator(): SimpleBuyNavigator =
@@ -215,6 +226,10 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
     @JavascriptInterface
     fun postMessage(data: String?) {
         try {
+            if (data?.contains("error", true) == true) {
+                listener.flowError(FastLinkFlowError.OTHER)
+                return
+            }
             val message = gson.fromJson(data, FastLinkMessage::class.java)
 
             when (message.type) {
@@ -240,8 +255,6 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
                         handleExitAction()
                     }
                 }
-            } else {
-                // TODO no action but we may already have providerAccountId
             }
         }
     }
