@@ -134,6 +134,7 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
     private fun showError(errorText: String) {
         yodlee_webview.gone()
         yodlee_status_label.text = errorText
+        yodlee_status_label.visible()
         yodlee_subtitle.gone()
         yodlee_retry.visible()
         yodlee_retry.setOnClickListener { loadYodlee() }
@@ -215,6 +216,9 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
     @JavascriptInterface
     fun postMessage(data: String?) {
         try {
+            if (data?.contains("error", true) == true) {
+                listener.flowError(FastLinkFlowError.OTHER)
+            }
             val message = gson.fromJson(data, FastLinkMessage::class.java)
 
             when (message.type) {
@@ -240,8 +244,6 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
                         handleExitAction()
                     }
                 }
-            } else {
-                // TODO no action but we may already have providerAccountId
             }
         }
     }
