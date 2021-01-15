@@ -235,7 +235,7 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
             listener.showLogWithMessage(it)
         }
 
-        try {
+      /*  try {
             if (data?.contains("error", true) == true) {
                 listener.flowError(FastLinkFlowError.OTHER)
                 return
@@ -256,7 +256,7 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
             listener.flowError(FastLinkFlowError.JSON_PARSING)
         } catch (j: JsonSyntaxException) {
             listener.flowError(FastLinkFlowError.JSON_PARSING)
-        }
+        }*/
     }
 
     private fun handlePostMessage(message: FastLinkMessage) {
