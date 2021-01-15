@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.btc
 
 import com.blockchain.logging.CrashLogger
+import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
@@ -325,7 +326,7 @@ class BtcOnChainTxEngine(
             }.doOnError { e ->
                 doOnTransactionFailed(pendingTx, e)
             }.onErrorResumeNext {
-                Single.error(onChainExecutionError)
+                Single.error(TransactionError.ExecutionFailed)
             }.map {
                 TxResult.HashedTxResult(it, pendingTx.amount)
             }

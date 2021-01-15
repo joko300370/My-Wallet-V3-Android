@@ -1,6 +1,5 @@
 package piuk.blockchain.android.coincore.impl.txEngine
 
-import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.data.FeeOptions
@@ -73,8 +72,6 @@ abstract class OnChainTxEngineBase(
                 FeeDetails(pTx.fees)
             }
         }
-
-    protected val onChainExecutionError = TransactionError.ExecutionFailed(asset)
 
     protected fun updateFeeSelection(
         cryptoCurrency: CryptoCurrency,
