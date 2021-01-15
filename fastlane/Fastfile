@@ -19,12 +19,14 @@ platform :android do
 
     end
 
+
     desc "Runs all tests"
     lane :test do
       gradle(
         task: "coveralls"
         )
     end
+
 
     desc "Submit a release Alpha build to the Play Store. This won't publish, just upload."
     lane :alpha do
@@ -35,6 +37,52 @@ platform :android do
       )
 
     end
+
+
+    desc "Get the configuration files from the Android credentials repository."
+    lane :credentials do
+
+      credentials_folder = File.expand_path("../../wallet-android-credentials/")
+      if !File.exist? credentials_folder
+
+        sh("echo \"--------------Cloning Credentials Repo--------------\"")
+        sh("git clone git@github.com:blockchain/wallet-android-credentials.git ../../")
+
+      end
+
+      sh("echo \"--------------Pulling Latest Credentials--------------\"")
+      sh("( cd ../../wallet-android-credentials/ ; git pull )")
+
+      sh("echo \"--------------Unzip Firebase Credentials--------------\"")
+      sh("unzip ../../wallet-android-credentials/env.zip  -d ../../wallet-android-credentials/")
+
+      sh("rm -rf ../app/src/env")
+
+      sh("echo \"--------------Copying Firebase Credentials--------------\"")
+      sh("cp -r ../../wallet-android-credentials/env ../app/src")
+
+      sh("echo \"--------------Copying Secrets Properties--------------\"")
+      sh("cp ../../wallet-android-credentials/secrets.properties ../app")
+
+    end
+    
+
+    desc "Get the configuration files from the Android credentials repository on CI."
+    lane :ci_credentials do
+
+      sh("echo \"--------------Cloning Credentials Repo--------------\"")
+      sh("git clone $CREDENTIALS_REPO ../../tmp/credentials")
+
+      sh("echo \"--------------Unzip Firebase Credentials--------------\"")
+      sh("unzip ../../tmp/credentials/env.zip  -d ../../tmp/credentials/")
+
+      sh("echo \"--------------Copying Firebase Credentials--------------\"")
+      sh("cp -r ../../tmp/credentials/env ../app/src")
+
+      sh("echo \"--------------Copying Secrets Properties--------------\"")
+      sh("cp ../../tmp/credentials/secrets.properties ../app")
+    end
+
 
     desc "Upload to AppCenter."
     lane :upload_to_appcenter do
@@ -53,6 +101,7 @@ platform :android do
         )
     end
 
+
     desc "Build to run on CI"
     lane :ci_build do | options |
 
@@ -60,14 +109,7 @@ platform :android do
 
       build_type = options[:build_type]
 
-      sh("echo $FIREBASE_API_JSON_PROD > ../app/src/env/prod/google-services.json")
-      sh("echo $FIREBASE_API_JSON_DEV > ../app/src/env/dev/google-services.json")
-      sh("echo $FIREBASE_API_JSON_STAGING > ../app/src/env/staging/google-services.json")
-      sh("echo $FIREBASE_API_JSON_TESTNET > ../app/src/env/testnet/google-services.json")
-
-      sh("wget -O \"../app/secrets.properties\" \"$BITRISEIO_secrets_properties_URL\"")
-
-      sh("echo \"file downloaded to: ../app/secrets.properties\"")
+      ci_credentials
 
       gradle(
         task: 'assemble',
@@ -77,6 +119,7 @@ platform :android do
         flags: "--info --stacktrace --no-daemon"
       )
     end
+
 
     desc "Checks to run on CI"
     lane :ci_lint do
@@ -89,6 +132,7 @@ platform :android do
         flags: "lintDebug ktlint -Dpre-dex=false -Pkotlin.incremental=false --no-daemon --stacktrace"
       )
     end
+
 
     private_lane :ship_it do
       rand = Random.rand(0..1)
@@ -113,6 +157,7 @@ platform :android do
             !!!\\______\\
       "
     end
+
 
     def boat
       puts "

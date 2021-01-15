@@ -31,6 +31,16 @@ Runs all tests
 fastlane android alpha
 ```
 Submit a release Alpha build to the Play Store. This won't publish, just upload.
+### android credentials
+```
+fastlane android credentials
+```
+Get the configuration files from the Android credentials repository.
+### android ci_credentials
+```
+fastlane android ci_credentials
+```
+Get the configuration files from the Android credentials repository on CI.
 ### android upload_to_appcenter
 ```
 fastlane android upload_to_appcenter
