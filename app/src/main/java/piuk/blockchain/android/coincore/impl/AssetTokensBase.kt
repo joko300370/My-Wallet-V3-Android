@@ -81,7 +81,9 @@ internal abstract class CryptoAssetBase(
         ) { nc, c, i ->
             nc + c + i
         }.doOnError {
-            Timber.e("Error loading accounts for ${asset.networkTicker}: $it")
+            val errorMsg = "Error loading accounts for ${asset.networkTicker}"
+            Timber.e("$errorMsg: $it")
+            crashLogger.logException(it, errorMsg)
         }
 
     // Called when the set of account in use bu this asset changes. Update the offline
