@@ -6,8 +6,8 @@ object Versions {
     const val minSdk = 21
     const val targetSdk = 29
     const val compileSdk = 28
-    const val versionCode = 597
-    const val versionName = "8.4.0"
+    const val versionCode = 598
+    const val versionName = "8.4.1"
     const val buildTools = "28.0.3"
 
     // Build tools and languages
@@ -50,8 +50,8 @@ object Versions {
     const val mockWebServer = "v0.1.8"
     const val moshi = "1.8.0"
     const val gson = "2.8.5"
+    const val jacksonCore = "2.9.6"
     const val kotlinJson = "1.0.1"
-    const val jacksonCore = "2.10.0"
     const val koin = "2.1.5"
     const val rxJava = "2.2.20"
     const val rxKotlin = "2.4.0"
