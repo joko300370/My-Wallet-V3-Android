@@ -18,7 +18,6 @@ import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.synthetic.main.fragment_yodlee_webview.*
 import org.json.JSONException
-import org.json.JSONObject
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
