@@ -52,26 +52,8 @@ data class CryptoValue(
         val ZeroUsdt = CryptoValue(CryptoCurrency.USDT, BigInteger.ZERO)
         val ZeroDgld = CryptoValue(CryptoCurrency.DGLD, BigInteger.ZERO)
 
-        fun zero(cryptoCurrency: CryptoCurrency) = when (cryptoCurrency) {
-            CryptoCurrency.BTC -> ZeroBtc
-            CryptoCurrency.BCH -> ZeroBch
-            CryptoCurrency.ETHER -> ZeroEth
-            CryptoCurrency.XLM -> ZeroXlm
-            CryptoCurrency.PAX -> ZeroPax
-            CryptoCurrency.STX -> ZeroStx
-            CryptoCurrency.ALGO -> ZeroAlg
-            CryptoCurrency.USDT -> ZeroUsdt
-            CryptoCurrency.DGLD -> ZeroDgld
-        }
-
-        // These calls are currently (mostly) only used in tests, where we have a second mechanism
-        // [xx.bitcoin(), xx.satoshi() etc] for generating CryptoValues.
-        // So ALL these coin specific calls are deprecated and will be removed once all the tests
-        // are updated to use the other, more readable, mechanism. Use the suggested
-        // replacement in test code. If found in prod code, then it's CryptoValue.fromMajor/fromMinor etc
-        @Deprecated("Historical method", ReplaceWith("satoshi.satoshi()"))
-        fun bitcoinFromSatoshis(satoshi: Long) =
-            CryptoValue(CryptoCurrency.BTC, satoshi.toBigInteger())
+        fun zero(asset: CryptoCurrency) =
+            CryptoValue(asset, BigInteger.ZERO)
 
         fun fromMajor(
             currency: CryptoCurrency,

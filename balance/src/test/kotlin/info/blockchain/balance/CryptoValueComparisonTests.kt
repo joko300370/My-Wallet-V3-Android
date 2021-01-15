@@ -9,8 +9,8 @@ class CryptoValueComparisonTests {
 
     @Test
     fun `compare greater than true`() {
-        val a = CryptoValue.bitcoinFromSatoshis(2)
-        val b = CryptoValue.bitcoinFromSatoshis(1)
+        val a = 2.satoshi()
+        val b = 1.satoshi()
         (a > b) `should be` true
     }
 
