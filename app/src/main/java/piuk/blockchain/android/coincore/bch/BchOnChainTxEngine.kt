@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.bch
 
+import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
@@ -245,7 +246,7 @@ class BchOnChainTxEngine(
             Timber.e("BCH Send failed: $e")
             // logPaymentSentEvent(false, BCH.BTC, pendingTransaction.bigIntAmount)
         }.onErrorResumeNext {
-            Single.error(onChainExecutionError)
+            Single.error(TransactionError.ExecutionFailed)
         }.map {
             TxResult.HashedTxResult(it, pendingTx.amount)
         }

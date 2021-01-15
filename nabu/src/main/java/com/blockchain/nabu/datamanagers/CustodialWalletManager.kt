@@ -406,7 +406,7 @@ sealed class TransactionError : Throwable() {
     object InvalidOrExpiredQuote : TransactionError()
     object IneligibleForSwap : TransactionError()
     object InvalidDestinationAmount : TransactionError()
-    class ExecutionFailed(val currency: CryptoCurrency) : TransactionError()
+    object ExecutionFailed : TransactionError()
 }
 
 sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val order: Int) :
