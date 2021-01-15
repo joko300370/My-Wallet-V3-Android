@@ -72,7 +72,7 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
     }
 
     override fun showLogWithMessage(message: String) {
-        navigator().showLogs(message)
+        navigator().showLogs("$fastLinkUrl -- $yodleeQuery -- $message")
     }
 
     @SuppressLint("SetJavaScriptEnabled")
