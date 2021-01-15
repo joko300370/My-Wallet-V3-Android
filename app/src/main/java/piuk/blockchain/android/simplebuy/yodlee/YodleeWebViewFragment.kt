@@ -72,10 +72,7 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
     }
 
     override fun showLogWithMessage(message: String) {
-        activity?.runOnUiThread {
-            webview_logs.visible()
-            webview_logs.text = message
-        }
+        navigator().showLogs(message)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -169,7 +166,7 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
 
     override fun navigator(): SimpleBuyNavigator =
         (activity as? SimpleBuyNavigator)
-        ?: throw IllegalStateException("Parent must implement SimpleBuyNavigator")
+            ?: throw IllegalStateException("Parent must implement SimpleBuyNavigator")
 
     override fun onBackPressed(): Boolean = true
 

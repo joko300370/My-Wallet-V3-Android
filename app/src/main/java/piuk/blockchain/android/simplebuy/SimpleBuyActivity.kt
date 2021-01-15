@@ -65,6 +65,13 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
         subscribeForNavigation()
     }
 
+    override fun showLogs(message: String) {
+        runOnUiThread {
+            webview_logs.visible()
+            webview_logs.text = message
+        }
+    }
+
     private fun subscribeForNavigation() {
         compositeDisposable += simpleBuyFlowNavigator.navigateTo(
             startedFromKycResume,
@@ -119,9 +126,11 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
 
     override fun goToBuyCryptoScreen(addToBackStack: Boolean, cryptoCurrency: CryptoCurrency) {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.content_frame,
+            .replace(
+                R.id.content_frame,
                 SimpleBuyCryptoFragment.newInstance(cryptoCurrency),
-                SimpleBuyCryptoFragment::class.simpleName)
+                SimpleBuyCryptoFragment::class.simpleName
+            )
             .apply {
                 if (addToBackStack) {
                     addToBackStack(SimpleBuyCryptoFragment::class.simpleName)
@@ -156,9 +165,11 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
 
     override fun goToPendingOrderScreen() {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.content_frame,
+            .replace(
+                R.id.content_frame,
                 SimpleBuyCheckoutFragment.newInstance(true),
-                SimpleBuyCheckoutFragment::class.simpleName)
+                SimpleBuyCheckoutFragment::class.simpleName
+            )
             .commitAllowingStateLoss()
     }
 
@@ -207,17 +218,19 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
         } else if (requestCode == CardDetailsActivity.ADD_CARD_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 val card = (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as?
-                        PaymentMethod.Card) ?: return
+                    PaymentMethod.Card) ?: return
                 val cardId = card.cardId
                 val cardLabel = card.uiLabel()
                 val cardPartner = card.partner
 
-                simpleBuyModel.process(SimpleBuyIntent.UpdateSelectedPaymentMethod(
-                    cardId,
-                    cardLabel,
-                    cardPartner,
-                    PaymentMethodType.PAYMENT_CARD
-                ))
+                simpleBuyModel.process(
+                    SimpleBuyIntent.UpdateSelectedPaymentMethod(
+                        cardId,
+                        cardLabel,
+                        cardPartner,
+                        PaymentMethodType.PAYMENT_CARD
+                    )
+                )
                 goToCheckOutScreen()
             } else
                 finish()
@@ -254,8 +267,10 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
 
     override fun launchBankLinking(accountProviderId: String, accountId: String) {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.content_frame,
-                LinkBankFragment.newInstance(accountProviderId = accountProviderId, accountId = accountId))
+            .replace(
+                R.id.content_frame,
+                LinkBankFragment.newInstance(accountProviderId = accountProviderId, accountId = accountId)
+            )
             .addToBackStack(LinkBankFragment::class.simpleName)
             .commitAllowingStateLoss()
     }
