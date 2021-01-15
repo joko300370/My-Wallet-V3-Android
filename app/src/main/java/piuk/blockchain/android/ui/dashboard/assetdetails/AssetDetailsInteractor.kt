@@ -107,8 +107,14 @@ class AssetDetailsInteractor(
         interestRate: Double,
         interestEnabled: Boolean
     ): AssetDisplayMap = mutableMapOf<AssetFilter, AssetDisplayInfo>().apply {
-        addToDisplayMap(this, AssetFilter.NonCustodial, nonCustodial, fiatRate)
-        addToDisplayMap(this, AssetFilter.Custodial, custodial, fiatRate)
+        if (nonCustodial !is Details.NoDetails) {
+            addToDisplayMap(this, AssetFilter.NonCustodial, nonCustodial, fiatRate)
+        }
+
+        if (custodial !is Details.NoDetails) {
+            addToDisplayMap(this, AssetFilter.Custodial, custodial, fiatRate)
+        }
+
         if (interestEnabled && (interest as? Details.DetailsItem)?.isEnabled == true) {
             addToDisplayMap(this, AssetFilter.Interest, interest, fiatRate, interestRate)
         }
