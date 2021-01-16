@@ -210,20 +210,17 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
 
     @JavascriptInterface
     fun postMessage(data: String?) {
-        data?.let {
-            println("Incoming $it")
-        }
 
         val message = gson.fromJson(data, FastLinkMessage::class.java)
+        val type = message.type ?: return
+        val data = message.data ?: return
 
-        when (message.type) {
+        when (type) {
             MessageType.POST_MESSAGE -> {
-                message?.data?.let {
-                    handlePostMessage(it)
-                }
+                handlePostMessage(data)
             }
             MessageType.OPEN_EXTERNAL_URL -> {
-                message.data?.externalUrl?.let {
+                data.externalUrl?.let {
                     listener.openExternalUrl(it)
                 }
             }
