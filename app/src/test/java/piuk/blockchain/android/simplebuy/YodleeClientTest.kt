@@ -48,7 +48,8 @@ class YodleeClientTest {
                 "    \"providerName\": \"Bank of America\",\n" +
                 "    \"requestId\": \"NWLsQ+Ixn6yB2TL3018GBFd4yil=\",\n" +
                 "    \"isMFAError\": true,\n" +
-                "    \"reason\": \"The information you provided is incorrect. Please try again or visit Bank of America to verify your details.\",\n" +
+                "    \"reason\": \"The information you provided is incorrect. " +
+                "Please try again or visit Bank of America to verify your details.\",\n" +
                 "    \"status\": \"FAILED\",\n" +
                 "    \"additionalStatus\": \"INVALID_ADDL_INFO_PROVIDED\",\n" +
                 "    \"providerAccountId\": 10722673,\n" +
@@ -253,7 +254,7 @@ class YodleeClientTest {
                 "}"
         )
 
-        //Then
+        // Then
         verifyZeroInteractions(listener)
     }
 
@@ -269,7 +270,7 @@ class YodleeClientTest {
                 "  }\n" +
                 "}\n"
         )
-        //Then
+        // Then
         verify(listener).flowError(FastLinkInterfaceHandler.FastLinkFlowError.OTHER)
         verifyNoMoreInteractions(listener)
     }
@@ -282,7 +283,7 @@ class YodleeClientTest {
                 "  \"rtet\": 213\n" +
                 "}"
         )
-        //Then
+        // Then
         verifyZeroInteractions(listener)
     }
 }

@@ -302,14 +302,14 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
     )
 
     companion object {
-        //Message types
+        // Message types
         private const val POST_MESSAGE = "POST_MESSAGE"
         private const val OPEN_EXTERNAL_URL = "OPEN_EXTERNAL_URL"
 
-        //Handled actions
+        // Handled actions
         private const val EXIT_ACTION = "exit"
 
-        //Data statuses
+        // Data statuses
         private const val FLOW_SUCCESS = "SUCCESS"
         private const val FLOW_ABANDONED = "ACTION_ABANDONED"
         private const val USER_CLOSE_ACTION = "USER_CLOSE_ACTION"
