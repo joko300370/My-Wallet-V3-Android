@@ -1,14 +1,14 @@
 package piuk.blockchain.android.simplebuy
 
-import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.any
+import  com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
-import com.nhaarman.mockito_kotlin.verifyZeroInteractions
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.simplebuy.yodlee.FastLinkInterfaceHandler
 
-class YodleeClientTest {
+class FastLinkInterfaceHandlerTest {
 
     private lateinit var fastlinkHandler: FastLinkInterfaceHandler
     private val listener: FastLinkInterfaceHandler.FastLinkListener = mock()
@@ -34,7 +34,8 @@ class YodleeClientTest {
         )
 
         // Then
-        verifyZeroInteractions(listener)
+        verify(listener).showLogs(any())
+        verifyNoMoreInteractions(listener)
     }
 
     @Test
@@ -59,7 +60,8 @@ class YodleeClientTest {
         )
 
         // Then
-        verifyZeroInteractions(listener)
+        verify(listener).showLogs(any())
+        verifyNoMoreInteractions(listener)
     }
 
     @Test
@@ -87,6 +89,7 @@ class YodleeClientTest {
         )
 
         // Then
+        verify(listener).showLogs(any())
         verify(listener).flowSuccess(providerAccountId = "10722878", accountId = "11172738")
         verifyNoMoreInteractions(listener)
     }
@@ -110,7 +113,8 @@ class YodleeClientTest {
         )
 
         // Then
-        verifyZeroInteractions(listener)
+        verify(listener).showLogs(any())
+        verifyNoMoreInteractions(listener)
     }
 
     @Test
@@ -134,7 +138,8 @@ class YodleeClientTest {
         )
 
         // Then
-        verifyZeroInteractions(listener)
+        verify(listener).showLogs(any())
+        verifyNoMoreInteractions(listener)
     }
 
     @Test
@@ -153,6 +158,7 @@ class YodleeClientTest {
         )
 
         // Then
+        verify(listener).showLogs(any())
         verify(listener).flowError(FastLinkInterfaceHandler.FastLinkFlowError.FLOW_QUIT_BY_USER, null)
         verifyNoMoreInteractions(listener)
     }
@@ -173,6 +179,7 @@ class YodleeClientTest {
         )
 
         // Then
+        verify(listener).showLogs(any())
         verify(listener).flowError(FastLinkInterfaceHandler.FastLinkFlowError.OTHER, null)
         verifyNoMoreInteractions(listener)
     }
@@ -194,6 +201,7 @@ class YodleeClientTest {
         )
 
         // Then
+        verify(listener).showLogs(any())
         verify(listener).flowError(FastLinkInterfaceHandler.FastLinkFlowError.FLOW_QUIT_BY_USER, "Invalid State")
         verifyNoMoreInteractions(listener)
     }
@@ -214,6 +222,7 @@ class YodleeClientTest {
         )
 
         // Then
+        verify(listener).showLogs(any())
         verify(listener).flowError(FastLinkInterfaceHandler.FastLinkFlowError.FLOW_QUIT_BY_USER, null)
         verifyNoMoreInteractions(listener)
     }
@@ -232,6 +241,7 @@ class YodleeClientTest {
         )
 
         // Then
+        verify(listener).showLogs(any())
         verify(listener).openExternalUrl("https://www.yodlee.com/financial-products")
         verifyNoMoreInteractions(listener)
     }
@@ -255,7 +265,8 @@ class YodleeClientTest {
         )
 
         // Then
-        verifyZeroInteractions(listener)
+        verify(listener).showLogs(any())
+        verifyNoMoreInteractions(listener)
     }
 
     @Test
@@ -271,6 +282,7 @@ class YodleeClientTest {
                 "}\n"
         )
         // Then
+        verify(listener).showLogs(any())
         verify(listener).flowError(FastLinkInterfaceHandler.FastLinkFlowError.OTHER)
         verifyNoMoreInteractions(listener)
     }
@@ -284,7 +296,8 @@ class YodleeClientTest {
                 "}"
         )
         // Then
-        verifyZeroInteractions(listener)
+        verify(listener).showLogs(any())
+        verifyNoMoreInteractions(listener)
     }
 
     @Test
@@ -453,9 +466,8 @@ class YodleeClientTest {
                 "}\n"
         )
 
-        messages.forEachIndexed { index, json ->
-            println(index)
-            fastlinkHandler.postMessage(json)
+        messages.forEach {
+            fastlinkHandler.postMessage(it)
         }
     }
 }

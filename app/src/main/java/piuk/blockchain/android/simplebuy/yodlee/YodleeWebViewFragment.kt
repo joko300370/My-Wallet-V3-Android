@@ -20,10 +20,11 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
+import piuk.blockchain.android.simplebuy.SimpleBuyNavigator
 import piuk.blockchain.android.ui.base.setupToolbar
-import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.visible
-import piuk.blockchain.android.util.visibleIf
+import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import timber.log.Timber
 import java.net.URLEncoder
 
@@ -135,6 +136,10 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
         requireContext().startActivity(intent)
     }
 
+    override fun showLogs(message: String) {
+        navigator().showLogs(message)
+    }
+
     override fun pageFinishedLoading() {
         yodlee_webview.visible()
         updateViewsVisibility(false)
@@ -147,9 +152,9 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
         yodlee_icon.visibleIf { visible }
     }
 
-    private fun navigator(): YodleeLinkingFlowNavigator =
-        (activity as? YodleeLinkingFlowNavigator)
-            ?: throw IllegalStateException("Parent must implement YodleeLinkingFlowNavigator")
+    private fun navigator(): SimpleBuyNavigator =
+        (activity as? SimpleBuyNavigator)
+            ?: throw IllegalStateException("Parent must implement SimpleBuyNavigator")
 
     companion object {
         private const val FAST_LINK_URL: String = "FAST_LINK_URL"
@@ -200,6 +205,7 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
         fun flowSuccess(providerAccountId: String, accountId: String)
         fun flowError(error: FastLinkFlowError, reason: String? = null)
         fun openExternalUrl(url: String)
+        fun showLogs(message: String)
     }
 
     enum class FastLinkFlowError {
@@ -210,8 +216,9 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
 
     @JavascriptInterface
     fun postMessage(data: String?) {
-
-        val message = gson.fromJson(data?.trim(), FastLinkMessage::class.java)
+        if (data == null) return
+        listener.showLogs(message = data)
+        val message = gson.fromJson(data.trim(), FastLinkMessage::class.java)
         val messageType = message.type ?: return
         val messageData = message.data ?: return
 
