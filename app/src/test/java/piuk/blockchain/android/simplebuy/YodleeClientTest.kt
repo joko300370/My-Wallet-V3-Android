@@ -173,7 +173,7 @@ class YodleeClientTest {
         )
 
         // Then
-        verify(listener).flowError(FastLinkInterfaceHandler.FastLinkFlowError.FLOW_QUIT_BY_USER, null)
+        verify(listener).flowError(FastLinkInterfaceHandler.FastLinkFlowError.OTHER, null)
         verifyNoMoreInteractions(listener)
     }
 
@@ -208,7 +208,7 @@ class YodleeClientTest {
                 "    \"action\": \"exit\",\n" +
                 "    \"fnToCall\": \"accountStatus\",\n" +
                 "    \"sites\": [],\n" +
-                "    \"status\": \"FAILED\"\n" +
+                "    \"status\": \"ACTION_ABANDONED\"\n" +
                 "  }\n" +
                 "}"
         )
@@ -285,5 +285,177 @@ class YodleeClientTest {
         )
         // Then
         verifyZeroInteractions(listener)
+    }
+
+    @Test
+    fun `methodDoesn'tThrowForAnyOfTheKnownMessages`() {
+        val messages = listOf(
+            "{\n" +
+                "  \"type\": \"POST_MESSAGE\",\n" +
+                "  \"data\": {\n" +
+                "    \"fnToCall\": \"errorHandler\",\n" +
+                "    \"code\": \"100\",\n" +
+                "    \"title \": \"TECH_ERROR\",\n" +
+                "    \"message\": \"Internal Server Error.\"\n" +
+                "  }\n" +
+                "}", "{\n" +
+                "  \"type\": \"POST_MESSAGE\",\n" +
+                "  \"data\": {\n" +
+                "    \"providerId\": 2852,\n" +
+                "    \"providerName\": \"Bank of America\",\n" +
+                "    \"requestId\": \"NWLsQ+Ixn6yB2TL3018GBFd4yil=\",\n" +
+                "    \"isMFAError\": true,\n" +
+                "    \"reason\": \"The information you provided is incorrect." +
+                " Please try again or visit Bank of America to verify your details.\",\n" +
+                "    \"status\": \"FAILED\",\n" +
+                "    \"additionalStatus\": \"INVALID_ADDL_INFO_PROVIDED\",\n" +
+                "    \"providerAccountId\": 10722673,\n" +
+                "    \"fnToCall\": \"accountStatus\"\n" +
+                "  }\n" +
+                "}\n",
+            "{\n" +
+                "  \"type\": \"POST_MESSAGE\",\n" +
+                "  \"data\": {\n" +
+                "    \"action\": \"exit\",\n" +
+                "    \"fnToCall\": \"accountStatus\",\n" +
+                "    \"sites\": [\n" +
+                "      {\n" +
+                "        \"providerld\": 2852,\n" +
+                "        \"providerName\": \"Bank of America\",\n" +
+                "        \"requestId\": \"hD/00dCz8rkOduCc/ NFHIT02ZS8=\",\n" +
+                "        \"status\": \"SUCCESS\",\n" +
+                "        \"additionalSta tus\": \"AVAILABLE_DATA_RETRIEVED\",\n" +
+                "        \"providerAccountId\": 10722878,\n" +
+                "        \"accountId\": \"11172738\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  }\n" +
+                "}",
+            "{\n" +
+                "  \"type\": \"POST_MESSAGE\",\n" +
+                "  \"data\": {\n" +
+                "    \"providerld\": 2852,\n" +
+                "    \"providerName\": \"Bank of America\",\n" +
+                "    \"requestid\": \"hD/00dCz8rkOducc/NFHITO2ZS8=\",\n" +
+                "    \"status\": \"SUCCESS\",\n" +
+                "    \"additionalStatus\": \"ACCT_SUMMARY_RECEIVED\",\n" +
+                "    \"providerAccountId\": 10722878,\n" +
+                "    \"fnToCall\": \"accountStatus\"\n" +
+                "  }\n" +
+                "}",
+            "{\n" +
+                "  \"type\": \"POST_MESSAGE\",\n" +
+                "  \"data\": {\n" +
+                "    \"action\": \"exit\",\n" +
+                "    \"fnToCall\": \"account Status\",\n" +
+                "    \"sites\": [\n" +
+                "      {\n" +
+                "        \"providerld\": 2852,\n" +
+                "        \"providerName\": \"Bank of America\",\n" +
+                "        \"requestid\": \"UHRÌNJIZNLHnOhBaCjHhV 2887k=\",\n" +
+                "        \"status\": \"SUCCESS\",\n" +
+                "        \"additionalStatus\": \"AVAILABLE_DATA_RETRIEVED\",\n" +
+                "        \"providerAccountld\": 10722695,\n" +
+                "        \"accountid\": \"11172647\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  }\n" +
+                "}\n",
+            "{\n" +
+                "  \"type\": \"POST_MESSAGE\",\n" +
+                "  \"data\": {\n" +
+                "    \"providerId\": 2852,\n" +
+                "    \"providerName\": \"Bank of America\",\n" +
+                "    \"requestId\": \"PwBex9DXXKdUchtkdHbEhE1LVuU=\",\n" +
+                "    \"isMFAError\": true,\n" +
+                "    \"reason\": \"Check that your credentials are the same that you use for this institution.\",\n" +
+                "    \"status\": \"FAILED\",\n" +
+                "    \"additionalStatus\": \"INCORRECT_CREDENTIALS\",\n" +
+                "    \"providerAccountId\": 10070628,\n" +
+                "    \"fnToCall\": \"accountStatus\"\n" +
+                "  }\n" +
+                "}",
+            "{\n" +
+                "  \"type\": \"POST_MESSAGE\",\n" +
+                "  \"data\": {\n" +
+                "    \"providerId\": 16442,\n" +
+                "    \"providerName\": \"Dag Site Multilevel\",\n" +
+                "    \"requestId\": \"Sx9TljVbOYC/vDA7TtFs8bgSXqw=\",\n" +
+                "    \"status\": \"SUCCESS\",\n" +
+                "    \"additionalStatus\": \"ACCT_SUMMARY_RECEIVED\",\n" +
+                "    \"providerAccountId\": 10070670,\n" +
+                "    \"fnToCall\": \"accountStatus\"\n" +
+                "  }\n" +
+                "}",
+            "{\n" +
+                "  \"type\": \"POST_MESSAGE\",\n" +
+                "  \"data\": {\n" +
+                "    \"action\": \"exit\",\n" +
+                "    \"fnToCall\": \"accountStatus\",\n" +
+                "    \"sites\": [\n" +
+                "      {\n" +
+                "        \"providerId\": 16442,\n" +
+                "        \"providerName\": \"Dag Site Multilevel\",\n" +
+                "        \"requestId\": \"Sx9TljVbOYC/vDA7TtFs8bgSXqw=\",\n" +
+                "        \"status\": \"SUCCESS\",\n" +
+                "        \"additionalStatus\": \"AVAILABLE_DATA_RETRIEVED\",\n" +
+                "        \"providerAccountId\": 10070670,\n" +
+                "        \"accountId\": \"10305403\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  }\n" +
+                "}",
+            "{\n" +
+                "  \"type\": \"POST_MESSAGE\",\n" +
+                "  \"data\": {\n" +
+                "    \"providerId\": 16441,\n" +
+                "    \"providerName\": \"Dag Site\",\n" +
+                "    \"requestId\": \"I9yNQ9mxU69JZpxaN/SEFR/Yra8=\",\n" +
+                "    \"status\": \"SUCCESS\",\n" +
+                "    \"additionalStatus\": \"ACCT_SUMMARY_RECEIVED\",\n" +
+                "    \"providerAccountId\": 10070629,\n" +
+                "    \"fnToCall\": \"accountStatus\"\n" +
+                "  }\n" +
+                "}",
+            "{\n" +
+                "  \"type\": \"POST_MESSAGE\",\n" +
+                "  \"data\": {\n" +
+                "    \"action\": \"exit\",\n" +
+                "    \"fnToCall\": \"accountStatus\",\n" +
+                "    \"sites\": [\n" +
+                "      {\n" +
+                "        \"providerId\": 16441,\n" +
+                "        \"providerName\": \"Dag Site\",\n" +
+                "        \"requestId\": \"I9yNQ9mxU69JZpxaN/SEFR/Yra8=\",\n" +
+                "        \"status\": \"SUCCESS\",\n" +
+                "        \"additionalStatus\": \"AVAILABLE_DATA_RETRIEVED\",\n" +
+                "        \"providerAccountId\": 10070629,\n" +
+                "        \"accountId\": \"10305452\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "  }\n" +
+                "}",
+            "{\n" +
+                "  \"type\": \"POST_MESSAGE\",\n" +
+                "  \"data\": {\n" +
+                "    \"action\": \"exit\",\n" +
+                "    \"fnToCall\": \"accountStatus\",\n" +
+                "    \"sites\": [],\n" +
+                "    \"status\": \"USER_CLOSE_ACTION\",\n" +
+                "    \"reason\": \"Invalid State\"\n" +
+                "  }\n" +
+                "}",
+            "{\n" +
+                "  \"type\": \"OPEN_EXTERNAL_URL\",\n" +
+                "  \"data\": {\n" +
+                "    \"url\": \"https://www.yodlee.com/financial-products\"\n" +
+                "  }\n" +
+                "}\n"
+        )
+
+        messages.forEachIndexed { index, json ->
+            println(index)
+            fastlinkHandler.postMessage(json)
+        }
     }
 }

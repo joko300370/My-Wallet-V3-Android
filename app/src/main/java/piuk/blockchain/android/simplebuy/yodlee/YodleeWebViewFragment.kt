@@ -211,16 +211,16 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
     @JavascriptInterface
     fun postMessage(data: String?) {
 
-        val message = gson.fromJson(data, FastLinkMessage::class.java)
-        val type = message.type ?: return
-        val data = message.data ?: return
+        val message = gson.fromJson(data?.trim(), FastLinkMessage::class.java)
+        val messageType = message.type ?: return
+        val messageData = message.data ?: return
 
-        when (type) {
+        when (messageType) {
             MessageType.POST_MESSAGE -> {
-                handlePostMessage(data)
+                handlePostMessage(messageData)
             }
             MessageType.OPEN_EXTERNAL_URL -> {
-                data.externalUrl?.let {
+                messageData.externalUrl?.let {
                     listener.openExternalUrl(it)
                 }
             }
@@ -260,11 +260,11 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
     private fun handleMessageStatus(status: String, reason: String?) {
         if (
             status.equals(FLOW_ABANDONED, true) ||
-            status.equals(FLOW_FAILED, true) ||
             status.equals(USER_CLOSE_ACTION, true)
         ) {
             listener.flowError(FastLinkFlowError.FLOW_QUIT_BY_USER, reason)
-        }
+        } else
+            listener.flowError(FastLinkFlowError.OTHER)
     }
 
     private data class FastLinkMessage(val type: MessageType?, val data: MessageData?)
@@ -313,6 +313,5 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
         private const val FLOW_SUCCESS = "SUCCESS"
         private const val FLOW_ABANDONED = "ACTION_ABANDONED"
         private const val USER_CLOSE_ACTION = "USER_CLOSE_ACTION"
-        private const val FLOW_FAILED = "FAILED"
     }
 }
