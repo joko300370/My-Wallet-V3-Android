@@ -1,6 +1,6 @@
 package piuk.blockchain.android.simplebuy
 
-import  com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.verifyZeroInteractions
 import org.amshove.kluent.mock

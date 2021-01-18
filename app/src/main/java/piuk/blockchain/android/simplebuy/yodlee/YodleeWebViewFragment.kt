@@ -15,7 +15,6 @@ import androidx.fragment.app.Fragment
 import com.blockchain.notifications.analytics.Analytics
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_yodlee_webview.*
-import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import org.koin.android.ext.android.inject
@@ -213,7 +212,7 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
     @JavascriptInterface
     fun postMessage(data: String?) {
         if (data == null) return
-        if (!data.isValidJSON()) {
+        if (!data.isValidJSONObject()) {
             return
         }
         val message = Gson().fromJson(data, FastLinkMessage::class.java)
@@ -269,15 +268,11 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
             listener.flowError(FastLinkFlowError.OTHER)
     }
 
-    private fun String.isValidJSON(): Boolean {
+    private fun String.isValidJSONObject(): Boolean {
         try {
             JSONObject(this)
         } catch (ex: JSONException) {
-            try {
-                JSONArray(this)
-            } catch (ex1: JSONException) {
-                return false
-            }
+            return false
         }
         return true
     }
