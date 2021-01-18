@@ -14,8 +14,10 @@ import android.webkit.WebViewClient
 import androidx.fragment.app.Fragment
 import com.blockchain.notifications.analytics.Analytics
 import com.google.gson.Gson
-import com.google.gson.annotations.SerializedName
 import kotlinx.android.synthetic.main.fragment_yodlee_webview.*
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
@@ -136,10 +138,6 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
         requireContext().startActivity(intent)
     }
 
-    override fun showLogs(message: String) {
-        navigator().showLogs(message)
-    }
-
     override fun pageFinishedLoading() {
         yodlee_webview.visible()
         updateViewsVisibility(false)
@@ -199,13 +197,11 @@ class YodleeWebClient(private val listener: YodleeWebClientInterface) : WebViewC
 }
 
 class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
-    private val gson = Gson()
 
     interface FastLinkListener {
         fun flowSuccess(providerAccountId: String, accountId: String)
         fun flowError(error: FastLinkFlowError, reason: String? = null)
         fun openExternalUrl(url: String)
-        fun showLogs(message: String)
     }
 
     enum class FastLinkFlowError {
@@ -217,19 +213,18 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
     @JavascriptInterface
     fun postMessage(data: String?) {
         if (data == null) return
-        listener.showLogs(message = data)
-        val message = gson.fromJson(data.trim(), FastLinkMessage::class.java)
+        if (!data.isValidJSON()) {
+            return
+        }
+        val message = Gson().fromJson(data, FastLinkMessage::class.java)
         val messageType = message.type ?: return
         val messageData = message.data ?: return
 
-        when (messageType) {
-            MessageType.POST_MESSAGE -> {
-                handlePostMessage(messageData)
-            }
-            MessageType.OPEN_EXTERNAL_URL -> {
-                messageData.externalUrl?.let {
-                    listener.openExternalUrl(it)
-                }
+        if (messageType.equals(POST_MESSAGE, true) && messageData.action != null) {
+            handlePostMessage(messageData)
+        } else if (messageType.equals(OPEN_EXTERNAL_URL, true)) {
+            messageData.externalUrl?.let {
+                listener.openExternalUrl(it)
             }
         }
     }
@@ -274,39 +269,18 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
             listener.flowError(FastLinkFlowError.OTHER)
     }
 
-    private data class FastLinkMessage(val type: MessageType?, val data: MessageData?)
-
-    private enum class MessageType {
-        POST_MESSAGE,
-        OPEN_EXTERNAL_URL
+    private fun String.isValidJSON(): Boolean {
+        try {
+            JSONObject(this)
+        } catch (ex: JSONException) {
+            try {
+                JSONArray(this)
+            } catch (ex1: JSONException) {
+                return false
+            }
+        }
+        return true
     }
-
-    private data class MessageData(
-        val fnToCall: String?,
-        val title: String?,
-        val code: String?,
-        val message: String?,
-        val providerName: String?,
-        val requestId: String?,
-        val isMFAError: Boolean?,
-        val reason: String?,
-        val status: String?,
-        val action: String?,
-        val providerAccountId: String?,
-        val providerId: String?,
-        val sites: List<SiteData>?,
-        @SerializedName("url")
-        val externalUrl: String?
-    )
-
-    private data class SiteData(
-        val status: String?,
-        val providerId: String?,
-        val requestId: String?,
-        val providerName: String?,
-        val providerAccountId: String?,
-        val accountId: String?
-    )
 
     companion object {
         // Message types

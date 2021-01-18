@@ -65,13 +65,6 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
         subscribeForNavigation()
     }
 
-    override fun showLogs(message: String) {
-        runOnUiThread {
-            webview_logs.visible()
-            webview_logs.text = message
-        }
-    }
-
     private fun subscribeForNavigation() {
         compositeDisposable += simpleBuyFlowNavigator.navigateTo(
             startedFromKycResume,
