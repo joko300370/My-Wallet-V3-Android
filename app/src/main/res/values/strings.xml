@@ -8,6 +8,9 @@
     <string name="common_send">Send</string>
     <string name="common_receive">Receive</string>
     <string name="common_swap">Swap</string>
+    <string name="common_withdraw">Withdraw</string>
+    <string name="common_activity">Activity</string>
+    <string name="common_summary">Summary</string>
     <string name="common_from">From</string>
     <string name="common_to">To</string>
     <string name="common_yes">Yes</string>
@@ -236,6 +239,10 @@
     <string name="next">Next</string>
     <string name="received_ethereum">Received Ether</string>
 
+    <!-- "Received {ETHER} {10.2 ETH}" -->
+    <string name="received_erc20_marquee">Received %1$s %2$s</string>
+    <!-- "Received {ETHER} {2.89 ETH} from {an address}" -->
+    <string name="received_erc20_text">Received %1$s %2$s from %3$s</string>
     <string name="received_usd_pax_1">Received USD Digital</string>
     <string name="received_usdt">Received Tether</string>
     <string name="received_dgld">Received Wrapped-DGLD</string>
@@ -1573,7 +1580,7 @@
     <string name="sell_progress_complete_title">%1$s Sold</string>
     <string name="swap_progress_complete_title">Swap Complete</string>
     <string name="send_progress_complete_subtitle">Your %1$s has been successfully sent.</string>
-    <string name="send_progress_error_title">Oops! Something Went Wrong.</string>
+    <string name="send_progress_error_title">Oops! Something Went Wrong. Please try again.</string>
     <string name="send_progress_error_subtitle">Don’t worry. Your money is safe. Please try again or contact our Support Team for help.</string>
     <string name="send_enter_asset_address_hint">%1s Address</string>
     <string name="send_warn_internal_send_only">Internal Send Only</string>
@@ -1780,6 +1787,7 @@
     <string name="pay_with_my">Pay with my</string>
 
     <!-- Yodlee splash -->
+    <string name="yodlee_splash_title_partner">Blockchain.com uses Yodlee to verify your bank credentials &amp; securely link your accounts.</string>
     <string name="yodlee_splash_title">Secure Connection</string>
     <string name="yodlee_splash_blurb">Yodlee securely stores your credentials adhering to leading industry practices for data security, regulatory compliance and privacy.\n <annotation link="yodlee_learn_more">Learn more</annotation></string>
     <string name="yodlee_connection_title">Taking you to Yodlee…</string>
@@ -1805,4 +1813,40 @@
     <string name="available_to_trade">Available to Trade</string>
     <string name="instantly">Instantly</string>
     <string name="instantly_available">Instantly Available</string>
+
+    <!-- lockbox -->
+    <string name="lockbox_title">Lockbox</string>
+    <string name="lockbox_landing_get_yours_title">Get Your Lockbox</string>
+    <string name="lockbox_landing_get_yours_message">Safely store your cryptocurrency offline.</string>
+    <string name="lockbox_landing_get_yours_button">Buy now</string>
+    <string name="lockbox_landing_already_owned_title">Already own one?</string>
+    <string name="lockbox_landing_already_owned_message">From your computer, log into blockchain.com and connect your lockbox.</string>
+    <string name="lockbox_landing_learn_more">Want to learn more? Tap here to visit\n%1$s</string>
+    <string name="lockbox_landing_coming_soon_title">Balances Coming Soon</string>
+    <string name="lockbox_landing_coming_soon_message">We are unable to display your Lockbox balance at this time. Don’t worry, your funds are safe. We’ll be adding this feature soon. While you wait, you can check your balance on the web.</string>
+    <string name="lockbox_landing_coming_soon_button">Check my balance</string>
+
+    <!-- trading error messages -->
+    <string name="trading_order_limit">You have too many pending %1$s transactions. Once those complete you can create a new one.</string>
+    <string name="trading_order_not_cancelable">Oops! This %1$s order is not cancelable.</string>
+    <string name="trading_pending_withdrawal">Oops! You’ve already got an existing pending withdrawal, please try again once that completes.</string>
+    <string name="trading_withdrawal_balance_locked">Oops! For security reasons, your balance is currently locked, please try again later.</string>
+    <string name="trading_withdrawal_insufficient_funds">Oops! You don’t have enough funds to Withdraw</string>
+    <string name="trading_internal_server_error">Oops! This service is currently unavailable, please try again later.</string>
+    <string name="trading_albert_error">@string/send_progress_error_title</string>
+    <string name="trading_service_temp_disabled">This service will be back soon. We’re updating &amp; fixing some bugs right now.</string>
+    <string name="trading_insufficient_balance">Oops! You don’t have enough balance to %1$s.</string>
+    <string name="trading_amount_below_min">Oops! The amount you selected is below the minimum %1$s limit.</string>
+    <string name="trading_amount_above_max">Oops! The amount you selected is above the maximum %1$s limit.</string>
+    <string name="trading_daily_limit_exceeded">Oops! You’ve exceeded your daily %1$s limit</string>
+    <string name="trading_weekly_limit_exceeded">Oops! You’ve exceeded your weekly %1$s limit</string>
+    <string name="trading_yearly_limit_exceeded">Oops! You’ve exceeded your yearly %1$s limit</string>
+    <string name="trading_invalid_address">Oops! Looks like that address is invalid, please try again.</string>
+    <string name="trading_invalid_currency">Oops! Looks like that cryptocurrency is invalid, please try again.</string>
+    <string name="trading_invalid_fiat">Oops! Looks like that fiat is invalid, please try again.</string>
+    <string name="trading_direction_disabled">Oops! That service isn’t available at the moment, please try again later.</string>
+    <string name="trading_quote_invalid_or_expired">Oops! The amount we quoted you is no longer valid, please try again.</string>
+    <string name="executing_transaction_error">Oops! Something went wrong while executing the %1$s on-chain transaction.</string>
+    <string name="trading_ineligible_for_swap">Oops! This service isn’t currently available. Please contact support.</string>
+    <string name="trading_invalid_destination_amount">Oops! Looks like that isn’t a valid amount, please try again.</string>
 </resources>

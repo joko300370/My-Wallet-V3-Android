@@ -1,6 +1,5 @@
 package com.blockchain.nabu.datamanagers.custodialwalletimpl
 
-import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.nabu.Authenticator
 import com.blockchain.nabu.datamanagers.BankAccount
 import com.blockchain.nabu.datamanagers.Beneficiary
@@ -27,6 +26,7 @@ import com.blockchain.nabu.datamanagers.PartnerCredentials
 import com.blockchain.nabu.datamanagers.PaymentLimits
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.Product
+import com.blockchain.nabu.datamanagers.TransactionErrorMapper
 import com.blockchain.nabu.datamanagers.TransactionState
 import com.blockchain.nabu.datamanagers.TransactionType
 import com.blockchain.nabu.datamanagers.TransferDirection
@@ -72,6 +72,7 @@ import com.blockchain.nabu.models.responses.swap.CreateOrderRequest
 import com.blockchain.nabu.models.responses.swap.CustodialOrderResponse
 import com.blockchain.nabu.models.responses.tokenresponse.NabuSessionTokenResponse
 import com.blockchain.nabu.service.NabuService
+import com.blockchain.preferences.SimpleBuyPrefs
 import com.braintreepayments.cardform.utils.CardType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -99,7 +100,8 @@ class LiveCustodialWalletManager(
     private val interestRepository: InterestRepository,
     private val custodialRepository: CustodialRepository,
     private val extraAttributesProvider: ExtraAttributesProvider,
-    private val bankLinkingEnabledProvider: BankLinkingEnabledProvider
+    private val bankLinkingEnabledProvider: BankLinkingEnabledProvider,
+    private val transactionErrorMapper: TransactionErrorMapper
 ) : CustodialWalletManager {
 
     override fun getQuote(
@@ -696,7 +698,7 @@ class LiveCustodialWalletManager(
         refundAddress: String?
     ): Single<CustodialOrder> =
         authenticator.authenticate { sessionToken ->
-            nabuService.createSwapOrder(
+            nabuService.createCustodialOrder(
                 sessionToken,
                 CreateOrderRequest(
                     direction = direction.toString(),
@@ -705,7 +707,9 @@ class LiveCustodialWalletManager(
                     destinationAddress = destinationAddress,
                     refundAddress = refundAddress
                 )
-            ).map {
+            ).onErrorResumeNext {
+                Single.error(transactionErrorMapper.mapToTransactionError(it))
+            }.map {
                 it.toCustodialOrder() ?: throw IllegalStateException("Invalid order created")
             }
         }

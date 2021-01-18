@@ -27,10 +27,10 @@ import piuk.blockchain.android.ui.kyc.navigate
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.toast
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.androidcoreui.ui.customviews.toast
+import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
+import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.visible
 import timber.log.Timber
 import kotlinx.android.synthetic.main.fragment_kyc_splash.button_kyc_splash_apply_now as buttonContinue
 import kotlinx.android.synthetic.main.fragment_kyc_splash.text_view_kyc_splash_message as textViewMessage
@@ -46,7 +46,9 @@ class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), Kyc
 
     private val analytics: Analytics by inject()
 
-    private val progressListener: KycProgressListener by ParentActivityDelegate(this)
+    private val progressListener: KycProgressListener by ParentActivityDelegate(
+        this
+    )
 
     private var progressDialog: MaterialProgressDialog? = null
 
@@ -130,9 +132,8 @@ class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), Kyc
         }
     }
 
-    override fun showError(message: String) {
+    override fun showError(message: String) =
         toast(message, ToastCustom.TYPE_ERROR)
-    }
 
     override fun onEmailNotVerified() {
         disposable += settingsDataManager.getSettings().subscribeBy(onNext = {

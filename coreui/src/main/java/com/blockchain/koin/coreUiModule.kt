@@ -1,12 +1,8 @@
-@file:Suppress("USELESS_CAST")
-
 package com.blockchain.koin
 
 import com.blockchain.CrashLoggerImpl
-import com.blockchain.SwapDiagnosticsImpl
 import com.blockchain.logging.CrashLogger
 import com.blockchain.logging.EventLogger
-import com.blockchain.logging.SwapDiagnostics
 import com.blockchain.remoteconfig.ABTestExperiment
 import com.blockchain.remoteconfig.RemoteConfig
 import com.blockchain.remoteconfig.RemoteConfiguration
@@ -32,13 +28,9 @@ val coreUiModule = module {
         .bind(RemoteConfig::class)
         .bind(ABTestExperiment::class)
 
-    factory { InjectableLogging(get()) as EventLogger }
+    factory { InjectableLogging(get()) }.bind(EventLogger::class)
 
     single {
         CrashLoggerImpl(BuildConfig.DEBUG)
     }.bind(CrashLogger::class)
-
-    single {
-        SwapDiagnosticsImpl(crashLogger = get())
-    }.bind(SwapDiagnostics::class)
 }

@@ -23,6 +23,7 @@ import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.crypto.BIP38PrivateKey.BadPassphraseException
 import org.junit.Rule
 import org.junit.Test
+import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
@@ -59,6 +60,7 @@ class BtcAssetTest {
     }
     private val walletPreferences: WalletStatus = mock()
     private val eligibilityProvider: EligibilityProvider = mock()
+    private val offlineCache: OfflineAccountUpdater = mock()
 
     private val subject = BtcAsset(
         payloadManager = payloadManager,
@@ -74,6 +76,7 @@ class BtcAssetTest {
         crashLogger = crashLogger,
         tiersService = tiersService,
         environmentConfig = environmentConfig,
+        offlineAccounts = offlineCache,
         walletPreferences = walletPreferences,
         eligibilityProvider = eligibilityProvider
     )

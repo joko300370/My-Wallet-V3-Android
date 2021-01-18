@@ -13,9 +13,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatEditText
 import piuk.blockchain.android.R
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.ViewUtils
-import piuk.blockchain.androidcoreui.utils.extensions.getTextString
-import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.androidcoreui.ui.customviews.toast
+import piuk.blockchain.android.util.ViewUtils
+import piuk.blockchain.android.util.getTextString
 
 private const val ADDRESS_LABEL_MAX_LENGTH = 17
 

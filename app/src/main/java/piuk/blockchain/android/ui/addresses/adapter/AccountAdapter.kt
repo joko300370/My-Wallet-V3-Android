@@ -4,7 +4,7 @@ import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
 import piuk.blockchain.android.ui.adapters.DelegationAdapter
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
-import piuk.blockchain.androidcoreui.utils.extensions.autoNotify
+import piuk.blockchain.android.util.autoNotify
 import kotlin.properties.Delegates
 
 sealed class AccountListItem {

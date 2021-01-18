@@ -13,8 +13,8 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.util.setCoinIcon
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 
 class AccountInfoCryptoArchived @JvmOverloads constructor(
     ctx: Context,

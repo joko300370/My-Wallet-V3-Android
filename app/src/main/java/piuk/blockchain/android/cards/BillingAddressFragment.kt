@@ -20,9 +20,9 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.util.US
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
-import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
+import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.visibleIf
+import piuk.blockchain.android.util.AfterTextChangedWatcher
 import java.util.Locale
 
 class BillingAddressFragment : MviFragment<CardModel, CardIntent, CardState>(),

@@ -79,7 +79,7 @@ class VeriffSplashPresenter(
                         if (e is NabuApiException) {
                             handleSessionStartError(e)
                         } else {
-                            view.showErrorToast(R.string.kyc_veriff_splash_verification_error)
+                            view.showError(R.string.kyc_veriff_splash_verification_error)
                         }
                     }
                 )
@@ -92,13 +92,13 @@ class VeriffSplashPresenter(
             // announcements etc
             NabuErrorStatusCodes.PreIDVCheckFailed,
             // Or did we try to register with a duplicate email?
-            NabuErrorStatusCodes.AlreadyRegistered -> {
+            NabuErrorStatusCodes.Conflict -> {
                 prefs.devicePreIDVCheckFailed = true
                 updateUiState(UiState.FAILURE)
             }
             // For anything else, just show the 'failed' toast as before:
             NabuErrorStatusCodes.TokenExpired,
-            NabuErrorStatusCodes.Unknown -> view.showErrorToast(R.string.kyc_veriff_splash_verification_error)
+            NabuErrorStatusCodes.Unknown -> view.showError(R.string.kyc_veriff_splash_verification_error)
         }
     }
 
@@ -116,7 +116,7 @@ class VeriffSplashPresenter(
                 .subscribeBy(
                     onComplete = { view.continueToCompletion() },
                     onError = {
-                        view.showErrorToast(R.string.kyc_veriff_splash_verification_error)
+                        view.showError(R.string.kyc_veriff_splash_verification_error)
                     }
                 )
     }

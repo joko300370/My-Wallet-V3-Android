@@ -1,10 +1,10 @@
 package piuk.blockchain.android.ui.transactionflow.engine
 
-import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligibilityProvider
 import com.blockchain.nabu.datamanagers.repositories.swap.CustodialRepository
+import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
@@ -29,6 +29,7 @@ import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
+import piuk.blockchain.android.ui.transfer.AccountsSorting
 import timber.log.Timber
 
 class TransactionInteractor(
@@ -37,7 +38,8 @@ class TransactionInteractor(
     private val custodialRepository: CustodialRepository,
     private val custodialWalletManager: CustodialWalletManager,
     private val currencyPrefs: CurrencyPrefs,
-    private val eligibilityProvider: EligibilityProvider
+    private val eligibilityProvider: EligibilityProvider,
+    private val accountsSorting: AccountsSorting
 ) {
     private var transactionProcessor: TransactionProcessor? = null
 
@@ -134,17 +136,15 @@ class TransactionInteractor(
 
     fun getAvailableSourceAccounts(action: AssetAction): Single<List<CryptoAccount>> {
         require(action == AssetAction.Swap) { "Source account should be preselected for action $action" }
-        return coincore.allWallets()
+        return coincore.allWalletsWithActions(setOf(action), accountsSorting.sorter())
             .zipWith(
                 custodialRepository.getSwapAvailablePairs()
-            ).map { (accountGroup, pairs) ->
-                accountGroup.accounts.filter { account ->
+            ).map { (accounts, pairs) ->
+                accounts.filter { account ->
                     (account as? CryptoAccount)?.isAvailableToSwapFrom(pairs) ?: false
                 }
             }.map {
-                it.map { account -> account as CryptoAccount }.filter { account ->
-                    account.actions.contains(AssetAction.Swap)
-                }
+                it.map { account -> account as CryptoAccount }
             }
     }
 

@@ -3,19 +3,17 @@ package piuk.blockchain.android.coincore.erc20
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
-import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
-import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.erc20.FeedErc20Transfer
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -24,9 +22,11 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import java.util.concurrent.atomic.AtomicBoolean
 
-abstract class Erc20NonCustodialAccount(
+class Erc20NonCustodialAccount(
     payloadManager: PayloadDataManager,
     asset: CryptoCurrency,
+    private val ethDataManager: EthDataManager,
+    internal val address: String,
     private val fees: FeeDataManager,
     override val label: String,
     override val exchangeRates: ExchangeRateDataManager,
@@ -39,31 +39,25 @@ abstract class Erc20NonCustodialAccount(
     override val isFunded: Boolean
         get() = hasFunds.get()
 
-    abstract val erc20Account: Erc20Account
-
-    private val ethDataManager: EthDataManager
-        get() = erc20Account.ethDataManager
-
     override val isDefault: Boolean = true // Only one account, so always default
 
+    override val receiveAddress: Single<ReceiveAddress>
+        get() = Single.just(
+            Erc20Address(asset, address, label)
+        )
+
     override val accountBalance: Single<Money>
-        get() = erc20Account.getBalance()
-            .map { CryptoValue.fromMinor(asset, it) }
-            .doOnSuccess {
-                hasFunds.set(it.isPositive)
-            }
-            .map {
-                it
-            }
+        get() = ethDataManager.getErc20Balance(asset)
+            .doOnSuccess { hasFunds.set(it.isPositive) }
+            .map { it }
 
     override val actionableBalance: Single<Money>
         get() = accountBalance
 
     override val activity: Single<ActivitySummaryList>
         get() {
-            val feedTransactions =
-                erc20Account.fetchErc20Address()
-                    .flatMap { erc20Account.getTransactions() }
+            val feedTransactions = ethDataManager.fetchErc20DataModel(asset)
+                    .flatMap { ethDataManager.getErc20Transactions(asset) }
                     .mapList {
                         val feeObservable = ethDataManager
                             .getTransaction(it.transactionHash)
@@ -75,7 +69,7 @@ abstract class Erc20NonCustodialAccount(
 
             return Singles.zip(
                 feedTransactions,
-                erc20Account.getAccountHash(),
+                ethDataManager.getErc20AccountHash(asset),
                 ethDataManager.getLatestBlockNumber()
             ) { transactions, accountHash, latestBlockNumber ->
                 transactions.map { transaction ->
@@ -87,13 +81,11 @@ abstract class Erc20NonCustodialAccount(
                         exchangeRates = exchangeRates,
                         lastBlockNumber = latestBlockNumber.number,
                         account = this
-                    ) as ActivitySummaryItem
+                    )
                 }
-            }
-                .flatMap {
-                    appendTradeActivity(custodialWalletManager, asset, it)
-                }
-                .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
+            }.flatMap {
+                appendTradeActivity(custodialWalletManager, asset, it)
+            }.doOnSuccess { setHasTransactions(it.isNotEmpty()) }
         }
 
     override val sourceState: Single<TxSourceState>
@@ -109,7 +101,7 @@ abstract class Erc20NonCustodialAccount(
 
     override fun createTxEngine(): TxEngine =
         Erc20OnChainTxEngine(
-            erc20Account = erc20Account,
+            ethDataManager = ethDataManager,
             feeManager = fees,
             requireSecondPassword = ethDataManager.requireSecondPassword,
             walletPreferences = walletPreferences

@@ -33,7 +33,7 @@ class KycTierSplashPresenter(
                         view!!.renderTiersList(it)
                     },
                     onError = {
-                        view!!.showErrorToast(R.string.kyc_non_specific_server_error)
+                        view!!.showError(R.string.kyc_non_specific_server_error)
                     }
                 )
     }
@@ -60,7 +60,7 @@ class KycTierSplashPresenter(
                     view!!.navigateTo(it, tier)
                 },
                 onError = {
-                    view!!.showErrorToast(R.string.kyc_non_specific_server_error)
+                    view!!.showError(R.string.kyc_non_specific_server_error)
                 }
             )
     }

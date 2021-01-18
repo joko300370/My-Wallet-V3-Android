@@ -22,7 +22,7 @@ import piuk.blockchain.android.ui.customviews.getTwoFactorDialog
 import piuk.blockchain.android.ui.start.PasswordRequiredActivity.Companion.TWO_FA_COUNTDOWN
 import piuk.blockchain.android.ui.start.PasswordRequiredActivity.Companion.TWO_FA_STEP
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.ViewUtils
+import piuk.blockchain.android.util.ViewUtils
 
 class ManualPairingActivity : MvpActivity<ManualPairingView, ManualPairingPresenter>(),
     ManualPairingView {

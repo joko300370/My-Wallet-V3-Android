@@ -6,6 +6,7 @@ import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.datamanagers.repositories.interest.Eligibility
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestLimits
+import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
 import com.blockchain.nabu.models.responses.interest.InterestActivityItemResponse
@@ -13,7 +14,6 @@ import com.blockchain.nabu.models.responses.interest.InterestAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CardPartnerAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CardPaymentAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
-import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.braintreepayments.cardform.utils.CardType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -150,7 +150,7 @@ interface CustodialWalletManager {
     ): Single<List<PaymentMethod.Card>> // fetches the available
 
     fun confirmOrder(orderId: String, attributes: CardPartnerAttributes?, paymentMethodId: String?):
-            Single<BuySellOrder>
+        Single<BuySellOrder>
 
     fun getInterestAccountBalance(crypto: CryptoCurrency): Maybe<CryptoValue>
 
@@ -383,13 +383,30 @@ data class BankAccount(val details: List<BankDetail>)
 
 data class BankDetail(val title: String, val value: String, val isCopyable: Boolean = false)
 
-sealed class SimpleBuyError : Throwable() {
-    object OrderLimitReached : SimpleBuyError()
-    object OrderNotCancelable : SimpleBuyError()
-    object WithdrawalAlreadyPending : SimpleBuyError()
-    object WithdrawalBalanceLocked : SimpleBuyError()
-    object WithdrawalInsufficientFunds : SimpleBuyError()
-    object UnexpectedError : SimpleBuyError()
+sealed class TransactionError : Throwable() {
+    object OrderLimitReached : TransactionError()
+    object OrderNotCancelable : TransactionError()
+    object WithdrawalAlreadyPending : TransactionError()
+    object WithdrawalBalanceLocked : TransactionError()
+    object WithdrawalInsufficientFunds : TransactionError()
+    object UnexpectedError : TransactionError()
+    object InternalServerError : TransactionError()
+    object AlbertExecutionError : TransactionError()
+    object TradingTemporarilyDisabled : TransactionError()
+    object InsufficientBalance : TransactionError()
+    object OrderBelowMin : TransactionError()
+    object OrderAboveMax : TransactionError()
+    object SwapDailyLimitExceeded : TransactionError()
+    object SwapWeeklyLimitExceeded : TransactionError()
+    object SwapYearlyLimitExceeded : TransactionError()
+    object InvalidCryptoAddress : TransactionError()
+    object InvalidCryptoCurrency : TransactionError()
+    object InvalidFiatCurrency : TransactionError()
+    object OrderDirectionDisabled : TransactionError()
+    object InvalidOrExpiredQuote : TransactionError()
+    object IneligibleForSwap : TransactionError()
+    object InvalidDestinationAmount : TransactionError()
+    object ExecutionFailed : TransactionError()
 }
 
 sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val order: Int) :

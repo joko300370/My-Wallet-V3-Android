@@ -4,7 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.annotation.StringRes
 import com.blockchain.extensions.exhaustive
-import com.blockchain.lockbox.data.LockboxDataManager
+import com.blockchain.lockbox.LockboxDataManager
 import com.blockchain.logging.CrashLogger
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
@@ -73,7 +73,6 @@ interface MainView : MvpView, HomeNavigator {
 class MainPresenter internal constructor(
     private val prefs: PersistentPrefs,
     private val accessState: AccessState,
-    private val credentialsWiper: CredentialsWiper,
     private val payloadDataManager: PayloadDataManager,
     private val exchangeRateFactory: ExchangeRateDataManager,
     private val qrProcessor: QrScanResultProcessor,
@@ -88,7 +87,7 @@ class MainPresenter internal constructor(
     private val simpleBuySync: SimpleBuySyncFactory,
     private val crashLogger: CrashLogger,
     private val analytics: Analytics,
-    private val cacheCredentialsWiper: CacheCredentialsWiper,
+    private val credentialsWiper: CredentialsWiper,
     nabuToken: NabuToken
 ) : MvpPresenter<MainView>() {
 
@@ -306,8 +305,7 @@ class MainPresenter internal constructor(
 
     internal fun unPair() {
         view?.clearAllDynamicShortcuts()
-        credentialsWiper.unload()
-        cacheCredentialsWiper.wipe()
+        credentialsWiper.wipe()
     }
 
     internal fun updateTicker() {

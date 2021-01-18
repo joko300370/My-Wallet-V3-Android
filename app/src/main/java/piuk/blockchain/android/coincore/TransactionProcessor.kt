@@ -3,6 +3,7 @@ package piuk.blockchain.android.coincore
 import androidx.annotation.CallSuper
 import com.blockchain.extensions.replace
 import com.blockchain.koin.payloadScope
+import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -161,7 +162,7 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
 
     data class Description(val text: String = "") : TxConfirmationValue(TxConfirmation.DESCRIPTION)
 
-    data class Memo(val text: String?, val isRequired: Boolean, val id: Long?) :
+    data class Memo(val text: String?, val isRequired: Boolean, val id: Long?, val editable: Boolean = true) :
         TxConfirmationValue(TxConfirmation.MEMO)
 
     data class NetworkFee(
@@ -424,20 +425,40 @@ class TransactionProcessor(
     // Ideally, I'd like to return the Tx id/hash. But we get nothing back from the
     // custodial APIs (and are not likely to, since the tx is batched and not executed immediately)
     fun execute(secondPassword: String): Completable {
-        if (requireSecondPassword && secondPassword.isEmpty())
+        if (requireSecondPassword && secondPassword.isEmpty()) {
             throw IllegalArgumentException("Second password not supplied")
+        }
 
-        val pendingTx = getPendingTx()
-        return engine.doValidateAll(pendingTx)
-            .doOnSuccess {
-                if (it.validationState != ValidationState.CAN_EXECUTE)
-                    throw IllegalStateException("PendingTx is not executable")
-            }.flatMapCompletable {
-                engine.doExecute(it, secondPassword).flatMapCompletable { result ->
+        return engine.doValidateAll(getPendingTx())
+            .flatMapCompletable {
+                it.validationState.toErrorStateOrExecute(it, secondPassword)
+            }
+    }
+
+    private fun ValidationState.toErrorStateOrExecute(pendingTx: PendingTx, secondPassword: String): Completable =
+        when (this) {
+            ValidationState.CAN_EXECUTE -> {
+                engine.doExecute(pendingTx, secondPassword).flatMapCompletable { result ->
                     engine.doPostExecute(result)
                 }
             }
-    }
+            ValidationState.UNINITIALISED -> Completable.error(TransactionError.UnexpectedError)
+            ValidationState.HAS_TX_IN_FLIGHT -> Completable.error(TransactionError.OrderLimitReached)
+            ValidationState.INVALID_AMOUNT -> Completable.error(TransactionError.InvalidDestinationAmount)
+            ValidationState.INSUFFICIENT_FUNDS -> Completable.error(TransactionError.InsufficientBalance)
+            ValidationState.INSUFFICIENT_GAS -> Completable.error(TransactionError.InsufficientBalance)
+            ValidationState.INVALID_ADDRESS -> Completable.error(TransactionError.InvalidCryptoAddress)
+            ValidationState.ADDRESS_IS_CONTRACT -> Completable.error(TransactionError.InvalidCryptoAddress)
+            ValidationState.OPTION_INVALID -> Completable.error(TransactionError.UnexpectedError)
+            ValidationState.UNDER_MIN_LIMIT -> Completable.error(TransactionError.OrderBelowMin)
+            ValidationState.PENDING_ORDERS_LIMIT_REACHED ->
+                Completable.error(TransactionError.OrderLimitReached)
+            ValidationState.OVER_MAX_LIMIT,
+            ValidationState.OVER_SILVER_TIER_LIMIT,
+            ValidationState.OVER_GOLD_TIER_LIMIT -> Completable.error(TransactionError.OrderAboveMax)
+            ValidationState.INVOICE_EXPIRED -> Completable.error(TransactionError.UnexpectedError)
+            ValidationState.UNKNOWN_ERROR -> throw IllegalStateException("PendingTx is not executable")
+        }
 
     // If the source and target assets are not the same this MAY return a stream of the exchange rates
     // between them. Or it may simply complete. This is not used yet in the UI, but it may be when
@@ -496,10 +517,12 @@ fun Single<PendingTx>.updateTxValidity(pendingTx: PendingTx): Single<PendingTx> 
 
 private fun updateOptionsWithValidityWarning(pendingTx: PendingTx): PendingTx =
     if (pendingTx.validationState !in setOf(ValidationState.CAN_EXECUTE, ValidationState.UNINITIALISED)) {
-        pendingTx.addOrReplaceOption(TxConfirmationValue.ErrorNotice(
-            status = pendingTx.validationState,
-            money = if (pendingTx.validationState == ValidationState.UNDER_MIN_LIMIT) pendingTx.minLimit else null
-        ))
+        pendingTx.addOrReplaceOption(
+            TxConfirmationValue.ErrorNotice(
+                status = pendingTx.validationState,
+                money = if (pendingTx.validationState == ValidationState.UNDER_MIN_LIMIT) pendingTx.minLimit else null
+            )
+        )
     } else {
         pendingTx.removeOption(TxConfirmation.ERROR_NOTICE)
     }

@@ -3,6 +3,7 @@ package piuk.blockchain.androidcore.utils
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.DashboardPrefs
 import com.blockchain.preferences.NotificationPrefs
+import com.blockchain.preferences.OfflineCachePrefs
 import com.blockchain.preferences.RatingPrefs
 import com.blockchain.preferences.SecurityPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
@@ -18,6 +19,7 @@ interface PersistentPrefs :
     SimpleBuyPrefs,
     RatingPrefs,
     WalletStatus,
+    OfflineCachePrefs,
     EncryptedPrefs {
 
     val isLoggedOut: Boolean
@@ -67,14 +69,13 @@ interface PersistentPrefs :
         const val KEY_ENCRYPTED_PIN_CODE = "encrypted_pin_code"
         const val KEY_FINGERPRINT_ENABLED = "fingerprint_enabled"
         const val KEY_RECEIVE_SHORTCUTS_ENABLED = "receive_shortcuts_enabled"
-        const val KEY_SWIPE_TO_RECEIVE_ENABLED = "swipe_to_receive_enabled"
         const val KEY_SCREENSHOTS_ENABLED = "screenshots_enabled"
         const val KEY_ONBOARDING_COMPLETE = "onboarding_complete_1"
         const val KEY_OVERLAY_TRUSTED = "overlay_trusted"
 
         const val KEY_ROOT_WARNING_DISABLED = "disable_root_warning"
 
-        // Send screen
-        const val KEY_WARN_ADVANCED_FEE = "pref_warn_advanced_fee"
+        // Swipe To Receive
+        const val KEY_SWIPE_TO_RECEIVE_ENABLED = "swipe_to_receive_enabled"
     }
 }

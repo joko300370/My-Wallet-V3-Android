@@ -16,8 +16,8 @@ import retrofit2.Call;
 
 public abstract class BalanceManager {
 
-    private BlockExplorer blockExplorer;
-    private CryptoCurrency cryptoCurrency;
+    private final BlockExplorer blockExplorer;
+    private final CryptoCurrency cryptoCurrency;
 
     @Nonnull
     private CryptoBalanceMap balanceMap;
@@ -66,7 +66,7 @@ public abstract class BalanceManager {
     /**
      * @deprecated Use getBalanceQuery
      */
-    @Deprecated // Used only in swipe to receive
+    @Deprecated
     public Call<HashMap<String, Balance>> getBalanceOfAddresses(List<String> addresses) {
         return getBlockExplorer().getBalance("btc", addresses, FilterType.RemoveUnspendable);
     }

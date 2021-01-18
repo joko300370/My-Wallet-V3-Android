@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.btc
 
 import com.blockchain.logging.CrashLogger
+import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
@@ -324,6 +325,8 @@ class BtcOnChainTxEngine(
                 doOnTransactionSuccess(pendingTx)
             }.doOnError { e ->
                 doOnTransactionFailed(pendingTx, e)
+            }.onErrorResumeNext {
+                Single.error(TransactionError.ExecutionFailed)
             }.map {
                 TxResult.HashedTxResult(it, pendingTx.amount)
             }
@@ -355,6 +358,7 @@ class BtcOnChainTxEngine(
 
     override fun doOnTransactionFailed(pendingTx: PendingTx, e: Throwable) {
         Timber.e("BTC Send failed: $e")
+        crashLogger.logException(e)
     }
 
     // Update balance immediately after spend - until refresh from server
@@ -370,6 +374,10 @@ class BtcOnChainTxEngine(
             Timber.e(e)
         }
     }
+
+    override fun doPostExecute(txResult: TxResult): Completable =
+        super.doPostExecute(txResult)
+            .doOnComplete { btcSource.forceRefresh() }
 
     companion object {
         const val LARGE_TX_FIAT = "USD"

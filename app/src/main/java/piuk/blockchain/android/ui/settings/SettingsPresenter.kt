@@ -5,15 +5,12 @@ import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
-import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.nabu.models.responses.nabu.NabuApiException
 import com.blockchain.nabu.models.responses.nabu.NabuErrorStatusCodes
 import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
-import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.preferences.SimpleBuyPrefs
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.settings.SettingsManager
@@ -29,8 +26,6 @@ import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.thepit.PitLinkingState
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
-import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
-import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -40,8 +35,7 @@ import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.AndroidUtils
+import piuk.blockchain.android.util.AndroidUtils
 import timber.log.Timber
 
 class SettingsPresenter(
@@ -51,26 +45,25 @@ class SettingsPresenter(
     private val emailUpdater: EmailSyncUpdater,
     private val payloadManager: PayloadManager,
     private val payloadDataManager: PayloadDataManager,
-    private val stringUtils: StringUtils,
     private val prefs: PersistentPrefs,
-    private val currencyPrefs: CurrencyPrefs,
     private val accessState: AccessState,
     private val custodialWalletManager: CustodialWalletManager,
-    private val swipeToReceiveHelper: SwipeToReceiveHelper,
     private val notificationTokenManager: NotificationTokenManager,
     private val exchangeRateDataManager: ExchangeRateDataManager,
     private val kycStatusHelper: KycStatusHelper,
     private val pitLinking: PitLinking,
-    private val analytics: Analytics,
-    private val simpleBuyPrefs: SimpleBuyPrefs
+    private val analytics: Analytics
 ) : BasePresenter<SettingsView>() {
 
     private val fiatUnit: String
-        get() = currencyPrefs.selectedFiatCurrency
+        get() = prefs.selectedFiatCurrency
+
+    private var pitClickedListener = {}
 
     override fun onViewReady() {
-        view?.showProgressDialog(R.string.please_wait)
-        compositeDisposable += settingsDataManager.fetchSettings().singleOrError()
+        view?.showProgress()
+        compositeDisposable += settingsDataManager.fetchSettings()
+            .singleOrError()
             .zipWith(kycStatusHelper.getSettingsKycStateTier())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -80,7 +73,7 @@ class SettingsPresenter(
                 },
                 onError = {
                     handleUpdate(Settings())
-                    view?.showToast(R.string.settings_error_updating, ToastCustom.TYPE_ERROR)
+                    view?.showError(R.string.settings_error_updating)
                 }
             )
 
@@ -96,15 +89,18 @@ class SettingsPresenter(
 
     private fun updateCards() {
         compositeDisposable += kycStatusHelper.getSettingsKycStateTier()
-            .map { kycTiers: KycTiers -> kycTiers.isApprovedFor(KycTierLevel.GOLD) }
-            .doOnSuccess { isGold: Boolean ->
+            .map { kycTiers -> kycTiers.isApprovedFor(KycTierLevel.GOLD) }
+            .doOnSuccess { isGold ->
                 view?.cardsEnabled(isGold)
             }
             .flatMap { isGold ->
                 if (isGold) {
-                    custodialWalletManager.updateSupportedCardTypes(fiatUnit).thenSingle {
-                        custodialWalletManager.fetchUnawareLimitsCards(listOf(CardStatus.ACTIVE, CardStatus.EXPIRED))
-                    }
+                    custodialWalletManager.updateSupportedCardTypes(fiatUnit)
+                        .thenSingle {
+                            custodialWalletManager.fetchUnawareLimitsCards(
+                                listOf(CardStatus.ACTIVE, CardStatus.EXPIRED)
+                            )
+                        }
                 } else {
                     Single.just(emptyList())
                 }
@@ -126,20 +122,21 @@ class SettingsPresenter(
 
     private fun updateBanks() {
         compositeDisposable += kycStatusHelper.getSettingsKycStateTier()
-            .map { kycTiers: KycTiers -> kycTiers.isApprovedFor(KycTierLevel.GOLD) }
-            .flatMap { isGold: Boolean ->
-                supportedCurrencies(fiatUnit, isGold).doOnSuccess {
-                    view?.banksEnabled(it.isNotEmpty())
-                }.zipWith(custodialWalletManager.getLinkedBeneficiaries()) { supportedCurrencies, linkedBeneficiaries ->
-                    LinkedBanksAndSupportedCurrencies(linkedBeneficiaries, supportedCurrencies)
-                }
-            }
-            .observeOn(AndroidSchedulers.mainThread())
+            .map { kycTiers -> kycTiers.isApprovedFor(KycTierLevel.GOLD) }
+            .flatMap { isGold ->
+                supportedCurrencies(fiatUnit, isGold)
+                    .doOnSuccess {
+                        view?.banksEnabled(it.isNotEmpty())
+                    }.zipWith(
+                        custodialWalletManager.getLinkedBeneficiaries()
+                    ) { supportedCurrencies, linkedBeneficiaries ->
+                        LinkedBanksAndSupportedCurrencies(linkedBeneficiaries, supportedCurrencies)
+                    }
+            }.observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
                 view?.banksEnabled(false)
                 view?.updateBanks(LinkedBanksAndSupportedCurrencies(emptyList(), emptyList()))
-            }
-            .subscribeBy(
+            }.subscribeBy(
                 onSuccess = {
                     view?.updateBanks(it)
                 },
@@ -154,12 +151,13 @@ class SettingsPresenter(
     }
 
     private fun onPitStateUpdated(state: PitLinkingState) {
-        view?.setPitLinkingState(state.isLinked)
-
-        pitClickedListener = if (state.isLinked) {
-            { view?.launchThePit() }
-        } else {
-            { view?.launchThePitLandingActivity() }
+        view?.let {
+            it.setPitLinkingState(state.isLinked)
+            pitClickedListener = if (state.isLinked) {
+                { it.launchThePit() }
+            } else {
+                { it.launchThePitLandingActivity() }
+            }
         }
     }
 
@@ -171,90 +169,48 @@ class SettingsPresenter(
     }
 
     private fun handleUpdate(settings: Settings) {
-        view?.hideProgressDialog()
+        view?.hideProgress()
         view?.setUpUi()
         updateUi(settings)
     }
 
-    private fun updateUi(settings: Settings) {
-        // GUID
-        view?.setGuidSummary(settings.guid)
+    private fun updateUi(settings: Settings) =
+        view?.apply {
+            setGuidSummary(settings.guid)
+            setEmailSummary(settings.email, settings.isEmailVerified)
+            setSmsSummary(settings.smsNumber, settings.isSmsVerified)
+            setFiatSummary(fiatUnit)
+            setEmailNotificationsVisibility(settings.isEmailVerified)
 
-        // Email
-        var emailAndStatus = settings.email
-        when {
-            emailAndStatus.isEmpty() -> {
-                emailAndStatus = stringUtils.getString(R.string.not_specified)
-            }
-            settings.isEmailVerified -> {
-                emailAndStatus += "  (" + stringUtils.getString(R.string.verified) + ")"
-            }
-            else -> {
-                emailAndStatus += "  (" + stringUtils.getString(R.string.unverified) + ")"
-            }
-        }
-        view?.setEmailSummary(emailAndStatus)
-
-        // Phone
-        var smsAndStatus = settings.smsNumber
-        when {
-            smsAndStatus.isEmpty() -> {
-                smsAndStatus = stringUtils.getString(R.string.not_specified)
-            }
-            settings.isSmsVerified -> {
-                smsAndStatus += "  (" + stringUtils.getString(R.string.verified) + ")"
-            }
-            else -> {
-                smsAndStatus += "  (" + stringUtils.getString(R.string.unverified) + ")"
-            }
-        }
-        view?.setSmsSummary(smsAndStatus)
-
-        // Fiat
-        view?.setFiatSummary(fiatUnit)
-
-        // Email notifications
-        view?.setEmailNotificationsVisibility(settings.isEmailVerified)
-
-        // Push and Email notification status
-        view?.setEmailNotificationPref(false)
-        view?.setPushNotificationPref(arePushNotificationEnabled())
-        if (settings.isNotificationsOn && settings.notificationsType.isNotEmpty()) {
-            for (type in settings.notificationsType) {
-                if (type == Settings.NOTIFICATION_TYPE_EMAIL || type == Settings.NOTIFICATION_TYPE_ALL) {
-                    view?.setEmailNotificationPref(true)
-                    break
+            setEmailNotificationPref(false)
+            setPushNotificationPref(arePushNotificationEnabled())
+            if (settings.isNotificationsOn && settings.notificationsType.isNotEmpty()) {
+                for (type in settings.notificationsType) {
+                    if (type in setOf(Settings.NOTIFICATION_TYPE_EMAIL, Settings.NOTIFICATION_TYPE_ALL)) {
+                        setEmailNotificationPref(true)
+                        break
+                    }
                 }
             }
+
+            setFingerprintVisibility(isFingerprintHardwareAvailable)
+            updateFingerprintPreferenceStatus()
+            setTwoFaPreference(settings.authType != Settings.AUTH_TYPE_OFF)
+            setTorBlocked(settings.isBlockTorIps)
+            setScreenshotsEnabled(prefs.getValue(PersistentPrefs.KEY_SCREENSHOTS_ENABLED, false))
+            setLauncherShortcutVisibility(AndroidUtils.is25orHigher())
         }
-
-        // Fingerprint
-        view?.setFingerprintVisibility(ifFingerprintHardwareAvailable)
-        view?.updateFingerprintPreferenceStatus()
-
-        // 2FA
-        view?.setTwoFaPreference(settings.authType != Settings.AUTH_TYPE_OFF)
-
-        // Tor
-        view?.setTorBlocked(settings.isBlockTorIps)
-
-        // Screenshots
-        view?.setScreenshotsEnabled(prefs.getValue(PersistentPrefs.KEY_SCREENSHOTS_ENABLED, false))
-
-        // Launcher shortcuts
-        view?.setLauncherShortcutVisibility(AndroidUtils.is25orHigher())
-    }
 
     /**
      * @return true if the device has usable fingerprint hardware
      */
-    private val ifFingerprintHardwareAvailable: Boolean
+    private val isFingerprintHardwareAvailable: Boolean
         get() = fingerprintHelper.isHardwareDetected()
 
     /**
      * @return true if the user has previously enabled fingerprint login
      */
-    val ifFingerprintUnlockEnabled: Boolean
+    val isFingerprintUnlockEnabled: Boolean
         get() = fingerprintHelper.isFingerprintUnlockEnabled()
 
     /**
@@ -273,7 +229,7 @@ class SettingsPresenter(
      * Handle fingerprint preference toggle
      */
     fun onFingerprintClicked() {
-        if (ifFingerprintUnlockEnabled) {
+        if (isFingerprintUnlockEnabled) {
             // Show dialog "are you sure you want to disable fingerprint login?
             view?.showDisableFingerprintDialog()
         } else if (!fingerprintHelper.areFingerprintsEnrolled()) {
@@ -289,9 +245,8 @@ class SettingsPresenter(
         }
     }
 
-    private fun String?.isInvalid(): Boolean {
-        return this == null || this.isEmpty() || this.length >= 256
-    }
+    private fun String?.isInvalid(): Boolean =
+        this.isNullOrEmpty() || this.length >= 256
 
     private val cachedSettings: Single<Settings>
         get() = settingsDataManager.getSettings().first(Settings())
@@ -328,26 +283,26 @@ class SettingsPresenter(
      */
     fun updateEmail(email: String) {
         if (email.isInvalid()) {
-            view?.setEmailSummary(stringUtils.getString(R.string.not_specified))
+            view?.setEmailUnknown()
             return
         }
-        compositeDisposable +=
-            emailUpdater.updateEmailAndSync(email)
-                .flatMap {
-                    settingsDataManager.fetchSettings().singleOrError().flatMap {
+        compositeDisposable += emailUpdater.updateEmailAndSync(email)
+            .flatMap {
+                settingsDataManager.fetchSettings()
+                    .singleOrError()
+                    .flatMap {
                         updateNotification(Settings.NOTIFICATION_TYPE_EMAIL, false)
                     }
+            }.observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    updateUi(it)
+                    view?.showDialogEmailVerification()
+                },
+                onError = {
+                    view?.showError(R.string.update_failed)
                 }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = {
-                        updateUi(it)
-                        view?.showDialogEmailVerification()
-                    },
-                    onError = {
-                        view?.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)
-                    }
-                )
+            )
     }
 
     /**
@@ -357,27 +312,25 @@ class SettingsPresenter(
      */
     fun updateSms(sms: String) {
         if (sms.isInvalid()) {
-            view?.setSmsSummary(stringUtils.getString(R.string.not_specified))
+            view?.setSmsUnknown()
             return
         }
-        compositeDisposable +=
-            settingsDataManager.updateSms(sms)
-                .firstOrError()
-                .flatMap {
-                    syncPhoneNumberWithNabu().thenSingle {
-                        updateNotification(Settings.NOTIFICATION_TYPE_SMS, false)
-                    }
+        compositeDisposable += settingsDataManager.updateSms(sms)
+            .firstOrError()
+            .flatMap {
+                syncPhoneNumberWithNabu().thenSingle {
+                    updateNotification(Settings.NOTIFICATION_TYPE_SMS, false)
                 }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = {
-                        updateUi(it)
-                        view?.showDialogVerifySms()
-                    },
-                    onError = {
-                        view?.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)
-                    }
-                )
+            }.observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    updateUi(it)
+                    view?.showDialogVerifySms()
+                },
+                onError = {
+                    view?.showError(R.string.update_failed)
+                }
+            )
     }
 
     /**
@@ -386,20 +339,19 @@ class SettingsPresenter(
      * @param code The verification code which has been sent to the user
      */
     fun verifySms(code: String) {
-        compositeDisposable +=
-            settingsDataManager.verifySms(code)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext { updateUi(it) }
-                .doOnSubscribe { view?.showProgressDialog(R.string.please_wait) }
-                .flatMapCompletable { syncPhoneNumberWithNabu() }
-                .observeOn(AndroidSchedulers.mainThread())
-                .doAfterTerminate {
-                    view?.hideProgressDialog()
-                }
-                .subscribeBy(
-                    onComplete = { view?.showDialogSmsVerified() },
-                    onError = { view?.showWarningDialog(R.string.verify_sms_failed) }
-                )
+        compositeDisposable += settingsDataManager.verifySms(code)
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext { updateUi(it) }
+            .doOnSubscribe { view?.showProgress() }
+            .flatMapCompletable { syncPhoneNumberWithNabu() }
+            .observeOn(AndroidSchedulers.mainThread())
+            .doAfterTerminate {
+                view?.hideProgress()
+            }
+            .subscribeBy(
+                onComplete = { view?.showDialogSmsVerified() },
+                onError = { view?.showWarningDialog(R.string.verify_sms_failed) }
+            )
     }
 
     private fun syncPhoneNumberWithNabu(): Completable {
@@ -407,7 +359,7 @@ class SettingsPresenter(
             .subscribeOn(Schedulers.io())
             .onErrorResumeNext { throwable: Throwable? ->
                 if (throwable is NabuApiException && throwable.getErrorStatusCode() ==
-                    NabuErrorStatusCodes.AlreadyRegistered
+                    NabuErrorStatusCodes.Conflict
                 )
                     Completable.complete()
                 else Completable.error(throwable)
@@ -420,12 +372,11 @@ class SettingsPresenter(
      * @param blocked Whether or not to block Tor requests
      */
     fun updateTor(blocked: Boolean) {
-        compositeDisposable +=
-            settingsDataManager.updateTor(blocked)
-                .subscribeBy(
-                    onNext = { updateUi(it) },
-                    onError = { view?.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR) }
-                )
+        compositeDisposable += settingsDataManager.updateTor(blocked)
+            .subscribeBy(
+                onNext = { updateUi(it) },
+                onError = { view?.showError(R.string.update_failed) }
+            )
     }
 
     /**
@@ -435,21 +386,24 @@ class SettingsPresenter(
      * @see Settings
      */
     fun updateTwoFa(type: Int) {
-        compositeDisposable +=
-            settingsDataManager.updateTwoFactor(type)
-                .subscribeBy(
-                    onNext = { updateUi(it) },
-                    onError = { view?.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR) }
-                )
+        compositeDisposable += settingsDataManager.updateTwoFactor(type)
+            .subscribeBy(
+                onNext = { updateUi(it) },
+                onError = { view?.showError(R.string.update_failed) }
+            )
     }
 
     fun updateEmailNotification(enabled: Boolean) {
         compositeDisposable += updateNotification(Settings.NOTIFICATION_TYPE_EMAIL, enabled)
-            .observeOn(AndroidSchedulers.mainThread()).subscribeBy(onSuccess = {
-                view?.setEmailNotificationPref(enabled)
-            }, onError = {
-                view?.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)
-            })
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    view?.setEmailNotificationPref(enabled)
+                },
+                onError = {
+                    view?.showError(R.string.update_failed)
+                }
+            )
     }
 
     /**
@@ -514,12 +468,12 @@ class SettingsPresenter(
     fun updatePassword(password: String, fallbackPassword: String) {
         payloadManager.tempPassword = password
         compositeDisposable += authDataManager.createPin(password, accessState.pin)
-            .doOnSubscribe { view?.showProgressDialog(R.string.please_wait) }
-            .doOnTerminate { view?.hideProgressDialog() }
+            .doOnSubscribe { view?.showProgress() }
+            .doOnTerminate { view?.hideProgress() }
             .andThen(payloadDataManager.syncPayloadWithServer())
             .subscribeBy(
                 onComplete = {
-                    view?.showToast(R.string.password_changed, ToastCustom.TYPE_OK)
+                    view?.showError(R.string.password_changed)
                     analytics.logEvent(SettingsAnalyticsEvents.PasswordChanged)
                 },
                 onError = { showUpdatePasswordFailed(fallbackPassword) })
@@ -527,56 +481,42 @@ class SettingsPresenter(
 
     private fun showUpdatePasswordFailed(fallbackPassword: String) {
         payloadManager.tempPassword = fallbackPassword
-        view?.showToast(R.string.remote_save_failed, ToastCustom.TYPE_ERROR)
-        view?.showToast(R.string.password_unchanged, ToastCustom.TYPE_ERROR)
+        view?.showError(R.string.remote_save_failed)
+        view?.showError(R.string.password_unchanged)
     }
 
     /**
      * Updates the user's fiat unit preference
      */
     fun updateFiatUnit(fiatUnit: String) {
-        compositeDisposable +=
-            settingsDataManager.updateFiatUnit(fiatUnit)
-                .subscribeBy(
-                    onNext = {
-                        if (currencyPrefs.selectedFiatCurrency != fiatUnit)
-                            analytics.logEvent(AnalyticsEvents.ChangeFiatCurrency)
-                        prefs.selectedFiatCurrency = fiatUnit
-                        simpleBuyPrefs.clearState()
-                        analytics.logEvent(SettingsAnalyticsEvents.CurrencyChanged)
-                        updateUi(it)
-                    },
-                    onError = { view?.showToast(R.string.update_failed, ToastCustom.TYPE_ERROR) })
+        compositeDisposable += settingsDataManager.updateFiatUnit(fiatUnit)
+            .subscribeBy(
+                onNext = {
+                    if (prefs.selectedFiatCurrency != fiatUnit) {
+                        analytics.logEvent(AnalyticsEvents.ChangeFiatCurrency)
+                    }
+                    prefs.selectedFiatCurrency = fiatUnit
+                    prefs.clearState()
+                    analytics.logEvent(SettingsAnalyticsEvents.CurrencyChanged)
+                    updateUi(it)
+                },
+                onError = { view?.showError(R.string.update_failed) }
+            )
     }
 
-    fun storeSwipeToReceiveAddresses() {
-        compositeDisposable +=
-            swipeToReceiveHelper.generateAddresses()
-                .subscribeOn(Schedulers.computation())
-                .doOnSubscribe { view?.showProgressDialog(R.string.please_wait) }
-                .doOnTerminate { view?.hideProgressDialog() }
-                .subscribeBy(
-                    onComplete = {},
-                    onError = {
-                        view?.showToast(R.string.update_failed,
-                            ToastCustom.TYPE_ERROR)
-                    })
-    }
-
-    fun clearSwipeToReceiveData() {
-        swipeToReceiveHelper.clearStoredData()
+    fun clearOfflineAddressCache() {
+        prefs.offlineCacheData = null
     }
 
     fun updateCloudData(newValue: Boolean) {
         if (newValue) {
-            swipeToReceiveHelper.clearStoredData()
+            clearOfflineAddressCache()
         }
         prefs.backupEnabled = newValue
     }
 
-    private fun arePushNotificationEnabled(): Boolean {
-        return prefs.arePushNotificationsEnabled
-    }
+    private fun arePushNotificationEnabled(): Boolean =
+        prefs.arePushNotificationsEnabled
 
     fun enablePushNotifications() {
         compositeDisposable += notificationTokenManager.enableNotifications()
@@ -604,7 +544,9 @@ class SettingsPresenter(
     }
 
     fun onTwoStepVerificationRequested() {
-        compositeDisposable += authType.zipWith(isSmsVerified).subscribe { (auth, smsVerified) ->
+        compositeDisposable += authType.zipWith(
+            isSmsVerified
+        ).subscribeBy { (auth, smsVerified) ->
             view?.showDialogTwoFA(auth, smsVerified)
         }
     }
@@ -626,6 +568,4 @@ class SettingsPresenter(
             view?.showEmailDialog(it.email, it.isEmailVerified)
         }
     }
-
-    private var pitClickedListener = {}
 }

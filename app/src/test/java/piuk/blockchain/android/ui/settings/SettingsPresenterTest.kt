@@ -1,16 +1,17 @@
 package piuk.blockchain.android.ui.settings
 
+import com.blockchain.android.testutils.rxInit
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.models.responses.nabu.KycTierState
 import com.blockchain.nabu.models.responses.nabu.NabuApiException.Companion.fromResponseBody
 import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.remoteconfig.FeatureFlag
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.times
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.payload.PayloadManager
@@ -23,18 +24,16 @@ import okhttp3.ResponseBody
 import org.amshove.kluent.`it returns`
 import org.amshove.kluent.mock
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import piuk.blockchain.android.R
-import piuk.blockchain.android.testutils.RxTest
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.thepit.PitLinkingState
 import piuk.blockchain.android.ui.fingerprint.FingerprintHelper
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
-import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveHelper
 import piuk.blockchain.android.ui.tiers
-import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -43,10 +42,18 @@ import piuk.blockchain.androidcore.data.settings.Email
 import piuk.blockchain.androidcore.data.settings.EmailSyncUpdater
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import retrofit2.HttpException
 import retrofit2.Response.error
 
-class SettingsPresenterTest : RxTest() {
+class SettingsPresenterTest {
+
+    @get:Rule
+    val rxSchedulers = rxInit {
+        mainTrampoline()
+        ioTrampoline()
+        computationTrampoline()
+    }
+
     private lateinit var subject: SettingsPresenter
 
     private val activity: SettingsView = mock()
@@ -58,11 +65,9 @@ class SettingsPresenterTest : RxTest() {
 
     private val payloadManager: PayloadManager = mock()
     private val payloadDataManager: PayloadDataManager = mock()
-    private val stringUtils: StringUtils = mock()
 
     private val prefsUtil: PersistentPrefs = mock()
     private val accessState: AccessState = mock()
-    private val swipeToReceiveHelper: SwipeToReceiveHelper = mock()
 
     private val notificationTokenManager: NotificationTokenManager = mock()
     private val exchangeRateDataManager: ExchangeRateDataManager = mock()
@@ -74,11 +79,9 @@ class SettingsPresenterTest : RxTest() {
     private val featureFlag: FeatureFlag = mock()
 
     private val analytics: Analytics = mock()
-    private val simpleBuyPrefs: SimpleBuyPrefs = mock()
     private val custodialWalletManager: CustodialWalletManager = mock()
     private val cardsFeatureFlag: FeatureFlag = mock()
     private val fundsFeatureFlag: FeatureFlag = mock()
-    private val currencyPrefs: CurrencyPrefs = mock()
 
     @Before
     fun setUp() {
@@ -89,21 +92,17 @@ class SettingsPresenterTest : RxTest() {
             emailUpdater = emailSyncUpdater,
             payloadManager = payloadManager,
             payloadDataManager = payloadDataManager,
-            stringUtils = stringUtils,
             prefs = prefsUtil,
-            currencyPrefs = currencyPrefs,
             accessState = accessState,
             custodialWalletManager = custodialWalletManager,
-            swipeToReceiveHelper = swipeToReceiveHelper,
             notificationTokenManager = notificationTokenManager,
             exchangeRateDataManager = exchangeRateDataManager,
             kycStatusHelper = kycStatusHelper,
             pitLinking = pitLinking,
-            analytics = analytics,
-            simpleBuyPrefs = simpleBuyPrefs
+            analytics = analytics
         )
         subject.initView(activity)
-        whenever(currencyPrefs.selectedFiatCurrency).thenReturn("USD")
+        whenever(prefsUtil.selectedFiatCurrency).thenReturn("USD")
         whenever(prefsUtil.arePushNotificationsEnabled).thenReturn(false)
         whenever(fingerprintHelper.isHardwareDetected()).thenReturn(false)
         whenever(prefsUtil.getValue(any(), any<Boolean>())).thenReturn(false)
@@ -122,7 +121,7 @@ class SettingsPresenterTest : RxTest() {
         }
 
         whenever(settingsDataManager.fetchSettings()).thenReturn(Observable.just(mockSettings))
-        whenever(currencyPrefs.selectedFiatCurrency).thenReturn("USD")
+        whenever(prefsUtil.selectedFiatCurrency).thenReturn("USD")
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(mockSettings))
         whenever(kycStatusHelper.getSettingsKycStateTier())
             .thenReturn(Single.just(tiers(KycTierState.None, KycTierState.None)))
@@ -141,12 +140,12 @@ class SettingsPresenterTest : RxTest() {
         // Act
         subject.onViewReady()
         // Assert
-        Mockito.verify(activity).showProgressDialog(ArgumentMatchers.anyInt())
-        Mockito.verify(activity).hideProgressDialog()
-        Mockito.verify(activity).setUpUi()
-        Mockito.verify(activity).setPitLinkingState(false)
-        Mockito.verify(activity, Mockito.times(2)).updateCards(emptyList())
-        Mockito.verify(activity, Mockito.times(2))
+        verify(activity).showProgress()
+        verify(activity).hideProgress()
+        verify(activity).setUpUi()
+        verify(activity).setPitLinkingState(false)
+        verify(activity, Mockito.times(2)).updateCards(emptyList())
+        verify(activity, Mockito.times(2))
             .updateBanks(LinkedBanksAndSupportedCurrencies(emptyList(), emptyList()))
     }
 
@@ -160,7 +159,7 @@ class SettingsPresenterTest : RxTest() {
             .thenReturn(Single.just(tiers(KycTierState.Verified, KycTierState.Verified)))
         whenever(pitLinking.state).thenReturn(Observable.just(pitLinkState))
         whenever(featureFlag.enabled).thenReturn(Single.just(false))
-        whenever(currencyPrefs.selectedFiatCurrency).thenReturn("USD")
+        whenever(prefsUtil.selectedFiatCurrency).thenReturn("USD")
         whenever(cardsFeatureFlag.enabled).thenReturn(Single.just(false))
         whenever(fundsFeatureFlag.enabled).thenReturn(Single.just(false))
         whenever(custodialWalletManager.getSupportedFundsFiats(any(), any())).thenReturn(Single.just(emptyList()))
@@ -174,11 +173,11 @@ class SettingsPresenterTest : RxTest() {
         subject.onViewReady()
 
         // Assert
-        Mockito.verify(activity).showProgressDialog(ArgumentMatchers.anyInt())
-        Mockito.verify(activity).hideProgressDialog()
-        Mockito.verify(activity).setUpUi()
-        Mockito.verify(activity, times(2)).updateCards(emptyList())
-        Mockito.verify(activity, Mockito.times(2))
+        verify(activity).showProgress()
+        verify(activity).hideProgress()
+        verify(activity).setUpUi()
+        verify(activity, times(2)).updateCards(emptyList())
+        verify(activity, Mockito.times(2))
             .updateBanks(LinkedBanksAndSupportedCurrencies(emptyList(), emptyList()))
     }
 
@@ -230,12 +229,14 @@ class SettingsPresenterTest : RxTest() {
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(mockSettings))
         whenever(settingsDataManager.disableNotification(Settings.NOTIFICATION_TYPE_EMAIL, notifications))
             .thenReturn(Observable.just(mockSettings))
+
         // Act
         subject.updateEmail(email)
+
         // Assert
-        Mockito.verify(emailSyncUpdater).updateEmailAndSync(email)
-        Mockito.verify(settingsDataManager).disableNotification(Settings.NOTIFICATION_TYPE_EMAIL, notifications)
-        Mockito.verify(activity).showDialogEmailVerification()
+        verify(emailSyncUpdater).updateEmailAndSync(email)
+        verify(settingsDataManager).disableNotification(Settings.NOTIFICATION_TYPE_EMAIL, notifications)
+        verify(activity).showDialogEmailVerification()
     }
 
     @Test
@@ -243,24 +244,23 @@ class SettingsPresenterTest : RxTest() {
         // Arrange
         val email = "EMAIL"
         whenever(emailSyncUpdater.updateEmailAndSync(email)).thenReturn(Single.error(Throwable()))
+
         // Act
         subject.updateEmail(email)
+
         // Assert
-        Mockito.verify(emailSyncUpdater).updateEmailAndSync(email)
-        Mockito.verify(activity).showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)
-        Mockito.verifyNoMoreInteractions(activity)
+        verify(emailSyncUpdater).updateEmailAndSync(email)
+        verify(activity).showError(R.string.update_failed)
+        verifyNoMoreInteractions(activity)
     }
 
     @Test
     fun updateSmsInvalid() {
         // Arrange
-        val stringResource = "STRING_RESOURCE"
-        whenever(stringUtils.getString(any())).thenReturn(stringResource)
-
         subject.updateSms("")
         // Assert
-        Mockito.verify(activity).setSmsSummary(stringResource)
-        Mockito.verifyNoMoreInteractions(activity)
+        verify(activity).setSmsUnknown()
+        verifyNoMoreInteractions(activity)
     }
 
     @Test
@@ -275,12 +275,14 @@ class SettingsPresenterTest : RxTest() {
             .thenReturn(Observable.just(mockSettings))
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(mockSettings))
         whenever(kycStatusHelper.syncPhoneNumberWithNabu()).thenReturn(Completable.complete())
+
         // Act
         subject.updateSms(phoneNumber)
+
         // Assert
-        Mockito.verify(settingsDataManager).updateSms(phoneNumber)
-        Mockito.verify(settingsDataManager).disableNotification(Settings.NOTIFICATION_TYPE_SMS, notifications)
-        Mockito.verify(activity).showDialogVerifySms()
+        verify(settingsDataManager).updateSms(phoneNumber)
+        verify(settingsDataManager).disableNotification(Settings.NOTIFICATION_TYPE_SMS, notifications)
+        verify(activity).showDialogVerifySms()
     }
 
     @Test
@@ -297,29 +299,32 @@ class SettingsPresenterTest : RxTest() {
             settingsDataManager.disableNotification(Settings.NOTIFICATION_TYPE_SMS, notifications))
             .thenReturn(Observable.just(mockSettings))
         val responseBody = ResponseBody.create("application/json".toMediaTypeOrNull(), "{}")
-        val error = fromResponseBody(error<Any>(409, responseBody))
+        val error = fromResponseBody(HttpException(error<Any>(409, responseBody)))
         whenever(kycStatusHelper.syncPhoneNumberWithNabu()).thenReturn(Completable.error(error))
+
         // Act
         subject.updateSms(phoneNumber)
+
         // Assert
-        Mockito.verify(settingsDataManager).updateSms(phoneNumber)
-        Mockito.verify(settingsDataManager).disableNotification(Settings.NOTIFICATION_TYPE_SMS, notifications)
-        Mockito.verify(activity).showDialogVerifySms()
+        verify(settingsDataManager).updateSms(phoneNumber)
+        verify(settingsDataManager).disableNotification(Settings.NOTIFICATION_TYPE_SMS, notifications)
+        verify(activity).showDialogVerifySms()
     }
 
     @Test
     fun updateSmsFailed() {
         // Arrange
         val phoneNumber = "PHONE_NUMBER"
-        Mockito.`when`(
-            settingsDataManager.updateSms(phoneNumber)).thenReturn(Observable.error(Throwable()))
+        whenever(settingsDataManager.updateSms(phoneNumber)).thenReturn(Observable.error(Throwable()))
+
         // Act
         subject.updateSms(phoneNumber)
+
         // Assert
-        Mockito.verify(settingsDataManager).updateSms(phoneNumber)
-        Mockito.verifyNoMoreInteractions(settingsDataManager)
-        Mockito.verify(activity).showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)
-        Mockito.verifyNoMoreInteractions(activity)
+        verify(settingsDataManager).updateSms(phoneNumber)
+        verifyNoMoreInteractions(settingsDataManager)
+        verify(activity).showError(R.string.update_failed)
+        verifyNoMoreInteractions(activity)
     }
 
     @Test
@@ -329,14 +334,16 @@ class SettingsPresenterTest : RxTest() {
         val mockSettings = Settings()
         whenever(settingsDataManager.verifySms(verificationCode)).thenReturn(Observable.just(mockSettings))
         whenever(kycStatusHelper.syncPhoneNumberWithNabu()).thenReturn(Completable.complete())
+
         // Act
         subject.verifySms(verificationCode)
+
         // Assert
-        Mockito.verify(settingsDataManager).verifySms(verificationCode)
-        Mockito.verifyNoMoreInteractions(settingsDataManager)
-        Mockito.verify(activity).showProgressDialog(ArgumentMatchers.anyInt())
-        Mockito.verify(activity).hideProgressDialog()
-        Mockito.verify(activity).showDialogSmsVerified()
+        verify(settingsDataManager).verifySms(verificationCode)
+        verifyNoMoreInteractions(settingsDataManager)
+        verify(activity).showProgress()
+        verify(activity).hideProgress()
+        verify(activity).showDialogSmsVerified()
     }
 
     @Test
@@ -348,11 +355,11 @@ class SettingsPresenterTest : RxTest() {
         // Act
         subject.verifySms(verificationCode)
         // Assert
-        Mockito.verify(settingsDataManager).verifySms(verificationCode)
-        Mockito.verifyNoMoreInteractions(settingsDataManager)
-        Mockito.verify(activity).showProgressDialog(ArgumentMatchers.anyInt())
-        Mockito.verify(activity).hideProgressDialog()
-        Mockito.verify(activity).showWarningDialog(R.string.verify_sms_failed)
+        verify(settingsDataManager).verifySms(verificationCode)
+        verifyNoMoreInteractions(settingsDataManager)
+        verify(activity).showProgress()
+        verify(activity).hideProgress()
+        verify(activity).showWarningDialog(R.string.verify_sms_failed)
     }
 
     @Test
@@ -366,8 +373,8 @@ class SettingsPresenterTest : RxTest() {
         // Act
         subject.updateTor(true)
         // Assert
-        Mockito.verify(settingsDataManager).updateTor(true)
-        Mockito.verify(activity).setTorBlocked(true)
+        verify(settingsDataManager).updateTor(true)
+        verify(activity).setTorBlocked(true)
     }
 
     @Test
@@ -377,8 +384,8 @@ class SettingsPresenterTest : RxTest() {
         // Act
         subject.updateTor(true)
         // Assert
-        Mockito.verify(settingsDataManager).updateTor(true)
-        Mockito.verify(activity).showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)
+        verify(settingsDataManager).updateTor(true)
+        verify(activity).showError(R.string.update_failed)
     }
 
     @Test
@@ -391,21 +398,21 @@ class SettingsPresenterTest : RxTest() {
         // Act
         subject.updateTwoFa(authType)
         // Assert
-        Mockito.verify(settingsDataManager).updateTwoFactor(authType)
+        verify(settingsDataManager).updateTwoFactor(authType)
     }
 
     @Test
     fun update2FaFailed() {
         // Arrange
         val authType = SettingsManager.AUTH_TYPE_YUBI_KEY
-        Mockito.`when`(
+        whenever(
             settingsDataManager.updateTwoFactor(authType)).thenReturn(Observable.error(Throwable()))
 
         // Act
         subject.updateTwoFa(authType)
         // Assert
-        Mockito.verify(settingsDataManager).updateTwoFactor(authType)
-        Mockito.verify(activity).showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)
+        verify(settingsDataManager).updateTwoFactor(authType)
+        verify(activity).showError(R.string.update_failed)
     }
 
     @Test
@@ -428,12 +435,12 @@ class SettingsPresenterTest : RxTest() {
         // Act
         subject.updateEmailNotification(true)
         // Assert
-        Mockito.verify(settingsDataManager)
+        verify(settingsDataManager)
             .enableNotification(SettingsManager.NOTIFICATION_TYPE_EMAIL, listOf(
                 SettingsManager.NOTIFICATION_TYPE_NONE
             ))
-        Mockito.verify(payloadDataManager).syncPayloadAndPublicKeys()
-        Mockito.verify(activity).setEmailNotificationPref(true)
+        verify(payloadDataManager).syncPayloadAndPublicKeys()
+        verify(activity).setEmailNotificationPref(true)
     }
 
     @Test
@@ -447,18 +454,18 @@ class SettingsPresenterTest : RxTest() {
 
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(mockSettings))
 
-        Mockito.`when`(
+        whenever(
             settingsDataManager.disableNotification(SettingsManager.NOTIFICATION_TYPE_EMAIL,
                 listOf(SettingsManager.NOTIFICATION_TYPE_EMAIL))).thenReturn(Observable.just(mockSettingsResponse))
         // Act
         subject.updateEmailNotification(false)
         // Assert
-        Mockito.verify(settingsDataManager)
+        verify(settingsDataManager)
             .disableNotification(SettingsManager.NOTIFICATION_TYPE_EMAIL,
                 listOf(SettingsManager.NOTIFICATION_TYPE_EMAIL))
 
-        Mockito.verify(payloadDataManager).syncPayloadWithServer()
-        Mockito.verify(activity).setEmailNotificationPref(ArgumentMatchers.anyBoolean())
+        verify(payloadDataManager).syncPayloadWithServer()
+        verify(activity).setEmailNotificationPref(ArgumentMatchers.anyBoolean())
     }
 
     @Test
@@ -469,12 +476,14 @@ class SettingsPresenterTest : RxTest() {
             notificationsOn = 1
         )
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(mockSettings))
+
         // Act
         subject.updateEmailNotification(true)
+
         // Assert
-        Mockito.verify(settingsDataManager).getSettings()
-        Mockito.verifyNoMoreInteractions(settingsDataManager)
-        Mockito.verify(activity).setEmailNotificationPref(true)
+        verify(settingsDataManager).getSettings()
+        verifyNoMoreInteractions(settingsDataManager)
+        verify(activity).setEmailNotificationPref(true)
     }
 
     @Test
@@ -485,32 +494,33 @@ class SettingsPresenterTest : RxTest() {
             notificationsOn = 1
         )
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(mockSettings))
+
         // Act
         subject.updateEmailNotification(false)
+
         // Assert
-        Mockito.verify(settingsDataManager).getSettings()
-        Mockito.verifyNoMoreInteractions(settingsDataManager)
-        Mockito.verify(activity).setEmailNotificationPref(false)
+        verify(settingsDataManager).getSettings()
+        verifyNoMoreInteractions(settingsDataManager)
+        verify(activity).setEmailNotificationPref(false)
     }
 
     @Test
     fun enableNotificationFailed() {
         // Arrange
-        // Arrange
         val mockSettings = Settings().copy(
             notificationsType = listOf(SettingsManager.NOTIFICATION_TYPE_NONE)
         )
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(mockSettings))
-        // Act
-
         whenever(settingsDataManager.enableNotification(SettingsManager.NOTIFICATION_TYPE_EMAIL,
             listOf(SettingsManager.NOTIFICATION_TYPE_NONE))).thenReturn(Observable.error(Throwable()))
+
         // Act
         subject.updateEmailNotification(true)
+
         // Assert
-        Mockito.verify(settingsDataManager).enableNotification(SettingsManager.NOTIFICATION_TYPE_EMAIL,
+        verify(settingsDataManager).enableNotification(SettingsManager.NOTIFICATION_TYPE_EMAIL,
             listOf(SettingsManager.NOTIFICATION_TYPE_NONE))
-        Mockito.verify(activity).showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)
+        verify(activity).showError(R.string.update_failed)
     }
 
     @Test
@@ -520,10 +530,10 @@ class SettingsPresenterTest : RxTest() {
         // Act
         subject.pinCodeValidatedForChange()
         // Assert
-        Mockito.verify(prefsUtil).removeValue(PersistentPrefs.KEY_PIN_FAILS)
-        Mockito.verify(prefsUtil).pinId = ""
-        Mockito.verify(activity).goToPinEntryPage()
-        Mockito.verifyNoMoreInteractions(activity)
+        verify(prefsUtil).removeValue(PersistentPrefs.KEY_PIN_FAILS)
+        verify(prefsUtil).pinId = ""
+        verify(activity).goToPinEntryPage()
+        verifyNoMoreInteractions(activity)
     }
 
     @Test
@@ -532,18 +542,20 @@ class SettingsPresenterTest : RxTest() {
         val newPassword = "NEW_PASSWORD"
         val oldPassword = "OLD_PASSWORD"
         val pin = "PIN"
-        Mockito.`when`(accessState.pin).thenReturn(pin)
-        Mockito.`when`(authDataManager.createPin(newPassword, pin)).thenReturn(Completable.complete())
-        Mockito.`when`(payloadDataManager.syncPayloadWithServer()).thenReturn(Completable.complete())
+        whenever(accessState.pin).thenReturn(pin)
+        whenever(authDataManager.createPin(newPassword, pin)).thenReturn(Completable.complete())
+        whenever(payloadDataManager.syncPayloadWithServer()).thenReturn(Completable.complete())
+
         // Act
         subject.updatePassword(newPassword, oldPassword)
+
         // Assert
-        Mockito.verify(accessState).pin
-        Mockito.verify(authDataManager).createPin(newPassword, pin)
-        Mockito.verify(payloadDataManager).syncPayloadWithServer()
-        Mockito.verify(activity).showProgressDialog(ArgumentMatchers.anyInt())
-        Mockito.verify(activity).hideProgressDialog()
-        Mockito.verify(activity).showToast(R.string.password_changed, ToastCustom.TYPE_OK)
+        verify(accessState).pin
+        verify(authDataManager).createPin(newPassword, pin)
+        verify(payloadDataManager).syncPayloadWithServer()
+        verify(activity).showProgress()
+        verify(activity).hideProgress()
+        verify(activity).showError(R.string.password_changed)
     }
 
     @Test
@@ -552,65 +564,24 @@ class SettingsPresenterTest : RxTest() {
         val newPassword = "NEW_PASSWORD"
         val oldPassword = "OLD_PASSWORD"
         val pin = "PIN"
-        Mockito.`when`(accessState.pin).thenReturn(pin)
-        Mockito.`when`(authDataManager.createPin(newPassword, pin))
+        whenever(accessState.pin).thenReturn(pin)
+        whenever(authDataManager.createPin(newPassword, pin))
             .thenReturn(Completable.error(Throwable()))
-        Mockito.`when`(payloadDataManager.syncPayloadWithServer()).thenReturn(Completable.complete())
+        whenever(payloadDataManager.syncPayloadWithServer()).thenReturn(Completable.complete())
+
         // Act
         subject.updatePassword(newPassword, oldPassword)
-        // Assert
-        Mockito.verify(accessState).pin
-        Mockito.verify(authDataManager).createPin(newPassword, pin)
-        Mockito.verify(payloadDataManager).syncPayloadWithServer()
-        Mockito.verify(payloadManager).tempPassword = newPassword
-        Mockito.verify(payloadManager).tempPassword = oldPassword
-        Mockito.verify(activity).showProgressDialog(ArgumentMatchers.anyInt())
-        Mockito.verify(activity).hideProgressDialog()
-        Mockito.verify(activity)
-            .showToast(R.string.remote_save_failed, ToastCustom.TYPE_ERROR)
-        Mockito.verify(activity)
-            .showToast(R.string.password_unchanged, ToastCustom.TYPE_ERROR)
-    }
 
-    @Test
-    fun storeSwipeToReceiveAddressesSuccessful() {
-        // Arrange
-        whenever(swipeToReceiveHelper.generateAddresses()).thenReturn(Completable.complete())
-        // Act
-        subject.storeSwipeToReceiveAddresses()
-        testScheduler.triggerActions()
         // Assert
-        Mockito.verify(swipeToReceiveHelper).generateAddresses()
-        Mockito.verifyNoMoreInteractions(swipeToReceiveHelper)
-        Mockito.verify(activity).showProgressDialog(R.string.please_wait)
-        Mockito.verify(activity).hideProgressDialog()
-        Mockito.verifyNoMoreInteractions(activity)
-    }
-
-    @Test
-    fun storeSwipeToReceiveAddressesFailed() {
-        // Arrange
-        whenever(swipeToReceiveHelper.generateAddresses()).thenReturn(Completable.error(Throwable()))
-        // Act
-        subject.storeSwipeToReceiveAddresses()
-        testScheduler.triggerActions()
-        // Assert
-        Mockito.verify(swipeToReceiveHelper).generateAddresses()
-        Mockito.verifyNoMoreInteractions(swipeToReceiveHelper)
-        Mockito.verify(activity).showProgressDialog(ArgumentMatchers.anyInt())
-        Mockito.verify(activity).hideProgressDialog()
-        Mockito.verify(activity).showToast(R.string.update_failed, ToastCustom.TYPE_ERROR)
-        Mockito.verifyNoMoreInteractions(activity)
-    }
-
-    @Test
-    fun clearSwipeToReceiveData() {
-        // Arrange
-
-        // Act
-        subject.clearSwipeToReceiveData()
-        // Assert
-        swipeToReceiveHelper.clearStoredData()
+        verify(accessState).pin
+        verify(authDataManager).createPin(newPassword, pin)
+        verify(payloadDataManager).syncPayloadWithServer()
+        verify(payloadManager).tempPassword = newPassword
+        verify(payloadManager).tempPassword = oldPassword
+        verify(activity).showProgress()
+        verify(activity).hideProgress()
+        verify(activity).showError(R.string.remote_save_failed)
+        verify(activity).showError(R.string.password_unchanged)
     }
 
     @Test
@@ -622,9 +593,9 @@ class SettingsPresenterTest : RxTest() {
         subject.enablePushNotifications()
 
         // Assert
-        Mockito.verify(activity).setPushNotificationPref(true)
-        Mockito.verify(notificationTokenManager).enableNotifications()
-        Mockito.verifyNoMoreInteractions(notificationTokenManager)
+        verify(activity).setPushNotificationPref(true)
+        verify(notificationTokenManager).enableNotifications()
+        verifyNoMoreInteractions(notificationTokenManager)
     }
 
     @Test
@@ -636,18 +607,20 @@ class SettingsPresenterTest : RxTest() {
         subject.disablePushNotifications()
 
         // Assert
-        Mockito.verify(activity).setPushNotificationPref(false)
-        Mockito.verify(notificationTokenManager).disableNotifications()
-        Mockito.verifyNoMoreInteractions(notificationTokenManager)
+        verify(activity).setPushNotificationPref(false)
+        verify(notificationTokenManager).disableNotifications()
+        verifyNoMoreInteractions(notificationTokenManager)
     }
 
     private fun assertClickLaunchesKyc(status1: KycTierState, status2: KycTierState) {
         // Arrange
         whenever(kycStatusHelper.getKycTierStatus())
             .thenReturn(Single.just(tiers(status1, status2)))
+
         // Act
         subject.onKycStatusClicked()
+
         // Assert
-        Mockito.verify(activity).launchKycFlow()
+        verify(activity).launchKycFlow()
     }
 }

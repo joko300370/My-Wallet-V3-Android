@@ -18,7 +18,6 @@ import kotlinx.android.synthetic.main.item_account_select_crypto.view.*
 import kotlinx.android.synthetic.main.item_account_select_fiat.view.*
 import kotlinx.android.synthetic.main.item_account_select_group.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
@@ -28,10 +27,9 @@ import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
 import piuk.blockchain.android.ui.adapters.DelegationAdapter
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.customviews.IntroHeaderView
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.util.inflate
 
 typealias StatusDecorator = (BlockchainAccount) -> CellDecorator
-typealias ActionedStatusDecorator = (BlockchainAccount, AssetAction) -> CellDecorator
 
 internal data class SelectableAccountItem(
     val account: BlockchainAccount,

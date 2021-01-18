@@ -1,10 +1,6 @@
-@file:Suppress("USELESS_CAST")
-
 package com.blockchain.koin
 
 import android.preference.PreferenceManager
-import com.blockchain.datamanagers.AccountLookup
-import com.blockchain.datamanagers.AddressResolver
 import com.blockchain.datamanagers.DataManagerPayloadDecrypt
 import com.blockchain.logging.LastTxUpdateDateOnSettingsService
 import com.blockchain.logging.LastTxUpdater
@@ -15,6 +11,7 @@ import com.blockchain.payload.PayloadDecrypt
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.DashboardPrefs
 import com.blockchain.preferences.NotificationPrefs
+import com.blockchain.preferences.OfflineCachePrefs
 import com.blockchain.preferences.RatingPrefs
 import com.blockchain.preferences.SecurityPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
@@ -39,7 +36,6 @@ import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataStore
 import piuk.blockchain.androidcore.data.erc20.datastores.Erc20DataStore
-import piuk.blockchain.androidcore.data.ethereum.EthereumAccountWrapper
 import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
@@ -90,7 +86,12 @@ val coreModule = module {
 
         factory { PayloadDataManager(get(), get(), get(), get(), get()) }
 
-        factory { DataManagerPayloadDecrypt(get(), get()) as PayloadDecrypt }
+        factory {
+            DataManagerPayloadDecrypt(
+                payloadDataManager = get(),
+                bchDataManager = get()
+            )
+        }.bind(PayloadDecrypt::class)
 
         factory { PromptingSeedAccessAdapter(PayloadDataManagerSeedAccessAdapter(get()), get()) }
             .bind(SeedAccessWithoutPrompt::class)
@@ -105,11 +106,9 @@ val coreModule = module {
             )
         }
 
-        scoped { MoshiMetadataRepositoryAdapter(get(), get()) as MetadataRepository }
-
-        factory { AddressResolver(get(), get(), get()) }
-
-        factory { AccountLookup(get(), get(), get()) }
+        scoped {
+            MoshiMetadataRepositoryAdapter(get(), get())
+        }.bind(MetadataRepository::class)
 
         scoped { EthDataStore() }
 
@@ -127,8 +126,15 @@ val coreModule = module {
             SettingsDataStore(SettingsMemoryStore(), get<SettingsService>().getSettingsObservable())
         }
 
-        factory { WalletOptionsDataManager(get(), get(), get(), get(explorerUrl)) }
-            .bind(XlmTransactionTimeoutFetcher::class).bind(XlmHorizonUrlFetcher::class)
+        factory {
+            WalletOptionsDataManager(
+                authService = get(),
+                walletOptionsState = get(),
+                settingsDataManager = get(),
+                explorerUrl = get(explorerUrl)
+            )
+        }.bind(XlmTransactionTimeoutFetcher::class)
+        .bind(XlmHorizonUrlFetcher::class)
 
         factory { ExchangeRateDataManager(get(), get()) }.bind(ExchangeRates::class)
 
@@ -204,6 +210,7 @@ val coreModule = module {
         .bind(RatingPrefs::class)
         .bind(WalletStatus::class)
         .bind(EncryptedPrefs::class)
+        .bind(OfflineCachePrefs::class)
 
     factory { PaymentService(get(), get(), get()) }
 
@@ -219,8 +226,6 @@ val coreModule = module {
         else
             NullLogger
     }
-
-    factory { EthereumAccountWrapper() }
 
     single {
         AccessStateImpl(

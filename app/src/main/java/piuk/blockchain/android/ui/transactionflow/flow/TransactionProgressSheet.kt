@@ -14,6 +14,7 @@ class TransactionProgressSheet : TransactionFlowSheet() {
     override val layoutResource: Int = R.layout.dialog_tx_flow_in_progress
 
     private val customiser: TransactionFlowCustomiser by inject()
+    private val MAX_STACKTRACE_CHARS = 400
 
     override fun render(newState: TransactionState) {
         Timber.d("!TRANSACTION!> Rendering! TransactionProgressSheet")
@@ -34,16 +35,30 @@ class TransactionProgressSheet : TransactionFlowSheet() {
                 )
             }
             is TxExecutionStatus.Error -> {
-                analyticsHooks.onTransactionFailure(newState, newState.executionStatus.message)
+                analyticsHooks.onTransactionFailure(
+                    newState, collectStackTraceString(newState.executionStatus.exception)
+                )
                 dialogView.tx_progress_view.showTxError(
-                    getString(R.string.send_progress_error_title),
+                    customiser.transactionProgressExceptionMessage(newState),
                     getString(R.string.send_progress_error_subtitle)
                 )
             }
             else -> {
-            } // do nothing
+                // do nothing
+            }
         }
         cacheState(newState)
+    }
+
+    private fun collectStackTraceString(e: Throwable): String {
+        var stackTraceString = ""
+        var index = 0
+        while (stackTraceString.length <= MAX_STACKTRACE_CHARS && index < e.stackTrace.size) {
+            stackTraceString += "${e.stackTrace[index]}\n"
+            index++
+        }
+        Timber.d("Sending trace to analytics: $stackTraceString")
+        return stackTraceString
     }
 
     override fun initControls(view: View) {

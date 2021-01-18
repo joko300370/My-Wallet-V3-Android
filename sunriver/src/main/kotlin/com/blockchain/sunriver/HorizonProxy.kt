@@ -1,6 +1,5 @@
 package com.blockchain.sunriver
 
-import com.blockchain.account.BalanceAndMin
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.withMajorValue
@@ -15,15 +14,13 @@ import org.stellar.sdk.Server
 import org.stellar.sdk.Transaction
 import org.stellar.sdk.requests.ErrorResponse
 import org.stellar.sdk.requests.RequestBuilder
-import org.stellar.sdk.requests.TooManyRequestsException
 import org.stellar.sdk.responses.AccountResponse
 import org.stellar.sdk.responses.TransactionResponse
 import org.stellar.sdk.responses.operations.OperationResponse
-import java.io.IOException
 import java.math.BigDecimal
 import java.math.BigInteger
 
-private val basePerOperationFee = CryptoValue.lumensFromStroop(100.toBigInteger())
+private val basePerOperationFee = CryptoValue.fromMinor(CryptoCurrency.XLM, 100.toBigInteger())
 
 internal class HorizonProxy {
 
@@ -80,7 +77,6 @@ internal class HorizonProxy {
         }
     }
 
-    @Throws(IOException::class, TooManyRequestsException::class)
     fun getTransaction(hash: String): TransactionResponse =
         server.transactions()
             .transaction(hash)

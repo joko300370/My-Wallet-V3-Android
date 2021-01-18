@@ -30,7 +30,7 @@ class KycEmailEntryPresenter(
                         .doOnTerminate { view.dismissProgressDialog() }
                         .doOnError {
                             Timber.e(it)
-                            view.showErrorToast(R.string.kyc_email_error_saving_email)
+                            view.showError(R.string.kyc_email_error_saving_email)
                         }
                         .doOnComplete {
                             view.continueSignUp(email)

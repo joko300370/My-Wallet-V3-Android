@@ -46,6 +46,14 @@ class InterestDepositTxEngine(
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         onChainTxEngine.doBuildConfirmations(pendingTx).map { pTx ->
             modifyEngineConfirmations(pTx)
+        }.flatMap {
+            if (it.hasOption(TxConfirmation.MEMO)) {
+                it.getOption<TxConfirmationValue.Memo>(TxConfirmation.MEMO)?.let { memo ->
+                    onChainTxEngine.doOptionUpdateRequest(it, memo.copy(editable = false))
+                }
+            } else {
+                Single.just(it)
+            }
         }
 
     private fun modifyEngineConfirmations(
@@ -54,11 +62,13 @@ class InterestDepositTxEngine(
         agreementChecked: Boolean = false
     ): PendingTx =
         pendingTx.removeOption(TxConfirmation.DESCRIPTION)
-            .removeOption(TxConfirmation.MEMO)
             .removeOption(TxConfirmation.FEE_SELECTION)
             .addOrReplaceOption(
-                TxConfirmationValue.NetworkFee(pendingTx.fees, TxConfirmationValue.NetworkFee.FeeType.DEPOSIT_FEE,
-                    sourceAccount.asset))
+                TxConfirmationValue.NetworkFee(
+                    pendingTx.fees, TxConfirmationValue.NetworkFee.FeeType.DEPOSIT_FEE,
+                    sourceAccount.asset
+                )
+            )
             .addOrReplaceOption(
                 TxConfirmationValue.TxBooleanConfirmation<Unit>(
                     confirmation = TxConfirmation.AGREEMENT_INTEREST_T_AND_C,
@@ -74,8 +84,11 @@ class InterestDepositTxEngine(
             )
 
     override fun doOptionUpdateRequest(pendingTx: PendingTx, newConfirmation: TxConfirmationValue): Single<PendingTx> =
-        if (newConfirmation.confirmation in setOf(TxConfirmation.AGREEMENT_INTEREST_T_AND_C,
-                TxConfirmation.AGREEMENT_INTEREST_TRANSFER)) {
+        if (newConfirmation.confirmation in setOf(
+                TxConfirmation.AGREEMENT_INTEREST_T_AND_C,
+                TxConfirmation.AGREEMENT_INTEREST_TRANSFER
+            )
+        ) {
             Single.just(pendingTx.addOrReplaceOption(newConfirmation))
         } else {
             onChainTxEngine.doOptionUpdateRequest(pendingTx, newConfirmation)

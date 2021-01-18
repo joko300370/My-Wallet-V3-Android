@@ -8,8 +8,8 @@ import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
-import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxConfirmationValue
+import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
@@ -61,7 +61,8 @@ class TradingToOnChainTxEngine(
                 if (isNoteSupported) {
                     toMutableList().add(TxConfirmationValue.Description())
                 }
-            }))
+            })
+        )
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         validateAmounts(pendingTx).updateTxValidity(pendingTx)
@@ -75,7 +76,13 @@ class TradingToOnChainTxEngine(
                 if (max >= pendingTx.amount) {
                     Completable.complete()
                 } else {
-                    throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
+                    throw TxValidationFailure(
+                        if (pendingTx.amount > pendingTx.available) {
+                            ValidationState.INSUFFICIENT_FUNDS
+                        } else {
+                            ValidationState.INVALID_AMOUNT
+                        }
+                    )
                 }
             }
 
