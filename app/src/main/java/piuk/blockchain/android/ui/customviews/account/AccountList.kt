@@ -28,6 +28,7 @@ import piuk.blockchain.android.ui.adapters.DelegationAdapter
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.customviews.IntroHeaderView
 import piuk.blockchain.android.util.inflate
+import java.util.concurrent.TimeUnit
 
 typealias StatusDecorator = (BlockchainAccount) -> CellDecorator
 
@@ -92,6 +93,12 @@ class AccountList @JvmOverloads constructor(
     fun loadItems(source: Single<List<BlockchainAccount>>) {
         disposables += source
             .observeOn(uiScheduler)
+            .doOnSubscribe {
+                if ((adapter as? AccountsDelegateAdapter)?.items?.isEmpty() == true) {
+                    onListLoading()
+                }
+            }
+            .delay(5,TimeUnit.SECONDS)
             .subscribeBy(
                 onSuccess = {
                     (adapter as? AccountsDelegateAdapter)?.items = it.map { account ->
@@ -143,6 +150,7 @@ class AccountList @JvmOverloads constructor(
     var onAccountSelected: (BlockchainAccount) -> Unit = {}
     var onEmptyList: () -> Unit = {}
     var onListLoaded: () -> Unit = {}
+    var onListLoading: () -> Unit = {}
 }
 
 private class AccountsDelegateAdapter(
@@ -201,8 +209,10 @@ private class CryptoAccountDelegate(
         items[position].account is CryptoAccount
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        CryptoSingleAccountViewHolder(showSelectionStatus,
-            parent.inflate(R.layout.item_account_select_crypto))
+        CryptoSingleAccountViewHolder(
+            showSelectionStatus,
+            parent.inflate(R.layout.item_account_select_crypto)
+        )
 
     override fun onBindViewHolder(
         items: List<SelectableAccountItem>,
@@ -233,8 +243,10 @@ private class CryptoSingleAccountViewHolder(
                     crypto_account_parent.background = null
                 }
             }
-            crypto_account.updateAccount(selectableAccountItem.account as CryptoAccount, onAccountClicked,
-                statusDecorator(selectableAccountItem.account))
+            crypto_account.updateAccount(
+                selectableAccountItem.account as CryptoAccount, onAccountClicked,
+                statusDecorator(selectableAccountItem.account)
+            )
         }
     }
 

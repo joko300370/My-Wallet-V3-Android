@@ -53,6 +53,9 @@ class SelectSourceAccountSheet : TransactionFlowSheet() {
             account_list_back.setOnClickListener {
                 model.process(TransactionIntent.ReturnToPreviousStep)
             }
+            account_list.onEmptyList = {
+                account_list_empty.visible()
+            }
         }
     }
 }
