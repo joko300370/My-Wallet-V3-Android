@@ -22,6 +22,7 @@ import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import piuk.blockchain.android.simplebuy.SimpleBuyNavigator
+import piuk.blockchain.android.simplebuy.SimpleBuyScreen
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
@@ -30,7 +31,7 @@ import timber.log.Timber
 import java.net.URLEncoder
 
 class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLinkInterfaceHandler.FastLinkListener,
-    YodleeWebClient.YodleeWebClientInterface {
+    YodleeWebClient.YodleeWebClientInterface, SimpleBuyScreen {
 
     private val analytics: Analytics by inject()
 
@@ -149,9 +150,11 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
         yodlee_icon.visibleIf { visible }
     }
 
-    private fun navigator(): SimpleBuyNavigator =
+    override fun navigator(): SimpleBuyNavigator =
         (activity as? SimpleBuyNavigator)
             ?: throw IllegalStateException("Parent must implement SimpleBuyNavigator")
+
+    override fun onBackPressed(): Boolean = true
 
     companion object {
         private const val FAST_LINK_URL: String = "FAST_LINK_URL"
