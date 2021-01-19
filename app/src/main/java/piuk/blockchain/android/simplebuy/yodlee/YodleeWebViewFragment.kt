@@ -14,9 +14,9 @@ import android.webkit.WebViewClient
 import androidx.fragment.app.Fragment
 import com.blockchain.notifications.analytics.Analytics
 import com.google.gson.Gson
-import com.google.gson.annotations.SerializedName
 import kotlinx.android.synthetic.main.fragment_yodlee_webview.*
 import org.json.JSONException
+import org.json.JSONObject
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
@@ -26,6 +26,7 @@ import piuk.blockchain.android.simplebuy.SimpleBuyScreen
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.androidcoreui.utils.extensions.gone
 import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import timber.log.Timber
 import java.net.URLEncoder
 
@@ -94,11 +95,12 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
 
     private fun loadYodlee() {
         requireActivity().runOnUiThread {
-            yodlee_loading_group.visible()
+            updateViewsVisibility(true)
             yodlee_webview.clearCache(true)
+            yodlee_status_label.text = getString(R.string.yodlee_connection_title)
+            yodlee_subtitle.text = getString(R.string.yodlee_connection_subtitle)
             yodlee_webview.gone()
             yodlee_retry.gone()
-
             yodlee_webview.postUrl(fastLinkUrl, yodleeQuery.toByteArray())
         }
     }
@@ -110,33 +112,25 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
 
     override fun flowError(error: FastLinkInterfaceHandler.FastLinkFlowError, reason: String?) {
         requireActivity().runOnUiThread {
-            when (error) {
-                FastLinkInterfaceHandler.FastLinkFlowError.FLOW_QUIT_BY_USER -> {
-                    analytics.logEvent(SimpleBuyAnalytics.ACH_CLOSE)
-                    yodlee_webview.gone()
-                    yodlee_status_label.gone()
-                    yodlee_subtitle.gone()
-                    yodlee_retry.gone()
-                    navigator().pop()
-                }
-                FastLinkInterfaceHandler.FastLinkFlowError.JSON_PARSING -> {
-                    analytics.logEvent(SimpleBuyAnalytics.ACH_ERROR)
-                    showError(getString(R.string.yodlee_parsing_error))
-                }
-                FastLinkInterfaceHandler.FastLinkFlowError.OTHER -> {
-                    analytics.logEvent(SimpleBuyAnalytics.ACH_ERROR)
-                    showError(getString(R.string.yodlee_unexpected_error))
-                }
-            }
+            showError(getString(R.string.yodlee_parsing_error), reason)
         }
     }
 
-    private fun showError(errorText: String) {
+    private fun showError(errorText: String, reason: String?) {
         yodlee_webview.gone()
+        yodlee_icon.gone()
+        yodlee_progress.gone()
         yodlee_status_label.text = errorText
-        yodlee_subtitle.gone()
+        yodlee_status_label.visible()
+
         yodlee_retry.visible()
         yodlee_retry.setOnClickListener { loadYodlee() }
+        reason?.let {
+            yodlee_subtitle.visible()
+            yodlee_subtitle.text = it
+        } ?: kotlin.run {
+            yodlee_subtitle.gone()
+        }
     }
 
     override fun openExternalUrl(url: String) {
@@ -146,7 +140,14 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
 
     override fun pageFinishedLoading() {
         yodlee_webview.visible()
-        yodlee_loading_group.gone()
+        updateViewsVisibility(false)
+    }
+
+    private fun updateViewsVisibility(visible: Boolean) {
+        yodlee_progress.visibleIf { visible }
+        yodlee_status_label.visibleIf { visible }
+        yodlee_subtitle.visibleIf { visible }
+        yodlee_icon.visibleIf { visible }
     }
 
     override fun navigator(): SimpleBuyNavigator =
@@ -198,7 +199,6 @@ class YodleeWebClient(private val listener: YodleeWebClientInterface) : WebViewC
 }
 
 class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
-    private val gson = Gson()
 
     interface FastLinkListener {
         fun flowSuccess(providerAccountId: String, accountId: String)
@@ -214,134 +214,83 @@ class FastLinkInterfaceHandler(private val listener: FastLinkListener) {
 
     @JavascriptInterface
     fun postMessage(data: String?) {
+        if (data == null) return
+        if (!data.isValidJSONObject()) {
+            return
+        }
+        val message = Gson().fromJson(data, FastLinkMessage::class.java)
+        val messageType = message.type ?: return
+        val messageData = message.data ?: return
+
+        if (messageType.equals(POST_MESSAGE, true) && messageData.action != null) {
+            handlePostMessage(messageData)
+        } else if (messageType.equals(OPEN_EXTERNAL_URL, true)) {
+            messageData.externalUrl?.let {
+                listener.openExternalUrl(it)
+            }
+        }
+    }
+
+    private fun handlePostMessage(data: MessageData) {
+        data.action?.let {
+            if (it.equals(EXIT_ACTION, true)) {
+                handleExitAction(data)
+            }
+        }
+    }
+
+    private fun handleExitAction(data: MessageData) {
+        if (data.sites?.isNotEmpty() == true && data.sites[0].status.equals(FLOW_SUCCESS, true)) {
+            handleSitesSuccess(data.sites[0])
+        } else if (data.status != null) {
+            handleMessageStatus(data.status, data.reason)
+        } else {
+            listener.flowError(FastLinkFlowError.OTHER)
+        }
+    }
+
+    private fun handleSitesSuccess(siteData: SiteData) {
+        val accountId = siteData.accountId ?: kotlin.run {
+            listener.flowError(FastLinkFlowError.OTHER)
+            return
+        }
+        val providerAccountId: String = siteData.providerAccountId ?: kotlin.run {
+            listener.flowError(FastLinkFlowError.OTHER)
+            return
+        }
+        listener.flowSuccess(providerAccountId = providerAccountId, accountId = accountId)
+    }
+
+    private fun handleMessageStatus(status: String, reason: String?) {
+        if (
+            status.equals(FLOW_ABANDONED, true) ||
+            status.equals(USER_CLOSE_ACTION, true)
+        ) {
+            listener.flowError(FastLinkFlowError.FLOW_QUIT_BY_USER, reason)
+        } else
+            listener.flowError(FastLinkFlowError.OTHER)
+    }
+
+    private fun String.isValidJSONObject(): Boolean {
         try {
-            val message = gson.fromJson(data, FastLinkMessage::class.java)
-
-            when (message.type) {
-                MessageType.POST_MESSAGE -> {
-                    handlePostMessage(message)
-                }
-                MessageType.OPEN_EXTERNAL_URL -> {
-                    message.data.externalUrl?.let {
-                        listener.openExternalUrl(it)
-                    } ?: listener.flowError(FastLinkFlowError.OTHER)
-                }
-            }
-        } catch (e: JSONException) {
-            listener.flowError(FastLinkFlowError.JSON_PARSING)
+            JSONObject(this)
+        } catch (ex: JSONException) {
+            return false
         }
+        return true
     }
 
-    private fun handlePostMessage(message: FastLinkMessage) {
-        with(message.data) {
-            if (action != null) {
-                when (action) {
-                    MessageAction.EXIT -> {
-                        handleExitAction()
-                    }
-                }
-            } else {
-                // TODO no action but we may already have providerAccountId
-            }
-        }
+    companion object {
+        // Message types
+        private const val POST_MESSAGE = "POST_MESSAGE"
+        private const val OPEN_EXTERNAL_URL = "OPEN_EXTERNAL_URL"
+
+        // Handled actions
+        private const val EXIT_ACTION = "exit"
+
+        // Data statuses
+        private const val FLOW_SUCCESS = "SUCCESS"
+        private const val FLOW_ABANDONED = "ACTION_ABANDONED"
+        private const val USER_CLOSE_ACTION = "USER_CLOSE_ACTION"
     }
-
-    private fun MessageData.handleExitAction() {
-        when {
-            status != null -> {
-                handleMessageStatus(status, reason)
-            }
-            sites?.isNotEmpty() == true -> {
-                val site = sites[0]
-                site.status?.let {
-                    handleMessageStatusFromSite(it, site)
-                } ?: listener.flowError(FastLinkFlowError.OTHER)
-            }
-            else -> {
-                listener.flowError(FastLinkFlowError.OTHER)
-            }
-        }
-    }
-
-    private fun MessageData.handleMessageStatus(status: MessageStatus, reason: String?) {
-        when (status) {
-            MessageStatus.FLOW_SUCCESS -> {
-                listener.flowSuccess(providerAccountId = providerAccountId, accountId = accountId)
-            }
-            MessageStatus.FLOW_ABANDONED,
-            MessageStatus.FLOW_CLOSED,
-            MessageStatus.FLOW_FAILED -> {
-                listener.flowError(FastLinkFlowError.FLOW_QUIT_BY_USER, reason)
-            }
-        }
-    }
-
-    private fun handleMessageStatusFromSite(status: MessageStatus, site: SiteData) {
-        when (status) {
-            MessageStatus.FLOW_SUCCESS -> {
-                val pId = site.providerAccountId ?: kotlin.run {
-                    listener.flowError(FastLinkFlowError.OTHER, "Provide ID not found")
-                    return
-                }
-                val acId = site.accountId ?: kotlin.run {
-                    listener.flowError(FastLinkFlowError.OTHER, "Account ID not found")
-                    return
-                }
-                listener.flowSuccess(accountId = acId, providerAccountId = pId)
-            }
-            MessageStatus.FLOW_ABANDONED,
-            MessageStatus.FLOW_CLOSED,
-            MessageStatus.FLOW_FAILED -> {
-                listener.flowError(FastLinkFlowError.FLOW_QUIT_BY_USER, site.reason)
-            }
-        }
-    }
-
-    private data class FastLinkMessage(val type: MessageType, val data: MessageData)
-
-    private enum class MessageType {
-        POST_MESSAGE,
-        OPEN_EXTERNAL_URL
-    }
-
-    private enum class MessageStatus {
-        @SerializedName("SUCCESS")
-        FLOW_SUCCESS,
-
-        @SerializedName("ACTION_ABANDONED")
-        FLOW_ABANDONED,
-
-        @SerializedName("USER_CLOSE_ACTION")
-        FLOW_CLOSED,
-
-        @SerializedName("FAILED")
-        FLOW_FAILED
-    }
-
-    private enum class MessageAction {
-        @SerializedName("exit")
-        EXIT
-    }
-
-    private data class MessageData(
-        val action: MessageAction?,
-        val status: MessageStatus?,
-        val sites: List<SiteData>?,
-        val providerAccountId: String,
-        val accountId: String,
-        val providerName: String?,
-        val additionalStatus: String?,
-        @SerializedName("url")
-        val externalUrl: String?,
-        val reason: String?
-    )
-
-    private data class SiteData(
-        val reason: String?,
-        val status: MessageStatus?,
-        val providerId: String?,
-        val providerAccountId: String?,
-        val accountId: String?,
-        val providerName: String?
-    )
 }
