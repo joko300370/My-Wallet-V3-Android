@@ -33,6 +33,7 @@ import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.android.util.AfterTextChangedWatcher
 import timber.log.Timber
+
 class EnterTargetAddressSheet : TransactionFlowSheet() {
     override val layoutResource: Int = R.layout.dialog_tx_flow_enter_address
 
@@ -49,7 +50,7 @@ class EnterTargetAddressSheet : TransactionFlowSheet() {
                 model.process(TransactionIntent.EnteredAddressReset)
             } else {
                 if (customiser.enterTargetAddressSheetState(state) is
-                            TargetAddressSheetState.SelectAccountWhenOverMaxLimitSurpassed
+                        TargetAddressSheetState.SelectAccountWhenOverMaxLimitSurpassed
                 ) {
                     dialogView.select_an_account.visible()
                 } else {
@@ -76,7 +77,7 @@ class EnterTargetAddressSheet : TransactionFlowSheet() {
             }
 
             if (customiser.enterTargetAddressSheetState(newState) is
-                        TargetAddressSheetState.SelectAccountWhenOverMaxLimitSurpassed
+                    TargetAddressSheetState.SelectAccountWhenOverMaxLimitSurpassed
             ) {
                 select_an_account.visible()
             }
@@ -89,7 +90,8 @@ class EnterTargetAddressSheet : TransactionFlowSheet() {
 
             customiser.issueFlashMessage(newState, null)?.let {
                 address_entry.setBackgroundColor(
-                    ContextCompat.getColor(requireContext(), R.color.red_000))
+                    ContextCompat.getColor(requireContext(), R.color.red_000)
+                )
                 error_msg.apply {
                     text = it
                     visible()
@@ -113,7 +115,9 @@ class EnterTargetAddressSheet : TransactionFlowSheet() {
                 onLoadError = {
                     hideTransferList()
                 }
-              /*  onEmptyList = { hideTransferList() }*/
+                onListLoaded = {
+                    if (it) hideTransferList()
+                }
             }
             address_sheet_back.setOnClickListener {
                 model.process(TransactionIntent.ReturnToPreviousStep)
@@ -134,7 +138,8 @@ class EnterTargetAddressSheet : TransactionFlowSheet() {
     private fun hideErrorState() {
         dialogView.error_msg.invisible()
         dialogView.address_entry.setBackgroundColor(
-            ContextCompat.getColor(requireContext(), R.color.grey_000))
+            ContextCompat.getColor(requireContext(), R.color.grey_000)
+        )
     }
 
     private fun showManualAddressEntry(newState: TransactionState) {
@@ -198,7 +203,8 @@ class EnterTargetAddressSheet : TransactionFlowSheet() {
                 }
                 is TargetAddressSheetState.TargetAccountSelected -> {
                     updatedSelectedAccount(
-                        targetAddressSheetState.accounts.filterIsInstance<BlockchainAccount>().first())
+                        targetAddressSheetState.accounts.filterIsInstance<BlockchainAccount>().first()
+                    )
                     onAccountSelected = {
                         model.process(TransactionIntent.ShowTargetSelection)
                     }

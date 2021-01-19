@@ -56,7 +56,8 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
 
     private val host: SellIntroHost by lazy {
         parentFragment as? SellIntroHost ?: throw IllegalStateException(
-            "Host fragment is not a SellIntroHost")
+            "Host fragment is not a SellIntroHost"
+        )
     }
 
     private val tierService: TierService by scopedInject()
@@ -222,9 +223,9 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
                     }
                 }
 
-                /*accounts_list.onEmptyList = {
-                    renderSellEmpty()
-                }*/
+                accounts_list.onListLoaded = {
+                    if (it) renderSellEmpty()
+                }
             }, onError = {
                 renderSellError()
             })
@@ -239,8 +240,10 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
             .append(sellInfoIntro)
             .append(sellInfoBold)
             .append(sellInfoEnd)
-        sb.setSpan(StyleSpan(Typeface.BOLD), sellInfoIntro.length, sellInfoIntro.length + sellInfoBold.length,
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        sb.setSpan(
+            StyleSpan(Typeface.BOLD), sellInfoIntro.length, sellInfoIntro.length + sellInfoBold.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
     }
 
     private fun statusDecorator(account: BlockchainAccount): CellDecorator = SellCellDecorator(account)

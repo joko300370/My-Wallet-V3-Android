@@ -10,6 +10,7 @@ import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
+import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 
@@ -41,6 +42,13 @@ class SelectTargetAccountSheet : TransactionFlowSheet() {
             account_list.onAccountSelected = {
                 require(it is SingleAccount)
                 model.process(TransactionIntent.TargetAccountSelected(it))
+            }
+            account_list.onListLoaded = {
+                progress.gone()
+            }
+            account_list.onLoadError = {
+                dialogView.account_list_empty.visible()
+                progress.gone()
             }
             account_list_back.setOnClickListener {
                 model.process(TransactionIntent.ReturnToPreviousStep)

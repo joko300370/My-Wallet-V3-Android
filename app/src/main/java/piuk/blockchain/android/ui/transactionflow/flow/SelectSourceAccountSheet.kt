@@ -50,6 +50,10 @@ class SelectSourceAccountSheet : TransactionFlowSheet() {
                 dialogView.account_list_empty.visibleIf { it }
                 progress.gone()
             }
+            account_list.onLoadError = {
+                dialogView.account_list_empty.visible()
+                progress.gone()
+            }
             account_list.onListLoading = {
                 account_list_empty.gone()
                 progress.visible()

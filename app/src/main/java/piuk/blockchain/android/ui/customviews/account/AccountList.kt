@@ -28,7 +28,6 @@ import piuk.blockchain.android.ui.adapters.DelegationAdapter
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.customviews.IntroHeaderView
 import piuk.blockchain.android.util.inflate
-import java.util.concurrent.TimeUnit
 
 typealias StatusDecorator = (BlockchainAccount) -> CellDecorator
 
@@ -142,7 +141,7 @@ class AccountList @JvmOverloads constructor(
 
     var onLoadError: (Throwable) -> Unit = {}
     var onAccountSelected: (BlockchainAccount) -> Unit = {}
-    var onListLoaded: (Boolean) -> Unit = {}
+    var onListLoaded: (isEmpty: Boolean) -> Unit = {}
     var onListLoading: () -> Unit = {}
 }
 
