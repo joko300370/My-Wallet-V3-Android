@@ -94,22 +94,16 @@ class AccountList @JvmOverloads constructor(
         disposables += source
             .observeOn(uiScheduler)
             .doOnSubscribe {
-                if ((adapter as? AccountsDelegateAdapter)?.items?.isEmpty() == true) {
+                if (adapter?.itemCount == 0) {
                     onListLoading()
                 }
             }
-            .delay(5,TimeUnit.SECONDS)
             .subscribeBy(
                 onSuccess = {
                     (adapter as? AccountsDelegateAdapter)?.items = it.map { account ->
                         SelectableAccountItem(account, false)
                     }
-
-                    if (it.isEmpty()) {
-                        onEmptyList()
-                    } else {
-                        onListLoaded()
-                    }
+                    onListLoaded(it.isEmpty())
 
                     lastSelectedAccount?.let {
                         updatedSelectedAccount(it)
@@ -148,8 +142,7 @@ class AccountList @JvmOverloads constructor(
 
     var onLoadError: (Throwable) -> Unit = {}
     var onAccountSelected: (BlockchainAccount) -> Unit = {}
-    var onEmptyList: () -> Unit = {}
-    var onListLoaded: () -> Unit = {}
+    var onListLoaded: (Boolean) -> Unit = {}
     var onListLoading: () -> Unit = {}
 }
 

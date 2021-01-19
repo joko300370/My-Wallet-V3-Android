@@ -222,9 +222,9 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
                     }
                 }
 
-                accounts_list.onEmptyList = {
+                /*accounts_list.onEmptyList = {
                     renderSellEmpty()
-                }
+                }*/
             }, onError = {
                 renderSellError()
             })

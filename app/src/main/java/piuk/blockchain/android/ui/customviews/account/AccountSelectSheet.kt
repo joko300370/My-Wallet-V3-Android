@@ -61,7 +61,7 @@ class AccountSelectSheet(
         with(view) {
 
             account_list.onAccountSelected = ::doOnAccountSelected
-            account_list.onEmptyList = ::doOnEmptyList
+       /*     account_list.onEmptyList = ::doOnEmptyList*/
             account_list.onLoadError = ::doOnLoadError
 
             account_list_title.text = getString(sheetTitle)

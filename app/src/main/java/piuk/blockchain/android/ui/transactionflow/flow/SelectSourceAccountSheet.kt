@@ -8,6 +8,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
+import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 
@@ -17,9 +18,6 @@ class SelectSourceAccountSheet : TransactionFlowSheet() {
     private var availableSources = emptyList<CryptoAccount>()
     override fun render(newState: TransactionState) {
         if (availableSources == newState.availableSources) {
-            if (availableSources.isEmpty()) {
-                showEmptyState()
-            }
             // If list displays already the same accounts return so to avoid the annoying flickering
             return
         }
@@ -32,14 +30,9 @@ class SelectSourceAccountSheet : TransactionFlowSheet() {
             account_list_subtitle.text = customiser.selectSourceAccountSubtitle(newState)
             account_list_subtitle.visible()
             account_list_back.visibleIf { newState.canGoBack }
-            account_list.onEmptyList = {
-                showEmptyState()
-            }
         }
         availableSources = newState.availableSources
     }
-
-    private fun showEmptyState() { dialogView.account_list_empty.visible() }
 
     override val layoutResource: Int
         get() = R.layout.dialog_sheet_account_selector
@@ -53,8 +46,13 @@ class SelectSourceAccountSheet : TransactionFlowSheet() {
             account_list_back.setOnClickListener {
                 model.process(TransactionIntent.ReturnToPreviousStep)
             }
-            account_list.onEmptyList = {
-                account_list_empty.visible()
+            account_list.onListLoaded = {
+                dialogView.account_list_empty.visibleIf { it }
+                progress.gone()
+            }
+            account_list.onListLoading = {
+                account_list_empty.gone()
+                progress.visible()
             }
         }
     }

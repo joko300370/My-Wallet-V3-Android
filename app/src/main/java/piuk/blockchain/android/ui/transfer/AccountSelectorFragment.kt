@@ -37,8 +37,10 @@ abstract class AccountSelectorFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         account_selector_account_list.onLoadError = ::doOnLoadError
-        account_selector_account_list.onEmptyList = ::doOnEmptyList
-        account_selector_account_list.onListLoaded = ::doOnListLoaded
+      /*  account_selector_account_list.onEmptyList = ::doOnEmptyList*/
+        account_selector_account_list.onListLoaded = {
+            doOnListLoaded()
+        }
     }
 
     fun initialiseAccountSelectorWithHeader(

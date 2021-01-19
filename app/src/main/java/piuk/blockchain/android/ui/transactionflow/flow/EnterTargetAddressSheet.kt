@@ -113,7 +113,7 @@ class EnterTargetAddressSheet : TransactionFlowSheet() {
                 onLoadError = {
                     hideTransferList()
                 }
-                onEmptyList = { hideTransferList() }
+              /*  onEmptyList = { hideTransferList() }*/
             }
             address_sheet_back.setOnClickListener {
                 model.process(TransactionIntent.ReturnToPreviousStep)
