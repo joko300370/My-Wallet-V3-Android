@@ -39,20 +39,26 @@ class SelectTargetAccountSheet : TransactionFlowSheet() {
 
     override fun initControls(view: View) {
         view.apply {
-            account_list.onAccountSelected = {
-                require(it is SingleAccount)
-                model.process(TransactionIntent.TargetAccountSelected(it))
-            }
-            account_list.onListLoaded = {
-                progress.gone()
-            }
-            account_list.onLoadError = {
-                dialogView.account_list_empty.visible()
-                progress.gone()
-            }
+            account_list.onAccountSelected = ::doOnAccountSelected
+            account_list.onListLoaded = ::doOnListLoaded
+            account_list.onLoadError = ::doOnLoadError
             account_list_back.setOnClickListener {
                 model.process(TransactionIntent.ReturnToPreviousStep)
             }
         }
+    }
+
+    private fun doOnListLoaded(isEmpty: Boolean) {
+        dialogView.progress.gone()
+    }
+
+    private fun doOnAccountSelected(account: BlockchainAccount) {
+        require(account is SingleAccount)
+        model.process(TransactionIntent.TargetAccountSelected(account))
+    }
+
+    private fun doOnLoadError(it: Throwable) {
+        dialogView.account_list_empty.visible()
+        dialogView.progress.gone()
     }
 }

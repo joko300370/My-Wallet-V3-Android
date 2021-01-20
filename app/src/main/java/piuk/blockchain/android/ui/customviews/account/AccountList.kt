@@ -93,9 +93,7 @@ class AccountList @JvmOverloads constructor(
         disposables += source
             .observeOn(uiScheduler)
             .doOnSubscribe {
-                if (adapter?.itemCount == 0) {
-                    onListLoading()
-                }
+                onListLoading()
             }
             .subscribeBy(
                 onSuccess = {

@@ -37,9 +37,7 @@ abstract class AccountSelectorFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         account_selector_account_list.onLoadError = ::doOnLoadError
-        account_selector_account_list.onListLoaded = {
-            if (it) doOnEmptyList() else doOnListLoaded()
-        }
+        account_selector_account_list.onListLoaded = ::doOnListLoaded
     }
 
     fun initialiseAccountSelectorWithHeader(
@@ -106,5 +104,9 @@ abstract class AccountSelectorFragment : Fragment() {
             ToastCustom.TYPE_ERROR
         )
         doOnEmptyList()
+    }
+
+    private fun doOnListLoaded(isEmpty: Boolean) {
+        if (isEmpty) doOnEmptyList() else doOnListLoaded()
     }
 }

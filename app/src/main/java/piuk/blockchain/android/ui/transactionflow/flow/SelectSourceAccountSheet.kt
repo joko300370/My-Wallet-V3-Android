@@ -46,18 +46,24 @@ class SelectSourceAccountSheet : TransactionFlowSheet() {
             account_list_back.setOnClickListener {
                 model.process(TransactionIntent.ReturnToPreviousStep)
             }
-            account_list.onListLoaded = {
-                dialogView.account_list_empty.visibleIf { it }
-                progress.gone()
-            }
-            account_list.onLoadError = {
-                dialogView.account_list_empty.visible()
-                progress.gone()
-            }
-            account_list.onListLoading = {
-                account_list_empty.gone()
-                progress.visible()
-            }
+            account_list.onListLoaded = ::doOnListLoaded
+            account_list.onLoadError = ::doOnLoadError
+            account_list.onListLoading = ::doOnListLoading
         }
+    }
+
+    private fun doOnListLoaded(isEmpty: Boolean) {
+        dialogView.account_list_empty.visibleIf { isEmpty }
+        dialogView.progress.gone()
+    }
+
+    private fun doOnLoadError(it: Throwable) {
+        dialogView.account_list_empty.visible()
+        dialogView.progress.gone()
+    }
+
+    private fun doOnListLoading() {
+        dialogView.account_list_empty.gone()
+        dialogView.progress.visible()
     }
 }
