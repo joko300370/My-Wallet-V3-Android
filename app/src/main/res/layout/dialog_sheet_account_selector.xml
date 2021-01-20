@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -72,11 +73,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/standard_margin"
-        android:paddingBottom="@dimen/standard_margin"
         android:text="@string/select_account_sheet_empty"
         android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/account_list"
         app:layout_constraintTop_toBottomOf="@id/account_list_separator"
+        app:layout_goneMarginBottom="@dimen/standard_margin"
         tools:visibility="visible" />
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/standard_margin"
+        app:layout_constraintBottom_toTopOf="@+id/account_list"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/account_list_separator"
+        app:layout_goneMarginBottom="@dimen/standard_margin" />
 
     <piuk.blockchain.android.ui.customviews.account.AccountList
         android:id="@+id/account_list"
