@@ -141,6 +141,11 @@ class AccountList @JvmOverloads constructor(
     var onAccountSelected: (BlockchainAccount) -> Unit = {}
     var onListLoaded: (isEmpty: Boolean) -> Unit = {}
     var onListLoading: () -> Unit = {}
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        disposables.clear()
+    }
 }
 
 private class AccountsDelegateAdapter(

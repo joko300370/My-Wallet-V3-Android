@@ -50,17 +50,17 @@ class AccountSelectSheet(
     }
 
     private fun doOnListLoaded(isEmpty: Boolean) {
-        account_list_empty.visibleIf { isEmpty }
-        progress.gone()
+        dialogView.account_list_empty.visibleIf { isEmpty }
+        dialogView.progress.gone()
     }
 
     private fun doOnLoadError(it: Throwable) {
+        dialogView.progress.gone()
         dismiss()
-        progress.gone()
     }
 
     private fun doOnListLoading() {
-        progress.visible()
+        dialogView.progress.visible()
     }
 
     override fun initControls(view: View) {
