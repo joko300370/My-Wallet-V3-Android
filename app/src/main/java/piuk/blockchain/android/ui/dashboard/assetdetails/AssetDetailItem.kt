@@ -45,7 +45,7 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
         block: AssetDetailsDecorator
     ) {
         with(itemView) {
-            val asset = getAsset(item.account)
+            val asset = item.account.getAsset()
 
             icon.setCoinIcon(asset)
             wallet_name.text = resources.getString(asset.assetName())
@@ -96,15 +96,15 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
                 }
         }
     }
-
-    private fun getAsset(account: BlockchainAccount): CryptoCurrency =
-        when (account) {
-            is CryptoAccount -> account.asset
-            is AccountGroup -> account.accounts.filterIsInstance<CryptoAccount>()
-                .firstOrNull()?.asset
-            else -> null
-        } ?: throw IllegalStateException("Unsupported account type ${account::class.java}")
 }
+
+private fun BlockchainAccount.getAsset(): CryptoCurrency =
+    when (this) {
+        is CryptoAccount -> asset
+        is AccountGroup -> accounts.filterIsInstance<CryptoAccount>()
+            .firstOrNull()?.asset
+        else -> null
+    } ?: throw IllegalStateException("Unsupported account type ${this::class.java}")
 
 class LabelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun bind(token: CryptoAsset) {

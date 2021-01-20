@@ -35,7 +35,10 @@ class LoadAsset(
     val asset: CryptoAsset
 ) : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
-        oldState.copy(asset = asset)
+        oldState.copy(
+            asset = asset,
+            assetDisplayMap = mapOf()
+        )
 }
 
 object LoadAssetDisplayDetails : AssetDetailsIntent() {
