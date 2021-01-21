@@ -558,6 +558,9 @@ class TransactionFlowCustomiserImpl(
                 TransactionError.InvalidDestinationAmount -> resources.getString(
                     R.string.trading_invalid_destination_amount
                 )
+                is TransactionError.ExecutionFailed -> resources.getString(
+                    R.string.executing_transaction_error, state.asset.displayTicker
+                )
                 TransactionError.UnexpectedError -> resources.getString(R.string.send_progress_error_title)
                 else -> resources.getString(R.string.send_progress_error_title)
             }

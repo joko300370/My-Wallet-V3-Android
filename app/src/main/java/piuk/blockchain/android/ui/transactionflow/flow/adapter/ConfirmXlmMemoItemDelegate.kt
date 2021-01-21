@@ -69,11 +69,11 @@ private class XlmMemoItemViewHolder(
 ) : RecyclerView.ViewHolder(parent), LayoutContainer {
     private val maxCharacters = 28
 
-    override val containerView: View?
+    override val containerView: View
         get() = itemView
 
     private lateinit var timer: Timer
-    private val savingDelay = 250L
+    private val savingDelay = 300L
 
     init {
         itemView.apply {
@@ -178,15 +178,19 @@ private class XlmMemoItemViewHolder(
                     override fun run() {
                         if (text?.isNotEmpty() == true) {
                             if (itemView.confirm_details_memo_spinner.selectedItemPosition == TEXT_INDEX) {
-                                model.process(
-                                    TransactionIntent.ModifyTxOption(item.copy(text = text.toString()))
-                                )
-                            } else {
-                                model.process(
-                                    TransactionIntent.ModifyTxOption(
-                                        item.copy(id = text.toString().toLong())
+                                if (haveContentsChanged(s?.toString(), item.text)) {
+                                    model.process(
+                                        TransactionIntent.ModifyTxOption(item.copy(text = text.toString()))
                                     )
-                                )
+                                }
+                            } else {
+                                if (haveContentsChanged(s?.toString(), item.id?.toString())) {
+                                    model.process(
+                                        TransactionIntent.ModifyTxOption(
+                                            item.copy(id = text.toString().toLong())
+                                        )
+                                    )
+                                }
                             }
                         }
                     }
@@ -233,6 +237,10 @@ private class XlmMemoItemViewHolder(
                 }
             }
     }
+
+    // only save if same values after countdown but different from original
+    private fun EditText.haveContentsChanged(currentText: String? = "", previousText: String? = ""): Boolean =
+        text?.toString() == currentText && previousText != currentText
 
     private fun EditText.configureForSelection(selection: Int) {
         if (selection == TEXT_INDEX) {

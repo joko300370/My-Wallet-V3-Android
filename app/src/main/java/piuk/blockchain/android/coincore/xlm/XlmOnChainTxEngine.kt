@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.xlm
 
 import com.blockchain.fees.FeeType
+import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.sunriver.Memo
 import com.blockchain.sunriver.SendDetails
@@ -232,6 +233,8 @@ class XlmOnChainTxEngine(
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
         createTransaction(pendingTx).flatMap { sendDetails ->
             xlmDataManager.sendFunds(sendDetails, secondPassword)
+        }.onErrorResumeNext {
+            Single.error(TransactionError.ExecutionFailed)
         }.map {
             TxResult.HashedTxResult(it.txHash, pendingTx.amount)
         }

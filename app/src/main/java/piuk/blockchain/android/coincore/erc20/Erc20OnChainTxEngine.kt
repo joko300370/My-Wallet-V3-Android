@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.erc20
 
+import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -208,6 +209,8 @@ open class Erc20OnChainTxEngine(
                 }?.toSingle {
                     hash
                 } ?: Single.just(hash)
+            }.onErrorResumeNext {
+                Single.error(TransactionError.ExecutionFailed)
             }.map {
                 TxResult.HashedTxResult(it, pendingTx.amount)
             }

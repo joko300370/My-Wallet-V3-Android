@@ -409,7 +409,9 @@ sealed class TransactionError : Throwable() {
     object InvalidOrExpiredQuote : TransactionError()
     object IneligibleForSwap : TransactionError()
     object InvalidDestinationAmount : TransactionError()
+    object ExecutionFailed : TransactionError()
 }
+
 sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val order: Int) :
     Serializable {
     object Undefined : PaymentMethod(UNDEFINED_PAYMENT_ID, null, UNDEFINED_PAYMENT_METHOD_ORDER)

@@ -1852,6 +1852,7 @@
     <string name="trading_invalid_fiat">Oops! Looks like that fiat is invalid, please try again.</string>
     <string name="trading_direction_disabled">Oops! That service isn’t available at the moment, please try again later.</string>
     <string name="trading_quote_invalid_or_expired">Oops! The amount we quoted you is no longer valid, please try again.</string>
+    <string name="executing_transaction_error">Oops! Something went wrong while executing the %1$s on-chain transaction.</string>
     <string name="trading_ineligible_for_swap">Oops! This service isn’t currently available. Please contact support.</string>
     <string name="trading_invalid_destination_amount">Oops! Looks like that isn’t a valid amount, please try again.</string>
 </resources>

@@ -80,10 +80,12 @@ abstract class OnChainTxEngineBase(
     ): Single<PendingTx> {
         setFeeType(cryptoCurrency, newConfirmation.selectedLevel)
 
-        return doUpdateAmount(pendingTx.amount, pendingTx.copy(
-            feeLevel = newConfirmation.selectedLevel,
-            customFeeAmount = newConfirmation.customFeeAmount
-        ))
+        return doUpdateAmount(
+            pendingTx.amount, pendingTx.copy(
+                feeLevel = newConfirmation.selectedLevel,
+                customFeeAmount = newConfirmation.customFeeAmount
+            )
+        )
             .flatMap { pTx -> doValidateAmount(pTx) }
             .flatMap { pTx -> doBuildConfirmations(pTx) }
     }
