@@ -132,7 +132,11 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
             oldState.copy(confirmationActionRequested = true, orderState = OrderState.INITIALISED)
     }
 
-    object LinkBankTransferRequested : SimpleBuyIntent()
+    object LinkBankTransferRequested : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState.copy(
+            linkBankRequested = false
+        )
+    }
 
     object TryToLinkABankTransfer : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState {
@@ -462,6 +466,16 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     object DepositFundsRequested : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(depositFundsRequested = true)
+    }
+
+    object LinkBankSelected : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
+            oldState.copy(linkBankRequested = true)
+    }
+
+    object LinkBankActionHandled : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
+            oldState.copy(linkBankRequested = false)
     }
 
     object DepositFundsHandled : SimpleBuyIntent() {

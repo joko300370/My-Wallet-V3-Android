@@ -6,6 +6,7 @@ import com.blockchain.nabu.datamanagers.BuySellPairs
 import com.blockchain.nabu.datamanagers.CardToBeActivated
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.EligiblePaymentMethodType
 import com.blockchain.nabu.datamanagers.OrderInput
 import com.blockchain.nabu.datamanagers.OrderOutput
 import com.blockchain.nabu.datamanagers.OrderState
@@ -242,4 +243,9 @@ class SimpleBuyInteractor(
 
     fun addNewCard(fiatCurrency: String, billingAddress: BillingAddress): Single<CardToBeActivated> =
         custodialWalletManager.addNewCard(fiatCurrency, billingAddress)
+
+    fun userIsEligibleToLinkABank(fiatCurrency: String): Single<Boolean> =
+        custodialWalletManager.getEligiblePaymentMethodTypes(fiatCurrency).map {
+            it.contains(EligiblePaymentMethodType(PaymentMethodType.BANK_TRANSFER,fiatCurrency))
+        }
 }

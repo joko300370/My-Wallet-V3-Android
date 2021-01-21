@@ -12,6 +12,7 @@ import com.blockchain.nabu.models.responses.simplebuy.EverypayPaymentAttrs
 import com.google.gson.Gson
 import io.reactivex.Completable
 import io.reactivex.Scheduler
+import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.cards.partners.CardActivator
@@ -66,11 +67,11 @@ class SimpleBuyModel(
             } ?: Completable.complete()).thenSingle {
                 interactor.createOrder(
                     previousState.selectedCryptoCurrency
-                    ?: throw IllegalStateException("Missing Cryptocurrency "),
+                        ?: throw IllegalStateException("Missing Cryptocurrency "),
                     previousState.order.amount ?: throw IllegalStateException("Missing amount"),
                     previousState.selectedPaymentMethod?.concreteId(),
                     previousState.selectedPaymentMethod?.paymentMethodType
-                    ?: throw IllegalStateException("Missing Payment Method"),
+                        ?: throw IllegalStateException("Missing Payment Method"),
                     true
                 )
             }.subscribeBy(
@@ -103,7 +104,17 @@ class SimpleBuyModel(
                 )
 
             is SimpleBuyIntent.LinkBankTransferRequested -> {
-                interactor.linkNewBank(previousState.fiatCurrency)
+                interactor.userIsEligibleToLinkABank(previousState.fiatCurrency).flatMap {
+                    if (it) {
+                        interactor.linkNewBank(previousState.fiatCurrency)
+                    } else {
+                        Single.just(SimpleBuyIntent.SelectedPaymentMethodUpdate(
+                            previousState.paymentOptions.availablePaymentMethods.first { paymentMethod ->
+                                paymentMethod.id == PaymentMethod.UNDEFINED_BANK_TRANSFER_PAYMENT_ID
+                            }
+                        ))
+                    }
+                }
                     .subscribeBy(
                         onSuccess = { process(it) },
                         onError = { process(SimpleBuyIntent.ErrorIntent(ErrorState.LinkedBankNotSupported)) }
@@ -213,6 +224,7 @@ class SimpleBuyModel(
                         process(SimpleBuyIntent.ErrorIntent())
                     }
                 )
+            is SimpleBuyIntent.LinkBankSelected,
             is SimpleBuyIntent.DepositFundsRequested -> interactor.checkTierLevel()
                 .subscribeBy(
                     onSuccess = { process(it) },
@@ -272,7 +284,7 @@ class SimpleBuyModel(
 
     private fun shouldShowAppRating(orderCreatedSuccessFully: Boolean): Boolean =
         ratingPrefs.preRatingActionCompletedTimes >= COMPLETED_ORDERS_BEFORE_SHOWING_APP_RATING &&
-        !ratingPrefs.hasSeenRatingDialog && orderCreatedSuccessFully
+            !ratingPrefs.hasSeenRatingDialog && orderCreatedSuccessFully
 
     private fun pollForOrderStatus() {
         process(SimpleBuyIntent.CheckOrderStatus)
