@@ -29,7 +29,8 @@ class SimpleBuyModel(
     private val interactor: SimpleBuyInteractor
 ) : MviModel<SimpleBuyState, SimpleBuyIntent>(
     gson.fromJson(prefs.simpleBuyState(), SimpleBuyState::class.java) ?: initialState,
-    scheduler) {
+    scheduler
+) {
 
     override fun performAction(previousState: SimpleBuyState, intent: SimpleBuyIntent): Disposable? =
         when (intent) {
@@ -38,9 +39,11 @@ class SimpleBuyModel(
                     .subscribeBy(
                         onSuccess = { pairs ->
                             process(
-                                SimpleBuyIntent.UpdatedBuyLimitsAndSupportedCryptoCurrencies(pairs,
+                                SimpleBuyIntent.UpdatedBuyLimitsAndSupportedCryptoCurrencies(
+                                    pairs,
                                     intent.cryptoCurrency
-                                ))
+                                )
+                            )
                             process(SimpleBuyIntent.NewCryptoCurrencySelected(intent.cryptoCurrency))
                         },
                         onError = { process(SimpleBuyIntent.ErrorIntent()) }
@@ -63,11 +66,11 @@ class SimpleBuyModel(
             } ?: Completable.complete()).thenSingle {
                 interactor.createOrder(
                     previousState.selectedCryptoCurrency
-                        ?: throw IllegalStateException("Missing Cryptocurrency "),
+                    ?: throw IllegalStateException("Missing Cryptocurrency "),
                     previousState.order.amount ?: throw IllegalStateException("Missing amount"),
                     previousState.selectedPaymentMethod?.concreteId(),
                     previousState.selectedPaymentMethod?.paymentMethodType
-                        ?: throw IllegalStateException("Missing Payment Method"),
+                    ?: throw IllegalStateException("Missing Payment Method"),
                     true
                 )
             }.subscribeBy(
@@ -126,13 +129,12 @@ class SimpleBuyModel(
 
             is SimpleBuyIntent.UpdateAccountProvider -> {
                 interactor.updateAccountProviderId(
-                    linkingId = previousState.selectedPaymentMethod?.id ?: throw IllegalStateException(
-                        "Missing required payment method ID"),
+                    linkingId = intent.linkingBankId,
                     providerAccountId = intent.accountProviderId,
                     accountId = intent.accountId
                 ).subscribeBy(
                     onComplete = {
-                        process(SimpleBuyIntent.StartPollingForLinkStatus)
+                        process(SimpleBuyIntent.StartPollingForLinkStatus(intent.linkingBankId))
                     },
                     onError = {
                         process(SimpleBuyIntent.ProviderAccountIdUpdateError)
@@ -141,44 +143,41 @@ class SimpleBuyModel(
             }
 
             is SimpleBuyIntent.StartPollingForLinkStatus -> {
-                interactor.pollForLinkedBankState(
-                    previousState.selectedPaymentMethod?.id ?: throw IllegalStateException(
-                        "Missing required payment method ID"))
-                    .subscribeBy(
-                        onSuccess = {
-                            when (it.state) {
-                                LinkedBankState.ACTIVE -> {
-                                    process(SimpleBuyIntent.LinkedBankStateSuccess(it))
-                                }
-                                LinkedBankState.BLOCKED,
-                                LinkedBankState.UNKNOWN -> {
-                                    when (it.errorStatus) {
-                                        LinkedBankErrorState.ACCOUNT_ALREADY_LINKED -> {
-                                            process(SimpleBuyIntent.LinkedBankStateAlreadyLinked)
-                                        }
-                                        LinkedBankErrorState.UNKNOWN -> {
-                                            process(SimpleBuyIntent.LinkedBankStateError)
-                                        }
-                                        LinkedBankErrorState.ACCOUNT_TYPE_UNSUPPORTED -> {
-                                            process(SimpleBuyIntent.LinkedBankStateUnsupportedAccount)
-                                        }
-                                        LinkedBankErrorState.NAMES_MISS_MATCHED -> {
-                                            process(SimpleBuyIntent.LinkedBankStateNamesMissMatch)
-                                        }
-                                        LinkedBankErrorState.NONE -> {
-                                            // do nothing
-                                        }
+                interactor.pollForLinkedBankState(intent.bankId).subscribeBy(
+                    onSuccess = {
+                        when (it.state) {
+                            LinkedBankState.ACTIVE -> {
+                                process(SimpleBuyIntent.LinkedBankStateSuccess(it))
+                            }
+                            LinkedBankState.BLOCKED,
+                            LinkedBankState.UNKNOWN -> {
+                                when (it.errorStatus) {
+                                    LinkedBankErrorState.ACCOUNT_ALREADY_LINKED -> {
+                                        process(SimpleBuyIntent.LinkedBankStateAlreadyLinked)
+                                    }
+                                    LinkedBankErrorState.UNKNOWN -> {
+                                        process(SimpleBuyIntent.LinkedBankStateError)
+                                    }
+                                    LinkedBankErrorState.ACCOUNT_TYPE_UNSUPPORTED -> {
+                                        process(SimpleBuyIntent.LinkedBankStateUnsupportedAccount)
+                                    }
+                                    LinkedBankErrorState.NAMES_MISS_MATCHED -> {
+                                        process(SimpleBuyIntent.LinkedBankStateNamesMissMatch)
+                                    }
+                                    LinkedBankErrorState.NONE -> {
+                                        // do nothing
                                     }
                                 }
-                                LinkedBankState.PENDING -> {
-                                    process(SimpleBuyIntent.LinkedBankStateTimeout)
-                                }
                             }
-                        },
-                        onError = {
-                            process(SimpleBuyIntent.LinkedBankStateError)
+                            LinkedBankState.PENDING -> {
+                                process(SimpleBuyIntent.LinkedBankStateTimeout)
+                            }
                         }
-                    )
+                    },
+                    onError = {
+                        process(SimpleBuyIntent.LinkedBankStateError)
+                    }
+                )
             }
 
             is SimpleBuyIntent.UpdateExchangeRate -> interactor.exchangeRate(intent.currency)
@@ -273,7 +272,7 @@ class SimpleBuyModel(
 
     private fun shouldShowAppRating(orderCreatedSuccessFully: Boolean): Boolean =
         ratingPrefs.preRatingActionCompletedTimes >= COMPLETED_ORDERS_BEFORE_SHOWING_APP_RATING &&
-                !ratingPrefs.hasSeenRatingDialog && orderCreatedSuccessFully
+        !ratingPrefs.hasSeenRatingDialog && orderCreatedSuccessFully
 
     private fun pollForOrderStatus() {
         process(SimpleBuyIntent.CheckOrderStatus)
@@ -284,10 +283,12 @@ class SimpleBuyModel(
             if (attrs.paymentState == EverypayPaymentAttrs.WAITING_3DS &&
                 order.state == OrderState.AWAITING_FUNDS
             ) {
-                process(SimpleBuyIntent.Open3dsAuth(
-                    attrs.paymentLink,
-                    EverypayCardActivator.redirectUrl
-                ))
+                process(
+                    SimpleBuyIntent.Open3dsAuth(
+                        attrs.paymentLink,
+                        EverypayCardActivator.redirectUrl
+                    )
+                )
                 process(SimpleBuyIntent.ResetEveryPayAuth)
             } else {
                 process(SimpleBuyIntent.CheckOrderStatus)

@@ -60,7 +60,7 @@ class WithdrawCheckoutFragment : MviFragment<WithdrawModel, WithdrawIntent, With
             CheckoutItem(getString(R.string.common_from), getString(R.string.currency_funds_wallet, state.currency)),
             CheckoutItem(
                 getString(R.string.withdraw_to),
-                state.selectedBank?.title?.plus(" ${state.selectedBank.account}") ?: ""
+                state.selectedBank?.name?.plus(" ${state.selectedBank.account}") ?: ""
             ),
             CheckoutItem(getString(R.string.fee), state.fee?.toStringWithSymbol() ?: ""),
             CheckoutItem(getString(R.string.common_total), state.total?.toStringWithSymbol() ?: "")

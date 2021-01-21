@@ -15,6 +15,7 @@ import com.blockchain.nabu.datamanagers.CustodialOrder
 import com.blockchain.nabu.datamanagers.CustodialOrderState
 import com.blockchain.nabu.datamanagers.CustodialQuote
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.EligiblePaymentMethodType
 import com.blockchain.nabu.datamanagers.EveryPayCredentials
 import com.blockchain.nabu.datamanagers.ExtraAttributesProvider
 import com.blockchain.nabu.datamanagers.FiatTransaction
@@ -42,6 +43,7 @@ import com.blockchain.nabu.datamanagers.repositories.swap.CustodialRepository
 import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.blockchain.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.nabu.extensions.toLocalTime
+import com.blockchain.nabu.models.data.Bank
 import com.blockchain.nabu.models.data.BankPartner
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
@@ -320,9 +322,9 @@ class LiveCustodialWalletManager(
             nabuService.deleteCard(it, cardId)
         }
 
-    override fun deleteBank(bankId: String): Completable =
+    override fun removeBank(bank: Bank): Completable =
         authenticator.authenticateCompletable {
-            nabuService.deleteBank(it, bankId)
+            bank.remove(it)
         }
 
     override fun getTotalBalanceForAsset(crypto: CryptoCurrency): Maybe<CryptoValue> =
@@ -368,7 +370,7 @@ class LiveCustodialWalletManager(
             it.map { beneficiary ->
                 Beneficiary(
                     id = beneficiary.id,
-                    title = "${beneficiary.name} ${beneficiary.agent.account}",
+                    name = "${beneficiary.name} ${beneficiary.agent.account}",
                     // address is returned from the api as ****6810
                     account = beneficiary.address.replace("*", ""),
                     currency = beneficiary.currency
@@ -553,6 +555,33 @@ class LiveCustodialWalletManager(
             )
         }.map {
             CardToBeActivated(cardId = it.id, partner = it.partner)
+        }
+
+    override fun getEligiblePaymentMethodTypes(fiatCurrency: String): Single<List<EligiblePaymentMethodType>> =
+        authenticator.authenticate {
+            nabuService.paymentMethods(
+                sessionToken = it,
+                currency = fiatCurrency,
+                eligibleOnly = true
+            ).map { methodsResponse ->
+                methodsResponse.mapNotNull { method ->
+                    when (method.type) {
+                        PaymentMethodResponse.PAYMENT_CARD -> EligiblePaymentMethodType(
+                            PaymentMethodType.PAYMENT_CARD,
+                            method.currency ?: return@mapNotNull null
+                        )
+                        PaymentMethodResponse.BANK_TRANSFER -> EligiblePaymentMethodType(
+                            PaymentMethodType.BANK_TRANSFER,
+                            method.currency ?: return@mapNotNull null
+                        )
+                        PaymentMethodResponse.BANK_ACCOUNT -> EligiblePaymentMethodType(
+                            PaymentMethodType.FUNDS,
+                            method.currency ?: return@mapNotNull null
+                        )
+                        else -> null
+                    }
+                }
+            }
         }
 
     override fun activateCard(
@@ -954,6 +983,13 @@ class LiveCustodialWalletManager(
             } ?: return null
         )
     }
+
+    private fun Bank.remove(sessionToken: NabuSessionTokenResponse): Completable =
+        when (this.paymentMethod) {
+            PaymentMethodType.FUNDS -> nabuService.removeBeneficiary(sessionToken, id)
+            PaymentMethodType.BANK_TRANSFER -> nabuService.removeLinkedBank(sessionToken, id)
+            else -> Completable.error(java.lang.IllegalStateException("Unknown Bank type"))
+        }
 
     companion object {
         internal val SUPPORTED_FUNDS_CURRENCIES = listOf(

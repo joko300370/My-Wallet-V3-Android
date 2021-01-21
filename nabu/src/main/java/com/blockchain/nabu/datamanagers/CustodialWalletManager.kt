@@ -14,6 +14,7 @@ import com.blockchain.nabu.models.responses.interest.InterestAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CardPartnerAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CardPaymentAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
+import com.blockchain.nabu.models.data.Bank
 import com.braintreepayments.cardform.utils.CardType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -23,7 +24,6 @@ import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.io.Serializable
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -119,7 +119,7 @@ interface CustodialWalletManager {
 
     fun deleteCard(cardId: String): Completable
 
-    fun deleteBank(bankId: String): Completable
+    fun removeBank(bank: Bank): Completable
 
     fun transferFundsToWallet(amount: CryptoValue, walletAddress: String): Single<String>
 
@@ -138,6 +138,10 @@ interface CustodialWalletManager {
         fiatCurrency: String,
         onlyEligible: Boolean
     ): Single<List<PaymentMethod>>
+
+    fun getEligiblePaymentMethodTypes(
+        fiatCurrency: String
+    ): Single<List<EligiblePaymentMethodType>>
 
     fun addNewCard(fiatCurrency: String, billingAddress: BillingAddress): Single<CardToBeActivated>
 
@@ -294,15 +298,14 @@ data class OrderInput(private val symbol: String, private val amount: String? = 
 data class OrderOutput(private val symbol: String, private val amount: String? = null)
 
 data class Beneficiary(
-    val id: String,
-    val title: String,
-    val account: String,
-    val currency: String
-) : Serializable {
+    override val id: String,
+    override val name: String,
+    override val account: String,
+    override val currency: String
+) : Bank {
 
-    val accountDotted: String by unsafeLazy {
-        "•••• $account"
-    }
+    override val paymentMethod: PaymentMethodType
+        get() = PaymentMethodType.FUNDS
 }
 
 data class FiatTransaction(
@@ -616,4 +619,9 @@ data class CustodialOrder(
     val createdAt: Date,
     val inputMoney: Money,
     val outputMoney: Money
+)
+
+data class EligiblePaymentMethodType(
+    val paymentMethodType: PaymentMethodType,
+    val currency: String
 )

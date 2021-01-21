@@ -137,6 +137,8 @@ class SettingsPresenterTest {
         whenever(custodialWalletManager.canWireTransferToABankWithCurrency(any())).thenReturn(Single.just(false))
         whenever(custodialWalletManager.updateSupportedCardTypes(ArgumentMatchers.anyString())).thenReturn(
             Completable.complete())
+        whenever(custodialWalletManager.getLinkedBanks()).thenReturn(Single.just(emptyList()))
+        whenever(custodialWalletManager.getEligiblePaymentMethodTypes(any())).thenReturn(Single.just(emptyList()))
         // Act
         subject.onViewReady()
         // Assert
@@ -145,8 +147,6 @@ class SettingsPresenterTest {
         verify(activity).setUpUi()
         verify(activity).setPitLinkingState(false)
         verify(activity, Mockito.times(2)).updateCards(emptyList())
-        verify(activity, Mockito.times(2))
-            .updateBanks(LinkedBanksAndSupportedCurrencies(emptyList(), emptyList()))
     }
 
     @Test
@@ -168,6 +168,8 @@ class SettingsPresenterTest {
         whenever(custodialWalletManager.fetchUnawareLimitsCards(ArgumentMatchers.anyList()))
             .thenReturn(Single.just(emptyList()))
         whenever(custodialWalletManager.getLinkedBeneficiaries()).thenReturn(Single.just(emptyList()))
+        whenever(custodialWalletManager.getLinkedBanks()).thenReturn(Single.just(emptyList()))
+        whenever(custodialWalletManager.getEligiblePaymentMethodTypes(any())).thenReturn(Single.just(emptyList()))
 
         // Act
         subject.onViewReady()
@@ -177,8 +179,6 @@ class SettingsPresenterTest {
         verify(activity).hideProgress()
         verify(activity).setUpUi()
         verify(activity, times(2)).updateCards(emptyList())
-        verify(activity, Mockito.times(2))
-            .updateBanks(LinkedBanksAndSupportedCurrencies(emptyList(), emptyList()))
     }
 
     @Test
