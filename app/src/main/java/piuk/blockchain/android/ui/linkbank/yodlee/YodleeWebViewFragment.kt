@@ -22,7 +22,6 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
-import piuk.blockchain.android.simplebuy.SimpleBuyNavigator
 import piuk.blockchain.android.simplebuy.yodlee.FastLinkMessage
 import piuk.blockchain.android.simplebuy.yodlee.MessageData
 import piuk.blockchain.android.simplebuy.yodlee.SiteData
@@ -151,8 +150,8 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
         yodlee_icon.visibleIf { visible }
     }
 
-    private fun navigator(): SimpleBuyNavigator =
-        (activity as? SimpleBuyNavigator)
+    private fun navigator(): YodleeLinkingFlowNavigator =
+        (activity as? YodleeLinkingFlowNavigator)
             ?: throw IllegalStateException("Parent must implement SimpleBuyNavigator")
 
     companion object {

@@ -44,7 +44,6 @@ class LinkBankActivity : BlockchainActivity(), YodleeLinkingFlowNavigator {
     override fun launchYodleeSplash(attributes: YodleeAttributes, bankId: String) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.content_frame, YodleeSplashFragment.newInstance(attributes, bankId))
-            .addToBackStack(YodleeSplashFragment::class.simpleName)
             .commitAllowingStateLoss()
     }
 

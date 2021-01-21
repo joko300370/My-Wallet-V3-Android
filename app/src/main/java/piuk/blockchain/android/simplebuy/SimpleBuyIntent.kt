@@ -151,7 +151,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(
                 isLoading = false,
-                selectedPaymentMethod = oldState.selectedPaymentMethod?.copy(
+                selectedPaymentMethod = SelectedPaymentMethod(
                     id = linkedBank.id,
                     paymentMethodType = PaymentMethodType.BANK_TRANSFER,
                     label = linkedBank.name
