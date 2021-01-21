@@ -134,7 +134,7 @@ class SettingsPresenterTest {
         whenever(cardsFeatureFlag.enabled).thenReturn(Single.just(true))
         whenever(fundsFeatureFlag.enabled).thenReturn(Single.just(true))
         whenever(custodialWalletManager.getLinkedBeneficiaries()).thenReturn(Single.just(emptyList()))
-        whenever(custodialWalletManager.getSupportedFundsFiats(any(), any())).thenReturn(Single.just(emptyList()))
+        whenever(custodialWalletManager.canWireTransferToABankWithCurrency(any())).thenReturn(Single.just(false))
         whenever(custodialWalletManager.updateSupportedCardTypes(ArgumentMatchers.anyString())).thenReturn(
             Completable.complete())
         whenever(custodialWalletManager.getLinkedBanks()).thenReturn(Single.just(emptyList()))
@@ -162,7 +162,7 @@ class SettingsPresenterTest {
         whenever(prefsUtil.selectedFiatCurrency).thenReturn("USD")
         whenever(cardsFeatureFlag.enabled).thenReturn(Single.just(false))
         whenever(fundsFeatureFlag.enabled).thenReturn(Single.just(false))
-        whenever(custodialWalletManager.getSupportedFundsFiats(any(), any())).thenReturn(Single.just(emptyList()))
+        whenever(custodialWalletManager.canWireTransferToABankWithCurrency(any())).thenReturn(Single.just(false))
         whenever(custodialWalletManager.updateSupportedCardTypes(ArgumentMatchers.anyString())).thenReturn(
             Completable.complete())
         whenever(custodialWalletManager.fetchUnawareLimitsCards(ArgumentMatchers.anyList()))

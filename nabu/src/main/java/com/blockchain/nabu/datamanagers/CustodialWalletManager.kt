@@ -177,6 +177,9 @@ interface CustodialWalletManager {
     fun getInterestEligibilityForAsset(crypto: CryptoCurrency): Single<Eligibility>
 
     fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean): Single<List<String>>
+
+    fun canWireTransferToABankWithCurrency(fiatCurrency: String): Single<Boolean>
+
     fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String>
 
     fun createCustodialOrder(

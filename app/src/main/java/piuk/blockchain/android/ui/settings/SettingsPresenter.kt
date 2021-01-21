@@ -138,9 +138,8 @@ class SettingsPresenter(
                         view?.updateLinkableBanks(linkableBanks, linkedBanks.size)
                     },
                     onError = {
-                        Timber.i(it)
-                    }
-                )
+                        Timber.e(it)
+                    })
     }
 
     private fun onCardsUpdated(cards: List<PaymentMethod.Card>) {
@@ -162,7 +161,7 @@ class SettingsPresenter(
         custodialWalletManager.getEligiblePaymentMethodTypes(fiat).map { methods ->
             val bankPaymentMethods = methods.filter {
                 it.paymentMethodType == PaymentMethodType.BANK_TRANSFER ||
-                    // Bank linking through deposit has not been implemented for USD
+                    // Bank linking through wire transfer has not been implemented for USD
                     (it.paymentMethodType == PaymentMethodType.FUNDS && it.currency != "USD")
             }
 
@@ -458,13 +457,14 @@ class SettingsPresenter(
     }
 
     private fun Settings.isNotificationTypeEnabled(type: Int): Boolean {
-        return isNotificationsOn &&
-            (notificationsType.contains(type) || notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL))
+        return isNotificationsOn && (notificationsType.contains(type) ||
+            notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL))
     }
 
     private fun Settings.isNotificationTypeDisabled(type: Int): Boolean {
         return notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_NONE) ||
-            (!notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL) && !notificationsType.contains(type))
+            (!notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL) &&
+                !notificationsType.contains(type))
     }
 
     /**

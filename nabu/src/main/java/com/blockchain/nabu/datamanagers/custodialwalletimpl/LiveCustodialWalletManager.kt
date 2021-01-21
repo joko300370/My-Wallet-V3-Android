@@ -479,12 +479,6 @@ class LiveCustodialWalletManager(
                             )
                         )
                     }
-                    availablePaymentMethods.add(
-                        PaymentMethod.UndefinedFunds(
-                            paymentMethod.currency,
-                            PaymentLimits(paymentMethod.limits.min, paymentMethod.limits.max, paymentMethod.currency)
-                        )
-                    )
                 } else if (
                     paymentMethod.type == PaymentMethodResponse.BANK_TRANSFER &&
                     linkedBanks.isNotEmpty()
@@ -495,6 +489,17 @@ class LiveCustodialWalletManager(
                     }.forEach { linkedBank: LinkedBank ->
                         availablePaymentMethods.add(linkedBank.toBankPaymentMethod(bankLimits))
                     }
+                } else if (
+                    paymentMethod.type == PaymentMethodResponse.BANK_ACCOUNT &&
+                    paymentMethod.currency?.canWireTransfer() == true &&
+                    paymentMethod.currency == fiatCurrency
+                ) {
+                    availablePaymentMethods.add(
+                        PaymentMethod.UndefinedFunds(
+                            paymentMethod.currency,
+                            PaymentLimits(paymentMethod.limits.min, paymentMethod.limits.max, paymentMethod.currency)
+                        )
+                    )
                 }
             }
 
@@ -560,16 +565,16 @@ class LiveCustodialWalletManager(
                 eligibleOnly = true
             ).map { methodsResponse ->
                 methodsResponse.mapNotNull { method ->
-                    when (method.type.toPaymentMethodType()) {
-                        PaymentMethodType.PAYMENT_CARD -> EligiblePaymentMethodType(
+                    when (method.type) {
+                        PaymentMethodResponse.PAYMENT_CARD -> EligiblePaymentMethodType(
                             PaymentMethodType.PAYMENT_CARD,
                             method.currency ?: return@mapNotNull null
                         )
-                        PaymentMethodType.BANK_TRANSFER -> EligiblePaymentMethodType(
+                        PaymentMethodResponse.BANK_TRANSFER -> EligiblePaymentMethodType(
                             PaymentMethodType.BANK_TRANSFER,
                             method.currency ?: return@mapNotNull null
                         )
-                        PaymentMethodType.FUNDS -> EligiblePaymentMethodType(
+                        PaymentMethodResponse.BANK_ACCOUNT -> EligiblePaymentMethodType(
                             PaymentMethodType.FUNDS,
                             method.currency ?: return@mapNotNull null
                         )
@@ -731,6 +736,27 @@ class LiveCustodialWalletManager(
             }.mapNotNull {
                 it.currency
             }
+        }
+    }
+
+    private fun getSupportedCurrenciesForWireTransfer(fiatCurrency: String): Single<List<String>> {
+        return authenticator.authenticate {
+            nabuService.paymentMethods(it, fiatCurrency, true)
+        }.map { methods ->
+            methods.filter {
+                it.type == PaymentMethodResponse.BANK_ACCOUNT &&
+                    it.currency == fiatCurrency
+            }.mapNotNull {
+                it.currency
+            }
+        }
+    }
+
+    override fun canWireTransferToABankWithCurrency(fiatCurrency: String): Single<Boolean> {
+        if (!fiatCurrency.canWireTransfer())
+            return Single.just(false)
+        return getSupportedCurrenciesForWireTransfer(fiatCurrency).map {
+            it.contains(fiatCurrency)
         }
     }
 
@@ -969,7 +995,13 @@ class LiveCustodialWalletManager(
         internal val SUPPORTED_FUNDS_CURRENCIES = listOf(
             "GBP", "EUR", "USD"
         )
+        private val SUPPORTED_FUNDS_FOR_WIRE_TRANSFER = listOf(
+            "GBP", "EUR"
+        )
     }
+
+    private fun String.canWireTransfer(): Boolean =
+        SUPPORTED_FUNDS_FOR_WIRE_TRANSFER.contains(this)
 }
 
 private fun String.toLinkedBankState(): LinkedBankState =
