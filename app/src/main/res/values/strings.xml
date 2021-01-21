@@ -34,6 +34,7 @@
     <string name="common_continue">Continue</string>
     <string name="common_try_again">Try Again</string>
     <string name="common_oops">Oops! Something went wrong.</string>
+    <string name="common_sell">Sell</string>
 
     <plurals name="transfer_label_plural">
         <item quantity="one">1 imported address</item>
@@ -1660,7 +1661,6 @@
     <string name="sell_crypto_subtitle">Verify your identity to sell crypto for cash.</string>
     <string name="sell_for_cash">Sell Crypto for Cash</string>
     <string name="select_wallet_to_sell">Select a wallet to sell from.</string>
-    <string name="common_sell">Sell</string>
     <string name="sell_quote_price">%1$s Price</string>
     <string name="purchase_funds_note">Your final amount may change due to market activity.</string>
     <string name="convert_your_crypto_to_cash">Convert Your Crypto to Cash</string>
@@ -1798,7 +1798,7 @@
     <string name="yodlee_linking_is_this_your_bank">Is this your bank?</string>
     <string name="yodlee_linking_generic_error_subtitle">Please try linking your bank again. If this keeps happening please contact support.</string>
     <string name="yodlee_linking_timeout_error_subtitle">It’s taking too long to link your bank, please try again.</string>
-    <string name="yodlee_linking_already_linked_error_subtitle">We noticed <annotation font="bold">the names don’t match.</annotation> The bank you link must have a matching legal first &amp; last name as your Blockchain.com Account. <annotation link="yodlee_names_dont_match_learn_more">Learn more \u2192</annotation></string>
+    <string name="yodlee_linking_already_linked_error_subtitle">We noticed <annotation font="bold">the names don’t match.</annotation> The bank you link must have a matching legal first &amp; last name as your Blockchain.com Account. <annotation link="yodlee_names_dont_match_learn_more">Learn more →</annotation></string>
     <string name="yodlee_linking_checking_error_title">Please link a Checking Account.</string>
     <string name="yodlee_linking_checking_error_subtitle">Your bank may charge you extra fees if you buy crypto without a checking account.</string>
     <string name="yodlee_linking_success_title">Bank Linked!</string>

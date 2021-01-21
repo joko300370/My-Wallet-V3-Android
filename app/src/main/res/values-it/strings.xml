@@ -540,8 +540,6 @@
     <string name="eth_second_password_prompt">Per utilizzare questo servizio, ti chiediamo di inserire il tuo
  seconda password. 
 </string>
-    <string name="ether">Ether</string>
-    <string name="bitcoin">Bitcoin</string>
     <string name="dashboard_title">Pannello di controllo</string>
     <string name="dashboard_time_span_last_day">Ultimo giorno</string>
     <string name="dashboard_time_span_last_month">Lo scorso mese</string>
@@ -872,8 +870,19 @@
     <string name="xlm_memo_id">ID memo</string>
     <string name="airdrop_activity_title">lanci</string>
     <string name="simple_buy_intro_title">Benvenuto in Blockchain</string>
+    <string name="simple_buy_buy_crypto">Acquista Crypto</string>
+    <string name="simple_buy_instructions_to_buy">Possiamo aiutarti ad acquistare in pochi semplici passaggi.</string>
     <string name="simple_buy_intro_main_button_action">Acquista ora Crypto</string>
+    <string name="simple_buy_deposit_my_crypto">Visita il Portafoglio</string>
+    <string name="simple_buy_skip_text">Esplora il tuo nuovo portafoglio Blockchain.</string>
+    <string name="simple_buy_get_started">Iniziare</string>
+    <string name="simple_buy_what_you_want_to_buy">Cosa ti piacerebbe comprare?</string>
+    <string name="simple_buy_enter_amount">Inserire l\'importo</string>
     <string name="simple_buy_buy_crypto_title">Acquista Crypto</string>
+    <string name="simple_buy_verify_email_instruction">Abbiamo inviato un\'email a %1$s con un link di verifica. Non l\'hai capito? Controlla la tua cartella spam.</string>
+    <string name="simple_buy_error_fetching_price">Errore durante il recupero dell\'ultimo prezzo.</string>
+    <string name="simple_buy_up_to_amount">Fino a %1$s</string>
+    <string name="use_max">Usa MAX</string>
     <string name="checkout">Check-out</string>
     <string name="date">Data</string>
     <string name="kyc_verifying_info">Verifica le tue informazioni</string>
@@ -913,6 +922,7 @@
     <string name="bank_country">Paese della banca</string>
     <string name="iban">IBAN</string>
     <string name="estonia">Estonia</string>
+    <string name="lets_setup_wallet">Prepariamo il tuo portafoglio. Puoi acquistare rapidamente criptovalute ora o farlo in seguito.</string>
     <string name="btc_default_wallet_name">Il mio portafoglio Bitcoin</string>
     <string name="bch_default_account_label">Portafoglio My Bitcoin Cash</string>
     <string name="eth_default_account_label">Il mio portafoglio Ether</string>
@@ -939,9 +949,12 @@
     <string name="simple_buy_currency_selection_header">La tua valuta locale per archiviare fondi in quella valuta come fondi nel tuo Portafoglio Blockchain.</string>
     <string name="payment_methods">Modalità di pagamento</string>
     <string name="payment_method">Metodo di pagamento</string>
+    <string name="simple_buy_select_currency">Seleziona la tua valuta</string>
     <string name="change_currency">Cambia valuta</string>
     <string name="maximum_buy">%1$s massimo</string>
     <string name="minimum_buy">%1$s minimo</string>
+    <string name="buy_min">Acquista min</string>
+    <string name="buy_max">Acquista max</string>
     <string name="bank_wire_transfer">Bonifico bancario</string>
     <string name="credit_or_debit_card">Carta di credito o di debito</string>
     <string name="add_credit_or_debit_card">Aggiungi una carta di credito o di debito</string>
@@ -950,6 +963,7 @@
     <string name="order_details">Dettagli dell\'ordine</string>
     <string name="purchase_bank_note">Una volta ricevuti i tuoi fondi, inizieremo il tuo ordine di acquisto di %1$s . Tieni presente che l\'importo finale potrebbe cambiare in due attività di mercato Potrebbero essere applicate commissioni.</string>
     <string name="complete_payment">Pagamento completo</string>
+    <string name="buy_now">Acquista ora</string>
     <string name="default_label_all_wallets">Tutti i portafogli</string>
     <string name="approximately_symbol">~ %1$s</string>
     <string name="custodial_wallet_default_label">%1s Portafoglio di trading</string>
@@ -1206,7 +1220,7 @@
     <string name="send_enter_unexpected_error">Si è verificato un errore imprevisto. Per favore riprova.</string>
     <string name="send_enter_insufficient_gas">Non hai abbastanza ETH per elaborare questa transazione.</string>
     <string name="send_select_a_wallet_title">o Seleziona un portafoglio</string>
-    <string name="send_internal_transfer_message">Al momento, puoi trasferire solo %1$s dal tuo portafoglio di scambio %2$s ai tuoi portafogli di Vault. Una volta che %1$s è nel tuo Vault Wallet, puoi trasferirlo a indirizzi esterni.</string>
+    <string name="send_internal_transfer_message">Al momento, puoi trasferire solo %1$s dal tuo portafoglio di scambio %1$s ai tuoi portafogli di Vault. Una volta che %1$s è nel tuo Vault Wallet, puoi trasferirlo a indirizzi esterni.</string>
     <string name="purchase_funds_note">L\'importo finale potrebbe cambiare a causa dell\'attività di mercato.</string>
     <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Ulteriori informazioni. </annotation>
@@ -1410,11 +1424,13 @@
     <string name="trending_empty">Finanzia i tuoi portafogli di trading per vedere gli swap di tendenza con commissioni inferiori.</string>
     <string name="trending_receive">Ricevi %1$s</string>
     <string name="select_a_wallet">Seleziona un portafoglio</string>
+    <string name="pending_swap_info_message">Hai 1 scambio in sospeso. Una volta cancellato, puoi fare un nuovo scambio.</string>
+    <string name="deposit_fee">Commissione di rete</string>
     <string name="current_unit_price">%1$s = %2$s</string>
     <string name="exchange_rate">Tasso di cambio</string>
     <string name="in_progress">In corso</string>
     <string name="swap_direction">%1$s - &gt; %2$s</string>
-    <string name="security_locked_card_funds_explanation">Per la tua sicurezza, i primi acquisti con carta sono soggetti a un periodo di detenzione di %1$s giorni prima che tu possa inviare o ritirare la tua crittografia acquistata. Ti avviseremo quando la sospensione verrà revocata.
+    <string name="security_locked_funds_explanation">Per la tua sicurezza, i primi acquisti con carta sono soggetti a un periodo di detenzione di %1$s giorni prima che tu possa inviare o ritirare la tua crittografia acquistata. Ti avviseremo quando la sospensione verrà revocata.
 
  Nel frattempo, puoi vendere in contanti, scambiare e fare trading su Blockchain.com.</string>
     <string name="recover_funds_warning_message_1">Dovresti sempre eseguire l\'accoppiamento o il login se hai accesso
@@ -1441,7 +1457,9 @@
     <string name="qr_activity_hint_import_wallet">Scansiona una chiave privata del portafoglio</string>
     <string name="qr_activity_hint_pairing_code">Scansiona un codice QR di accoppiamento web</string>
     <string name="qr_activity_hint_new_web_login">Accedi al web</string>
-
+    <string name="common_retry">Riprova</string>
+    <string name="strength_hint">Utilizza almeno 8 caratteri, una combinazione di lettere, numeri e simboli.</string>
+    <string name="content_desc_enter_amount">Inserire l\'importo</string>
     <string name="common_try_again">Riprova</string>
     <string name="common_oops">Ops! Qualcosa è andato storto.</string>
     <string name="min_with_value">%1$s min</string>
@@ -1453,4 +1471,93 @@
     <string name="swap_upgrade_to_gold">Passa a Gold e scambia più velocemente, con limiti più alti, commissioni più basse e un\'esperienza migliore.</string>
     <string name="swap_better_experience">Abbiamo aggiornato Swap con un nuovo look e una migliore esperienza.</string>
     <string name="swap_faster_cheaper_better">Più veloce. Più economico. Meglio. La nostra nuova esperienza di scambio ti consente di scambiare criptovalute con meno tocchi.</string>
+    <string name="common_continue">Continua</string>
+    <plurals name="transfer_label_plural">
+        <item quantity="one">1 indirizzo importato</item>
+        <item quantity="other">%d indirizzi importati</item>
+    </plurals>
+    <string name="upgrade_wallet">Aggiornamento</string>
+    <string name="remote_save_failed">Salvataggio fallito</string>
+    <string name="transfer_amount">Importo del trasferimento</string>
+    <string name="dont_ask_again">Non chiedermelo di nuovo.</string>
+    <string name="share_failed">Impossibile condividere con %1$s</string>
+    <string name="activity_details_title_sell_1">Vendi %1$s</string>
+    <string name="security_locked_card_funds_explanation">Per la tua sicurezza, i primi acquisti con carta sono soggetti a un periodo di detenzione di %1$s giorni prima che tu possa inviare o ritirare la criptovaluta acquistata. Ti avviseremo quando la sospensione verrà revocata.
+
+ Nel frattempo, puoi vendere in contanti, scambiare e fare trading su Blockchain.com.</string>
+    <string name="security_locked_funds_bank_transfer_explanation">L\'importo finale potrebbe cambiare a causa dell\'attività di mercato. Per la tua sicurezza, gli ordini di acquisto con un conto bancario sono soggetti a un periodo di detenzione fino a %1$s giorni. Durante questo periodo puoi effettuare vendite o scambi. Ti avviseremo non appena i fondi saranno completamente disponibili.</string>
+    <string name="security_locked_funds_bank_transfer_payment_screen_explanation">Questi fondi sono ora disponibili per la vendita e lo scambio.
+
+ Nota: non potrai inviare o prelevare questi fondi dal tuo portafoglio per i prossimi %1$s giorni. Maggiori informazioni</string>
+    <string name="link_a_bank">Collega una banca</string>
+    <string name="instantly_buy_crypto_with_link_a_bank">Collega la tua banca e acquista immediatamente criptovalute in qualsiasi momento.</string>
+    <string name="add_payment_method">Aggiungi un metodo di pagamento</string>
+    <string name="pay_with_my">Paga con</string>
+    <string name="yodlee_splash_title">Connessione sicura</string>
+    <string name="yodlee_splash_blurb">Yodlee memorizza le tue credenziali in modo sicuro aderendo alle principali pratiche del settore per la sicurezza dei dati, la conformità normativa e la privacy.
+ <annotation link="yodlee_learn_more">Maggiori informazioni</annotation></string>
+    <string name="yodlee_connection_title">Reindirizzamento a Yodlee ...</string>
+    <string name="yodlee_connection_subtitle">Potrebbero volerci fino a 30 secondi.</string>
+    <string name="yodlee_linking_title">Reindirizzamento al portafoglio..</string>
+    <string name="yodlee_linking_subtitle">Potrebbero volerci fino a 30 secondi. Si prega di non tornare indietro e di non chiudere l\'applicazione.</string>
+    <string name="yodlee_linking_generic_error_title">Ops! Qualcosa è andato storto</string>
+    <string name="yodlee_linking_is_this_your_bank">Questa è la tua banca?</string>
+    <string name="yodlee_linking_generic_error_subtitle">Prova a collegare di nuovo la tua banca. Se il problema persiste, contatta l\'assistenza.</string>
+    <string name="yodlee_linking_timeout_error_subtitle">Il collegamento alla tua banca impiega troppo tempo, riprova.</string>
+    <string name="yodlee_linking_already_linked_error_subtitle">Abbiamo notato che <annotation font="bold">i nomi non corrispondono.</annotation> La banca che colleghi deve avere un nome legale che corrisponda a quello del tuo account Blockchain.com. <annotation link="yodlee_names_dont_match_learn_more">Maggiori informazioni →</annotation></string>
+    <string name="yodlee_linking_checking_error_title">Collega un conto corrente.</string>
+    <string name="yodlee_linking_checking_error_subtitle">La tua banca potrebbe addebitarti costi aggiuntivi se acquisti criptovaluta senza un conto corrente.</string>
+    <string name="yodlee_linking_success_title">Banca collegata!</string>
+    <string name="yodlee_linking_success_subtitle">Il tuo account %1$s è ora collegato al tuo portafoglio Blockchain.com.</string>
+    <string name="yodlee_linking_try_different_bank">Prova una banca diversa</string>
+    <string name="yodlee_linking_try_different_account">Prova un account diverso</string>
+    <string name="yodlee_parsing_error">Si è verificato un problema durante il collegamento con Yodlee, riprova o contatta l\'assistenza.</string>
+    <string name="yodlee_flow_exited">Collegamento di Yodlee terminato, riprovare?</string>
+    <string name="yodlee_unexpected_error">Si è verificato un problema durante il collegamento con Yodlee, riprova.</string>
+    <string name="yodlee_linking_cancel">Annulla e torna indietro</string>
+    <string name="please_try_linking_your_bank_again">Prova a collegare di nuovo la tua banca. Se il problema persiste, contatta l\'assistenza.</string>
+    <string name="available_to_trade">Disponibile per il trading</string>
+    <string name="instantly">Immediatamente</string>
+    <string name="instantly_available">Immediatamente disponibile</string>
+    <string name="common_withdraw">Preleva</string>
+    <string name="common_activity">Attività</string>
+    <string name="common_summary">Sommario</string>
+    <string name="received_erc20_marquee">Ricevuto %1$s %2$s</string>
+    <string name="received_erc20_text">Ricevuto %1$s %2$s da %3$s</string>
+    <string name="sell_intro_empty_title">Nessun portafoglio da cui vendere</string>
+    <string name="sell_intro_empty_label">Sembra che tu non abbia portafogli con un saldo che puoi vendere, prova prima a finanziare alcuni portafogli.</string>
+    <string name="yodlee_splash_title_partner">Blockchain.com utilizza Yodlee per verificare le tue credenziali bancarie e collegare in modo sicuro i tuoi conti.</string>
+    <string name="lockbox_title">Lockbox</string>
+    <string name="lockbox_landing_get_yours_title">Ottieni il tuo Lockbox</string>
+    <string name="lockbox_landing_get_yours_message">Memorizza in modo sicuro la tua criptovaluta offline.</string>
+    <string name="lockbox_landing_get_yours_button">Acquista ora</string>
+    <string name="lockbox_landing_already_owned_title">Ne possiedi già uno?</string>
+    <string name="lockbox_landing_already_owned_message">Dal tuo computer, accedi a blockchain.com e connetti il tuo lockbox.</string>
+    <string name="lockbox_landing_learn_more">Vuoi saperne di più? Tocca qui per visitare
+ %1$s</string>
+    <string name="lockbox_landing_coming_soon_title">Saldi in arrivo</string>
+    <string name="lockbox_landing_coming_soon_message">Al momento non siamo in grado di visualizzare il saldo del tuo Lockbox. Non preoccuparti, i tuoi fondi sono al sicuro. A breve aggiungeremo questa funzionalità. Nel frattempo, puoi controllare il tuo saldo sul web.</string>
+    <string name="lockbox_landing_coming_soon_button">Controlla il mio saldo</string>
+    <string name="trading_order_limit">Hai troppe transazioni in sospeso %1$s. Una volta completate, puoi crearne una nuova.</string>
+    <string name="trading_order_not_cancelable">Ops! Questo ordine %1$s non è annullabile.</string>
+    <string name="trading_pending_withdrawal">Ops! Hai già un prelievo in sospeso, riprova una volta completato.</string>
+    <string name="trading_withdrawal_balance_locked">Ops! Per motivi di sicurezza, il tuo saldo è attualmente bloccato, riprova più tardi.</string>
+    <string name="trading_withdrawal_insufficient_funds">Ops! Non hai fondi sufficienti per prelevare</string>
+    <string name="trading_internal_server_error">Ops! Questo servizio non è attualmente disponibile, riprova più tardi.</string>
+    <string name="trading_albert_error">@string/send_progress_error_title</string>
+    <string name="trading_service_temp_disabled">Questo servizio sarà presto nuovamente disponibile. In questo momento stiamo aggiornando e correggendo alcuni bug.</string>
+    <string name="trading_insufficient_balance">Ops! Non hai abbastanza saldo per %1$s.</string>
+    <string name="trading_amount_below_min">Ops! L\'importo selezionato è inferiore al limite minimo di %1$s.</string>
+    <string name="trading_amount_above_max">Ops! L\'importo selezionato è superiore al limite massimo di %1$s.</string>
+    <string name="trading_daily_limit_exceeded">Ops! Hai superato il tuo limite giornaliero di %1$s</string>
+    <string name="trading_weekly_limit_exceeded">Ops! Hai superato il tuo limite settimanale di %1$s</string>
+    <string name="trading_yearly_limit_exceeded">Ops! Hai superato il tuo limite annuale di %1$s</string>
+    <string name="trading_invalid_address">Ops! Sembra che l\'indirizzo non sia valido, riprovare.</string>
+    <string name="trading_invalid_currency">Ops! Sembra che la criptovaluta non sia valida, riprovare.</string>
+    <string name="trading_invalid_fiat">Ops! Sembra che quel fiat non sia valido, riprovare.</string>
+    <string name="trading_direction_disabled">Ops! Il servizio non è disponibile al momento, riprovare più tardi.</string>
+    <string name="trading_quote_invalid_or_expired">Ops! L\'importo da noi indicato non è più valido, riprovare.</string>
+    <string name="trading_ineligible_for_swap">Ops! Questo servizio non è attualmente disponibile. Contatta l\'assistenza.</string>
+    <string name="trading_invalid_destination_amount">Ops! Sembra che non sia un importo valido, riprovare.</string>
+    <string name="executing_transaction_error">Ops! Qualcosa è andato storto durante l\'esecuzione della transazione a catena c%1$s.</string>
 </resources>
