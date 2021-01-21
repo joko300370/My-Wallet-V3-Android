@@ -121,29 +121,28 @@ class SettingsPresenter(
     }
 
     private fun updateBanks() {
-        compositeDisposable += kycStatusHelper.getSettingsKycStateTier()
-            .map { kycTiers -> kycTiers.isApprovedFor(KycTierLevel.GOLD) }
-            .flatMap { isGold ->
-                supportedCurrencies(fiatUnit, isGold)
-                    .doOnSuccess {
-                        view?.banksEnabled(it.isNotEmpty())
-                    }.zipWith(
-                        custodialWalletManager.getLinkedBeneficiaries()
-                    ) { supportedCurrencies, linkedBeneficiaries ->
-                        LinkedBanksAndSupportedCurrencies(linkedBeneficiaries, supportedCurrencies)
-                    }
-            }.observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe {
-                view?.banksEnabled(false)
-                view?.updateBanks(LinkedBanksAndSupportedCurrencies(emptyList(), emptyList()))
-            }.subscribeBy(
-                onSuccess = {
-                    view?.updateBanks(it)
-                },
-                onError = {
-                    Timber.i(it)
+        compositeDisposable +=
+            canLinkABankWithCurrency(fiatUnit)
+                .doOnSuccess {
+                    view?.banksEnabled(it)
+                }.zipWith(
+                    custodialWalletManager.getLinkedBeneficiaries()
+                ) { canLink, linkedBeneficiaries ->
+                    val supportedCurrencies = if (canLink) listOf(fiatUnit) else emptyList()
+                    LinkedBanksAndSupportedCurrencies(linkedBeneficiaries, supportedCurrencies)
                 }
-            )
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe {
+                    view?.banksEnabled(false)
+                    view?.updateBanks(LinkedBanksAndSupportedCurrencies(emptyList(), emptyList()))
+                }.subscribeBy(
+                    onSuccess = {
+                        view?.updateBanks(it)
+                    },
+                    onError = {
+                        Timber.i(it)
+                    }
+                )
     }
 
     private fun onCardsUpdated(cards: List<PaymentMethod.Card>) {
@@ -161,8 +160,8 @@ class SettingsPresenter(
         }
     }
 
-    private fun supportedCurrencies(fiat: String, isGold: Boolean): Single<List<String>> =
-        custodialWalletManager.getSupportedFundsFiats(fiat, isGold)
+    private fun canLinkABankWithCurrency(fiat: String): Single<Boolean> =
+        custodialWalletManager.canWireTransferToABankWithCurrency(fiat)
 
     fun onKycStatusClicked() {
         view?.launchKycFlow()
@@ -440,13 +439,13 @@ class SettingsPresenter(
 
     private fun Settings.isNotificationTypeEnabled(type: Int): Boolean {
         return isNotificationsOn && (notificationsType.contains(type) ||
-                notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL))
+            notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL))
     }
 
     private fun Settings.isNotificationTypeDisabled(type: Int): Boolean {
         return notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_NONE) ||
-                (!notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL) &&
-                        !notificationsType.contains(type))
+            (!notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL) &&
+                !notificationsType.contains(type))
     }
 
     /**

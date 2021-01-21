@@ -80,15 +80,17 @@ internal class FiatCustodialAccount(
             }
 
     override val actions: Single<AvailableActions> =
-        if (fiatCurrency != "USD") Single.just(
-            setOf(
-                AssetAction.ViewActivity,
-                AssetAction.Deposit,
-                AssetAction.Withdraw
-            )
-        )
-        else
-            Single.just(setOf(AssetAction.ViewActivity))
+        custodialWalletManager.canWireTransferToABankWithCurrency(fiatCurrency).map {
+            if (it) {
+                setOf(
+                    AssetAction.ViewActivity,
+                    AssetAction.Deposit,
+                    AssetAction.Withdraw
+                )
+            } else {
+                setOf(AssetAction.ViewActivity)
+            }
+        }
 
     override val isFunded: Boolean
         get() = hasFunds.get()
