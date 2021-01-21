@@ -153,6 +153,7 @@
 }
 # Temporary fix: Keep classes for jackson json
 -keep public class info.blockchain.api.data.** { *; }
+-keep public class piuk.blockchain.android.coincore.** { *; }
 -keep public class piuk.blockchain.android.simplebuy.yodlee.** { *; }
 -keep public class info.blockchain.wallet.api.data.** { *; }
 -keep public class info.blockchain.wallet.contacts.data.** { *; }
