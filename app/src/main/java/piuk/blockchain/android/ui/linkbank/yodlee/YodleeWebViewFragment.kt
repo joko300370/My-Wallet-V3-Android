@@ -1,4 +1,4 @@
-package piuk.blockchain.android.simplebuy.yodlee
+package piuk.blockchain.android.ui.linkbank.yodlee
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -12,6 +12,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.fragment.app.Fragment
+import com.blockchain.nabu.models.data.YodleeAttributes
 import com.blockchain.notifications.analytics.Analytics
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_yodlee_webview.*
@@ -22,6 +23,9 @@ import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import piuk.blockchain.android.simplebuy.SimpleBuyNavigator
+import piuk.blockchain.android.simplebuy.yodlee.FastLinkMessage
+import piuk.blockchain.android.simplebuy.yodlee.MessageData
+import piuk.blockchain.android.simplebuy.yodlee.SiteData
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
@@ -34,23 +38,19 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
 
     private val analytics: Analytics by inject()
 
-    private val fastLinkUrl: String by lazy {
-        arguments?.getString(FAST_LINK_URL) ?: ""
+    private val attributes: YodleeAttributes by lazy {
+        arguments?.getSerializable(ATTRIBUTES) as YodleeAttributes
     }
 
-    private val accessToken: String by lazy {
-        arguments?.getString(ACCESS_TOKEN) ?: ""
-    }
-
-    private val configName: String by lazy {
-        arguments?.getString(CONFIG_NAME) ?: ""
+    private val linkingBankId: String by lazy {
+        arguments?.getString(LINKING_BANK_ID) ?: ""
     }
 
     private val accessTokenKey = "accessToken"
-    private val bearerParam: String by lazy { "Bearer $accessToken" }
+    private val bearerParam: String by lazy { "Bearer ${attributes.token}" }
     private val extraParamsKey = "extraParams"
     private val extraParamConfigName: String
-        get() = "configName=$configName"
+        get() = "configName=${attributes.configName}"
     private val extraParamEncoding = "UTF-8"
 
     private val yodleeQuery: String by lazy {
@@ -100,13 +100,15 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
             yodlee_subtitle.text = getString(R.string.yodlee_connection_subtitle)
             yodlee_webview.gone()
             yodlee_retry.gone()
-            yodlee_webview.postUrl(fastLinkUrl, yodleeQuery.toByteArray())
+            yodlee_webview.postUrl(attributes.fastlinkUrl, yodleeQuery.toByteArray())
         }
     }
 
     override fun flowSuccess(providerAccountId: String, accountId: String) {
         analytics.logEvent(SimpleBuyAnalytics.ACH_SUCCESS)
-        navigator().launchBankLinking(accountProviderId = providerAccountId, accountId = accountId)
+        navigator().launchBankLinking(
+            accountProviderId = providerAccountId, accountId = accountId, bankId = linkingBankId
+        )
     }
 
     override fun flowError(error: FastLinkInterfaceHandler.FastLinkFlowError, reason: String?) {
@@ -154,19 +156,16 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
             ?: throw IllegalStateException("Parent must implement SimpleBuyNavigator")
 
     companion object {
-        private const val FAST_LINK_URL: String = "FAST_LINK_URL"
-        private const val ACCESS_TOKEN: String = "ACCESS_TOKEN"
-        private const val CONFIG_NAME: String = "CONFIG_NAME"
+        private const val ATTRIBUTES: String = "ATTRIBUTES"
+        private const val LINKING_BANK_ID: String = "LINKING_BANK_ID"
 
         fun newInstance(
-            fastLinkUrl: String,
-            accessToken: String,
-            configName: String
+            attributes: YodleeAttributes,
+            bankId: String
         ): YodleeWebViewFragment = YodleeWebViewFragment().apply {
             arguments = Bundle().apply {
-                putString(FAST_LINK_URL, fastLinkUrl)
-                putString(ACCESS_TOKEN, accessToken)
-                putString(CONFIG_NAME, configName)
+                putSerializable(ATTRIBUTES, attributes)
+                putString(LINKING_BANK_ID, bankId)
             }
         }
     }
