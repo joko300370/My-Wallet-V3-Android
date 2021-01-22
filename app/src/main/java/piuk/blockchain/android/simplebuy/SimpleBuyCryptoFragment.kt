@@ -354,8 +354,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         )
         payment_method_title.text = getString(paymentMethod.label())
 
-        payment_method_limit.text =
-            getString(R.string.payment_method_limit, paymentMethod.limits.max.toStringWithSymbol())
+        payment_method_limit.text = paymentMethod.limits.max.toStringWithSymbol()
     }
 
     private fun renderBankPayment(paymentMethod: PaymentMethod.Bank) {

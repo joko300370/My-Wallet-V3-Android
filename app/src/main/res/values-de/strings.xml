@@ -1277,7 +1277,7 @@
     <string name="sell_for_cash">Verkaufe Crypto gegen Bargeld</string>
     <string name="select_wallet_to_sell">Wählen Sie eine Brieftasche aus, aus der Sie verkaufen möchten.</string>
     <string name="common_sell">Verkaufen</string>
-    <string name="sell_quote_price">%1$s Preis</string>
+    <string name="quote_price">%1$s Preis</string>
     <string name="convert_your_crypto_to_cash">Wandeln Sie Ihre Krypto in Bargeld um</string>
     <string name="scan_mismatch_transaction_target">Der gescannte Code ist kein %1$s QR-Code.</string>
     <string name="scan_failed">QR-Code nicht erkannt, bitte erneut versuchen.</string>

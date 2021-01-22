@@ -1281,7 +1281,7 @@
     <string name="sell_for_cash">Vendi Crypto per contanti</string>
     <string name="select_wallet_to_sell">Seleziona un portafoglio da cui vendere.</string>
     <string name="common_sell">Vendere</string>
-    <string name="sell_quote_price">Prezzo %1$s</string>
+    <string name="quote_price">Prezzo %1$s</string>
     <string name="convert_your_crypto_to_cash">Converti le tue criptovalute in contanti</string>
     <string name="scan_mismatch_transaction_target">Il codice scansionato non è un codice QR %1$s .</string>
     <string name="scan_failed">Codice QR non riconosciuto, riprova.</string>

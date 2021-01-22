@@ -1661,7 +1661,7 @@
     <string name="sell_for_cash">Sell Crypto for Cash</string>
     <string name="select_wallet_to_sell">Select a wallet to sell from.</string>
     <string name="common_sell">Sell</string>
-    <string name="sell_quote_price">%1$s Price</string>
+    <string name="quote_price">%1$s Price</string>
     <string name="purchase_funds_note">Your final amount may change due to market activity.</string>
     <string name="convert_your_crypto_to_cash">Convert Your Crypto to Cash</string>
     <string name="sell_info_title">Want to sell from your other Wallets?</string>
@@ -1855,4 +1855,5 @@
     <string name="executing_transaction_error">Oops! Something went wrong while executing the %1$s on-chain transaction.</string>
     <string name="trading_ineligible_for_swap">Oops! This service isn’t currently available. Please contact support.</string>
     <string name="trading_invalid_destination_amount">Oops! Looks like that isn’t a valid amount, please try again.</string>
+    <string name="add_credit_or_debit_card_1">Credit or Debit Card</string>
 </resources>
