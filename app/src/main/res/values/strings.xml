@@ -1783,8 +1783,8 @@
     <string name="swap_faster_cheaper_better">Faster. Cheaper. Better. Our new Swap experience lets you exchange crypto in fewer taps.</string>
     <string name="link_a_bank">Link a Bank</string>
     <string name="instantly_buy_crypto_with_link_a_bank">Link your bank and instantly buy crypto at anytime.</string>
-    <string name="add_payment_method">Add a Payment Method</string>
-    <string name="pay_with_my">Pay with my</string>
+    <string name="add_payment_method">+Add New</string>
+    <string name="pay_with_my_dotted">Pay with my…</string>
 
     <!-- Yodlee splash -->
     <string name="yodlee_splash_title_partner">Blockchain.com uses Yodlee to verify your bank credentials &amp; securely link your accounts.</string>
