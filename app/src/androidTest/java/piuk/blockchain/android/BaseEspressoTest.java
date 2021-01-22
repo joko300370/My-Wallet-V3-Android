@@ -30,7 +30,9 @@ public class BaseEspressoTest {
     @Mock
     protected CrashLogger crashLogger;
 
-    private SharedPreferences store = PreferenceManager.getDefaultSharedPreferences(InstrumentationRegistry.getTargetContext());
+    private final SharedPreferences store =
+        PreferenceManager.getDefaultSharedPreferences(InstrumentationRegistry.getTargetContext());
+
     private SystemAnimations systemAnimations;
     protected PrefsUtil prefs;
 

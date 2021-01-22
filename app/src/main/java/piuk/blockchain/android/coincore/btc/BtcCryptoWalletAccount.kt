@@ -114,7 +114,7 @@ internal class BtcCryptoWalletAccount(
         BtcOnChainTxEngine(
             btcDataManager = payloadDataManager,
             sendDataManager = sendDataManager,
-            feeDataManager = feeDataManager,
+            feeManager = feeDataManager,
             btcNetworkParams = networkParameters,
             requireSecondPassword = payloadDataManager.isDoubleEncrypted,
             walletPreferences = walletPreferences

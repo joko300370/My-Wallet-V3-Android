@@ -2,7 +2,6 @@ package piuk.blockchain.android.coincore.impl.txEngine.swap
 
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.TransferDirection
-import com.blockchain.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.nabu.service.TierService
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -11,44 +10,52 @@ import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
+import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 
 class TradingToTradingSwapTxEngine(
     walletManager: CustodialWalletManager,
-    quotesProvider: QuotesProvider,
+    quotesEngine: TransferQuotesEngine,
     kycTierService: TierService,
     environmentConfig: EnvironmentConfig
-) : SwapEngineBase(quotesProvider, walletManager, kycTierService, environmentConfig) {
+) : SwapEngineBase(quotesEngine, walletManager, kycTierService, environmentConfig) {
 
     override val availableBalance: Single<Money>
         get() = sourceAccount.accountBalance
 
     override fun assertInputsValid() {
-        require(txTarget is CustodialTradingAccount)
-        require(sourceAccount is CustodialTradingAccount)
-        require((txTarget as CustodialTradingAccount).asset != sourceAccount.asset)
+        check(txTarget is CustodialTradingAccount)
+        check(sourceAccount is CustodialTradingAccount)
+        check((txTarget as CustodialTradingAccount).asset != sourceAccount.asset)
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
-        quotesEngine.pricedQuote.firstOrError().flatMap { pricedQuote ->
-            availableBalance.flatMap { balance ->
-                Single.just(PendingTx(
+        quotesEngine.pricedQuote.firstOrError()
+            .flatMap { pricedQuote ->
+                availableBalance.flatMap { balance ->
+                    Single.just(
+                        PendingTx(
+                            amount = CryptoValue.zero(sourceAccount.asset),
+                            totalBalance = balance,
+                            availableBalance = balance,
+                            fees = CryptoValue.zero(sourceAccount.asset),
+                            feeLevel = FeeLevel.None,
+                            selectedFiat = userFiat
+                        )
+                    ).flatMap {
+                        updateLimits(it, pricedQuote)
+                    }
+                }
+            }.handlePendingOrdersError(
+                PendingTx(
                     amount = CryptoValue.zero(sourceAccount.asset),
-                    available = balance,
+                    totalBalance = CryptoValue.zero(sourceAccount.asset),
+                    availableBalance = CryptoValue.zero(sourceAccount.asset),
                     fees = CryptoValue.zero(sourceAccount.asset),
                     feeLevel = FeeLevel.None,
-                    selectedFiat = userFiat)).flatMap {
-                    updateLimits(it, pricedQuote)
-                }
-            }
-        }.handlePendingOrdersError(
-            PendingTx(
-                amount = CryptoValue.zero(sourceAccount.asset),
-                available = CryptoValue.zero(target.asset),
-                fees = CryptoValue.ZeroBch,
-                selectedFiat = userFiat
+                    selectedFiat = userFiat
+                )
             )
-        )
 
     override val direction: TransferDirection
         get() = TransferDirection.INTERNAL
@@ -59,10 +66,13 @@ class TradingToTradingSwapTxEngine(
         }
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> =
-        availableBalance.map { balance -> balance as CryptoValue }.map { available ->
+        availableBalance.map { balance ->
+            balance as CryptoValue
+        }.map { available ->
             pendingTx.copy(
                 amount = amount,
-                available = available
+                availableBalance = available,
+                totalBalance = available
             )
         }.updateQuotePrice().clearConfirmations()
 }

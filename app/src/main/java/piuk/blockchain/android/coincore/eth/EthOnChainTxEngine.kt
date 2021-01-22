@@ -38,16 +38,17 @@ open class EthOnChainTxEngine(
     walletPreferences
 ) {
     override fun assertInputsValid() {
-        require(txTarget is CryptoAddress)
-        require((txTarget as CryptoAddress).asset == CryptoCurrency.ETHER)
-        require(asset == CryptoCurrency.ETHER)
+        check(txTarget is CryptoAddress)
+        check((txTarget as CryptoAddress).asset == CryptoCurrency.ETHER)
+        check(asset == CryptoCurrency.ETHER)
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
         Single.just(
             PendingTx(
                 amount = CryptoValue.ZeroEth,
-                available = CryptoValue.ZeroEth,
+                totalBalance = CryptoValue.ZeroEth,
+                availableBalance = CryptoValue.ZeroEth,
                 fees = CryptoValue.ZeroEth,
                 feeLevel = mapSavedFeeToFeeLevel(getFeeType(CryptoCurrency.ETHER)),
                 selectedFiat = userFiat
@@ -105,12 +106,14 @@ open class EthOnChainTxEngine(
         require(amount.currency == CryptoCurrency.ETHER)
 
         return Singles.zip(
+            sourceAccount.accountBalance.map { it as CryptoValue },
             sourceAccount.actionableBalance.map { it as CryptoValue },
             absoluteFee(pendingTx.feeLevel)
-        ) { available, fees ->
+        ) { total, available, fees ->
             pendingTx.copy(
                 amount = amount,
-                available = max(available - fees, CryptoValue.ZeroEth) as CryptoValue,
+                totalBalance = total,
+                availableBalance = max(available - fees, CryptoValue.ZeroEth) as CryptoValue,
                 fees = fees
             )
         }

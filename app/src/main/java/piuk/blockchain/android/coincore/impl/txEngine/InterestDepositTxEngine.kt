@@ -12,6 +12,7 @@ import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxEngine
+import piuk.blockchain.android.coincore.TxFee
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -65,8 +66,11 @@ class InterestDepositTxEngine(
             .removeOption(TxConfirmation.FEE_SELECTION)
             .addOrReplaceOption(
                 TxConfirmationValue.NetworkFee(
-                    pendingTx.fees, TxConfirmationValue.NetworkFee.FeeType.DEPOSIT_FEE,
-                    sourceAccount.asset
+                    txFee = TxFee(
+                        pendingTx.fees,
+                        TxFee.FeeType.DEPOSIT_FEE,
+                        sourceAccount.asset
+                    )
                 )
             )
             .addOrReplaceOption(

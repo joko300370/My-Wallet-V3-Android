@@ -61,19 +61,19 @@ private class NetworkFeeItemViewHolder(
 
         with(itemView) {
             confirmation_fee_label.text =
-                context.getString(R.string.tx_confirmation_network_fee, item.asset.displayTicker)
+                context.getString(R.string.tx_confirmation_network_fee, item.txFee.asset.displayTicker)
 
-            if (item.fee.isZero) {
+            if (item.txFee.fee.isZero) {
                 confirmation_fee_value.gone()
                 confirmation_free_label.visible()
 
                 confirmation_learn_more.setText(getFreeFeesText(context, linksMap), TextView.BufferType.SPANNABLE)
             } else {
-                confirmation_fee_value.text = item.fee.toStringWithSymbol()
+                confirmation_fee_value.text = item.txFee.fee.toStringWithSymbol()
                 confirmation_fee_value.visible()
                 confirmation_free_label.gone()
 
-                confirmation_learn_more.setText(getFeesText(context, linksMap, item.asset.assetName()),
+                confirmation_learn_more.setText(getFeesText(context, linksMap, item.txFee.asset.assetName()),
                     TextView.BufferType.SPANNABLE)
             }
 

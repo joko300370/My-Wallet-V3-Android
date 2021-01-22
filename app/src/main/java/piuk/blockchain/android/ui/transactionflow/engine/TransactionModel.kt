@@ -87,7 +87,7 @@ data class TransactionState(
         get() = pendingTx?.amount ?: CryptoValue.zero(asset) // TODO: Better default required
 
     val availableBalance: Money
-        get() = pendingTx?.available ?: CryptoValue.zero(sendingAccount.asset) // TODO: Better default required
+        get() = pendingTx?.availableBalance ?: CryptoValue.zero(sendingAccount.asset) // TODO: Better default required
 
     val canGoBack: Boolean
         get() = stepsBackStack.isNotEmpty()
@@ -98,7 +98,7 @@ data class TransactionState(
     val maxSpendable: Money
         get() {
             return pendingTx?.let {
-                val available = availableToAmountCurrency(it.available, amount)
+                val available = availableToAmountCurrency(it.availableBalance, amount)
                 Money.min(available,
                     it.maxLimit ?: available)
             } ?: CryptoValue.zero(asset)
