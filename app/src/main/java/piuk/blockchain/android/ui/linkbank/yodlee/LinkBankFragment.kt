@@ -83,12 +83,11 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
             showErrorState(it)
         }
 
-        if (!newState.isLoading && error == null) {
-            newState.selectedPaymentMethod?.label?.let {
-                if (it.isNotEmpty()) {
-                    showLinkingSuccess(it)
-                }
-            }
+        if (newState.selectedPaymentMethod?.isActive() == true && newState.selectedPaymentMethod.isBank()) {
+            showLinkingSuccess(
+                label = newState.selectedPaymentMethod.label ?: "",
+                id = newState.selectedPaymentMethod.id
+            )
         }
     }
 
@@ -206,7 +205,7 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
         link_bank_subtitle.text = getString(R.string.yodlee_linking_subtitle)
     }
 
-    private fun showLinkingSuccess(label: String) {
+    private fun showLinkingSuccess(label: String, id: String) {
         analytics.logEvent(bankLinkingSuccess(BankPartnerTypes.ACH.name))
 
         link_bank_icon.setImageResource(R.drawable.ic_bank_details_big)
@@ -215,7 +214,7 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
         link_bank_state_indicator.visible()
         link_bank_btn.visible()
         link_bank_btn.setOnClickListener {
-            navigator().bankLinkingFinished()
+            navigator().bankLinkingFinished(id)
         }
         link_bank_title.text = getString(R.string.yodlee_linking_success_title)
         link_bank_subtitle.text = getString(R.string.yodlee_linking_success_subtitle, label)
@@ -223,7 +222,7 @@ class LinkBankFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyS
 
     private fun navigator(): YodleeLinkingFlowNavigator =
         (activity as? YodleeLinkingFlowNavigator)
-        ?: throw IllegalStateException("Parent must implement YodleeLinkingFlowNavigator")
+            ?: throw IllegalStateException("Parent must implement YodleeLinkingFlowNavigator")
 
     companion object {
         private const val ACCOUNT_PROVIDER_ID = "ACCOUNT_PROVIDER_ID"

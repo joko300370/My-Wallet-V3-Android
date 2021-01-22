@@ -266,6 +266,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         checkForPossibleBankLinkingRequest(newState)
 
         newState.linkBankTransfer?.let {
+            model.process(SimpleBuyIntent.ResetLinkBankTransfer)
             startActivityForResult(
                 LinkBankActivity.newInstance(it, requireContext()), LinkBankActivity.LINK_BANK_REQUEST_CODE
             )
@@ -283,7 +284,6 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                     }
                 ))
             }
-            model.process(SimpleBuyIntent.LinkBankActionHandled)
         }
     }
 
@@ -481,6 +481,14 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                 SimpleBuyIntent.FetchSuggestedPaymentMethod(
                     currencyPrefs.selectedFiatCurrency,
                     (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as? PaymentMethod.Card)?.id
+                )
+            )
+        }
+        if (requestCode == LinkBankActivity.LINK_BANK_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            model.process(
+                SimpleBuyIntent.FetchSuggestedPaymentMethod(
+                    currencyPrefs.selectedFiatCurrency,
+                    (data?.extras?.getString(LinkBankActivity.LINKED_BANK_ID_KEY))
                 )
             )
         }

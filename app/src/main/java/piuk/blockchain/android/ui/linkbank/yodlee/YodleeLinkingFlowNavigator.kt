@@ -9,6 +9,6 @@ interface YodleeLinkingFlowNavigator {
     fun launchBankLinking(accountProviderId: String, accountId: String, bankId: String)
     fun launchBankLinkingWithError(errorState: ErrorState)
     fun retry()
-    fun bankLinkingFinished()
+    fun bankLinkingFinished(bankId: String)
     fun bankLinkingCancelled()
 }

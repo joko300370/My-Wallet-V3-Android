@@ -294,7 +294,7 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
         exitSimpleBuyFlow()
     }
 
-    override fun bankLinkingFinished() {
+    override fun bankLinkingFinished(id: String) {
         goToCheckOutScreen(false)
     }
 

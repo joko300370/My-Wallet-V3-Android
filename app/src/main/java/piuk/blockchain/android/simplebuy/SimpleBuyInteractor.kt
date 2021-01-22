@@ -43,7 +43,7 @@ class SimpleBuyInteractor(
 ) {
 
     fun fetchBuyLimitsAndSupportedCryptoCurrencies(targetCurrency: String):
-            Single<BuySellPairs> =
+        Single<BuySellPairs> =
         custodialWalletManager.getSupportedBuySellCryptoCurrencies(targetCurrency)
             .trackProgress(appUtil.activityIndicator)
 
@@ -94,7 +94,8 @@ class SimpleBuyInteractor(
             fiatCurrency = amount?.currencyCode ?: throw IllegalStateException("Missing FiatCurrency "),
             action = "BUY",
             currency = amount.currencyCode,
-            amount = amount.toBigInteger().toString()).map {
+            amount = amount.toBigInteger().toString()
+        ).map {
             SimpleBuyIntent.QuoteUpdated(it)
         }
 
@@ -184,15 +185,18 @@ class SimpleBuyInteractor(
     fun fetchPaymentMethods(fiatCurrency: String, preselectedId: String?):
         Single<SimpleBuyIntent.PaymentMethodsUpdated> =
         tierService.tiers().flatMap { tier ->
-            custodialWalletManager.fetchSuggestedPaymentMethod(fiatCurrency,
-                tier.isInitialisedFor(KycTierLevel.GOLD)).map { paymentMethods ->
+            custodialWalletManager.fetchSuggestedPaymentMethod(
+                fiatCurrency,
+                tier.isInitialisedFor(KycTierLevel.GOLD)
+            ).map { paymentMethods ->
                 SimpleBuyIntent.PaymentMethodsUpdated(
                     availablePaymentMethods = paymentMethods,
                     canAddCard = tier.isApprovedFor(KycTierLevel.GOLD),
                     canLinkFunds = tier.isApprovedFor(KycTierLevel.GOLD),
                     canLinkBank = tier.isApprovedFor(KycTierLevel.GOLD),
                     preselectedId = if (tier.isApprovedFor(
-                            KycTierLevel.GOLD) || preselectedId != null
+                            KycTierLevel.GOLD
+                        ) || preselectedId != null
                     ) {
                         preselectedId
                     } else {
@@ -246,6 +250,6 @@ class SimpleBuyInteractor(
 
     fun userIsEligibleToLinkABank(fiatCurrency: String): Single<Boolean> =
         custodialWalletManager.getEligiblePaymentMethodTypes(fiatCurrency).map {
-            it.contains(EligiblePaymentMethodType(PaymentMethodType.BANK_TRANSFER,fiatCurrency))
+            it.contains(EligiblePaymentMethodType(PaymentMethodType.BANK_TRANSFER, fiatCurrency))
         }
 }

@@ -38,7 +38,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
     object ResetLinkBankTransfer : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(linkBankTransfer = null)
+            oldState.copy(linkBankTransfer = null, linkBankRequested = false)
     }
 
     class OrderPriceUpdated(private val price: FiatValue?) : SimpleBuyIntent() {
@@ -368,12 +368,9 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     class BankLinkProcessStarted(private val bankTransfer: LinkBankTransfer) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState {
             return oldState.copy(
-                selectedPaymentMethod = SelectedPaymentMethod(
-                    id = bankTransfer.id,
-                    paymentMethodType = PaymentMethodType.BANK_TRANSFER
-                ),
                 linkBankTransfer = bankTransfer,
                 confirmationActionRequested = false,
+                linkBankRequested = false,
                 isLoading = false
             )
         }
