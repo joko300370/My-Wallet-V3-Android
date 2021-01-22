@@ -59,7 +59,7 @@ class TransactionProgressView(context: Context, attrs: AttributeSet) :
         title: String,
         subtitle: SpannableStringBuilder
     ) {
-        tx_state_indicator.setImageResource(R.drawable.ic_locked_funds_pending)
+        tx_state_indicator.setImageResource(R.drawable.ic_check_circle)
         tx_state_indicator.visible()
         showEndStateUi()
         tx_title.text = title

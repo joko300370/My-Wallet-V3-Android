@@ -38,7 +38,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
     object ResetLinkBankTransfer : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(linkBankTransfer = null)
+            oldState.copy(linkBankTransfer = null, linkBankRequested = false)
     }
 
     class OrderPriceUpdated(private val price: FiatValue?) : SimpleBuyIntent() {
@@ -132,7 +132,11 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
             oldState.copy(confirmationActionRequested = true, orderState = OrderState.INITIALISED)
     }
 
-    object LinkBankTransferRequested : SimpleBuyIntent()
+    object LinkBankTransferRequested : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState.copy(
+            linkBankRequested = false
+        )
+    }
 
     object TryToLinkABankTransfer : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState {
@@ -364,12 +368,9 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     class BankLinkProcessStarted(private val bankTransfer: LinkBankTransfer) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState {
             return oldState.copy(
-                selectedPaymentMethod = SelectedPaymentMethod(
-                    id = bankTransfer.id,
-                    paymentMethodType = PaymentMethodType.BANK_TRANSFER
-                ),
                 linkBankTransfer = bankTransfer,
                 confirmationActionRequested = false,
+                linkBankRequested = false,
                 isLoading = false
             )
         }
@@ -462,6 +463,16 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     object DepositFundsRequested : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(depositFundsRequested = true)
+    }
+
+    object LinkBankSelected : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
+            oldState.copy(linkBankRequested = true)
+    }
+
+    object LinkBankActionHandled : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
+            oldState.copy(linkBankRequested = false)
     }
 
     object DepositFundsHandled : SimpleBuyIntent() {

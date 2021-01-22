@@ -65,7 +65,7 @@
         app:layout_goneMarginBottom="@dimen/small_margin" />
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/purchase_note"
-        style="@style/Text.Semibold.12"
+        style="@style/Text.Light.12"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/very_small_margin"
@@ -84,7 +84,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/tiny_margin"
         android:text="@string/common_cancel"
-        android:textColor="@color/red_600"
+        android:textColor="@color/red_400"
         app:layout_constraintBottom_toTopOf="@id/button_action"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

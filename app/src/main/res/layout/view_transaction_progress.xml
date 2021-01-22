@@ -62,7 +62,7 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tx_subtitle"
-        style="@style/Text.Standard.Centered.14"
+        style="@style/Text.Light.Centered.14"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"

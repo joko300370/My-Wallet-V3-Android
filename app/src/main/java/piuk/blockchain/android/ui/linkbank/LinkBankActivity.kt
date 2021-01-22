@@ -14,6 +14,7 @@ import piuk.blockchain.android.ui.linkbank.yodlee.LinkBankFragment
 import piuk.blockchain.android.ui.linkbank.yodlee.YodleeLinkingFlowNavigator
 import piuk.blockchain.android.ui.linkbank.yodlee.YodleeSplashFragment
 import piuk.blockchain.android.ui.linkbank.yodlee.YodleeWebViewFragment
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
 
 class LinkBankActivity : BlockchainActivity(), YodleeLinkingFlowNavigator {
 
@@ -58,7 +59,9 @@ class LinkBankActivity : BlockchainActivity(), YodleeLinkingFlowNavigator {
         supportFragmentManager.beginTransaction()
             .replace(
                 R.id.content_frame,
-                LinkBankFragment.newInstance(accountProviderId = accountProviderId, accountId = accountId, bankId)
+                LinkBankFragment.newInstance(
+                    accountProviderId = accountProviderId, accountId = accountId, linkingBankId = bankId
+                )
             )
             .addToBackStack(LinkBankFragment::class.simpleName)
             .commitAllowingStateLoss()
@@ -75,8 +78,9 @@ class LinkBankActivity : BlockchainActivity(), YodleeLinkingFlowNavigator {
         onBackPressed()
     }
 
-    override fun bankLinkingFinished() {
+    override fun bankLinkingFinished(bankId: String) {
         val data = Intent()
+        data.putExtra(LINKED_BANK_ID_KEY, bankId)
         setResult(RESULT_OK, data)
         finish()
     }
@@ -85,9 +89,14 @@ class LinkBankActivity : BlockchainActivity(), YodleeLinkingFlowNavigator {
         finish()
     }
 
+    override fun onSupportNavigateUp(): Boolean = consume {
+        onBackPressed()
+    }
+
     companion object {
         private const val LINK_BANK_TRANSFER_KEY = "LINK_BANK_TRANSFER_KEY"
         const val LINK_BANK_REQUEST_CODE = 999
+        const val LINKED_BANK_ID_KEY = "LINKED_BANK_ID"
 
         fun newInstance(linkBankTransfer: LinkBankTransfer, context: Context): Intent {
             val intent = Intent(context, LinkBankActivity::class.java)

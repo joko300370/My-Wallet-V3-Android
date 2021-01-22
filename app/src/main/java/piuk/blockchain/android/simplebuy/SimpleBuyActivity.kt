@@ -178,7 +178,7 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
     override fun hasMoreThanOneFragmentInTheStack(): Boolean =
         supportFragmentManager.backStackEntryCount > 1
 
-    override fun goToCardPaymentScreen(addToBackStack: Boolean) {
+    override fun goToPaymentScreen(addToBackStack: Boolean) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.content_frame, SimpleBuyPaymentFragment(), SimpleBuyPaymentFragment::class.simpleName)
             .apply {
@@ -294,7 +294,7 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
         exitSimpleBuyFlow()
     }
 
-    override fun bankLinkingFinished() {
+    override fun bankLinkingFinished(id: String) {
         goToCheckOutScreen(false)
     }
 

@@ -1295,7 +1295,7 @@
     <string name="sell_for_cash">Продать криптовалюту за наличные</string>
     <string name="select_wallet_to_sell">Выберите кошелек для продажи.</string>
     <string name="common_sell">Продать</string>
-    <string name="sell_quote_price">%1$s Цена</string>
+    <string name="quote_price">%1$s Цена</string>
     <string name="convert_your_crypto_to_cash">Конвертируйте свою криптовалюту в наличные</string>
     <string name="scan_mismatch_transaction_target">Отсканированный код не является QR-кодом %1$s .</string>
     <string name="scan_failed">QR-код не распознан, попробуйте еще раз.</string>

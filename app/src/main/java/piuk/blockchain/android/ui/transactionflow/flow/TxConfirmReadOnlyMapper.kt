@@ -53,7 +53,7 @@ class ExchangePriceFormatter(private val resources: Resources) : TxOptionsFormat
 
     override fun format(property: TxConfirmationValue): Pair<String, String>? =
         if (property is TxConfirmationValue.ExchangePriceConfirmation) {
-            resources.getString(R.string.sell_quote_price,
+            resources.getString(R.string.quote_price,
                 property.asset.displayTicker) to property.money.toStringWithSymbol()
         } else {
             null
