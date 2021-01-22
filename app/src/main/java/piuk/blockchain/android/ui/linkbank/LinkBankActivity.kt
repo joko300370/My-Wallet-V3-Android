@@ -59,7 +59,9 @@ class LinkBankActivity : BlockchainActivity(), YodleeLinkingFlowNavigator {
         supportFragmentManager.beginTransaction()
             .replace(
                 R.id.content_frame,
-                LinkBankFragment.newInstance(accountProviderId = accountProviderId, accountId = accountId, bankId)
+                LinkBankFragment.newInstance(
+                    accountProviderId = accountProviderId, accountId = accountId, linkingBankId = bankId
+                )
             )
             .addToBackStack(LinkBankFragment::class.simpleName)
             .commitAllowingStateLoss()

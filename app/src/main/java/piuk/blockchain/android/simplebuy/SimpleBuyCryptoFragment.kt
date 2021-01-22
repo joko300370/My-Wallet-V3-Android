@@ -273,6 +273,14 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         }
     }
 
+    /**
+     * Once User selects the option to Link a bank then his/her Kyc status is checked.
+     * If is VERIFIED_AND_ELIGIBLE then we try to link a bank and if the fetched partner is supported
+     * then the LinkBankActivity is launched.
+     * In case that user is not VERIFIED_AND_ELIGIBLE then we just select the payment method and when
+     * user presses Continue the KYC flow is launched
+     */
+
     private fun checkForPossibleBankLinkingRequest(newState: SimpleBuyState) {
         if (newState.linkBankRequested) {
             if (newState.kycVerificationState == KycState.VERIFIED_AND_ELIGIBLE) {
