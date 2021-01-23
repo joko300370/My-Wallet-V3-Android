@@ -114,7 +114,8 @@ class AssetDetailsFlow(
                         AssetAction.Deposit -> R.string.select_deposit_source_title
                         AssetAction.Send -> R.string.select_send_sheet_title
                         else -> R.string.select_account_sheet_title
-                    })
+                    }
+                )
             }
         )
     }
@@ -128,9 +129,8 @@ class AssetDetailsFlow(
             .flatMapSingle { account ->
                 account.actions.map { actions ->
                     if (
-                        (action == AssetAction.Receive || account.isFunded) &&
-                        (actions.contains(action)) ||
-                        action == AssetAction.Deposit
+                        actions.contains(action) ||
+                        (action == AssetAction.Deposit && account.isFunded)
                     ) {
                         account
                     } else NullCryptoAccount()
@@ -187,7 +187,8 @@ class AssetDetailsFlow(
                 )
             }
             AssetAction.Summary -> getInterestAccountAndNavigate(
-                newState.selectedAccount.selectFirstAccount(), newState.hostAction)
+                newState.selectedAccount.selectFirstAccount(), newState.hostAction
+            )
             AssetAction.Deposit -> {
                 selectAccountOrPerformAction(
                     state = newState,
@@ -260,7 +261,8 @@ class AssetDetailsFlow(
             AssetAction.Swap -> launchSwap(singleAccount)
             AssetAction.Receive -> launchReceive(singleAccount)
             else -> throw IllegalStateException(
-                "Account selection not supported for this action ${localState.hostAction}")
+                "Account selection not supported for this action ${localState.hostAction}"
+            )
         }
     }
 
@@ -282,7 +284,8 @@ class AssetDetailsFlow(
                             assetFlowHost.goToDeposit(
                                 account,
                                 ag.accounts.first(),
-                                assetAction)
+                                assetAction
+                            )
                         } else if (assetAction == AssetAction.Summary) {
                             localState.asset?.asset?.let {
                                 assetFlowHost.goToSummary(ag.accounts.first(), it)
