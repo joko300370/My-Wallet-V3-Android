@@ -3,7 +3,6 @@ package piuk.blockchain.android.ui.activity.detail
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.PaymentLimits
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.TransferDirection
@@ -89,12 +88,6 @@ class ActivityDetailsInteractor(
             else -> {
                 list.add(BuyPaymentMethod(
                     PaymentDetails(summaryItem.paymentMethodId)))
-
-                if (summaryItem.status == OrderState.AWAITING_FUNDS ||
-                    summaryItem.status == OrderState.PENDING_EXECUTION
-                ) {
-                    list.add(CancelAction())
-                }
                 Single.just(list.toList())
             }
         }
@@ -205,9 +198,6 @@ class ActivityDetailsInteractor(
                 it.id, it.label(), it.endDigits()
             )))
         } ?: list.add(BuyPaymentMethod(PaymentDetails(summaryItem.paymentMethodId)))
-        if (summaryItem.status == OrderState.PENDING_CONFIRMATION) {
-            list.add(CancelAction())
-        }
     }
 
     fun getCustodialTradingActivityDetails(

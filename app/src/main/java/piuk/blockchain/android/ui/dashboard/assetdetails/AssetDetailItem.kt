@@ -45,7 +45,8 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
         block: AssetDetailsDecorator
     ) {
         with(itemView) {
-            val asset = getAsset(item.account)
+            val asset = getAsset(item.account, item.balance.currencyCode)
+
 
             icon.setCoinIcon(asset)
             wallet_name.text = resources.getString(asset.assetName())
@@ -72,12 +73,14 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
                 AssetFilter.Interest -> {
                     asset_account_icon.visible()
                     asset_account_icon.setImageResource(
-                        R.drawable.ic_account_badge_interest)
+                        R.drawable.ic_account_badge_interest
+                    )
                 }
                 AssetFilter.Custodial -> {
                     asset_account_icon.visible()
                     asset_account_icon.setImageResource(
-                        R.drawable.ic_account_badge_custodial)
+                        R.drawable.ic_account_badge_custodial
+                    )
                 }
                 AssetFilter.All -> asset_account_icon.gone()
             }
@@ -97,13 +100,15 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
         }
     }
 
-    private fun getAsset(account: BlockchainAccount): CryptoCurrency =
+    private fun getAsset(account: BlockchainAccount, currency: String): CryptoCurrency =
         when (account) {
             is CryptoAccount -> account.asset
             is AccountGroup -> account.accounts.filterIsInstance<CryptoAccount>()
-                .firstOrNull()?.asset
+                .firstOrNull()?.asset ?: throw IllegalStateException(
+                "No crypto accounts found in ${this::class.java} with currency $currency "
+            )
             else -> null
-        } ?: throw IllegalStateException("Unsupported account type ${account::class.java}")
+        } ?: throw IllegalStateException("Unsupported account type ${this::class.java}")
 }
 
 class LabelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
