@@ -20,17 +20,32 @@ or alternatively using `brew install fastlane`
 ```
 fastlane android build
 ```
-Builds using the given environment and build type
+Build using the given environment (default: Staging) and build type (default: Debug).
+### android staging_release
+```
+fastlane android staging_release
+```
+Build Staging Release
+### android prod_debug
+```
+fastlane android prod_debug
+```
+Build Prod Debug
+### android prod_release
+```
+fastlane android prod_release
+```
+Build Prod Release
 ### android test
 ```
 fastlane android test
 ```
-Runs all tests
-### android alpha
+Run tests. Optional flags: environment (Staging), build_type (Debug), test_name (runs all by default).
+### android upload_to_internal_track
 ```
-fastlane android alpha
+fastlane android upload_to_internal_track
 ```
-Submit a release Alpha build to the Play Store. This won't publish, just upload.
+Submit a release build to the Play Store internal test track.
 ### android credentials
 ```
 fastlane android credentials
@@ -46,16 +61,16 @@ Bundle of build, perform checks and run tests on CI.
 fastlane android ci_credentials
 ```
 Get the configuration files from the Android credentials repository on CI.
-### android upload_to_appcenter
+### android ci_upload_to_appcenter
 ```
-fastlane android upload_to_appcenter
+fastlane android ci_upload_to_appcenter
 ```
 Upload to AppCenter.
 ### android ci_export_build
 ```
 fastlane android ci_export_build
 ```
-Export the build path to environment variables for upload. Optional flags: export_bundle (APK is default).
+Export the build path to environment variables for upload. Optional flags: export_bundle (APK is default), do_sign (False is default).
 ### android ci_test
 ```
 fastlane android ci_test
@@ -65,7 +80,7 @@ Tests to run on CI
 ```
 fastlane android ci_build
 ```
-Build to run on CI. Optional flags: copy_credentials, build_bundle (APK is default), export_build.
+Build to run on CI. Optional flags: copy_credentials, build_bundle (APK is default), export_build(False is default), do_sign (False is default).
 ### android ci_lint
 ```
 fastlane android ci_lint
