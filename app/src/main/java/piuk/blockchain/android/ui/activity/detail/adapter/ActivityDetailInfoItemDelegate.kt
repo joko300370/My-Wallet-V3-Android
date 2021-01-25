@@ -16,7 +16,6 @@ import piuk.blockchain.android.ui.activity.detail.BuyCryptoWallet
 import piuk.blockchain.android.ui.activity.detail.BuyFee
 import piuk.blockchain.android.ui.activity.detail.BuyPaymentMethod
 import piuk.blockchain.android.ui.activity.detail.BuyPurchaseAmount
-import piuk.blockchain.android.ui.activity.detail.CancelAction
 import piuk.blockchain.android.ui.activity.detail.Created
 import piuk.blockchain.android.ui.activity.detail.Description
 import piuk.blockchain.android.ui.activity.detail.Fee
@@ -38,7 +37,7 @@ import piuk.blockchain.android.util.inflate
 class ActivityDetailInfoItemDelegate<in T> : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
         val item = items[position] as ActivityDetailsType
-        return item !is Action && item !is Description && item !is CancelAction
+        return item !is Action && item !is Description
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
