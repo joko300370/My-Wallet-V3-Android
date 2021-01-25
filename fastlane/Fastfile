@@ -3,12 +3,12 @@ opt_out_usage
 default_platform :android
 platform :android do
 
-    desc "Builds using the given environment and build type"
+    desc "Build using the given environment (default: Staging) and build type (default: Debug)."
     lane :build do | options |
 
-      environment = options[:environment]
+      environment = options[:environment] ? options[:environment] : "Staging"
 
-      build_type = options[:build_type]
+      build_type = options[:build_type] ? options[:build_type] : "Debug"
 
       gradle(
         task: 'assemble',
@@ -19,20 +19,77 @@ platform :android do
 
     end
 
+    desc "Build Staging Release"
+    lane :staging_release do
 
-    desc "Runs all tests"
-    lane :test do
       gradle(
-        task: "coveralls"
-        )
+        task: 'assemble',
+        build_type: 'Release',
+        flavor: 'EnvStaging',
+        print_command: false
+      )
+
+    end
+
+    desc "Build Prod Debug"
+    lane :prod_debug do
+
+      gradle(
+        task: 'assemble',
+        build_type: 'Debug',
+        flavor: 'EnvProd',
+        print_command: false
+      )
+
+    end
+
+    desc "Build Prod Release"
+    lane :prod_release do
+
+      gradle(
+        task: 'assemble',
+        build_type: 'Release',
+        flavor: 'EnvProd',
+        print_command: false
+      )
+
     end
 
 
-    desc "Submit a release Alpha build to the Play Store. This won't publish, just upload."
-    lane :alpha do
+    desc "Run tests. Optional flags: environment (Staging), build_type (Debug), test_name (runs all by default)."
+    lane :test do | options |
+
+      environment = options[:environment] ? options[:environment] : "Staging"
+
+      build_type = options[:build_type] ? options[:build_type] : "Debug"
+
+      if options[:test_name]
+
+        gradle(
+          task: "test",
+          build_type: build_type + "UnitTest",
+          flavor: 'Env' + environment,
+          flags: "--tests " + options[:test_name]
+        )
+
+      else
+
+        gradle(
+          task: "test",
+          build_type: build_type + "UnitTest",
+          flavor: 'Env' + environment,
+        )
+        
+      end
+
+    end
+
+
+    desc "Submit a release build to the Play Store internal test track."
+    lane :upload_to_internal_track do
 
       upload_to_play_store(
-          track: 'alpha',
+          track: 'internal',
           validate_only: 'true',
       )
 
@@ -46,23 +103,22 @@ platform :android do
       if !File.exist? credentials_folder
 
         sh("echo \"--------------Cloning Credentials Repo--------------\"")
-        sh("git clone git@github.com:blockchain/wallet-android-credentials.git ../../")
+        sh("git clone git@github.com:blockchain/wallet-android-credentials.git " + credentials_folder)
 
       end
 
-      sh("echo \"--------------Pulling Latest Credentials--------------\"")
-      sh("( cd ../../wallet-android-credentials/ ; git pull )")
-
-      sh("echo \"--------------Unzip Firebase Credentials--------------\"")
-      sh("unzip ../../wallet-android-credentials/env.zip  -d ../../wallet-android-credentials/")
-
       sh("rm -rf ../app/src/env")
 
-      sh("echo \"--------------Copying Firebase Credentials--------------\"")
-      sh("cp -r ../../wallet-android-credentials/env ../app/src")
+      sh("echo \"--------------Pulling Latest Credentials--------------\"")
+      sh("( cd " + credentials_folder + " ; git pull )")
+
+      sh("echo \"--------------Unzip Firebase Credentials into app/src--------------\"")
+      sh("unzip -o " + credentials_folder + "/env.zip -d ../app/src")
+
+      sh("rm -rf ../app/src/__MACOSX")
 
       sh("echo \"--------------Copying Secrets Properties--------------\"")
-      sh("cp ../../wallet-android-credentials/secrets.properties ../app")
+      sh("cp " + credentials_folder + "/secrets.properties ../app")
 
     end
 
@@ -102,39 +158,36 @@ platform :android do
 
 
     desc "Upload to AppCenter."
-    lane :upload_to_appcenter do | options |
+    lane :ci_upload_to_appcenter do | options |
       #  Expected env vars: 
-      #  APPCENTER_API_TOKEN, APPCENTER_OWNER_NAME, APPCENTER_DISTRIBUTE_DESTINATIONS
-      #  APPCENTER_DISTRIBUTE_RELEASE_NOTES and APPCENTER_APP_NAME
-      if options[:appcenter_file_path]
+      #  APPCENTER_API_TOKEN, APPCENTER_OWNER_NAME, APPCENTER_DISTRIBUTE_FILE,
+      #  APPCENTER_DISTRIBUTE_DESTINATIONS APPCENTER_DISTRIBUTE_RELEASE_NOTES and APPCENTER_APP_NAME
+      file_path = options[:appcenter_file_path] ? options[:appcenter_file_path] : ENV["APPCENTER_DISTRIBUTE_FILE"]
+      app_name = options[:app_name] ? options[:app_name] : ENV["APPCENTER_APP_NAME"]
+      testers_group = options[:testers_group] ? options[:testers_group] : ENV["APPCENTER_TESTERS_GROUP"]
 
-        appcenter_upload(
-          file: options[:appcenter_file_path]
-        )
-
-      else
-
-        #  Expected env var when no input file specified: APPCENTER_DISTRIBUTE_FILE, CI only
-        file_path = options[:upload_bundle] ? "$BITRISE_AAB_PATH" : "$BITRISE_APK_PATH"
-        sh("envman add --key APPCENTER_DISTRIBUTE_FILE --value " + file_path)
-        appcenter_upload
-
-      end
+      appcenter_upload(
+        app_name: app_name,
+        file: file_path,
+        destinations: testers_group
+      )
       
     end
 
-    desc "Export the build path to environment variables for upload. Optional flags: export_bundle (APK is default)."
+    desc "Export the build path to environment variables for upload. Optional flags: export_bundle (APK is default), do_sign (False is default)."
     lane :ci_export_build do | options |
 
       file_path = options[:build_path]
 
+      do_sign = options[:do_sign] ? "true" : "false"
+
       if options[:export_bundle]
 
-        sh("./../scripts/ci_export_aab.sh " + file_path)
+        sh("./../scripts/ci_export_aab.sh " + file_path + " " + do_sign)
 
       else
 
-        sh("./../scripts/ci_export_apk.sh " + file_path)
+        sh("./../scripts/ci_export_apk.sh " + file_path + " " + do_sign)
         
       end
       
@@ -146,11 +199,11 @@ platform :android do
       gradle(
         task: "coveralls",
         flags: "-Dpre-dex=false -Pkotlin.incremental=false --stacktrace --no-daemon --max-workers 2"
-        )
+      )
     end
 
 
-    desc "Build to run on CI. Optional flags: copy_credentials, build_bundle (APK is default), export_build."
+    desc "Build to run on CI. Optional flags: copy_credentials, build_bundle (APK is default), export_build(False is default), do_sign (False is default)."
     lane :ci_build do | options |
 
       environment = options[:environment]
@@ -195,6 +248,7 @@ platform :android do
 
         ci_export_build(
           build_path: file_path,
+          do_sign: options[:do_sign],
           export_bundle: options[:build_bundle]
         )
           
