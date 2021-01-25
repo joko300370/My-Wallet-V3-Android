@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore
 
 import androidx.annotation.CallSuper
+import androidx.annotation.VisibleForTesting
 import com.blockchain.extensions.replace
 import com.blockchain.koin.payloadScope
 import com.blockchain.nabu.datamanagers.TransactionError
@@ -50,9 +51,21 @@ enum class FeeLevel {
     Custom
 }
 
+data class TxFee(
+    val fee: Money,
+    val type: FeeType,
+    val asset: CryptoCurrency
+) {
+    enum class FeeType {
+        DEPOSIT_FEE,
+        WITHDRAWAL_FEE
+    }
+}
+
 data class PendingTx(
     val amount: Money,
-    val available: Money,
+    val totalBalance: Money,
+    val availableBalance: Money,
     val fees: Money,
     val selectedFiat: String,
     val feeLevel: FeeLevel = FeeLevel.Regular,
@@ -166,15 +179,8 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
         TxConfirmationValue(TxConfirmation.MEMO)
 
     data class NetworkFee(
-        val fee: Money,
-        val type: FeeType,
-        val asset: CryptoCurrency
-    ) : TxConfirmationValue(TxConfirmation.NETWORK_FEE) {
-        enum class FeeType {
-            DEPOSIT_FEE,
-            WITHDRAWAL_FEE
-        }
-    }
+        val txFee: TxFee
+    ) : TxConfirmationValue(TxConfirmation.NETWORK_FEE)
 
     data class TxBooleanConfirmation<T>(
         override val confirmation: TxConfirmation,
@@ -188,15 +194,16 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
         TxConfirmationValue(TxConfirmation.READ_ONLY)
 }
 
-sealed class FeeState
-object FeeTooHigh : FeeState()
-object FeeUnderMinLimit : FeeState()
-object FeeUnderRecommended : FeeState()
-object FeeOverRecommended : FeeState()
-object ValidCustomFee : FeeState()
-data class FeeDetails(
-    val absoluteFee: Money
-) : FeeState()
+sealed class FeeState {
+    object FeeTooHigh : FeeState()
+    object FeeUnderMinLimit : FeeState()
+    object FeeUnderRecommended : FeeState()
+    object FeeOverRecommended : FeeState()
+    object ValidCustomFee : FeeState()
+    data class FeeDetails(
+        val absoluteFee: Money
+    ) : FeeState()
+}
 
 abstract class TxEngine : KoinComponent {
 
@@ -218,7 +225,8 @@ abstract class TxEngine : KoinComponent {
     protected val exchangeRates: ExchangeRateDataManager
         get() = _exchangeRates
 
-    protected fun refreshConfirmations(revalidate: Boolean = false) =
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    fun refreshConfirmations(revalidate: Boolean = false) =
         _refresh.refreshConfirmations(revalidate).emptySubscribe()
 
     @CallSuper
@@ -252,7 +260,8 @@ abstract class TxEngine : KoinComponent {
         payloadScope.get<CurrencyPrefs>().selectedFiatCurrency
     }
 
-    protected val asset: CryptoCurrency
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    val asset: CryptoCurrency
         get() = sourceAccount.asset
 
     open val requireSecondPassword: Boolean = false

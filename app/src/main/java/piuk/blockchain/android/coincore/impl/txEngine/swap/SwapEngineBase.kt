@@ -1,10 +1,10 @@
 package piuk.blockchain.android.coincore.impl.txEngine.swap
 
+import androidx.annotation.VisibleForTesting
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.CustodialOrder
-import com.blockchain.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.nabu.service.TierService
@@ -19,27 +19,30 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmationValue
+import piuk.blockchain.android.coincore.TxFee
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.copyAndPut
 import piuk.blockchain.android.coincore.impl.txEngine.PricedQuote
 import piuk.blockchain.android.coincore.impl.txEngine.QuotedEngine
+import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import java.math.BigDecimal
 import java.math.RoundingMode
 
-private const val USER_TIER = "USER_TIER"
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+const val USER_TIER = "USER_TIER"
 
 private val PendingTx.userTier: KycTiers
     get() = (this.engineState[USER_TIER] as KycTiers)
 
 abstract class SwapEngineBase(
-    quotesProvider: QuotesProvider,
+    quotesEngine: TransferQuotesEngine,
     private val walletManager: CustodialWalletManager,
     kycTierService: TierService,
     environmentConfig: EnvironmentConfig
-) : QuotedEngine(quotesProvider, kycTierService, walletManager, environmentConfig) {
+) : QuotedEngine(quotesEngine, kycTierService, walletManager, environmentConfig) {
 
     private lateinit var minApiLimit: Money
 
@@ -72,8 +75,8 @@ abstract class SwapEngineBase(
 
         return pendingTx.copy(
             minLimit = minLimit(pricedQuote.price),
-            maxLimit = (exchangeRate.inverse().convert(limits.maxLimit) as CryptoValue).withUserDpRounding(
-                RoundingMode.FLOOR),
+            maxLimit = (exchangeRate.inverse().convert(limits.maxLimit) as CryptoValue)
+                .withUserDpRounding(RoundingMode.FLOOR),
             engineState = pendingTx.engineState.copyAndPut(USER_TIER, tier)
         )
     }
@@ -123,14 +126,18 @@ abstract class SwapEngineBase(
                         TxConfirmationValue.From(from = sourceAccount.label),
                         TxConfirmationValue.To(to = txTarget.label),
                         TxConfirmationValue.NetworkFee(
+                            txFee = TxFee(
                             fee = pricedQuote.transferQuote.networkFee,
-                            type = TxConfirmationValue.NetworkFee.FeeType.WITHDRAWAL_FEE,
+                            type = TxFee.FeeType.WITHDRAWAL_FEE,
                             asset = target.asset
+                            )
                         ),
                         TxConfirmationValue.NetworkFee(
-                            fee = pendingTx.fees,
-                            type = TxConfirmationValue.NetworkFee.FeeType.DEPOSIT_FEE,
-                            asset = sourceAccount.asset
+                            txFee = TxFee(
+                                fee = pendingTx.fees,
+                                type = TxFee.FeeType.DEPOSIT_FEE,
+                                asset = sourceAccount.asset
+                            )
                         )
                     ),
                     minLimit = minLimit(pricedQuote.price)
@@ -142,8 +149,7 @@ abstract class SwapEngineBase(
     private fun minLimit(price: Money): Money {
         val minAmountToPayFees = minAmountToPayNetworkFees(
             price,
-            quotesEngine.getLatestQuote().transferQuote.networkFee,
-            quotesEngine.getLatestQuote().transferQuote.staticFee
+            quotesEngine.getLatestQuote().transferQuote.networkFee
         )
 
         return minApiLimit.plus(minAmountToPayFees).withUserDpRounding(RoundingMode.CEILING)
@@ -156,9 +162,11 @@ abstract class SwapEngineBase(
             ).apply {
                 addOrReplaceOption(
                     TxConfirmationValue.NetworkFee(
-                        fee = quotesEngine.getLatestQuote().transferQuote.networkFee,
-                        type = TxConfirmationValue.NetworkFee.FeeType.WITHDRAWAL_FEE,
-                        asset = target.asset
+                        txFee = TxFee(
+                            fee = quotesEngine.getLatestQuote().transferQuote.networkFee,
+                            type = TxFee.FeeType.WITHDRAWAL_FEE,
+                            asset = target.asset
+                        )
                     )
                 )
                 addOrReplaceOption(
@@ -195,10 +203,9 @@ abstract class SwapEngineBase(
     private fun TransferDirection.requireRefundAddress() =
         this == TransferDirection.ON_CHAIN || this == TransferDirection.FROM_USERKEY
 
-    private fun minAmountToPayNetworkFees(price: Money, networkFee: Money, staticFee: Money): Money =
+    private fun minAmountToPayNetworkFees(price: Money, networkFee: Money): Money =
         CryptoValue.fromMajor(
             sourceAccount.asset,
-            (networkFee.toBigDecimal().divide(price.toBigDecimal(), sourceAccount.asset.dp, RoundingMode.HALF_UP)).plus(
-                staticFee.toBigDecimal())
+            networkFee.toBigDecimal().divide(price.toBigDecimal(), sourceAccount.asset.dp, RoundingMode.HALF_UP)
         )
 }

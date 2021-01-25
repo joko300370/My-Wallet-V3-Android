@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.xlm
 
+import androidx.annotation.VisibleForTesting
 import com.blockchain.fees.FeeType
 import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
@@ -15,7 +16,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.FeeDetails
+import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
@@ -29,7 +30,8 @@ import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.utils.extensions.then
 
-private const val STATE_MEMO = "XLM_MEMO"
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+const val STATE_MEMO = "XLM_MEMO"
 
 private val PendingTx.memo: TxConfirmationValue.Memo
     get() = (this.engineState[STATE_MEMO] as? TxConfirmationValue.Memo)
@@ -52,9 +54,9 @@ class XlmOnChainTxEngine(
         get() = txTarget as XlmAddress
 
     override fun assertInputsValid() {
-        require(txTarget is CryptoAddress)
-        require((txTarget as CryptoAddress).asset == CryptoCurrency.XLM)
-        require(asset == CryptoCurrency.XLM)
+        check(txTarget is CryptoAddress)
+        check((txTarget as CryptoAddress).asset == CryptoCurrency.XLM)
+        check(asset == CryptoCurrency.XLM)
     }
 
     override fun restart(txTarget: TransactionTarget, pendingTx: PendingTx): Single<PendingTx> {
@@ -72,12 +74,12 @@ class XlmOnChainTxEngine(
     override fun doInitialiseTx(): Single<PendingTx> =
         Single.just(
             PendingTx(
-                amount = CryptoValue.ZeroXlm,
-                available = CryptoValue.ZeroXlm,
-                fees = CryptoValue.ZeroXlm,
+                amount = CryptoValue.zero(asset),
+                totalBalance = CryptoValue.zero(asset),
+                availableBalance = CryptoValue.zero(asset),
+                fees = CryptoValue.zero(asset),
                 feeLevel = FeeLevel.Regular,
-                selectedFiat = userFiat,
-                engineState = hashMapOf()
+                selectedFiat = userFiat
             ).setMemo(
                 TxConfirmationValue.Memo(
                     text = targetXlmAddress.memo,
@@ -92,12 +94,14 @@ class XlmOnChainTxEngine(
         require(amount.currency == CryptoCurrency.XLM)
 
         return Singles.zip(
+            sourceAccount.accountBalance.map { it as CryptoValue },
             sourceAccount.actionableBalance.map { it as CryptoValue },
             absoluteFee()
-        ) { available, fees ->
+        ) { total, available, fees ->
             pendingTx.copy(
                 amount = amount,
-                available = Money.max(available - fees, CryptoValue.ZeroXlm) as CryptoValue,
+                totalBalance = total,
+                availableBalance = Money.max(available - fees, CryptoValue.zero(CryptoCurrency.XLM)) as CryptoValue,
                 fees = fees
             )
         }
@@ -149,16 +153,17 @@ class XlmOnChainTxEngine(
         )
 
     override fun doOptionUpdateRequest(pendingTx: PendingTx, newConfirmation: TxConfirmationValue): Single<PendingTx> {
-        return super.doOptionUpdateRequest(pendingTx, newConfirmation).flatMap { tx ->
-            (newConfirmation as? TxConfirmationValue.Memo)?.let {
-                Single.just(tx.setMemo(newConfirmation))
-            } ?: Single.just(tx)
-        }
+        return super.doOptionUpdateRequest(pendingTx, newConfirmation)
+            .flatMap { tx ->
+                (newConfirmation as? TxConfirmationValue.Memo)?.let {
+                    Single.just(tx.setMemo(newConfirmation))
+                } ?: Single.just(tx)
+            }
     }
 
     private fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
         TxConfirmationValue.FeeSelection(
-            feeDetails = FeeDetails(pendingTx.fees),
+            feeDetails = FeeState.FeeDetails(pendingTx.fees),
             exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
             selectedLevel = pendingTx.feeLevel,
             availableLevels = setOf(FeeLevel.Regular),

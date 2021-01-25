@@ -34,6 +34,7 @@
     <string name="common_continue">Continue</string>
     <string name="common_try_again">Try Again</string>
     <string name="common_oops">Oops! Something went wrong.</string>
+    <string name="common_sell">Sell</string>
 
     <plurals name="transfer_label_plural">
         <item quantity="one">1 imported address</item>
@@ -1660,7 +1661,6 @@
     <string name="sell_crypto_subtitle">Verify your identity to sell crypto for cash.</string>
     <string name="sell_for_cash">Sell Crypto for Cash</string>
     <string name="select_wallet_to_sell">Select a wallet to sell from.</string>
-    <string name="common_sell">Sell</string>
     <string name="quote_price">%1$s Price</string>
     <string name="purchase_funds_note">Your final amount may change due to market activity.</string>
     <string name="convert_your_crypto_to_cash">Convert Your Crypto to Cash</string>

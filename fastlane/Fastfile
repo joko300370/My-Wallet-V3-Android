@@ -19,12 +19,14 @@ platform :android do
 
     end
 
+
     desc "Runs all tests"
     lane :test do
       gradle(
         task: "coveralls"
         )
     end
+
 
     desc "Submit a release Alpha build to the Play Store. This won't publish, just upload."
     lane :alpha do
@@ -36,12 +38,106 @@ platform :android do
 
     end
 
+
+    desc "Get the configuration files from the Android credentials repository."
+    lane :credentials do
+
+      credentials_folder = File.expand_path("../../wallet-android-credentials/")
+      if !File.exist? credentials_folder
+
+        sh("echo \"--------------Cloning Credentials Repo--------------\"")
+        sh("git clone git@github.com:blockchain/wallet-android-credentials.git ../../")
+
+      end
+
+      sh("echo \"--------------Pulling Latest Credentials--------------\"")
+      sh("( cd ../../wallet-android-credentials/ ; git pull )")
+
+      sh("echo \"--------------Unzip Firebase Credentials--------------\"")
+      sh("unzip ../../wallet-android-credentials/env.zip  -d ../../wallet-android-credentials/")
+
+      sh("rm -rf ../app/src/env")
+
+      sh("echo \"--------------Copying Firebase Credentials--------------\"")
+      sh("cp -r ../../wallet-android-credentials/env ../app/src")
+
+      sh("echo \"--------------Copying Secrets Properties--------------\"")
+      sh("cp ../../wallet-android-credentials/secrets.properties ../app")
+
+    end
+
+
+    desc "Bundle of build, perform checks and run tests on CI."
+    lane :ci_run_tests do
+
+      ci_credentials
+
+      ci_lint
+
+      ci_build(
+        environment: "Prod",
+        build_type: "Debug"
+      )
+
+      ci_test
+      
+    end
+    
+
+    desc "Get the configuration files from the Android credentials repository on CI."
+    lane :ci_credentials do
+
+      sh("echo \"--------------Cloning Credentials Repo--------------\"")
+      sh("git clone $CREDENTIALS_REPO ../../tmp/credentials")
+
+      sh("echo \"--------------Unzip Firebase Credentials--------------\"")
+      sh("unzip ../../tmp/credentials/env.zip  -d ../../tmp/credentials/")
+
+      sh("echo \"--------------Copying Firebase Credentials--------------\"")
+      sh("cp -r ../../tmp/credentials/env ../app/src")
+
+      sh("echo \"--------------Copying Secrets Properties--------------\"")
+      sh("cp ../../tmp/credentials/secrets.properties ../app")
+    end
+
+
     desc "Upload to AppCenter."
-    lane :upload_to_appcenter do
+    lane :upload_to_appcenter do | options |
       #  Expected env vars: 
-      #  APPCENTER_API_TOKEN, APPCENTER_DISTRIBUTE_FILE, APPCENTER_OWNER_NAME,
-      #  APPCENTER_DISTRIBUTE_DESTINATIONS, APPCENTER_DISTRIBUTE_RELEASE_NOTES and APPCENTER_APP_NAME
-      appcenter_upload
+      #  APPCENTER_API_TOKEN, APPCENTER_OWNER_NAME, APPCENTER_DISTRIBUTE_DESTINATIONS
+      #  APPCENTER_DISTRIBUTE_RELEASE_NOTES and APPCENTER_APP_NAME
+      if options[:appcenter_file_path]
+
+        appcenter_upload(
+          file: options[:appcenter_file_path]
+        )
+
+      else
+
+        #  Expected env var when no input file specified: APPCENTER_DISTRIBUTE_FILE, CI only
+        file_path = options[:upload_bundle] ? "$BITRISE_AAB_PATH" : "$BITRISE_APK_PATH"
+        sh("envman add --key APPCENTER_DISTRIBUTE_FILE --value " + file_path)
+        appcenter_upload
+
+      end
+      
+    end
+
+    desc "Export the build path to environment variables for upload. Optional flags: export_bundle (APK is default)."
+    lane :ci_export_build do | options |
+
+      file_path = options[:build_path]
+
+      if options[:export_bundle]
+
+        sh("./../scripts/ci_export_aab.sh " + file_path)
+
+      else
+
+        sh("./../scripts/ci_export_apk.sh " + file_path)
+        
+      end
+      
     end
 
 
@@ -53,30 +149,59 @@ platform :android do
         )
     end
 
-    desc "Build to run on CI"
+
+    desc "Build to run on CI. Optional flags: copy_credentials, build_bundle (APK is default), export_build."
     lane :ci_build do | options |
 
       environment = options[:environment]
 
       build_type = options[:build_type]
 
-      sh("echo $FIREBASE_API_JSON_PROD > ../app/src/env/prod/google-services.json")
-      sh("echo $FIREBASE_API_JSON_DEV > ../app/src/env/dev/google-services.json")
-      sh("echo $FIREBASE_API_JSON_STAGING > ../app/src/env/staging/google-services.json")
-      sh("echo $FIREBASE_API_JSON_TESTNET > ../app/src/env/testnet/google-services.json")
+      if options[:copy_credentials]
 
-      sh("wget -O \"../app/secrets.properties\" \"$BITRISEIO_secrets_properties_URL\"")
+        ci_credentials
 
-      sh("echo \"file downloaded to: ../app/secrets.properties\"")
+      end
 
-      gradle(
-        task: 'assemble',
-        build_type: build_type,
-        flavor: 'Env' + environment,
-        print_command: false,
-        flags: "--info --stacktrace --no-daemon"
-      )
+      file_path = ""
+
+      if options[:build_bundle]
+
+        gradle(
+          task: 'bundle',
+          build_type: build_type,
+          flavor: 'Env' + environment,
+          print_command: false,
+          flags: "--info"
+        )
+
+        file_path = "../app/build/outputs/apk/env" + environment + build_type
+
+      else
+
+        gradle(
+          task: 'assemble',
+          build_type: build_type,
+          flavor: 'Env' + environment,
+          print_command: false,
+          flags: "--info --stacktrace --no-daemon"
+        )
+
+        file_path = "../app/build/outputs/apk/env" + environment + "/" + build_type.downcase
+
+      end
+
+      if options[:export_build]
+
+        ci_export_build(
+          build_path: file_path,
+          export_bundle: options[:build_bundle]
+        )
+          
+      end
+
     end
+
 
     desc "Checks to run on CI"
     lane :ci_lint do
@@ -89,6 +214,7 @@ platform :android do
         flags: "lintDebug ktlint -Dpre-dex=false -Pkotlin.incremental=false --no-daemon --stacktrace"
       )
     end
+
 
     private_lane :ship_it do
       rand = Random.rand(0..1)
@@ -113,6 +239,7 @@ platform :android do
             !!!\\______\\
       "
     end
+
 
     def boat
       puts "

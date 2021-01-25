@@ -131,12 +131,17 @@ is on `develop`. Import it as an Android Studio project (`File -> Open`).
 
 ## Configuration files
 
-The following files can be found in [Android Configuration Files](https://github.com/blockchain/android-config-files):
+The following files can be found in [Android Configuration Files](https://github.com/blockchain/wallet-android-credentials):
 * Secrets properties file - Contains API keys and the various combinations of production/staging/testnet/dev URLs.
 * Environment files - root `env` folder and total of 3 `google-services.json` files.
 
-Get the Secrets file: `secrets.properties` (file extension should be `properties` only) and move it to `./app`.
-Get the `env.zip` file and unzip it. Delete `./app/src/env` and then move the unzipped `env` folder to `./app/src/`.
+You can get the latest configuration files by running 
+
+     bundle exec fastlane credentials
+     
+Or manually cloning the [Android Configuration Files](https://github.com/blockchain/wallet-android-credentials) repository
+and then moving the  `secrets.properties` (file extension should be `properties` only) into `./app` as well as
+unzipping the `env.zip` file, deleting `./app/src/env` and then moving the unzipped `env` folder to `./app/src/`.
 
 Select the `envStagingDebug` variant from `Build Variants` (bottom left corner in AS) since dev is quite unstable,
 then hit `Build -> Make Project`. For Dev and Staging access you'll need [VPN access](https://blockchain.atlassian.net/wiki/spaces/SKB/pages/501350537/Algo+VPN+Client+side+setup#How-can-setup-it-up%3F).

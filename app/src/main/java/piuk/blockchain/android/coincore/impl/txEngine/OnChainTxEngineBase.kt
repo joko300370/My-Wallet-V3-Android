@@ -6,17 +6,12 @@ import info.blockchain.wallet.api.data.FeeOptions
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.FeeDetails
+import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.FeeLevel
-import piuk.blockchain.android.coincore.FeeOverRecommended
-import piuk.blockchain.android.coincore.FeeTooHigh
-import piuk.blockchain.android.coincore.FeeUnderMinLimit
-import piuk.blockchain.android.coincore.FeeUnderRecommended
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxResult
-import piuk.blockchain.android.coincore.ValidCustomFee
 
 abstract class OnChainTxEngineBase(
     override val requireSecondPassword: Boolean,
@@ -25,9 +20,9 @@ abstract class OnChainTxEngineBase(
 
     override fun assertInputsValid() {
         val tgt = txTarget
-        require(tgt is CryptoAddress)
-        require(tgt.address.isNotEmpty())
-        require(sourceAccount.asset == tgt.asset)
+        check(tgt is CryptoAddress)
+        check(tgt.address.isNotEmpty())
+        check(sourceAccount.asset == tgt.asset)
     }
 
     override fun doPostExecute(txResult: TxResult): Completable =
@@ -52,24 +47,24 @@ abstract class OnChainTxEngineBase(
     protected fun getFeeState(pTx: PendingTx, feeOptions: FeeOptions? = null) =
         if (pTx.feeLevel == FeeLevel.Custom) {
             when {
-                pTx.customFeeAmount == -1L -> ValidCustomFee
+                pTx.customFeeAmount == -1L -> FeeState.ValidCustomFee
                 pTx.customFeeAmount < MINIMUM_CUSTOM_FEE -> {
-                    FeeUnderMinLimit
+                    FeeState.FeeUnderMinLimit
                 }
                 pTx.customFeeAmount >= MINIMUM_CUSTOM_FEE &&
                     pTx.customFeeAmount <= feeOptions?.limits?.min ?: 0L -> {
-                    FeeUnderRecommended
+                    FeeState.FeeUnderRecommended
                 }
                 pTx.customFeeAmount >= feeOptions?.limits?.max ?: 0L -> {
-                    FeeOverRecommended
+                    FeeState.FeeOverRecommended
                 }
-                else -> ValidCustomFee
+                else -> FeeState.ValidCustomFee
             }
         } else {
-            if (pTx.available < pTx.amount) {
-                FeeTooHigh
+            if (pTx.availableBalance < pTx.amount) {
+                FeeState.FeeTooHigh
             } else {
-                FeeDetails(pTx.fees)
+                FeeState.FeeDetails(pTx.fees)
             }
         }
 

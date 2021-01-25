@@ -89,8 +89,8 @@ class AssetDetailSheet :
             handleErrorState(newState.errorState)
         }
 
-        newState.assetDisplayMap?.let {
-            onGotAssetDetails(it)
+        newState.assetDisplayMap?.let { assetDisplayMap ->
+            onGotAssetDetails(assetDisplayMap)
         }
 
         dialogView.current_price.text = newState.assetFiatPrice

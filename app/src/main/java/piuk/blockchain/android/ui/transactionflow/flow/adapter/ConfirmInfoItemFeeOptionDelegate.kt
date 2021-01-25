@@ -21,14 +21,9 @@ import com.blockchain.ui.urllinks.URL_TX_FEES
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_send_confirm_select_fee.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.FeeDetails
+import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.FeeLevel
-import piuk.blockchain.android.coincore.FeeOverRecommended
-import piuk.blockchain.android.coincore.FeeTooHigh
-import piuk.blockchain.android.coincore.FeeUnderMinLimit
-import piuk.blockchain.android.coincore.FeeUnderRecommended
 import piuk.blockchain.android.coincore.TxConfirmationValue
-import piuk.blockchain.android.coincore.ValidCustomFee
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
@@ -157,24 +152,24 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
         private fun View.showFeeDetails(item: TxConfirmationValue.FeeSelection) {
             item.feeDetails?.let {
                 when (it) {
-                    is FeeUnderMinLimit -> {
+                    is FeeState.FeeUnderMinLimit -> {
                         setCustomFeeValues(item.customFeeAmount,
                             context.getString(R.string.fee_options_sat_byte_min_error))
                     }
-                    is FeeUnderRecommended -> {
+                    is FeeState.FeeUnderRecommended -> {
                         setCustomFeeValues(item.customFeeAmount, context.getString(R.string.fee_options_fee_too_low))
                     }
-                    is FeeOverRecommended -> {
+                    is FeeState.FeeOverRecommended -> {
                         setCustomFeeValues(item.customFeeAmount, context.getString(R.string.fee_options_fee_too_high))
                     }
-                    is ValidCustomFee -> {
+                    is FeeState.ValidCustomFee -> {
                         setCustomFeeValues(item.customFeeAmount)
                     }
-                    is FeeTooHigh -> {
+                    is FeeState.FeeTooHigh -> {
                         fee_option_value.text = context.getString(R.string.send_confirmation_insufficient_fee)
                         fee_option_value.setTextColor(ContextCompat.getColor(context, R.color.red_600))
                     }
-                    is FeeDetails -> {
+                    is FeeState.FeeDetails -> {
                         fee_option_value.text = it.absoluteFee.formatWithExchange(item.exchange)
                         fee_option_value.setTextColor(ContextCompat.getColor(context, R.color.grey_800))
                     }

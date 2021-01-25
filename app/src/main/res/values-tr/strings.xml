@@ -897,7 +897,7 @@
     <string name="simple_buy_amount_to_send">Gönderilecek tutar</string>
     <string name="simple_buy_pending_buy_sheet_title">Bekleyen %1s Satın Al</string>
     <string name="recipient_name_must_match_eur">Aktarımınızın başarılı olması için yukarıdaki Alıcı adınızın hesap sahibinin banka hesabınızdaki adıyla eşleşmesi gerekir. Bir eşleşme yoksa transferiniz reddedilebilir.</string>
-    <string name="recipient_name_must_match_gbp">Aktarımınızın başarılı olması için yukarıdaki Alıcı adınızın hesap sahibinin banka hesabınızdaki adıyla eşleşmesi gerekir. Bir eşleşme yoksa transferiniz reddedilebilir. Bu hesaba para yatırarak, bankacılık ortağımız <annotation link="modular_terms_and_conditions"> Şartlar ve Koşulları </annotation> anno kabul edersiniz.</string>
+    <string name="recipient_name_must_match_gbp">Aktarımınızın başarılı olması için yukarıdaki Alıcı adınızın hesap sahibinin banka hesabınızdaki adıyla eşleşmesi gerekir. Bir eşleşme yoksa transferiniz reddedilebilir.Bu hesaba para yatırarak, bankacılık ortağımız <annotation link="modular_terms_and_conditions"> Şartlar ve Koşulları</annotation> anno kabul edersiniz.</string>
     <string name="recipient_name_must_match">Yalnızca adınızdaki bir banka hesabından para gönderin. Aksi takdirde, depozitonuz ertelenebilir veya reddedilebilir.</string>
     <string name="are_ypu_sure">Emin misiniz?</string>
     <string name="cancel_order">Siparişi iptal et</string>
@@ -1292,7 +1292,6 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
     <string name="sell_for_cash">Nakit Karşılığında Kripto Sat</string>
     <string name="select_wallet_to_sell">Satış yapmak için bir cüzdan seçin.</string>
     <string name="common_sell">Satmak</string>
-    <string name="quote_price">%1$s Fiyatı</string>
     <string name="convert_your_crypto_to_cash">Kriptoyu Nakite Çevirin</string>
     <string name="scan_mismatch_transaction_target">Taranan kod bir %1$s QR kodu değil.</string>
     <string name="scan_failed">QR kodu tanınmadı, lütfen tekrar deneyin.</string>

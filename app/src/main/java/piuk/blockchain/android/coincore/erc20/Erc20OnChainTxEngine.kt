@@ -40,8 +40,9 @@ open class Erc20OnChainTxEngine(
         Single.just(
             PendingTx(
                 amount = CryptoValue.zero(asset),
-                available = CryptoValue.zero(asset),
-                fees = CryptoValue.ZeroEth,
+                totalBalance = CryptoValue.zero(asset),
+                availableBalance = CryptoValue.zero(asset),
+                fees = CryptoValue.zero(CryptoCurrency.ETHER),
                 feeLevel = mapSavedFeeToFeeLevel(getFeeType(asset)),
                 selectedFiat = userFiat
             )
@@ -97,12 +98,14 @@ open class Erc20OnChainTxEngine(
         require(amount is CryptoValue)
         require(amount.currency == asset)
         return Singles.zip(
+            sourceAccount.accountBalance.map { it as CryptoValue },
             sourceAccount.actionableBalance.map { it as CryptoValue },
             absoluteFee(pendingTx.feeLevel)
-        ) { available, fee ->
+        ) { total, available, fee ->
             pendingTx.copy(
                 amount = amount,
-                available = available,
+                totalBalance = total,
+                availableBalance = available,
                 fees = fee
             )
         }

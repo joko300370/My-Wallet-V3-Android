@@ -49,21 +49,26 @@ class AccountSelectSheet(
         dismiss()
     }
 
-    private fun doOnLoadError(t: Throwable) {
+    private fun doOnListLoaded(isEmpty: Boolean) {
+        dialogView.account_list_empty.visibleIf { isEmpty }
+        dialogView.progress.gone()
+    }
+
+    private fun doOnLoadError(it: Throwable) {
+        dialogView.progress.gone()
         dismiss()
     }
 
-    private fun doOnEmptyList() {
-        account_list_empty.visible()
+    private fun doOnListLoading() {
+        dialogView.progress.visible()
     }
 
     override fun initControls(view: View) {
         with(view) {
-
             account_list.onAccountSelected = ::doOnAccountSelected
-            account_list.onEmptyList = ::doOnEmptyList
+            account_list.onListLoaded = ::doOnListLoaded
             account_list.onLoadError = ::doOnLoadError
-
+            account_list.onListLoading = ::doOnListLoading
             account_list_title.text = getString(sheetTitle)
             account_list_subtitle.text = getString(sheetSubtitle)
             account_list_subtitle.visibleIf { getString(sheetSubtitle).isNotEmpty() }

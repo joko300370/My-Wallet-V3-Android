@@ -42,7 +42,12 @@ data class FiatValue private constructor(
 ) : Money() {
 
     // ALWAYS for display, so use default Locale
-    override val symbol: String = Currency.getInstance(currencyCode).getSymbol(Locale.getDefault())
+    override val symbol: String =
+        try {
+            Currency.getInstance(currencyCode).getSymbol(Locale.getDefault())
+        } catch (t: IllegalArgumentException) {
+            throw IllegalArgumentException("${t.message} (currency=$currencyCode)")
+        }
 
     override val maxDecimalPlaces: Int get() = maxDecimalPlaces(currencyCode)
 

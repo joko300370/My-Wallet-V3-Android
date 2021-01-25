@@ -96,7 +96,7 @@ internal class BchCryptoWalletAccount private constructor(
 
     override fun createTxEngine(): TxEngine =
         BchOnChainTxEngine(
-            feeDataManager = feeDataManager,
+            feeManager = feeDataManager,
             networkParams = networkParams,
             sendDataManager = sendDataManager,
             bchDataManager = bchManager,

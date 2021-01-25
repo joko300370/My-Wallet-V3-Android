@@ -2,24 +2,25 @@ package piuk.blockchain.android.coincore.impl.txEngine.sell
 
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.TransferDirection
-import com.blockchain.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.nabu.service.TierService
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxResult
+import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
+import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 
 class CustodialSellTxEngine(
     walletManager: CustodialWalletManager,
-    quotesProvider: QuotesProvider,
+    quotesEngine: TransferQuotesEngine,
     kycTierService: TierService,
     environmentConfig: EnvironmentConfig
-) : SellTxEngine(walletManager, kycTierService, quotesProvider, environmentConfig) {
+) : SellTxEngine(walletManager, kycTierService, quotesEngine, environmentConfig) {
 
     override val direction: TransferDirection
         get() = TransferDirection.INTERNAL
@@ -27,14 +28,20 @@ class CustodialSellTxEngine(
     override val availableBalance: Single<Money>
         get() = sourceAccount.accountBalance
 
+    override fun assertInputsValid() {
+        check(sourceAccount is CustodialTradingAccount)
+        check(txTarget is FiatAccount)
+    }
+
     override fun doInitialiseTx(): Single<PendingTx> =
         quotesEngine.pricedQuote.firstOrError()
             .zipWith(sourceAccount.accountBalance).flatMap { (quote, balance) ->
                 Single.just(
                     PendingTx(
-                        amount = FiatValue.zero(userFiat),
-                        available = balance,
-                        fees = CryptoValue.zero(sourceAccount.asset),
+                        amount = CryptoValue.zero(asset),
+                        totalBalance = balance,
+                        availableBalance = balance,
+                        fees = CryptoValue.zero(asset),
                         selectedFiat = userFiat,
                         feeLevel = FeeLevel.None
                     )
@@ -43,10 +50,12 @@ class CustodialSellTxEngine(
                 }
             }.handlePendingOrdersError(
                 PendingTx(
-                    amount = CryptoValue.zero(sourceAccount.asset),
-                    available = CryptoValue.zero(sourceAccount.asset),
-                    fees = CryptoValue.zero(sourceAccount.asset),
-                    selectedFiat = userFiat
+                    amount = CryptoValue.zero(asset),
+                    totalBalance = CryptoValue.zero(asset),
+                    availableBalance = CryptoValue.zero(asset),
+                    fees = CryptoValue.zero(asset),
+                    selectedFiat = userFiat,
+                    feeLevel = FeeLevel.None
                 )
             )
 
@@ -56,9 +65,12 @@ class CustodialSellTxEngine(
             .map { available ->
                 pendingTx.copy(
                     amount = amount,
-                    available = available
+                    availableBalance = available,
+                    totalBalance = available
                 )
-            }.updateQuotePrice().clearConfirmations()
+            }
+            .updateQuotePrice()
+            .clearConfirmations()
     }
 
     override val requireSecondPassword: Boolean
