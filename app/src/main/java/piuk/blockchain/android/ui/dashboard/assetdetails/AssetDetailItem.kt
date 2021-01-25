@@ -46,8 +46,7 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
     ) {
         with(itemView) {
             val asset = getAsset(item.account, item.balance.currencyCode)
-
-
+            
             icon.setCoinIcon(asset)
             wallet_name.text = resources.getString(asset.assetName())
 
