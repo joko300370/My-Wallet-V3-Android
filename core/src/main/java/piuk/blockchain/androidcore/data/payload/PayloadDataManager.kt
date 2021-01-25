@@ -4,7 +4,6 @@ import info.blockchain.api.data.Balance
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.bip44.HDWalletFactory
-import info.blockchain.wallet.exceptions.ApiException
 import info.blockchain.wallet.exceptions.DecryptionException
 import info.blockchain.wallet.exceptions.HDWalletException
 import info.blockchain.wallet.multiaddress.TransactionSummary
@@ -23,15 +22,12 @@ import io.reactivex.schedulers.Schedulers
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.crypto.DeterministicKey
-import org.spongycastle.crypto.InvalidCipherTextException
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.metadata.MetadataCredentials
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.utils.RefreshUpdater
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
-import java.io.IOException
-import java.io.UnsupportedEncodingException
 import java.math.BigInteger
 import java.util.LinkedHashMap
 
@@ -417,16 +413,8 @@ class PayloadDataManager(
      * @param legacyAddress The [LegacyAddress] to generate an Elliptic Curve Key for
      * @param secondPassword An optional second password, necessary if the private key is ebcrypted
      * @return An Elliptic Curve Key object [ECKey]
-     * @throws UnsupportedEncodingException Thrown if the private key is formatted incorrectly
-     * @throws DecryptionException Thrown if the supplied password is wrong
-     * @throws InvalidCipherTextException Thrown if there's an issue decrypting the private key
      * @see LegacyAddress.isPrivateKeyEncrypted
      */
-    @Throws(
-        UnsupportedEncodingException::class,
-        DecryptionException::class,
-        InvalidCipherTextException::class
-    )
     fun getAddressECKey(legacyAddress: LegacyAddress, secondPassword: String?): ECKey? =
         payloadManager.getAddressECKey(legacyAddress, secondPassword)
 
@@ -538,7 +526,6 @@ class PayloadDataManager(
      * @param spentAmount The spent amount as a long
      * @throws Exception Thrown if the address isn't found
      */
-    @Throws(Exception::class)
     fun subtractAmountFromAddressBalance(address: String, spentAmount: Long) {
         payloadManager.subtractAmountFromAddressBalance(address, BigInteger.valueOf(spentAmount))
     }
@@ -599,11 +586,6 @@ class PayloadDataManager(
             ?: throw NullPointerException("Account not found for XPub")
     }
 
-    @Throws(
-        IOException::class,
-        ApiException::class
-    )
-
     fun getAccountTransactions(xpub: String?, limit: Int, offset: Int):
         Single<List<TransactionSummary>> =
             Single.fromCallable {
@@ -625,9 +607,7 @@ class PayloadDataManager(
      * @param account The [Account] that you wish to send funds from
      * @param unspentOutputBundle A [SpendableUnspentOutputs] bundle for a given Account
      * @return A list of [ECKey] objects
-     * @throws Exception Will be thrown if there are issues with the private keys
      */
-    @Throws(Exception::class)
     fun getHDKeysForSigning(
         account: Account,
         unspentOutputBundle: SpendableUnspentOutputs
@@ -646,7 +626,6 @@ class PayloadDataManager(
     fun validateSecondPassword(secondPassword: String?): Boolean =
         payloadManager.validateSecondPassword(secondPassword)
 
-    @Throws(Exception::class)
     fun decryptHDWallet(secondPassword: String?) {
         payloadManager.payload!!.decryptHDWallet(networkParameters, 0, secondPassword)
     }

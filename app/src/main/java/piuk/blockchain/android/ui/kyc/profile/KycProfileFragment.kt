@@ -32,11 +32,11 @@ import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
-import piuk.blockchain.androidcoreui.utils.ViewUtils
-import piuk.blockchain.androidcoreui.utils.extensions.getTextString
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.androidcoreui.ui.customviews.toast
+import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
+import piuk.blockchain.android.util.ViewUtils
+import piuk.blockchain.android.util.getTextString
+import piuk.blockchain.android.util.inflate
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -51,7 +51,9 @@ class KycProfileFragment : BaseFragment<KycProfileView, KycProfilePresenter>(), 
 
     private val presenter: KycProfilePresenter by scopedInject()
     private val analytics: Analytics by inject()
-    private val progressListener: KycProgressListener by ParentActivityDelegate(this)
+    private val progressListener: KycProgressListener by ParentActivityDelegate(
+        this
+    )
     private val compositeDisposable = CompositeDisposable()
     override val firstName: String
         get() = editTextFirstName.getTextString()

@@ -42,10 +42,10 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.goneIf
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.goneIf
+import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.visible
 import timber.log.Timber
 
 class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesIntent, ActivitiesState>(),

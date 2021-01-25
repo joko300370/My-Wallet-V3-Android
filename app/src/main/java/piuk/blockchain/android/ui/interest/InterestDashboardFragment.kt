@@ -25,9 +25,9 @@ import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.SingleAccount
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.visible
 import timber.log.Timber
 
 class InterestDashboardFragment : Fragment() {

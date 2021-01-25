@@ -9,8 +9,8 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.FeeDetails
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmation
@@ -148,7 +148,7 @@ class BtcBitpayTxEngine(
     // underlying asset engine.
     private fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
         TxConfirmationValue.FeeSelection(
-            feeDetails = FeeDetails(pendingTx.fees),
+            feeDetails = FeeState.FeeDetails(pendingTx.fees),
             exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
             selectedLevel = pendingTx.feeLevel,
             availableLevels = setOf(FeeLevel.Priority),

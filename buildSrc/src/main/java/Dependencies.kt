@@ -6,13 +6,13 @@ object Versions {
     const val minSdk = 21
     const val targetSdk = 29
     const val compileSdk = 28
-    const val versionCode = 599
-    const val versionName = "8.4.2"
+    const val versionCode = 603
+    const val versionName = "8.4.4"
     const val buildTools = "28.0.3"
 
     // Build tools and languages
     const val androidPlugin = "3.4.1"
-    const val kotlin = "1.3.30"
+    const val kotlin = "1.4.21"
     const val googleServicesPlugin = "4.3.3"
     const val coveralls = "2.8.2"
     const val buildProperties = "0.4"
@@ -51,6 +51,7 @@ object Versions {
     const val moshi = "1.8.0"
     const val gson = "2.8.5"
     const val jacksonCore = "2.9.6"
+    const val kotlinJson = "1.0.1"
     const val koin = "2.1.5"
     const val rxJava = "2.2.20"
     const val rxKotlin = "2.4.0"
@@ -95,7 +96,7 @@ object Versions {
     // Third Party SDKs
     const val veriff = "3.9.0"
     const val probity = "1.0.0"
-    const val sift = "0.10.5"
+    const val sift = "0.11.1"
     const val cardForm = "4.2.0"
     const val xlmSunriver = "0.21.1"
 
@@ -127,6 +128,7 @@ object Libraries {
     // Build tools and languages
     const val androidGradlePlugin = "com.android.tools.build:gradle:${Versions.androidPlugin}"
     const val kotlinGradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
+    const val kotlinSerializationPlugin = "org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}"
     const val kotlin = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.kotlin}"
     const val kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}"
     const val coveralls = "org.kt3k.gradle.plugin:coveralls-gradle-plugin:${Versions.coveralls}"
@@ -186,6 +188,7 @@ object Libraries {
     const val jacksonCore = "com.fasterxml.jackson.core:jackson-core:${Versions.jacksonCore}"
     const val jacksonKotlin = "com.fasterxml.jackson.module:jackson-module-kotlin:${Versions.jacksonCore}"
     const val gson = "com.google.code.gson:gson:${Versions.gson}"
+    const val kotlinJson = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.kotlinJson}"
     const val koin = "org.koin:koin-core:${Versions.koin}"
     const val koinAndroid = "org.koin:koin-android:${Versions.koin}"
 

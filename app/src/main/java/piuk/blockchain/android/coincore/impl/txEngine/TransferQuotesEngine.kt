@@ -16,11 +16,12 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.absoluteValue
 
 class TransferQuotesEngine(
-    private val quotesProvider: QuotesProvider,
-    private val direction: TransferDirection,
-    private val pair: CurrencyPair
+    private val quotesProvider: QuotesProvider
 ) {
     private lateinit var latestQuote: PricedQuote
+
+    private lateinit var direction: TransferDirection
+    private lateinit var pair: CurrencyPair
 
     private val stop = PublishSubject.create<Unit>()
 
@@ -45,6 +46,26 @@ class TransferQuotesEngine(
     }.doOnNext {
         latestQuote = it
     }.share().replay(1).refCount()
+
+    fun start(
+        direction: TransferDirection,
+        pair: CurrencyPair
+    ) {
+        // This is a bit of a hack, to make the clients of this code testable.
+        // start() can be called multiple times by a given client, but we only care about the first.
+        // Since the params should NOT change between invocations, we will enforce it as an invariant.
+        // TODO: Fix this properly, once the test framework is all in place.
+        if (this::direction.isInitialized) {
+            require(this.direction == direction)
+        } else {
+            this.direction = direction
+        }
+        if (this::pair.isInitialized) {
+            require(this.pair == pair)
+        } else {
+            this.pair = pair
+        }
+    }
 
     fun stop() {
         stop.onNext(Unit)

@@ -335,7 +335,13 @@ internal interface Nabu {
     ): Completable
 
     @DELETE("$NABU_BANKS/{id}")
-    fun deleteBank(
+    fun removeBeneficiary(
+        @Header("authorization") authHeader: String,
+        @Path("id") id: String
+    ): Completable
+
+    @DELETE("$NABU_LINKED_BANK/{id}")
+    fun removeLinkedBank(
         @Header("authorization") authHeader: String,
         @Path("id") id: String
     ): Completable
@@ -436,7 +442,7 @@ internal interface Nabu {
     ): Single<QuoteResponse>
 
     @POST(NABU_SWAP_ORDER)
-    fun createSwapOrder(
+    fun createCustodialOrder(
         @Header("authorization") authorization: String,
         @Body order: CreateOrderRequest
     ): Single<CustodialOrderResponse>

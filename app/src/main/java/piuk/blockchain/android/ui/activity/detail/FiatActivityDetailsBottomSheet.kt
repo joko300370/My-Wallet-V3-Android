@@ -15,9 +15,9 @@ import piuk.blockchain.android.repositories.AssetActivityRepository
 import piuk.blockchain.android.ui.activity.detail.adapter.FiatDetailsSheetAdapter
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
-import piuk.blockchain.android.util.extensions.toFormattedString
+import piuk.blockchain.android.util.toFormattedString
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.utils.extensions.gone
+import piuk.blockchain.android.util.gone
 import java.util.Date
 
 class FiatActivityDetailsBottomSheet :

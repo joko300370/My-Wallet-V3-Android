@@ -31,6 +31,7 @@ class AssetDetailsModelTest {
             tiersService = mock(),
             environmentConfig = mock(),
             walletPreferences = mock(),
+            offlineAccounts = mock(),
             eligibilityProvider = mock(),
             coinsWebsocket = mock()
         )

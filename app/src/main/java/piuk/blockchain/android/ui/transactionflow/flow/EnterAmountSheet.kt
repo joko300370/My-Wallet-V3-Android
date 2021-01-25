@@ -26,8 +26,8 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.setCoinIcon
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 import timber.log.Timber
 import java.math.RoundingMode
 

@@ -5,11 +5,12 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
-import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxConfirmationValue
+import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
@@ -22,15 +23,16 @@ class TradingToOnChainTxEngine(
 ) : TxEngine() {
 
     override fun assertInputsValid() {
-        require(txTarget is CryptoAddress)
-        require(sourceAccount.asset == (txTarget as CryptoAddress).asset)
+        check(txTarget is CryptoAddress)
+        check(sourceAccount.asset == (txTarget as CryptoAddress).asset)
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
         Single.just(
             PendingTx(
                 amount = CryptoValue.zero(sourceAccount.asset),
-                available = CryptoValue.zero(sourceAccount.asset),
+                totalBalance = CryptoValue.zero(sourceAccount.asset),
+                availableBalance = CryptoValue.zero(sourceAccount.asset),
                 fees = CryptoValue.zero(sourceAccount.asset),
                 feeLevel = FeeLevel.None,
                 selectedFiat = userFiat
@@ -41,14 +43,16 @@ class TradingToOnChainTxEngine(
         require(amount is CryptoValue)
         require(amount.currency == asset)
 
-        return sourceAccount.actionableBalance
-            .map { it as CryptoValue }
-            .map { available ->
-                pendingTx.copy(
-                    amount = amount,
-                    available = available
-                )
-            }
+        return Singles.zip(
+            sourceAccount.accountBalance.map { it as CryptoValue },
+            sourceAccount.actionableBalance.map { it as CryptoValue }
+        ) { total, available ->
+            pendingTx.copy(
+                amount = amount,
+                totalBalance = total,
+                availableBalance = available
+            )
+        }
     }
 
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
@@ -61,7 +65,8 @@ class TradingToOnChainTxEngine(
                 if (isNoteSupported) {
                     toMutableList().add(TxConfirmationValue.Description())
                 }
-            }))
+            })
+        )
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         validateAmounts(pendingTx).updateTxValidity(pendingTx)
@@ -75,7 +80,13 @@ class TradingToOnChainTxEngine(
                 if (max >= pendingTx.amount) {
                     Completable.complete()
                 } else {
-                    throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
+                    throw TxValidationFailure(
+                        if (pendingTx.amount > pendingTx.availableBalance) {
+                            ValidationState.INSUFFICIENT_FUNDS
+                        } else {
+                            ValidationState.INVALID_AMOUNT
+                        }
+                    )
                 }
             }
 

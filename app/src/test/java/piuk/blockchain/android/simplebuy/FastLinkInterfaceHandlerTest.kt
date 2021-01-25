@@ -6,7 +6,7 @@ import com.nhaarman.mockito_kotlin.verifyZeroInteractions
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
-import piuk.blockchain.android.simplebuy.yodlee.FastLinkInterfaceHandler
+import piuk.blockchain.android.ui.linkbank.yodlee.FastLinkInterfaceHandler
 
 class FastLinkInterfaceHandlerTest {
 

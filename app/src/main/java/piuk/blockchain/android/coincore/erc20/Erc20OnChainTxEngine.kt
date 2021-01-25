@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.erc20
 
+import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -20,7 +21,6 @@ import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.updateTxValidity
-import piuk.blockchain.androidcore.data.erc20.Erc20Account
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.utils.extensions.then
@@ -28,7 +28,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 open class Erc20OnChainTxEngine(
-    private val erc20Account: Erc20Account,
+    private val ethDataManager: EthDataManager,
     private val feeManager: FeeDataManager,
     walletPreferences: WalletStatus,
     requireSecondPassword: Boolean
@@ -36,16 +36,14 @@ open class Erc20OnChainTxEngine(
     requireSecondPassword,
     walletPreferences
 ) {
-    private val ethDataManager: EthDataManager =
-        erc20Account.ethDataManager
-
     override fun doInitialiseTx(): Single<PendingTx> =
         Single.just(
             PendingTx(
                 amount = CryptoValue.zero(asset),
-                available = CryptoValue.zero(asset),
-                fees = CryptoValue.ZeroEth,
-                feeLevel = mapSavedFeeToFeeLevel(getFeeType(erc20Account.cryptoCurrency)),
+                totalBalance = CryptoValue.zero(asset),
+                availableBalance = CryptoValue.zero(asset),
+                fees = CryptoValue.zero(CryptoCurrency.ETHER),
+                feeLevel = mapSavedFeeToFeeLevel(getFeeType(asset)),
                 selectedFiat = userFiat
             )
         )
@@ -100,12 +98,14 @@ open class Erc20OnChainTxEngine(
         require(amount is CryptoValue)
         require(amount.currency == asset)
         return Singles.zip(
+            sourceAccount.accountBalance.map { it as CryptoValue },
             sourceAccount.actionableBalance.map { it as CryptoValue },
             absoluteFee(pendingTx.feeLevel)
-        ) { available, fee ->
+        ) { total, available, fee ->
             pendingTx.copy(
                 amount = amount,
-                available = available,
+                totalBalance = total,
+                availableBalance = available,
                 fees = fee
             )
         }
@@ -114,7 +114,7 @@ open class Erc20OnChainTxEngine(
     override fun doOptionUpdateRequest(pendingTx: PendingTx, newConfirmation: TxConfirmationValue): Single<PendingTx> =
         if (newConfirmation is TxConfirmationValue.FeeSelection) {
             if (newConfirmation.selectedLevel != pendingTx.feeLevel) {
-                updateFeeSelection(erc20Account.cryptoCurrency, pendingTx, newConfirmation)
+                updateFeeSelection(asset, pendingTx, newConfirmation)
             } else {
                 super.doOptionUpdateRequest(pendingTx, makeFeeSelectionOption(pendingTx))
             }
@@ -128,7 +128,7 @@ open class Erc20OnChainTxEngine(
         ethDataManager.fetchEthAddress()
             .singleOrError()
             .map { CryptoValue(CryptoCurrency.ETHER, it.getTotalBalance()) }
-            .map { it as Money }
+            .map { it }
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         validateAmounts(pendingTx)
@@ -212,6 +212,8 @@ open class Erc20OnChainTxEngine(
                 }?.toSingle {
                     hash
                 } ?: Single.just(hash)
+            }.onErrorResumeNext {
+                Single.error(TransactionError.ExecutionFailed)
             }.map {
                 TxResult.HashedTxResult(it, pendingTx.amount)
             }
@@ -223,10 +225,10 @@ open class Erc20OnChainTxEngine(
             ethDataManager.getNonce(),
             feeOptions()
         ).map { (nonce, fees) ->
-            erc20Account.createTransaction(
+            ethDataManager.createErc20Transaction(
                 nonce = nonce,
                 to = tgt.address,
-                contractAddress = erc20Account.contractAddress,
+                contractAddress = ethDataManager.erc20ContractAddress(asset),
                 gasPriceWei = fees.gasPrice(pendingTx.feeLevel),
                 gasLimitGwei = fees.gasLimitGwei,
                 amount = pendingTx.amount.toBigInteger()

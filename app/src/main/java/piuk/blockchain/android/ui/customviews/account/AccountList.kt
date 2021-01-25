@@ -18,7 +18,6 @@ import kotlinx.android.synthetic.main.item_account_select_crypto.view.*
 import kotlinx.android.synthetic.main.item_account_select_fiat.view.*
 import kotlinx.android.synthetic.main.item_account_select_group.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
@@ -28,10 +27,9 @@ import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
 import piuk.blockchain.android.ui.adapters.DelegationAdapter
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.customviews.IntroHeaderView
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.util.inflate
 
 typealias StatusDecorator = (BlockchainAccount) -> CellDecorator
-typealias ActionedStatusDecorator = (BlockchainAccount, AssetAction) -> CellDecorator
 
 internal data class SelectableAccountItem(
     val account: BlockchainAccount,
@@ -94,17 +92,15 @@ class AccountList @JvmOverloads constructor(
     fun loadItems(source: Single<List<BlockchainAccount>>) {
         disposables += source
             .observeOn(uiScheduler)
+            .doOnSubscribe {
+                onListLoading()
+            }
             .subscribeBy(
                 onSuccess = {
                     (adapter as? AccountsDelegateAdapter)?.items = it.map { account ->
                         SelectableAccountItem(account, false)
                     }
-
-                    if (it.isEmpty()) {
-                        onEmptyList()
-                    } else {
-                        onListLoaded()
-                    }
+                    onListLoaded(it.isEmpty())
 
                     lastSelectedAccount?.let {
                         updatedSelectedAccount(it)
@@ -143,8 +139,13 @@ class AccountList @JvmOverloads constructor(
 
     var onLoadError: (Throwable) -> Unit = {}
     var onAccountSelected: (BlockchainAccount) -> Unit = {}
-    var onEmptyList: () -> Unit = {}
-    var onListLoaded: () -> Unit = {}
+    var onListLoaded: (isEmpty: Boolean) -> Unit = {}
+    var onListLoading: () -> Unit = {}
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        disposables.clear()
+    }
 }
 
 private class AccountsDelegateAdapter(
@@ -203,8 +204,10 @@ private class CryptoAccountDelegate(
         items[position].account is CryptoAccount
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        CryptoSingleAccountViewHolder(showSelectionStatus,
-            parent.inflate(R.layout.item_account_select_crypto))
+        CryptoSingleAccountViewHolder(
+            showSelectionStatus,
+            parent.inflate(R.layout.item_account_select_crypto)
+        )
 
     override fun onBindViewHolder(
         items: List<SelectableAccountItem>,
@@ -235,8 +238,10 @@ private class CryptoSingleAccountViewHolder(
                     crypto_account_parent.background = null
                 }
             }
-            crypto_account.updateAccount(selectableAccountItem.account as CryptoAccount, onAccountClicked,
-                statusDecorator(selectableAccountItem.account))
+            crypto_account.updateAccount(
+                selectableAccountItem.account as CryptoAccount, onAccountClicked,
+                statusDecorator(selectableAccountItem.account)
+            )
         }
     }
 

@@ -43,11 +43,11 @@ import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.util.setImageDrawable
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.toast
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.androidcoreui.ui.customviews.toast
+import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.visible
 import timber.log.Timber
 
 class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPresenter>(),
@@ -55,7 +55,9 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
 
     private val presenter: KycTierSplashPresenter by scopedInject()
     private val analytics: Analytics by inject()
-    private val progressListener: KycProgressListener by ParentActivityDelegate(this)
+    private val progressListener: KycProgressListener by ParentActivityDelegate(
+        this
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -285,9 +287,8 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
         navigate(directions)
     }
 
-    override fun showErrorToast(message: Int) {
+    override fun showError(message: Int) =
         toast(message, ToastCustom.TYPE_ERROR)
-    }
 
     private inner class TierLayoutElements(
         val cardTier: CardView,

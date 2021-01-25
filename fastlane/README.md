@@ -12,35 +12,65 @@ Install _fastlane_ using
 ```
 [sudo] gem install fastlane -NV
 ```
-or alternatively using `brew cask install fastlane`
+or alternatively using `brew install fastlane`
 
 # Available Actions
 ## Android
-### android build_tag_and_upload_release
+### android build
 ```
-fastlane android build_tag_and_upload_release
+fastlane android build
 ```
-Runs our entire release process from start to finish. Tests the app, increments version code and updates version name, commits changes to build.gradle, and then tags + signs + generates changelog, uploads to Drive, uploads to Alpha, posts to Slack.
+Builds using the given environment and build type
 ### android test
 ```
 fastlane android test
 ```
 Runs all tests
-### android generate_apks
-```
-fastlane android generate_apks
-```
-Generate release builds for both staging and production
-### android archive
-```
-fastlane android archive
-```
-Upload APK to Google Drive
 ### android alpha
 ```
 fastlane android alpha
 ```
 Submit a release Alpha build to the Play Store. This won't publish, just upload.
+### android credentials
+```
+fastlane android credentials
+```
+Get the configuration files from the Android credentials repository.
+### android ci_run_tests
+```
+fastlane android ci_run_tests
+```
+Bundle of build, perform checks and run tests on CI.
+### android ci_credentials
+```
+fastlane android ci_credentials
+```
+Get the configuration files from the Android credentials repository on CI.
+### android upload_to_appcenter
+```
+fastlane android upload_to_appcenter
+```
+Upload to AppCenter.
+### android ci_export_build
+```
+fastlane android ci_export_build
+```
+Export the build path to environment variables for upload. Optional flags: export_bundle (APK is default).
+### android ci_test
+```
+fastlane android ci_test
+```
+Tests to run on CI
+### android ci_build
+```
+fastlane android ci_build
+```
+Build to run on CI. Optional flags: copy_credentials, build_bundle (APK is default), export_build.
+### android ci_lint
+```
+fastlane android ci_lint
+```
+Checks to run on CI
 
 ----
 

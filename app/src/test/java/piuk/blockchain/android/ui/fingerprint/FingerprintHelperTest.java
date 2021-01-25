@@ -20,7 +20,6 @@ import org.robolectric.annotation.Config;
 
 import io.reactivex.Observable;
 import piuk.blockchain.android.BlockchainTestApplication;
-import piuk.blockchain.android.BuildConfig;
 import piuk.blockchain.android.data.fingerprint.FingerprintAuth;
 import piuk.blockchain.androidcore.utils.PersistentPrefs;
 

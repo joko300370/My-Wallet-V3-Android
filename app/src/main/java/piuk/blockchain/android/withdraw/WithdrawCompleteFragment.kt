@@ -14,8 +14,8 @@ import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.withdraw.mvi.WithdrawIntent
 import piuk.blockchain.android.withdraw.mvi.WithdrawModel
 import piuk.blockchain.android.withdraw.mvi.WithdrawState
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
+import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.visibleIf
 
 class WithdrawCompleteFragment : MviFragment<WithdrawModel, WithdrawIntent, WithdrawState>(), WithdrawScreen {
     override val model: WithdrawModel by scopedInject()

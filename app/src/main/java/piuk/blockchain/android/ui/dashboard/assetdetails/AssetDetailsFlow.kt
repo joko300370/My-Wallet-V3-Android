@@ -16,6 +16,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.InterestAccount
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.impl.CryptoAccountCustodialGroup
@@ -113,7 +114,8 @@ class AssetDetailsFlow(
                         AssetAction.Deposit -> R.string.select_deposit_source_title
                         AssetAction.Send -> R.string.select_send_sheet_title
                         else -> R.string.select_account_sheet_title
-                    })
+                    }
+                )
             }
         )
     }
@@ -123,12 +125,20 @@ class AssetDetailsFlow(
     ): Single<List<BlockchainAccount>> =
         coincore[cryptoCurrency].accountGroup(AssetFilter.NonCustodial)
             .map { it.accounts }.toSingle(emptyList())
-            .map {
-                it.filter { a ->
-                    (action == AssetAction.Receive || a.isFunded) && (a.actions.contains(action)) ||
-                            action == AssetAction.Deposit
+            .flattenAsObservable { it }
+            .flatMapSingle { account ->
+                account.actions.map { actions ->
+                    if (
+                        actions.contains(action) ||
+                        (action == AssetAction.Deposit && account.isFunded)
+                    ) {
+                        account
+                    } else NullCryptoAccount()
                 }
             }
+            .filter { it !is NullCryptoAccount }
+            .map { it as BlockchainAccount }
+            .toList()
 
     private fun handleHostAction(
         newState: AssetDetailsState,
@@ -177,7 +187,8 @@ class AssetDetailsFlow(
                 )
             }
             AssetAction.Summary -> getInterestAccountAndNavigate(
-                newState.selectedAccount.selectFirstAccount(), newState.hostAction)
+                newState.selectedAccount.selectFirstAccount(), newState.hostAction
+            )
             AssetAction.Deposit -> {
                 selectAccountOrPerformAction(
                     state = newState,
@@ -250,7 +261,8 @@ class AssetDetailsFlow(
             AssetAction.Swap -> launchSwap(singleAccount)
             AssetAction.Receive -> launchReceive(singleAccount)
             else -> throw IllegalStateException(
-                "Account selection not supported for this action ${localState.hostAction}")
+                "Account selection not supported for this action ${localState.hostAction}"
+            )
         }
     }
 
@@ -272,7 +284,8 @@ class AssetDetailsFlow(
                             assetFlowHost.goToDeposit(
                                 account,
                                 ag.accounts.first(),
-                                assetAction)
+                                assetAction
+                            )
                         } else if (assetAction == AssetAction.Summary) {
                             localState.asset?.asset?.let {
                                 assetFlowHost.goToSummary(ag.accounts.first(), it)

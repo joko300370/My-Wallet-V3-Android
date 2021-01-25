@@ -35,9 +35,9 @@ import piuk.blockchain.androidcoreui.ui.base.BaseMvpFragment
 import kotlinx.android.synthetic.main.fragment_kyc_mobile_validation.*
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
-import piuk.blockchain.androidcoreui.utils.ViewUtils
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
+import piuk.blockchain.android.util.ViewUtils
+import piuk.blockchain.android.util.inflate
 import java.util.concurrent.TimeUnit
 import kotlinx.android.synthetic.main.fragment_kyc_mobile_validation.button_kyc_mobile_validation_next as buttonNext
 import kotlinx.android.synthetic.main.fragment_kyc_mobile_validation.edit_text_kyc_mobile_validation_code as editTextVerificationCode
@@ -50,7 +50,9 @@ class KycMobileValidationFragment :
     private val presenter: KycMobileValidationPresenter by scopedInject()
     private val analytics: Analytics by inject()
     private val stringUtils: StringUtils by inject()
-    private val progressListener: KycProgressListener by ParentActivityDelegate(this)
+    private val progressListener: KycProgressListener by ParentActivityDelegate(
+        this
+    )
     private val compositeDisposable = CompositeDisposable()
     private var progressDialog: MaterialProgressDialog? = null
     private val args by unsafeLazy {

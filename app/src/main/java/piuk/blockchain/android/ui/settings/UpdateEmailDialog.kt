@@ -9,7 +9,7 @@ import androidx.appcompat.widget.AppCompatEditText
 import info.blockchain.wallet.util.FormatsUtil
 import piuk.blockchain.android.R
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.ViewUtils
+import piuk.blockchain.android.util.ViewUtils
 
 internal fun showUpdateEmailDialog(
     activity: Context,

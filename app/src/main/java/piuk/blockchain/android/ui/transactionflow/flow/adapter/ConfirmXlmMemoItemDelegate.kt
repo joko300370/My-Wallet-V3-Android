@@ -31,8 +31,8 @@ import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.visible
 import java.util.Timer
 import java.util.TimerTask
 
@@ -69,11 +69,11 @@ private class XlmMemoItemViewHolder(
 ) : RecyclerView.ViewHolder(parent), LayoutContainer {
     private val maxCharacters = 28
 
-    override val containerView: View?
+    override val containerView: View
         get() = itemView
 
     private lateinit var timer: Timer
-    private val savingDelay = 250L
+    private val savingDelay = 300L
 
     init {
         itemView.apply {
@@ -108,13 +108,19 @@ private class XlmMemoItemViewHolder(
 
             confirm_details_memo_spinner.addSpinnerListener(model, item, confirm_details_memo_input)
 
-            with(confirm_details_memo_input) {
-                if (text?.isNotEmpty() == true) {
-                    requestFocus()
-                    setSelection(confirm_details_memo_input.text?.length ?: 0)
+            if (item.editable) {
+                with(confirm_details_memo_input) {
+                    if (text?.isNotEmpty() == true) {
+                        requestFocus()
+                        setSelection(confirm_details_memo_input.text?.length ?: 0)
+                    }
+                    setupOnDoneListener(model, item)
+                    setupMemoSaving(model, item)
                 }
-                setupOnDoneListener(model, item)
-                setupMemoSaving(model, item)
+            } else {
+                confirm_details_memo_spinner.isEnabled = false
+                confirm_details_memo_input.isEnabled = false
+                confirm_details_memo_parent.alpha = 0.6f
             }
         }
     }
@@ -130,10 +136,14 @@ private class XlmMemoItemViewHolder(
             if (actionId == EditorInfo.IME_ACTION_DONE && v.text.isNotEmpty()) {
                 if (itemView.confirm_details_memo_spinner.selectedItemPosition == TEXT_INDEX) {
                     model.process(
-                        TransactionIntent.ModifyTxOption(item.copy(text = v.text.toString())))
+                        TransactionIntent.ModifyTxOption(item.copy(text = v.text.toString()))
+                    )
                 } else {
-                    model.process(TransactionIntent.ModifyTxOption(
-                        item.copy(id = v.text.toString().toLong())))
+                    model.process(
+                        TransactionIntent.ModifyTxOption(
+                            item.copy(id = v.text.toString().toLong())
+                        )
+                    )
                 }
 
                 clearFocus()
@@ -168,11 +178,19 @@ private class XlmMemoItemViewHolder(
                     override fun run() {
                         if (text?.isNotEmpty() == true) {
                             if (itemView.confirm_details_memo_spinner.selectedItemPosition == TEXT_INDEX) {
-                                model.process(
-                                    TransactionIntent.ModifyTxOption(item.copy(text = text.toString())))
+                                if (haveContentsChanged(s?.toString(), item.text)) {
+                                    model.process(
+                                        TransactionIntent.ModifyTxOption(item.copy(text = text.toString()))
+                                    )
+                                }
                             } else {
-                                model.process(TransactionIntent.ModifyTxOption(
-                                    item.copy(id = text.toString().toLong())))
+                                if (haveContentsChanged(s?.toString(), item.id?.toString())) {
+                                    model.process(
+                                        TransactionIntent.ModifyTxOption(
+                                            item.copy(id = text.toString().toLong())
+                                        )
+                                    )
+                                }
                             }
                         }
                     }
@@ -183,8 +201,10 @@ private class XlmMemoItemViewHolder(
 
     private fun AppCompatSpinner.setupSpinner() {
         val spinnerArrayAdapter: ArrayAdapter<String> =
-            ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item,
-                resources.getStringArray(R.array.xlm_memo_types_manual))
+            ArrayAdapter(
+                context, android.R.layout.simple_spinner_dropdown_item,
+                resources.getStringArray(R.array.xlm_memo_types_manual)
+            )
         adapter = spinnerArrayAdapter
     }
 
@@ -205,7 +225,8 @@ private class XlmMemoItemViewHolder(
                     editText.configureForSelection(position)
                     if (!isFirstTime) {
                         model.process(
-                            TransactionIntent.ModifyTxOption(item.copy(id = null, text = null)))
+                            TransactionIntent.ModifyTxOption(item.copy(id = null, text = null))
+                        )
                         editText.setText("", TextView.BufferType.EDITABLE)
                     }
                     isFirstTime = false
@@ -216,6 +237,10 @@ private class XlmMemoItemViewHolder(
                 }
             }
     }
+
+    // only save if same values after countdown but different from original
+    private fun EditText.haveContentsChanged(currentText: String? = "", previousText: String? = ""): Boolean =
+        text?.toString() == currentText && previousText != currentText
 
     private fun EditText.configureForSelection(selection: Int) {
         if (selection == TEXT_INDEX) {
@@ -237,15 +262,18 @@ private class XlmMemoItemViewHolder(
         val link = stringUtils.getStringWithMappedAnnotations(
             R.string.send_to_exchange_xlm_link,
             map,
-            activity)
+            activity
+        )
 
         val sb = SpannableStringBuilder()
             .append(boldIntro)
             .append(blurb)
             .append(link)
 
-        sb.setSpan(StyleSpan(Typeface.BOLD), 0, boldIntro.length,
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        sb.setSpan(
+            StyleSpan(Typeface.BOLD), 0, boldIntro.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
 
         confirm_details_memo_exchange.run {
             setText(sb, TextView.BufferType.SPANNABLE)

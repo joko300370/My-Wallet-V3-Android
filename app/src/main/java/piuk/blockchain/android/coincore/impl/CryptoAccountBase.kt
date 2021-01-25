@@ -149,7 +149,7 @@ internal class CryptoExchangeAccount(
     override val activity: Single<ActivitySummaryList>
         get() = Single.just(emptyList())
 
-    override val actions: AvailableActions = emptySet()
+    override val actions: Single<AvailableActions> = Single.just(emptySet())
 
     // No activity on exchange accounts, so just return the activity list
     // unmodified - they should both be empty anyway
@@ -167,20 +167,20 @@ abstract class CryptoNonCustodialAccount(
 
     override val isFunded: Boolean = true
 
-    override val actions: AvailableActions
-        get() = mutableSetOf(
+    // The plan here is once we are caching the non custodial balances to remove this isFunded
+    override val actions: Single<AvailableActions>
+        get() = Single.just(mutableSetOf(
             AssetAction.ViewActivity
         ).apply {
             if (!isArchived) {
                 add(AssetAction.Receive)
-
                 if (isFunded) {
                     add(AssetAction.Send)
                     add(AssetAction.Sell)
                     add(AssetAction.Swap)
                 }
             }
-        }
+        })
 
     override val directions: Set<TransferDirection> = setOf(TransferDirection.FROM_USERKEY, TransferDirection.ON_CHAIN)
 
@@ -269,7 +269,7 @@ class CryptoAccountCustodialGroup(
     override val activity: Single<ActivitySummaryList>
         get() = account.activity
 
-    override val actions: AvailableActions
+    override val actions: Single<AvailableActions>
         get() = account.actions
 
     override val isFunded: Boolean
@@ -321,11 +321,13 @@ class CryptoAccountNonCustodialGroup(
         }
 
     // The intersection of the actions for each account
-    override val actions: AvailableActions
+    override val actions: Single<AvailableActions>
         get() = if (accounts.isEmpty()) {
-            emptySet()
+            Single.just(emptySet())
         } else {
-            accounts.map { it.actions }.reduce { a, b -> a.union(b) }
+            Single.zip(accounts.map { it.actions }) { t: Array<Any> ->
+                t.filterIsInstance<AvailableActions>().flatten().toSet()
+            }
         }
 
     // if _any_ of the accounts have transactions

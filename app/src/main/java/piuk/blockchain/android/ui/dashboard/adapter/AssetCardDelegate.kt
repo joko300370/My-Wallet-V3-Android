@@ -16,11 +16,11 @@ import piuk.blockchain.android.ui.dashboard.showLoading
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.chartLineColour
 import piuk.blockchain.android.util.setCoinIcon
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.invisible
-import piuk.blockchain.androidcoreui.utils.extensions.setOnClickListenerDebounced
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.invisible
+import piuk.blockchain.android.util.setOnClickListenerDebounced
+import piuk.blockchain.android.util.visible
 
 // Uses sparkline lib from here: https://github.com/robinhood/spark
 

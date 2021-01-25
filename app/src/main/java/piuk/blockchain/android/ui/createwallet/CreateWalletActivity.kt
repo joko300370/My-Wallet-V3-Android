@@ -28,9 +28,9 @@ import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.ViewUtils
-import piuk.blockchain.androidcoreui.utils.extensions.getTextString
-import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.androidcoreui.ui.customviews.toast
+import piuk.blockchain.android.util.ViewUtils
+import piuk.blockchain.android.util.getTextString
 
 class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPresenter>(),
     CreateWalletView,
@@ -171,9 +171,8 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
         entropy_container.updateLevelUI(level)
     }
 
-    override fun showError(message: Int) {
+    override fun showError(message: Int) =
         toast(message, ToastCustom.TYPE_ERROR)
-    }
 
     override fun warnWeakPassword(email: String, password: String) {
         AlertDialog.Builder(this, R.style.AlertDialogStyle)

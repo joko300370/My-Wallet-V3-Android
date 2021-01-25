@@ -9,9 +9,9 @@ import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.BlockchainActivity
+import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.gone
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visible
 
 class CardDetailsActivity : BlockchainActivity(), AddCardNavigator, CardDetailsPersistence {
     override val alwaysDisableScreenshots: Boolean

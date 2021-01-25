@@ -23,8 +23,8 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NullFiatAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 
 class FiatFundsDetailSheet : SlidingModalBottomDialog() {
@@ -63,14 +63,18 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
 
             disposables += Singles.zip(
                 account.accountBalance,
-                account.fiatBalance(prefs.selectedFiatCurrency, exchangeRates)
+                account.fiatBalance(prefs.selectedFiatCurrency, exchangeRates),
+                account.actions
             ).observeOn(AndroidSchedulers.mainThread()).subscribeBy(
-                onSuccess = { (fiatBalance, userFiatBalance) ->
+                onSuccess = { (fiatBalance, userFiatBalance, actions) ->
                     funds_user_fiat_balance.visibleIf { prefs.selectedFiatCurrency != ticker }
                     funds_user_fiat_balance.text = userFiatBalance.toStringWithSymbol()
 
                     funds_balance.text = fiatBalance.toStringWithSymbol()
                     funds_balance.visibleIf { fiatBalance.isZero || fiatBalance.isPositive }
+                    funds_withdraw_holder.visibleIf { actions.contains(AssetAction.Withdraw) }
+                    funds_deposit_holder.visibleIf { actions.contains(AssetAction.Deposit) }
+                    funds_activity_holder.visibleIf { actions.contains(AssetAction.ViewActivity) }
                 },
                 onError = {
                     Timber.e("Error getting fiat funds balances: $it")
@@ -96,10 +100,6 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
                         showErrorToast()
                     }
                 )
-
-            funds_withdraw_holder.visibleIf { account.actions.contains(AssetAction.Withdraw) }
-            funds_deposit_holder.visibleIf { account.actions.contains(AssetAction.Deposit) }
-            funds_activity_holder.visibleIf { account.actions.contains(AssetAction.ViewActivity) }
 
             funds_withdraw_holder.setOnClickListener {
                 dismiss()

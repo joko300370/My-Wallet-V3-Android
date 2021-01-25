@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.settings
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -33,8 +34,10 @@ import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.nabu.datamanagers.Beneficiary
 import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.models.data.Bank
+import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.blockchain.ui.urllinks.URL_PRIVACY_POLICY
@@ -66,9 +69,11 @@ import piuk.blockchain.android.ui.base.mvi.MviFragment.Companion.BOTTOM_SHEET
 import piuk.blockchain.android.ui.customviews.PasswordStrengthView
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
+import piuk.blockchain.android.ui.dashboard.sheets.LinkBankMethodChooserBottomSheet
 import piuk.blockchain.android.ui.fingerprint.FingerprintDialog
 import piuk.blockchain.android.ui.fingerprint.FingerprintStage
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
+import piuk.blockchain.android.ui.linkbank.LinkBankActivity
 import piuk.blockchain.android.ui.settings.preferences.BankPreference
 import piuk.blockchain.android.ui.settings.preferences.CardPreference
 import piuk.blockchain.android.ui.settings.preferences.KycStatusPreference
@@ -81,15 +86,17 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.AndroidUtils
-import piuk.blockchain.androidcoreui.utils.ViewUtils
-import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
+import piuk.blockchain.android.util.AndroidUtils
+import piuk.blockchain.android.util.ViewUtils
+import piuk.blockchain.android.util.AfterTextChangedWatcher
 import piuk.blockchain.androidcoreui.utils.logging.Logging
+import timber.log.Timber
 import java.util.Locale
 import java.lang.IllegalStateException
 import kotlin.math.roundToInt
 
-class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePaymentMethodBottomSheetHost, ReviewHost {
+class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePaymentMethodBottomSheetHost, BankLinkingHost,
+    ReviewHost {
 
     // Profile
     private val kycStatusPref by lazy {
@@ -139,7 +146,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         findPreference<SwitchPreferenceCompat>("receive_shortcuts_enabled")
     }
     private val swipeToReceivePrefs by lazy {
-        findPreference<SwitchPreferenceCompat>("swipe_to_receive_enabled")
+        findPreference<SwitchPreferenceCompat>(PersistentPrefs.KEY_SWIPE_TO_RECEIVE_ENABLED)
     }
     private val screenshotPref by lazy {
         findPreference<SwitchPreferenceCompat>("screenshots_enabled")
@@ -259,14 +266,12 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
         swipeToReceivePrefs?.setOnPreferenceChangeListener { _, newValue ->
             if (!(newValue as Boolean)) {
-                settingsPresenter.clearSwipeToReceiveData()
+                settingsPresenter.clearOfflineAddressCache()
             } else {
                 AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
                     .setTitle(R.string.swipe_receive_hint)
                     .setMessage(R.string.swipe_receive_address_info)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        settingsPresenter.storeSwipeToReceiveAddresses()
-                    }
+                    .setPositiveButton(android.R.string.ok) { _, _ -> }
                     .setCancelable(false)
                     .show()
             }
@@ -307,10 +312,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         }
     }
 
-    override fun showProgressDialog(@StringRes message: Int) {
+    override fun showProgress() {
         progressDialog = MaterialProgressDialog(requireContext()).apply {
             setCancelable(false)
-            setMessage(message)
+            setMessage(R.string.please_wait)
             show()
         }
     }
@@ -319,22 +324,45 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         showUpdateEmailDialog(settingsActivity, settingsPresenter, currentEmail, emailVerified)
     }
 
-    override fun hideProgressDialog() {
+    override fun hideProgress() {
         progressDialog?.dismiss()
         progressDialog = null
     }
 
-    override fun showToast(@StringRes message: Int, @ToastCustom.ToastType toastType: String) {
-        ToastCustom.makeText(activity, getString(message), ToastCustom.LENGTH_SHORT, toastType)
+    override fun showError(@StringRes message: Int) {
+        ToastCustom.makeText(
+            activity,
+            getString(message),
+            ToastCustom.LENGTH_SHORT,
+            ToastCustom.TYPE_ERROR
+        )
     }
 
     override fun showReviewDialog() {
         reviewInfo?.let {
             reviewManager.launchReviewFlow(activity, reviewInfo).addOnFailureListener {
                 analytics.logEvent(ReviewAnalytics.LAUNCH_REVIEW_FAILURE)
-            }.addOnCompleteListener { _ ->
+                goToPlayStore()
+            }.addOnCompleteListener {
                 analytics.logEvent(ReviewAnalytics.LAUNCH_REVIEW_SUCCESS)
             }
+        } ?: goToPlayStore()
+    }
+
+    private fun goToPlayStore() {
+        val flags = Intent.FLAG_ACTIVITY_NO_HISTORY or
+            Intent.FLAG_ACTIVITY_MULTIPLE_TASK or Intent.FLAG_ACTIVITY_NEW_DOCUMENT
+        try {
+            val appPackageName = requireActivity().packageName
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("market://details?id=$appPackageName")
+            ).let {
+                it.addFlags(flags)
+                startActivity(it)
+            }
+        } catch (e: ActivityNotFoundException) {
+            Timber.e(e, "Google Play Store not found")
         }
     }
 
@@ -385,12 +413,28 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         guidPref?.summary = summary
     }
 
-    override fun setEmailSummary(summary: String) {
-        emailPref?.summary = summary
+    override fun setEmailSummary(email: String, isVerified: Boolean) {
+        emailPref?.summary = when {
+            email.isEmpty() -> getString(R.string.not_specified)
+            isVerified -> "$email  (${getString(R.string.verified)})"
+            else -> "$email  (${getString(R.string.unverified)})"
+        }
     }
 
-    override fun setSmsSummary(summary: String) {
-        smsPref?.summary = summary
+    override fun setEmailUnknown() {
+        emailPref?.summary = getString(R.string.not_specified)
+    }
+
+    override fun setSmsSummary(smsNumber: String, isVerified: Boolean) {
+        smsPref?.summary = when {
+            smsNumber.isEmpty() -> getString(R.string.not_specified)
+            isVerified -> "$smsNumber (${getString(R.string.verified)})"
+            else -> "$smsNumber (${getString(R.string.unverified)})"
+        }
+    }
+
+    override fun setSmsUnknown() {
+        emailPref?.summary = getString(R.string.not_specified)
     }
 
     override fun setFiatSummary(summary: String) {
@@ -425,10 +469,29 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         thePit?.setValue(isLinked)
     }
 
-    override fun updateBanks(linkedAndSupportedCurrencies: LinkedBanksAndSupportedCurrencies) {
+    override fun updateLinkableBanks(linkableBanks: Set<LinkableBank>, linkedBanksCount: Int) {
+        if (linkableBanks.isEmpty()) {
+            banksPref?.isVisible = false
+        } else {
+            linkableBanks.forEach { linkableBank ->
+                banksPref?.findPreference<BankPreference>(LINK_BANK_KEY.plus(linkableBank.hashCode()))?.let {
+                    it.order = it.order + linkedBanksCount + linkableBanks.indexOf(linkableBank)
+                } ?: banksPref?.addPreference(
+                    BankPreference(context = requireContext(), fiatCurrency = linkableBank.currency).apply {
+                        onClick {
+                            linkBank(linkableBank)
+                        }
+                        key = LINK_BANK_KEY.plus(linkableBank.hashCode())
+                    }
+                )
+            }
+        }
+    }
+
+    override fun updateLinkedBanks(banks: Set<Bank>) {
         val existingBanks = prefsExistingBanks()
 
-        val newBanks = linkedAndSupportedCurrencies.beneficiaries.filterNot { existingBanks.contains(it.id) }
+        val newBanks = banks.filterNot { existingBanks.contains(it.id) }
 
         newBanks.forEach { bank ->
             banksPref?.addPreference(
@@ -440,39 +503,36 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                 }
             )
         }
-
-        addOrUpdateLinkBankForCurrencies(
-            linkedAndSupportedCurrencies.beneficiaries.size + 1,
-            linkedAndSupportedCurrencies.supportedCurrencies.filterNot { it == "USD" }
-        )
     }
 
-    private fun addOrUpdateLinkBankForCurrencies(firstIndex: Int, currencies: List<String>) {
-        if (currencies.isEmpty()) {
-            banksPref?.isVisible = false
+    private fun removeBank(bank: Bank) {
+        RemoveLinkedBankBottomSheet.newInstance(bank).show(childFragmentManager, BOTTOM_SHEET)
+    }
+
+    override fun linkBankWithWireTransfer(currency: String) {
+        LinkBankAccountDetailsBottomSheet.newInstance(currency).show(childFragmentManager, BOTTOM_SHEET)
+        analytics.logEvent(linkBankEventWithCurrency(SimpleBuyAnalytics.LINK_BANK_CLICKED, currency))
+    }
+
+    private fun linkBank(linkableBank: LinkableBank) {
+        require(linkableBank.linkMethods.isNotEmpty())
+        if (linkableBank.linkMethods.size > 1) {
+            showDialogForLinkBankMethodChooser(linkableBank)
         } else {
-            currencies.forEach { currency ->
-                banksPref?.findPreference<BankPreference>(LINK_BANK_KEY.plus(currency))?.let {
-                    it.order = it.order + firstIndex + currencies.indexOf(currency)
-                } ?: banksPref?.addPreference(
-                    BankPreference(context = requireContext(), fiatCurrency = currency).apply {
-                        onClick {
-                            linkBankWithCurrency(currency)
-                        }
-                        key = LINK_BANK_KEY.plus(currency)
-                    }
-                )
+            when (linkableBank.linkMethods[0]) {
+                PaymentMethodType.FUNDS -> linkBankWithWireTransfer(linkableBank.currency)
+                PaymentMethodType.BANK_TRANSFER -> linkBankWithBankTransfer(linkableBank.currency)
+                else -> throw IllegalStateException("Not valid linkable bank type")
             }
         }
     }
 
-    private fun removeBank(bank: Beneficiary) {
-        RemoveLinkedBankBottomSheet.newInstance(bank).show(childFragmentManager, BOTTOM_SHEET)
+    override fun linkBankWithBankTransfer(currency: String) {
+        settingsPresenter.linkBank(currency)
     }
 
-    private fun linkBankWithCurrency(currency: String) {
-        LinkBankAccountDetailsBottomSheet.newInstance(currency).show(childFragmentManager, BOTTOM_SHEET)
-        analytics.logEvent(linkBankEventWithCurrency(SimpleBuyAnalytics.LINK_BANK_CLICKED, currency))
+    private fun showDialogForLinkBankMethodChooser(linkableBank: LinkableBank) {
+        LinkBankMethodChooserBottomSheet.newInstance(linkableBank).show(childFragmentManager, BOTTOM_SHEET)
     }
 
     override fun updateCards(cards: List<PaymentMethod.Card>) {
@@ -527,8 +587,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         val existingBanks = mutableListOf<String>()
 
         for (i in (0 until (banksPref?.preferenceCount ?: 0))) {
-            existingBanks.add(banksPref?.getPreference(i)?.key.takeIf { it?.contains(LINK_BANK_KEY)?.not() ?: false }
-                ?: continue)
+            existingBanks.add(
+                banksPref?.getPreference(i)?.key.takeIf {
+                    it?.contains(LINK_BANK_KEY)?.not() ?: false
+                } ?: continue
+            )
         }
         return existingBanks
     }
@@ -574,7 +637,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     override fun updateFingerprintPreferenceStatus() {
-        fingerprintPref.isChecked = settingsPresenter.ifFingerprintUnlockEnabled
+        fingerprintPref.isChecked = settingsPresenter.isFingerprintUnlockEnabled
     }
 
     override fun showFingerprintDialog(pincode: String) {
@@ -588,7 +651,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             override fun onCanceled() {
                 dialog.dismissAllowingStateLoss()
                 settingsPresenter.setFingerprintUnlockEnabled(false)
-                fingerprintPref.isChecked = settingsPresenter.ifFingerprintUnlockEnabled
+                fingerprintPref.isChecked = settingsPresenter.isFingerprintUnlockEnabled
             }
         })
         dialog.show(fragmentManager!!, FingerprintDialog.TAG)
@@ -767,7 +830,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         val dialog = AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
             .setTitle(R.string.verify_mobile)
             .setMessage(R.string.verify_sms_summary)
-            .setView(ViewUtils.getAlertDialogPaddedView(activity, editText))
+            .setView(ViewUtils.getAlertDialogPaddedView(requireContext(), editText))
             .setCancelable(false)
             .setPositiveButton(R.string.verify, null)
             .setNegativeButton(android.R.string.cancel, null)
@@ -799,12 +862,21 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK)
-            if (requestCode == REQUEST_CODE_VALIDATE_PIN) {
-                settingsPresenter.pinCodeValidatedForChange()
-            } else if (requestCode == CardDetailsActivity.ADD_CARD_REQUEST_CODE) {
-                updateCards(listOf(
-                    (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as? PaymentMethod.Card) ?: return
-                ))
+            when (requestCode) {
+                REQUEST_CODE_VALIDATE_PIN -> {
+                    settingsPresenter.pinCodeValidatedForChange()
+                }
+                CardDetailsActivity.ADD_CARD_REQUEST_CODE -> {
+                    updateCards(
+                        listOf(
+                            (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as? PaymentMethod.Card)
+                                ?: return
+                        )
+                    )
+                }
+                LinkBankActivity.LINK_BANK_REQUEST_CODE -> {
+                    settingsPresenter.updateBanks()
+                }
             }
     }
 
@@ -1039,7 +1111,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
     override fun onDestroy() {
         super.onDestroy()
-        hideProgressDialog()
+        hideProgress()
         settingsPresenter.onViewDestroyed()
     }
 
@@ -1073,6 +1145,12 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     override fun banksEnabled(enabled: Boolean) {
         banksPref?.isVisible = enabled
     }
+
+    override fun linkBankWithPartner(linkBankTransfer: LinkBankTransfer) {
+        startActivityForResult(
+            LinkBankActivity.newInstance(linkBankTransfer, requireContext()), LinkBankActivity.LINK_BANK_REQUEST_CODE
+        )
+    }
 }
 
 fun Preference?.onClick(onClick: () -> Unit) {
@@ -1097,7 +1175,8 @@ enum class ReviewAnalytics : AnalyticsEvent {
     override val params: Map<String, String>
         get() = emptyMap()
 }
-data class LinkedBanksAndSupportedCurrencies(
-    val beneficiaries: List<Beneficiary>,
-    val supportedCurrencies: List<String>
-)
+
+interface BankLinkingHost {
+    fun linkBankWithWireTransfer(currency: String)
+    fun linkBankWithBankTransfer(currency: String)
+}

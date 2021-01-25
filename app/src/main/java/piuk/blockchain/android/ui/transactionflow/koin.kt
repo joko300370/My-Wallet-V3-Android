@@ -117,7 +117,8 @@ val transactionModule = module {
                 custodialRepository = payloadScope.get(),
                 custodialWalletManager = payloadScope.get(),
                 currencyPrefs = get(),
-                eligibilityProvider = payloadScope.get()
+                eligibilityProvider = payloadScope.get(),
+                accountsSorting = get()
             )
         }
 

@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.btc
 
 import com.blockchain.logging.CrashLogger
+import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
@@ -61,7 +62,7 @@ private class BtcPreparedTx(
 class BtcOnChainTxEngine(
     private val btcDataManager: PayloadDataManager,
     private val sendDataManager: SendDataManager,
-    private val feeDataManager: FeeDataManager,
+    private val feeManager: FeeDataManager,
     private val btcNetworkParams: NetworkParameters,
     walletPreferences: WalletStatus,
     requireSecondPassword: Boolean
@@ -71,10 +72,10 @@ class BtcOnChainTxEngine(
 ), BitPayClientEngine, KoinComponent {
 
     override fun assertInputsValid() {
-        require(sourceAccount is BtcCryptoWalletAccount)
-        require(txTarget is CryptoAddress)
-        require((txTarget as CryptoAddress).asset == CryptoCurrency.BTC)
-        require(asset == CryptoCurrency.BTC)
+        check(sourceAccount is BtcCryptoWalletAccount)
+        check(txTarget is CryptoAddress)
+        check((txTarget as CryptoAddress).asset == CryptoCurrency.BTC)
+        check(asset == CryptoCurrency.BTC)
     }
 
     private val btcTarget: CryptoAddress
@@ -92,7 +93,8 @@ class BtcOnChainTxEngine(
         Single.just(
             PendingTx(
                 amount = CryptoValue.ZeroBtc,
-                available = CryptoValue.ZeroBtc,
+                totalBalance = CryptoValue.ZeroBtc,
+                availableBalance = CryptoValue.ZeroBtc,
                 fees = CryptoValue.ZeroBtc,
                 feeLevel = mapSavedFeeToFeeLevel(getFeeType(CryptoCurrency.BTC)),
                 selectedFiat = userFiat
@@ -101,11 +103,13 @@ class BtcOnChainTxEngine(
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> =
         Singles.zip(
+            sourceAccount.accountBalance.map { it as CryptoValue },
             getDynamicFeePerKb(pendingTx),
             getUnspentApiResponse(sourceAddress)
-        ).map { (optionsAndFeePerKb, coins) ->
+        ) { total, optionsAndFeePerKb, coins ->
             updatePendingTxFromAmount(
                 amount as CryptoValue,
+                total,
                 pendingTx,
                 optionsAndFeePerKb.second,
                 optionsAndFeePerKb.first,
@@ -135,7 +139,7 @@ class BtcOnChainTxEngine(
         }
 
     private fun getDynamicFeePerKb(pendingTx: PendingTx): Single<Pair<FeeOptions, CryptoValue>> =
-        feeDataManager.btcFeeOptions
+        feeManager.btcFeeOptions
             .map { feeOptions ->
                 when (pendingTx.feeLevel) {
                     FeeLevel.None -> Pair(feeOptions, CryptoValue.ZeroBtc)
@@ -150,32 +154,32 @@ class BtcOnChainTxEngine(
 
     private fun updatePendingTxFromAmount(
         amount: CryptoValue,
+        balance: CryptoValue,
         pendingTx: PendingTx,
         feePerKb: CryptoValue,
         feeOptions: FeeOptions,
         coins: UnspentOutputs
     ): PendingTx {
-        val sweepBundle = sendDataManager.getMaximumAvailable(
+        val maxAvailable = sendDataManager.getMaximumAvailable(
             cryptoCurrency = CryptoCurrency.BTC,
             unspentCoins = coins,
-            feePerKb = feePerKb.toBigInteger(),
-            useNewCoinSelection = true
-        )
-
-        val maxAvailable = sweepBundle.left
+            feePerKb = feePerKb
+        ) // This is total balance, with fees deducted
 
         val utxoBundle = sendDataManager.getSpendableCoins(
             unspentCoins = coins,
             paymentAmount = amount,
-            feePerKb = feePerKb.toBigInteger(),
-            useNewCoinSelection = true
+            feePerKb = feePerKb
         )
 
         return pendingTx.copy(
             amount = amount,
-            available = CryptoValue.fromMinor(CryptoCurrency.BTC, maxAvailable),
+            totalBalance = balance,
+            availableBalance = maxAvailable,
             fees = CryptoValue.fromMinor(CryptoCurrency.BTC, utxoBundle.absoluteFee),
-            engineState = pendingTx.engineState.copyAndPut(STATE_UTXO, utxoBundle).copyAndPut(FEE_OPTIONS, feeOptions)
+            engineState = pendingTx.engineState
+                .copyAndPut(STATE_UTXO, utxoBundle)
+                .copyAndPut(FEE_OPTIONS, feeOptions)
         )
     }
 
@@ -287,7 +291,7 @@ class BtcOnChainTxEngine(
 
     private fun validateSufficientFunds(pendingTx: PendingTx): Completable =
         Completable.fromCallable {
-            if (pendingTx.available < pendingTx.amount) {
+            if (pendingTx.availableBalance < pendingTx.amount) {
                 throw TxValidationFailure(ValidationState.INSUFFICIENT_FUNDS)
             }
 
@@ -324,6 +328,8 @@ class BtcOnChainTxEngine(
                 doOnTransactionSuccess(pendingTx)
             }.doOnError { e ->
                 doOnTransactionFailed(pendingTx, e)
+            }.onErrorResumeNext {
+                Single.error(TransactionError.ExecutionFailed)
             }.map {
                 TxResult.HashedTxResult(it, pendingTx.amount)
             }
@@ -355,6 +361,7 @@ class BtcOnChainTxEngine(
 
     override fun doOnTransactionFailed(pendingTx: PendingTx, e: Throwable) {
         Timber.e("BTC Send failed: $e")
+        crashLogger.logException(e)
     }
 
     // Update balance immediately after spend - until refresh from server
@@ -370,6 +377,10 @@ class BtcOnChainTxEngine(
             Timber.e(e)
         }
     }
+
+    override fun doPostExecute(txResult: TxResult): Completable =
+        super.doPostExecute(txResult)
+            .doOnComplete { btcSource.forceRefresh() }
 
     companion object {
         const val LARGE_TX_FIAT = "USD"

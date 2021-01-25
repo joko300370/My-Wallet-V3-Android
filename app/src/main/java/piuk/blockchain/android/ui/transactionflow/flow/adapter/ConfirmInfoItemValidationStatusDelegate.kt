@@ -11,10 +11,11 @@ import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.androidcoreui.utils.extensions.context
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.util.context
+import piuk.blockchain.android.util.inflate
 
-class ConfirmInfoItemValidationStatusDelegate<in T> : AdapterDelegate<T> {
+class ConfirmInfoItemValidationStatusDelegate<in T> :
+    AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
         return (items[position] as? TxConfirmationValue)?.confirmation == TxConfirmation.ERROR_NOTICE
     }

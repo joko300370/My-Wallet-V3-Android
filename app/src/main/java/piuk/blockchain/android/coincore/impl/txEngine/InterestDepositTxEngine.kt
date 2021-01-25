@@ -12,6 +12,7 @@ import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxEngine
+import piuk.blockchain.android.coincore.TxFee
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -46,6 +47,14 @@ class InterestDepositTxEngine(
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         onChainTxEngine.doBuildConfirmations(pendingTx).map { pTx ->
             modifyEngineConfirmations(pTx)
+        }.flatMap {
+            if (it.hasOption(TxConfirmation.MEMO)) {
+                it.getOption<TxConfirmationValue.Memo>(TxConfirmation.MEMO)?.let { memo ->
+                    onChainTxEngine.doOptionUpdateRequest(it, memo.copy(editable = false))
+                }
+            } else {
+                Single.just(it)
+            }
         }
 
     private fun modifyEngineConfirmations(
@@ -54,11 +63,16 @@ class InterestDepositTxEngine(
         agreementChecked: Boolean = false
     ): PendingTx =
         pendingTx.removeOption(TxConfirmation.DESCRIPTION)
-            .removeOption(TxConfirmation.MEMO)
             .removeOption(TxConfirmation.FEE_SELECTION)
             .addOrReplaceOption(
-                TxConfirmationValue.NetworkFee(pendingTx.fees, TxConfirmationValue.NetworkFee.FeeType.DEPOSIT_FEE,
-                    sourceAccount.asset))
+                TxConfirmationValue.NetworkFee(
+                    txFee = TxFee(
+                        pendingTx.fees,
+                        TxFee.FeeType.DEPOSIT_FEE,
+                        sourceAccount.asset
+                    )
+                )
+            )
             .addOrReplaceOption(
                 TxConfirmationValue.TxBooleanConfirmation<Unit>(
                     confirmation = TxConfirmation.AGREEMENT_INTEREST_T_AND_C,
@@ -74,8 +88,11 @@ class InterestDepositTxEngine(
             )
 
     override fun doOptionUpdateRequest(pendingTx: PendingTx, newConfirmation: TxConfirmationValue): Single<PendingTx> =
-        if (newConfirmation.confirmation in setOf(TxConfirmation.AGREEMENT_INTEREST_T_AND_C,
-                TxConfirmation.AGREEMENT_INTEREST_TRANSFER)) {
+        if (newConfirmation.confirmation in setOf(
+                TxConfirmation.AGREEMENT_INTEREST_T_AND_C,
+                TxConfirmation.AGREEMENT_INTEREST_TRANSFER
+            )
+        ) {
             Single.just(pendingTx.addOrReplaceOption(newConfirmation))
         } else {
             onChainTxEngine.doOptionUpdateRequest(pendingTx, newConfirmation)

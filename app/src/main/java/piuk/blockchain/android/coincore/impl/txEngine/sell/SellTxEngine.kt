@@ -4,7 +4,6 @@ import com.blockchain.nabu.datamanagers.CustodialOrder
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.TransferLimits
-import com.blockchain.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.nabu.service.TierService
 import info.blockchain.balance.CryptoValue
@@ -16,10 +15,12 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmationValue
+import piuk.blockchain.android.coincore.TxFee
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.txEngine.PricedQuote
 import piuk.blockchain.android.coincore.impl.txEngine.QuotedEngine
+import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import java.math.RoundingMode
@@ -27,9 +28,9 @@ import java.math.RoundingMode
 abstract class SellTxEngine(
     private val walletManager: CustodialWalletManager,
     kycTierService: TierService,
-    quotesProvider: QuotesProvider,
+    quotesEngine: TransferQuotesEngine,
     environmentConfig: EnvironmentConfig
-) : QuotedEngine(quotesProvider, kycTierService, walletManager, environmentConfig) {
+) : QuotedEngine(quotesEngine, kycTierService, walletManager, environmentConfig) {
 
     val target: FiatAccount
         get() = txTarget as FiatAccount
@@ -51,10 +52,10 @@ abstract class SellTxEngine(
         )
 
         return pendingTx.copy(
-            minLimit = (exchangeRate.inverse().convert(limits.minLimit) as CryptoValue).withUserDpRounding(
-                RoundingMode.CEILING),
-            maxLimit = (exchangeRate.inverse().convert(limits.maxLimit) as CryptoValue).withUserDpRounding(
-                RoundingMode.FLOOR)
+            minLimit = (exchangeRate.inverse().convert(limits.minLimit) as CryptoValue)
+                .withUserDpRounding(RoundingMode.CEILING),
+            maxLimit = (exchangeRate.inverse().convert(limits.maxLimit) as CryptoValue)
+                .withUserDpRounding(RoundingMode.FLOOR)
         )
     }
 
@@ -81,65 +82,71 @@ abstract class SellTxEngine(
         }
     }
 
-    override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> {
-        return quotesEngine.pricedQuote.firstOrError().map { pricedQuote ->
-            val latestQuoteExchangeRate = ExchangeRate.CryptoToFiat(
-                from = sourceAccount.asset,
-                to = userFiat,
-                _rate = pricedQuote.price.toBigDecimal()
-            )
-            pendingTx.copy(
-                confirmations = listOf(
-                    TxConfirmationValue.ExchangePriceConfirmation(pricedQuote.price,
-                        sourceAccount.asset),
-                    TxConfirmationValue.From(sourceAccount.label),
-                    TxConfirmationValue.To(txTarget.label),
-                    TxConfirmationValue.NetworkFee(
-                        fee = pendingTx.fees,
-                        type = TxConfirmationValue.NetworkFee.FeeType.DEPOSIT_FEE,
-                        asset = sourceAccount.asset
-                    ),
-                    TxConfirmationValue.Total(total = pendingTx.amount,
-                        exchange = latestQuoteExchangeRate.convert(pendingTx.amount)
-                    )
-                ))
-        }
-    }
-
-    override fun doRefreshConfirmations(pendingTx: PendingTx): Single<PendingTx> {
-        return quotesEngine.pricedQuote.firstOrError().map { pricedQuote ->
-            val latestQuoteExchangeRate = ExchangeRate.CryptoToFiat(
-                from = sourceAccount.asset,
-                to = userFiat,
-                _rate = pricedQuote.price.toBigDecimal()
-            )
-            pendingTx.apply {
-                addOrReplaceOption(
-                    TxConfirmationValue.ExchangePriceConfirmation(
-                        pricedQuote.price,
-                        sourceAccount.asset
-                    )
+    override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
+        quotesEngine.pricedQuote
+            .firstOrError()
+            .map { pricedQuote ->
+                val latestQuoteExchangeRate = ExchangeRate.CryptoToFiat(
+                    from = asset,
+                    to = userFiat,
+                    _rate = pricedQuote.price.toBigDecimal()
                 )
-                addOrReplaceOption(
-                    TxConfirmationValue.Total(total = pendingTx.amount,
-                        exchange = latestQuoteExchangeRate.convert(pendingTx.amount)
+                pendingTx.copy(
+                    confirmations = listOf(
+                        TxConfirmationValue.ExchangePriceConfirmation(pricedQuote.price, asset),
+                        TxConfirmationValue.From(sourceAccount.label),
+                        TxConfirmationValue.To(txTarget.label),
+                        TxConfirmationValue.NetworkFee(
+                            txFee = TxFee(
+                                fee = pendingTx.fees,
+                                type = TxFee.FeeType.DEPOSIT_FEE,
+                                asset = sourceAccount.asset
+                            )
+                        ),
+                        TxConfirmationValue.Total(total = pendingTx.amount,
+                            exchange = latestQuoteExchangeRate.convert(pendingTx.amount)
+                        )
                     )
                 )
             }
-        }
-    }
+
+    override fun doRefreshConfirmations(pendingTx: PendingTx): Single<PendingTx> =
+        quotesEngine.pricedQuote
+            .firstOrError()
+            .map { pricedQuote ->
+                val latestQuoteExchangeRate = ExchangeRate.CryptoToFiat(
+                    from = sourceAccount.asset,
+                    to = userFiat,
+                    _rate = pricedQuote.price.toBigDecimal()
+                )
+                pendingTx.apply {
+                    addOrReplaceOption(
+                        TxConfirmationValue.ExchangePriceConfirmation(
+                            pricedQuote.price,
+                            sourceAccount.asset
+                        )
+                    )
+                    addOrReplaceOption(
+                        TxConfirmationValue.Total(total = pendingTx.amount,
+                            exchange = latestQuoteExchangeRate.convert(pendingTx.amount)
+                        )
+                    )
+                }
+            }
 
     protected fun createSellOrder(pendingTx: PendingTx): Single<CustodialOrder> =
-        sourceAccount.receiveAddress.onErrorReturn { NullAddress }.flatMap { refAddress ->
-            walletManager.createCustodialOrder(
-                direction = direction,
-                quoteId = quotesEngine.getLatestQuote().transferQuote.id,
-                volume = pendingTx.amount,
-                refundAddress = if (direction.requiresRefundAddress()) refAddress.address else null
-            ).doFinally {
-                disposeQuotesFetching(pendingTx)
+        sourceAccount.receiveAddress
+            .onErrorReturn { NullAddress }
+            .flatMap { refAddress ->
+                walletManager.createCustodialOrder(
+                    direction = direction,
+                    quoteId = quotesEngine.getLatestQuote().transferQuote.id,
+                    volume = pendingTx.amount,
+                    refundAddress = if (direction.requiresRefundAddress()) refAddress.address else null
+                ).doFinally {
+                    disposeQuotesFetching(pendingTx)
+                }
             }
-        }
 
     private fun TransferDirection.requiresRefundAddress() =
         this == TransferDirection.FROM_USERKEY
@@ -147,11 +154,12 @@ abstract class SellTxEngine(
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =
         validateAmount(pendingTx).updateTxValidity(pendingTx)
 
-    override fun userExchangeRate(): Observable<ExchangeRate> = quotesEngine.pricedQuote.map {
-        ExchangeRate.CryptoToFiat(
-            from = sourceAccount.asset,
-            to = userFiat,
-            _rate = it.price.toBigDecimal()
-        )
-    }
+    override fun userExchangeRate(): Observable<ExchangeRate> =
+        quotesEngine.pricedQuote.map {
+            ExchangeRate.CryptoToFiat(
+                from = sourceAccount.asset,
+                to = userFiat,
+                _rate = it.price.toBigDecimal()
+            )
+        }
 }
