@@ -171,6 +171,9 @@
         <activity
             android:name=".ui.interest.InterestDashboardActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.linkbank.LinkBankActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"

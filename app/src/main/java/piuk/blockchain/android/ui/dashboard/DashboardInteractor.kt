@@ -70,7 +70,7 @@ class DashboardInteractor(
                     .emptySubscribe()
             }
 
-        cd += checkForFiatBalances(model)
+        cd += checkForFiatBalances(model, currencyPrefs.selectedFiatCurrency)
 
         return cd
     }
@@ -160,14 +160,14 @@ class DashboardInteractor(
             )
         }
 
-    private fun checkForFiatBalances(model: DashboardModel): Disposable =
+    private fun checkForFiatBalances(model: DashboardModel, fiatCurrency: String): Disposable =
         coincore.fiatAssets.accountGroup()
             .flattenAsObservable { g -> g.accounts }
             .flatMapSingle { a ->
                 a.accountBalance.map { balance ->
                     FiatBalanceInfo(
                         balance,
-                        balance.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency),
+                        balance.toFiat(exchangeRates, fiatCurrency),
                         a as FiatAccount
                     )
                 }

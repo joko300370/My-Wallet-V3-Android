@@ -28,6 +28,7 @@ data class PaymentMethodResponse(
         const val PAYMENT_CARD = "PAYMENT_CARD"
         const val FUNDS = "FUNDS"
         const val BANK_TRANSFER = "BANK_TRANSFER"
+        const val BANK_ACCOUNT = "BANK_ACCOUNT"
     }
 }
 

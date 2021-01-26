@@ -78,15 +78,20 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
 
     override fun navigator(): SimpleBuyNavigator =
         (activity as? SimpleBuyNavigator) ?: throw IllegalStateException(
-            "Parent must implement SimpleBuyNavigator")
+            "Parent must implement SimpleBuyNavigator"
+        )
 
     override fun onBackPressed(): Boolean = true
 
     override fun render(newState: SimpleBuyState) {
         // Event should be triggered only the first time a state is rendered
         if (lastState == null) {
-            analytics.logEvent(eventWithPaymentMethod(SimpleBuyAnalytics.CHECKOUT_SUMMARY_SHOWN,
-                newState.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString() ?: ""))
+            analytics.logEvent(
+                eventWithPaymentMethod(
+                    SimpleBuyAnalytics.CHECKOUT_SUMMARY_SHOWN,
+                    newState.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString() ?: ""
+                )
+            )
             lastState = newState
         }
 
@@ -132,7 +137,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
             OrderState.FINISHED, // Funds orders are getting finished right after confirmation
             OrderState.AWAITING_FUNDS -> {
                 if (newState.confirmationActionRequested) {
-                    navigator().goToCardPaymentScreen()
+                    navigator().goToPaymentScreen()
                 }
             }
             OrderState.CANCELED -> {
@@ -156,14 +161,16 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
                 status.background =
                     ContextCompat.getDrawable(requireContext(), R.drawable.bkgd_status_unconfirmed)
                 status.setTextColor(
-                    ContextCompat.getColor(requireContext(), R.color.grey_800))
+                    ContextCompat.getColor(requireContext(), R.color.grey_800)
+                )
             }
             newState.orderState == OrderState.FINISHED -> {
                 status.text = getString(R.string.order_complete)
                 status.background =
                     ContextCompat.getDrawable(requireContext(), R.drawable.bkgd_green_100_rounded)
                 status.setTextColor(
-                    ContextCompat.getColor(requireContext(), R.color.green_600))
+                    ContextCompat.getColor(requireContext(), R.color.green_600)
+                )
             }
             else -> {
                 status.gone()
@@ -173,16 +180,21 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
 
     private fun getListFields(state: SimpleBuyState) =
         listOfNotNull(
-            CheckoutItem(getString(R.string.morph_exchange_rate),
-                "${state.orderExchangePrice?.toStringWithSymbol()} / " +
-                        "${state.selectedCryptoCurrency?.displayTicker}"),
+            CheckoutItem(
+                getString(R.string.quote_price, state.selectedCryptoCurrency?.displayTicker),
+                state.orderExchangePrice?.toStringWithSymbol() ?: ""
+            ),
 
-            CheckoutItem(getString(R.string.fees),
+            CheckoutItem(
+                getString(R.string.fee),
                 state.fee?.toStringWithSymbol() ?: FiatValue.zero(state.fiatCurrency)
-                    .toStringWithSymbol()),
+                    .toStringWithSymbol()
+            ),
 
-            CheckoutItem(getString(R.string.common_total),
-                state.order.amount?.toStringWithSymbol() ?: ""),
+            CheckoutItem(
+                getString(R.string.common_total),
+                state.order.amount?.toStringWithSymbol() ?: ""
+            ),
 
             CheckoutItem(getString(R.string.payment_method),
                 state.selectedPaymentMethod?.let {
@@ -190,8 +202,10 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
                 } ?: ""
             ),
             state.selectedPaymentMethod?.isBank()?.let {
-                CheckoutItem(getString(R.string.available_to_trade),
-                    getString(R.string.instantly))
+                CheckoutItem(
+                    getString(R.string.available_to_trade),
+                    getString(R.string.instantly)
+                )
             }
         )
 
@@ -207,8 +221,11 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
                 setOnClickListener {
                     model.process(SimpleBuyIntent.ConfirmOrder)
                     analytics.logEvent(
-                        eventWithPaymentMethod(SimpleBuyAnalytics.CHECKOUT_SUMMARY_CONFIRMED,
-                            state.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString() ?: ""))
+                        eventWithPaymentMethod(
+                            SimpleBuyAnalytics.CHECKOUT_SUMMARY_CONFIRMED,
+                            state.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString() ?: ""
+                        )
+                    )
                 }
             } else {
                 text = if (isOrderAwaitingFunds && !isForPendingPayment) {
@@ -220,7 +237,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
                     if (isForPendingPayment) {
                         navigator().exitSimpleBuyFlow()
                     } else {
-                        navigator().goToCardPaymentScreen()
+                        navigator().goToPaymentScreen()
                     }
                 }
             }
@@ -252,9 +269,12 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
         if (cancelOrder) {
             model.process(SimpleBuyIntent.CancelOrder)
             analytics.logEvent(
-                eventWithPaymentMethod(SimpleBuyAnalytics.CHECKOUT_SUMMARY_CANCELLATION_CONFIRMED,
+                eventWithPaymentMethod(
+                    SimpleBuyAnalytics.CHECKOUT_SUMMARY_CANCELLATION_CONFIRMED,
                     lastState?.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString()
-                        ?: ""))
+                        ?: ""
+                )
+            )
         } else {
             analytics.logEvent(SimpleBuyAnalytics.CHECKOUT_SUMMARY_CANCELLATION_GO_BACK)
         }

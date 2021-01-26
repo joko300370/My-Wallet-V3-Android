@@ -65,6 +65,8 @@
         app:layout_constraintTop_toBottomOf="@+id/yodlee_status_label"
         app:layout_constraintVertical_bias="0" />
 
+
+
     <WebView
         android:id="@+id/yodlee_webview"
         android:layout_width="match_parent"
@@ -82,7 +84,7 @@
         android:text="@string/common_retry"
         android:layout_marginTop="@dimen/standard_margin"
         android:textAllCaps="true"
-        app:layout_constraintTop_toBottomOf="@+id/yodlee_status_label"
+        app:layout_constraintTop_toBottomOf="@+id/yodlee_subtitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

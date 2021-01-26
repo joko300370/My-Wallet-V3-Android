@@ -6,6 +6,7 @@ import android.text.Editable
 import android.text.Selection
 import android.util.AttributeSet
 import android.view.KeyEvent
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import info.blockchain.utils.tryParseBigDecimal
 import io.reactivex.Observable
@@ -26,7 +27,8 @@ class PrefixedOrSuffixedEditText : AutofitEdittext {
     constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(
         context,
         attrs,
-        defStyle)
+        defStyle
+    )
 
     private val imeActionsSubject: PublishSubject<ImeOptions> = PublishSubject.create()
     private val textSizeSubject: PublishSubject<Int> = PublishSubject.create()
@@ -62,6 +64,7 @@ class PrefixedOrSuffixedEditText : AutofitEdittext {
                 setText(text.toString().replace(digitsOnlyRegex, ""))
             }
         }
+        importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
 
         setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_NEXT) {
@@ -111,7 +114,8 @@ class PrefixedOrSuffixedEditText : AutofitEdittext {
     private var suffix: String? = null
 
     internal var configuration: Configuration by Delegates.observable(
-        Configuration()) { _, oldValue, newValue ->
+        Configuration()
+    ) { _, oldValue, newValue ->
         if (newValue != oldValue) {
             if (newValue.isPrefix) {
                 suffix = null

@@ -116,7 +116,7 @@ private class LinkedBankItemDelegate :
 
         fun bind(item: BankChooserItem) {
             (item as? BankChooserItem.BankItem)?.let {
-                title.text = it.bank.title.plus(" ${it.bank.account}")
+                title.text = it.bank.name.plus(" ${it.bank.account}")
             }
             root.setOnClickListener { item.clickAction() }
         }

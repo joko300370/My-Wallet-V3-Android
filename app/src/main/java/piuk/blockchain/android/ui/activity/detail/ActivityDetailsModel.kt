@@ -34,7 +34,6 @@ data class FeeForTransaction(
 data class To(val toAddress: String?) : ActivityDetailsType()
 data class Description(val description: String? = null) : ActivityDetailsType()
 data class Action(val action: String = "") : ActivityDetailsType()
-data class CancelAction(val cancelAction: String = "") : ActivityDetailsType()
 data class BuyFee(val feeValue: FiatValue) : ActivityDetailsType()
 data class BuyPurchaseAmount(val fundedFiat: FiatValue) : ActivityDetailsType()
 data class SellPurchaseAmount(val value: Money) : ActivityDetailsType()

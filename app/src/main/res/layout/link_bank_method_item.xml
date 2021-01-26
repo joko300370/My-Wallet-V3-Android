@@ -20,7 +20,7 @@
         android:layout_marginBottom="@dimen/small_margin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_payment_card" />
+        tools:srcCompat="@drawable/ic_bank_transfer" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/payment_method_title"
@@ -31,31 +31,23 @@
         android:layout_marginEnd="@dimen/standard_margin"
         android:ellipsize="end"
         android:singleLine="true"
-        android:text="@string/add_credit_or_debit_card_1"
+        android:text="@string/link_a_bank"
         app:layout_constraintStart_toEndOf="@+id/payment_method_icon"
         app:layout_constraintTop_toTopOf="@+id/payment_method_icon" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/payment_method_limit"
-        style="@style/Text.Light.14"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/small_margin"
-        app:layout_constraintStart_toEndOf="@+id/payment_method_icon"
-        app:layout_constraintTop_toBottomOf="@+id/payment_method_title"
-        tools:text="$5,000 USD Limit" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/instructions"
+        android:id="@+id/subtitle"
         style="@style/Text.Light.14"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/small_margin"
         android:layout_marginEnd="@dimen/standard_margin"
-        android:text="@string/instantly_buy_crypto_with_card"
+        android:text="@string/instantly_buy_crypto_with_link_a_bank"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/badge"
+        app:layout_goneMarginBottom="@dimen/standard_margin"
         app:layout_constraintStart_toEndOf="@+id/payment_method_icon"
-        app:layout_constraintTop_toBottomOf="@+id/payment_method_limit" />
+        app:layout_constraintTop_toBottomOf="@+id/payment_method_title" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/add_payment_method_icon"
@@ -77,19 +69,23 @@
         android:background="@drawable/payment_method_badge_background"
         android:text="@string/most_popular"
         android:textColor="@color/green_500"
-        app:layout_constraintStart_toStartOf="@+id/instructions"
-        app:layout_constraintTop_toBottomOf="@+id/instructions" />
+        tools:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/separator"
+        android:layout_marginBottom="@dimen/standard_margin"
+        app:layout_constraintStart_toStartOf="@+id/subtitle"
+        app:layout_constraintTop_toBottomOf="@+id/subtitle" />
+
 
     <View
         style="@style/Separator"
         android:layout_width="0dp"
         android:layout_height="1dp"
+        android:id="@+id/separator"
         android:layout_marginStart="0dp"
         android:layout_marginTop="@dimen/small_margin"
         android:layout_marginBottom="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/badge" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

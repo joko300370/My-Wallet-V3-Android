@@ -20,9 +20,9 @@ import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.cards.CardDetailsActivity
-import piuk.blockchain.android.simplebuy.yodlee.LinkBankFragment
-import piuk.blockchain.android.simplebuy.yodlee.YodleeSplashFragment
-import piuk.blockchain.android.simplebuy.yodlee.YodleeWebViewFragment
+import piuk.blockchain.android.ui.linkbank.yodlee.LinkBankFragment
+import piuk.blockchain.android.ui.linkbank.yodlee.YodleeSplashFragment
+import piuk.blockchain.android.ui.linkbank.yodlee.YodleeWebViewFragment
 import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
@@ -120,9 +120,11 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
 
     override fun goToBuyCryptoScreen(addToBackStack: Boolean, cryptoCurrency: CryptoCurrency) {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.content_frame,
+            .replace(
+                R.id.content_frame,
                 SimpleBuyCryptoFragment.newInstance(cryptoCurrency),
-                SimpleBuyCryptoFragment::class.simpleName)
+                SimpleBuyCryptoFragment::class.simpleName
+            )
             .apply {
                 if (addToBackStack) {
                     addToBackStack(SimpleBuyCryptoFragment::class.simpleName)
@@ -157,9 +159,11 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
 
     override fun goToPendingOrderScreen() {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.content_frame,
+            .replace(
+                R.id.content_frame,
                 SimpleBuyCheckoutFragment.newInstance(true),
-                SimpleBuyCheckoutFragment::class.simpleName)
+                SimpleBuyCheckoutFragment::class.simpleName
+            )
             .commitAllowingStateLoss()
     }
 
@@ -174,7 +178,7 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
     override fun hasMoreThanOneFragmentInTheStack(): Boolean =
         supportFragmentManager.backStackEntryCount > 1
 
-    override fun goToCardPaymentScreen(addToBackStack: Boolean) {
+    override fun goToPaymentScreen(addToBackStack: Boolean) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.content_frame, SimpleBuyPaymentFragment(), SimpleBuyPaymentFragment::class.simpleName)
             .apply {
@@ -195,7 +199,7 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
         when (bankTransfer.partner) {
             BankPartner.YODLEE -> {
                 val attributes = bankTransfer.attributes as YodleeAttributes
-                launchYodleeSplash(attributes.fastlinkUrl, attributes.token, attributes.configName)
+                launchYodleeSplash(attributes, bankTransfer.id)
             }
         }
     }
@@ -208,17 +212,19 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
         } else if (requestCode == CardDetailsActivity.ADD_CARD_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 val card = (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as?
-                        PaymentMethod.Card) ?: return
+                    PaymentMethod.Card) ?: return
                 val cardId = card.cardId
                 val cardLabel = card.uiLabel()
                 val cardPartner = card.partner
 
-                simpleBuyModel.process(SimpleBuyIntent.UpdateSelectedPaymentMethod(
-                    cardId,
-                    cardLabel,
-                    cardPartner,
-                    PaymentMethodType.PAYMENT_CARD
-                ))
+                simpleBuyModel.process(
+                    SimpleBuyIntent.UpdateSelectedPaymentMethod(
+                        cardId,
+                        cardLabel,
+                        cardPartner,
+                        PaymentMethodType.PAYMENT_CARD
+                    )
+                )
                 goToCheckOutScreen()
             } else
                 finish()
@@ -237,26 +243,42 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
         progress.gone()
     }
 
-    override fun launchYodleeSplash(fastLinkUrl: String, accessToken: String, configName: String) {
+    override fun launchYodleeSplash(attributes: YodleeAttributes, bankId: String) {
         ViewUtils.hideKeyboard(this)
-
         supportFragmentManager.beginTransaction()
-            .replace(R.id.content_frame, YodleeSplashFragment.newInstance(fastLinkUrl, accessToken, configName))
+            .replace(
+                R.id.content_frame, YodleeSplashFragment.newInstance(
+                    attributes = attributes,
+                    bankId = bankId
+                )
+            )
             .addToBackStack(YodleeSplashFragment::class.simpleName)
             .commitAllowingStateLoss()
     }
 
-    override fun launchYodleeWebview(fastLinkUrl: String, accessToken: String, configName: String) {
+    override fun launchYodleeWebview(attributes: YodleeAttributes, bankId: String) {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.content_frame, YodleeWebViewFragment.newInstance(fastLinkUrl, accessToken, configName))
+            .replace(
+                R.id.content_frame,
+                YodleeWebViewFragment.newInstance(
+                    attributes = attributes,
+                    bankId = bankId
+                )
+            )
             .addToBackStack(YodleeWebViewFragment::class.simpleName)
             .commitAllowingStateLoss()
     }
 
-    override fun launchBankLinking(accountProviderId: String, accountId: String) {
+    override fun launchBankLinking(accountProviderId: String, accountId: String, bankId: String) {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.content_frame,
-                LinkBankFragment.newInstance(accountProviderId = accountProviderId, accountId = accountId))
+            .replace(
+                R.id.content_frame,
+                LinkBankFragment.newInstance(
+                    accountProviderId = accountProviderId,
+                    accountId = accountId,
+                    linkingBankId = bankId
+                )
+            )
             .addToBackStack(LinkBankFragment::class.simpleName)
             .commitAllowingStateLoss()
     }
@@ -272,7 +294,7 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
         exitSimpleBuyFlow()
     }
 
-    override fun bankLinkingFinished() {
+    override fun bankLinkingFinished(id: String) {
         goToCheckOutScreen(false)
     }
 

@@ -23,7 +23,7 @@
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginTop="@dimen/small_margin"
         android:background="@color/white"
-        android:text="@string/payment_methods"
+        android:text="@string/add_a_bank_account"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/sheet_indicator" />
 
@@ -34,24 +34,10 @@
         android:layout_marginTop="@dimen/small_margin"
         android:layout_marginBottom="@dimen/standard_margin"
         app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toTopOf="@+id/add_payment_method"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title"
         app:layout_goneMarginBottom="@dimen/standard_margin" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/add_payment_method"
-        style="@style/CtaButton.White"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/standard_margin"
-        android:layout_marginBottom="@dimen/standard_margin"
-        android:text="@string/add_payment_method"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recycler" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

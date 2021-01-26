@@ -36,13 +36,13 @@ class BalanceCardDelegate<in T>(private val selectedFiat: String, private val co
     ) = (holder as BalanceCardViewHolder).bind(items[position] as BalanceState)
 }
 
-private class BalanceCardViewHolder internal constructor(
+private class BalanceCardViewHolder(
     itemView: View,
     private val selectedFiat: String,
     private val coincore: Coincore
 ) : RecyclerView.ViewHolder(itemView) {
 
-    internal fun bind(state: BalanceState) {
+    fun bind(state: BalanceState) {
         configurePieChart()
 
         if (state.isLoading) {

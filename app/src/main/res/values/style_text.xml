@@ -121,12 +121,20 @@
         <item name="android:gravity">center</item>
     </style>
 
+    <style name="Text.Light.Centered">
+        <item name="android:gravity">center</item>
+    </style>
+
     <style name="Text.White.Semibold.Centered.16">
         <item name="android:textSize">16sp</item>
     </style>
 
     <style name="Text.Light.12">
         <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="Text.Light.Centered.14">
+        <item name="android:textSize">14sp</item>
     </style>
 
     <style name="Text.Light.14">

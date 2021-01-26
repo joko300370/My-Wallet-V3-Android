@@ -4,6 +4,9 @@ import android.annotation.SuppressLint
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.models.data.Bank
+import com.blockchain.nabu.models.data.LinkedBankState
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.models.responses.nabu.NabuApiException
 import com.blockchain.nabu.models.responses.nabu.NabuErrorStatusCodes
@@ -37,6 +40,7 @@ import piuk.blockchain.androidcore.utils.extensions.thenSingle
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.android.util.AndroidUtils
 import timber.log.Timber
+import java.io.Serializable
 
 class SettingsPresenter(
     private val fingerprintHelper: FingerprintHelper,
@@ -120,30 +124,22 @@ class SettingsPresenter(
             )
     }
 
-    private fun updateBanks() {
-        compositeDisposable += kycStatusHelper.getSettingsKycStateTier()
-            .map { kycTiers -> kycTiers.isApprovedFor(KycTierLevel.GOLD) }
-            .flatMap { isGold ->
-                supportedCurrencies(fiatUnit, isGold)
-                    .doOnSuccess {
-                        view?.banksEnabled(it.isNotEmpty())
-                    }.zipWith(
-                        custodialWalletManager.getLinkedBeneficiaries()
-                    ) { supportedCurrencies, linkedBeneficiaries ->
-                        LinkedBanksAndSupportedCurrencies(linkedBeneficiaries, supportedCurrencies)
-                    }
-            }.observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe {
-                view?.banksEnabled(false)
-                view?.updateBanks(LinkedBanksAndSupportedCurrencies(emptyList(), emptyList()))
-            }.subscribeBy(
-                onSuccess = {
-                    view?.updateBanks(it)
-                },
-                onError = {
-                    Timber.i(it)
+    fun updateBanks() {
+        compositeDisposable +=
+            linkableBanks(fiatUnit).zipWith(linkedBanks().onErrorReturn { emptySet() })
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe {
+                    view?.banksEnabled(false)
                 }
-            )
+                .subscribeBy(
+                    onSuccess = { (linkableBanks, linkedBanks) ->
+                        view?.banksEnabled(linkedBanks.isNotEmpty() or linkableBanks.isNotEmpty())
+                        view?.updateLinkedBanks(linkedBanks)
+                        view?.updateLinkableBanks(linkableBanks, linkedBanks.size)
+                    },
+                    onError = {
+                        Timber.e(it)
+                    })
     }
 
     private fun onCardsUpdated(cards: List<PaymentMethod.Card>) {
@@ -161,8 +157,30 @@ class SettingsPresenter(
         }
     }
 
-    private fun supportedCurrencies(fiat: String, isGold: Boolean): Single<List<String>> =
-        custodialWalletManager.getSupportedFundsFiats(fiat, isGold)
+    private fun linkableBanks(fiat: String): Single<Set<LinkableBank>> =
+        custodialWalletManager.getEligiblePaymentMethodTypes(fiat).map { methods ->
+            val bankPaymentMethods = methods.filter {
+                it.paymentMethodType == PaymentMethodType.BANK_TRANSFER ||
+                    // Bank linking through wire transfer has not been implemented for USD
+                    (it.paymentMethodType == PaymentMethodType.FUNDS && it.currency != "USD")
+            }
+
+            bankPaymentMethods.map { method ->
+                LinkableBank(
+                    method.currency,
+                    bankPaymentMethods.filter { it.currency == method.currency }.map { it.paymentMethodType }.distinct()
+                )
+            }.toSet()
+        }
+
+    private fun linkedBanks(): Single<Set<Bank>> =
+        custodialWalletManager.getLinkedBeneficiaries()
+            .zipWith(custodialWalletManager.getLinkedBanks().map { linkedBanks ->
+                linkedBanks.filter { it.state == LinkedBankState.ACTIVE }
+            })
+            .map { (beneficiaries, linkedBanks) ->
+                beneficiaries.toSet() + linkedBanks
+            }
 
     fun onKycStatusClicked() {
         view?.launchKycFlow()
@@ -440,13 +458,13 @@ class SettingsPresenter(
 
     private fun Settings.isNotificationTypeEnabled(type: Int): Boolean {
         return isNotificationsOn && (notificationsType.contains(type) ||
-                notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL))
+            notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL))
     }
 
     private fun Settings.isNotificationTypeDisabled(type: Int): Boolean {
         return notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_NONE) ||
-                (!notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL) &&
-                        !notificationsType.contains(type))
+            (!notificationsType.contains(SettingsManager.NOTIFICATION_TYPE_ALL) &&
+                !notificationsType.contains(type))
     }
 
     /**
@@ -568,4 +586,19 @@ class SettingsPresenter(
             view?.showEmailDialog(it.email, it.isEmailVerified)
         }
     }
+
+    fun linkBank(currency: String) {
+        compositeDisposable += custodialWalletManager.linkToABank(currency)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(onSuccess = {
+                view?.linkBankWithPartner(it)
+            }, onError = {
+                view?.showError(R.string.failed_to_link_bank)
+            })
+    }
 }
+
+data class LinkableBank(
+    val currency: String,
+    val linkMethods: List<PaymentMethodType>
+) : Serializable

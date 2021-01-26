@@ -1289,7 +1289,7 @@ Esto le permitirá restaurar su Wallet si perdiera este dispositivo.</string>
     <string name="sell_for_cash">Vender criptomonedas por efectivo</string>
     <string name="select_wallet_to_sell">Seleccione una billetera desde la que vender.</string>
     <string name="common_sell">Vender</string>
-    <string name="sell_quote_price">%1$s Precio</string>
+    <string name="quote_price">%1$s Precio</string>
     <string name="convert_your_crypto_to_cash">Convierta su cripto en efectivo</string>
     <string name="scan_mismatch_transaction_target">El código escaneado no es un código QR %1$s .</string>
     <string name="scan_failed">No se reconoce el código QR. Vuelve a intentarlo.</string>
