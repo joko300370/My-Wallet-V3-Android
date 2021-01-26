@@ -995,11 +995,11 @@
     <string name="invalid_date">Ungültiges Datum</string>
     <string name="invalid_card_number">Ungültige Kartennummer</string>
     <string name="full_name">Vollständiger Name</string>
-    <string name="billing_address_line_1">Anschrift Zeile 1</string>
-    <string name="billing_address_line_2">Adresszeile 2</string>
-    <string name="billing_address_city">Stadt</string>
-    <string name="billing_address_zip">POSTLEITZAHL</string>
-    <string name="billing_address_postcode">Postleitzahl</string>
+    <string name="address_line_1">Anschrift Zeile 1</string>
+    <string name="address_line_2">Adresszeile 2</string>
+    <string name="address_city">Stadt</string>
+    <string name="address_zip">POSTLEITZAHL</string>
+    <string name="address_postcode">Postleitzahl</string>
     <string name="billing_address_state">Zustand</string>
     <string name="currency_not_supported_title">Ihre Währung wird nicht unterstützt</string>
     <string name="activity_no_activity_title">Sie haben keine Aktivität</string>

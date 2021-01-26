@@ -149,7 +149,7 @@ class KycHomeAddressPresenter(
                             if (it.phoneNeedsToBeVerified) {
                                 view.continueToMobileVerification(it.countryCode)
                             } else {
-                                view.continueToOnfidoSplash(it.countryCode)
+                                view.continueToVeriffSplash(it.countryCode)
                             }
                     }
                 },

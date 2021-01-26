@@ -998,11 +998,11 @@
     <string name="invalid_date">Недействительная дата</string>
     <string name="invalid_card_number">Не верный номер карты</string>
     <string name="full_name">Полное имя</string>
-    <string name="billing_address_line_1">Адресная строка 1</string>
-    <string name="billing_address_line_2">Адресная строка 2</string>
-    <string name="billing_address_city">город</string>
-    <string name="billing_address_zip">ZIP</string>
-    <string name="billing_address_postcode">почтовый индекс</string>
+    <string name="address_line_1">Адресная строка 1</string>
+    <string name="address_line_2">Адресная строка 2</string>
+    <string name="address_city">город</string>
+    <string name="address_zip">ZIP</string>
+    <string name="address_postcode">почтовый индекс</string>
     <string name="billing_address_state">государственный</string>
     <string name="currency_not_supported_title">Ваша валюта не поддерживается</string>
     <string name="activity_no_activity_title">У вас нет активности</string>

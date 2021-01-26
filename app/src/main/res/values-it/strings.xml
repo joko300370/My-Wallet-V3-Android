@@ -998,11 +998,11 @@
     <string name="invalid_date">Data non valida</string>
     <string name="invalid_card_number">Numero di carta non valido</string>
     <string name="full_name">Nome e cognome</string>
-    <string name="billing_address_line_1">Indirizzo Linea 1</string>
-    <string name="billing_address_line_2">indirizzo 2</string>
-    <string name="billing_address_city">Città</string>
-    <string name="billing_address_zip">cerniera lampo</string>
-    <string name="billing_address_postcode">Codice postale</string>
+    <string name="address_line_1">Indirizzo Linea 1</string>
+    <string name="address_line_2">indirizzo 2</string>
+    <string name="address_city">Città</string>
+    <string name="address_zip">cerniera lampo</string>
+    <string name="address_postcode">Codice postale</string>
     <string name="billing_address_state">Stato</string>
     <string name="currency_not_supported_title">La tua valuta non è supportata</string>
     <string name="activity_no_activity_title">Non hai attività</string>
