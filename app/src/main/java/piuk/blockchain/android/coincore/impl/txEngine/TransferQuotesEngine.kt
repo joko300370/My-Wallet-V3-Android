@@ -25,11 +25,12 @@ class TransferQuotesEngine(
 
     private val stop = PublishSubject.create<Unit>()
 
-    private val amount
-        get() = BehaviorSubject.createDefault(pair.toSourceMoney(BigInteger.ZERO))
+    private val amount by lazy {
+        BehaviorSubject.createDefault(pair.toSourceMoney(BigInteger.ZERO))
+    }
 
-    private val quote: Observable<TransferQuote>
-        get() = quotesProvider.fetchQuote(direction = direction, pair = pair).flatMapObservable { quote ->
+    private val quote: Observable<TransferQuote> by lazy {
+        quotesProvider.fetchQuote(direction = direction, pair = pair).flatMapObservable { quote ->
             Observable.interval(
                 quote.creationDate.diffInSeconds(quote.expirationDate),
                 quote.creationDate.diffInSeconds(quote.expirationDate),
@@ -38,9 +39,10 @@ class TransferQuotesEngine(
                 quotesProvider.fetchQuote(direction = direction, pair = pair)
             }.startWith(quote)
         }.takeUntil(stop)
+    }
 
-    val pricedQuote: Observable<PricedQuote>
-        get() = Observables.combineLatest(quote, amount).map { (quote, amount) ->
+    val pricedQuote: Observable<PricedQuote> by lazy {
+        Observables.combineLatest(quote, amount).map { (quote, amount) ->
             PricedQuote(
                 PricesInterpolator(
                     list = quote.prices,
@@ -50,6 +52,7 @@ class TransferQuotesEngine(
         }.doOnNext {
             latestQuote = it
         }.share().replay(1).refCount()
+    }
 
     fun start(
         direction: TransferDirection,
