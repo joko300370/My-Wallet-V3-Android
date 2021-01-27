@@ -228,7 +228,7 @@ platform :android do
           flags: "--info"
         )
 
-        file_path = "../app/build/outputs/apk/env" + environment + build_type
+        file_path = "../app/build/outputs/bundle/env" + environment + build_type
 
       else
 
