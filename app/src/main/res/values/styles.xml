@@ -24,11 +24,6 @@
         <item name="android:windowContentTransitions">true</item>
         <item name="toolbarStyle">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
-
-        <item name="materialCalendarStyle">@style/Widget.MaterialComponents.MaterialCalendar</item>
-        <item name="materialCalendarFullscreenTheme">@style/ThemeOverlay.MaterialComponents.MaterialCalendar.Fullscreen</item>
-        <item name="materialCalendarTheme">@style/ThemeOverlay.MaterialComponents.MaterialCalendar</item>
-
     </style>
 
     <style name="AppTheme.MainActivity">
@@ -329,10 +324,6 @@
         <item name="colorControlActivated">@color/blue_600</item>
         <item name="colorControlHighlight">@color/blue_600</item>
         <item name="errorTextAppearance">@style/ErrorText</item>
-    </style>
-
-    <style name="KycAddressFieldAppearance" parent ="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="boxStrokeColor">@color/grey_100</item>
     </style>
 
     <style name="FloatingBottomSheet" parent="BottomSheetDialog">
