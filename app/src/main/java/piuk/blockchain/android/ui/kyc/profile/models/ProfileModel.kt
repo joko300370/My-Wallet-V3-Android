@@ -8,5 +8,5 @@ data class ProfileModel(
     val firstName: String,
     val lastName: String,
     val countryCode: String,
-    val state:String?
+    val state: String?
 ) : Parcelable

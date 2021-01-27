@@ -37,11 +37,14 @@ data class CountryDisplayModel(
         get() = if (isState) state!! else countryCode
 
     val shortName: String
-        get() = state?.removePrefix("US-") ?: countryCode
+        get() = state?.toUiState() ?: countryCode
 
     @IgnoredOnParcel
     val searchCode = "${name.acronym()};$regionCode;$name"
 }
+
+internal fun String.toUiState() =
+    this.removePrefix("US-")
 
 internal fun String.acronym(): String = String(
     toCharArray()

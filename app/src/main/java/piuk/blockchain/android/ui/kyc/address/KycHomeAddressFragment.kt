@@ -55,6 +55,7 @@ import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.ui.customviews.toast
 import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
+import piuk.blockchain.android.ui.kyc.countryselection.util.toUiState
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.inflate
 import timber.log.Timber
@@ -262,7 +263,7 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
                 .subscribe()
             compositeDisposable += editTextState
                 .onDelayedChange(KycStep.State)
-                .doOnNext { addressSubject.onNext(AddressIntent.State(it)) }
+                .doOnNext { addressSubject.onNext(AddressIntent.State(profileModel.state ?: "")) }
                 .subscribe()
             compositeDisposable += editTextZipCode
                 .onDelayedChange(KycStep.ZipCode)
@@ -345,6 +346,10 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
                 Locale.getDefault().displayLanguage,
                 profileModel.countryCode
             ).displayCountry
+        )
+
+        editTextState.setText(
+            profileModel.state?.toUiState() ?: ""
         )
     }
 
