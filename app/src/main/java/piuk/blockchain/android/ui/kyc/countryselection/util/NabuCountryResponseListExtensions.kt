@@ -36,6 +36,9 @@ data class CountryDisplayModel(
     val regionCode: String
         get() = if (isState) state!! else countryCode
 
+    val shortName: String
+        get() = state?.removePrefix("US-") ?: countryCode
+
     @IgnoredOnParcel
     val searchCode = "${name.acronym()};$regionCode;$name"
 }

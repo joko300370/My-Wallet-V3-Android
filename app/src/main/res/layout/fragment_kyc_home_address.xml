@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,294 +10,193 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:id="@+id/country_header"
+        <TextView
+            android:id="@+id/text_view_address_title"
+            style="@style/KycFlowTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/small_margin"
+            android:text="@string/kyc_address_header_1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/country_selector"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/tiny_margin"
-                android:layout_marginEnd="@dimen/tiny_margin"
-                android:layout_marginBottom="@dimen/tiny_margin"
-                android:background="@drawable/kyc_cuntry_selector_background">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/flag_icon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/small_margin"
-                    android:textColor="@color/black"
-                    android:textSize="35sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/country_text"
-                    style="@style/Text.Semibold.16"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/small_margin"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/flag_icon"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="United State of America" />
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/arrow"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/small_margin"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_arrow_down"
-                    app:tint="@color/grey_600" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </LinearLayout>
-
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/vertical_guideline"
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.5" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/first_name_input"
-            style="@style/KycAddressFieldAppearance"
-            android:layout_width="0dp"
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/search_view_kyc_address"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="@dimen/standard_margin"
-            android:layout_marginTop="@dimen/small_margin"
-            android:layout_marginEnd="@dimen/small_margin"
-            android:hint="@string/first_name"
-            app:layout_constraintEnd_toStartOf="@+id/vertical_guideline"
-            app:layout_constraintTop_toBottomOf="@+id/country_header">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/first_name"
-                android:layout_width="match_parent"
-                android:maxLines="2"
-                android:layout_height="wrap_content"
-                android:textSize="16sp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/last_name_input"
-            style="@style/KycAddressFieldAppearance"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/small_margin"
-            android:layout_marginTop="@dimen/small_margin"
-            android:layout_marginEnd="@dimen/standard_margin"
-            android:hint="@string/last_name"
-            app:layout_constraintStart_toStartOf="@+id/vertical_guideline"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:visibility="gone"
+            app:iconifiedByDefault="false"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/country_header">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_address_title"
+            app:queryHint="@string/kyc_address_search_hint" />
+
+        <!-- Address -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_layout_kyc_address_first_line"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="16dp"
+            android:hint="@string/kyc_address_address_first_line_hint"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/search_view_kyc_address">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/last_name"
+                android:id="@+id/edit_text_kyc_address_first_line"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="16sp" />
+                android:imeOptions="actionNext"
+                android:inputType="textPostalAddress|textCapWords" />
+
         </com.google.android.material.textfield.TextInputLayout>
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
+        <!-- Apt Name or Number -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_layout_kyc_address_apt_name"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/name_instructions"
-            app:layout_constraintTop_toBottomOf="@+id/first_name_input"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="16dp"
+            android:hint="@string/kyc_address_address_apt_name_hint"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/input_layout_kyc_address_first_line">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_text_kyc_address_apt_name"
+                android:layout_width="match_parent"
+                android:imeOptions="actionNext"
+                android:layout_height="wrap_content"
+                android:inputType="textPostalAddress|textCapWords" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- City -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_layout_kyc_address_city"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="16dp"
+            android:hint="@string/kyc_address_address_city_hint"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/input_layout_kyc_address_apt_name">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_text_kyc_address_city"
+                android:layout_width="match_parent"
+                android:imeOptions="actionNext"
+                android:layout_height="wrap_content"
+                android:inputType="textPostalAddress|textCapWords" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- State/County -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_layout_kyc_address_state"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="16dp"
+            android:hint="@string/kyc_address_address_state_hint"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="@dimen/standard_margin"
-            android:layout_marginEnd="@dimen/standard_margin"
-            android:layout_marginTop="@dimen/smallest_margin"
-            style="@style/Text.Light.12"
-            app:layout_constraintHorizontal_bias="0"
-            android:text="@string/as_it_shows_in_id"/>
+            app:layout_constraintTop_toBottomOf="@+id/input_layout_kyc_address_city">
 
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_text_kyc_address_state"
+                android:layout_width="match_parent"
+                android:imeOptions="actionNext"
+                android:layout_height="wrap_content"
+                android:inputType="textPostalAddress|textCapWords" />
 
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Zip Code/Postcode -->
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/date_of_birth_input"
-            style="@style/KycAddressFieldAppearance"
+            android:id="@+id/input_layout_kyc_address_zip_code"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="@dimen/standard_margin"
-            android:layout_marginTop="@dimen/small_margin"
-            android:layout_marginEnd="@dimen/standard_margin"
-            android:hint="@string/date_of_birth"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="16dp"
+            android:hint="@string/kyc_address_address_postcode_hint"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/name_instructions">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/input_layout_kyc_address_state">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/date_of_birth"
+                android:id="@+id/edit_text_kyc_address_zip_code"
                 android:layout_width="match_parent"
-                android:focusable="false"
                 android:layout_height="wrap_content"
-                android:textSize="16sp" />
+                android:imeOptions="actionDone"
+                android:inputType="textPostalAddress|textCapWords" />
+
         </com.google.android.material.textfield.TextInputLayout>
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:layout_width="wrap_content"
+        <!-- Country -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_layout_kyc_address_country"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/date_of_birth_instructions"
-            app:layout_constraintTop_toBottomOf="@+id/date_of_birth_input"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="16dp"
+            android:hint="@string/kyc_address_address_country_hint"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="@dimen/standard_margin"
-            android:layout_marginEnd="@dimen/standard_margin"
-            android:layout_marginTop="@dimen/smallest_margin"
-            style="@style/Text.Light.12"
-            app:layout_constraintHorizontal_bias="0"
-            android:text="@string/date_of_birth_instructions"/>
-
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/address_line_1_input"
-            style="@style/KycAddressFieldAppearance"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="@dimen/standard_margin"
-            android:layout_marginTop="@dimen/small_margin"
-            android:layout_marginEnd="@dimen/standard_margin"
-            android:hint="@string/address_line_1"
+            app:layout_constraintTop_toBottomOf="@+id/input_layout_kyc_address_zip_code">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_text_kyc_address_country"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:focusable="false" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/text_view_kyc_terms_and_conditions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="32dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginRight="32dp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            app:layout_constraintBottom_toTopOf="@+id/button_kyc_address_next"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/date_of_birth_instructions">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/address_line_1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="16sp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/address_line_2_input"
-            style="@style/KycAddressFieldAppearance"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="@dimen/standard_margin"
-            android:layout_marginTop="@dimen/tiny_margin"
-            android:layout_marginEnd="@dimen/small_margin"
-            android:hint="@string/address_line_2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/address_line_1_input">
+            app:layout_constraintVertical_bias="1.0"
+            app:layout_constraintTop_toBottomOf="@+id/input_layout_kyc_address_country"
+            tools:text="By tapping Submit, you agree to Blockchain’s Terms of Service &amp; Privacy Policy" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/address_line_2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="16sp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/city_input"
-            style="@style/KycAddressFieldAppearance"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="@dimen/standard_margin"
-            android:layout_marginTop="@dimen/tiny_margin"
-            android:layout_marginEnd="@dimen/standard_margin"
-            android:hint="@string/address_city"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/address_line_2_input">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/city"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="16sp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/zip_input"
-            style="@style/KycAddressFieldAppearance"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="@dimen/small_margin"
-            android:layout_marginTop="@dimen/tiny_margin"
-            android:layout_marginEnd="@dimen/standard_margin"
-            android:hint="@string/address_zip"
-            app:layout_constraintStart_toEndOf="@+id/vertical_guideline"
-            app:layout_constraintTop_toBottomOf="@+id/city_input">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/zip"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="16sp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/state_input"
-            style="@style/KycAddressFieldAppearance"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="@dimen/standard_margin"
-            android:layout_marginTop="@dimen/tiny_margin"
-            android:layout_marginEnd="@dimen/small_margin"
-            android:hint="@string/billing_address_state"
-            app:layout_constraintEnd_toStartOf="@+id/vertical_guideline"
-            app:layout_constraintTop_toBottomOf="@+id/city_input">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/state"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:focusable="false"
-                android:textSize="16sp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/post_code_input"
-            style="@style/KycAddressFieldAppearance"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="@dimen/standard_margin"
-            android:layout_marginTop="@dimen/tiny_margin"
-            android:layout_marginEnd="@dimen/small_margin"
-            android:hint="@string/address_postcode"
-            app:layout_constraintEnd_toStartOf="@+id/vertical_guideline"
-            app:layout_constraintTop_toBottomOf="@+id/city_input">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/post_code"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="16sp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-
-
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_next"
+        <Button
+            android:id="@+id/button_kyc_address_next"
             style="@style/CtaButton.Blue"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/standard_margin"
-            android:layout_marginBottom="@dimen/standard_margin"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="32dp"
+            android:layout_marginTop="32dp"
             android:enabled="false"
-            android:text="@string/next"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            android:text="@string/kyc_profile_submit"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/input_layout_kyc_address_country"
+            app:layout_constraintVertical_bias="1.0" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

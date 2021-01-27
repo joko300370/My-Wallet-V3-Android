@@ -33,16 +33,15 @@ class CountryCodeAdapter(
         itemView: View
     ) : RecyclerView.ViewHolder(itemView) {
 
-        private val flag = itemView.text_view_flag
         private val name = itemView.text_view_country_name
+        private val shortName = itemView.text_view_country_short_name
 
         fun bind(
             country: CountryDisplayModel,
             countrySelector: (CountryDisplayModel) -> Unit
         ) {
-            flag.text = country.flag
             name.text = country.name
-
+            shortName.text = country.shortName
             itemView.setOnClickListener { countrySelector(country) }
         }
     }

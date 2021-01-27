@@ -1861,4 +1861,6 @@
     <string name="as_it_shows_in_id">As shown on your government issued ID or Passport</string>
     <string name="date_of_birth">Date of birth</string>
     <string name="date_of_birth_instructions">You must be 18 years of age or older to Buy Crypto.</string>
+    <string name="kyc_profile_message_1">Blockchain.com is required by law to collect this information. You must be 18 years of age or older to buy and sell crypto.</string>
+    <string name="kyc_address_header_1">Blockchain.com is required by law to collect this information.</string>
 </resources>

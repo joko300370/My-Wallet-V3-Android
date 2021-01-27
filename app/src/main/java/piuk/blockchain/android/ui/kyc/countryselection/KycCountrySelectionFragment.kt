@@ -73,13 +73,11 @@ internal class KycCountrySelectionFragment :
             RegionType.Country -> {
                 logEvent(AnalyticsEvents.KycCountry)
                 progressListener.setHostTitle(R.string.kyc_country_selection_title)
-                message.setText(R.string.kyc_country_selection_message)
                 search_view.queryHint = getString(R.string.kyc_country_selection_search_hint)
             }
             RegionType.State -> {
                 logEvent(AnalyticsEvents.KycStates)
                 progressListener.setHostTitle(R.string.kyc_country_selection_state_title)
-                message.setText(R.string.kyc_country_selection_message_state)
                 search_view.queryHint = getString(R.string.kyc_state_selection_search_hint)
             }
         }

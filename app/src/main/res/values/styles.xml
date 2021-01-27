@@ -323,7 +323,7 @@
         <item name="android:textSize">12sp</item>
     </style>
 
-    <style name="CardDataInputLayoutAppearance" parent="Widget.MaterialComponents.TextInputLayout.FilledBox.Dense">
+    <style name="CommonDataInputAppearance" parent="Widget.MaterialComponents.TextInputLayout.FilledBox.Dense">
         <item name="colorControlNormal">@color/grey_200</item>
         <item name="boxBackgroundColor">@color/grey_000</item>
         <item name="colorControlActivated">@color/blue_600</item>
