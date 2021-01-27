@@ -2,13 +2,7 @@ package piuk.blockchain.android.cards
 
 import java.util.Locale
 
-data class CountryPickerItem(private val defCode: String = "") : PickerItem {
-
-    override val code: String
-        get() = if (defCode.isEmpty()) {
-            Locale.getDefault().country.takeIf { it.isNotEmpty() } ?: DEFAULT_COUNTRY_CODE
-        } else defCode
-
+data class CountryPickerItem(override val code: String) : PickerItem {
     private val locale = Locale("", code)
     override val label: String = locale.displayCountry
 
@@ -17,7 +11,6 @@ data class CountryPickerItem(private val defCode: String = "") : PickerItem {
     }
 
     companion object {
-        private const val DEFAULT_COUNTRY_CODE = "US"
         private const val ASCII_OFFSET = 0x41
         private const val FLAG_OFFSET = 0x1F1E6
         private fun getFlagEmojiFromCountryCode(countryCode: String): String {
