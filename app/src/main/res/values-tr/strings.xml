@@ -994,11 +994,11 @@
     <string name="invalid_date">Geçersiz tarih</string>
     <string name="invalid_card_number">Geçersiz kart numarası</string>
     <string name="full_name">Ad Soyad</string>
-    <string name="billing_address_line_1">Adres satırı 1</string>
-    <string name="billing_address_line_2">Adres Satırı 2</string>
-    <string name="billing_address_city">Kent</string>
-    <string name="billing_address_zip">Posta</string>
-    <string name="billing_address_postcode">posta kodu</string>
+    <string name="address_line_1">Adres satırı 1</string>
+    <string name="address_line_2">Adres Satırı 2</string>
+    <string name="address_city">Kent</string>
+    <string name="address_zip">Posta</string>
+    <string name="address_postcode">posta kodu</string>
     <string name="billing_address_state">Durum</string>
     <string name="currency_not_supported_title">Para Birimi Desteklenmiyor</string>
     <string name="activity_no_activity_title">Etkinliğiniz Yok</string>

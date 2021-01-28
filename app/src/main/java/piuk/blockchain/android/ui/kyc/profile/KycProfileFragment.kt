@@ -64,6 +64,12 @@ class KycProfileFragment : BaseFragment<KycProfileView, KycProfilePresenter>(), 
             arguments ?: Bundle()
         ).countryCode
     }
+
+    override val state: String?
+        get() = KycProfileFragmentArgs.fromBundle(
+            arguments ?: Bundle()
+        ).stateCode.takeIf { it.isNotEmpty() }
+
     override var dateOfBirth: Calendar? = null
     private var progressDialog: MaterialProgressDialog? = null
 
@@ -107,9 +113,13 @@ class KycProfileFragment : BaseFragment<KycProfileView, KycProfilePresenter>(), 
                 .subscribeBy(
                     onNext = {
                         presenter.onContinueClicked(progressListener.campaignType)
-                        analytics.logEvent(KYCAnalyticsEvents.PersonalDetailsSet("${editTextFirstName.text}," +
-                                "${editTextLastName.text}," +
-                                "${editTextDob.text}"))
+                        analytics.logEvent(
+                            KYCAnalyticsEvents.PersonalDetailsSet(
+                                "${editTextFirstName.text}," +
+                                    "${editTextLastName.text}," +
+                                    "${editTextDob.text}"
+                            )
+                        )
                     },
                     onError = { Timber.e(it) }
                 )

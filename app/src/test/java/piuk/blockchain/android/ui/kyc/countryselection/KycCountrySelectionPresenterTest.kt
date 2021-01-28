@@ -140,7 +140,7 @@ class KycCountrySelectionPresenterTest {
         subject.onRegionSelected(countryDisplayModel)
         // Assert
         verify(nabuDataManager).getStatesList("US", Scope.None)
-        verify(view).continueFlow(countryCode)
+        verify(view).continueFlow(countryCode, "US-AL")
     }
 
     @Test
@@ -160,7 +160,7 @@ class KycCountrySelectionPresenterTest {
         subject.onRegionSelected(countryDisplayModel)
         // Assert
         verify(nabuDataManager).getCountriesList(Scope.None)
-        verify(view).continueFlow(countryCode)
+        verify(view).continueFlow(countryCode, null)
     }
 
     @Test

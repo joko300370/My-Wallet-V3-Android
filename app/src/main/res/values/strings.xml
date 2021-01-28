@@ -1392,11 +1392,11 @@
     <string name="invalid_date">Invalid Date</string>
     <string name="invalid_card_number">Invalid Card Number</string>
     <string name="full_name">Full Name</string>
-    <string name="billing_address_line_1">Address Line 1</string>
-    <string name="billing_address_line_2">Address Line 2</string>
-    <string name="billing_address_city">City</string>
-    <string name="billing_address_zip">ZIP</string>
-    <string name="billing_address_postcode">Postcode</string>
+    <string name="address_line_1">Address Line 1</string>
+    <string name="address_line_2">Address Line 2</string>
+    <string name="address_city">City</string>
+    <string name="address_zip">ZIP</string>
+    <string name="address_postcode">Postcode</string>
     <string name="billing_address_state">State</string>
     <string name="currency_not_supported_title">Your Currency is Not Supported</string>
     <string name="currency_not_supported_1">Currently we don’t support buying crypto with %1s</string>
@@ -1856,4 +1856,11 @@
     <string name="trading_ineligible_for_swap">Oops! This service isn’t currently available. Please contact support.</string>
     <string name="trading_invalid_destination_amount">Oops! Looks like that isn’t a valid amount, please try again.</string>
     <string name="add_credit_or_debit_card_1">Credit or Debit Card</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="as_it_shows_in_id">As shown on your government issued ID or Passport</string>
+    <string name="date_of_birth">Date of birth</string>
+    <string name="date_of_birth_instructions">You must be 18 years of age or older to Buy Crypto.</string>
+    <string name="kyc_profile_message_1">Blockchain.com is required by law to collect this information. You must be 18 years of age or older to buy and sell crypto.</string>
+    <string name="kyc_address_header_1">Blockchain.com is required by law to collect this information.</string>
 </resources>

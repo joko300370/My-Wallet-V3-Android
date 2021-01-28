@@ -55,6 +55,7 @@ import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.ui.customviews.toast
 import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
+import piuk.blockchain.android.ui.kyc.countryselection.util.toUiUSState
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.inflate
 import timber.log.Timber
@@ -130,7 +131,7 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
     }
 
     @Suppress("ConstantConditionIf")
-    override fun continueToOnfidoSplash(countryCode: String) {
+    override fun continueToVeriffSplash(countryCode: String) {
         closeKeyboard()
         navigate(KycNavXmlDirections.actionStartVeriff(countryCode))
     }
@@ -260,14 +261,13 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
                 .onDelayedChange(KycStep.City)
                 .doOnNext { addressSubject.onNext(AddressIntent.City(it)) }
                 .subscribe()
-            compositeDisposable += editTextState
-                .onDelayedChange(KycStep.State)
-                .doOnNext { addressSubject.onNext(AddressIntent.State(it)) }
-                .subscribe()
+
             compositeDisposable += editTextZipCode
                 .onDelayedChange(KycStep.ZipCode)
                 .doOnNext { addressSubject.onNext(AddressIntent.PostCode(it)) }
                 .subscribe()
+
+            addressSubject.onNext(AddressIntent.State(profileModel.state ?: ""))
 
             compositeDisposable +=
                 searchViewAddress.getEditText()
@@ -345,6 +345,10 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
                 Locale.getDefault().displayLanguage,
                 profileModel.countryCode
             ).displayCountry
+        )
+
+        editTextState.setText(
+            profileModel.state?.toUiUSState() ?: ""
         )
     }
 

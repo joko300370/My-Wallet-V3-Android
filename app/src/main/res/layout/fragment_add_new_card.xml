@@ -69,7 +69,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/card_name_input"
-                style="@style/CardDataInputLayoutAppearance"
+                style="@style/CommonDataInputAppearance"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/standard_margin"
@@ -86,7 +86,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/card_input_form"
-                style="@style/CardDataInputLayoutAppearance"
+                style="@style/CommonDataInputAppearance"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/standard_margin"
@@ -109,7 +109,7 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/card_date_input"
-                    style="@style/CardDataInputLayoutAppearance"
+                    style="@style/CommonDataInputAppearance"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/standard_margin"
@@ -130,7 +130,7 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/card_cvv_input"
-                    style="@style/CardDataInputLayoutAppearance"
+                    style="@style/CommonDataInputAppearance"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/very_small_margin"

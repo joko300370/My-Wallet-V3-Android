@@ -996,11 +996,11 @@ Euros/Dolares</string>
     <string name="invalid_date">Fecha invalida</string>
     <string name="invalid_card_number">El número de tarjeta no es válido</string>
     <string name="full_name">Nombre completo</string>
-    <string name="billing_address_line_1">Dirección Línea 1</string>
-    <string name="billing_address_line_2">Dirección Línea 2</string>
-    <string name="billing_address_city">Ciudad</string>
-    <string name="billing_address_zip">CÓDIGO POSTAL</string>
-    <string name="billing_address_postcode">Código postal</string>
+    <string name="address_line_1">Dirección Línea 1</string>
+    <string name="address_line_2">Dirección Línea 2</string>
+    <string name="address_city">Ciudad</string>
+    <string name="address_zip">CÓDIGO POSTAL</string>
+    <string name="address_postcode">Código postal</string>
     <string name="billing_address_state">Estado</string>
     <string name="currency_not_supported_title">Su moneda no es compatible</string>
     <string name="activity_no_activity_title">No tienes actividad</string>

@@ -74,9 +74,10 @@ class KycProfilePresenter(
                 .subscribeBy(
                     onComplete = {
                         ProfileModel(
-                            view.firstName,
-                            view.lastName,
-                            view.countryCode
+                            firstName = view.firstName,
+                            lastName = view.lastName,
+                            countryCode = view.countryCode,
+                            state = view.state
                         ).run { view.continueSignUp(this) }
                     },
                     onError = {
