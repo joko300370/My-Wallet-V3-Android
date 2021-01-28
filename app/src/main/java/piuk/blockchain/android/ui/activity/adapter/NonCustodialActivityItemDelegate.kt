@@ -11,10 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_activities_tx_item.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
@@ -24,12 +21,9 @@ import piuk.blockchain.android.util.toFormattedDate
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.inflate
-import piuk.blockchain.android.util.visible
-import timber.log.Timber
 import java.util.Date
 
 class NonCustodialActivityItemDelegate<in T>(
-    private val disposables: CompositeDisposable,
     private val currencyPrefs: CurrencyPrefs,
     private val onItemClicked: (CryptoCurrency, String, CryptoActivityType) -> Unit // crypto, txID, type
 ) : AdapterDelegate<T> {
@@ -46,7 +40,6 @@ class NonCustodialActivityItemDelegate<in T>(
         holder: RecyclerView.ViewHolder
     ) = (holder as NonCustodialActivityItemViewHolder).bind(
         items[position] as NonCustodialActivitySummaryItem,
-        disposables,
         currencyPrefs.selectedFiatCurrency,
         onItemClicked
     )
@@ -56,12 +49,14 @@ private class NonCustodialActivityItemViewHolder(
     itemView: View
 ) : RecyclerView.ViewHolder(itemView) {
 
-    internal fun bind(
+    private val disposables: CompositeDisposable = CompositeDisposable()
+
+    fun bind(
         tx: NonCustodialActivitySummaryItem,
-        disposables: CompositeDisposable,
-        fiatCurrency: String,
+        selectedFiatCurrency: String,
         onAccountClicked: (CryptoCurrency, String, CryptoActivityType) -> Unit
     ) {
+        disposables.clear()
         with(itemView) {
             if (tx.isConfirmed) {
                 icon.setTransactionTypeIcon(tx.transactionType, tx.isFeeTransaction)
@@ -78,17 +73,7 @@ private class NonCustodialActivityItemViewHolder(
 
             asset_balance_fiat.gone()
             asset_balance_crypto.text = tx.value.toStringWithSymbol()
-            disposables += tx.totalFiatWhenExecuted(fiatCurrency)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = {
-                        asset_balance_fiat.text = it.toStringWithSymbol()
-                        asset_balance_fiat.visible()
-                    },
-                    onError = {
-                        Timber.e("Cannot convert to fiat")
-                    }
-                )
+            asset_balance_fiat.bindAndConvertFiatBalance(tx, disposables, selectedFiatCurrency)
 
             setOnClickListener { onAccountClicked(tx.cryptoCurrency, tx.txId, CryptoActivityType.NON_CUSTODIAL) }
         }

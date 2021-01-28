@@ -55,13 +55,11 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
 
     private val theAdapter: ActivitiesDelegateAdapter by lazy {
         ActivitiesDelegateAdapter(
-            disposables = disposables,
             prefs = get(),
             onCryptoItemClicked = { cc, tx, type ->
                 onCryptoActivityClicked(cc, tx, type)
             },
-            onFiatItemClicked = { cc, tx -> onFiatActivityClicked(cc, tx) },
-            analytics = get()
+            onFiatItemClicked = { cc, tx -> onFiatActivityClicked(cc, tx) }
         )
     }
 
