@@ -116,9 +116,7 @@ class EthOnChainTxEngineTest {
             on { asset } itReturns WRONG_ASSET
         }
 
-        val txTarget: CryptoAddress = mock {
-            on { asset } itReturns ASSET
-        }
+        val txTarget = mockTransactionTarget()
 
         // Act
         subject.start(
@@ -164,9 +162,7 @@ class EthOnChainTxEngineTest {
     fun `PendingTx is correctly initialised`() {
         // Arrange
         val sourceAccount = mockSourceAccount()
-        val txTarget: CryptoAddress = mock {
-            on { asset } itReturns ASSET
-        }
+        val txTarget = mockTransactionTarget()
 
         subject.start(
             sourceAccount,
@@ -208,10 +204,7 @@ class EthOnChainTxEngineTest {
         val totalBalance = 21.ether()
         val actionableBalance = 20.ether()
         val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
-
-        val txTarget: CryptoAddress = mock {
-            on { asset } itReturns ASSET
-        }
+        val txTarget = mockTransactionTarget()
 
         withDefaultFeeOptions()
 
@@ -266,10 +259,7 @@ class EthOnChainTxEngineTest {
         val totalBalance = 21.ether()
         val actionableBalance = 20.ether()
         val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
-
-        val txTarget: CryptoAddress = mock {
-            on { asset } itReturns ASSET
-        }
+        val txTarget = mockTransactionTarget()
 
         withDefaultFeeOptions()
 
@@ -328,10 +318,7 @@ class EthOnChainTxEngineTest {
         val regularAvailable = actionableBalance - regularFee
 
         val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
-
-        val txTarget: CryptoAddress = mock {
-            on { asset } itReturns ASSET
-        }
+        val txTarget = mockTransactionTarget()
 
         withDefaultFeeOptions()
 
@@ -387,9 +374,7 @@ class EthOnChainTxEngineTest {
         val totalBalance = 21.ether()
         val actionableBalance = 20.ether()
         val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
-        val txTarget: CryptoAddress = mock {
-            on { asset } itReturns ASSET
-        }
+        val txTarget = mockTransactionTarget()
 
         withDefaultFeeOptions()
 
@@ -429,9 +414,7 @@ class EthOnChainTxEngineTest {
         val totalBalance = 21.ether()
         val actionableBalance = 20.ether()
         val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
-        val txTarget: CryptoAddress = mock {
-            on { asset } itReturns ASSET
-        }
+        val txTarget = mockTransactionTarget()
 
         withDefaultFeeOptions()
 
@@ -480,9 +463,7 @@ class EthOnChainTxEngineTest {
         val totalBalance = 21.ether()
         val actionableBalance = 20.ether()
         val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
-        val txTarget: CryptoAddress = mock {
-            on { asset } itReturns ASSET
-        }
+        val txTarget = mockTransactionTarget()
 
         withDefaultFeeOptions()
 
@@ -524,6 +505,10 @@ class EthOnChainTxEngineTest {
             on { accountBalance } itReturns Single.just(totalBalance)
             on { actionableBalance } itReturns Single.just(availableBalance)
         }
+
+    private fun mockTransactionTarget() = mock<CryptoAddress> {
+        on { asset } itReturns ASSET
+    }
 
     private fun withDefaultFeeOptions() {
         whenever(ethFeeOptions.gasLimit).thenReturn(GAS_LIMIT)

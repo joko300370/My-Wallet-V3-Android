@@ -21,6 +21,7 @@ import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.copyAndPut
 import piuk.blockchain.android.coincore.impl.BitPayInvoiceTarget
+import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.android.data.api.bitpay.analytics.BitPayEvent
@@ -48,7 +49,7 @@ interface BitPayClientEngine {
     fun doOnTransactionFailed(pendingTx: PendingTx, e: Throwable)
 }
 
-class BtcBitpayTxEngine(
+class BitpayTxEngine(
     private val bitPayDataManager: BitPayDataManager,
     private val assetEngine: OnChainTxEngineBase,
     private val walletPrefs: WalletStatus,
@@ -56,10 +57,12 @@ class BtcBitpayTxEngine(
 ) : TxEngine() {
 
     override fun assertInputsValid() {
-        // Only support BTC bitpay at this time
-        require(asset == CryptoCurrency.BTC)
-        require(txTarget is BitPayInvoiceTarget)
+        // Only support non-custodial BTC bitpay at this time
+        check(sourceAccount is CryptoNonCustodialAccount)
+        check(asset == CryptoCurrency.BTC)
+        check(txTarget is BitPayInvoiceTarget)
         require(assetEngine is BitPayClientEngine)
+        assetEngine.assertInputsValid()
     }
 
     private val executionClient: BitPayClientEngine by unsafeLazy {
@@ -85,7 +88,8 @@ class BtcBitpayTxEngine(
             .map { tx ->
                 tx.copy(
                     amount = bitpayInvoice.amount,
-                    feeLevel = FeeLevel.Priority
+                    feeLevel = FeeLevel.Priority,
+                    availableFeeLevels = AVAILABLE_FEE_LEVELS
                 )
             }
 
@@ -164,7 +168,7 @@ class BtcBitpayTxEngine(
         level: FeeLevel,
         customFeeAmount: Long
     ): Single<PendingTx> {
-        // Does not support changing fees
+        require(pendingTx.availableFeeLevels.contains(level))
         return Single.just(pendingTx)
     }
 
@@ -237,5 +241,6 @@ class BtcBitpayTxEngine(
 
     companion object {
         private const val TIMEOUT_STOP = 2
+        private val AVAILABLE_FEE_LEVELS = setOf(FeeLevel.Priority)
     }
 }

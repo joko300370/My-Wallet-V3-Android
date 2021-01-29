@@ -48,6 +48,7 @@ class OnChainSwapTxEngine(
             check(txTarget is CustodialTradingAccount)
         }
         check(asset != (txTarget as CryptoAccount).asset)
+        engine.assertInputsValid()
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =

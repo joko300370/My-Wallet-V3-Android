@@ -108,13 +108,8 @@ class OnChainSwapEngineTest {
 
     @Test
     fun `inputs validate when correct`() {
-        val sourceAccount: BtcCryptoWalletAccount = mock {
-            on { asset } itReturns SRC_ASSET
-        }
-
-        val txTarget: BchCryptoWalletAccount = mock {
-            on { asset } itReturns TGT_ASSET
-        }
+        val sourceAccount = mockSourceAccount()
+        val txTarget = mockTransactionTarget()
 
         // Act
         subject.start(
@@ -128,19 +123,15 @@ class OnChainSwapEngineTest {
         // Assert
         verify(sourceAccount, atLeastOnce()).asset
         verify(txTarget, atLeastOnce()).asset
-        verify(quotesEngine).start(
-            TransferDirection.ON_CHAIN,
-            CurrencyPair.CryptoCurrencyPair(SRC_ASSET, TGT_ASSET)
-        )
+        verifyQuotesEngineStarted()
+        verify(onChainEngine).assertInputsValid()
 
-        noMoreInteractions(txTarget)
+        noMoreInteractions(sourceAccount, txTarget)
     }
 
     @Test
     fun `inputs validate when correct, for Custodial target`() {
-        val sourceAccount: BtcCryptoWalletAccount = mock {
-            on { asset } itReturns SRC_ASSET
-        }
+        val sourceAccount = mockSourceAccount()
 
         val txTarget: CustodialTradingAccount = mock {
             on { asset } itReturns TGT_ASSET
@@ -162,8 +153,9 @@ class OnChainSwapEngineTest {
             TransferDirection.FROM_USERKEY,
             CurrencyPair.CryptoCurrencyPair(SRC_ASSET, TGT_ASSET)
         )
+        verify(onChainEngine).assertInputsValid()
 
-        noMoreInteractions(txTarget)
+        noMoreInteractions(sourceAccount, txTarget)
     }
 
     @Test(expected = IllegalStateException::class)
@@ -172,9 +164,7 @@ class OnChainSwapEngineTest {
             on { asset } itReturns SRC_ASSET
         }
 
-        val txTarget: BchCryptoWalletAccount = mock {
-            on { asset } itReturns TGT_ASSET
-        }
+        val txTarget = mockTransactionTarget()
 
         // Act
         subject.start(
@@ -188,10 +178,7 @@ class OnChainSwapEngineTest {
 
     @Test(expected = IllegalStateException::class)
     fun `inputs fail validation when Account assets match`() {
-        val sourceAccount: BtcCryptoWalletAccount = mock {
-            on { asset } itReturns SRC_ASSET
-        }
-
+        val sourceAccount = mockSourceAccount()
         val txTarget: CustodialTradingAccount = mock {
             on { asset } itReturns SRC_ASSET
         }
@@ -208,10 +195,7 @@ class OnChainSwapEngineTest {
 
     @Test(expected = IllegalStateException::class)
     fun `inputs fail validation when target account incorrect`() {
-        val sourceAccount: BtcCryptoWalletAccount = mock {
-            on { asset } itReturns SRC_ASSET
-        }
-
+        val sourceAccount = mockSourceAccount()
         val txTarget: FiatAccount = mock {
             on { fiatCurrency } itReturns SELECTED_FIAT
         }
@@ -226,16 +210,28 @@ class OnChainSwapEngineTest {
         subject.assertInputsValid()
     }
 
+    @Test(expected = IllegalStateException::class)
+    fun `inputs fail validation when on chain engine validation fails`() {
+        val sourceAccount = mockSourceAccount()
+        val txTarget = mockTransactionTarget()
+
+        whenever(onChainEngine.assertInputsValid()).thenThrow(IllegalStateException())
+
+        // Act
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        subject.assertInputsValid()
+    }
+
     @Test
     fun `asset is returned correctly`() {
         // Arrange
-        val sourceAccount: BtcCryptoWalletAccount = mock {
-            on { asset } itReturns SRC_ASSET
-        }
-
-        val txTarget: BchCryptoWalletAccount = mock {
-            on { asset } itReturns TGT_ASSET
-        }
+        val sourceAccount = mockSourceAccount()
+        val txTarget = mockTransactionTarget()
 
         // Act
         subject.start(
@@ -256,7 +252,7 @@ class OnChainSwapEngineTest {
             CurrencyPair.CryptoCurrencyPair(SRC_ASSET, TGT_ASSET)
         )
 
-        noMoreInteractions(txTarget)
+        noMoreInteractions(sourceAccount, txTarget)
     }
 
     @Test
@@ -271,11 +267,8 @@ class OnChainSwapEngineTest {
         val expectedFeeOptions = setOf(FeeLevel.Regular, FeeLevel.Priority)
         whenOnChainEngineInitOK(totalBalance, availableBalance, initialFeeLevel, expectedFeeOptions)
 
-        val sourceAccount = fundedSourceAccount(totalBalance, availableBalance)
-
-        val txTarget: BchCryptoWalletAccount = mock {
-            on { asset } itReturns TGT_ASSET
-        }
+        val sourceAccount = mockSourceAccount(totalBalance, availableBalance)
+        val txTarget = mockTransactionTarget()
 
         val txQuote: TransferQuote = mock {
             on { sampleDepositAddress } itReturns SAMPLE_DEPOSIT_ADDRESS
@@ -331,7 +324,7 @@ class OnChainSwapEngineTest {
         verify(environmentConfig).bitcoinNetworkParameters
         verify(onChainEngine).doInitialiseTx()
 
-        noMoreInteractions(txTarget)
+        noMoreInteractions(sourceAccount, txTarget)
     }
 
     @Test
@@ -345,11 +338,8 @@ class OnChainSwapEngineTest {
         val expectedFeeOptions = setOf(FeeLevel.Regular)
         whenOnChainEngineInitOK(totalBalance, availableBalance, expectedFeeLevel, expectedFeeOptions)
 
-        val sourceAccount = fundedSourceAccount(totalBalance, availableBalance)
-
-        val txTarget: BchCryptoWalletAccount = mock {
-            on { asset } itReturns TGT_ASSET
-        }
+        val sourceAccount = mockSourceAccount(totalBalance, availableBalance)
+        val txTarget = mockTransactionTarget()
 
         val txQuote: TransferQuote = mock {
             on { sampleDepositAddress } itReturns SAMPLE_DEPOSIT_ADDRESS
@@ -405,7 +395,7 @@ class OnChainSwapEngineTest {
         verify(environmentConfig).bitcoinNetworkParameters
         verify(onChainEngine).doInitialiseTx()
 
-        noMoreInteractions(txTarget)
+        noMoreInteractions(sourceAccount, txTarget)
     }
 
     @Test
@@ -416,11 +406,8 @@ class OnChainSwapEngineTest {
 
         whenUserIsGold()
 
-        val sourceAccount = fundedSourceAccount(totalBalance, availableBalance)
-
-        val txTarget: BchCryptoWalletAccount = mock {
-            on { asset } itReturns TGT_ASSET
-        }
+        val sourceAccount = mockSourceAccount(totalBalance, availableBalance)
+        val txTarget = mockTransactionTarget()
 
         val error: NabuApiException = mock {
             on { getErrorCode() } itReturns NabuErrorCodes.PendingOrdersLimitReached
@@ -460,7 +447,7 @@ class OnChainSwapEngineTest {
         verifyQuotesEngineStarted()
         verify(quotesEngine).pricedQuote
 
-        noMoreInteractions(txTarget)
+        noMoreInteractions(sourceAccount, txTarget)
     }
 
     @Test
@@ -469,11 +456,8 @@ class OnChainSwapEngineTest {
         val totalBalance: Money = 21.bitcoin()
         val availableBalance: Money = 20.bitcoin()
 
-        val sourceAccount = fundedSourceAccount(totalBalance, availableBalance)
-
-        val txTarget: BchCryptoWalletAccount = mock {
-            on { asset } itReturns TGT_ASSET
-        }
+        val sourceAccount = mockSourceAccount(totalBalance, availableBalance)
+        val txTarget = mockTransactionTarget()
 
         subject.start(
             sourceAccount,
@@ -530,7 +514,7 @@ class OnChainSwapEngineTest {
         verify(onChainEngine).doUpdateAmount(inputAmount, pendingTx)
         verify(quotesEngine).updateAmount(inputAmount)
 
-        noMoreInteractions(txTarget)
+        noMoreInteractions(sourceAccount, txTarget)
     }
 
     @Test
@@ -539,11 +523,8 @@ class OnChainSwapEngineTest {
         val totalBalance: Money = 21.bitcoin()
         val availableBalance: Money = 20.bitcoin()
 
-        val sourceAccount = fundedSourceAccount(totalBalance, availableBalance)
-
-        val txTarget: BchCryptoWalletAccount = mock {
-            on { asset } itReturns TGT_ASSET
-        }
+        val sourceAccount = mockSourceAccount(totalBalance, availableBalance)
+        val txTarget = mockTransactionTarget()
 
         subject.start(
             sourceAccount,
@@ -596,15 +577,21 @@ class OnChainSwapEngineTest {
         verifyQuotesEngineStarted()
         verify(onChainEngine).doUpdateFeeLevel(pendingTx, FeeLevel.Regular, -1)
 
-        noMoreInteractions(txTarget)
+        noMoreInteractions(sourceAccount, txTarget)
     }
 
-    private fun fundedSourceAccount(totalBalance: Money, availableBalance: Money) =
-        mock<BtcCryptoWalletAccount> {
+    private fun mockSourceAccount(
+        totalBalance: Money = CryptoValue.zero(SRC_ASSET),
+        availableBalance: Money = CryptoValue.zero(SRC_ASSET)
+    ) = mock<BtcCryptoWalletAccount> {
             on { asset } itReturns SRC_ASSET
             on { accountBalance } itReturns Single.just(totalBalance)
             on { actionableBalance } itReturns Single.just(availableBalance)
         }
+
+    private fun mockTransactionTarget() = mock<BchCryptoWalletAccount> {
+        on { asset } itReturns TGT_ASSET
+    }
 
     private fun whenOnChainEngineInitOK(
         totalBalance: Money,
@@ -669,8 +656,9 @@ class OnChainSwapEngineTest {
         pendingTx.availableFeeLevels == expectedFeeOptions &&
         pendingTx.availableFeeLevels.contains(pendingTx.feeLevel)
 
-    private fun noMoreInteractions(txTarget: TransactionTarget) {
+    private fun noMoreInteractions(sourceAccount: CryptoAccount, txTarget: TransactionTarget) {
         verifyNoMoreInteractions(txTarget)
+        verifyNoMoreInteractions(sourceAccount)
         verifyNoMoreInteractions(walletManager)
         verifyNoMoreInteractions(currencyPrefs)
         verifyNoMoreInteractions(exchangeRates)

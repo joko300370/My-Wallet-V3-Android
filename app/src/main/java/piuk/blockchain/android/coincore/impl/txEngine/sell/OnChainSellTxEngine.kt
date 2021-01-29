@@ -35,6 +35,7 @@ class OnChainSellTxEngine(
     override fun assertInputsValid() {
         check(sourceAccount is CryptoNonCustodialAccount)
         check(txTarget is FiatAccount)
+        engine.assertInputsValid()
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
