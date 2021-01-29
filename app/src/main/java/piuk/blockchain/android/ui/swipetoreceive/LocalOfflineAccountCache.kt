@@ -58,8 +58,8 @@ class LocalOfflineAccountCache(
 
     fun availableAssets(): Single<List<String>> =
         ordering.getAssetOrdering().map { it.map { a -> a.networkTicker } }
-            .map { assetList ->
-                val orderList = cache.keys.toList()
+            .map { orderList ->
+                val assetList = cache.keys.toList()
                 assetList.sortedBy { i -> orderList.indexOf(i) }
             }
 
