@@ -23,8 +23,8 @@ import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import io.reactivex.Observable
 import io.reactivex.Single
-import junit.framework.Assert.assertEquals
 import org.amshove.kluent.itReturns
+import org.amshove.kluent.shouldEqual
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -45,7 +45,7 @@ import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
-class CustodialSellTxEngineTest {
+class TradingSellTxEngineTest {
 
     @get:Rule
     val initSchedulers = rxInit {
@@ -67,7 +67,7 @@ class CustodialSellTxEngineTest {
         on { selectedFiatCurrency } itReturns SELECTED_FIAT
     }
 
-    private val subject = CustodialSellTxEngine(
+    private val subject = TradingSellTxEngine(
         walletManager = walletManager,
         quotesEngine = quotesEngine,
         kycTierService = kycTierService,
@@ -181,7 +181,7 @@ class CustodialSellTxEngineTest {
         val asset = subject.asset
 
         // Assert
-        assertEquals(asset, SRC_ASSET)
+        asset shouldEqual SRC_ASSET
 
         verify(sourceAccount, atLeastOnce()).asset
         verify(txTarget).fiatCurrency
@@ -222,7 +222,6 @@ class CustodialSellTxEngineTest {
                 it.availableBalance == totalBalance &&
                 it.fees == CryptoValue.zero(SRC_ASSET) &&
                 it.selectedFiat == TGT_ASSET &&
-                it.feeLevel == FeeLevel.None &&
                 it.customFeeAmount == -1L &&
                 it.confirmations.isEmpty() &&
                 it.minLimit == MIN_GOLD_LIMIT_ASSET &&
@@ -230,6 +229,7 @@ class CustodialSellTxEngineTest {
                 it.validationState == ValidationState.UNINITIALISED &&
                 it.engineState.isEmpty()
             }
+            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
             .assertNoErrors()
             .assertComplete()
 
@@ -284,6 +284,7 @@ class CustodialSellTxEngineTest {
                 it.validationState == ValidationState.PENDING_ORDERS_LIMIT_REACHED &&
                 it.engineState.isEmpty()
             }
+            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
             .assertNoErrors()
             .assertComplete()
 
@@ -319,7 +320,8 @@ class CustodialSellTxEngineTest {
             availableBalance = CryptoValue.zero(SRC_ASSET),
             fees = CryptoValue.zero(SRC_ASSET),
             selectedFiat = TGT_ASSET,
-            feeLevel = FeeLevel.None
+            feeLevel = FeeLevel.None,
+            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
         )
 
         val inputAmount = 2.bitcoin()
@@ -339,12 +341,176 @@ class CustodialSellTxEngineTest {
                 it.availableBalance == totalBalance &&
                 it.fees == expectedFee
             }
+            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
 
         verify(sourceAccount, atLeastOnce()).asset
         verify(sourceAccount).accountBalance
         verify(txTarget, atLeastOnce()).fiatCurrency
         verifyQuotesEngineStarted()
         verify(quotesEngine).updateAmount(inputAmount)
+
+        noMoreInteractions(txTarget)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `update fee level from NONE to PRIORITY is rejected`() {
+        // Arrange
+        val totalBalance: Money = 21.bitcoin()
+        val actionableBalance: Money = 20.bitcoin()
+        val inputAmount = 2.bitcoin()
+        val initialFee = 0.bitcoin()
+
+        val sourceAccount = fundedSourceAccount(totalBalance, actionableBalance)
+        val txTarget: FiatAccount = mock {
+            on { fiatCurrency } itReturns TGT_ASSET
+        }
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = inputAmount,
+            totalBalance = totalBalance,
+            availableBalance = totalBalance,
+            fees = initialFee,
+            selectedFiat = TGT_ASSET,
+            feeLevel = FeeLevel.None,
+            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+        )
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.Priority,
+            -1
+        ).test()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `update fee level from NONE to REGULAR is rejected`() {
+        // Arrange
+        val totalBalance: Money = 21.bitcoin()
+        val actionableBalance: Money = 20.bitcoin()
+        val inputAmount = 2.bitcoin()
+        val initialFee = 0.bitcoin()
+
+        val sourceAccount = fundedSourceAccount(totalBalance, actionableBalance)
+        val txTarget: FiatAccount = mock {
+            on { fiatCurrency } itReturns TGT_ASSET
+        }
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = inputAmount,
+            totalBalance = totalBalance,
+            availableBalance = totalBalance,
+            fees = initialFee,
+            selectedFiat = TGT_ASSET,
+            feeLevel = FeeLevel.None,
+            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+        )
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.Regular,
+            -1
+        ).test()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `update fee level from NONE to CUSTOM is rejected`() {
+        // Arrange
+        val totalBalance: Money = 21.bitcoin()
+        val actionableBalance: Money = 20.bitcoin()
+        val inputAmount = 2.bitcoin()
+        val initialFee = 0.bitcoin()
+
+        val sourceAccount = fundedSourceAccount(totalBalance, actionableBalance)
+        val txTarget: FiatAccount = mock {
+            on { fiatCurrency } itReturns TGT_ASSET
+        }
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = inputAmount,
+            totalBalance = totalBalance,
+            availableBalance = totalBalance,
+            fees = initialFee,
+            selectedFiat = TGT_ASSET,
+            feeLevel = FeeLevel.None,
+            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+        )
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.Custom,
+            100
+        ).test()
+    }
+
+    @Test
+    fun `update fee level from NONE to NONE has no effect`() {
+        // Arrange
+        val totalBalance: Money = 21.bitcoin()
+        val actionableBalance: Money = 20.bitcoin()
+        val inputAmount = 2.bitcoin()
+        val initialFee = 0.bitcoin()
+
+        val sourceAccount = fundedSourceAccount(totalBalance, actionableBalance)
+        val txTarget: FiatAccount = mock {
+            on { fiatCurrency } itReturns TGT_ASSET
+        }
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = inputAmount,
+            totalBalance = totalBalance,
+            availableBalance = totalBalance,
+            fees = initialFee,
+            selectedFiat = TGT_ASSET,
+            feeLevel = FeeLevel.None,
+            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+        )
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.None,
+        -1
+        ).test()
+            .assertComplete()
+            .assertNoErrors()
+            .assertValue {
+                it.amount == inputAmount &&
+                it.totalBalance == totalBalance &&
+                it.availableBalance == totalBalance &&
+                it.fees == initialFee
+            }
+            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
+
+        verify(sourceAccount, atLeastOnce()).asset
+        verify(txTarget, atLeastOnce()).fiatCurrency
+        verifyQuotesEngineStarted()
 
         noMoreInteractions(txTarget)
     }
@@ -384,6 +550,11 @@ class CustodialSellTxEngineTest {
         )
     }
 
+    private fun verifyFeeLevels(pendingTx: PendingTx, expectedLevel: FeeLevel) =
+        pendingTx.feeLevel == expectedLevel &&
+            pendingTx.availableFeeLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
+            pendingTx.availableFeeLevels.contains(pendingTx.feeLevel)
+
     private fun noMoreInteractions(txTarget: TransactionTarget) {
         verifyNoMoreInteractions(txTarget)
         verifyNoMoreInteractions(walletManager)
@@ -407,5 +578,7 @@ class CustodialSellTxEngineTest {
         private val MIN_GOLD_LIMIT_ASSET = CryptoValue.fromMajor(SRC_ASSET, 50.toBigDecimal())
         private val MAX_GOLD_ORDER_ASSET = CryptoValue.fromMajor(SRC_ASSET, 250.toBigDecimal())
         private val MAX_GOLD_LIMIT_ASSET = CryptoValue.fromMajor(SRC_ASSET, 1000.toBigDecimal())
+
+        private val EXPECTED_AVAILABLE_FEE_LEVELS = setOf(FeeLevel.None)
     }
 }

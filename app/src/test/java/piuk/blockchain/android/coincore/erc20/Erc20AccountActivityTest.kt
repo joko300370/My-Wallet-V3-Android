@@ -80,9 +80,9 @@ class Erc20AccountActivityTest {
             "sendingAddress",
             "receivingAddress",
             CustodialOrderState.FINISHED,
-            CryptoValue.ZeroDgld,
-            CryptoValue.ZeroBtc,
-            CryptoValue.ZeroBtc,
+            CryptoValue.zero(CryptoCurrency.DGLD),
+            CryptoValue.zero(CryptoCurrency.BTC),
+            CryptoValue.zero(CryptoCurrency.BTC),
             CurrencyPair.CryptoCurrencyPair(CryptoCurrency.DGLD, CryptoCurrency.BTC),
             FiatValue.zero("USD"),
             "USD"

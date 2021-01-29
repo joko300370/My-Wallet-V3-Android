@@ -18,7 +18,7 @@ class TradingToTradingSwapTxEngine(
     quotesEngine: TransferQuotesEngine,
     kycTierService: TierService,
     environmentConfig: EnvironmentConfig
-) : SwapEngineBase(quotesEngine, walletManager, kycTierService, environmentConfig) {
+) : SwapTxEngineBase(quotesEngine, walletManager, kycTierService, environmentConfig) {
 
     override val availableBalance: Single<Money>
         get() = sourceAccount.accountBalance
@@ -40,6 +40,7 @@ class TradingToTradingSwapTxEngine(
                             availableBalance = balance,
                             fees = CryptoValue.zero(sourceAccount.asset),
                             feeLevel = FeeLevel.None,
+                            availableFeeLevels = AVAILABLE_FEE_LEVELS,
                             selectedFiat = userFiat
                         )
                     ).flatMap {
@@ -75,4 +76,18 @@ class TradingToTradingSwapTxEngine(
                 totalBalance = available
             )
         }.updateQuotePrice().clearConfirmations()
+
+    override fun doUpdateFeeLevel(
+        pendingTx: PendingTx,
+        level: FeeLevel,
+        customFeeAmount: Long
+    ): Single<PendingTx> {
+        require(pendingTx.availableFeeLevels.contains(level))
+        // This engine only supports FeeLevel.None, so
+        return Single.just(pendingTx)
+    }
+
+    companion object {
+        private val AVAILABLE_FEE_LEVELS = setOf(FeeLevel.None)
+    }
 }

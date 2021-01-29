@@ -6,12 +6,14 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.testutils.ether
 import com.blockchain.testutils.gwei
+import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
 import info.blockchain.wallet.api.data.FeeLimits
 import info.blockchain.wallet.api.data.FeeOptions
 import io.reactivex.Observable
@@ -24,8 +26,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
+import piuk.blockchain.android.coincore.BlockchainAccount
 import kotlin.test.assertEquals
-import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
@@ -85,15 +87,12 @@ class EthOnChainTxEngineTest {
         stopKoin()
     }
 
-    private val sourceAccount: CryptoAccount = mock()
-
     @Test
     fun `inputs validate when correct`() {
+        val sourceAccount = mockSourceAccount()
         val txTarget: CryptoAddress = mock {
             on { asset } itReturns ASSET
         }
-
-        whenever(sourceAccount.asset).thenReturn(ASSET)
 
         // Act
         subject.start(
@@ -108,16 +107,18 @@ class EthOnChainTxEngineTest {
         verify(txTarget).asset
         verify(sourceAccount).asset
 
-        noMoreInteractions(txTarget)
+        noMoreInteractions(sourceAccount, txTarget)
     }
 
     @Test(expected = IllegalStateException::class)
     fun `inputs fail validation when source Asset incorrect`() {
+        val sourceAccount = mock<EthCryptoWalletAccount> {
+            on { asset } itReturns WRONG_ASSET
+        }
+
         val txTarget: CryptoAddress = mock {
             on { asset } itReturns ASSET
         }
-
-        whenever(sourceAccount.asset).thenReturn(WRONG_ASSET)
 
         // Act
         subject.start(
@@ -132,17 +133,16 @@ class EthOnChainTxEngineTest {
         verify(txTarget).asset
         verify(sourceAccount).asset
 
-        noMoreInteractions(txTarget)
+        noMoreInteractions(sourceAccount, txTarget)
     }
 
     @Test
     fun `asset is returned correctly`() {
         // Arrange
+        val sourceAccount = mockSourceAccount()
         val txTarget: CryptoAddress = mock {
             on { asset } itReturns ASSET
         }
-
-        whenever(sourceAccount.asset).thenReturn(ASSET)
 
         // Act
         subject.start(
@@ -157,17 +157,16 @@ class EthOnChainTxEngineTest {
         assertEquals(asset, ASSET)
         verify(sourceAccount).asset
 
-        noMoreInteractions(txTarget)
+        noMoreInteractions(sourceAccount, txTarget)
     }
 
     @Test
     fun `PendingTx is correctly initialised`() {
         // Arrange
+        val sourceAccount = mockSourceAccount()
         val txTarget: CryptoAddress = mock {
             on { asset } itReturns ASSET
         }
-
-        whenever(sourceAccount.asset).thenReturn(ASSET)
 
         subject.start(
             sourceAccount,
@@ -192,29 +191,29 @@ class EthOnChainTxEngineTest {
                 it.validationState == ValidationState.UNINITIALISED &&
                 it.engineState.isEmpty()
             }
+            .assertValue { verifyFeeLevels(it, FeeLevel.Regular) }
             .assertNoErrors()
             .assertComplete()
 
+        verify(sourceAccount, atLeastOnce()).asset
         verify(walletPreferences).getFeeTypeForAsset(ASSET)
         verify(currencyPrefs).selectedFiatCurrency
 
-        noMoreInteractions(txTarget)
+        noMoreInteractions(sourceAccount, txTarget)
     }
 
     @Test
     fun `update amount modifies the pendingTx correctly for regular fees`() {
         // Arrange
-        withDefaultFeeOptions()
+        val totalBalance = 21.ether()
+        val actionableBalance = 20.ether()
+        val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
 
         val txTarget: CryptoAddress = mock {
             on { asset } itReturns ASSET
         }
 
-        val totalBalance = 21.ether()
-        val actionableBalance = 20.ether()
-        whenever(sourceAccount.asset).thenReturn(ASSET)
-        whenever(sourceAccount.accountBalance).thenReturn(Single.just(totalBalance))
-        whenever(sourceAccount.actionableBalance).thenReturn(Single.just(actionableBalance))
+        withDefaultFeeOptions()
 
         subject.start(
             sourceAccount,
@@ -228,7 +227,8 @@ class EthOnChainTxEngineTest {
             availableBalance = CryptoValue.zero(ASSET),
             fees = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular
+            feeLevel = FeeLevel.Regular,
+            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
         )
 
         val inputAmount = 2.ether()
@@ -248,30 +248,30 @@ class EthOnChainTxEngineTest {
                 it.availableBalance == expectedAvailable &&
                 it.fees == expectedFee
             }
+            .assertValue { verifyFeeLevels(it, FeeLevel.Regular) }
 
+        verify(sourceAccount, atLeastOnce()).asset
         verify(sourceAccount).accountBalance
         verify(sourceAccount).actionableBalance
         verify(feeManager).ethFeeOptions
         verify(ethFeeOptions).gasLimit
         verify(ethFeeOptions).regularFee
 
-        noMoreInteractions(txTarget)
+        noMoreInteractions(sourceAccount, txTarget)
     }
 
     @Test
     fun `update amount modifies the pendingTx correctly for priority fees`() {
         // Arrange
-        withDefaultFeeOptions()
+        val totalBalance = 21.ether()
+        val actionableBalance = 20.ether()
+        val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
 
         val txTarget: CryptoAddress = mock {
             on { asset } itReturns ASSET
         }
 
-        val totalBalance = 21.ether()
-        val actionableBalance = 20.ether()
-        whenever(sourceAccount.asset).thenReturn(ASSET)
-        whenever(sourceAccount.accountBalance).thenReturn(Single.just(totalBalance))
-        whenever(sourceAccount.actionableBalance).thenReturn(Single.just(actionableBalance))
+        withDefaultFeeOptions()
 
         subject.start(
             sourceAccount,
@@ -285,7 +285,8 @@ class EthOnChainTxEngineTest {
             availableBalance = CryptoValue.zero(CryptoCurrency.ETHER),
             fees = CryptoValue.zero(CryptoCurrency.ETHER),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Priority
+            feeLevel = FeeLevel.Priority,
+            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
         )
 
         val inputAmount = 2.ether()
@@ -305,15 +306,224 @@ class EthOnChainTxEngineTest {
                 it.availableBalance == expectedAvailable &&
                 it.fees == expectedFee
             }
+            .assertValue { verifyFeeLevels(it, FeeLevel.Priority) }
 
+        verify(sourceAccount, atLeastOnce()).asset
         verify(sourceAccount).accountBalance
         verify(sourceAccount).actionableBalance
         verify(feeManager).ethFeeOptions
         verify(ethFeeOptions).gasLimit
         verify(ethFeeOptions).priorityFee
 
-        noMoreInteractions(txTarget)
+        noMoreInteractions(sourceAccount, txTarget)
     }
+
+    @Test
+    fun `update fee level from REGULAR to PRIORITY updates the pendingTx correctly`() {
+        // Arrange
+        val totalBalance = 21.ether()
+        val actionableBalance = 20.ether()
+        val inputAmount = 2.ether()
+        val regularFee = (GAS_LIMIT * FEE_REGULAR).gwei()
+        val regularAvailable = actionableBalance - regularFee
+
+        val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
+
+        val txTarget: CryptoAddress = mock {
+            on { asset } itReturns ASSET
+        }
+
+        withDefaultFeeOptions()
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = inputAmount,
+            totalBalance = totalBalance,
+            availableBalance = regularAvailable,
+            fees = regularFee,
+            selectedFiat = SELECTED_FIAT,
+            feeLevel = FeeLevel.Regular,
+            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+        )
+
+        val expectedFee = (GAS_LIMIT * FEE_PRIORITY).gwei()
+        val expectedAvailable = actionableBalance - expectedFee
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.Priority,
+            -1
+        ).test()
+            .assertComplete()
+            .assertNoErrors()
+            .assertValue {
+                it.amount == inputAmount &&
+                    it.totalBalance == totalBalance &&
+                    it.availableBalance == expectedAvailable &&
+                    it.fees == expectedFee
+            }
+            .assertValue { verifyFeeLevels(it, FeeLevel.Priority) }
+
+        verify(sourceAccount, atLeastOnce()).asset
+        verify(sourceAccount).accountBalance
+        verify(sourceAccount).actionableBalance
+        verify(feeManager).ethFeeOptions
+        verify(ethFeeOptions).gasLimit
+        verify(ethFeeOptions).priorityFee
+        verify(walletPreferences).setFeeTypeForAsset(ASSET, FeeLevel.Priority.ordinal)
+
+        noMoreInteractions(sourceAccount, txTarget)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `update fee level from REGULAR to NONE is rejected`() {
+        // Arrange
+        val totalBalance = 21.ether()
+        val actionableBalance = 20.ether()
+        val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
+        val txTarget: CryptoAddress = mock {
+            on { asset } itReturns ASSET
+        }
+
+        withDefaultFeeOptions()
+
+        val inputAmount = 2.ether()
+        val expectedFee = (GAS_LIMIT * FEE_PRIORITY).gwei()
+        val expectedAvailable = actionableBalance - expectedFee
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = inputAmount,
+            totalBalance = totalBalance,
+            availableBalance = expectedAvailable,
+            fees = expectedFee,
+            selectedFiat = SELECTED_FIAT,
+            feeLevel = FeeLevel.Regular,
+            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+        )
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.None,
+            -1
+        ).test()
+
+        noMoreInteractions(sourceAccount, txTarget)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `update fee level from REGULAR to CUSTOM is rejected`() {
+        // Arrange
+        val totalBalance = 21.ether()
+        val actionableBalance = 20.ether()
+        val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
+        val txTarget: CryptoAddress = mock {
+            on { asset } itReturns ASSET
+        }
+
+        withDefaultFeeOptions()
+
+        val inputAmount = 2.ether()
+        val expectedFee = (GAS_LIMIT * FEE_PRIORITY).gwei()
+        val expectedAvailable = actionableBalance - expectedFee
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = inputAmount,
+            totalBalance = totalBalance,
+            availableBalance = expectedAvailable,
+            fees = expectedFee,
+            selectedFiat = SELECTED_FIAT,
+            feeLevel = FeeLevel.Regular,
+            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+        )
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.Custom,
+            100
+        ).test()
+            .assertComplete()
+            .assertNoErrors()
+            .assertValue {
+                it.amount == inputAmount &&
+                    it.totalBalance == totalBalance &&
+                    it.availableBalance == expectedAvailable &&
+                    it.fees == expectedFee
+            }
+            .assertValue { verifyFeeLevels(it, FeeLevel.Regular) }
+
+        noMoreInteractions(sourceAccount, txTarget)
+    }
+
+    @Test
+    fun `update fee level from REGULAR to REGULAR has no effect`() {
+        // Arrange
+        val totalBalance = 21.ether()
+        val actionableBalance = 20.ether()
+        val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
+        val txTarget: CryptoAddress = mock {
+            on { asset } itReturns ASSET
+        }
+
+        withDefaultFeeOptions()
+
+        val inputAmount = 2.ether()
+        val expectedFee = (GAS_LIMIT * FEE_PRIORITY).gwei()
+        val expectedAvailable = actionableBalance - expectedFee
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = inputAmount,
+            totalBalance = totalBalance,
+            availableBalance = expectedAvailable,
+            fees = expectedFee,
+            selectedFiat = SELECTED_FIAT,
+            feeLevel = FeeLevel.Regular,
+            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+        )
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.Regular,
+            -1
+        ).test()
+
+        noMoreInteractions(sourceAccount, txTarget)
+    }
+
+    private fun mockSourceAccount(
+        totalBalance: Money = CryptoValue.zero(ASSET),
+        availableBalance: Money = CryptoValue.zero(ASSET)
+    ) = mock<EthCryptoWalletAccount> {
+            on { asset } itReturns ASSET
+            on { accountBalance } itReturns Single.just(totalBalance)
+            on { actionableBalance } itReturns Single.just(availableBalance)
+        }
 
     private fun withDefaultFeeOptions() {
         whenever(ethFeeOptions.gasLimit).thenReturn(GAS_LIMIT)
@@ -323,7 +533,12 @@ class EthOnChainTxEngineTest {
         whenever(ethFeeOptions.limits).thenReturn(FeeLimits(FEE_REGULAR, FEE_PRIORITY))
     }
 
-    private fun noMoreInteractions(txTarget: TransactionTarget) {
+    private fun verifyFeeLevels(pendingTx: PendingTx, expectedLevel: FeeLevel) =
+        pendingTx.feeLevel == expectedLevel &&
+            pendingTx.availableFeeLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
+            pendingTx.availableFeeLevels.contains(pendingTx.feeLevel)
+
+    private fun noMoreInteractions(sourceAccount: BlockchainAccount, txTarget: TransactionTarget) {
         verifyNoMoreInteractions(txTarget)
         verifyNoMoreInteractions(ethDataManager)
         verifyNoMoreInteractions(feeManager)
@@ -342,5 +557,7 @@ class EthOnChainTxEngineTest {
         private const val FEE_PRIORITY = 5L
         private const val FEE_REGULAR = 2L
         private const val SELECTED_FIAT = "INR"
+
+        private val EXPECTED_AVAILABLE_FEE_LEVELS = setOf(FeeLevel.Regular, FeeLevel.Priority)
     }
 }

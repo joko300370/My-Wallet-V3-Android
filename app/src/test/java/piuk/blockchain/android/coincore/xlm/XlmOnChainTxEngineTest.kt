@@ -13,9 +13,9 @@ import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
-import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
 import io.reactivex.Single
 import org.amshove.kluent.itReturns
 import org.amshove.kluent.mock
@@ -25,6 +25,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
+import piuk.blockchain.android.coincore.BlockchainAccount
 import kotlin.test.assertEquals
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
@@ -89,15 +90,15 @@ class XlmOnChainTxEngineTest {
         stopKoin()
     }
 
-    private val sourceAccount: CryptoAccount = mock()
-
     @Test
     fun `inputs validate when correct`() {
-        val txTarget: CryptoAddress = mock {
+        val sourceAccount: CryptoAccount = mock {
             on { asset } itReturns ASSET
         }
 
-        whenever(sourceAccount.asset).thenReturn(ASSET)
+        val txTarget: CryptoAddress = mock {
+            on { asset } itReturns ASSET
+        }
 
         // Act
         subject.start(
@@ -112,16 +113,18 @@ class XlmOnChainTxEngineTest {
         verify(txTarget).asset
         verify(sourceAccount).asset
 
-        noMoreInteractions(txTarget)
+        noMoreInteractions(sourceAccount, txTarget)
     }
 
     @Test(expected = IllegalStateException::class)
     fun `inputs fail validation when source Asset incorrect`() {
+        val sourceAccount: CryptoAccount = mock {
+            on { asset } itReturns WRONG_ASSET
+        }
+
         val txTarget: CryptoAddress = mock {
             on { asset } itReturns ASSET
         }
-
-        whenever(sourceAccount.asset).thenReturn(WRONG_ASSET)
 
         // Act
         subject.start(
@@ -136,17 +139,19 @@ class XlmOnChainTxEngineTest {
         verify(txTarget).asset
         verify(sourceAccount).asset
 
-        noMoreInteractions(txTarget)
+        noMoreInteractions(sourceAccount, txTarget)
     }
 
     @Test
     fun `asset is returned correctly`() {
         // Arrange
-        val txTarget: CryptoAddress = mock {
+        val sourceAccount: CryptoAccount = mock {
             on { asset } itReturns ASSET
         }
 
-        whenever(sourceAccount.asset).thenReturn(ASSET)
+        val txTarget: CryptoAddress = mock {
+            on { asset } itReturns ASSET
+        }
 
         // Act
         subject.start(
@@ -161,19 +166,21 @@ class XlmOnChainTxEngineTest {
         assertEquals(asset, ASSET)
         verify(sourceAccount).asset
 
-        noMoreInteractions(txTarget)
+        noMoreInteractions(sourceAccount, txTarget)
     }
 
     @Test
     fun `PendingTx is correctly initialised for non-exchange address`() {
         // Arrange
+        val sourceAccount: CryptoAccount = mock {
+            on { asset } itReturns ASSET
+        }
+
         val txTarget: XlmAddress = mock {
             on { asset } itReturns ASSET
             on { address } itReturns TARGET_ADDRESS
             on { memo } itReturns MEMO_TEXT
         }
-
-        whenever(sourceAccount.asset).thenReturn(ASSET)
 
         subject.start(
             sourceAccount,
@@ -190,7 +197,6 @@ class XlmOnChainTxEngineTest {
                 it.availableBalance == CryptoValue.zero(ASSET) &&
                 it.fees == CryptoValue.zero(ASSET) &&
                 it.selectedFiat == SELECTED_FIAT &&
-                it.feeLevel == FeeLevel.Regular &&
                 it.customFeeAmount == -1L &&
                 it.confirmations.isEmpty() &&
                 it.minLimit == null &&
@@ -205,6 +211,7 @@ class XlmOnChainTxEngineTest {
                     memo.editable
                 } ?: false
             }
+            .assertValue { verifyFeeLevels(it, FeeLevel.Regular) }
             .assertNoErrors()
             .assertComplete()
 
@@ -214,19 +221,21 @@ class XlmOnChainTxEngineTest {
         verify(currencyPrefs).selectedFiatCurrency
         verify(walletOptionsDataManager).isXlmAddressExchange(TARGET_ADDRESS)
 
-        noMoreInteractions(txTarget)
+        noMoreInteractions(sourceAccount, txTarget)
     }
 
     @Test
     fun `PendingTx is correctly initialised for exchange address`() {
         // Arrange
+        val sourceAccount: CryptoAccount = mock {
+            on { asset } itReturns ASSET
+        }
+
         val txTarget: XlmAddress = mock {
             on { asset } itReturns ASSET
             on { address } itReturns TARGET_EXCHANGE_ADDRESS
             on { memo } itReturns MEMO_TEXT
         }
-
-        whenever(sourceAccount.asset).thenReturn(ASSET)
 
         subject.start(
             sourceAccount,
@@ -244,7 +253,6 @@ class XlmOnChainTxEngineTest {
                     it.availableBalance == CryptoValue.zero(ASSET) &&
                     it.fees == CryptoValue.zero(ASSET) &&
                     it.selectedFiat == SELECTED_FIAT &&
-                    it.feeLevel == FeeLevel.Regular &&
                     it.customFeeAmount == -1L &&
                     it.confirmations.isEmpty() &&
                     it.minLimit == null &&
@@ -259,6 +267,7 @@ class XlmOnChainTxEngineTest {
                             memo.editable
                     } ?: false
             }
+            .assertValue { verifyFeeLevels(it, FeeLevel.Regular) }
             .assertNoErrors()
             .assertComplete()
 
@@ -268,7 +277,7 @@ class XlmOnChainTxEngineTest {
         verify(currencyPrefs).selectedFiatCurrency
         verify(walletOptionsDataManager).isXlmAddressExchange(TARGET_EXCHANGE_ADDRESS)
 
-        noMoreInteractions(txTarget)
+        noMoreInteractions(sourceAccount, txTarget)
     }
 
     @Test
@@ -280,9 +289,8 @@ class XlmOnChainTxEngineTest {
 
         val totalBalance = 21.lumens()
         val actionableBalance = 20.lumens()
-        whenever(sourceAccount.asset).thenReturn(ASSET)
-        whenever(sourceAccount.accountBalance).thenReturn(Single.just(totalBalance))
-        whenever(sourceAccount.actionableBalance).thenReturn(Single.just(actionableBalance))
+
+        val sourceAccount = fundedSourceAccount(totalBalance, actionableBalance)
 
         subject.start(
             sourceAccount,
@@ -296,7 +304,8 @@ class XlmOnChainTxEngineTest {
             availableBalance = CryptoValue.zero(ASSET),
             fees = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular
+            feeLevel = FeeLevel.Regular,
+            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
         )
 
         val inputAmount = 2.lumens()
@@ -316,15 +325,193 @@ class XlmOnChainTxEngineTest {
                 it.availableBalance == expectedAvailable &&
                 it.fees == expectedFee
             }
+            .assertValue { verifyFeeLevels(it, FeeLevel.Regular) }
 
         verify(sourceAccount).accountBalance
         verify(sourceAccount).actionableBalance
         verify(xlmFeesFetcher).operationFee(FeeType.Regular)
 
-        noMoreInteractions(txTarget)
+        noMoreInteractions(sourceAccount, txTarget)
     }
 
-    private fun noMoreInteractions(txTarget: TransactionTarget) {
+    @Test(expected = IllegalArgumentException::class)
+    fun `update fee level to PRIORITY is rejected`() {
+        // Arrange
+        val txTarget: CryptoAddress = mock {
+            on { asset } itReturns ASSET
+        }
+
+        val totalBalance = 21.lumens()
+        val availableBalance = 20.lumens()
+        val sourceAccount = fundedSourceAccount(totalBalance, availableBalance)
+
+        val inputAmount = 2.lumens()
+        val expectedFee = FEE_REGULAR
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = inputAmount,
+            totalBalance = totalBalance,
+            availableBalance = availableBalance,
+            fees = expectedFee,
+            selectedFiat = SELECTED_FIAT,
+            feeLevel = FeeLevel.Regular,
+            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+        )
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.Priority,
+            -1
+        ).test()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `update fee level to NONE is rejected`() {
+        // Arrange
+        val txTarget: CryptoAddress = mock {
+            on { asset } itReturns ASSET
+        }
+
+        val totalBalance = 21.lumens()
+        val availableBalance = 20.lumens()
+        val sourceAccount = fundedSourceAccount(totalBalance, availableBalance)
+
+        val inputAmount = 2.lumens()
+        val expectedFee = FEE_REGULAR
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = inputAmount,
+            totalBalance = totalBalance,
+            availableBalance = availableBalance,
+            fees = expectedFee,
+            selectedFiat = SELECTED_FIAT,
+            feeLevel = FeeLevel.Regular,
+            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+        )
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.None,
+            -1
+        ).test()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `update fee level to CUSTOM is rejected`() {
+        // Arrange
+        val txTarget: CryptoAddress = mock {
+            on { asset } itReturns ASSET
+        }
+
+        val totalBalance = 21.lumens()
+        val availableBalance = 20.lumens()
+        val sourceAccount = fundedSourceAccount(totalBalance, availableBalance)
+
+        val inputAmount = 2.lumens()
+        val expectedFee = FEE_REGULAR
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = inputAmount,
+            totalBalance = totalBalance,
+            availableBalance = availableBalance,
+            fees = expectedFee,
+            selectedFiat = SELECTED_FIAT,
+            feeLevel = FeeLevel.Regular,
+            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+        )
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.Custom,
+            -1
+        ).test()
+    }
+
+    @Test
+    fun `update fee level to REGULAR has no effect`() {
+        // Arrange
+        val txTarget: CryptoAddress = mock {
+            on { asset } itReturns ASSET
+        }
+
+        val totalBalance = 21.lumens()
+        val availableBalance = 20.lumens()
+        val sourceAccount = fundedSourceAccount(totalBalance, availableBalance)
+
+        val inputAmount = 2.lumens()
+        val expectedFee = FEE_REGULAR
+        val expectedAvailable = availableBalance - expectedFee
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = inputAmount,
+            totalBalance = totalBalance,
+            availableBalance = expectedAvailable,
+            fees = expectedFee,
+            selectedFiat = SELECTED_FIAT,
+            feeLevel = FeeLevel.Regular,
+            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+        )
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.Regular,
+            -1
+        ).test()
+            .assertComplete()
+            .assertNoErrors()
+            .assertValue {
+                val v = 100
+                it.amount == inputAmount &&
+                it.totalBalance == totalBalance &&
+                it.availableBalance == expectedAvailable &&
+                it.fees == expectedFee
+            }
+            .assertValue { verifyFeeLevels(it, FeeLevel.Regular) }
+
+        noMoreInteractions(sourceAccount, txTarget)
+    }
+
+    private fun fundedSourceAccount(totalBalance: Money, availableBalance: Money) =
+        mock<XlmCryptoWalletAccount> {
+            on { asset } itReturns ASSET
+            on { accountBalance } itReturns Single.just(totalBalance)
+            on { actionableBalance } itReturns Single.just(availableBalance)
+        }
+
+    private fun verifyFeeLevels(pendingTx: PendingTx, expectedLevel: FeeLevel) =
+        pendingTx.feeLevel == expectedLevel &&
+            pendingTx.availableFeeLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
+            pendingTx.availableFeeLevels.contains(pendingTx.feeLevel)
+
+    private fun noMoreInteractions(sourceAccount: BlockchainAccount, txTarget: TransactionTarget) {
         verifyNoMoreInteractions(txTarget)
         verifyNoMoreInteractions(xlmDataManager)
         verifyNoMoreInteractions(xlmFeesFetcher)
@@ -343,5 +530,7 @@ class XlmOnChainTxEngineTest {
         private const val MEMO_TEXT = "ADDRESS_PART_FOR_MEMO"
         private val FEE_REGULAR = 2000.stroops()
         private const val SELECTED_FIAT = "INR"
+
+        private val EXPECTED_AVAILABLE_FEE_LEVELS = setOf(FeeLevel.Regular)
     }
 }

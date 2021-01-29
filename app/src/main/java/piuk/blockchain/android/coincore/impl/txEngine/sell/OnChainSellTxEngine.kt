@@ -17,13 +17,13 @@ import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 
-class NonCustodialSellTxEngine(
+class OnChainSellTxEngine(
     private val engine: OnChainTxEngineBase,
     environmentConfig: EnvironmentConfig,
     walletManager: CustodialWalletManager,
     kycTierService: TierService,
     quotesEngine: TransferQuotesEngine
-) : SellTxEngine(
+) : SellTxEngineBase(
     walletManager, kycTierService, quotesEngine, environmentConfig
 ) {
     override val direction: TransferDirection
@@ -48,7 +48,10 @@ class NonCustodialSellTxEngine(
                         updateLimits(it, quote)
                     }
             }.map { px ->
-                px.copy(feeLevel = FeeLevel.Priority, selectedFiat = userFiat)
+                px.copy(
+                    feeLevel = defaultFeeLevel(px),
+                    selectedFiat = userFiat
+                )
             }.handlePendingOrdersError(
                 PendingTx(
                     amount = CryptoValue.zero(asset),
@@ -56,9 +59,16 @@ class NonCustodialSellTxEngine(
                     availableBalance = CryptoValue.zero(asset),
                     fees = CryptoValue.zero(asset),
                     selectedFiat = userFiat,
-                    feeLevel = FeeLevel.None
+                    feeLevel = FeeLevel.Regular,
+                    availableFeeLevels = setOf(FeeLevel.Regular)
                 )
             )
+
+    private fun defaultFeeLevel(pendingTx: PendingTx): FeeLevel =
+        if (pendingTx.availableFeeLevels.contains(FeeLevel.Priority))
+            FeeLevel.Priority
+        else
+            pendingTx.feeLevel
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         engine.doValidateAmount(pendingTx)
@@ -91,12 +101,20 @@ class NonCustodialSellTxEngine(
             .updateQuotePrice()
             .clearConfirmations()
 
+    override fun doUpdateFeeLevel(
+        pendingTx: PendingTx,
+        level: FeeLevel,
+        customFeeAmount: Long
+    ): Single<PendingTx> {
+        return engine.doUpdateFeeLevel(pendingTx, level, customFeeAmount)
+    }
+
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
         createSellOrder(pendingTx)
             .flatMap { order ->
                 engine.restartFromOrder(order, pendingTx)
                     .flatMap { px ->
                         engine.doExecute(px, secondPassword).updateOrderStatus(order.id)
-                }
+                    }
             }
 }

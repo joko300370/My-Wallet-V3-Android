@@ -43,7 +43,8 @@ open class Erc20OnChainTxEngine(
                 totalBalance = CryptoValue.zero(asset),
                 availableBalance = CryptoValue.zero(asset),
                 fees = CryptoValue.zero(CryptoCurrency.ETHER),
-                feeLevel = mapSavedFeeToFeeLevel(getFeeType(asset)),
+                feeLevel = mapSavedFeeToFeeLevel(fetchDefaultFeeLevel(asset)),
+                availableFeeLevels = AVAILABLE_FEE_LEVELS,
                 selectedFiat = userFiat
             )
         )
@@ -82,12 +83,12 @@ open class Erc20OnChainTxEngine(
             FeeLevel.Custom -> priorityFee
         }
 
-    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
+    override fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
         TxConfirmationValue.FeeSelection(
             feeDetails = getFeeState(pendingTx),
             exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
+            availableLevels = AVAILABLE_FEE_LEVELS,
             selectedLevel = pendingTx.feeLevel,
-            availableLevels = setOf(FeeLevel.Regular, FeeLevel.Priority),
             asset = CryptoCurrency.ETHER
         )
 
@@ -110,17 +111,6 @@ open class Erc20OnChainTxEngine(
             )
         }
     }
-
-    override fun doOptionUpdateRequest(pendingTx: PendingTx, newConfirmation: TxConfirmationValue): Single<PendingTx> =
-        if (newConfirmation is TxConfirmationValue.FeeSelection) {
-            if (newConfirmation.selectedLevel != pendingTx.feeLevel) {
-                updateFeeSelection(asset, pendingTx, newConfirmation)
-            } else {
-                super.doOptionUpdateRequest(pendingTx, makeFeeSelectionOption(pendingTx))
-            }
-        } else {
-            super.doOptionUpdateRequest(pendingTx, newConfirmation)
-        }
 
     // In an ideal world, we'd get this via a CryptoAccount object.
     // However accessing one for Eth here would break the abstractions, so:
@@ -246,4 +236,8 @@ open class Erc20OnChainTxEngine(
         get() = BigInteger.valueOf(
             gasLimitContract
         )
+
+    companion object {
+        private val AVAILABLE_FEE_LEVELS = setOf(FeeLevel.Regular, FeeLevel.Priority)
+    }
 }

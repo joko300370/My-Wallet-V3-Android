@@ -26,6 +26,7 @@ import kotlin.test.assertEquals
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
@@ -75,6 +76,7 @@ class OnChainTxEngineBaseTest {
         override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
             STUB_THIS()
         }
+
         override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> {
             STUB_THIS()
         }
@@ -83,6 +85,10 @@ class OnChainTxEngineBaseTest {
         }
         override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> {
             STUB_THIS()
+        }
+
+        override fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection {
+            TODO("Not yet implemented")
         }
     }
 

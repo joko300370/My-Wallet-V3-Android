@@ -3,7 +3,6 @@ package com.blockchain.sunriver
 import com.blockchain.sunriver.models.XlmTransaction
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.withMajorValue
 import org.stellar.sdk.KeyPair
 import org.stellar.sdk.responses.operations.CreateAccountOperationResponse
 import org.stellar.sdk.responses.operations.OperationResponse
@@ -89,5 +88,5 @@ private fun deltaValueForAccount(
         } else {
             valueAsBigDecimal
         }
-    return CryptoCurrency.XLM.withMajorValue(deltaForThisAccount)
+    return CryptoValue.fromMajor(CryptoCurrency.XLM, deltaForThisAccount)
 }

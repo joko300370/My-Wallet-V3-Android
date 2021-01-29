@@ -77,13 +77,13 @@ internal class CryptoInterestAccount(
             .switchIfEmpty(
                 Single.just(CryptoValue.zero(asset))
             ).doOnSuccess { hasFunds.set(it.isPositive) }
-            .map { it as Money }
+            .map { it }
 
     override val pendingBalance: Single<Money>
         get() = custodialWalletManager.getPendingInterestAccountBalance(asset)
             .switchIfEmpty(
                 Single.just(CryptoValue.zero(asset))
-            ).map { it as Money }
+            ).map { it }
 
     override val actionableBalance: Single<Money>
         get() = accountBalance // TODO This will need updating when we support transfer out of an interest account

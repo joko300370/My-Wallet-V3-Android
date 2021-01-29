@@ -26,7 +26,7 @@ class OnChainSwapTxEngine(
     kycTierService: TierService,
     private val engine: OnChainTxEngineBase,
     environmentConfig: EnvironmentConfig
-) : SwapEngineBase(
+) : SwapTxEngineBase(
     quotesEngine, walletManager, kycTierService, environmentConfig
 ) {
     override val direction: TransferDirection by unsafeLazy {
@@ -61,23 +61,37 @@ class OnChainSwapTxEngine(
                         updateLimits(it, quote)
                     }
             }.map { px ->
-                px.copy(feeLevel = FeeLevel.Priority)
+                px.copy(feeLevel = defaultFeeLevel(px))
             }.handlePendingOrdersError(
                 PendingTx(
                     amount = CryptoValue.zero(sourceAccount.asset),
                     totalBalance = CryptoValue.zero(sourceAccount.asset),
                     availableBalance = CryptoValue.zero(sourceAccount.asset),
                     fees = CryptoValue.zero(sourceAccount.asset),
-                    feeLevel = FeeLevel.Priority,
+                    feeLevel = FeeLevel.Regular,
+                    availableFeeLevels = setOf(FeeLevel.Regular),
                     selectedFiat = userFiat
                 )
             )
+
+    private fun defaultFeeLevel(pendingTx: PendingTx): FeeLevel =
+        if (pendingTx.availableFeeLevels.contains(FeeLevel.Priority))
+            FeeLevel.Priority
+        else
+            pendingTx.feeLevel
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
         return engine.doUpdateAmount(amount, pendingTx)
             .updateQuotePrice()
             .clearConfirmations()
     }
+
+    override fun doUpdateFeeLevel(
+        pendingTx: PendingTx,
+        level: FeeLevel,
+        customFeeAmount: Long
+    ): Single<PendingTx> =
+        engine.doUpdateFeeLevel(pendingTx, level, customFeeAmount)
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> {
         return engine.doValidateAmount(pendingTx)

@@ -59,34 +59,9 @@ data class CryptoValue(
         val ZeroEth = CryptoValue(CryptoCurrency.ETHER, BigInteger.ZERO)
         @Deprecated(
             message = "As we add more assets, this will become a maintenance headache, prefer the zero(asset) method",
-            replaceWith = ReplaceWith("CryptoValue.zero(CryptoCurrency.STX)")
-        )
-        val ZeroStx = CryptoValue(CryptoCurrency.STX, BigInteger.ZERO)
-        @Deprecated(
-            message = "As we add more assets, this will become a maintenance headache, prefer the zero(asset) method",
             replaceWith = ReplaceWith("CryptoValue.zero(CryptoCurrency.XLM)")
         )
         val ZeroXlm = CryptoValue(CryptoCurrency.XLM, BigInteger.ZERO)
-        @Deprecated(
-            message = "As we add more assets, this will become a maintenance headache, prefer the zero(asset) method",
-            replaceWith = ReplaceWith("CryptoValue.zero(CryptoCurrency.PAX)")
-        )
-        val ZeroPax = CryptoValue(CryptoCurrency.PAX, BigInteger.ZERO)
-        @Deprecated(
-            message = "As we add more assets, this will become a maintenance headache, prefer the zero(asset) method",
-            replaceWith = ReplaceWith("CryptoValue.zero(CryptoCurrency.ALGO)")
-        )
-        val ZeroAlg = CryptoValue(CryptoCurrency.ALGO, BigInteger.ZERO)
-        @Deprecated(
-            message = "As we add more assets, this will become a maintenance headache, prefer the zero(asset) method",
-            replaceWith = ReplaceWith("CryptoValue.zero(CryptoCurrency.USDT)")
-        )
-        val ZeroUsdt = CryptoValue(CryptoCurrency.USDT, BigInteger.ZERO)
-        @Deprecated(
-            message = "As we add more assets, this will become a maintenance headache, prefer the zero(asset) method",
-            replaceWith = ReplaceWith("CryptoValue.zero(CryptoCurrency.DGLD)")
-        )
-        val ZeroDgld = CryptoValue(CryptoCurrency.DGLD, BigInteger.ZERO)
 
         fun zero(asset: CryptoCurrency) =
             CryptoValue(asset, BigInteger.ZERO)
@@ -147,7 +122,9 @@ data class CryptoValue(
     }
 }
 
+@Deprecated("Only used in tests")
 fun CryptoCurrency.withMajorValue(majorValue: BigDecimal) = CryptoValue.fromMajor(this, majorValue)
 
+@Deprecated("Only used in tests")
 fun CryptoCurrency.withMajorValueOrZero(majorValue: String, locale: Locale = Locale.getDefault()) =
     CryptoValue.fromMajor(this, majorValue.tryParseBigDecimal(locale) ?: BigDecimal.ZERO)

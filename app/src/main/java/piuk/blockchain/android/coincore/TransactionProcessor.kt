@@ -68,8 +68,9 @@ data class PendingTx(
     val availableBalance: Money,
     val fees: Money,
     val selectedFiat: String,
-    val feeLevel: FeeLevel = FeeLevel.Regular,
+    val feeLevel: FeeLevel = FeeLevel.None,
     val customFeeAmount: Long = -1L,
+    val availableFeeLevels: Set<FeeLevel> = setOf(FeeLevel.None),
     val confirmations: List<TxConfirmationValue> = emptyList(),
     val minLimit: Money? = null,
     val maxLimit: Money? = null,
@@ -161,9 +162,6 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
             val regularFee: Long,
             val priorityFee: Long
         )
-
-        fun hasOptionChanged(oldLevel: FeeLevel, oldAmount: Long) =
-            selectedLevel != oldLevel || (selectedLevel == FeeLevel.Custom && oldAmount != customFeeAmount)
     }
 
     data class BitPayCountdown(
@@ -303,6 +301,9 @@ abstract class TxEngine : KoinComponent {
     // be passed to validate after this call.
     abstract fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx>
 
+    // Update the selected fee level of this Tx. This should check & update balances etc
+    abstract fun doUpdateFeeLevel(pendingTx: PendingTx, level: FeeLevel, customFeeAmount: Long): Single<PendingTx>
+
     // Process any TxOption updates, if required. The default just replaces the option and returns
     // the updated pendingTx. Subclasses may want to, eg, update amounts on fee changes etc
     open fun doOptionUpdateRequest(pendingTx: PendingTx, newConfirmation: TxConfirmationValue): Single<PendingTx> =
@@ -410,6 +411,21 @@ class TransactionProcessor(
             .doOnSuccess {
                 updatePendingTx(it)
             }
+            .ignoreElement()
+    }
+
+    // Check that the fee level is supported, then call into the engine to set the fee and validate ballances etc
+    // the selected fee level is supported
+    fun updateFeeLevel(level: FeeLevel, customFeeAmount: Long = -1): Completable {
+        Timber.d("!TRANSACTION!> in UpdateFeeLevel")
+        val pendingTx = getPendingTx()
+        check(pendingTx.availableFeeLevels.contains(level)) {
+            "Fee Level $level not supported by engine ${engine::class.java.name}"
+        }
+
+        return engine.doUpdateFeeLevel(pendingTx, level, customFeeAmount)
+            .flatMap { engine.doValidateAmount(it) }
+            .doOnSuccess { updatePendingTx(it) }
             .ignoreElement()
     }
 

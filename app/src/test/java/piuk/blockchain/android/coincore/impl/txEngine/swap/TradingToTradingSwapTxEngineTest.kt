@@ -254,7 +254,6 @@ class TradingToTradingSwapTxEngineTest {
                 it.availableBalance == totalBalance &&
                 it.fees == CryptoValue.zero(SRC_ASSET) &&
                 it.selectedFiat == SELECTED_FIAT &&
-                it.feeLevel == FeeLevel.None &&
                 it.customFeeAmount == -1L &&
                 it.confirmations.isEmpty() &&
                 it.minLimit == expectedMinLimit &&
@@ -262,6 +261,7 @@ class TradingToTradingSwapTxEngineTest {
                 it.validationState == ValidationState.UNINITIALISED &&
                 it.engineState[USER_TIER] != null
             }
+            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
             .assertNoErrors()
             .assertComplete()
 
@@ -310,7 +310,6 @@ class TradingToTradingSwapTxEngineTest {
                 it.availableBalance == CryptoValue.zero(SRC_ASSET) &&
                 it.fees == CryptoValue.zero(SRC_ASSET) &&
                 it.selectedFiat == SELECTED_FIAT &&
-                it.feeLevel == FeeLevel.None &&
                 it.customFeeAmount == -1L &&
                 it.confirmations.isEmpty() &&
                 it.minLimit == null &&
@@ -318,6 +317,7 @@ class TradingToTradingSwapTxEngineTest {
                 it.validationState == ValidationState.PENDING_ORDERS_LIMIT_REACHED &&
                 it.engineState.isEmpty()
             }
+            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
             .assertNoErrors()
             .assertComplete()
 
@@ -354,7 +354,8 @@ class TradingToTradingSwapTxEngineTest {
             availableBalance = CryptoValue.zero(SRC_ASSET),
             fees = CryptoValue.zero(SRC_ASSET),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.None
+            feeLevel = FeeLevel.None,
+            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
         )
 
         val inputAmount = 2.bitcoin()
@@ -366,20 +367,187 @@ class TradingToTradingSwapTxEngineTest {
             pendingTx
         ).test()
             .assertValue {
-                val i = 10
                 it.amount == inputAmount &&
-                it.totalBalance == totalBalance &&
-                it.availableBalance == totalBalance &&
-                it.fees == expectedFee
+                    it.totalBalance == totalBalance &&
+                    it.availableBalance == totalBalance &&
+                    it.fees == expectedFee
             }
+            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
+            .assertComplete()
+            .assertNoErrors()
+
+            verify(sourceAccount, atLeastOnce()).asset
+            verify(txTarget, atLeastOnce()).asset
+            verifyQuotesEngineStarted()
+
+            verify(quotesEngine).updateAmount(inputAmount)
+
+            noMoreInteractions(txTarget)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `update fee level from NONE to PRIORITY is rejected`() {
+        // Arrange
+        val totalBalance: Money = 21.bitcoin()
+        val availableBalance: Money = 20.bitcoin()
+        val inputAmount = 2.bitcoin()
+        val initialFees = 0.bitcoin()
+
+        val sourceAccount = fundedSourceAccount(totalBalance, availableBalance)
+
+        val txTarget: CustodialTradingAccount = mock {
+            on { asset } itReturns TGT_ASSET
+        }
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = inputAmount,
+            totalBalance = totalBalance,
+            availableBalance = totalBalance,
+            fees = initialFees,
+            selectedFiat = SELECTED_FIAT,
+            feeLevel = FeeLevel.None,
+            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+        )
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.Priority,
+            -1
+        ).test()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `update fee level from NONE to REGULAR is rejected`() {
+        // Arrange
+        val totalBalance: Money = 21.bitcoin()
+        val availableBalance: Money = 20.bitcoin()
+        val inputAmount = 2.bitcoin()
+        val initialFees = 0.bitcoin()
+
+        val sourceAccount = fundedSourceAccount(totalBalance, availableBalance)
+
+        val txTarget: CustodialTradingAccount = mock {
+            on { asset } itReturns TGT_ASSET
+        }
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = inputAmount,
+            totalBalance = totalBalance,
+            availableBalance = totalBalance,
+            fees = initialFees,
+            selectedFiat = SELECTED_FIAT,
+            feeLevel = FeeLevel.None,
+            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+        )
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.Regular,
+            -1
+        ).test()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `update fee level from NONE to CUSTOM is rejected`() {
+        // Arrange
+        val totalBalance: Money = 21.bitcoin()
+        val availableBalance: Money = 20.bitcoin()
+        val inputAmount = 2.bitcoin()
+        val initialFees = 0.bitcoin()
+
+        val sourceAccount = fundedSourceAccount(totalBalance, availableBalance)
+
+        val txTarget: CustodialTradingAccount = mock {
+            on { asset } itReturns TGT_ASSET
+        }
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = inputAmount,
+            totalBalance = totalBalance,
+            availableBalance = totalBalance,
+            fees = initialFees,
+            selectedFiat = SELECTED_FIAT,
+            feeLevel = FeeLevel.None,
+            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+        )
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.Custom,
+            100
+        ).test()
+    }
+
+    @Test
+    fun `update fee level from NONE to NONE has no effect`() {
+        // Arrange
+        val totalBalance: Money = 21.bitcoin()
+        val availableBalance: Money = 20.bitcoin()
+        val inputAmount = 2.bitcoin()
+        val initialFees = 0.bitcoin()
+
+        val sourceAccount = fundedSourceAccount(totalBalance, availableBalance)
+
+        val txTarget: CustodialTradingAccount = mock {
+            on { asset } itReturns TGT_ASSET
+        }
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = inputAmount,
+            totalBalance = totalBalance,
+            availableBalance = totalBalance,
+            fees = initialFees,
+            selectedFiat = SELECTED_FIAT,
+            feeLevel = FeeLevel.None,
+            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+        )
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.None,
+                -1
+        ).test()
+            .assertValue {
+                it.amount == inputAmount &&
+                    it.totalBalance == totalBalance &&
+                    it.availableBalance == totalBalance &&
+                    it.fees == initialFees
+            }
+            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
             .assertComplete()
             .assertNoErrors()
 
         verify(sourceAccount, atLeastOnce()).asset
         verify(txTarget, atLeastOnce()).asset
         verifyQuotesEngineStarted()
-
-        verify(quotesEngine).updateAmount(inputAmount)
 
         noMoreInteractions(txTarget)
     }
@@ -419,6 +587,11 @@ class TradingToTradingSwapTxEngineTest {
         )
     }
 
+    private fun verifyFeeLevels(pendingTx: PendingTx, expectedLevel: FeeLevel) =
+        pendingTx.feeLevel == expectedLevel &&
+            pendingTx.availableFeeLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
+            pendingTx.availableFeeLevels.contains(pendingTx.feeLevel)
+
     private fun noMoreInteractions(txTarget: TransactionTarget) {
         verifyNoMoreInteractions(txTarget)
         verifyNoMoreInteractions(walletManager)
@@ -448,5 +621,7 @@ class TradingToTradingSwapTxEngineTest {
         private val MIN_GOLD_LIMIT_ASSET = CryptoValue.fromMajor(SRC_ASSET, 50.toBigDecimal())
         private val MAX_GOLD_ORDER_ASSET = CryptoValue.fromMajor(SRC_ASSET, 250.toBigDecimal())
         private val MAX_GOLD_LIMIT_ASSET = CryptoValue.fromMajor(SRC_ASSET, 1000.toBigDecimal())
+
+        private val EXPECTED_AVAILABLE_FEE_LEVELS = setOf(FeeLevel.None)
     }
 }

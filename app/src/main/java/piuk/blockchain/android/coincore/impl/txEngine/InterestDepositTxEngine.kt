@@ -7,6 +7,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmation
@@ -36,13 +37,28 @@ class InterestDepositTxEngine(
     override fun doInitialiseTx(): Single<PendingTx> =
         onChainTxEngine.doInitialiseTx()
             .flatMap { pendingTx ->
-                custodialWalletManager.getInterestLimits(asset).toSingle().map {
-                    pendingTx.copy(minLimit = it.minDepositAmount)
+                custodialWalletManager.getInterestLimits(asset)
+                    .toSingle()
+                    .map {
+                        pendingTx.copy(
+                            minLimit = it.minDepositAmount,
+                            feeLevel = FeeLevel.Priority,
+                            availableFeeLevels = AVAILABLE_FEE_LEVELS
+                        )
+                    }
                 }
-            }
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> =
         onChainTxEngine.doUpdateAmount(amount, pendingTx)
+
+    override fun doUpdateFeeLevel(
+        pendingTx: PendingTx,
+        level: FeeLevel,
+        customFeeAmount: Long
+    ): Single<PendingTx> {
+        // Does not support changing fees
+        return Single.just(pendingTx)
+    }
 
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         onChainTxEngine.doBuildConfirmations(pendingTx).map { pTx ->
@@ -145,4 +161,8 @@ class InterestDepositTxEngine(
         onChainTxEngine.doExecute(pendingTx, secondPassword)
 
     override fun doPostExecute(txResult: TxResult): Completable = txTarget.onTxCompleted(txResult)
+
+    companion object {
+        private val AVAILABLE_FEE_LEVELS = setOf(FeeLevel.Priority)
+    }
 }

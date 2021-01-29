@@ -27,8 +27,8 @@ import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import io.reactivex.Observable
 import io.reactivex.Single
-import junit.framework.Assert
 import org.amshove.kluent.itReturns
+import org.amshove.kluent.shouldEqual
 import org.bitcoinj.core.NetworkParameters
 import org.junit.After
 import org.junit.Before
@@ -52,7 +52,7 @@ import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
-class NonCustodialSellEngineTest {
+class OnChainSellTxEngineTest {
 
     @get:Rule
     val initSchedulers = rxInit {
@@ -79,7 +79,7 @@ class NonCustodialSellEngineTest {
 
     private val onChainEngine: OnChainTxEngineBase = mock()
 
-    private val subject = NonCustodialSellTxEngine(
+    private val subject = OnChainSellTxEngine(
         engine = onChainEngine,
         walletManager = walletManager,
         quotesEngine = quotesEngine,
@@ -196,7 +196,7 @@ class NonCustodialSellEngineTest {
         val asset = subject.asset
 
         // Assert
-        Assert.assertEquals(asset, SRC_ASSET)
+        asset shouldEqual SRC_ASSET
 
         verify(sourceAccount, atLeastOnce()).asset
         verify(txTarget, atLeastOnce()).fiatCurrency
@@ -215,7 +215,10 @@ class NonCustodialSellEngineTest {
         val availableBalance: Money = 20.bitcoin()
 
         whenUserIsGold()
-        whenOnChainEngineInitOK(totalBalance, availableBalance)
+        val initialFeeLevel = FeeLevel.Regular
+        val expectedFeeLevel = FeeLevel.Priority
+        val expectedFeeOptions = setOf(FeeLevel.Regular, FeeLevel.Priority)
+        whenOnChainEngineInitOK(totalBalance, availableBalance, initialFeeLevel, expectedFeeOptions)
 
         val sourceAccount = fundedSourceAccount(totalBalance, availableBalance)
 
@@ -248,7 +251,6 @@ class NonCustodialSellEngineTest {
                 it.availableBalance == availableBalance &&
                 it.fees == CryptoValue.zero(SRC_ASSET) &&
                 it.selectedFiat == TGT_ASSET &&
-                it.feeLevel == FeeLevel.Priority &&
                 it.customFeeAmount == -1L &&
                 it.confirmations.isEmpty() &&
                 it.minLimit == MIN_GOLD_LIMIT_ASSET &&
@@ -256,6 +258,7 @@ class NonCustodialSellEngineTest {
                 it.validationState == ValidationState.UNINITIALISED &&
                 it.engineState.isEmpty()
             }
+            .assertValue { verifyFeeLevels(it, expectedFeeLevel, expectedFeeOptions) }
             .assertNoErrors()
             .assertComplete()
 
@@ -267,6 +270,73 @@ class NonCustodialSellEngineTest {
         verify(quotesEngine).pricedQuote
         verify(exchangeRates).getLastPrice(SRC_ASSET, TGT_ASSET)
         verify(environmentConfig).bitcoinNetworkParameters
+        verify(onChainEngine).doInitialiseTx()
+
+        noMoreInteractions(txTarget)
+    }
+
+    @Test
+    fun `PendingTx is correctly initialised with flat regular fees`() {
+        // Arrange
+        val totalBalance: Money = 21.bitcoin()
+        val availableBalance: Money = 20.bitcoin()
+
+        whenUserIsGold()
+        val expectedFeeLevel = FeeLevel.Regular
+        val expectedFeeOptions = setOf(FeeLevel.Regular)
+        whenOnChainEngineInitOK(totalBalance, availableBalance, expectedFeeLevel, expectedFeeOptions)
+
+        val sourceAccount = fundedSourceAccount(totalBalance, availableBalance)
+
+        val txTarget: FiatAccount = mock {
+            on { fiatCurrency } itReturns TGT_ASSET
+        }
+
+        val txQuote: TransferQuote = mock {
+            on { sampleDepositAddress } itReturns SAMPLE_DEPOSIT_ADDRESS
+        }
+
+        val pricedQuote: PricedQuote = mock {
+            on { transferQuote } itReturns txQuote
+        }
+
+        whenever(quotesEngine.pricedQuote).thenReturn(Observable.just(pricedQuote))
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        // Act
+        subject.doInitialiseTx()
+            .test()
+            .assertValue {
+                it.amount == CryptoValue.zero(SRC_ASSET) &&
+                    it.totalBalance == totalBalance &&
+                    it.availableBalance == availableBalance &&
+                    it.fees == CryptoValue.zero(SRC_ASSET) &&
+                    it.selectedFiat == TGT_ASSET &&
+                    it.customFeeAmount == -1L &&
+                    it.confirmations.isEmpty() &&
+                    it.minLimit == MIN_GOLD_LIMIT_ASSET &&
+                    it.maxLimit == MAX_GOLD_LIMIT_ASSET &&
+                    it.validationState == ValidationState.UNINITIALISED &&
+                    it.engineState.isEmpty()
+            }
+            .assertValue { verifyFeeLevels(it, expectedFeeLevel, expectedFeeOptions) }
+            .assertNoErrors()
+            .assertComplete()
+
+        verify(sourceAccount, atLeastOnce()).asset
+        verify(txTarget, atLeastOnce()).fiatCurrency
+        verifyQuotesEngineStarted()
+        verifyOnChainEngineStarted(sourceAccount)
+        verifyLimitsFetched()
+        verify(quotesEngine).pricedQuote
+        verify(exchangeRates).getLastPrice(SRC_ASSET, TGT_ASSET)
+        verify(environmentConfig).bitcoinNetworkParameters
+        verify(onChainEngine).doInitialiseTx()
 
         noMoreInteractions(txTarget)
     }
@@ -304,7 +374,6 @@ class NonCustodialSellEngineTest {
                 it.availableBalance == CryptoValue.zero(SRC_ASSET) &&
                 it.fees == CryptoValue.zero(SRC_ASSET) &&
                 it.selectedFiat == TGT_ASSET &&
-                it.feeLevel == FeeLevel.None &&
                 it.customFeeAmount == -1L &&
                 it.confirmations.isEmpty() &&
                 it.minLimit == null &&
@@ -312,6 +381,7 @@ class NonCustodialSellEngineTest {
                 it.validationState == ValidationState.PENDING_ORDERS_LIMIT_REACHED &&
                 it.engineState.isEmpty()
             }
+            .assertValue { verifyFeeLevels(it, FeeLevel.Regular, setOf(FeeLevel.Regular)) }
             .assertNoErrors()
             .assertComplete()
 
@@ -344,13 +414,17 @@ class NonCustodialSellEngineTest {
         val inputAmount = 2.bitcoin()
         val expectedFee = 0.bitcoin()
 
+        val expectedFeeLevel = FeeLevel.Priority
+        val expectedAvailableFeeLevels = setOf(FeeLevel.Regular, FeeLevel.Priority)
+
         val pendingTx = PendingTx(
             amount = CryptoValue.zero(SRC_ASSET),
             totalBalance = CryptoValue.zero(SRC_ASSET),
             availableBalance = CryptoValue.zero(SRC_ASSET),
             fees = CryptoValue.zero(SRC_ASSET),
             selectedFiat = TGT_ASSET,
-            feeLevel = FeeLevel.Priority
+            feeLevel = expectedFeeLevel,
+            availableFeeLevels = expectedAvailableFeeLevels
         )
 
         whenever(onChainEngine.doUpdateAmount(inputAmount, pendingTx))
@@ -370,22 +444,86 @@ class NonCustodialSellEngineTest {
             inputAmount,
             pendingTx
         ).test()
-            .assertComplete()
-            .assertNoErrors()
             .assertValue {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == availableBalance &&
                 it.fees == expectedFee
             }
+            .assertValue { verifyFeeLevels(it, expectedFeeLevel, expectedAvailableFeeLevels) }
+            .assertComplete()
+            .assertNoErrors()
 
         verify(sourceAccount, atLeastOnce()).asset
         verify(txTarget, atLeastOnce()).fiatCurrency
-        verify(quotesEngine).start(
-            TransferDirection.FROM_USERKEY,
-            CurrencyPair.CryptoToFiatCurrencyPair(SRC_ASSET, TGT_ASSET)
-        )
+        verifyQuotesEngineStarted()
         verify(quotesEngine).updateAmount(inputAmount)
+        verify(onChainEngine).doUpdateAmount(inputAmount, pendingTx)
+
+        noMoreInteractions(txTarget)
+    }
+
+    @Test
+    fun `doUpdateFeeLevel delegates to the on-chain engine`() {
+        // Arrange
+        val totalBalance: Money = 21.bitcoin()
+        val availableBalance: Money = 20.bitcoin()
+
+        val sourceAccount = fundedSourceAccount(totalBalance, availableBalance)
+
+        val txTarget: FiatAccount = mock {
+            on { fiatCurrency } itReturns TGT_ASSET
+        }
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val initialFeeLevel = FeeLevel.Priority
+        val expectedFeeLevel = FeeLevel.Regular
+        val expectedAvailableFeeLevels = setOf(FeeLevel.Regular, FeeLevel.Priority)
+
+        val pendingTx = PendingTx(
+            amount = CryptoValue.zero(SRC_ASSET),
+            totalBalance = CryptoValue.zero(SRC_ASSET),
+            availableBalance = CryptoValue.zero(SRC_ASSET),
+            fees = CryptoValue.zero(SRC_ASSET),
+            selectedFiat = TGT_ASSET,
+            feeLevel = initialFeeLevel,
+            availableFeeLevels = expectedAvailableFeeLevels
+        )
+
+        whenever(
+            onChainEngine.doUpdateFeeLevel(
+                pendingTx,
+                FeeLevel.Regular,
+                -1
+            )
+        ).thenReturn(
+            Single.just(
+                pendingTx.copy(
+                    feeLevel = FeeLevel.Regular
+                )
+            )
+        )
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.Regular,
+            -1
+        ).test()
+            .assertValue {
+                verifyFeeLevels(it, expectedFeeLevel, expectedAvailableFeeLevels) }
+            .assertComplete()
+            .assertNoErrors()
+
+        verify(sourceAccount, atLeastOnce()).asset
+        verify(txTarget, atLeastOnce()).fiatCurrency
+        verifyQuotesEngineStarted()
+        verify(onChainEngine).doUpdateFeeLevel(pendingTx, FeeLevel.Regular, -1)
 
         noMoreInteractions(txTarget)
     }
@@ -397,14 +535,20 @@ class NonCustodialSellEngineTest {
             on { actionableBalance } itReturns Single.just(availableBalance)
         }
 
-    private fun whenOnChainEngineInitOK(totalBalance: Money, availableBalance: Money) {
+    private fun whenOnChainEngineInitOK(
+        totalBalance: Money,
+        availableBalance: Money,
+        initialFeeLevel: FeeLevel,
+        availableFeeOptions: Set<FeeLevel>
+    ) {
         val initialisedPendingTx = PendingTx(
             amount = CryptoValue.zero(SRC_ASSET),
             totalBalance = totalBalance,
             availableBalance = availableBalance,
             fees = CryptoValue.zero(SRC_ASSET),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Priority
+            feeLevel = initialFeeLevel,
+            availableFeeLevels = availableFeeOptions
         )
         whenever(onChainEngine.doInitialiseTx()).thenReturn(Single.just(initialisedPendingTx))
     }
@@ -446,6 +590,14 @@ class NonCustodialSellEngineTest {
         )
     }
 
+    private fun verifyFeeLevels(
+        pendingTx: PendingTx,
+        expectedLevel: FeeLevel,
+        expectedFeeOptions: Set<FeeLevel>
+    ) = pendingTx.feeLevel == expectedLevel &&
+            pendingTx.availableFeeLevels == expectedFeeOptions &&
+            pendingTx.availableFeeLevels.contains(pendingTx.feeLevel)
+
     private fun noMoreInteractions(txTarget: TransactionTarget) {
         verifyNoMoreInteractions(txTarget)
         verifyNoMoreInteractions(walletManager)
@@ -454,6 +606,7 @@ class NonCustodialSellEngineTest {
         verifyNoMoreInteractions(quotesEngine)
         verifyNoMoreInteractions(kycTierService)
         verifyNoMoreInteractions(environmentConfig)
+        verifyNoMoreInteractions(onChainEngine)
     }
 
     companion object {

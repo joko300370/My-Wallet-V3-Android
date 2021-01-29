@@ -15,12 +15,12 @@ import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 
-class CustodialSellTxEngine(
+class TradingSellTxEngine(
     walletManager: CustodialWalletManager,
     quotesEngine: TransferQuotesEngine,
     kycTierService: TierService,
     environmentConfig: EnvironmentConfig
-) : SellTxEngine(walletManager, kycTierService, quotesEngine, environmentConfig) {
+) : SellTxEngineBase(walletManager, kycTierService, quotesEngine, environmentConfig) {
 
     override val direction: TransferDirection
         get() = TransferDirection.INTERNAL
@@ -43,7 +43,8 @@ class CustodialSellTxEngine(
                         availableBalance = balance,
                         fees = CryptoValue.zero(asset),
                         selectedFiat = userFiat,
-                        feeLevel = FeeLevel.None
+                        feeLevel = FeeLevel.None,
+                        availableFeeLevels = AVAILABLE_FEE_LEVELS
                     )
                 ).flatMap {
                     updateLimits(it, quote)
@@ -73,11 +74,25 @@ class CustodialSellTxEngine(
             .clearConfirmations()
     }
 
+    override fun doUpdateFeeLevel(
+        pendingTx: PendingTx,
+        level: FeeLevel,
+        customFeeAmount: Long
+    ): Single<PendingTx> {
+        require(pendingTx.availableFeeLevels.contains(level))
+        // This engine only supports FeeLevel.None, so
+        return Single.just(pendingTx)
+    }
+
     override val requireSecondPassword: Boolean
         get() = false
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
         createSellOrder(pendingTx).map {
-            TxResult.UnHashedTxResult(pendingTx.amount) as TxResult
+            TxResult.UnHashedTxResult(pendingTx.amount)
         }
+
+    companion object {
+        private val AVAILABLE_FEE_LEVELS = setOf(FeeLevel.None)
+    }
 }

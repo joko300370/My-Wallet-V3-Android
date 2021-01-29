@@ -79,6 +79,7 @@ class XlmOnChainTxEngine(
                 availableBalance = CryptoValue.zero(asset),
                 fees = CryptoValue.zero(asset),
                 feeLevel = FeeLevel.Regular,
+                availableFeeLevels = AVAILABLE_FEE_LEVELS,
                 selectedFiat = userFiat
             ).setMemo(
                 TxConfirmationValue.Memo(
@@ -117,7 +118,7 @@ class XlmOnChainTxEngine(
 
     private fun validateAmounts(pendingTx: PendingTx): Completable =
         Completable.fromCallable {
-            if (pendingTx.amount <= CryptoValue.ZeroXlm) {
+            if (pendingTx.amount <= CryptoValue.zero(asset)) {
                 throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
             }
         }
@@ -161,12 +162,12 @@ class XlmOnChainTxEngine(
             }
     }
 
-    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
+    override fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
         TxConfirmationValue.FeeSelection(
             feeDetails = FeeState.FeeDetails(pendingTx.fees),
             exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
             selectedLevel = pendingTx.feeLevel,
-            availableLevels = setOf(FeeLevel.Regular),
+            availableLevels = AVAILABLE_FEE_LEVELS,
             asset = sourceAccount.asset
         )
 
@@ -260,10 +261,9 @@ class XlmOnChainTxEngine(
         }
 
     companion object {
+        private val AVAILABLE_FEE_LEVELS = setOf(FeeLevel.Regular)
         // These map 1:1 to FailureReason enum class in HorizonProxy
-
         const val SUCCESS = 0
-
         const val UNKNOWN_ERROR = 1
 
         /**

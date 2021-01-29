@@ -2,7 +2,6 @@ package com.blockchain.sunriver
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.withMajorValue
 import org.stellar.sdk.AssetTypeNative
 import org.stellar.sdk.CreateAccountOperation
 import org.stellar.sdk.KeyPair
@@ -184,7 +183,7 @@ internal class HorizonProxy {
     /**
      * TODO("AND-1601") Get min reserve dynamically.
      */
-    private val minReserve = CryptoCurrency.XLM.withMajorValue(0.5.toBigDecimal())
+    private val minReserve = CryptoValue.fromMajor(CryptoCurrency.XLM, 0.5.toBigDecimal())
     private val minSend = CryptoValue(CryptoCurrency.XLM, BigInteger.ONE)
 
     class SendResult(

@@ -473,7 +473,7 @@ class PayloadDataManager(
 
     /**
      * Returns the balance of an address. If the address isn't found in the address map object, the
-     * method will return [CryptoValue.ZeroBtc] instead of a null object.
+     * method will return CryptoValue.Zero(Btc) instead of a null object.
      *
      * @param address The address whose balance you wish to query
      * @return A [CryptoValue] representing the total funds in the address

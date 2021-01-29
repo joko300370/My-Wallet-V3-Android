@@ -42,7 +42,7 @@ internal class XlmCryptoWalletAccount(
     override val accountBalance: Single<Money>
         get() = xlmManager.getBalance()
             .doOnSuccess {
-                hasFunds.set(it > CryptoValue.ZeroXlm)
+                hasFunds.set(it > CryptoValue.zero(asset))
             }
             .map { it as Money }
 

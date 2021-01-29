@@ -37,7 +37,7 @@ const val USER_TIER = "USER_TIER"
 private val PendingTx.userTier: KycTiers
     get() = (this.engineState[USER_TIER] as KycTiers)
 
-abstract class SwapEngineBase(
+abstract class SwapTxEngineBase(
     quotesEngine: TransferQuotesEngine,
     private val walletManager: CustodialWalletManager,
     kycTierService: TierService,

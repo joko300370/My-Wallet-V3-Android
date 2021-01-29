@@ -35,6 +35,7 @@ class TradingToOnChainTxEngine(
                 availableBalance = CryptoValue.zero(sourceAccount.asset),
                 fees = CryptoValue.zero(sourceAccount.asset),
                 feeLevel = FeeLevel.None,
+                availableFeeLevels = AVAILABLE_FEE_LEVELS,
                 selectedFiat = userFiat
             )
         )
@@ -53,6 +54,16 @@ class TradingToOnChainTxEngine(
                 availableBalance = available
             )
         }
+    }
+
+    override fun doUpdateFeeLevel(
+        pendingTx: PendingTx,
+        level: FeeLevel,
+        customFeeAmount: Long
+    ): Single<PendingTx> {
+        require(pendingTx.availableFeeLevels.contains(level))
+        // This engine only supports FeeLevel.None, so
+        return Single.just(pendingTx)
     }
 
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
@@ -98,5 +109,9 @@ class TradingToOnChainTxEngine(
             .map {
                 TxResult.UnHashedTxResult(pendingTx.amount)
             }
+    }
+
+    companion object {
+        private val AVAILABLE_FEE_LEVELS = setOf(FeeLevel.None)
     }
 }

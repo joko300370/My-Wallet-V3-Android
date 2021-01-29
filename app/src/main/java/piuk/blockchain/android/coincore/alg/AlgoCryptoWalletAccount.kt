@@ -22,7 +22,7 @@ internal class AlgoCryptoWalletAccount(
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ALGO) {
 
     override val accountBalance: Single<Money>
-        get() = Single.just(CryptoValue.ZeroAlg)
+        get() = Single.just(CryptoValue.zero(asset))
 
     override val actionableBalance: Single<Money>
         get() = accountBalance

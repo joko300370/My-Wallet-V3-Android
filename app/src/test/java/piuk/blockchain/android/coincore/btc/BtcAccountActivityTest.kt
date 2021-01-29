@@ -99,9 +99,9 @@ class BtcAccountActivityTest {
             "sendingAddress",
             "receivingAddress",
             CustodialOrderState.FINISHED,
-            CryptoValue.ZeroBtc,
-            CryptoValue.ZeroEth,
-            CryptoValue.ZeroEth,
+            CryptoValue.zero(CryptoCurrency.BTC),
+            CryptoValue.zero(CryptoCurrency.ETHER),
+            CryptoValue.zero(CryptoCurrency.ETHER),
             CurrencyPair.CryptoCurrencyPair(CryptoCurrency.BTC, CryptoCurrency.ETHER),
             FiatValue.zero("USD"),
             "USD"

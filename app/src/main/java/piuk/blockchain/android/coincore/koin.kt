@@ -15,6 +15,7 @@ import piuk.blockchain.android.coincore.eth.EthAsset
 import piuk.blockchain.android.coincore.fiat.FiatAsset
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.coincore.impl.TxProcessorFactory
+import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.android.coincore.stx.StxAsset
 import piuk.blockchain.android.coincore.xlm.XlmAsset
 import piuk.blockchain.android.repositories.AssetActivityRepository
@@ -239,7 +240,7 @@ val coincoreModule = module {
                 exchangeRates = get(),
                 walletManager = get(),
                 walletPrefs = get(),
-                quotesProvider = get(),
+                quotesEngine = get(),
                 analytics = get(),
                 kycTierService = get(),
                 environmentConfig = get()
@@ -265,6 +266,10 @@ val coincoreModule = module {
                 payloadManager = get(),
                 walletApi = get()
             )
+        }
+
+        factory {
+            TransferQuotesEngine(quotesProvider = get())
         }
     }
 }

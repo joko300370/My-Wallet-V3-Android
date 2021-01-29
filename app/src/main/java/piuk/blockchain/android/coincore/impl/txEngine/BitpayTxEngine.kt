@@ -159,6 +159,15 @@ class BtcBitpayTxEngine(
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> =
         Single.just(pendingTx)
 
+    override fun doUpdateFeeLevel(
+        pendingTx: PendingTx,
+        level: FeeLevel,
+        customFeeAmount: Long
+    ): Single<PendingTx> {
+        // Does not support changing fees
+        return Single.just(pendingTx)
+    }
+
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         assetEngine.doValidateAmount(pendingTx)
 

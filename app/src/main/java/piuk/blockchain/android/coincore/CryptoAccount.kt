@@ -116,7 +116,7 @@ class NullCryptoAccount(
         get() = Single.just(TxSourceState.NOT_SUPPORTED)
 
     override val accountBalance: Single<Money>
-        get() = Single.just(CryptoValue.ZeroBtc)
+        get() = Single.just(CryptoValue.zero(asset))
 
     override val actionableBalance: Single<Money>
         get() = accountBalance
@@ -162,7 +162,7 @@ object NullFiatAccount : FiatAccount {
     override val label: String = ""
 
     override val accountBalance: Single<Money>
-        get() = Single.just(CryptoValue.ZeroBtc)
+        get() = Single.just(FiatValue.zero(fiatCurrency))
 
     override val actionableBalance: Single<Money>
         get() = accountBalance

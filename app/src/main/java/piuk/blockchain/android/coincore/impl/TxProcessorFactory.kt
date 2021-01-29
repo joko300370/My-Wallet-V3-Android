@@ -3,7 +3,6 @@ package piuk.blockchain.android.coincore.impl
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.nabu.service.TierService
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AssetAction
@@ -15,12 +14,12 @@ import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TransferError
 import piuk.blockchain.android.coincore.impl.txEngine.BtcBitpayTxEngine
-import piuk.blockchain.android.coincore.impl.txEngine.sell.CustodialSellTxEngine
+import piuk.blockchain.android.coincore.impl.txEngine.sell.TradingSellTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.InterestDepositTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.impl.txEngine.TradingToOnChainTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
-import piuk.blockchain.android.coincore.impl.txEngine.sell.NonCustodialSellTxEngine
+import piuk.blockchain.android.coincore.impl.txEngine.sell.OnChainSellTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.swap.OnChainSwapTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.swap.TradingToTradingSwapTxEngine
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
@@ -32,7 +31,7 @@ class TxProcessorFactory(
     private val exchangeRates: ExchangeRateDataManager,
     private val walletManager: CustodialWalletManager,
     private val walletPrefs: WalletStatus,
-    private val quotesProvider: QuotesProvider,
+    private val quotesEngine: TransferQuotesEngine,
     private val analytics: Analytics,
     private val kycTierService: TierService,
     private val environmentConfig: EnvironmentConfig
@@ -105,7 +104,7 @@ class TxProcessorFactory(
                             sourceAccount = source,
                             txTarget = target,
                             engine = OnChainSwapTxEngine(
-                                quotesEngine = TransferQuotesEngine(quotesProvider),
+                                quotesEngine = quotesEngine,
                                 walletManager = walletManager,
                                 kycTierService = kycTierService,
                                 engine = engine,
@@ -119,8 +118,8 @@ class TxProcessorFactory(
                     exchangeRates = exchangeRates,
                     sourceAccount = source,
                     txTarget = target,
-                    engine = NonCustodialSellTxEngine(
-                        quotesEngine = TransferQuotesEngine(quotesProvider),
+                    engine = OnChainSellTxEngine(
+                        quotesEngine = quotesEngine,
                         walletManager = walletManager,
                         kycTierService = kycTierService,
                         engine = engine,
@@ -157,7 +156,7 @@ class TxProcessorFactory(
                     txTarget = target,
                     engine = TradingToTradingSwapTxEngine(
                         walletManager = walletManager,
-                        quotesEngine = TransferQuotesEngine(quotesProvider),
+                        quotesEngine = quotesEngine,
                         kycTierService = kycTierService,
                         environmentConfig = environmentConfig
                     )
@@ -181,9 +180,9 @@ class TxProcessorFactory(
                     exchangeRates = exchangeRates,
                     sourceAccount = source,
                     txTarget = target,
-                    engine = CustodialSellTxEngine(
+                    engine = TradingSellTxEngine(
                         walletManager = walletManager,
-                        quotesEngine = TransferQuotesEngine(quotesProvider),
+                        quotesEngine = quotesEngine,
                         kycTierService = kycTierService,
                         environmentConfig = environmentConfig
                     )

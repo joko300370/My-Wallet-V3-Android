@@ -25,7 +25,7 @@ import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import java.math.RoundingMode
 
-abstract class SellTxEngine(
+abstract class SellTxEngineBase(
     private val walletManager: CustodialWalletManager,
     kycTierService: TierService,
     quotesEngine: TransferQuotesEngine,

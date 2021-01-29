@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.impl.txEngine
 
+import androidx.annotation.CallSuper
 import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.data.FeeOptions
@@ -38,10 +39,10 @@ abstract class OnChainTxEngineBase(
     private fun FeeLevel.mapFeeLevelToSavedValue() =
         this.ordinal
 
-    private fun setFeeType(cryptoCurrency: CryptoCurrency, feeLevel: FeeLevel) =
+    private fun storeDefaultFeeLevel(cryptoCurrency: CryptoCurrency, feeLevel: FeeLevel) =
         walletPreferences.setFeeTypeForAsset(cryptoCurrency, feeLevel.mapFeeLevelToSavedValue())
 
-    protected fun getFeeType(cryptoCurrency: CryptoCurrency): Int? =
+    protected fun fetchDefaultFeeLevel(cryptoCurrency: CryptoCurrency): Int? =
         walletPreferences.getFeeTypeForAsset(cryptoCurrency)
 
     protected fun getFeeState(pTx: PendingTx, feeOptions: FeeOptions? = null) =
@@ -68,26 +69,67 @@ abstract class OnChainTxEngineBase(
             }
         }
 
-    protected fun updateFeeSelection(
+    final override fun doUpdateFeeLevel(
+        pendingTx: PendingTx,
+        level: FeeLevel,
+        customFeeAmount: Long
+    ): Single<PendingTx> {
+        require(pendingTx.availableFeeLevels.contains(level))
+
+        return if (pendingTx.hasFeeLevelChanged(level, customFeeAmount)) {
+            updateFeeSelection(
+                asset,
+                pendingTx,
+                level,
+                customFeeAmount
+            )
+        } else {
+            Single.just(pendingTx)
+        }
+    }
+
+    @CallSuper
+    override fun doOptionUpdateRequest(pendingTx: PendingTx, newConfirmation: TxConfirmationValue): Single<PendingTx> =
+        if (newConfirmation is TxConfirmationValue.FeeSelection) {
+            if (pendingTx.hasFeeLevelChanged(newConfirmation.selectedLevel, newConfirmation.customFeeAmount)) {
+                updateFeeSelection(
+                    asset,
+                    pendingTx,
+                    newConfirmation.selectedLevel,
+                    newConfirmation.customFeeAmount
+                )
+                .flatMap { pTx -> doValidateAmount(pTx) }
+                .flatMap { pTx -> doBuildConfirmations(pTx) }
+            } else {
+                super.doOptionUpdateRequest(pendingTx, makeFeeSelectionOption(pendingTx))
+            }
+        } else {
+            super.doOptionUpdateRequest(pendingTx, newConfirmation)
+        }
+
+    protected abstract fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection
+
+    private fun updateFeeSelection(
         cryptoCurrency: CryptoCurrency,
         pendingTx: PendingTx,
-        newConfirmation: TxConfirmationValue.FeeSelection
+        newFeeLevel: FeeLevel,
+        customFeeAmount: Long = -1
     ): Single<PendingTx> {
-        setFeeType(cryptoCurrency, newConfirmation.selectedLevel)
+        storeDefaultFeeLevel(cryptoCurrency, newFeeLevel)
 
         return doUpdateAmount(
-            pendingTx.amount, pendingTx.copy(
-                feeLevel = newConfirmation.selectedLevel,
-                customFeeAmount = newConfirmation.customFeeAmount
+            amount = pendingTx.amount,
+            pendingTx = pendingTx.copy(
+                feeLevel = newFeeLevel,
+                customFeeAmount = customFeeAmount
             )
         )
-            .flatMap { pTx -> doValidateAmount(pTx) }
-            .flatMap { pTx -> doBuildConfirmations(pTx) }
     }
+
+    private fun PendingTx.hasFeeLevelChanged(newLevel: FeeLevel, newAmount: Long) =
+        feeLevel != newLevel || (feeLevel == FeeLevel.Custom && newAmount != customFeeAmount)
 
     companion object {
         const val MINIMUM_CUSTOM_FEE = 1L
-        const val maxBTCAmount = 2_100_000_000_000_000L
-        const val maxBCHAmount = 2_100_000_000_000_000L
     }
 }

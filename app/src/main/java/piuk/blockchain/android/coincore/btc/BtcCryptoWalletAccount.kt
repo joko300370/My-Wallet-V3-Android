@@ -70,7 +70,7 @@ internal class BtcCryptoWalletAccount(
     private fun getAccountBalance(forceRefresh: Boolean): Single<Money> =
         payloadDataManager.getAddressBalanceRefresh(xpubAddress, forceRefresh)
             .doOnSuccess {
-                hasFunds.set(it > CryptoValue.ZeroBtc)
+                hasFunds.set(it > CryptoValue.zero(asset))
             }
             .map { it }
 
