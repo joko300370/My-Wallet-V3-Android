@@ -35,9 +35,8 @@ abstract class SellTxEngineBase(
     val target: FiatAccount
         get() = txTarget as FiatAccount
 
-    override val userFiat: String by lazy {
-        target.fiatCurrency
-    }
+    override val userFiat: String
+      get() =   target.fiatCurrency
 
     override fun onLimitsForTierFetched(
         tier: KycTiers,

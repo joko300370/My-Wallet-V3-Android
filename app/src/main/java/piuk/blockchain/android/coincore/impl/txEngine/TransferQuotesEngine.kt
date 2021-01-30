@@ -29,8 +29,8 @@ class TransferQuotesEngine(
         BehaviorSubject.createDefault(pair.toSourceMoney(BigInteger.ZERO))
     }
 
-    private val quote: Observable<TransferQuote> by lazy {
-        quotesProvider.fetchQuote(direction = direction, pair = pair).flatMapObservable { quote ->
+    private val quote: Observable<TransferQuote>
+       get() =  quotesProvider.fetchQuote(direction = direction, pair = pair).flatMapObservable { quote ->
             Observable.interval(
                 quote.creationDate.diffInSeconds(quote.expirationDate),
                 quote.creationDate.diffInSeconds(quote.expirationDate),
@@ -39,10 +39,9 @@ class TransferQuotesEngine(
                 quotesProvider.fetchQuote(direction = direction, pair = pair)
             }.startWith(quote)
         }.takeUntil(stop)
-    }
 
-    val pricedQuote: Observable<PricedQuote> by lazy {
-        Observables.combineLatest(quote, amount).map { (quote, amount) ->
+    val pricedQuote: Observable<PricedQuote>
+    get() = Observables.combineLatest(quote, amount).map { (quote, amount) ->
             PricedQuote(
                 PricesInterpolator(
                     list = quote.prices,
@@ -52,26 +51,14 @@ class TransferQuotesEngine(
         }.doOnNext {
             latestQuote = it
         }.share().replay(1).refCount()
-    }
+
 
     fun start(
         direction: TransferDirection,
         pair: CurrencyPair
     ) {
-        // This is a bit of a hack, to make the clients of this code testable.
-        // start() can be called multiple times by a given client, but we only care about the first.
-        // Since the params should NOT change between invocations, we will enforce it as an invariant.
-        // TODO: Fix this properly, once the test framework is all in place.
-        if (this::direction.isInitialized) {
-            require(this.direction == direction)
-        } else {
             this.direction = direction
-        }
-        if (this::pair.isInitialized) {
-            require(this.pair == pair)
-        } else {
             this.pair = pair
-        }
     }
 
     fun stop() {

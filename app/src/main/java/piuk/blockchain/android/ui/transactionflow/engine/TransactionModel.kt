@@ -149,7 +149,6 @@ class TransactionModel(
                     transactionTarget = intent.target,
                     action = intent.action
                 )
-                null
             }
             is TransactionIntent.TargetSelected ->
                 processTargetSelectionConfirmed(
@@ -215,7 +214,7 @@ class TransactionModel(
         Timber.v("!TRANSACTION!> Transaction Model: state update -> $s")
     }
 
-    private fun processInvalidateTransaction(): Disposable? =
+    private fun processInvalidateTransaction(): Disposable =
         interactor.invalidateTransaction()
             .subscribeBy(
                 onComplete = {
@@ -277,8 +276,15 @@ class TransactionModel(
                 )
                     onFirstUpdate(amount)
             }
+            .doOnDispose {
+                println("Disposeddddd ${transactionTarget.label}")
+            }
+            .doOnComplete {
+                println("Disposeddddd completeddd ${transactionTarget.label}")
+            }
             .subscribeBy(
                 onNext = {
+                    println("Disposeddddd onNext pxUpdated ${transactionTarget.label}")
                     process(TransactionIntent.PendingTxUpdated(it))
                 },
                 onError = {

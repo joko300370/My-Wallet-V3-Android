@@ -35,7 +35,6 @@ class OnChainSellTxEngine(
     override fun assertInputsValid() {
         check(sourceAccount is CryptoNonCustodialAccount)
         check(txTarget is FiatAccount)
-        engine.assertInputsValid()
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
@@ -43,6 +42,7 @@ class OnChainSellTxEngine(
             .firstOrError()
             .doOnSuccess { pricedQuote ->
                 engine.startFromQuote(pricedQuote)
+                engine.assertInputsValid()
             }.flatMap { quote ->
                 engine.doInitialiseTx()
                     .flatMap {

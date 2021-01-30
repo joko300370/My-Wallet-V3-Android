@@ -13,6 +13,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.zipWith
+import io.reactivex.subjects.PublishSubject
 import piuk.blockchain.android.coincore.AddressFactory
 import piuk.blockchain.android.coincore.AddressParseError
 import piuk.blockchain.android.coincore.AssetAction
@@ -42,9 +43,11 @@ class TransactionInteractor(
     private val accountsSorting: AccountsSorting
 ) {
     private var transactionProcessor: TransactionProcessor? = null
+    private val invalidate = PublishSubject.create<Unit>()
 
     fun invalidateTransaction() =
         Completable.fromAction {
+            invalidate.onNext(Unit)
             transactionProcessor = null
         }
 
@@ -54,7 +57,7 @@ class TransactionInteractor(
     fun validateTargetAddress(address: String, asset: CryptoCurrency): Single<ReceiveAddress> =
         addressFactory.parse(address, asset)
             .switchIfEmpty(
-                Single.error<ReceiveAddress>(
+                Single.error(
                     TxValidationFailure(ValidationState.INVALID_ADDRESS)
                 )
             )
@@ -82,7 +85,7 @@ class TransactionInteractor(
                 Timber.e("!TRANSACTION!> error initialising $it")
             }.flatMapObservable {
                 it.initialiseTx()
-            }
+            }.takeUntil(invalidate)
 
     val canTransactFiat: Boolean
         get() = transactionProcessor?.canTransactFiat ?: throw IllegalStateException("TxProcessor not initialised")
@@ -156,16 +159,18 @@ class TransactionInteractor(
 
     fun startFiatRateFetch(): Observable<ExchangeRate.CryptoToFiat> =
         transactionProcessor?.userExchangeRate()
+            ?.takeUntil(invalidate)
             ?.map { it as ExchangeRate.CryptoToFiat }
             ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun startTargetRateFetch(): Observable<ExchangeRate> =
-        transactionProcessor?.targetExchangeRate() ?: throw IllegalStateException("TxProcessor not initialised")
+        transactionProcessor?.targetExchangeRate()?.takeUntil(invalidate) ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun validateTransaction(): Completable =
         transactionProcessor?.validateAll() ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun reset() {
+        invalidate.onNext(Unit)
         transactionProcessor?.reset() ?: Timber.i("TxProcessor is not initialised yet")
     }
 }
