@@ -24,7 +24,6 @@ import piuk.blockchain.android.ui.kyc.countryselection.adapter.CountryCodeAdapte
 import piuk.blockchain.android.ui.kyc.countryselection.models.CountrySelectionState
 import piuk.blockchain.android.ui.kyc.countryselection.util.CountryDisplayModel
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
-import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import piuk.blockchain.android.ui.kyc.navigate
 import piuk.blockchain.android.ui.kyc.search.filterCountries
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -72,18 +71,13 @@ internal class KycCountrySelectionFragment :
         when (regionType) {
             RegionType.Country -> {
                 logEvent(AnalyticsEvents.KycCountry)
-                progressListener.setHostTitle(R.string.kyc_country_selection_title)
-                search_view.queryHint = getString(R.string.kyc_country_selection_search_hint)
+                progressListener.setHostTitle(R.string.kyc_country_selection_title_1)
             }
             RegionType.State -> {
                 logEvent(AnalyticsEvents.KycStates)
                 progressListener.setHostTitle(R.string.kyc_country_selection_state_title)
-                search_view.queryHint = getString(R.string.kyc_state_selection_search_hint)
             }
         }
-
-        progressListener.incrementProgress(KycStep.CountrySelection)
-
         onViewReady()
     }
 
@@ -92,8 +86,7 @@ internal class KycCountrySelectionFragment :
 
         compositeDisposable += countryList
             .filterCountries(
-                search_view.queryTextChanges().skipInitialValue()
-                    .debounce(100, TimeUnit.MILLISECONDS)
+                search_view.queryTextChanges().debounce(100, TimeUnit.MILLISECONDS)
             )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {

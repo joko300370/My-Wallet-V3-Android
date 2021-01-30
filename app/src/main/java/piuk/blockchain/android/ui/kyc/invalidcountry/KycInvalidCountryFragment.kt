@@ -39,8 +39,7 @@ class KycInvalidCountryFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        progressListener.setHostTitle(R.string.kyc_country_selection_title)
-        progressListener.incrementProgress(KycStep.SplashPage)
+        progressListener.setHostTitle(R.string.kyc_country_selection_title_1)
 
         textViewHeader.text = getString(R.string.kyc_invalid_country_header, displayModel.name)
         textViewMessage.text = getString(R.string.kyc_invalid_country_message, displayModel.name)

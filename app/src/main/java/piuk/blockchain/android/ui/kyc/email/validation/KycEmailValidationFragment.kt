@@ -70,7 +70,6 @@ class KycEmailValidationFragment :
         super.onViewCreated(view, savedInstanceState)
         logEvent(AnalyticsEvents.KycEmail)
         progressListener.setHostTitle(R.string.kyc_email_title)
-        progressListener.incrementProgress(KycStep.EmailVerifiedPage)
         textViewEmail.text = email
 
         val linksMap = mapOf<String, Uri?>(

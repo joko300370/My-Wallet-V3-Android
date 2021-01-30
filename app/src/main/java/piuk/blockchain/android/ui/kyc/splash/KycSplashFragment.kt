@@ -85,7 +85,6 @@ class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), Kyc
         }
 
         progressListener.setHostTitle(title)
-        progressListener.incrementProgress(KycStep.SplashPage)
 
         textViewTerms.renderTermsLinks(
             R.string.buy_sell_splash_terms_and_conditions,

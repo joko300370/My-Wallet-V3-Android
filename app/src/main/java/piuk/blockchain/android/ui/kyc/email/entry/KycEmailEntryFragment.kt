@@ -70,7 +70,6 @@ class KycEmailEntryFragment : BaseFragment<KycEmailEntryView, KycEmailEntryPrese
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         progressListener.setHostTitle(R.string.kyc_email_title)
-        progressListener.incrementProgress(KycStep.EmailPage)
 
         editTextEmail.setOnFocusChangeListener { _, hasFocus ->
             inputLayoutEmail.hint = if (hasFocus) {
@@ -132,19 +131,10 @@ class KycEmailEntryFragment : BaseFragment<KycEmailEntryView, KycEmailEntryPrese
             .map { mapToCompleted(it) }
             .distinctUntilChanged()
             .doOnNext {
-                updateProgress(it, kycStep)
                 buttonNext.isEnabled = it
             }
 
     private fun mapToCompleted(text: String): Boolean = emailIsValid(text)
-
-    private fun updateProgress(stepCompleted: Boolean, kycStep: KycStep) {
-        if (stepCompleted) {
-            progressListener.incrementProgress(kycStep)
-        } else {
-            progressListener.decrementProgress(kycStep)
-        }
-    }
 
     override fun createPresenter(): KycEmailEntryPresenter = presenter
 

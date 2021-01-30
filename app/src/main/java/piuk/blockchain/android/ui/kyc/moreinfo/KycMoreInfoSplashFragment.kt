@@ -36,7 +36,6 @@ class KycMoreInfoSplashFragment : Fragment() {
         logEvent(AnalyticsEvents.KycMoreInfo)
 
         progressListener.setHostTitle(R.string.kyc_more_info_splash_title)
-        progressListener.incrementProgress(KycStep.SplashPage)
     }
 
     private val disposable = CompositeDisposable()

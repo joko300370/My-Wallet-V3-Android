@@ -82,7 +82,6 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
         }
         container.visibility = if (showContent) View.VISIBLE else View.GONE
         progressListener.setHostTitle(title)
-        progressListener.incrementProgress(KycStep.SplashPage)
 
         textViewEligible.renderSingleLink(
             R.string.by_completing_gold_level_you_will_be_eligible_to_participate_in_our_airdrop_program,

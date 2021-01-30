@@ -214,7 +214,6 @@ class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresente
     private fun showContentState() {
         dismissProgressDialog()
         progressListener.setHostTitle(R.string.kyc_veriff_splash_title)
-        progressListener.incrementProgress(KycStep.VeriffSplashPage)
         error_layout.gone()
         content_view.visible()
         loading_view.gone()
