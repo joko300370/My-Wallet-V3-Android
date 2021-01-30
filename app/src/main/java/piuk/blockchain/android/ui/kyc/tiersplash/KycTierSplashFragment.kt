@@ -36,7 +36,6 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.ui.kyc.hyperlinks.renderSingleLink
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
-import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import piuk.blockchain.android.ui.kyc.navigate
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow

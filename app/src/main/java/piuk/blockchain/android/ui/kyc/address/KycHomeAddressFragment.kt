@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import android.content.Intent
 import android.location.Geocoder
 import android.os.Bundle
-import com.google.android.material.textfield.TextInputLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import android.view.LayoutInflater
@@ -23,7 +22,6 @@ import piuk.blockchain.android.ui.kyc.address.models.AddressDialog
 import piuk.blockchain.android.ui.kyc.address.models.AddressIntent
 import piuk.blockchain.android.ui.kyc.address.models.AddressModel
 import piuk.blockchain.android.ui.kyc.extensions.skipFirstUnless
-import piuk.blockchain.android.ui.kyc.hyperlinks.renderTermsLinks
 import com.blockchain.notifications.analytics.logEvent
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
 import piuk.blockchain.android.ui.kyc.navhost.models.KycStep

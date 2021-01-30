@@ -8,7 +8,6 @@ import com.blockchain.koin.scopedInject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
-import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpFragment
 import piuk.blockchain.android.ui.kyc.ParentActivityDelegate

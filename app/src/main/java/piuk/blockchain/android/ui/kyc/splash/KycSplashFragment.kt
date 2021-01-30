@@ -22,7 +22,6 @@ import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.kyc.hyperlinks.renderTermsLinks
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
-import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import piuk.blockchain.android.ui.kyc.navigate
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment

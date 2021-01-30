@@ -12,7 +12,6 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.logEvent
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
-import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import piuk.blockchain.android.ui.kyc.navigate
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.KYCAnalyticsEvents

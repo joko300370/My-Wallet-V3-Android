@@ -23,7 +23,6 @@ import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
-import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import piuk.blockchain.android.ui.kyc.navigate
 import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
 import piuk.blockchain.android.util.inflate

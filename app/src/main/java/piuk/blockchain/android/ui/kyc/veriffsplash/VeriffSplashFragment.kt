@@ -32,7 +32,6 @@ import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
-import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.util.StringUtils
