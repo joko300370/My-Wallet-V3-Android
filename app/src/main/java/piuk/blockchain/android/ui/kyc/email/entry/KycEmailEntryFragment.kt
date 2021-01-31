@@ -82,6 +82,11 @@ class KycEmailEntryFragment : BaseFragment<KycEmailEntryView, KycEmailEntryPrese
         onViewReady()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        presenter.dispose()
+    }
+
     override fun onResume() {
         super.onResume()
 
