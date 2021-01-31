@@ -284,7 +284,6 @@ class TransactionModel(
             }
             .subscribeBy(
                 onNext = {
-                    println("Disposeddddd onNext pxUpdated ${transactionTarget.label}")
                     process(TransactionIntent.PendingTxUpdated(it))
                 },
                 onError = {
