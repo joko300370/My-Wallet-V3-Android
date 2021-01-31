@@ -47,7 +47,7 @@ class TransactionInteractor(
 
     fun invalidateTransaction() =
         Completable.fromAction {
-            invalidate.onNext(Unit)
+            reset()
             transactionProcessor = null
         }
 
@@ -107,8 +107,10 @@ class TransactionInteractor(
             .zipWith(availableFiats) { supportedPairs, fiats ->
                 supportedPairs.pairs.filter { fiats.contains(it.fiatCurrency) }
                     .map {
-                        CurrencyPair.CryptoToFiatCurrencyPair(it.cryptoCurrency,
-                            it.fiatCurrency)
+                        CurrencyPair.CryptoToFiatCurrencyPair(
+                            it.cryptoCurrency,
+                            it.fiatCurrency
+                        )
                     }
             }
 
@@ -164,7 +166,9 @@ class TransactionInteractor(
             ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun startTargetRateFetch(): Observable<ExchangeRate> =
-        transactionProcessor?.targetExchangeRate()?.takeUntil(invalidate) ?: throw IllegalStateException("TxProcessor not initialised")
+        transactionProcessor?.targetExchangeRate()?.takeUntil(invalidate) ?: throw IllegalStateException(
+            "TxProcessor not initialised"
+        )
 
     fun validateTransaction(): Completable =
         transactionProcessor?.validateAll() ?: throw IllegalStateException("TxProcessor not initialised")

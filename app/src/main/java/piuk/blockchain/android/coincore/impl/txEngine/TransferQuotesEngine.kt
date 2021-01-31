@@ -30,7 +30,7 @@ class TransferQuotesEngine(
     }
 
     private val quote: Observable<TransferQuote>
-       get() =  quotesProvider.fetchQuote(direction = direction, pair = pair).flatMapObservable { quote ->
+        get() = quotesProvider.fetchQuote(direction = direction, pair = pair).flatMapObservable { quote ->
             Observable.interval(
                 quote.creationDate.diffInSeconds(quote.expirationDate),
                 quote.creationDate.diffInSeconds(quote.expirationDate),
@@ -41,7 +41,7 @@ class TransferQuotesEngine(
         }.takeUntil(stop)
 
     val pricedQuote: Observable<PricedQuote>
-    get() = Observables.combineLatest(quote, amount).map { (quote, amount) ->
+        get() = Observables.combineLatest(quote, amount).map { (quote, amount) ->
             PricedQuote(
                 PricesInterpolator(
                     list = quote.prices,
@@ -52,13 +52,12 @@ class TransferQuotesEngine(
             latestQuote = it
         }.share().replay(1).refCount()
 
-
     fun start(
         direction: TransferDirection,
         pair: CurrencyPair
     ) {
-            this.direction = direction
-            this.pair = pair
+        this.direction = direction
+        this.pair = pair
     }
 
     fun stop() {

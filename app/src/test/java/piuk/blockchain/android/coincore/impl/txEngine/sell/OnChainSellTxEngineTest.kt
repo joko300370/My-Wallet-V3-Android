@@ -124,7 +124,6 @@ class OnChainSellTxEngineTest {
         verify(sourceAccount, atLeastOnce()).asset
         verify(txTarget, atLeastOnce()).fiatCurrency
         verifyQuotesEngineStarted()
-        verify(onChainEngine).assertInputsValid()
 
         noMoreInteractions(sourceAccount, txTarget)
     }
@@ -164,11 +163,17 @@ class OnChainSellTxEngineTest {
         subject.assertInputsValid()
     }
 
-    @Test(expected = IllegalStateException::class)
     fun `inputs fail validation when on chain engine validation fails`() {
         val sourceAccount = mockSourceAccount()
         val txTarget = mockTransactionTarget()
 
+        val txQuote: TransferQuote = mock {
+            on { sampleDepositAddress } itReturns SAMPLE_DEPOSIT_ADDRESS
+        }
+        val pricedQuote: PricedQuote = mock {
+            on { transferQuote } itReturns txQuote
+        }
+        whenever(quotesEngine.pricedQuote).thenReturn(Observable.just(pricedQuote))
         whenever(onChainEngine.assertInputsValid()).thenThrow(IllegalStateException())
 
         // Act
@@ -178,7 +183,9 @@ class OnChainSellTxEngineTest {
             exchangeRates
         )
 
-        subject.assertInputsValid()
+        subject.doInitialiseTx().test().assertError {
+            it is java.lang.IllegalStateException
+        }
     }
 
     @Test
@@ -242,16 +249,16 @@ class OnChainSellTxEngineTest {
             .test()
             .assertValue {
                 it.amount == CryptoValue.zero(SRC_ASSET) &&
-                it.totalBalance == totalBalance &&
-                it.availableBalance == availableBalance &&
-                it.fees == CryptoValue.zero(SRC_ASSET) &&
-                it.selectedFiat == TGT_ASSET &&
-                it.customFeeAmount == -1L &&
-                it.confirmations.isEmpty() &&
-                it.minLimit == MIN_GOLD_LIMIT_ASSET &&
-                it.maxLimit == MAX_GOLD_LIMIT_ASSET &&
-                it.validationState == ValidationState.UNINITIALISED &&
-                it.engineState.isEmpty()
+                    it.totalBalance == totalBalance &&
+                    it.availableBalance == availableBalance &&
+                    it.fees == CryptoValue.zero(SRC_ASSET) &&
+                    it.selectedFiat == TGT_ASSET &&
+                    it.customFeeAmount == -1L &&
+                    it.confirmations.isEmpty() &&
+                    it.minLimit == MIN_GOLD_LIMIT_ASSET &&
+                    it.maxLimit == MAX_GOLD_LIMIT_ASSET &&
+                    it.validationState == ValidationState.UNINITIALISED &&
+                    it.engineState.isEmpty()
             }
             .assertValue { verifyFeeLevels(it, expectedFeeLevel, expectedFeeOptions) }
             .assertNoErrors()
@@ -266,6 +273,7 @@ class OnChainSellTxEngineTest {
         verify(exchangeRates).getLastPrice(SRC_ASSET, TGT_ASSET)
         verify(environmentConfig).bitcoinNetworkParameters
         verify(onChainEngine).doInitialiseTx()
+        verify(onChainEngine).assertInputsValid()
 
         noMoreInteractions(sourceAccount, txTarget)
     }
@@ -329,6 +337,7 @@ class OnChainSellTxEngineTest {
         verify(exchangeRates).getLastPrice(SRC_ASSET, TGT_ASSET)
         verify(environmentConfig).bitcoinNetworkParameters
         verify(onChainEngine).doInitialiseTx()
+        verify(onChainEngine).assertInputsValid()
 
         noMoreInteractions(sourceAccount, txTarget)
     }
@@ -359,16 +368,16 @@ class OnChainSellTxEngineTest {
             .test()
             .assertValue {
                 it.amount == CryptoValue.zero(SRC_ASSET) &&
-                it.totalBalance == CryptoValue.zero(SRC_ASSET) &&
-                it.availableBalance == CryptoValue.zero(SRC_ASSET) &&
-                it.fees == CryptoValue.zero(SRC_ASSET) &&
-                it.selectedFiat == TGT_ASSET &&
-                it.customFeeAmount == -1L &&
-                it.confirmations.isEmpty() &&
-                it.minLimit == null &&
-                it.maxLimit == null &&
-                it.validationState == ValidationState.PENDING_ORDERS_LIMIT_REACHED &&
-                it.engineState.isEmpty()
+                    it.totalBalance == CryptoValue.zero(SRC_ASSET) &&
+                    it.availableBalance == CryptoValue.zero(SRC_ASSET) &&
+                    it.fees == CryptoValue.zero(SRC_ASSET) &&
+                    it.selectedFiat == TGT_ASSET &&
+                    it.customFeeAmount == -1L &&
+                    it.confirmations.isEmpty() &&
+                    it.minLimit == null &&
+                    it.maxLimit == null &&
+                    it.validationState == ValidationState.PENDING_ORDERS_LIMIT_REACHED &&
+                    it.engineState.isEmpty()
             }
             .assertValue { verifyFeeLevels(it, FeeLevel.Regular, setOf(FeeLevel.Regular)) }
             .assertNoErrors()
@@ -432,9 +441,9 @@ class OnChainSellTxEngineTest {
         ).test()
             .assertValue {
                 it.amount == inputAmount &&
-                it.totalBalance == totalBalance &&
-                it.availableBalance == availableBalance &&
-                it.fees == expectedFee
+                    it.totalBalance == totalBalance &&
+                    it.availableBalance == availableBalance &&
+                    it.fees == expectedFee
             }
             .assertValue { verifyFeeLevels(it, expectedFeeLevel, expectedAvailableFeeLevels) }
             .assertComplete()
@@ -499,7 +508,8 @@ class OnChainSellTxEngineTest {
             -1
         ).test()
             .assertValue {
-                verifyFeeLevels(it, expectedFeeLevel, expectedAvailableFeeLevels) }
+                verifyFeeLevels(it, expectedFeeLevel, expectedAvailableFeeLevels)
+            }
             .assertComplete()
             .assertNoErrors()
 
@@ -515,10 +525,10 @@ class OnChainSellTxEngineTest {
         totalBalance: Money = CryptoValue.zero(SRC_ASSET),
         availableBalance: Money = CryptoValue.zero(SRC_ASSET)
     ) = mock<BtcCryptoWalletAccount> {
-            on { asset } itReturns SRC_ASSET
-            on { accountBalance } itReturns Single.just(totalBalance)
-            on { actionableBalance } itReturns Single.just(availableBalance)
-        }
+        on { asset } itReturns SRC_ASSET
+        on { accountBalance } itReturns Single.just(totalBalance)
+        on { actionableBalance } itReturns Single.just(availableBalance)
+    }
 
     private fun mockTransactionTarget() = mock<FiatAccount> {
         on { fiatCurrency } itReturns TGT_ASSET
@@ -584,8 +594,8 @@ class OnChainSellTxEngineTest {
         expectedLevel: FeeLevel,
         expectedFeeOptions: Set<FeeLevel>
     ) = pendingTx.feeLevel == expectedLevel &&
-            pendingTx.availableFeeLevels == expectedFeeOptions &&
-            pendingTx.availableFeeLevels.contains(pendingTx.feeLevel)
+        pendingTx.availableFeeLevels == expectedFeeOptions &&
+        pendingTx.availableFeeLevels.contains(pendingTx.feeLevel)
 
     private fun noMoreInteractions(sourceAccount: BlockchainAccount, txTarget: TransactionTarget) {
         verifyNoMoreInteractions(txTarget)
