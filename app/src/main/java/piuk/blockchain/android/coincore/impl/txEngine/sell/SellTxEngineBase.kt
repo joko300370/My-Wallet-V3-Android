@@ -35,9 +35,8 @@ abstract class SellTxEngineBase(
     val target: FiatAccount
         get() = txTarget as FiatAccount
 
-    override val userFiat: String by lazy {
-        target.fiatCurrency
-    }
+    override val userFiat: String
+        get() = target.fiatCurrency
 
     override fun onLimitsForTierFetched(
         tier: KycTiers,
@@ -68,9 +67,11 @@ abstract class SellTxEngineBase(
                 if (pendingTx.maxLimit != null && pendingTx.minLimit != null) {
                     when {
                         pendingTx.amount < pendingTx.minLimit -> throw TxValidationFailure(
-                            ValidationState.UNDER_MIN_LIMIT)
+                            ValidationState.UNDER_MIN_LIMIT
+                        )
                         pendingTx.amount > pendingTx.maxLimit -> throw TxValidationFailure(
-                            ValidationState.OVER_MAX_LIMIT)
+                            ValidationState.OVER_MAX_LIMIT
+                        )
                         else -> Completable.complete()
                     }
                 } else {
@@ -103,7 +104,8 @@ abstract class SellTxEngineBase(
                                 asset = sourceAccount.asset
                             )
                         ),
-                        TxConfirmationValue.Total(total = pendingTx.amount,
+                        TxConfirmationValue.Total(
+                            total = pendingTx.amount,
                             exchange = latestQuoteExchangeRate.convert(pendingTx.amount)
                         )
                     )
@@ -127,7 +129,8 @@ abstract class SellTxEngineBase(
                         )
                     )
                     addOrReplaceOption(
-                        TxConfirmationValue.Total(total = pendingTx.amount,
+                        TxConfirmationValue.Total(
+                            total = pendingTx.amount,
                             exchange = latestQuoteExchangeRate.convert(pendingTx.amount)
                         )
                     )
