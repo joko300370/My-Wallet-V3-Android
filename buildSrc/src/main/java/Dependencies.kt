@@ -3,9 +3,9 @@
 object Versions {
 
     // Release info
-    const val minSdk = 21
-    const val targetSdk = 29
-    const val compileSdk = 28
+    const val minSdk = 23
+    const val targetSdk = 30
+    const val compileSdk = 30
     const val versionCode = 603
     const val versionName = "8.4.4"
     const val buildTools = "28.0.3"
@@ -43,6 +43,7 @@ object Versions {
     const val firebaseConfig = "19.1.0"
     const val firebaseDynamicLink = "19.0.0"
     const val supportTesting = "1.0.2"
+    const val biometrics = "1.1.0-rc01"
 
     // Networking, RxJava
     const val retrofit = "2.7.0"
@@ -58,7 +59,6 @@ object Versions {
     const val rxAndroid = "2.1.1"
     const val rxBinding = "2.1.1"
     const val rxReplayShare = "2.0.1"
-    const val rxFingerprint = "2.2.1"
     const val rxRelay = "2.1.1"
 
     // Utils, Ethereum
@@ -89,7 +89,6 @@ object Versions {
     // List.sort() is not available on Android SDK < 24 so DO NOT UPGRADE until project target min is 24
     const val zxing = "3.3.0"
     const val wheelPicker = "1.1.2"
-    const val konfetti = "1.1.3"
     const val materialDatePicker = "3.6.4"
     const val sparkline = "1.2.0"
 
@@ -172,6 +171,7 @@ object Libraries {
     const val googlePlaces =
         "com.google.android.gms:play-services-places:${Versions.googleServicesPlaces}"
     const val googlePlayCore = "com.google.android.play:core:${Versions.googlePlayCore}"
+    const val biometricsApi = "androidx.biometric:biometric:${Versions.biometrics}"
 
     // Networking, RxJava
     const val retrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
@@ -201,7 +201,6 @@ object Libraries {
     const val rxBindingV7 = "com.jakewharton.rxbinding2:rxbinding-appcompat-v7-kotlin:${Versions.rxBinding}"
     const val rxReplayShare = "com.jakewharton.rx2:replaying-share-kotlin:${Versions.rxReplayShare}"
     const val rxRelay = "com.jakewharton.rxrelay2:rxrelay:${Versions.rxRelay}"
-    const val rxFingerprint = "com.mtramin:rxfingerprint:${Versions.rxFingerprint}"
 
     // Utils, Ethereum
     const val web3j = "org.web3j:core:${Versions.web3j}"
@@ -227,7 +226,6 @@ object Libraries {
     const val countryPicker = "com.github.mukeshsolanki:country-picker-android:${Versions.countryPicker}"
     const val zxing = "com.google.zxing:core:${Versions.zxing}"
     const val wheelPicker = "cn.aigestudio.wheelpicker:WheelPicker:${Versions.wheelPicker}"
-    const val konfetti = "nl.dionsegijn:konfetti:${Versions.konfetti}"
     const val materialDatePicker = "com.wdullaer:materialdatetimepicker:${Versions.materialDatePicker}"
     const val sparkline = "com.robinhood.spark:spark:${Versions.sparkline}"
 

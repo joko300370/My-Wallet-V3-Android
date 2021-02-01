@@ -302,6 +302,7 @@ dependencies {
         exclude group: 'com.android.support'
     }
     implementation Libraries.googlePlaces
+    implementation Libraries.biometricsApi
 
     implementation Libraries.gson
     implementation Libraries.kotlinJson

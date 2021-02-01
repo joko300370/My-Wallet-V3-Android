@@ -175,7 +175,7 @@ class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePr
                     val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                     val clip = ClipData.newPlainText("Send address", address)
                     toast(R.string.copied_to_clipboard)
-                    clipboard.primaryClip = clip
+                    clipboard.setPrimaryClip(clip)
                 }
                 .setNegativeButton(R.string.common_no, null)
                 .show()

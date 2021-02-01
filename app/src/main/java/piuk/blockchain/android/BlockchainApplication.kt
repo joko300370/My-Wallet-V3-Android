@@ -15,7 +15,6 @@ import com.blockchain.koin.KoinStarter
 import com.blockchain.koin.apiRetrofit
 import com.blockchain.koin.explorerRetrofit
 import com.blockchain.logging.CrashLogger
-import piuk.blockchain.android.util.CurrentContextAccess
 import com.facebook.stetho.Stetho
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -37,6 +36,7 @@ import piuk.blockchain.android.ui.auth.LogoutActivity
 import piuk.blockchain.android.ui.home.models.MetadataEvent
 import piuk.blockchain.android.ui.ssl.SSLVerifyActivity
 import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.android.util.CurrentContextAccess
 import piuk.blockchain.android.util.lifecycle.AppLifecycleListener
 import piuk.blockchain.android.util.lifecycle.LifecycleInterestedComponent
 import piuk.blockchain.androidcore.data.access.AccessState
@@ -303,7 +303,7 @@ open class BlockchainApplication : Application(), FrameworkInterface {
             trust.onActivityClose()
         }
 
-        override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle?) {}
+        override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
         override fun onActivityDestroyed(activity: Activity) {}
     }

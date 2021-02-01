@@ -34,7 +34,7 @@ class CopyableTextFormItem @JvmOverloads constructor(
                     val clipboard =
                         context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                     val clip = android.content.ClipData.newPlainText("Copied Text", value)
-                    clipboard.primaryClip = clip
+                    clipboard.setPrimaryClip(clip)
                     onCopy(title)
                 }
             }

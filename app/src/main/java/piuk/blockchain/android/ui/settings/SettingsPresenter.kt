@@ -20,15 +20,16 @@ import info.blockchain.wallet.settings.SettingsManager
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.subscribeBy
-import piuk.blockchain.android.R
 import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
+import piuk.blockchain.android.R
+import piuk.blockchain.android.data.biometrics.BiometricsController
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.thepit.PitLinkingState
-import piuk.blockchain.android.ui.fingerprint.FingerprintHelper
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
+import piuk.blockchain.android.util.AndroidUtils
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -38,12 +39,10 @@ import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import piuk.blockchain.android.util.AndroidUtils
 import timber.log.Timber
 import java.io.Serializable
 
 class SettingsPresenter(
-    private val fingerprintHelper: FingerprintHelper,
     private val authDataManager: AuthDataManager,
     private val settingsDataManager: SettingsDataManager,
     private val emailUpdater: EmailSyncUpdater,
@@ -56,7 +55,8 @@ class SettingsPresenter(
     private val exchangeRateDataManager: ExchangeRateDataManager,
     private val kycStatusHelper: KycStatusHelper,
     private val pitLinking: PitLinking,
-    private val analytics: Analytics
+    private val analytics: Analytics,
+    private val biometricsController: BiometricsController
 ) : BasePresenter<SettingsView>() {
 
     private val fiatUnit: String
@@ -223,13 +223,13 @@ class SettingsPresenter(
      * @return true if the device has usable fingerprint hardware
      */
     private val isFingerprintHardwareAvailable: Boolean
-        get() = fingerprintHelper.isHardwareDetected()
+        get() = biometricsController.isHardwareDetected
 
     /**
      * @return true if the user has previously enabled fingerprint login
      */
     val isFingerprintUnlockEnabled: Boolean
-        get() = fingerprintHelper.isFingerprintUnlockEnabled()
+        get() = biometricsController.isFingerprintUnlockEnabled
 
     /**
      * Sets fingerprint unlock enabled and clears the encrypted PIN if {@param enabled} is false
@@ -237,10 +237,7 @@ class SettingsPresenter(
      * @param enabled Whether or not the fingerprint unlock feature is set up
      */
     fun setFingerprintUnlockEnabled(enabled: Boolean) {
-        fingerprintHelper.setFingerprintUnlockEnabled(enabled)
-        if (!enabled) {
-            fingerprintHelper.clearEncryptedData(PersistentPrefs.KEY_ENCRYPTED_PIN_CODE)
-        }
+        biometricsController.setFingerprintUnlockEnabled(enabled)
     }
 
     /**
@@ -250,7 +247,7 @@ class SettingsPresenter(
         if (isFingerprintUnlockEnabled) {
             // Show dialog "are you sure you want to disable fingerprint login?
             view?.showDisableFingerprintDialog()
-        } else if (!fingerprintHelper.areFingerprintsEnrolled()) {
+        } else if (!biometricsController.areFingerprintsEnrolled) {
             // No fingerprints enrolled, prompt user to add some
             view?.showNoFingerprintsAddedDialog()
         } else {
