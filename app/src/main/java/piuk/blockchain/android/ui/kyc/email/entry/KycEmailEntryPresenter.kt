@@ -61,4 +61,8 @@ class KycEmailEntryPresenter(
         // Resubscribe to everything
         subscribeToClickEvents()
     }
+
+    fun dispose() {
+        compositeDisposable.clear()
+    }
 }

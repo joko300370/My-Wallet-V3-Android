@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import com.blockchain.notifications.analytics.logEvent
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
-import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import piuk.blockchain.android.ui.kyc.navigate
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.ui.extensions.throttledClicks
@@ -36,7 +35,6 @@ class KycMoreInfoSplashFragment : Fragment() {
         logEvent(AnalyticsEvents.KycMoreInfo)
 
         progressListener.setHostTitle(R.string.kyc_more_info_splash_title)
-        progressListener.incrementProgress(KycStep.SplashPage)
     }
 
     private val disposable = CompositeDisposable()
