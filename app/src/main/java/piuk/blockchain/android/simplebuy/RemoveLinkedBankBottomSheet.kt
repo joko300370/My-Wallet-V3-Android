@@ -11,14 +11,10 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.remove_bank_bottom_sheet.view.*
-import kotlinx.android.synthetic.main.remove_bank_bottom_sheet.view.end_digits
-import kotlinx.android.synthetic.main.remove_bank_bottom_sheet.view.icon
-import kotlinx.android.synthetic.main.remove_bank_bottom_sheet.view.progress
-import kotlinx.android.synthetic.main.remove_bank_bottom_sheet.view.title
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.android.util.visibleIf
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 
 class RemoveLinkedBankBottomSheet : SlidingModalBottomDialog() {
 
@@ -34,6 +30,8 @@ class RemoveLinkedBankBottomSheet : SlidingModalBottomDialog() {
         with(view) {
             title.text = resources.getString(R.string.common_spaced_strings, bank.name, bank.currency)
             end_digits.text = resources.getString(R.string.dotted_suffixed_string, bank.account)
+            account_info.text =
+                context.getString(R.string.payment_method_type_account_info, bank.toHumanReadableAccount(), "")
             rmv_bank_btn.setOnClickListener {
                 compositeDisposable += custodialWalletManager.removeBank(bank)
                     .observeOn(AndroidSchedulers.mainThread())

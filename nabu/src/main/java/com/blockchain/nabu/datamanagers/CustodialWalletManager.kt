@@ -7,6 +7,7 @@ import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.datamanagers.repositories.interest.Eligibility
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestLimits
 import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
+import com.blockchain.nabu.models.data.Bank
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
 import com.blockchain.nabu.models.responses.interest.InterestActivityItemResponse
@@ -14,7 +15,6 @@ import com.blockchain.nabu.models.responses.interest.InterestAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CardPartnerAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CardPaymentAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
-import com.blockchain.nabu.models.data.Bank
 import com.braintreepayments.cardform.utils.CardType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -28,6 +28,7 @@ import java.io.Serializable
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.Date
+import java.util.Locale
 
 enum class OrderState {
     UNKNOWN,
@@ -303,9 +304,13 @@ data class Beneficiary(
     override val account: String,
     override val currency: String
 ) : Bank {
+    override val accountType: String
+        get() = ""
 
     override val paymentMethod: PaymentMethodType
         get() = PaymentMethodType.FUNDS
+
+    override fun toHumanReadableAccount(): String = ""
 }
 
 data class FiatTransaction(
@@ -439,7 +444,8 @@ sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val 
         val bankId: String,
         override val limits: PaymentLimits,
         val bankName: String,
-        val accountEnding: String
+        val accountEnding: String,
+        val accountType: String
     ) : PaymentMethod(bankId, limits, BANK_PAYMENT_METHOD_ORDER), Serializable {
 
         val accountDottedLastDigits: String
@@ -447,6 +453,9 @@ sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val 
 
         override fun detailedLabel() =
             "$bankName $accountEnding"
+
+        val uiAccountType: String =
+            accountType.toLowerCase(Locale.getDefault()).capitalize(Locale.getDefault())
     }
 
     data class Card(
