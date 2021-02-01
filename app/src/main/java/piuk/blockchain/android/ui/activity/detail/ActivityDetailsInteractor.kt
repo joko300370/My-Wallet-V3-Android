@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.activity.detail
 
-import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.PaymentLimits
@@ -9,6 +8,7 @@ import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.LinkedBank
+import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -195,7 +195,7 @@ class ActivityDetailsInteractor(
     ) {
         paymentMethod?.let {
             list.add(BuyPaymentMethod(PaymentDetails(
-                it.id, it.label(), it.endDigits()
+                it.id, it.label(), it.endDigits(), it.accountType()
             )))
         } ?: list.add(BuyPaymentMethod(PaymentDetails(summaryItem.paymentMethodId)))
     }
@@ -492,10 +492,17 @@ private fun PaymentMethod.label(): String? =
         else -> null
     }
 
+private fun PaymentMethod.accountType(): String? =
+    when (this) {
+        is PaymentMethod.Bank -> uiAccountType
+        else -> null
+    }
+
 private fun LinkedBank.toPaymentMethod() =
     PaymentMethod.Bank(
         bankId = id,
         limits = PaymentLimits(0, 0, currency),
         bankName = name,
-        accountEnding = accountNumber
+        accountEnding = accountNumber,
+        accountType = accountType
     )

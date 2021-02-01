@@ -4,6 +4,7 @@
     <!-- common -->
     <string name="common_replaceable_value">%1$s</string>
     <string name="common_hyphenated_strings">%1$s - %2$s</string>
+    <string name="common_newlined_strings">%1$s\n%2$s</string>
     <string name="common_spaced_strings">%1$s&#160;%2$s</string>
     <string name="common_send">Send</string>
     <string name="common_receive">Receive</string>
@@ -1285,6 +1286,7 @@
     <string name="add_credit_or_debit_card">Add a Credit or Debit Card</string>
     <string name="select_payment_method">Select a Payment Method</string>
     <string name="payment_method_limit">%1$s Limit</string>
+    <string name="payment_method_type_account_info">%1$s account %2$s</string>
     <string name="checkout">Checkout</string>
     <string name="order_details">Order Details</string>
     <string name="fees">Fees</string>

@@ -3,6 +3,7 @@ package com.blockchain.nabu.models.data
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.responses.banktransfer.LinkBankAttrsResponse
 import java.io.Serializable
+import java.util.Locale
 
 data class LinkBankTransfer(val id: String, val partner: BankPartner, val attributes: LinkBankAttributes) : Serializable
 
@@ -35,12 +36,17 @@ data class LinkedBank(
     override val name: String,
     val accountNumber: String,
     val state: LinkedBankState,
-    val errorStatus: LinkedBankErrorState
+    val errorStatus: LinkedBankErrorState,
+    override val accountType: String
 ) : Bank {
     override val account: String
         get() = accountNumber
+
     override val paymentMethod: PaymentMethodType
         get() = PaymentMethodType.BANK_TRANSFER
+
+    override fun toHumanReadableAccount(): String =
+        accountType.toLowerCase(Locale.getDefault()).capitalize(Locale.getDefault())
 }
 
 enum class LinkedBankErrorState {
@@ -62,6 +68,8 @@ interface Bank : Serializable {
     val currency: String
     val account: String
     val name: String
+    val accountType: String
     val id: String
     val paymentMethod: PaymentMethodType
+    fun toHumanReadableAccount(): String
 }
