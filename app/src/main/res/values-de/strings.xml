@@ -708,7 +708,6 @@
     <string name="kyc_address_address_first_line_hint">Adresse</string>
     <string name="kyc_address_address_apt_name_hint">Apt, Etage, #</string>
     <string name="kyc_address_address_postcode_hint">Postleitzahl</string>
-    <string name="kyc_address_address_zip_code_hint">Postleitzahl</string>
     <string name="kyc_address_address_city_hint">Stadt</string>
     <string name="kyc_address_address_state_hint">Zustand</string>
     <string name="kyc_address_address_country_hint">Land</string>

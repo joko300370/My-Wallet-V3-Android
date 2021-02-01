@@ -8,7 +8,6 @@ import com.blockchain.koin.scopedInject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
-import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpFragment
 import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
@@ -39,8 +38,7 @@ class KycInvalidCountryFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        progressListener.setHostTitle(R.string.kyc_country_selection_title)
-        progressListener.incrementProgress(KycStep.SplashPage)
+        progressListener.setHostTitle(R.string.kyc_country_selection_title_1)
 
         textViewHeader.text = getString(R.string.kyc_invalid_country_header, displayModel.name)
         textViewMessage.text = getString(R.string.kyc_invalid_country_message, displayModel.name)

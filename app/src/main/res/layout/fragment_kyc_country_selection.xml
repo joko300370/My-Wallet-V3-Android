@@ -16,8 +16,7 @@
         android:background="@drawable/kyc_searc_country_backkground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:queryHint="@string/kyc_country_selection_search_hint" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/country_selection"

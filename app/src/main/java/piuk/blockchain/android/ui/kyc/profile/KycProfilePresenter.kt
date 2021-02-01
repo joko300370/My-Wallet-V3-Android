@@ -105,12 +105,16 @@ class KycProfilePresenter(
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(
                         onSuccess = {
+                            val firstName = it.firstName ?: return@subscribeBy
+                            val lastName = it.lastName ?: return@subscribeBy
+                            val dob = it.dob ?: return@subscribeBy
                             val displayFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.US)
                             val backendFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-                            val displayDate = backendFormat.parse(it.dob!!)
+                            val displayDate = backendFormat.parse(dob)
+
                             view.restoreUiState(
-                                it.firstName!!,
-                                it.lastName!!,
+                                firstName,
+                                lastName,
                                 displayFormat.format(displayDate),
                                 displayDate.toCalendar()
                             )

@@ -101,7 +101,6 @@ class KycMobileValidationFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         progressListener.setHostTitle(R.string.kyc_phone_number_title)
-        progressListener.incrementProgress(KycStep.MobileVerifiedPage)
         textViewPhoneNumber.text = displayModel.formattedString
 
         val linksMap = mapOf<String, Uri?>(
@@ -175,19 +174,10 @@ class KycMobileValidationFragment :
             .map { mapToCompleted(it) }
             .distinctUntilChanged()
             .doOnNext {
-                updateProgress(it, kycStep)
                 buttonNext.isEnabled = it
             }
 
     private fun mapToCompleted(text: String): Boolean = VerificationCode(text).isValid
-
-    private fun updateProgress(stepCompleted: Boolean, kycStep: KycStep) {
-        if (stepCompleted) {
-            progressListener.incrementProgress(kycStep)
-        } else {
-            progressListener.decrementProgress(kycStep)
-        }
-    }
 
     override fun createPresenter(): KycMobileValidationPresenter = presenter
 

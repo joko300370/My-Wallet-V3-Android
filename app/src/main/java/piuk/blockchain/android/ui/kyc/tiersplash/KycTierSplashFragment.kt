@@ -36,7 +36,6 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.ui.kyc.hyperlinks.renderSingleLink
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
-import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import piuk.blockchain.android.ui.kyc.navigate
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
@@ -82,7 +81,6 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
         }
         container.visibility = if (showContent) View.VISIBLE else View.GONE
         progressListener.setHostTitle(title)
-        progressListener.incrementProgress(KycStep.SplashPage)
 
         textViewEligible.renderSingleLink(
             R.string.by_completing_gold_level_you_will_be_eligible_to_participate_in_our_airdrop_program,
