@@ -863,7 +863,8 @@ class LiveCustodialWalletManager(
             state = state.toLinkedBankState(),
             name = details?.bankName ?: "",
             accountNumber = details?.accountNumber?.replace("x", "") ?: "",
-            errorStatus = error?.toLinkedBankErrorState() ?: LinkedBankErrorState.NONE
+            errorStatus = error?.toLinkedBankErrorState() ?: LinkedBankErrorState.NONE,
+            accountType = details?.bankAccountType ?: ""
         )
     }
 
@@ -914,7 +915,8 @@ class LiveCustodialWalletManager(
             bankId = this.id,
             limits = bankLimits,
             bankName = this.name,
-            accountEnding = this.accountNumber
+            accountEnding = this.accountNumber,
+            accountType = this.accountType
         )
 
     private fun String.isActive(): Boolean =

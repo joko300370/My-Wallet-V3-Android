@@ -10,10 +10,10 @@ import android.view.WindowManager
 import android.widget.TextView
 import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
-import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import io.reactivex.disposables.CompositeDisposable
@@ -34,13 +34,13 @@ import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomS
 import piuk.blockchain.android.ui.linkbank.LinkBankActivity
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.drawableResFilled
-import piuk.blockchain.android.util.setAssetIconColours
-import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 
 class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(),
     SimpleBuyScreen,
@@ -349,6 +349,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     }
 
     private fun renderFundsPayment(paymentMethod: PaymentMethod.Funds) {
+        payment_method_bank_info.gone()
         payment_method_icon.setImageResource(
             paymentMethod.icon()
         )
@@ -360,11 +361,18 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     private fun renderBankPayment(paymentMethod: PaymentMethod.Bank) {
         payment_method_icon.setImageResource(R.drawable.ic_bank_transfer)
         payment_method_title.text = paymentMethod.bankName
+        payment_method_bank_info.text =
+            requireContext().getString(
+                R.string.payment_method_type_account_info, paymentMethod.uiAccountType,
+                paymentMethod.accountEnding
+            )
+        payment_method_bank_info.visible()
         payment_method_limit.text =
             getString(R.string.payment_method_limit, paymentMethod.limits.max.toStringWithSymbol())
     }
 
     private fun renderUndefinedCardPayment(selectedPaymentMethod: PaymentMethod.UndefinedCard) {
+        payment_method_bank_info.gone()
         payment_method_icon.setImageResource(R.drawable.ic_payment_card)
         payment_method_title.text = getString(R.string.credit_or_debit_card)
         payment_method_limit.text =
@@ -372,6 +380,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     }
 
     private fun renderUndefinedBankTransfer(selectedPaymentMethod: PaymentMethod.UndefinedBankTransfer) {
+        payment_method_bank_info.gone()
         payment_method_icon.setImageResource(R.drawable.ic_bank_transfer)
         payment_method_title.text = getString(R.string.link_a_bank)
         payment_method_limit.text =
@@ -379,6 +388,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     }
 
     private fun renderCardPayment(selectedPaymentMethod: PaymentMethod.Card) {
+        payment_method_bank_info.gone()
         payment_method_icon.setImageResource(selectedPaymentMethod.cardType.icon())
         payment_method_title.text = selectedPaymentMethod.detailedLabel()
         payment_method_limit.text =
