@@ -163,29 +163,29 @@ class OnChainSellTxEngineTest {
         subject.assertInputsValid()
     }
 
-   /* todo fix test once assertInputsValid is called for decoration engine and making engine.start returns completable
-    @Test(expected = IllegalStateException::class)
-    fun `inputs fail validation when on chain engine validation fails`() {
-        val sourceAccount = mockSourceAccount()
-        val txTarget = mockTransactionTarget()
+    /* todo fix test once assertInputsValid is called for decoration engine and making engine.start returns completable
+     @Test(expected = IllegalStateException::class)
+     fun `inputs fail validation when on chain engine validation fails`() {
+         val sourceAccount = mockSourceAccount()
+         val txTarget = mockTransactionTarget()
 
-        val txQuote: TransferQuote = mock {
-            on { sampleDepositAddress } itReturns SAMPLE_DEPOSIT_ADDRESS
-        }
-        val pricedQuote: PricedQuote = mock {
-            on { transferQuote } itReturns txQuote
-        }
-        whenever(quotesEngine.pricedQuote).thenReturn(Observable.just(pricedQuote))
-        whenever(onChainEngine.assertInputsValid()).thenThrow(IllegalStateException())
+         val txQuote: TransferQuote = mock {
+             on { sampleDepositAddress } itReturns SAMPLE_DEPOSIT_ADDRESS
+         }
+         val pricedQuote: PricedQuote = mock {
+             on { transferQuote } itReturns txQuote
+         }
+         whenever(quotesEngine.pricedQuote).thenReturn(Observable.just(pricedQuote))
+         whenever(onChainEngine.assertInputsValid()).thenThrow(IllegalStateException())
 
-        // Act
-        subject.start(
-            sourceAccount,
-            txTarget,
-            exchangeRates
-        )
-        subject.assertInputsValid()
-    }*/
+         // Act
+         subject.start(
+             sourceAccount,
+             txTarget,
+             exchangeRates
+         )
+         subject.assertInputsValid()
+     }*/
 
     @Test
     fun `asset is returned correctly`() {
