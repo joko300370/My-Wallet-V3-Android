@@ -304,7 +304,7 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
 private class CustomPaddingArrayAdapter<T>(context: Context, layoutId: Int, items: MutableList<T>) :
     ArrayAdapter<T>(context, layoutId, items) {
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View? {
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view = super.getView(position, convertView, parent)
         val smallPadding = context.resources.getDimension(R.dimen.tiny_margin).toInt()
         view.setPadding(0, smallPadding, view.paddingRight, smallPadding)

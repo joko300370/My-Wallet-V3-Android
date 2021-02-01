@@ -3,6 +3,7 @@ package piuk.blockchain.androidcore.utils
 import android.annotation.SuppressLint
 import android.app.backup.BackupManager
 import android.content.SharedPreferences
+import android.util.Base64
 import androidx.annotation.VisibleForTesting
 import com.blockchain.logging.CrashLogger
 import info.blockchain.balance.CryptoCurrency
@@ -372,6 +373,27 @@ class PrefsUtil(
         get() = getValue(KEY_SWIPE_TO_RECEIVE_ENABLED, true)
         set(value) = setValue(KEY_SWIPE_TO_RECEIVE_ENABLED, value)
 
+    override var encodedPin: String
+        get() = decodeFromBase64ToString(getValue(KEY_ENCRYPTED_PIN_CODE, ""))
+        set(value) = setValue(KEY_ENCRYPTED_PIN_CODE, encodeToBase64(value))
+
+    override var biometricsEnabled: Boolean
+        get() = getValue(KEY_FINGERPRINT_ENABLED, false)
+        set(value) = setValue(KEY_FINGERPRINT_ENABLED, value)
+
+    override val encodedKeyName: String
+        get() = KEY_ENCRYPTED_PIN_CODE
+
+    override fun clearEncodedPin() {
+        removeValue(KEY_ENCRYPTED_PIN_CODE)
+    }
+
+    private fun encodeToBase64(data: String) =
+        Base64.encodeToString(data.toByteArray(charset("UTF-8")), Base64.DEFAULT)
+
+    private fun decodeFromBase64ToString(data: String): String =
+        String(Base64.decode(data.toByteArray(charset("UTF-8")), Base64.DEFAULT))
+
     private fun clearLegacyCacheData() {
         removeValue(KEY_SWIPE_RECEIVE_BTC_ADDRESSES)
         removeValue(KEY_SWIPE_RECEIVE_ETH_ADDRESS)
@@ -522,7 +544,12 @@ class PrefsUtil(
         private const val KEY_SWIPE_RECEIVE_XLM_ADDRESS = "key_swipe_receive_xlm_address"
         private const val KEY_SWIPE_RECEIVE_BTC_ACCOUNT_NAME = "swipe_receive_account_name"
         private const val KEY_SWIPE_RECEIVE_BCH_ACCOUNT_NAME = "swipe_receive_bch_account_name"
+
         // New key
         private const val OFFLINE_CACHE_KEY = "key_offline_address_cache"
+
+        // Auth prefs
+        private const val KEY_ENCRYPTED_PIN_CODE = "encrypted_pin_code"
+        private const val KEY_FINGERPRINT_ENABLED = "fingerprint_enabled"
     }
 }

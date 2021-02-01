@@ -72,7 +72,7 @@ internal class ReceiveQrActivity :
                     getString(R.string.copied_to_clipboard),
                     ToastCustom.LENGTH_LONG,
                     ToastCustom.TYPE_GENERAL)
-                clipboard.primaryClip = clip
+                clipboard.setPrimaryClip(clip)
             }
             .setNegativeButton(R.string.common_no, null)
             .show()

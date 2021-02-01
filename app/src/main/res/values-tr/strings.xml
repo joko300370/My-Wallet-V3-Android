@@ -51,7 +51,7 @@
  Yeni Şifre 
 </string>
     <string name="no_private_key">Özel anahtar üretilemiyor.</string>
-    <string name="pin_4_strikes">4 başarısız PIN denemesi. Lütfen şifre girin.</string>
+    <string name="pin_max_strikes">%1$d başarısız PIN denemesi. Lütfen şifre girin.</string>
     <string name="pin_4_strikes_password_accepted">Şifre kabul edildi. Lütfen yeni PIN tanımlayın.
 </string>
     <string name="bip38_password_entry">Lütfen özel anahtar şifresini girin</string>

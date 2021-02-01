@@ -15,11 +15,11 @@ import com.blockchain.koin.payloadScope
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.koin.usdt
 import com.blockchain.logging.DigitalTrust
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentAccountMapper
 import com.blockchain.network.websocket.Options
 import com.blockchain.network.websocket.autoRetry
 import com.blockchain.network.websocket.debugLog
 import com.blockchain.network.websocket.newBlockchainWebSocket
-import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentAccountMapper
 import com.blockchain.ui.password.SecondPasswordHandler
 import com.blockchain.wallet.DefaultLabels
 import com.google.gson.GsonBuilder
@@ -42,6 +42,10 @@ import piuk.blockchain.android.coincore.OfflineAccountCache
 import piuk.blockchain.android.coincore.impl.OfflineBalanceCall
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.android.data.api.bitpay.BitPayService
+import piuk.blockchain.android.data.biometrics.BiometricAuth
+import piuk.blockchain.android.data.biometrics.BiometricsController
+import piuk.blockchain.android.data.biometrics.CryptographyManager
+import piuk.blockchain.android.data.biometrics.CryptographyManagerImpl
 import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
@@ -84,8 +88,6 @@ import piuk.blockchain.android.ui.dashboard.DashboardState
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsInteractor
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsModel
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsState
-import piuk.blockchain.android.ui.fingerprint.FingerprintHelper
-import piuk.blockchain.android.ui.fingerprint.FingerprintPresenter
 import piuk.blockchain.android.ui.home.CredentialsWiper
 import piuk.blockchain.android.ui.home.MainPresenter
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
@@ -196,14 +198,6 @@ val applicationModule = module {
         }.bind(SecondPasswordHandler::class)
 
         factory { KycStatusHelper(get(), get(), get(), get()) }
-
-        factory {
-            FingerprintHelper(
-                applicationContext = get(),
-                prefs = get(),
-                fingerprintAuth = get()
-            )
-        }
 
         scoped {
             CredentialsWiper(
@@ -334,12 +328,6 @@ val applicationModule = module {
             BackupWalletUtil(
                 payloadDataManager = get(),
                 environmentConfig = get()
-            )
-        }
-
-        factory {
-            FingerprintPresenter(
-                fingerprintHelper = get()
             )
         }
 
@@ -544,7 +532,6 @@ val applicationModule = module {
 
         factory {
             SettingsPresenter(
-                fingerprintHelper = get(),
                 authDataManager = get(),
                 settingsDataManager = get(),
                 emailUpdater = get(),
@@ -557,7 +544,8 @@ val applicationModule = module {
                 exchangeRateDataManager = get(),
                 kycStatusHelper = get(),
                 pitLinking = get(),
-                analytics = get()
+                analytics = get(),
+                biometricsController = get()
             )
         }
 
@@ -575,14 +563,16 @@ val applicationModule = module {
                 prefs = get(),
                 payloadDataManager = get(),
                 stringUtils = get(),
-                fingerprintHelper = get(),
                 accessState = get(),
                 walletOptionsDataManager = get(),
                 environmentSettings = get(),
                 prngFixer = get(),
                 mobileNoticeRemoteConfig = get(),
                 crashLogger = get(),
-                analytics = get()
+                analytics = get(),
+                config = get(),
+                credentialsWiper = get(),
+                biometricsController = get()
             )
         }
 
@@ -637,7 +627,7 @@ val applicationModule = module {
 
         factory {
             OnboardingPresenter(
-                fingerprintHelper = get(),
+                biometricsController = get(),
                 accessState = get(),
                 settingsDataManager = get()
             )
@@ -692,6 +682,19 @@ val applicationModule = module {
         factory(eth) { EthAccountListAdapter(get()) }.bind(AccountList::class)
         factory(pax) { PaxAccountListAdapter(get(), get()) }.bind(AccountList::class)
         factory(usdt) { UsdtAccountListAdapter(get(), get()) }.bind(AccountList::class)
+
+        factory {
+            BiometricsController(
+                applicationContext = get(),
+                prefs = get(),
+                accessState = get(),
+                cryptographyManager = get()
+            )
+        }.bind(BiometricAuth::class)
+
+        factory {
+            CryptographyManagerImpl()
+        }.bind(CryptographyManager::class)
     }
 
     factory {

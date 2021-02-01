@@ -51,7 +51,7 @@
  новый пароль 
 </string>
     <string name="no_private_key">Невозможно создать закрытый ключ.</string>
-    <string name="pin_4_strikes">4 неудачных попытки PIN-кода. Пожалуйста, введите пароль.</string>
+    <string name="pin_max_strikes">%1$d неудачных попытки PIN-кода. Пожалуйста, введите пароль.</string>
     <string name="pin_4_strikes_password_accepted">Пароль принят. Пожалуйста, определите новый PIN-код.
 </string>
     <string name="bip38_password_entry">Пожалуйста, введите пароль закрытого ключа</string>

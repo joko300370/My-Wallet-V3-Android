@@ -92,7 +92,7 @@
     </string>
     <string name="no_private_key">Cannot produce private key.</string>
 
-    <string name="pin_4_strikes">4 failed PIN attempts. Please provide password.</string>
+    <string name="pin_max_strikes">%1$d failed PIN attempts. Please provide password.</string>
 
     <string name="pin_4_strikes_password_accepted">Password accepted. Please define new PIN.
     </string>
@@ -154,6 +154,7 @@
     <string name="restoring_wallet">Restoring wallet.</string>
     <string name="password">Password</string>
     <string name="email">Your Email</string>
+    <string name="password_disclaimer">I understand that Blockchain.com cannot recover my password for me. If I lose access to my Wallet, I must use my <annotation link="backup">Secret Phrase</annotation> to access my funds.</string>
     <string name="you_agree_terms_of_service">By creating an account, you agree to Blockchain’s <annotation link="terms">Terms of Service</annotation> &amp; <annotation link="privacy">Privacy Policy</annotation>.</string>
     <string name="new_account_cta_text">Continue</string>
     <string name="new_account_title">Create an Account</string>
@@ -430,7 +431,7 @@
     <string name="mobile_description">Your mobile phone can be used to enable two-factor
         authentication, helping to secure your wallet from unauthorized access.
     </string>
-    <string name="enable_fingerprint">Fingerprint Unlock</string>
+    <string name="enable_fingerprint">Biometric Unlock</string>
 
     <string name="notification_2fa_summary">2FA Notifications</string>
     <string name="notification_2fa_description">Notifications related to Two Factor Authentication</string>
@@ -597,33 +598,30 @@
     <string name="backup_word_mismatch">Word Mismatch</string>
     <string name="backup_done">DONE</string>
     <string name="backup_lost_mnemonic">Lost your 12 word backup phrase?</string>
-    <string name="fingerprint_prompt">Use your fingerprint for faster, easier access to your
-        wallet.\n\nConfirm fingerprint to continue
-    </string>
 
-    <!-- FINGERPRINT -->
+    <!-- BIOMETRICS -->
     <string name="fingerprint_description">Confirm fingerprint to continue</string>
     <string name="fingerprint_hint">Touch sensor</string>
-    <string name="fingerprint_login_title">Fingerprint login</string>
-    <string name="fingerprint_not_recognized">Fingerprint not recognized. Try again</string>
-    <string name="fingerprint_success">Fingerprint recognized</string>
+    <string name="fingerprint_login_title">Biometric login</string>
+    <string name="fingerprint_login_description">Use your biometrics to log into the Wallet</string>
+    <string name="fingerprint_register_description">Use your biometrics for faster, easier access to your wallet.\n\nConfirm it’s you to continue</string>
     <string name="fingerprint_use_pin">Use PIN</string>
-    <string name="fingerprint_disable_message">Are you sure you want to disable fingerprint login?
-    </string>
-    <string name="fingerprint_no_fingerprints_added">No fingerprints have been registered to this
-        device yet. Do you want to register a fingerprint now?
-    </string>
-    <string name="fingerprint_key_invalidated_description">Either the fingerprints stored on this
-        device have changed or the keyguard has been disabled
-    </string>
-    <string name="fingerprint_key_invalidated_brief">Keys invalidated, PIN code required</string>
-    <string name="fingerprint_fatal_error_register_description">There have been too many failed
-        attempts in the last 30 minutes. Please attempt setup again later.
-    </string>
-    <string name="fingerprint_fatal_error_authenticate_description">There have been too many failed
-        attempts. Please log in using your PIN instead.
-    </string>
+    <string name="biometric_disable_message">Are you sure you want to disable biometric login?</string>
+    <string name="fingerprint_no_fingerprints_added">No fingerprints have been registered to this device yet. Do you want to register a fingerprint now?</string>
+    <string name="biometrics_key_invalidated_title">Biometrics changed</string>
+    <string name="biometrics_key_invalidated_description">Either the biometrics stored on this device have changed or the keyguard has been disabled. Please use your PIN instead.\n\nYou can then set up Biometric Login again from Settings.</string>
+    <string name="biometrics_key_invalidated_settings_description">Either the biometrics stored on this device have changed or the keyguard has been disabled.\n\nPlease re-add your biometrics and try again.</string>
+    <string name="fingerprint_fatal_error_authenticate_description">There have been too many failed attempts. Please log in using your PIN instead.</string>
     <string name="fingerprint_fatal_error_brief">Unexpected error</string>
+    <string name="fingerprint_fatal_error_desc">Something went wrong while trying to use biometrics, please use your PIN instead.\n\nYou can then set up Biometric Login again from Settings.\nError: %1$s</string>
+    <string name="biometrics_disabled_lockout_title">Authentication failure</string>
+    <string name="biometrics_disabled_lockout_desc">You have failed too many attempts to authenticate, please wait 30 seconds and try again</string>
+    <string name="biometrics_disabled_lockout_perm_desc">Your biometrics sensors are disabled, please lock your device and un-lock it using your PIN, Pattern or Password to re-enable them.\n\nOnce this is done, please try again.</string>
+    <string name="biometrics_action_settings">Go to Settings</string>
+    <string name="biometrics_enrollment_title">Enable Biometrics</string>
+    <string name="biometrics_enrollment_desc">Quickly sign into your wallet instead of using your PIN.</string>
+
+
     <string name="shortcut_receive_copy_short">Copy Address</string>
 
     <!-- LAUNCHER SHORTCUTS -->

@@ -35,6 +35,7 @@ const val URL_THE_PIT_LAUNCH_SUPPORT = "https://exchange-support.blockchain.com/
 
 const val URL_COINIFY_POLICY = "https://coinify.com/legal"
 const val URL_TOS_POLICY = "https://blockchain.com/terms"
+const val URL_BACKUP_INFO = "https://support.blockchain.com/hc/en-us/articles/209564506-Make-a-Wallet-Backup"
 const val URL_PRIVACY_POLICY = "https://blockchain.com/privacy"
 const val URL_CONTACT_SUPPORT = "https://support.blockchain.com/hc/requests/new"
 const val URL_LEARN_MORE_REJECTED =
@@ -62,3 +63,6 @@ const val URL_TX_FEES = "https://support.blockchain.com/hc/en-us/articles/360000
 
 const val YODLEE_LEARN_MORE = "https://www.yodlee.com/legal/yodlee-security"
 const val URL_YODLEE_SUPPORT_LEARN_MORE = "https://support.blockchain.com/hc/en-us/articles/360053570252 "
+
+const val APP_STORE_URI = "market://details?id="
+const val APP_STORE_URL = "https://play.google.com/store/apps/details?id="
