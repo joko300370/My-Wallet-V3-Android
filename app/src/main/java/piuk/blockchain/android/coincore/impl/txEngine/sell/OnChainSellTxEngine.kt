@@ -42,7 +42,6 @@ class OnChainSellTxEngine(
             .firstOrError()
             .doOnSuccess { pricedQuote ->
                 engine.startFromQuote(pricedQuote)
-                engine.assertInputsValid()
             }.flatMap { quote ->
                 engine.doInitialiseTx()
                     .flatMap {
