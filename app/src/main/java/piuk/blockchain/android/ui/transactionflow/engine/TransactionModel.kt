@@ -276,12 +276,6 @@ class TransactionModel(
                 )
                     onFirstUpdate(amount)
             }
-            .doOnDispose {
-                println("Disposeddddd ${transactionTarget.label}")
-            }
-            .doOnComplete {
-                println("Disposeddddd completeddd ${transactionTarget.label}")
-            }
             .subscribeBy(
                 onNext = {
                     process(TransactionIntent.PendingTxUpdated(it))
