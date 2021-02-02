@@ -48,7 +48,8 @@ class OnChainSwapTxEngine(
             check(txTarget is CustodialTradingAccount)
         }
         check(asset != (txTarget as CryptoAccount).asset)
-        engine.assertInputsValid()
+        // TODO: Re-enable this once start() has been refactored to be Completable
+//        engine.assertInputsValid()
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
