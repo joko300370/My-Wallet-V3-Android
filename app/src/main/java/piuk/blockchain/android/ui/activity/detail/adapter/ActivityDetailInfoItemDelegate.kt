@@ -145,21 +145,27 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
             is BuyPaymentMethod -> {
                 when {
                     infoType.paymentDetails.endDigits != null &&
-                        infoType.paymentDetails.label != null &&
-                        infoType.paymentDetails.accountType != null -> {
-                        val accountInfo = parent.context.getString(
-                            R.string.common_hyphenated_strings, infoType.paymentDetails.label,
-                            infoType.paymentDetails.endDigits
-                        )
+                        infoType.paymentDetails.label != null -> {
 
-                        parent.context.getString(
-                            R.string.common_newlined_strings,
-                            accountInfo,
-                            parent.context.getString(
-                                R.string.payment_method_type_account_info, infoType.paymentDetails.accountType, ""
+                        with(parent.context) {
+                            infoType.paymentDetails.accountType?.let {
+                                val accType = getString(
+                                    R.string.payment_method_type_account_info,
+                                    infoType.paymentDetails.accountType,
+                                    infoType.paymentDetails.endDigits
+                                )
+
+                                getString(
+                                    R.string.common_spaced_strings,
+                                    infoType.paymentDetails.label,
+                                    accType
+                                )
+                            } ?: getString(
+                                R.string.common_hyphenated_strings,
+                                infoType.paymentDetails.label,
+                                infoType.paymentDetails.endDigits
                             )
-
-                        )
+                        }
                     }
                     infoType.paymentDetails.paymentMethodId == PaymentMethod.FUNDS_PAYMENT_ID -> {
                         parent.context.getString(R.string.checkout_funds_label)

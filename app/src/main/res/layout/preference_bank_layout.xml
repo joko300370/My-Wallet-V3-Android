@@ -7,25 +7,25 @@
     android:layout_height="wrap_content">
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/account_info"
+        android:id="@+id/end_digits"
         style="@style/Text.Standard.16"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/medium_margin"
-        app:layout_constraintBottom_toTopOf="@id/end_digits"
+        app:layout_constraintBottom_toTopOf="@id/account_info"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Checking" />
+        tools:text="3234" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/end_digits"
+        android:id="@+id/account_info"
         style="@style/Text.Light.14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/account_info"
-        app:layout_constraintTop_toBottomOf="@id/account_info"
-        tools:text="3234" />
+        app:layout_constraintEnd_toEndOf="@id/end_digits"
+        app:layout_constraintTop_toBottomOf="@id/end_digits"
+        tools:text="Checking" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/add_bank"
