@@ -166,7 +166,7 @@ class BchOnChainTxEngine(
 
     private fun validateSufficientFunds(pendingTx: PendingTx): Completable =
         Completable.fromCallable {
-            if (pendingTx.hasSufficientFunds()) {
+            if (!pendingTx.hasSufficientFunds()) {
                 throw TxValidationFailure(ValidationState.INSUFFICIENT_FUNDS)
             }
         }

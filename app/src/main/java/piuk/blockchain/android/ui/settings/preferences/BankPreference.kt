@@ -50,7 +50,7 @@ class BankPreference(
             accountInfo.visible()
             endDigits.visible()
             accountInfo.text = it.toHumanReadableAccount()
-            endDigits.text = endDigits.context.getString(R.string.dotted_suffixed_string, it.account)
+            endDigits.text = it.account
         } ?: kotlin.run {
             accountInfo.gone()
             endDigits.gone()

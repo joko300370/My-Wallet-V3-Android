@@ -17,6 +17,7 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.FiatCryptoInputView
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
@@ -198,6 +199,8 @@ class EnterAmountSheet : TransactionFlowSheet() {
     }
 
     private fun updateSourceAndTargetDetails(state: TransactionState) {
+        if (state.selectedTarget is NullAddress)
+            return
         with(dialogView) {
             amount_sheet_from.text = customiser.enterAmountSourceLabel(state)
             amount_sheet_to.text = customiser.enterAmountTargetLabel(state)
@@ -256,7 +259,8 @@ class EnterAmountSheet : TransactionFlowSheet() {
 
     private fun showKeyboard() {
         val inputView = dialogView.amount_sheet_input.findViewById<PrefixedOrSuffixedEditText>(
-            R.id.enter_amount)
+            R.id.enter_amount
+        )
         inputView?.run {
             requestFocus()
             imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)

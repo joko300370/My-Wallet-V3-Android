@@ -25,9 +25,8 @@ class TransferQuotesEngine(
 
     private val stop = PublishSubject.create<Unit>()
 
-    private val amount by lazy {
-        BehaviorSubject.createDefault(pair.toSourceMoney(BigInteger.ZERO))
-    }
+    private val amount
+        get() = BehaviorSubject.createDefault(pair.toSourceMoney(BigInteger.ZERO))
 
     private val quote: Observable<TransferQuote>
         get() = quotesProvider.fetchQuote(direction = direction, pair = pair).flatMapObservable { quote ->
