@@ -29,6 +29,7 @@ import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.coincore.btc.BtcActivitySummaryItem
 import piuk.blockchain.android.coincore.erc20.Erc20ActivitySummaryItem
 import piuk.blockchain.android.coincore.eth.EthActivitySummaryItem
+import piuk.blockchain.android.coincore.xlm.XlmActivitySummaryItem
 import piuk.blockchain.android.repositories.AssetActivityRepository
 import piuk.blockchain.android.ui.dashboard.assetdetails.selectFirstAccount
 import piuk.blockchain.android.util.StringUtils
@@ -269,6 +270,7 @@ class ActivityDetailsInteractor(
         HistoricValue(fiatValue, item.transactionType),
         addSingleOrMultipleFromAddresses(transactionInOutDetails),
         addFeeForTransaction(item),
+        checkIfShouldAddMemo(item),
         checkIfShouldAddDescription(item),
         Action()
     )
@@ -301,6 +303,7 @@ class ActivityDetailsInteractor(
         HistoricValue(fiatValue, item.transactionType),
         addSingleOrMultipleFromAddresses(transactionInOutDetails),
         addSingleOrMultipleToAddresses(transactionInOutDetails),
+        checkIfShouldAddMemo(item),
         checkIfShouldAddDescription(item),
         Action()
     )
@@ -333,6 +336,7 @@ class ActivityDetailsInteractor(
         HistoricValue(fiatValue, item.transactionType),
         addSingleOrMultipleFromAddresses(transactionInOutDetails),
         addSingleOrMultipleToAddresses(transactionInOutDetails),
+        checkIfShouldAddMemo(item),
         checkIfShouldAddDescription(item),
         Action()
     )
@@ -378,6 +382,7 @@ class ActivityDetailsInteractor(
         HistoricValue(fiatValue, item.transactionType),
         addSingleOrMultipleFromAddresses(transactionInOutDetails),
         addSingleOrMultipleToAddresses(transactionInOutDetails),
+        checkIfShouldAddMemo(item),
         checkIfShouldAddDescription(item),
         Action()
     )
@@ -474,6 +479,13 @@ class ActivityDetailsInteractor(
         is BtcActivitySummaryItem,
         is EthActivitySummaryItem,
         is Erc20ActivitySummaryItem -> Description(item.description)
+        else -> null
+    }
+
+    private fun checkIfShouldAddMemo(
+        item: NonCustodialActivitySummaryItem
+    ): XlmMemo? = when (item) {
+        is XlmActivitySummaryItem -> if (item.xlmMemo.isNotBlank()) XlmMemo(item.xlmMemo) else null
         else -> null
     }
 }

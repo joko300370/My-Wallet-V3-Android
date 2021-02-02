@@ -12,6 +12,7 @@ import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.CustodialOrderState
 import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
+import com.blockchain.sunriver.Memo
 import com.blockchain.testutils.stroops
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -77,6 +78,7 @@ class XlmAccountActivityTest {
             output.stroops(),
             100.stroops(),
             TX_HASH_RECEIVE,
+            Memo.None,
             HorizonKeyPair.Public(HORIZON_ACCOUNT_ID_1),
             HorizonKeyPair.Public(HORIZON_ACCOUNT_ID_2)
         )
@@ -148,6 +150,7 @@ class XlmAccountActivityTest {
             value.unaryMinus().stroops(),
             fee.stroops(),
             TX_HASH_SEND_NO_MATCH,
+            Memo.None,
             HorizonKeyPair.Public(HORIZON_ACCOUNT_ID_1),
             HorizonKeyPair.Public(HORIZON_ACCOUNT_ID_2)
         )
@@ -219,6 +222,7 @@ class XlmAccountActivityTest {
             output.stroops(),
             100.stroops(),
             TX_HASH_SEND_MATCH,
+            Memo.None,
             HorizonKeyPair.Public(HORIZON_ACCOUNT_ID_1),
             HorizonKeyPair.Public(HORIZON_ACCOUNT_ID_2)
         )

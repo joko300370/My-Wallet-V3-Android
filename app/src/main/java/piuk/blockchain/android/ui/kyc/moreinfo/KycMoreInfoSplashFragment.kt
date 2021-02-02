@@ -41,7 +41,7 @@ class KycMoreInfoSplashFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        disposable += view!!.findViewById<View>(R.id.button_kyc_more_info_splash_next)
+        disposable += requireView().findViewById<View>(R.id.button_kyc_more_info_splash_next)
             .throttledClicks()
             .subscribeBy(
                 onNext = {

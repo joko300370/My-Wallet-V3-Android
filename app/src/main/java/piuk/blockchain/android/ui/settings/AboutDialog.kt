@@ -36,7 +36,7 @@ class AboutDialog : SlidingModalBottomDialog() {
                     loadUrl("file:///android_asset/licenses.html")
                 }
 
-                AlertDialog.Builder(activity!!, R.style.AlertDialogStyle)
+                AlertDialog.Builder(requireActivity(), R.style.AlertDialogStyle)
                     .setView(layout)
                     .setPositiveButton(android.R.string.ok, null)
                     .show()

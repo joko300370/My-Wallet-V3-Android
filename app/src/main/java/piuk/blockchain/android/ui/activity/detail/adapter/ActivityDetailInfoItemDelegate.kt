@@ -29,6 +29,7 @@ import piuk.blockchain.android.ui.activity.detail.SwapReceiveAmount
 import piuk.blockchain.android.ui.activity.detail.To
 import piuk.blockchain.android.ui.activity.detail.TransactionId
 import piuk.blockchain.android.ui.activity.detail.Value
+import piuk.blockchain.android.ui.activity.detail.XlmMemo
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.inflate
@@ -99,6 +100,7 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
                 R.string.tx_confirmation_network_fee,
                 (infoType.feeValue as CryptoValue).currency.displayTicker
             )
+            is XlmMemo -> parent.context.getString(R.string.xlm_memo_text)
             else -> parent.context.getString(R.string.empty)
         }
 
@@ -177,6 +179,7 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
             }
             is SwapReceiveAmount -> infoType.receivedAmount.toStringWithSymbol()
             is NetworkFee -> infoType.feeValue.toStringWithSymbol()
+            is XlmMemo -> infoType.memo
             else -> ""
         }
 }

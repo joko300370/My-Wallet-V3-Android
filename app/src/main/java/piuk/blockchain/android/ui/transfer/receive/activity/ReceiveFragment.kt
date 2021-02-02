@@ -102,7 +102,7 @@ class ReceiveFragment : MvpFragment<ReceiveView, ReceivePresenter>(),
         scrollview?.post { scrollview?.scrollTo(0, 0) }
 
         requireActivity().onBackPressedDispatcher.addCallback(
-            this, object : OnBackPressedCallback(true) {
+            viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (custom_keyboard.isVisible) {
                     closeKeypad()
