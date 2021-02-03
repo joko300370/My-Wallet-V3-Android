@@ -28,7 +28,7 @@ class InterestDepositTxEngine(
         check(txTarget is ReceiveAddress)
 
         // TODO: Re-enable this once start() has been refactored to be Completable
-        // We should pass the receiveAddress here cause we need to start the onchain engine with that
+        // We have to pass the receiveAddress here cause we need to start the onchain engine with that
         // and so we need a way to get the receiveAddress from the CryptoInterestAccount.
         // This will be possible when start() returns a completable
         // check(sourceAccount.asset == (txTarget as CryptoInterestAccount).asset)
