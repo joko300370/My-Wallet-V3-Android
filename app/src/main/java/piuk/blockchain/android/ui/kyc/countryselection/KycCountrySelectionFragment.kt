@@ -32,6 +32,7 @@ import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.ui.customviews.toast
 import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
 import piuk.blockchain.android.util.inflate
+import java.io.Serializable
 import java.util.concurrent.TimeUnit
 
 internal class KycCountrySelectionFragment :
@@ -100,12 +101,12 @@ internal class KycCountrySelectionFragment :
         compositeDisposable.clear()
     }
 
-    override fun continueFlow(countryCode: String, stateCode: String?) {
+    override fun continueFlow(countryCode: String, state: USState?) {
         analytics.logEvent(KYCAnalyticsEvents.CountrySelected)
         navigate(
             KycCountrySelectionFragmentDirections.actionKycCountrySelectionFragmentToKycProfileFragment(
                 countryCode,
-                stateCode ?: ""
+                state
             )
         )
     }
@@ -175,3 +176,5 @@ internal enum class RegionType {
     Country,
     State
 }
+
+internal data class USState(val stateCode: String, val stateName: String) : Serializable
