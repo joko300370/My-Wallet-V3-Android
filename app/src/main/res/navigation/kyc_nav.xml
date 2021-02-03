@@ -51,7 +51,7 @@
             app:argType="string" />
         <argument
             android:name="stateCode"
-            android:defaultValue="@null"
+            app:nullable="true"
             app:argType="USState" />
     </fragment>
     <fragment
