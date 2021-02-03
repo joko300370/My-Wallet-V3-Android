@@ -47,7 +47,7 @@ object Versions {
 
     // Networking, RxJava
     const val retrofit = "2.7.0"
-    const val okHttp = "4.0.1"
+    const val okHttp = "4.9.0"
     const val mockWebServer = "v0.1.8"
     const val moshi = "1.8.0"
     const val gson = "2.8.5"
