@@ -7,6 +7,7 @@ import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
+import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
@@ -14,7 +15,6 @@ import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxFee
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.ValidationState
-import piuk.blockchain.android.coincore.impl.CryptoInterestAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
@@ -25,9 +25,15 @@ class InterestDepositTxEngine(
 
     override fun assertInputsValid() {
         check(sourceAccount is CryptoNonCustodialAccount)
-        check(txTarget is CryptoInterestAccount)
-        check(sourceAccount.asset == (txTarget as CryptoInterestAccount).asset)
-        onChainEngine.assertInputsValid()
+        check(txTarget is ReceiveAddress)
+
+        // TODO: Re-enable this once start() has been refactored to be Completable
+        // We should pass the receiveAddress here cause we need to start the onchain engine with that
+        // and so we need a way to get the receiveAddress from the CryptoInterestAccount.
+        // This will be possible when start() returns a completable
+        // check(sourceAccount.asset == (txTarget as CryptoInterestAccount).asset)
+        // check(txTarget is CryptoInterestAccount)
+        // onChainEngine.assertInputsValid()
     }
 
     override fun start(
