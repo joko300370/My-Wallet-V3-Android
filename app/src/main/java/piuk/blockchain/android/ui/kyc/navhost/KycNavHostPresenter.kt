@@ -132,5 +132,6 @@ internal fun NabuUser.toProfileModel(): ProfileModel = ProfileModel(
     firstName = firstName ?: throw IllegalStateException("First Name is null"),
     lastName = lastName ?: throw IllegalStateException("Last Name is null"),
     countryCode = address?.countryCode ?: throw IllegalStateException("Country Code is null"),
-    state = address?.state
+    stateName = address?.state,
+    stateCode = address?.state
 )

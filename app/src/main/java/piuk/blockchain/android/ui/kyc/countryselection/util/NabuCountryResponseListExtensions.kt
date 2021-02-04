@@ -43,7 +43,7 @@ data class CountryDisplayModel(
     val searchCode = "${name.acronym()};$regionCode;$name"
 }
 
-internal fun String.toUiUSState() =
+private fun String.toUiUSState() =
     this.removePrefix("US-")
 
 internal fun String.acronym(): String = String(

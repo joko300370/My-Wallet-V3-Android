@@ -65,10 +65,15 @@ class KycProfileFragment : BaseFragment<KycProfileView, KycProfilePresenter>(), 
         ).countryCode
     }
 
-    override val state: String?
+    override val stateCode: String?
         get() = KycProfileFragmentArgs.fromBundle(
             arguments ?: Bundle()
         ).stateCode.takeIf { it.isNotEmpty() }
+
+    override val stateName: String?
+        get() = KycProfileFragmentArgs.fromBundle(
+            arguments ?: Bundle()
+        ).stateName.takeIf { it.isNotEmpty() }
 
     override var dateOfBirth: Calendar? = null
     private var progressDialog: MaterialProgressDialog? = null

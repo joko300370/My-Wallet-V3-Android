@@ -100,12 +100,13 @@ internal class KycCountrySelectionFragment :
         compositeDisposable.clear()
     }
 
-    override fun continueFlow(countryCode: String, stateCode: String?) {
+    override fun continueFlow(countryCode: String, stateCode: String?, stateName: String?) {
         analytics.logEvent(KYCAnalyticsEvents.CountrySelected)
         navigate(
             KycCountrySelectionFragmentDirections.actionKycCountrySelectionFragmentToKycProfileFragment(
                 countryCode,
-                stateCode ?: ""
+                stateCode ?: "",
+                stateName ?: ""
             )
         )
     }
