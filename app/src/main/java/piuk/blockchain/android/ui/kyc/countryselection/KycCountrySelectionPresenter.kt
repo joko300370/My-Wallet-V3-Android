@@ -67,7 +67,7 @@ internal class KycCountrySelectionPresenter(
                         view.continueFlow(
                             countryDisplayModel.countryCode,
                             countryDisplayModel.state,
-                            countryDisplayModel.name
+                            if (countryDisplayModel.isState) countryDisplayModel.name else null
                         )
                     },
                     onComplete = {
