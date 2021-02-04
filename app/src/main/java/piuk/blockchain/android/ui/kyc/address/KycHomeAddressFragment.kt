@@ -36,6 +36,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.jakewharton.rx.replayingShare
+import com.jakewharton.rxbinding2.view.enabled
 import com.jakewharton.rxbinding2.widget.afterTextChangeEvents
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -261,6 +262,12 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
                 .doOnNext { addressSubject.onNext(AddressIntent.PostCode(it)) }
                 .subscribe()
 
+            compositeDisposable += editTextState
+                .onDelayedChange(KycStep.State)
+                .filter { !profileModel.isInUs() }
+                .doOnNext { addressSubject.onNext(AddressIntent.State(it)) }
+                .subscribe()
+
             addressSubject.onNext(AddressIntent.State(profileModel.state ?: ""))
 
             compositeDisposable +=
@@ -311,8 +318,11 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
         progressDialog = null
     }
 
+    private fun ProfileModel.isInUs() =
+        countryCode.equals("US", ignoreCase = true)
+
     private fun localiseUi() {
-        if (profileModel.countryCode.equals("US", ignoreCase = true)) {
+        if (profileModel.isInUs()) {
             searchViewAddress.queryHint = getString(
                 R.string.kyc_address_search_hint,
                 getString(R.string.kyc_address_search_hint_zipcode)
@@ -322,6 +332,7 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
             textInputCity.hint = getString(R.string.kyc_address_address_city_hint)
             textInputLayoutState.hint = getString(R.string.kyc_address_address_state_hint)
             textInputLayoutZipCode.hint = getString(R.string.kyc_address_address_zip_code_hint_1)
+            textInputLayoutState.editText?.isEnabled = false
         } else {
             searchViewAddress.queryHint = getString(
                 R.string.kyc_address_search_hint,
@@ -332,6 +343,7 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
             textInputCity.hint = getString(R.string.kyc_address_city_town_village)
             textInputLayoutState.hint = getString(R.string.kyc_address_state_region_province_county)
             textInputLayoutZipCode.hint = getString(R.string.kyc_address_postal_code)
+            textInputLayoutState.editText?.isEnabled = true
         }
 
         editTextCountry.setText(
