@@ -8,7 +8,7 @@ internal interface KycCountrySelectionView : View {
 
     val regionType: RegionType
 
-    fun continueFlow(countryCode: String, state: USState?)
+    fun continueFlow(countryCode: String, stateCode: String?, stateName: String?)
 
     fun invalidCountry(displayModel: CountryDisplayModel)
 

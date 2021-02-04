@@ -51,8 +51,10 @@
             app:argType="string" />
         <argument
             android:name="stateCode"
-            app:nullable="true"
-            app:argType="USState" />
+            app:argType="string" />
+        <argument
+            android:name="stateName"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/kycInvalidCountryFragment"
