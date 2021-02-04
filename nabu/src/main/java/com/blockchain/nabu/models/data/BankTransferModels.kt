@@ -46,7 +46,7 @@ data class LinkedBank(
         get() = PaymentMethodType.BANK_TRANSFER
 
     override fun toHumanReadableAccount(): String =
-        accountType.toLowerCase(Locale.getDefault()).capitalize(Locale.getDefault())
+        accountType.toLowerCase(Locale.ROOT).capitalize(Locale.getDefault())
 }
 
 enum class LinkedBankErrorState {
