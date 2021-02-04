@@ -90,7 +90,7 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
             "",
             null,
             "",
-            profileModel.stateCode?:"",
+            profileModel.stateCode ?: "",
             "",
             profileModel.countryCode
         )
