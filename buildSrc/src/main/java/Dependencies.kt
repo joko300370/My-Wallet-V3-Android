@@ -6,8 +6,8 @@ object Versions {
     const val minSdk = 23
     const val targetSdk = 30
     const val compileSdk = 30
-    const val versionCode = 603
-    const val versionName = "8.4.4"
+    const val versionCode = 607
+    const val versionName = "8.4.5"
     const val buildTools = "28.0.3"
 
     // Build tools and languages
@@ -47,7 +47,7 @@ object Versions {
 
     // Networking, RxJava
     const val retrofit = "2.7.0"
-    const val okHttp = "4.0.1"
+    const val okHttp = "4.9.0"
     const val mockWebServer = "v0.1.8"
     const val moshi = "1.8.0"
     const val gson = "2.8.5"

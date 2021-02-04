@@ -17,6 +17,7 @@ import info.blockchain.wallet.exceptions.HDWalletException
 import info.blockchain.wallet.exceptions.InvalidCredentialsException
 import info.blockchain.wallet.exceptions.ServerConnectionException
 import info.blockchain.wallet.exceptions.UnsupportedVersionException
+import io.reactivex.Single
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.spongycastle.crypto.InvalidCipherTextException
@@ -526,7 +527,7 @@ class PinEntryPresenter(
     }
 
     private fun getPinRetriesFromRemoteConfig(action: (Int) -> Unit) {
-        compositeDisposable += config.getFeatureCount(PIN_RETRIES_KEY)
+        compositeDisposable += Single.just(LOCAL_MAX_ATTEMPTS)
             .onErrorReturn { LOCAL_MAX_ATTEMPTS }
             .subscribeBy(
                 onSuccess = {
