@@ -51,11 +51,11 @@ import kotlinx.android.synthetic.main.activity_scan.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.ui.scan.camera.CameraManager
+import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.android.util.windowRect
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.extensions.toast
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
+import piuk.blockchain.androidcoreui.ui.customviews.toast
 import timber.log.Timber
 import java.io.IOException
 import java.util.EnumSet
@@ -242,7 +242,7 @@ class QrScanActivity : BlockchainActivity(), SurfaceHolder.Callback {
         return super.onKeyDown(keyCode, event)
     }
 
-    override fun surfaceCreated(holder: SurfaceHolder?) {
+    override fun surfaceCreated(holder: SurfaceHolder) {
         if (holder == null) {
             Timber.e("*** WARNING *** surfaceCreated() gave us a null surface!")
         }
@@ -376,7 +376,7 @@ class QrScanActivity : BlockchainActivity(), SurfaceHolder.Callback {
                     SCAN_URI_RESULT
                 )
             } else {
-                fragment.context?.toast(R.string.camera_unavailable, ToastCustom.TYPE_ERROR)
+                fragment.toast(R.string.camera_unavailable, ToastCustom.TYPE_ERROR)
             }
 
         private fun doStart(activity: Activity, expect: Set<QrExpected>) =

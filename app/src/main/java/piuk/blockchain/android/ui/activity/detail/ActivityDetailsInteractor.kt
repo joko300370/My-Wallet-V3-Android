@@ -1,15 +1,14 @@
 package piuk.blockchain.android.ui.activity.detail
 
-import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.PaymentLimits
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.LinkedBank
+import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -30,6 +29,7 @@ import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.coincore.btc.BtcActivitySummaryItem
 import piuk.blockchain.android.coincore.erc20.Erc20ActivitySummaryItem
 import piuk.blockchain.android.coincore.eth.EthActivitySummaryItem
+import piuk.blockchain.android.coincore.xlm.XlmActivitySummaryItem
 import piuk.blockchain.android.repositories.AssetActivityRepository
 import piuk.blockchain.android.ui.dashboard.assetdetails.selectFirstAccount
 import piuk.blockchain.android.util.StringUtils
@@ -89,12 +89,6 @@ class ActivityDetailsInteractor(
             else -> {
                 list.add(BuyPaymentMethod(
                     PaymentDetails(summaryItem.paymentMethodId)))
-
-                if (summaryItem.status == OrderState.AWAITING_FUNDS ||
-                    summaryItem.status == OrderState.PENDING_EXECUTION
-                ) {
-                    list.add(CancelAction())
-                }
                 Single.just(list.toList())
             }
         }
@@ -202,12 +196,9 @@ class ActivityDetailsInteractor(
     ) {
         paymentMethod?.let {
             list.add(BuyPaymentMethod(PaymentDetails(
-                it.id, it.label(), it.endDigits()
+                it.id, it.label(), it.endDigits(), it.accountType()
             )))
         } ?: list.add(BuyPaymentMethod(PaymentDetails(summaryItem.paymentMethodId)))
-        if (summaryItem.status == OrderState.PENDING_CONFIRMATION) {
-            list.add(CancelAction())
-        }
     }
 
     fun getCustodialTradingActivityDetails(
@@ -279,6 +270,7 @@ class ActivityDetailsInteractor(
         HistoricValue(fiatValue, item.transactionType),
         addSingleOrMultipleFromAddresses(transactionInOutDetails),
         addFeeForTransaction(item),
+        checkIfShouldAddMemo(item),
         checkIfShouldAddDescription(item),
         Action()
     )
@@ -311,6 +303,7 @@ class ActivityDetailsInteractor(
         HistoricValue(fiatValue, item.transactionType),
         addSingleOrMultipleFromAddresses(transactionInOutDetails),
         addSingleOrMultipleToAddresses(transactionInOutDetails),
+        checkIfShouldAddMemo(item),
         checkIfShouldAddDescription(item),
         Action()
     )
@@ -343,6 +336,7 @@ class ActivityDetailsInteractor(
         HistoricValue(fiatValue, item.transactionType),
         addSingleOrMultipleFromAddresses(transactionInOutDetails),
         addSingleOrMultipleToAddresses(transactionInOutDetails),
+        checkIfShouldAddMemo(item),
         checkIfShouldAddDescription(item),
         Action()
     )
@@ -388,6 +382,7 @@ class ActivityDetailsInteractor(
         HistoricValue(fiatValue, item.transactionType),
         addSingleOrMultipleFromAddresses(transactionInOutDetails),
         addSingleOrMultipleToAddresses(transactionInOutDetails),
+        checkIfShouldAddMemo(item),
         checkIfShouldAddDescription(item),
         Action()
     )
@@ -486,6 +481,13 @@ class ActivityDetailsInteractor(
         is Erc20ActivitySummaryItem -> Description(item.description)
         else -> null
     }
+
+    private fun checkIfShouldAddMemo(
+        item: NonCustodialActivitySummaryItem
+    ): XlmMemo? = when (item) {
+        is XlmActivitySummaryItem -> if (item.xlmMemo.isNotBlank()) XlmMemo(item.xlmMemo) else null
+        else -> null
+    }
 }
 
 private fun PaymentMethod.endDigits(): String? =
@@ -502,10 +504,17 @@ private fun PaymentMethod.label(): String? =
         else -> null
     }
 
+private fun PaymentMethod.accountType(): String? =
+    when (this) {
+        is PaymentMethod.Bank -> uiAccountType
+        else -> null
+    }
+
 private fun LinkedBank.toPaymentMethod() =
     PaymentMethod.Bank(
         bankId = id,
         limits = PaymentLimits(0, 0, currency),
         bankName = name,
-        accountEnding = accountNumber
+        accountEnding = accountNumber,
+        accountType = accountType
     )

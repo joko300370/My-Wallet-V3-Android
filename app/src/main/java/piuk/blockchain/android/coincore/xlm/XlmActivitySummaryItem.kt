@@ -51,4 +51,7 @@ class XlmActivitySummaryItem(
 
     override val confirmations: Int
         get() = CryptoCurrency.XLM.requiredConfirmations
+
+    val xlmMemo: String
+        get() = xlmTransaction.memo.value
 }

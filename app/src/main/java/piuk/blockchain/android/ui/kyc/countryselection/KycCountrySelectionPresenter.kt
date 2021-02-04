@@ -63,7 +63,7 @@ internal class KycCountrySelectionPresenter(
                         !countryDisplayModel.requiresStateSelection()
                 }
                 .subscribeBy(
-                    onSuccess = { view.continueFlow(countryDisplayModel.countryCode) },
+                    onSuccess = { view.continueFlow(countryDisplayModel.countryCode, countryDisplayModel.state) },
                     onComplete = {
                         when {
                             // Not found, is US, must select state

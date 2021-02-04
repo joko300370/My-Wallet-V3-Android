@@ -1,9 +1,9 @@
 package piuk.blockchain.android.ui.dashboard.announcements
 
 import com.blockchain.koin.coinifyUsersToKyc
+import com.blockchain.koin.dgldFeatureFlag
 import com.blockchain.koin.payloadScope
 import com.blockchain.koin.payloadScopeQualifier
-import com.blockchain.koin.dgldFeatureFlag
 import io.reactivex.android.schedulers.AndroidSchedulers
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -19,7 +19,6 @@ import piuk.blockchain.android.ui.dashboard.announcements.rule.KycForAirdropsAnn
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycIncompleteAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycMoreInfoAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycResubmissionAnnouncement
-import piuk.blockchain.android.ui.dashboard.announcements.rule.SwapAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.PitAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.RegisterFingerprintsAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.RegisteredForAirdropMiniAnnouncement
@@ -27,6 +26,7 @@ import piuk.blockchain.android.ui.dashboard.announcements.rule.SellIntroAnnounce
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyAddCardAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyFinishSignupAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.StxCompleteAnnouncement
+import piuk.blockchain.android.ui.dashboard.announcements.rule.SwapAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.TransferCryptoAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.TwoFAAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.VerifyEmailAnnouncement
@@ -149,7 +149,7 @@ val dashboardAnnouncementsModule = module {
         factory {
             RegisterFingerprintsAnnouncement(
                 dismissRecorder = get(),
-                fingerprints = get()
+                biometricsController = get()
             )
         }.bind(AnnouncementRule::class)
 

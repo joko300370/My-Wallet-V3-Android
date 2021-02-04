@@ -28,9 +28,9 @@ import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.assetName
-import piuk.blockchain.android.util.extensions.secondsToDays
+import piuk.blockchain.android.util.secondsToDays
 import piuk.blockchain.android.util.maskedAsset
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.util.inflate
 import java.math.BigInteger
 
 class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(),

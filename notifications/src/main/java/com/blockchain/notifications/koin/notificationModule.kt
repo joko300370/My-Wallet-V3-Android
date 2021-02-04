@@ -39,7 +39,7 @@ val notificationModule = module {
 
     single { FirebaseDynamicLinks.getInstance() }
 
-    factory { DynamicLinkHandler(get()) as PendingLink }
+    factory { DynamicLinkHandler(get()) }.bind(PendingLink::class)
 
     factory {
         AnalyticsImpl(

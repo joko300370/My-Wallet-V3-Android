@@ -22,7 +22,7 @@ internal class AlgoCryptoWalletAccount(
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ALGO) {
 
     override val accountBalance: Single<Money>
-        get() = Single.just(CryptoValue.ZeroAlg)
+        get() = Single.just(CryptoValue.zero(asset))
 
     override val actionableBalance: Single<Money>
         get() = accountBalance
@@ -36,8 +36,8 @@ internal class AlgoCryptoWalletAccount(
     override val isFunded: Boolean
         get() = false
 
-    override val actions: AvailableActions
-        get() = setOf(AssetAction.ViewActivity)
+    override val actions: Single<AvailableActions>
+        get() = Single.just(setOf(AssetAction.ViewActivity))
 
     override fun createTxEngine(): TxEngine {
         TODO("Not yet implemented")

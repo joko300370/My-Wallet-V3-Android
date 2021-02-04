@@ -19,8 +19,8 @@ import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.withdraw.mvi.WithdrawIntent
 import piuk.blockchain.android.withdraw.mvi.WithdrawModel
 import piuk.blockchain.android.withdraw.mvi.WithdrawState
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.inflate
 
 class WithdrawCheckoutFragment : MviFragment<WithdrawModel, WithdrawIntent, WithdrawState>(), WithdrawScreen {
     override val model: WithdrawModel by scopedInject()
@@ -60,7 +60,7 @@ class WithdrawCheckoutFragment : MviFragment<WithdrawModel, WithdrawIntent, With
             CheckoutItem(getString(R.string.common_from), getString(R.string.currency_funds_wallet, state.currency)),
             CheckoutItem(
                 getString(R.string.withdraw_to),
-                state.selectedBank?.title?.plus(" ${state.selectedBank.account}") ?: ""
+                state.selectedBank?.name?.plus(" ${state.selectedBank.account}") ?: ""
             ),
             CheckoutItem(getString(R.string.fee), state.fee?.toStringWithSymbol() ?: ""),
             CheckoutItem(getString(R.string.common_total), state.total?.toStringWithSymbol() ?: "")

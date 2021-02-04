@@ -10,8 +10,9 @@ import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
-import piuk.blockchain.androidcoreui.utils.extensions.visible
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.visibleIf
 
 class SelectTargetAccountSheet : TransactionFlowSheet() {
 
@@ -38,13 +39,26 @@ class SelectTargetAccountSheet : TransactionFlowSheet() {
 
     override fun initControls(view: View) {
         view.apply {
-            account_list.onAccountSelected = {
-                require(it is SingleAccount)
-                model.process(TransactionIntent.TargetAccountSelected(it))
-            }
+            account_list.onAccountSelected = ::doOnAccountSelected
+            account_list.onListLoaded = ::doOnListLoaded
+            account_list.onLoadError = ::doOnLoadError
             account_list_back.setOnClickListener {
                 model.process(TransactionIntent.ReturnToPreviousStep)
             }
         }
+    }
+
+    private fun doOnListLoaded(isEmpty: Boolean) {
+        dialogView.progress.gone()
+    }
+
+    private fun doOnAccountSelected(account: BlockchainAccount) {
+        require(account is SingleAccount)
+        model.process(TransactionIntent.TargetAccountSelected(account))
+    }
+
+    private fun doOnLoadError(it: Throwable) {
+        dialogView.account_list_empty.visible()
+        dialogView.progress.gone()
     }
 }

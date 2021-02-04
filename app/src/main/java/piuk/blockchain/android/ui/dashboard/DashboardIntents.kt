@@ -51,7 +51,7 @@ object GetAvailableAssets : DashboardIntent() {
 
 object RefreshAllIntent : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState {
-        return oldState.copy(assets = oldState.assets.reset())
+        return oldState.copy(assets = oldState.assets.reset(), fiatAssets = FiatAssetState())
     }
 }
 

@@ -51,7 +51,7 @@
  новый пароль 
 </string>
     <string name="no_private_key">Невозможно создать закрытый ключ.</string>
-    <string name="pin_4_strikes">4 неудачных попытки PIN-кода. Пожалуйста, введите пароль.</string>
+    <string name="pin_max_strikes">%1$d неудачных попытки PIN-кода. Пожалуйста, введите пароль.</string>
     <string name="pin_4_strikes_password_accepted">Пароль принят. Пожалуйста, определите новый PIN-код.
 </string>
     <string name="bip38_password_entry">Пожалуйста, введите пароль закрытого ключа</string>
@@ -160,7 +160,7 @@
     <string name="remote_save_ko">Сохранить неудачно</string>
     <string name="change_pin_code">Изменить PIN</string>
     <string name="drawer_addresses">Адреса</string>
-    <string name="wallets">бумажники</string>
+    <string name="wallets">Кошельки</string>
     <string name="save_name">Сохранить имя</string>
     <string name="receive_address_to_clipboard">Скопировать этот получаемый адрес в буфер обмена? Если так,
  Имейте в виду, что другие приложения могут просматривать эту информацию. 
@@ -540,8 +540,6 @@
     <string name="eth_second_password_prompt">Чтобы использовать эту услугу, мы требуем от вас ввести
  второй пароль. 
 </string>
-    <string name="ether">эфир</string>
-    <string name="bitcoin">Bitcoin</string>
     <string name="dashboard_title">Приборная доска</string>
     <string name="dashboard_time_span_last_day">Последний день</string>
     <string name="dashboard_time_span_last_month">Прошлый месяц</string>
@@ -872,8 +870,19 @@
     <string name="xlm_memo_id">Memo ID</string>
     <string name="airdrop_activity_title">Airdrops</string>
     <string name="simple_buy_intro_title">Добро пожаловать в блокчейн</string>
+    <string name="simple_buy_buy_crypto">Купить Крипто</string>
+    <string name="simple_buy_instructions_to_buy">Мы можем помочь вам купить всего за несколько простых шагов.</string>
     <string name="simple_buy_intro_main_button_action">Купить Crypto сейчас</string>
+    <string name="simple_buy_deposit_my_crypto">Тур кошелек</string>
+    <string name="simple_buy_skip_text">Исследуйте свой новый кошелек Blockchain.</string>
+    <string name="simple_buy_get_started">Начать</string>
+    <string name="simple_buy_what_you_want_to_buy">Что бы ты хотел купить?</string>
+    <string name="simple_buy_enter_amount">Введите сумму</string>
     <string name="simple_buy_buy_crypto_title">Купить Крипто</string>
+    <string name="simple_buy_verify_email_instruction">Мы отправили письмо на %1$s со ссылкой для подтверждения. Не понял? Проверьте папку со спамом.</string>
+    <string name="simple_buy_error_fetching_price">Ошибка при получении последней цены.</string>
+    <string name="simple_buy_up_to_amount">До %1$s</string>
+    <string name="use_max">Используйте MAX</string>
     <string name="checkout">Проверять, выписываться</string>
     <string name="date">Дата</string>
     <string name="kyc_verifying_info">Проверка вашей информации</string>
@@ -913,6 +922,7 @@
     <string name="bank_country">Банк Страна</string>
     <string name="iban">IBAN</string>
     <string name="estonia">Эстония</string>
+    <string name="lets_setup_wallet">Давайте настроим ваш кошелек. Вы можете быстро купить крипто сейчас или сделать это позже.</string>
     <string name="btc_default_wallet_name">Мой биткойн кошелек</string>
     <string name="bch_default_account_label">Мой биткойн-кошелек</string>
     <string name="eth_default_account_label">Мой эфирный кошелек</string>
@@ -936,12 +946,15 @@
     <string name="simple_buy_own_crypto">Собственная криптография за несколько минут</string>
     <string name="simple_buy_verify_your_identity">Подтвердите свою личность и купите крипто</string>
     <string name="simple_buy_skip">Пропускать</string>
-    <string name="simple_buy_currency_selection_header">Ваша местная валюта для хранения средств в этой валюте в качестве средств в вашем бумажнике Blockchain.</string>
+    <string name="simple_buy_currency_selection_header">Ваша местная валюта для хранения средств в этой валюте в качестве средств в вашем Криптовалютном Кошельке Blockchain.</string>
     <string name="payment_methods">Способы оплаты</string>
     <string name="payment_method">Способ оплаты</string>
+    <string name="simple_buy_select_currency">Выберите вашу валюту</string>
     <string name="change_currency">Изменить валюту</string>
     <string name="maximum_buy">%1$s максимум</string>
     <string name="minimum_buy">%1$s Минимум</string>
+    <string name="buy_min">Купить мин</string>
+    <string name="buy_max">Купить Макс</string>
     <string name="bank_wire_transfer">Банковский перевод</string>
     <string name="credit_or_debit_card">Кредитная или дебетовая карта</string>
     <string name="add_credit_or_debit_card">Добавить кредитную или дебетовую карту</string>
@@ -950,6 +963,7 @@
     <string name="order_details">Информация для заказа</string>
     <string name="purchase_bank_note">Как только мы получим ваши средства, мы начнем ваш заказ на покупку %1$s . Обратите внимание, что ваша окончательная сумма может измениться в зависимости от рыночной активности. Может взиматься плата.</string>
     <string name="complete_payment">Полная оплата</string>
+    <string name="buy_now">купить сейчас</string>
     <string name="default_label_all_wallets">Все кошельки</string>
     <string name="approximately_symbol">~ %1$s</string>
     <string name="custodial_wallet_default_label">%1s Торговый кошелек</string>
@@ -984,11 +998,11 @@
     <string name="invalid_date">Недействительная дата</string>
     <string name="invalid_card_number">Не верный номер карты</string>
     <string name="full_name">Полное имя</string>
-    <string name="billing_address_line_1">Адресная строка 1</string>
-    <string name="billing_address_line_2">Адресная строка 2</string>
-    <string name="billing_address_city">город</string>
-    <string name="billing_address_zip">ZIP</string>
-    <string name="billing_address_postcode">почтовый индекс</string>
+    <string name="address_line_1">Адресная строка 1</string>
+    <string name="address_line_2">Адресная строка 2</string>
+    <string name="address_city">город</string>
+    <string name="address_zip">ZIP</string>
+    <string name="address_postcode">почтовый индекс</string>
     <string name="billing_address_state">государственный</string>
     <string name="currency_not_supported_title">Ваша валюта не поддерживается</string>
     <string name="activity_no_activity_title">У вас нет активности</string>
@@ -1206,7 +1220,7 @@
     <string name="send_enter_unexpected_error">Произошла непредвиденная ошибка. Пожалуйста, попробуйте еще раз.</string>
     <string name="send_enter_insufficient_gas">У вас недостаточно ETH для обработки этой транзакции.</string>
     <string name="send_select_a_wallet_title">или выберите кошелек</string>
-    <string name="send_internal_transfer_message">В настоящее время вы можете перевести только %1$s из торгового кошелька %2$s в свои кошельки-хранилища. Как только %1$s окажется в вашем кошельке-хранилище, вы можете переводить на внешние адреса.</string>
+    <string name="send_internal_transfer_message">В настоящее время вы можете перевести только %1$s из торгового кошелька %1$s в свои кошельки-хранилища. Как только %1$s окажется в вашем кошельке-хранилище, вы можете переводить на внешние адреса.</string>
     <string name="purchase_funds_note">Ваша итоговая сумма может измениться из-за активности рынка.</string>
     <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Подробнее. </annotation>
@@ -1281,7 +1295,7 @@
     <string name="sell_for_cash">Продать криптовалюту за наличные</string>
     <string name="select_wallet_to_sell">Выберите кошелек для продажи.</string>
     <string name="common_sell">Продать</string>
-    <string name="sell_quote_price">%1$s Цена</string>
+    <string name="quote_price">%1$s Цена</string>
     <string name="convert_your_crypto_to_cash">Конвертируйте свою криптовалюту в наличные</string>
     <string name="scan_mismatch_transaction_target">Отсканированный код не является QR-кодом %1$s .</string>
     <string name="scan_failed">QR-код не распознан, попробуйте еще раз.</string>
@@ -1342,6 +1356,7 @@
     <string name="confirm_status_msg_option_invalid">Убедитесь, что вы согласны с нашими Условиями.</string>
     <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
     <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+    <string name="common_replaceable_value">%1$s</string>
     <string name="common_free">Бесплатно</string>
     <string name="two_fa_new_request">Запрос нового кода...</string>
     <string name="transfer_funds_title">Перевести с импортированного адреса?</string>
@@ -1410,11 +1425,13 @@
     <string name="trending_empty">Пополняйте свои торговые кошельки, чтобы увидеть тренды свопов с более низкими комиссиями.</string>
     <string name="trending_receive">Получить %1$s</string>
     <string name="select_a_wallet">Выберите кошелек</string>
+    <string name="pending_swap_info_message">У вас 1 своп в ожидании. Как только он исчезнет, вы можете сделать новый своп.</string>
+    <string name="deposit_fee">Сетевая комиссия</string>
     <string name="current_unit_price">%1$s = %2$s</string>
     <string name="exchange_rate">Обменный курс</string>
     <string name="in_progress">В процессе</string>
     <string name="swap_direction">%1$s-&gt;%2$s</string>
-    <string name="security_locked_card_funds_explanation">В целях вашей безопасности при первой покупке карты действует период хранения %1$s прежде чем вы сможете отправить или вывести купленную криптовалюту. Мы сообщим вам, когда задержка будет снята.
+    <string name="security_locked_funds_explanation">В целях вашей безопасности при первой покупке карты действует период хранения %1$s прежде чем вы сможете отправить или вывести купленную криптовалюту. Мы сообщим вам, когда задержка будет снята.
 
  А пока вы можете продавать за наличные, обменивать и торговать на Blockchain.com.</string>
     <string name="recover_funds_warning_message_1">Вы всегда должны сопрягать или входить в систему, если у вас есть доступ
@@ -1441,19 +1458,110 @@
     <string name="qr_activity_hint_import_wallet">Сканировать приватный ключ кошелька</string>
     <string name="qr_activity_hint_pairing_code">Отсканируйте QR-код для веб-сопряжения</string>
     <string name="qr_activity_hint_new_web_login">Авторизоваться в сети</string>
-
+    <string name="common_zero">0</string>
     <string name="common_retry">Повторить</string>
     <string name="strength_hint">Используйте не менее 8 символов, сочетание букв, цифр и символов.</string>
     <string name="content_desc_enter_amount">Введите сумму</string>
     <string name="common_try_again">Попробуй еще раз</string>
-    <string name="common_oops">Ой! Что-то пошло не так.</string>
+    <string name="common_oops">Упс! Что-то пошло не так.</string>
     <string name="min_with_value">%1$s мин.</string>
     <string name="max_with_value">%1$s Макс.</string>
     <string name="upgrade_now">Обнови сейчас</string>
     <string name="swap_faster_cheaper">Своп быстрее. Дешевле. Лучше.</string>
     <string name="swap_better">Поменять лучше.</string>
     <string name="swap_hot">Поменяйте местами, как будто жарко.</string>
-    <string name="swap_upgrade_to_gold">Обновитесь до Gold и Swap быстрее, с более высокими лимитами, более низкими комиссиями и улучшенным опытом.</string>
-    <string name="swap_better_experience">Мы обновили Swap, сделав его новым и улучшенным.</string>
-    <string name="swap_faster_cheaper_better">Быстрее. Дешевле. Лучше. Наш новый опыт обмена позволяет обменивать криптовалюту за меньшее количество нажатий.</string>
+    <string name="swap_upgrade_to_gold">Обновите статус до уровня \"Gold\" и конвертируйте (Swap) быстрее, с более высокими лимитами, более низкими комиссиями и улучшенными впечатлениями.</string>
+    <string name="swap_better_experience">Мы обновили Swap, сделав его более удобным.</string>
+    <string name="swap_faster_cheaper_better">Быстрее. Дешевле. Лучше. Наш новый опыт конвертации Swap позволяет обменивать криптовалюту за меньшее количество нажатий.</string>
+    <string name="common_continue">Продолжить</string>
+    <plurals name="transfer_label_plural">
+        <item quantity="one">1 импортированный адрес</item>
+        <item quantity="few">%d импортированных адреса</item>
+        <item quantity="many">%d импортированных адресов</item>
+        <item quantity="other">%d импортированных адресов</item>
+    </plurals>
+    <string name="upgrade_wallet">Обновить</string>
+    <string name="remote_save_failed">Не удалось сохранить</string>
+    <string name="transfer_amount">Сумма перевода</string>
+    <string name="dont_ask_again">Не спрашивать снова.</string>
+    <string name="share_failed">Невозможно поделиться с %1$s</string>
+    <string name="activity_details_title_sell_1">Продать %1$s</string>
+    <string name="security_locked_card_funds_explanation">В целях вашей безопасности при первой покупке картой действует %1$s-дневный период хранения, прежде чем вы сможете отправить или вывести купленную криптовалюту. Мы сообщим вам, когда удержание будет снято.
+
+ А пока вы можете продавать за наличные, обменивать и торговать на Blockchain.com.</string>
+    <string name="security_locked_funds_bank_transfer_explanation">Ваша окончательная сумма может измениться из-за активности на рынке. В целях безопасности заказы на покупку с банковского счета подлежат хранению до %1$s-дневного периода. В это время вы можете обменивать или продавать. Мы сообщим вам, когда средства будут полностью доступны.</string>
+    <string name="security_locked_funds_bank_transfer_payment_screen_explanation">Эти средства теперь можно продавать и обменивать.
+
+Примечание. Вы не сможете отправлять или снимать эти средства со своего кошелька в течение следующих %1$s дней. Подробнее</string>
+    <string name="link_a_bank">Присоединить банк</string>
+    <string name="instantly_buy_crypto_with_link_a_bank">Привяжите свой банк и мгновенно покупайте криптовалюту в любое время.</string>
+    <string name="add_payment_method">Добавить способ оплаты</string>
+    <string name="pay_with_my">Платить</string>
+    <string name="yodlee_splash_title">Безопасное соединение</string>
+    <string name="yodlee_splash_blurb">Yodlee надежно хранит ваши учетные данные, соблюдая ведущие отраслевые методы обеспечения безопасности данных, нормативные требования и конфиденциальность.
+ <annotation link="yodlee_learn_more">Подробнее</annotation></string>
+    <string name="yodlee_connection_title">Переходим к Yodlee…</string>
+    <string name="yodlee_connection_subtitle">Это может занять до 30 секунд.</string>
+    <string name="yodlee_linking_title">Возвращаемся к вашему кошельку…</string>
+    <string name="yodlee_linking_subtitle">Это может занять до 30 секунд. Пожалуйста, не возвращайтесь назад и не закрывайте приложение.</string>
+    <string name="yodlee_linking_generic_error_title">Ой! Что-то пошло не так</string>
+    <string name="yodlee_linking_is_this_your_bank">Это ваш банк?</string>
+    <string name="yodlee_linking_generic_error_subtitle">Пожалуйста, попробуйте снова установить связь с вашим банком. Если это повторяется, обратитесь в службу поддержки.</string>
+    <string name="yodlee_linking_timeout_error_subtitle">Установление соединения с вашим банком длится слишком долго, пожалуйста, попробуйте еще раз.</string>
+    <string name="yodlee_linking_already_linked_error_subtitle">Мы заметили, что <annotation font="bold">имена не совпадают.</annotation> В банке, который вы привязываете, должны быть такие же официальные имя и фамилия, как и в счете Blockchain.com. <annotation link="yodlee_names_dont_match_learn_more">Подробнее →</annotation></string>
+    <string name="yodlee_linking_checking_error_title">Пожалуйста, привяжите текущий счет.</string>
+    <string name="yodlee_linking_checking_error_subtitle">Ваш банк может взимать дополнительную комиссию, если вы покупаете криптовалюту без текущего счета.</string>
+    <string name="yodlee_linking_success_title">Банк привязан!</string>
+    <string name="yodlee_linking_success_subtitle">Ваш счет %1$s теперь привязан к кошельку Blockchain.com.</string>
+    <string name="yodlee_linking_try_different_bank">Попробуйте другой банк</string>
+    <string name="yodlee_linking_try_different_account">Попробуйте другой счет</string>
+    <string name="yodlee_parsing_error">При установлении соединения с Yodlee возникла проблема. Пожалуйста, попробуйте еще раз или свяжитесь со службой поддержки.</string>
+    <string name="yodlee_flow_exited">Соединение с Yodlee прекращено, хотите попробовать еще раз?</string>
+    <string name="yodlee_unexpected_error">К сожалению, при установлении связи с Yodlee что-то пошло не так, пожалуйста, попробуйте еще раз.</string>
+    <string name="yodlee_linking_cancel">Отменить и вернуться</string>
+    <string name="please_try_linking_your_bank_again">Пожалуйста, попробуйте снова установить связь с вашим банком. Если это повторяется, обратитесь в службу поддержки.</string>
+    <string name="available_to_trade">Доступно для торговли</string>
+    <string name="instantly">Мгновенно</string>
+    <string name="instantly_available">Доступно мгновенно</string>
+    <string name="common_withdraw">Снять средства</string>
+    <string name="common_activity">Действие</string>
+    <string name="common_summary">Сводные данные</string>
+    <string name="received_erc20_marquee">Получено %1$s %2$s</string>
+    <string name="received_erc20_text">Получено %1$s %2$s от %3$s</string>
+    <string name="sell_intro_empty_title">Нет кошельков для продаж</string>
+    <string name="sell_intro_empty_label">Похоже, у вас нет кошельков со средствами, которые вы можете продать, попробуйте сначала пополнить кошельки.</string>
+    <string name="yodlee_splash_title_partner">Blockchain.com использует Yodlee для проверки ваших банковских реквизитов и надежной привязки ваших счетов.</string>
+    <string name="lockbox_title">Lockbox</string>
+    <string name="lockbox_landing_get_yours_title">Получите свое устройство Lockbox</string>
+    <string name="lockbox_landing_get_yours_message">Безопасно храните криптовалюту в автономном режиме.</string>
+    <string name="lockbox_landing_get_yours_button">Купить сейчас</string>
+    <string name="lockbox_landing_already_owned_title">Уже есть?</string>
+    <string name="lockbox_landing_already_owned_message">Перейдите на компьютере по адресу blockchain.com и подключите свой Lockbox.</string>
+    <string name="lockbox_landing_learn_more">Хотите узнать больше? Нажмите здесь, чтобы перейти к
+%1$s</string>
+    <string name="lockbox_landing_coming_soon_title">Средства скоро будут доступны</string>
+    <string name="lockbox_landing_coming_soon_message">В данный момент мы не можем отобразить ваш баланс Lockbox. Не беспокойтесь, ваши средства в безопасности. Мы скоро добавим эту функцию. Пока вы ждете, можете проверить свой баланс в интернете.</string>
+    <string name="lockbox_landing_coming_soon_button">Проверить мой баланс</string>
+    <string name="trading_order_limit">У вас слишком много трансакций %1$s в ожидании. Когда они будут завершены, вы сможете создать новую.</string>
+    <string name="trading_order_not_cancelable">Ой! Этот заказ %1$s нельзя отменить.</string>
+    <string name="trading_pending_withdrawal">Ой! У вас уже есть вывод средств в ожидании. Пожалуйста, попробуйте еще раз, как только он будет завершен.</string>
+    <string name="trading_withdrawal_balance_locked">Ой! По соображениям безопасности ваш баланс в настоящее время заблокирован. Пожалуйста, повторите попытку позже.</string>
+    <string name="trading_withdrawal_insufficient_funds">Ой! У вас недостаточно средств для вывода</string>
+    <string name="trading_internal_server_error">Ой! Эта услуга в настоящее время недоступна. Пожалуйста, повторите попытку позже.</string>
+    <string name="trading_albert_error">@string/send_progress_error_title</string>
+    <string name="trading_service_temp_disabled">Эта услуга скоро будет снова доступна. Мы вносим обновления и исправляем некоторые ошибки прямо сейчас.</string>
+    <string name="trading_insufficient_balance">Ой! У вас недостаточно средств, чтобы %1$s.</string>
+    <string name="trading_amount_below_min">Ой! Выбранная вами сумма меньше минимального лимита %1$s.</string>
+    <string name="trading_amount_above_max">Ой! Выбранная вами сумма превышает максимальный лимит %1$s.</string>
+    <string name="trading_daily_limit_exceeded">Ой! Вы превысили свой дневной лимит %1$s</string>
+    <string name="trading_weekly_limit_exceeded">Ой! Вы превысили свой недельный лимит %1$s</string>
+    <string name="trading_yearly_limit_exceeded">Ой! Вы превысили свой годовой лимит %1$s</string>
+    <string name="trading_invalid_address">Ой! Похоже, этот адрес недействителен, попробуйте еще раз.</string>
+    <string name="trading_invalid_currency">Ой! Похоже, эта криптовалюта недействительна, попробуйте еще раз.</string>
+    <string name="trading_invalid_fiat">Ой! Похоже, что эти фиатные деньги недействительны, попробуйте еще раз.</string>
+    <string name="trading_direction_disabled">Ой! Эта услуга в настоящий момент недоступна, пожалуйста, повторите попытку позже.</string>
+    <string name="trading_quote_invalid_or_expired">Ой! Сумма, которую мы указали, больше недействительна, пожалуйста, попробуйте еще раз.</string>
+    <string name="trading_ineligible_for_swap">Ой! Эта услуга в настоящее время недоступна. Пожалуйста, обратитесь в службу поддержки.</string>
+    <string name="trading_invalid_destination_amount">Ой! Похоже, что это неверная сумма, попробуйте еще раз.</string>
+    <string name="executing_transaction_error">Ой! При выполнении ончейн-транзакции %1$s что-то пошло не так.</string>
 </resources>

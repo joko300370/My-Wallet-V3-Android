@@ -27,10 +27,10 @@ import piuk.blockchain.android.withdraw.mvi.WithdrawIntent
 import piuk.blockchain.android.withdraw.mvi.WithdrawModel
 import piuk.blockchain.android.withdraw.mvi.WithdrawState
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.visible
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.visibleIf
 
 class WithdrawEnterAmountFragment : MviFragment<WithdrawModel, WithdrawIntent, WithdrawState>(), WithdrawScreen,
     BankChooserHost {
@@ -161,7 +161,7 @@ class WithdrawEnterAmountFragment : MviFragment<WithdrawModel, WithdrawIntent, W
 
     private fun renderUiForBank(bank: Beneficiary, banks: List<Beneficiary>, currency: String) {
         bank_icon.setImageResource(R.drawable.ic_bank_transfer)
-        bank_title.text = bank.title.plus(" ${bank.account}")
+        bank_title.text = bank.name.plus(" ${bank.account}")
         bank_details_root.setOnClickListener {
             openBankChooserBottomSheet(banks, currency)
         }

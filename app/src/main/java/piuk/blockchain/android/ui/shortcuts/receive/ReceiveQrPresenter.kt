@@ -25,7 +25,7 @@ internal class ReceiveQrPresenter(
 
             // Show QR Code
             receiveAddressString = intent.getStringExtra(ReceiveQrActivity.INTENT_EXTRA_ADDRESS)
-            val labelString = intent.getStringExtra(ReceiveQrActivity.INTENT_EXTRA_LABEL)
+            val labelString = intent.getStringExtra(ReceiveQrActivity.INTENT_EXTRA_LABEL) ?: ""
 
             view.setAddressInfo(receiveAddressString ?: "")
             view.setAddressLabel(labelString)

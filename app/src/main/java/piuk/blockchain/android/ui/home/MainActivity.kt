@@ -18,7 +18,6 @@ import androidx.fragment.app.Fragment
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem
 import com.blockchain.koin.scopedInject
-import com.blockchain.lockbox.ui.LockboxLandingActivity
 import com.blockchain.notifications.NotificationsUtil
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.NotificationAppOpened
@@ -33,12 +32,10 @@ import com.google.android.material.snackbar.Snackbar
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar_general.*
-import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
@@ -60,6 +57,7 @@ import piuk.blockchain.android.ui.interest.InterestDashboardActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.kyc.status.KycStatusActivity
 import piuk.blockchain.android.ui.launcher.LauncherActivity
+import piuk.blockchain.android.ui.lockbox.LockboxLandingActivity
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity
 import piuk.blockchain.android.ui.pairingcode.PairingCodeActivity
 import piuk.blockchain.android.ui.scan.QrExpected
@@ -76,14 +74,14 @@ import piuk.blockchain.android.ui.tour.IntroTourStep
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.transfer.TransferFragment
+import piuk.blockchain.android.util.AndroidUtils
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.android.util.getAccount
 import piuk.blockchain.android.withdraw.WithdrawActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.AndroidUtils
-import piuk.blockchain.androidcoreui.utils.ViewUtils
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.ViewUtils
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 import timber.log.Timber
 import java.util.ArrayList
 
@@ -95,7 +93,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     override val presenter: MainPresenter by scopedInject()
     private val qrProcessor: QrScanResultProcessor by scopedInject()
-    private val compositeDisposable = CompositeDisposable()
 
     override val view: MainView = this
 
@@ -109,8 +106,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         get() = _refreshAnnouncements
 
     private var activityResultAction: () -> Unit = {}
-
-    private var backPressed: Long = 0
 
     private val tabSelectedListener =
         AHBottomNavigation.OnTabSelectedListener { position, wasSelected ->
@@ -303,17 +298,11 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 drawer_layout.closeDrawers()
                 true
             }
-            f is ActivitiesFragment -> f.onBackPressed()
-            f is TransferFragment -> {
-                setCurrentTabItem(ITEM_HOME)
-                startDashboardFragment()
-                true
-            }
+
             f is DashboardFragment -> f.onBackPressed()
-            f is BuySellFragment -> f.onBackPressed()
+
             else -> {
-                // Switch to dashboard fragment - it's not clear, though,
-                // how we can ever wind up here...
+                // Switch to dashboard fragment
                 setCurrentTabItem(ITEM_HOME)
                 startDashboardFragment()
                 true
@@ -321,12 +310,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         }
 
         if (!backHandled) {
-            if (backPressed + BuildConfig.EXIT_APP_COOLDOWN_MILLIS > System.currentTimeMillis()) {
-                presenter.clearLoginState()
-            } else {
-                showExitConfirmToast()
-                backPressed = System.currentTimeMillis()
-            }
+            presenter.clearLoginState()
         }
     }
 
@@ -340,13 +324,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
             val menuView = out[0]
             tour_guide.setDeferredTriggerView(menuView, offsetX = -menuView.width / 3)
         }
-    }
-
-    private fun showExitConfirmToast() {
-        ToastCustom.makeText(this,
-            getString(R.string.exit_confirm),
-            ToastCustom.LENGTH_SHORT,
-            ToastCustom.TYPE_GENERAL)
     }
 
     private fun selectDrawerItem(menuItem: MenuItem) {

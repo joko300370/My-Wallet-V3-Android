@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.dashboard.assetdetails
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.prices.data.PriceDatum
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.ui.base.mvi.MviIntent
@@ -11,12 +12,21 @@ import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 sealed class AssetDetailsIntent : MviIntent<AssetDetailsState>
 
 class ShowAssetActionsIntent(
-    private val account: BlockchainAccount
+    val account: BlockchainAccount
+) : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState
+}
+
+class AccountActionsLoaded(
+    private val account: BlockchainAccount,
+    private val actions: AvailableActions
 ) : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(
             selectedAccount = account,
             errorState = AssetDetailsError.NONE,
+            actions = actions,
             assetDetailsCurrentStep = AssetDetailsStep.ASSET_ACTIONS
         )
 }
@@ -25,7 +35,10 @@ class LoadAsset(
     val asset: CryptoAsset
 ) : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
-        oldState.copy(asset = asset)
+        oldState.copy(
+            asset = asset,
+            assetDisplayMap = mapOf()
+        )
 }
 
 object LoadAssetDisplayDetails : AssetDetailsIntent() {

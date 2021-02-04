@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 internal class XlmCryptoWalletAccount(
     payloadManager: PayloadDataManager,
     override val label: String = "",
-    private val address: String,
+    internal val address: String,
     private val xlmManager: XlmDataManager,
     override val exchangeRates: ExchangeRateDataManager,
     private val xlmFeesFetcher: XlmFeesFetcher,
@@ -42,7 +42,7 @@ internal class XlmCryptoWalletAccount(
     override val accountBalance: Single<Money>
         get() = xlmManager.getBalance()
             .doOnSuccess {
-                hasFunds.set(it > CryptoValue.ZeroXlm)
+                hasFunds.set(it > CryptoValue.zero(asset))
             }
             .map { it as Money }
 

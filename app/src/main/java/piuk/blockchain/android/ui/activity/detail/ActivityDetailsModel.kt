@@ -34,7 +34,6 @@ data class FeeForTransaction(
 data class To(val toAddress: String?) : ActivityDetailsType()
 data class Description(val description: String? = null) : ActivityDetailsType()
 data class Action(val action: String = "") : ActivityDetailsType()
-data class CancelAction(val cancelAction: String = "") : ActivityDetailsType()
 data class BuyFee(val feeValue: FiatValue) : ActivityDetailsType()
 data class BuyPurchaseAmount(val fundedFiat: FiatValue) : ActivityDetailsType()
 data class SellPurchaseAmount(val value: Money) : ActivityDetailsType()
@@ -43,8 +42,14 @@ data class BuyCryptoWallet(val crypto: CryptoCurrency) : ActivityDetailsType()
 data class SellCryptoWallet(val currency: String) : ActivityDetailsType()
 data class BuyPaymentMethod(val paymentDetails: PaymentDetails) : ActivityDetailsType()
 data class SwapReceiveAmount(val receivedAmount: Money) : ActivityDetailsType()
+data class XlmMemo(val memo: String) : ActivityDetailsType()
 
-data class PaymentDetails(val paymentMethodId: String, val label: String? = null, val endDigits: String? = null)
+data class PaymentDetails(
+    val paymentMethodId: String,
+    val label: String? = null,
+    val endDigits: String? = null,
+    val accountType: String? = null
+)
 
 enum class DescriptionState {
     NOT_SET,
@@ -93,8 +98,10 @@ class ActivityDetailsModel(
                 null
             }
             is UpdateDescriptionIntent ->
-                interactor.updateItemDescription(intent.txId, intent.cryptoCurrency,
-                    intent.description)
+                interactor.updateItemDescription(
+                    intent.txId, intent.cryptoCurrency,
+                    intent.description
+                )
                     .subscribeBy(
                         onComplete = {
                             process(DescriptionUpdatedIntent)
@@ -167,14 +174,17 @@ class ActivityDetailsModel(
     private fun loadNonCustodialActivityDetails(intent: LoadActivityDetailsIntent) =
         interactor.getNonCustodialActivityDetails(
             cryptoCurrency = intent.cryptoCurrency,
-            txHash = intent.txHash)?.let {
+            txHash = intent.txHash
+        )?.let {
             process(LoadNonCustodialCreationDateIntent(it))
             process(LoadNonCustodialHeaderDataIntent(it))
         } ?: process(ActivityDetailsLoadFailedIntent)
 
     private fun loadCustodialTradingActivityDetails(intent: LoadActivityDetailsIntent) =
-        interactor.getCustodialTradingActivityDetails(cryptoCurrency = intent.cryptoCurrency,
-            txHash = intent.txHash)?.let {
+        interactor.getCustodialTradingActivityDetails(
+            cryptoCurrency = intent.cryptoCurrency,
+            txHash = intent.txHash
+        )?.let {
             process(LoadCustodialTradingHeaderDataIntent(it))
             interactor.loadCustodialTradingItems(it).subscribeBy(
                 onSuccess = { activityList ->
@@ -186,8 +196,10 @@ class ActivityDetailsModel(
         } ?: process(ActivityDetailsLoadFailedIntent)
 
     private fun loadCustodialInterestActivityDetails(intent: LoadActivityDetailsIntent) =
-        interactor.getCustodialInterestActivityDetails(cryptoCurrency = intent.cryptoCurrency,
-            txHash = intent.txHash)?.let {
+        interactor.getCustodialInterestActivityDetails(
+            cryptoCurrency = intent.cryptoCurrency,
+            txHash = intent.txHash
+        )?.let {
             process(LoadCustodialInterestHeaderDataIntent(it))
             interactor.loadCustodialInterestItems(it).subscribeBy(
                 onSuccess = { activityList ->
@@ -199,8 +211,10 @@ class ActivityDetailsModel(
         } ?: process(ActivityDetailsLoadFailedIntent)
 
     private fun loadSwapActivityDetails(intent: LoadActivityDetailsIntent) =
-        interactor.getTradeActivityDetails(cryptoCurrency = intent.cryptoCurrency,
-            txHash = intent.txHash)?.let {
+        interactor.getTradeActivityDetails(
+            cryptoCurrency = intent.cryptoCurrency,
+            txHash = intent.txHash
+        )?.let {
             process(LoadSwapHeaderDataIntent(it))
             interactor.loadSwapItems(it).subscribeBy(
                 onSuccess = { swapItems ->

@@ -312,7 +312,7 @@ class KycHomeAddressPresenterTest {
         // Assert
         verify(view).showProgressDialog()
         verify(view).dismissProgressDialog()
-        verify(view).continueToOnfidoSplash(countryCode)
+        verify(view).continueToVeriffSplash(countryCode)
     }
 
     @Test

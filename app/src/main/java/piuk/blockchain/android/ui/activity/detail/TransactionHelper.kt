@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.activity.detail
 
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import info.blockchain.wallet.multiaddress.TransactionSummary
@@ -38,7 +39,7 @@ class TransactionHelper(
             inputMap[treeMap.lastKey()] = treeMap.lastEntry().value
         } else {
             for (inputAddress in tx.inputsMap.keys) {
-                val inputValue = tx.inputsMap[inputAddress] ?: CryptoValue.ZeroBtc
+                val inputValue = tx.inputsMap[inputAddress] ?: CryptoValue.zero(CryptoCurrency.BTC)
                 // Move or Send
                 // The address belongs to us
                 val xpub = payloadDataManager.getXpubFromAddress(inputAddress)
@@ -56,7 +57,7 @@ class TransactionHelper(
 
         // Outputs / To field
         for (outputAddress in tx.outputsMap.keys) {
-            val outputValue = tx.outputsMap[outputAddress] ?: CryptoValue.ZeroBtc
+            val outputValue = tx.outputsMap[outputAddress] ?: CryptoValue.zero(CryptoCurrency.BTC)
             if (payloadDataManager.isOwnHDAddress(outputAddress)) {
                 // If output address belongs to an xpub we own - we have to check if it's change
                 val xpub = payloadDataManager.getXpubFromAddress(outputAddress)
@@ -110,7 +111,7 @@ class TransactionHelper(
             }
         } else {
             for (inputAddress in tx.inputsMap.keys) {
-                val inputValue = tx.inputsMap[inputAddress] ?: CryptoValue.ZeroBch
+                val inputValue = tx.inputsMap[inputAddress] ?: CryptoValue.zero(CryptoCurrency.BCH)
                 // Move or Send
                 // The address belongs to us
                 val xpub = bchDataManager.getXpubFromAddress(inputAddress)
@@ -130,7 +131,7 @@ class TransactionHelper(
         }
         // Outputs / To field
         for (outputAddress in tx.outputsMap.keys) {
-            val outputValue = tx.outputsMap[outputAddress] ?: CryptoValue.ZeroBch
+            val outputValue = tx.outputsMap[outputAddress] ?: CryptoValue.zero(CryptoCurrency.BCH)
             // Skip dust output
             if (outputValue.toBigInteger() == Payment.DUST)
                 continue

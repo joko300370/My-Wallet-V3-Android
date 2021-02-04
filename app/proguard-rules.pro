@@ -153,6 +153,8 @@
 }
 # Temporary fix: Keep classes for jackson json
 -keep public class info.blockchain.api.data.** { *; }
+-keep public class piuk.blockchain.android.coincore.** { *; }
+-keep public class piuk.blockchain.android.simplebuy.yodlee.** { *; }
 -keep public class info.blockchain.wallet.api.data.** { *; }
 -keep public class info.blockchain.wallet.contacts.data.** { *; }
 -keep public class info.blockchain.wallet.metadata.data.** { *; }
@@ -224,3 +226,24 @@
 
 # XLM
 -keep public class org.stellar.sdk.responses.** { *; }
+
+# Kotlin serialization
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.AnnotationsKt # core serialization annotations
+
+# kotlinx-serialization-json specific. Add this if you have java.lang.NoClassDefFoundError kotlinx.serialization.json.JsonObjectSerializer
+-keepclassmembers class kotlinx.serialization.json.** {
+    *** Companion;
+}
+-keepclasseswithmembers class kotlinx.serialization.json.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
+# Change here com.yourcompany.yourpackage
+#-keep,includedescriptorclasses class com.yourcompany.yourpackage.**$$serializer { *; } # <-- change package name to your app's
+#-keepclassmembers class com.yourcompany.yourpackage.** { # <-- change package name to your app's
+#    *** Companion;
+#}
+#-keepclasseswithmembers class com.yourcompany.yourpackage.** { # <-- change package name to your app's
+#    kotlinx.serialization.KSerializer serializer(...);
+#}

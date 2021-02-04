@@ -10,8 +10,8 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
 import piuk.blockchain.android.ui.adapters.DelegationAdapter
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 import java.io.Serializable
 
 class PaymentMethodChooserBottomSheet : SlidingModalBottomDialog() {
@@ -36,7 +36,7 @@ class PaymentMethodChooserBottomSheet : SlidingModalBottomDialog() {
 
         view.add_payment_method.visibleIf { isShowingPaymentMethods }
         view.title.text =
-            if (isShowingPaymentMethods) getString(R.string.pay_with_my) else getString(R.string.payment_methods)
+            if (isShowingPaymentMethods) getString(R.string.pay_with_my_dotted) else getString(R.string.payment_methods)
         view.add_payment_method.setOnClickListener {
             (parentFragment as? PaymentMethodChangeListener)?.showAvailableToAddPaymentMethods()
             dismiss()

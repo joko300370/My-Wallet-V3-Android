@@ -9,8 +9,8 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.FeeDetails
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmation
@@ -21,6 +21,7 @@ import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.copyAndPut
 import piuk.blockchain.android.coincore.impl.BitPayInvoiceTarget
+import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.android.data.api.bitpay.analytics.BitPayEvent
@@ -48,7 +49,7 @@ interface BitPayClientEngine {
     fun doOnTransactionFailed(pendingTx: PendingTx, e: Throwable)
 }
 
-class BtcBitpayTxEngine(
+class BitpayTxEngine(
     private val bitPayDataManager: BitPayDataManager,
     private val assetEngine: OnChainTxEngineBase,
     private val walletPrefs: WalletStatus,
@@ -56,10 +57,12 @@ class BtcBitpayTxEngine(
 ) : TxEngine() {
 
     override fun assertInputsValid() {
-        // Only support BTC bitpay at this time
-        require(asset == CryptoCurrency.BTC)
-        require(txTarget is BitPayInvoiceTarget)
+        // Only support non-custodial BTC bitpay at this time
+        check(sourceAccount is CryptoNonCustodialAccount)
+        check(asset == CryptoCurrency.BTC)
+        check(txTarget is BitPayInvoiceTarget)
         require(assetEngine is BitPayClientEngine)
+        assetEngine.assertInputsValid()
     }
 
     private val executionClient: BitPayClientEngine by unsafeLazy {
@@ -85,7 +88,8 @@ class BtcBitpayTxEngine(
             .map { tx ->
                 tx.copy(
                     amount = bitpayInvoice.amount,
-                    feeLevel = FeeLevel.Priority
+                    feeLevel = FeeLevel.Priority,
+                    availableFeeLevels = AVAILABLE_FEE_LEVELS
                 )
             }
 
@@ -148,7 +152,7 @@ class BtcBitpayTxEngine(
     // underlying asset engine.
     private fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
         TxConfirmationValue.FeeSelection(
-            feeDetails = FeeDetails(pendingTx.fees),
+            feeDetails = FeeState.FeeDetails(pendingTx.fees),
             exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
             selectedLevel = pendingTx.feeLevel,
             availableLevels = setOf(FeeLevel.Priority),
@@ -158,6 +162,15 @@ class BtcBitpayTxEngine(
     // Don't set the amount here, it is fixed so we can do it in the confirmation building step
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> =
         Single.just(pendingTx)
+
+    override fun doUpdateFeeLevel(
+        pendingTx: PendingTx,
+        level: FeeLevel,
+        customFeeAmount: Long
+    ): Single<PendingTx> {
+        require(pendingTx.availableFeeLevels.contains(level))
+        return Single.just(pendingTx)
+    }
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         assetEngine.doValidateAmount(pendingTx)
@@ -228,5 +241,6 @@ class BtcBitpayTxEngine(
 
     companion object {
         private const val TIMEOUT_STOP = 2
+        private val AVAILABLE_FEE_LEVELS = setOf(FeeLevel.Priority)
     }
 }

@@ -22,7 +22,6 @@ import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import timber.log.Timber
-import java.lang.IllegalStateException
 import java.util.Stack
 
 enum class TransactionStep(val addToBackStack: Boolean = false) {
@@ -60,7 +59,7 @@ sealed class TxExecutionStatus {
     object NotStarted : TxExecutionStatus()
     object InProgress : TxExecutionStatus()
     object Completed : TxExecutionStatus()
-    data class Error(val message: String) : TxExecutionStatus()
+    data class Error(val exception: Throwable) : TxExecutionStatus()
 }
 
 data class TransactionState(
@@ -88,7 +87,7 @@ data class TransactionState(
         get() = pendingTx?.amount ?: CryptoValue.zero(asset) // TODO: Better default required
 
     val availableBalance: Money
-        get() = pendingTx?.available ?: CryptoValue.zero(sendingAccount.asset) // TODO: Better default required
+        get() = pendingTx?.availableBalance ?: CryptoValue.zero(sendingAccount.asset) // TODO: Better default required
 
     val canGoBack: Boolean
         get() = stepsBackStack.isNotEmpty()
@@ -99,7 +98,7 @@ data class TransactionState(
     val maxSpendable: Money
         get() {
             return pendingTx?.let {
-                val available = availableToAmountCurrency(it.available, amount)
+                val available = availableToAmountCurrency(it.availableBalance, amount)
                 Money.min(available,
                     it.maxLimit ?: available)
             } ?: CryptoValue.zero(asset)
@@ -150,7 +149,6 @@ class TransactionModel(
                     transactionTarget = intent.target,
                     action = intent.action
                 )
-                null
             }
             is TransactionIntent.TargetSelected ->
                 processTargetSelectionConfirmed(
@@ -216,7 +214,7 @@ class TransactionModel(
         Timber.v("!TRANSACTION!> Transaction Model: state update -> $s")
     }
 
-    private fun processInvalidateTransaction(): Disposable? =
+    private fun processInvalidateTransaction(): Disposable =
         interactor.invalidateTransaction()
             .subscribeBy(
                 onComplete = {
@@ -306,7 +304,7 @@ class TransactionModel(
                 }
             )
 
-    private fun processExecuteTransaction(secondPassword: String): Disposable? =
+    private fun processExecuteTransaction(secondPassword: String): Disposable =
         interactor.verifyAndExecute(secondPassword)
             .subscribeBy(
                 onComplete = {
@@ -319,7 +317,7 @@ class TransactionModel(
                 }
             )
 
-    private fun processModifyTxOptionRequest(newConfirmation: TxConfirmationValue): Disposable? =
+    private fun processModifyTxOptionRequest(newConfirmation: TxConfirmationValue): Disposable =
         interactor.modifyOptionValue(
             newConfirmation
         ).subscribeBy(

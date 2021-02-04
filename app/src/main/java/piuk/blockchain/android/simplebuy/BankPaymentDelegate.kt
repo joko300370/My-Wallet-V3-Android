@@ -39,10 +39,14 @@ class BankPaymentDelegate : AdapterDelegate<PaymentMethodItem> {
         fun bind(paymentMethodItem: PaymentMethodItem) {
             (paymentMethodItem.paymentMethod as? PaymentMethod.Bank)?.let {
                 limit.text =
-                    limit.context.getString(R.string.payment_method_limit,
-                        paymentMethodItem.paymentMethod.limits.max.toStringWithSymbol())
+                    limit.context.getString(
+                        R.string.payment_method_limit,
+                        paymentMethodItem.paymentMethod.limits.max.toStringWithSymbol()
+                    )
                 title.text = it.bankName
-                details.text = it.accountDottedLastDigits
+                details.text = details.context.getString(
+                    R.string.payment_method_type_account_info, it.uiAccountType, it.accountEnding
+                )
             }
             root.setOnClickListener { paymentMethodItem.clickAction() }
         }

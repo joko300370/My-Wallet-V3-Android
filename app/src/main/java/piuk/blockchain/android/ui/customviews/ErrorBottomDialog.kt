@@ -20,8 +20,8 @@ import kotlinx.android.parcel.Parcelize
 import kotlinx.android.synthetic.main.error_bottom_dialog.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 
 open class ErrorBottomDialog : BottomSheetDialogFragment() {
 

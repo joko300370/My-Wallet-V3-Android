@@ -1,13 +1,9 @@
 package piuk.blockchain.android.ui.kyc.navhost
 
-import android.animation.ObjectAnimator
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.animation.DecelerateInterpolator
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavDestination
@@ -18,16 +14,14 @@ import piuk.blockchain.android.KycNavXmlDirections
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.ui.kyc.complete.ApplicationCompleteFragment
-import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.extensions.invisibleIf
-import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.androidcoreui.ui.customviews.toast
+import piuk.blockchain.android.util.invisibleIf
 import kotlinx.android.synthetic.main.activity_kyc_nav_host.frame_layout_fragment_wrapper as fragmentWrapper
 import kotlinx.android.synthetic.main.activity_kyc_nav_host.nav_host as navHostFragment
-import kotlinx.android.synthetic.main.activity_kyc_nav_host.progress_bar_kyc as progressIndicator
 import kotlinx.android.synthetic.main.activity_kyc_nav_host.progress_bar_loading_user as progressLoadingUser
 import kotlinx.android.synthetic.main.activity_kyc_nav_host.toolbar_kyc as toolBar
 
@@ -105,34 +99,6 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
         navInitialDestination = navController.currentDestination
     }
 
-    override fun incrementProgress(kycStep: KycStep) {
-        val progress =
-            100 * (
-                    KycStep.values()
-                        .takeWhile { it != kycStep }
-                        .sumBy { it.relativeValue } + kycStep.relativeValue
-                    ) / KycStep.values().sumBy { it.relativeValue }
-
-        updateProgressBar(progress)
-    }
-
-    override fun decrementProgress(kycStep: KycStep) {
-        val progress =
-            100 * KycStep.values()
-                .takeWhile { it != kycStep }
-                .sumBy { it.relativeValue } / KycStep.values().sumBy { it.relativeValue }
-
-        updateProgressBar(progress)
-    }
-
-    private fun updateProgressBar(progress: Int) {
-        ObjectAnimator.ofInt(progressIndicator, "progress", progress).apply {
-            duration = 200
-            interpolator = DecelerateInterpolator()
-            start()
-        }
-    }
-
     override fun hideBackButton() {
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
     }
@@ -176,21 +142,6 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
     override fun getView(): KycNavHostView = this
 
     override fun startLogoutTimer() = Unit
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.help, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_help -> {
-                showHelpDialog(this)
-                return true
-            }
-            else -> false
-        }
-    }
 
     companion object {
 
@@ -242,10 +193,6 @@ interface KycProgressListener {
     val campaignType: CampaignType
 
     fun setHostTitle(@StringRes title: Int)
-
-    fun incrementProgress(kycStep: KycStep)
-
-    fun decrementProgress(kycStep: KycStep)
 
     fun hideBackButton()
 }

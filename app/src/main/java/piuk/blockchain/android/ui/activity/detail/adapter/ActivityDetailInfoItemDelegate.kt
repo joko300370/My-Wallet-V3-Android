@@ -16,29 +16,29 @@ import piuk.blockchain.android.ui.activity.detail.BuyCryptoWallet
 import piuk.blockchain.android.ui.activity.detail.BuyFee
 import piuk.blockchain.android.ui.activity.detail.BuyPaymentMethod
 import piuk.blockchain.android.ui.activity.detail.BuyPurchaseAmount
-import piuk.blockchain.android.ui.activity.detail.CancelAction
 import piuk.blockchain.android.ui.activity.detail.Created
 import piuk.blockchain.android.ui.activity.detail.Description
 import piuk.blockchain.android.ui.activity.detail.Fee
 import piuk.blockchain.android.ui.activity.detail.FeeForTransaction
 import piuk.blockchain.android.ui.activity.detail.From
 import piuk.blockchain.android.ui.activity.detail.HistoricValue
+import piuk.blockchain.android.ui.activity.detail.NetworkFee
 import piuk.blockchain.android.ui.activity.detail.SellCryptoWallet
 import piuk.blockchain.android.ui.activity.detail.SellPurchaseAmount
-import piuk.blockchain.android.ui.activity.detail.NetworkFee
 import piuk.blockchain.android.ui.activity.detail.SwapReceiveAmount
 import piuk.blockchain.android.ui.activity.detail.To
 import piuk.blockchain.android.ui.activity.detail.TransactionId
 import piuk.blockchain.android.ui.activity.detail.Value
+import piuk.blockchain.android.ui.activity.detail.XlmMemo
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.assetName
-import piuk.blockchain.android.util.extensions.toFormattedString
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.toFormattedString
 
 class ActivityDetailInfoItemDelegate<in T> : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
         val item = items[position] as ActivityDetailsType
-        return item !is Action && item !is Description && item !is CancelAction
+        return item !is Action && item !is Description
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
@@ -57,7 +57,7 @@ class ActivityDetailInfoItemDelegate<in T> : AdapterDelegate<T> {
 
 private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(parent),
     LayoutContainer {
-    override val containerView: View?
+    override val containerView: View
         get() = itemView
 
     fun bind(item: ActivityDetailsType) {
@@ -96,8 +96,11 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
             is SellCryptoWallet -> parent.context.getString(R.string.activity_details_buy_sending_to)
             is BuyPaymentMethod -> parent.context.getString(R.string.activity_details_buy_payment_method)
             is SwapReceiveAmount -> parent.context.getString(R.string.activity_details_swap_for)
-            is NetworkFee -> parent.context.getString(R.string.tx_confirmation_network_fee,
-                (infoType.feeValue as CryptoValue).currency.displayTicker)
+            is NetworkFee -> parent.context.getString(
+                R.string.tx_confirmation_network_fee,
+                (infoType.feeValue as CryptoValue).currency.displayTicker
+            )
+            is XlmMemo -> parent.context.getString(R.string.xlm_memo_text)
             else -> parent.context.getString(R.string.empty)
         }
 
@@ -106,39 +109,65 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
             is Created -> infoType.date.toFormattedString()
             is Amount -> infoType.value.toStringWithSymbol()
             is Fee -> infoType.feeValue?.toStringWithSymbol() ?: parent.context.getString(
-                R.string.activity_details_fee_load_fail)
+                R.string.activity_details_fee_load_fail
+            )
             is Value -> infoType.currentFiatValue?.toStringWithSymbol() ?: parent.context.getString(
-                R.string.activity_details_value_load_fail)
+                R.string.activity_details_value_load_fail
+            )
             is HistoricValue -> infoType.fiatAtExecution?.toStringWithSymbol()
                 ?: parent.context.getString(
-                    R.string.activity_details_historic_value_load_fail)
+                    R.string.activity_details_historic_value_load_fail
+                )
             is To -> infoType.toAddress ?: parent.context.getString(
-                R.string.activity_details_to_load_fail)
+                R.string.activity_details_to_load_fail
+            )
             is From -> infoType.fromAddress ?: parent.context.getString(
-                R.string.activity_details_from_load_fail)
+                R.string.activity_details_from_load_fail
+            )
             is FeeForTransaction -> {
                 when (infoType.transactionType) {
                     TransactionSummary.TransactionType.SENT -> parent.context.getString(
                         R.string.activity_details_transaction_fee_send,
-                        infoType.cryptoValue.toStringWithSymbol())
+                        infoType.cryptoValue.toStringWithSymbol()
+                    )
                     else -> parent.context.getString(
-                        R.string.activity_details_transaction_fee_unknown)
+                        R.string.activity_details_transaction_fee_unknown
+                    )
                 }
             }
             is BuyFee -> infoType.feeValue.toStringWithSymbol()
             is BuyPurchaseAmount -> infoType.fundedFiat.toStringWithSymbol()
             is TransactionId -> infoType.txId
-            is BuyCryptoWallet -> parent.context.getString(R.string.custodial_wallet_default_label,
-                parent.context.getString(infoType.crypto.assetName()))
+            is BuyCryptoWallet -> parent.context.getString(
+                R.string.custodial_wallet_default_label,
+                parent.context.getString(infoType.crypto.assetName())
+            )
             is SellCryptoWallet -> parent.context.getString(R.string.currency_funds_wallet, infoType.currency)
             is SellPurchaseAmount -> infoType.value.toStringWithSymbol()
             is BuyPaymentMethod -> {
                 when {
                     infoType.paymentDetails.endDigits != null &&
                         infoType.paymentDetails.label != null -> {
-                        parent.context.getString(R.string.common_hyphenated_strings,
-                            infoType.paymentDetails.label,
-                            infoType.paymentDetails.endDigits)
+
+                        with(parent.context) {
+                            infoType.paymentDetails.accountType?.let {
+                                val accType = getString(
+                                    R.string.payment_method_type_account_info,
+                                    infoType.paymentDetails.accountType,
+                                    infoType.paymentDetails.endDigits
+                                )
+
+                                getString(
+                                    R.string.common_spaced_strings,
+                                    infoType.paymentDetails.label,
+                                    accType
+                                )
+                            } ?: getString(
+                                R.string.common_hyphenated_strings,
+                                infoType.paymentDetails.label,
+                                infoType.paymentDetails.endDigits
+                            )
+                        }
                     }
                     infoType.paymentDetails.paymentMethodId == PaymentMethod.FUNDS_PAYMENT_ID -> {
                         parent.context.getString(R.string.checkout_funds_label)
@@ -150,6 +179,7 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
             }
             is SwapReceiveAmount -> infoType.receivedAmount.toStringWithSymbol()
             is NetworkFee -> infoType.feeValue.toStringWithSymbol()
+            is XlmMemo -> infoType.memo
             else -> ""
         }
 }

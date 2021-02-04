@@ -7,8 +7,12 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <!-- force the removal of these two permissions, which may be added by 3rd party libs -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove" />
 
     <uses-feature android:name="android.hardware.location.gps" />
 
@@ -134,18 +138,8 @@
             android:name=".ui.ssl.SSLVerifyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.swapold.detail.TradeDetailActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.swapold.exchange.history.TradeHistoryActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.swapold.exchange.detail.HomebrewTradeDetailActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.swapold.exchange.host.HomebrewNavHostActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:launchMode="singleTask" />
+            android:name=".ui.lockbox.LockboxLandingActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
         <activity
             android:name=".ui.thepit.PitPermissionsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
@@ -177,6 +171,9 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.interest.InterestDashboardActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.linkbank.LinkBankActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <meta-data

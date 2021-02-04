@@ -1,9 +1,6 @@
 package piuk.blockchain.android.coincore
 
-import com.blockchain.koin.dgldAccount
-import com.blockchain.koin.paxAccount
 import com.blockchain.koin.payloadScopeQualifier
-import com.blockchain.koin.usdtAccount
 import com.blockchain.koin.dgldFeatureFlag
 import info.blockchain.balance.CryptoCurrency
 import org.koin.dsl.bind
@@ -16,7 +13,9 @@ import piuk.blockchain.android.coincore.erc20.pax.PaxAsset
 import piuk.blockchain.android.coincore.erc20.usdt.UsdtAsset
 import piuk.blockchain.android.coincore.eth.EthAsset
 import piuk.blockchain.android.coincore.fiat.FiatAsset
+import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.coincore.impl.TxProcessorFactory
+import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.android.coincore.stx.StxAsset
 import piuk.blockchain.android.coincore.xlm.XlmAsset
 import piuk.blockchain.android.repositories.AssetActivityRepository
@@ -37,7 +36,8 @@ val coincoreModule = module {
                 labels = get(),
                 tiersService = get(),
                 environmentConfig = get(),
-                eligibilityProvider = get()
+                eligibilityProvider = get(),
+                offlineAccounts = get()
             )
         }
 
@@ -57,6 +57,7 @@ val coincoreModule = module {
                 tiersService = get(),
                 walletPreferences = get(),
                 eligibilityProvider = get(),
+                offlineAccounts = get(),
                 coinsWebsocket = get()
             )
         }
@@ -77,6 +78,7 @@ val coincoreModule = module {
                 labels = get(),
                 tiersService = get(),
                 walletPreferences = get(),
+                offlineAccounts = get(),
                 eligibilityProvider = get()
             )
         }
@@ -97,6 +99,7 @@ val coincoreModule = module {
                 tiersService = get(),
                 environmentConfig = get(),
                 walletPreferences = get(),
+                offlineAccounts = get(),
                 eligibilityProvider = get()
             )
         }
@@ -115,6 +118,7 @@ val coincoreModule = module {
                 pitLinking = get(),
                 labels = get(),
                 tiersService = get(),
+                offlineAccounts = get(),
                 environmentConfig = get(),
                 eligibilityProvider = get()
             )
@@ -123,7 +127,7 @@ val coincoreModule = module {
         scoped {
             PaxAsset(
                 payloadManager = get(),
-                paxAccount = get(paxAccount),
+                ethDataManager = get(),
                 feeDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
@@ -133,6 +137,7 @@ val coincoreModule = module {
                 crashLogger = get(),
                 labels = get(),
                 tiersService = get(),
+                offlineAccounts = get(),
                 environmentConfig = get(),
                 walletPreferences = get(),
                 eligibilityProvider = get()
@@ -151,7 +156,8 @@ val coincoreModule = module {
                 labels = get(),
                 tiersService = get(),
                 environmentConfig = get(),
-                eligibilityProvider = get()
+                eligibilityProvider = get(),
+                offlineAccounts = get()
             )
         }
 
@@ -169,7 +175,7 @@ val coincoreModule = module {
         scoped {
             UsdtAsset(
                 payloadManager = get(),
-                usdtAccount = get(usdtAccount),
+                ethDataManager = get(),
                 feeDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
@@ -179,6 +185,7 @@ val coincoreModule = module {
                 labels = get(),
                 pitLinking = get(),
                 tierService = get(),
+                offlineAccounts = get(),
                 environmentConfig = get(),
                 walletPreferences = get(),
                 eligibilityProvider = get()
@@ -188,7 +195,7 @@ val coincoreModule = module {
         scoped {
             DgldAsset(
                 payloadManager = get(),
-                dgldAccount = get(dgldAccount),
+                ethDataManager = get(),
                 feeDataManager = get(),
                 exchangeRates = get(),
                 historicRates = get(),
@@ -200,6 +207,7 @@ val coincoreModule = module {
                 environmentConfig = get(),
                 walletPreferences = get(),
                 eligibilityProvider = get(),
+                offlineAccounts = get(),
                 tiersService = get(),
                 wDgldFeatureFlag = get(dgldFeatureFlag)
             )
@@ -232,7 +240,7 @@ val coincoreModule = module {
                 exchangeRates = get(),
                 walletManager = get(),
                 walletPrefs = get(),
-                quotesProvider = get(),
+                quotesEngine = get(),
                 analytics = get(),
                 kycTierService = get(),
                 environmentConfig = get()
@@ -251,5 +259,17 @@ val coincoreModule = module {
                 coincore = get()
             )
         }.bind(AddressFactory::class)
+
+        scoped {
+            OfflineAccountUpdater(
+                localCache = get(),
+                payloadManager = get(),
+                walletApi = get()
+            )
+        }
+
+        factory {
+            TransferQuotesEngine(quotesProvider = get())
+        }
     }
 }

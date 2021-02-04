@@ -14,8 +14,8 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
 import piuk.blockchain.android.ui.transactionflow.flow.adapter.ConfirmTransactionDelegateAdapter
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.androidcoreui.utils.extensions.visible
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
+import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 
 class ConfirmTransactionSheet : TransactionFlowSheet() {

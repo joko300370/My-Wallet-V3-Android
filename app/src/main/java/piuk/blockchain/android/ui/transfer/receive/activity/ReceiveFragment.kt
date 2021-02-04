@@ -43,13 +43,13 @@ import piuk.blockchain.androidcore.utils.extensions.toSafeLong
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.extensions.disableSoftKeyboard
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.invisible
-import piuk.blockchain.androidcoreui.utils.extensions.toast
-import piuk.blockchain.androidcoreui.utils.extensions.visible
-import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
+import piuk.blockchain.androidcoreui.ui.customviews.toast
+import piuk.blockchain.android.util.disableSoftKeyboard
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.invisible
+import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.AfterTextChangedWatcher
 import java.text.DecimalFormatSymbols
 import java.util.Locale
 
@@ -102,7 +102,7 @@ class ReceiveFragment : MvpFragment<ReceiveView, ReceivePresenter>(),
         scrollview?.post { scrollview?.scrollTo(0, 0) }
 
         requireActivity().onBackPressedDispatcher.addCallback(
-            this, object : OnBackPressedCallback(true) {
+            viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (custom_keyboard.isVisible) {
                     closeKeypad()
@@ -302,7 +302,7 @@ class ReceiveFragment : MvpFragment<ReceiveView, ReceivePresenter>(),
                     val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                     val clip = ClipData.newPlainText("Send address", address)
                     toast(R.string.copied_to_clipboard)
-                    clipboard.primaryClip = clip
+                    clipboard.setPrimaryClip(clip)
                 }
                 .setNegativeButton(R.string.common_no, null)
                 .show()

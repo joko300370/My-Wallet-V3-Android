@@ -5,7 +5,6 @@ import com.blockchain.nabu.datamanagers.CustodialOrder
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.TransferDirection
-import com.blockchain.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.nabu.models.responses.nabu.NabuApiException
 import com.blockchain.nabu.models.responses.nabu.NabuErrorCodes
@@ -37,12 +36,11 @@ private val PendingTx.quoteSub: Disposable?
     get() = (this.engineState[QUOTE_SUB] as? Disposable)
 
 abstract class QuotedEngine(
-    private val quotesProvider: QuotesProvider,
+    protected val quotesEngine: TransferQuotesEngine,
     private val kycTierService: TierService,
     private val walletManager: CustodialWalletManager,
     private val environmentConfig: EnvironmentConfig
 ) : TxEngine() {
-    protected lateinit var quotesEngine: TransferQuotesEngine
     protected abstract val direction: TransferDirection
 
     protected abstract val availableBalance: Single<Money>
@@ -89,7 +87,7 @@ abstract class QuotedEngine(
         refreshTrigger: RefreshTrigger
     ) {
         super.start(sourceAccount, txTarget, exchangeRates, refreshTrigger)
-        quotesEngine = TransferQuotesEngine(quotesProvider, direction, pair)
+        quotesEngine.start(direction, pair)
     }
 
     protected fun Single<PendingTx>.updateQuotePrice(): Single<PendingTx> =
@@ -162,7 +160,6 @@ abstract class QuotedEngine(
     }
 
     // Quotes api returns the error code for pending orders that's why this method belongs here
-
     protected fun Single<PendingTx>.handlePendingOrdersError(pendingTx: PendingTx): Single<PendingTx> =
         this.onErrorResumeNext {
             if (it is NabuApiException && it.getErrorCode() == NabuErrorCodes.PendingOrdersLimitReached) {

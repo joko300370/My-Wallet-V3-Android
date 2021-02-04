@@ -3,8 +3,6 @@ package piuk.blockchain.android.coincore.impl
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.TransferDirection
-import com.blockchain.nabu.datamanagers.repositories.QuotesProvider
 import com.blockchain.nabu.service.TierService
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AssetAction
@@ -15,13 +13,14 @@ import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TransferError
-import piuk.blockchain.android.coincore.impl.txEngine.BtcBitpayTxEngine
-import piuk.blockchain.android.coincore.impl.txEngine.sell.CustodialSellTxEngine
+import piuk.blockchain.android.coincore.impl.txEngine.BitpayTxEngine
+import piuk.blockchain.android.coincore.impl.txEngine.sell.TradingSellTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.InterestDepositTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.impl.txEngine.TradingToOnChainTxEngine
-import piuk.blockchain.android.coincore.impl.txEngine.sell.NonCustodialSellEngine
-import piuk.blockchain.android.coincore.impl.txEngine.swap.OnChainSwapEngine
+import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
+import piuk.blockchain.android.coincore.impl.txEngine.sell.OnChainSellTxEngine
+import piuk.blockchain.android.coincore.impl.txEngine.swap.OnChainSwapTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.swap.TradingToTradingSwapTxEngine
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
@@ -32,7 +31,7 @@ class TxProcessorFactory(
     private val exchangeRates: ExchangeRateDataManager,
     private val walletManager: CustodialWalletManager,
     private val walletPrefs: WalletStatus,
-    private val quotesProvider: QuotesProvider,
+    private val quotesEngine: TransferQuotesEngine,
     private val analytics: Analytics,
     private val kycTierService: TierService,
     private val environmentConfig: EnvironmentConfig
@@ -61,7 +60,7 @@ class TxProcessorFactory(
                     exchangeRates = exchangeRates,
                     sourceAccount = source,
                     txTarget = target,
-                    engine = BtcBitpayTxEngine(
+                    engine = BitpayTxEngine(
                         bitPayDataManager = bitPayManager,
                         walletPrefs = walletPrefs,
                         assetEngine = engine,
@@ -69,16 +68,19 @@ class TxProcessorFactory(
                     )
                 )
             )
-            is CryptoInterestAccount -> target.receiveAddress.map {
-                TransactionProcessor(
-                    exchangeRates = exchangeRates,
-                    sourceAccount = source,
-                    txTarget = it,
-                    engine = InterestDepositTxEngine(
-                        onChainTxEngine = engine
-                    )
-                )
-            }
+            is CryptoInterestAccount ->
+                target.receiveAddress
+                    .map {
+                        TransactionProcessor(
+                            exchangeRates = exchangeRates,
+                            sourceAccount = source,
+                            txTarget = it,
+                            engine = InterestDepositTxEngine(
+                                walletManager = walletManager,
+                                onChainEngine = engine
+                            )
+                        )
+                    }
             is CryptoAddress -> Single.just(
                 TransactionProcessor(
                     exchangeRates = exchangeRates,
@@ -87,41 +89,45 @@ class TxProcessorFactory(
                     engine = engine
                 )
             )
-            is CryptoAccount -> if (action != AssetAction.Swap) target.receiveAddress.map {
-                TransactionProcessor(
-                    exchangeRates = exchangeRates,
-                    sourceAccount = source,
-                    txTarget = it,
-                    engine = engine
-                )
-            } else Single.just(
+            is CryptoAccount ->
+                if (action != AssetAction.Swap)
+                    target.receiveAddress.map {
+                        TransactionProcessor(
+                        exchangeRates = exchangeRates,
+                        sourceAccount = source,
+                        txTarget = it,
+                        engine = engine
+                    )
+                } else {
+                    Single.just(
+                        TransactionProcessor(
+                            exchangeRates = exchangeRates,
+                            sourceAccount = source,
+                            txTarget = target,
+                            engine = OnChainSwapTxEngine(
+                                quotesEngine = quotesEngine,
+                                walletManager = walletManager,
+                                kycTierService = kycTierService,
+                                engine = engine,
+                                environmentConfig = environmentConfig
+                            )
+                        )
+                    )
+                }
+            is FiatAccount -> Single.just(
                 TransactionProcessor(
                     exchangeRates = exchangeRates,
                     sourceAccount = source,
                     txTarget = target,
-                    engine = OnChainSwapEngine(
-                        quotesProvider = quotesProvider,
+                    engine = OnChainSellTxEngine(
+                        quotesEngine = quotesEngine,
                         walletManager = walletManager,
-                        tiersService = kycTierService,
+                        kycTierService = kycTierService,
                         engine = engine,
-                        environmentConfig = environmentConfig,
-                        direction = if (target is CustodialTradingAccount)
-                            TransferDirection.FROM_USERKEY else TransferDirection.ON_CHAIN
+                        environmentConfig = environmentConfig
                     )
                 )
             )
-            is FiatAccount -> Single.just(TransactionProcessor(
-                exchangeRates = exchangeRates,
-                sourceAccount = source,
-                txTarget = target,
-                engine = NonCustodialSellEngine(
-                    quotesProvider = quotesProvider,
-                    walletManager = walletManager,
-                    kycTierService = kycTierService,
-                    engine = engine,
-                    environmentConfig = environmentConfig
-                )
-            ))
             else -> Single.error(TransferError("Cannot send non-custodial crypto to a non-crypto target"))
         }
     }
@@ -151,32 +157,33 @@ class TxProcessorFactory(
                     txTarget = target,
                     engine = TradingToTradingSwapTxEngine(
                         walletManager = walletManager,
-                        quotesProvider = quotesProvider,
+                        quotesEngine = quotesEngine,
                         kycTierService = kycTierService,
                         environmentConfig = environmentConfig
                     )
                 )
             )
-        is CryptoAccount -> target.receiveAddress.map {
-            TransactionProcessor(
-                exchangeRates = exchangeRates,
-                sourceAccount = source,
-                txTarget = it,
-                engine = TradingToOnChainTxEngine(
-                    walletManager = walletManager,
-                    isNoteSupported = source.isNoteSupported
+        is CryptoAccount -> target.receiveAddress
+            .map {
+                TransactionProcessor(
+                    exchangeRates = exchangeRates,
+                    sourceAccount = source,
+                    txTarget = it,
+                    engine = TradingToOnChainTxEngine(
+                        walletManager = walletManager,
+                        isNoteSupported = source.isNoteSupported
+                    )
                 )
-            )
-        }
+            }
         is FiatAccount ->
             Single.just(
                 TransactionProcessor(
                     exchangeRates = exchangeRates,
                     sourceAccount = source,
                     txTarget = target,
-                    engine = CustodialSellTxEngine(
+                    engine = TradingSellTxEngine(
                         walletManager = walletManager,
-                        quotesProvider = quotesProvider,
+                        quotesEngine = quotesEngine,
                         kycTierService = kycTierService,
                         environmentConfig = environmentConfig
                     )

@@ -21,9 +21,9 @@ import piuk.blockchain.android.ui.start.LandingActivity
 import piuk.blockchain.android.ui.start.PasswordRequiredActivity
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
-import piuk.blockchain.androidcoreui.utils.ViewUtils
-import piuk.blockchain.androidcoreui.utils.extensions.toast
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
+import piuk.blockchain.androidcoreui.ui.customviews.toast
+import piuk.blockchain.android.util.ViewUtils
+import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 
 class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), LauncherView {

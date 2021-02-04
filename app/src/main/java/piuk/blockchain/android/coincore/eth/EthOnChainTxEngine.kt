@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.eth
 
+import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -37,18 +38,20 @@ open class EthOnChainTxEngine(
     walletPreferences
 ) {
     override fun assertInputsValid() {
-        require(txTarget is CryptoAddress)
-        require((txTarget as CryptoAddress).asset == CryptoCurrency.ETHER)
-        require(asset == CryptoCurrency.ETHER)
+        check(txTarget is CryptoAddress)
+        check((txTarget as CryptoAddress).asset == CryptoCurrency.ETHER)
+        check(asset == CryptoCurrency.ETHER)
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
         Single.just(
             PendingTx(
-                amount = CryptoValue.ZeroEth,
-                available = CryptoValue.ZeroEth,
-                fees = CryptoValue.ZeroEth,
-                feeLevel = mapSavedFeeToFeeLevel(getFeeType(CryptoCurrency.ETHER)),
+                amount = CryptoValue.zero(asset),
+                totalBalance = CryptoValue.zero(asset),
+                availableBalance = CryptoValue.zero(asset),
+                fees = CryptoValue.zero(asset),
+                feeLevel = mapSavedFeeToFeeLevel(fetchDefaultFeeLevel(asset)),
+                availableFeeLevels = AVAILABLE_FEE_LEVELS,
                 selectedFiat = userFiat
             )
         )
@@ -87,12 +90,12 @@ open class EthOnChainTxEngine(
             FeeLevel.Custom -> priorityFee
         }
 
-    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
+    override fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
         TxConfirmationValue.FeeSelection(
             feeDetails = getFeeState(pendingTx),
             exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
             selectedLevel = pendingTx.feeLevel,
-            availableLevels = setOf(FeeLevel.Regular, FeeLevel.Priority),
+            availableLevels = AVAILABLE_FEE_LEVELS,
             asset = sourceAccount.asset
         )
 
@@ -104,27 +107,18 @@ open class EthOnChainTxEngine(
         require(amount.currency == CryptoCurrency.ETHER)
 
         return Singles.zip(
+            sourceAccount.accountBalance.map { it as CryptoValue },
             sourceAccount.actionableBalance.map { it as CryptoValue },
             absoluteFee(pendingTx.feeLevel)
-        ) { available, fees ->
+        ) { total, available, fees ->
             pendingTx.copy(
                 amount = amount,
-                available = max(available - fees, CryptoValue.ZeroEth) as CryptoValue,
+                totalBalance = total,
+                availableBalance = max(available - fees, CryptoValue.zero(asset)) as CryptoValue,
                 fees = fees
             )
         }
     }
-
-    override fun doOptionUpdateRequest(pendingTx: PendingTx, newConfirmation: TxConfirmationValue): Single<PendingTx> =
-        if (newConfirmation is TxConfirmationValue.FeeSelection) {
-            if (newConfirmation.selectedLevel != pendingTx.feeLevel) {
-                updateFeeSelection(CryptoCurrency.ETHER, pendingTx, newConfirmation)
-            } else {
-                super.doOptionUpdateRequest(pendingTx, makeFeeSelectionOption(pendingTx))
-            }
-        } else {
-            super.doOptionUpdateRequest(pendingTx, newConfirmation)
-        }
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         validateAmounts(pendingTx)
@@ -152,6 +146,8 @@ open class EthOnChainTxEngine(
                 }?.toSingle {
                     hash
                 } ?: Single.just(hash)
+            }.onErrorResumeNext {
+                Single.error(TransactionError.ExecutionFailed)
             }.map {
                 TxResult.HashedTxResult(it, pendingTx.amount)
             }
@@ -188,7 +184,7 @@ open class EthOnChainTxEngine(
 
     private fun validateAmounts(pendingTx: PendingTx): Completable =
         Completable.fromCallable {
-            if (pendingTx.amount <= CryptoValue.ZeroEth) {
+            if (pendingTx.amount <= CryptoValue.zero(asset)) {
                 throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
             }
         }
@@ -214,4 +210,8 @@ open class EthOnChainTxEngine(
                     Completable.complete()
                 }
             }
+
+    companion object {
+        private val AVAILABLE_FEE_LEVELS = setOf(FeeLevel.Regular, FeeLevel.Priority)
+    }
 }

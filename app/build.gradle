@@ -8,6 +8,7 @@ apply from: '../quality/jacocoApp.gradle'
 apply from: '../quality/ktlint.gradle'
 apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'kotlinx-serialization'
 
 
 buildProperties {
@@ -43,7 +44,6 @@ android {
         // Flag to hide or show the Contacts feature
         buildConfigBoolean "LOG_KOIN_STARTUP", false
         buildConfigBoolean "SKIP_VERIFF_KYC", false
-        buildConfigLong "EXIT_APP_COOLDOWN_MILLIS", 2 * 1000
 
         buildConfigString "SHAPE_SHIFT_API_KEY", buildProperties.secrets['shapeShiftApiKey']
 
@@ -263,13 +263,11 @@ androidExtensions {
 }
 
 dependencies {
-//    implementation 'androidx.appcompat:appcompat:1.1.0'
-//    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation project(':coreui')
     implementation project(':notifications')
     implementation project(':nabu')
     implementation project(':sunriver')
-    implementation project(':lockbox')
+    implementation project(':core')
 
     api project(':coreui')
     api project(':notifications')
@@ -285,7 +283,6 @@ dependencies {
     implementation Libraries.bottomNav
     implementation Libraries.circleIndicator
     implementation Libraries.charts
-    implementation Libraries.gson
     implementation Libraries.sparkline
     implementation Libraries.cardForm
     implementation Libraries.zxing
@@ -305,8 +302,11 @@ dependencies {
         exclude group: 'com.android.support'
     }
     implementation Libraries.googlePlaces
+    implementation Libraries.biometricsApi
 
     implementation Libraries.gson
+    implementation Libraries.kotlinJson
+
     // Utils
     implementation Libraries.libPhoneNumber
     implementation Libraries.yearclass

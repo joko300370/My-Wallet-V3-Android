@@ -9,18 +9,21 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
+import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.dialog_activities_tx_item.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.android.util.extensions.toFormattedDate
+import piuk.blockchain.android.util.toFormattedDate
 import piuk.blockchain.android.util.setAssetIconColours
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.util.inflate
 import java.util.Date
 
 class CustodialTradingActivityItemDelegate<in T>(
+    private val currencyPrefs: CurrencyPrefs,
     private val onItemClicked: (CryptoCurrency, String, CryptoActivityType) -> Unit // crypto, txID, type
 ) : AdapterDelegate<T> {
 
@@ -36,6 +39,7 @@ class CustodialTradingActivityItemDelegate<in T>(
         holder: RecyclerView.ViewHolder
     ) = (holder as CustodialTradingActivityItemViewHolder).bind(
         items[position] as CustodialTradingActivitySummaryItem,
+        currencyPrefs.selectedFiatCurrency,
         onItemClicked
     )
 }
@@ -44,10 +48,14 @@ private class CustodialTradingActivityItemViewHolder(
     itemView: View
 ) : RecyclerView.ViewHolder(itemView) {
 
-    internal fun bind(
+    private val disposables: CompositeDisposable = CompositeDisposable()
+
+    fun bind(
         tx: CustodialTradingActivitySummaryItem,
+        selectedFiatCurrency: String,
         onAccountClicked: (CryptoCurrency, String, CryptoActivityType) -> Unit
     ) {
+        disposables.clear()
         with(itemView) {
             icon.setIcon(tx.status, tx.type)
             if (tx.status.isPending().not()) {
@@ -62,7 +70,7 @@ private class CustodialTradingActivityItemViewHolder(
             status_date.setTxStatus(tx)
             setTextColours(tx.status)
 
-            asset_balance_fiat.text = tx.fundedFiat.toStringWithSymbol()
+            asset_balance_fiat.bindAndConvertFiatBalance(tx, disposables, selectedFiatCurrency)
 
             asset_balance_crypto.text = tx.value.toStringWithSymbol()
 

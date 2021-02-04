@@ -42,7 +42,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/add_payment_method"
-        style="@style/CtaButton.Blue"
+        style="@style/CtaButton.White"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/standard_margin"

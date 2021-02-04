@@ -74,14 +74,15 @@ class KycProfilePresenter(
                 .subscribeBy(
                     onComplete = {
                         ProfileModel(
-                            view.firstName,
-                            view.lastName,
-                            view.countryCode
+                            firstName = view.firstName,
+                            lastName = view.lastName,
+                            countryCode = view.countryCode,
+                            state = view.state
                         ).run { view.continueSignUp(this) }
                     },
                     onError = {
                         if (it is NabuApiException &&
-                            it.getErrorStatusCode() == NabuErrorStatusCodes.AlreadyRegistered
+                            it.getErrorStatusCode() == NabuErrorStatusCodes.Conflict
                         ) {
                             view.showErrorToast(stringUtils.getString(R.string.kyc_profile_error_conflict))
                         } else {
@@ -104,12 +105,16 @@ class KycProfilePresenter(
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(
                         onSuccess = {
+                            val firstName = it.firstName ?: return@subscribeBy
+                            val lastName = it.lastName ?: return@subscribeBy
+                            val dob = it.dob ?: return@subscribeBy
                             val displayFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.US)
                             val backendFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-                            val displayDate = backendFormat.parse(it.dob!!)
+                            val displayDate = backendFormat.parse(dob)
+
                             view.restoreUiState(
-                                it.firstName!!,
-                                it.lastName!!,
+                                firstName,
+                                lastName,
                                 displayFormat.format(displayDate),
                                 displayDate.toCalendar()
                             )

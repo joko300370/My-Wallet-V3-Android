@@ -5,6 +5,7 @@ import com.blockchain.wallet.DefaultLabels
 import info.blockchain.api.blockexplorer.BlockExplorer
 import info.blockchain.api.data.UnspentOutput
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.BitcoinCashWallet
 import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.coin.GenericMetadataWallet
@@ -43,7 +44,7 @@ class BchDataManager(
     /**
      * Clears the currently stored BCH wallet from memory.
      */
-    fun clearBchAccountDetails() {
+    fun clearAccountDetails() {
         bchDataStore.clearData()
     }
 
@@ -298,8 +299,8 @@ class BchDataManager(
         }
     }
 
-    fun getAddressBalance(address: String): BigInteger =
-        bchDataStore.bchBalances[address] ?: BigInteger.ZERO
+    fun getAddressBalance(address: String): CryptoValue =
+        CryptoValue(CryptoCurrency.BCH, bchDataStore.bchBalances[address] ?: BigInteger.ZERO)
 
     private fun updateBalanceForAddress(address: String, balance: BigInteger) {
         bchDataStore.bchBalances[address] = balance

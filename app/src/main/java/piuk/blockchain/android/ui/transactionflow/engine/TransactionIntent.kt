@@ -329,7 +329,7 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             oldState.copy(
                 nextEnabled = true,
                 currentStep = TransactionStep.IN_PROGRESS,
-                executionStatus = TxExecutionStatus.Error(error.message ?: "")
+                executionStatus = TxExecutionStatus.Error(error)
             ).updateBackstack(oldState)
     }
 
@@ -338,7 +338,9 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             oldState.copy(
                 pendingTx = null,
                 selectedTarget = NullAddress,
-                nextEnabled = false
+                nextEnabled = false,
+                fiatRate = null,
+                targetRate = null
             ).updateBackstack(oldState)
     }
 

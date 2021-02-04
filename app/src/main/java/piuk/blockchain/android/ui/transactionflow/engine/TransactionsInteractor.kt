@@ -1,10 +1,10 @@
 package piuk.blockchain.android.ui.transactionflow.engine
 
-import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligibilityProvider
 import com.blockchain.nabu.datamanagers.repositories.swap.CustodialRepository
+import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
@@ -13,6 +13,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.zipWith
+import io.reactivex.subjects.PublishSubject
 import piuk.blockchain.android.coincore.AddressFactory
 import piuk.blockchain.android.coincore.AddressParseError
 import piuk.blockchain.android.coincore.AssetAction
@@ -29,6 +30,7 @@ import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
+import piuk.blockchain.android.ui.transfer.AccountsSorting
 import timber.log.Timber
 
 class TransactionInteractor(
@@ -37,12 +39,15 @@ class TransactionInteractor(
     private val custodialRepository: CustodialRepository,
     private val custodialWalletManager: CustodialWalletManager,
     private val currencyPrefs: CurrencyPrefs,
-    private val eligibilityProvider: EligibilityProvider
+    private val eligibilityProvider: EligibilityProvider,
+    private val accountsSorting: AccountsSorting
 ) {
     private var transactionProcessor: TransactionProcessor? = null
+    private val invalidate = PublishSubject.create<Unit>()
 
     fun invalidateTransaction() =
         Completable.fromAction {
+            reset()
             transactionProcessor = null
         }
 
@@ -52,7 +57,7 @@ class TransactionInteractor(
     fun validateTargetAddress(address: String, asset: CryptoCurrency): Single<ReceiveAddress> =
         addressFactory.parse(address, asset)
             .switchIfEmpty(
-                Single.error<ReceiveAddress>(
+                Single.error(
                     TxValidationFailure(ValidationState.INVALID_ADDRESS)
                 )
             )
@@ -80,7 +85,7 @@ class TransactionInteractor(
                 Timber.e("!TRANSACTION!> error initialising $it")
             }.flatMapObservable {
                 it.initialiseTx()
-            }
+            }.takeUntil(invalidate)
 
     val canTransactFiat: Boolean
         get() = transactionProcessor?.canTransactFiat ?: throw IllegalStateException("TxProcessor not initialised")
@@ -102,8 +107,10 @@ class TransactionInteractor(
             .zipWith(availableFiats) { supportedPairs, fiats ->
                 supportedPairs.pairs.filter { fiats.contains(it.fiatCurrency) }
                     .map {
-                        CurrencyPair.CryptoToFiatCurrencyPair(it.cryptoCurrency,
-                            it.fiatCurrency)
+                        CurrencyPair.CryptoToFiatCurrencyPair(
+                            it.cryptoCurrency,
+                            it.fiatCurrency
+                        )
                     }
             }
 
@@ -134,17 +141,15 @@ class TransactionInteractor(
 
     fun getAvailableSourceAccounts(action: AssetAction): Single<List<CryptoAccount>> {
         require(action == AssetAction.Swap) { "Source account should be preselected for action $action" }
-        return coincore.allWallets()
+        return coincore.allWalletsWithActions(setOf(action), accountsSorting.sorter())
             .zipWith(
                 custodialRepository.getSwapAvailablePairs()
-            ).map { (accountGroup, pairs) ->
-                accountGroup.accounts.filter { account ->
+            ).map { (accounts, pairs) ->
+                accounts.filter { account ->
                     (account as? CryptoAccount)?.isAvailableToSwapFrom(pairs) ?: false
                 }
             }.map {
-                it.map { account -> account as CryptoAccount }.filter { account ->
-                    account.actions.contains(AssetAction.Swap)
-                }
+                it.map { account -> account as CryptoAccount }
             }
     }
 
@@ -156,16 +161,20 @@ class TransactionInteractor(
 
     fun startFiatRateFetch(): Observable<ExchangeRate.CryptoToFiat> =
         transactionProcessor?.userExchangeRate()
+            ?.takeUntil(invalidate)
             ?.map { it as ExchangeRate.CryptoToFiat }
             ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun startTargetRateFetch(): Observable<ExchangeRate> =
-        transactionProcessor?.targetExchangeRate() ?: throw IllegalStateException("TxProcessor not initialised")
+        transactionProcessor?.targetExchangeRate()?.takeUntil(invalidate) ?: throw IllegalStateException(
+            "TxProcessor not initialised"
+        )
 
     fun validateTransaction(): Completable =
         transactionProcessor?.validateAll() ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun reset() {
+        invalidate.onNext(Unit)
         transactionProcessor?.reset() ?: Timber.i("TxProcessor is not initialised yet")
     }
 }

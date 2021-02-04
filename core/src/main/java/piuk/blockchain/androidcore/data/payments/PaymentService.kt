@@ -14,7 +14,6 @@ import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.Transaction
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.annotations.WebRequest
-import java.io.UnsupportedEncodingException
 import java.math.BigInteger
 import java.util.HashMap
 
@@ -190,15 +189,13 @@ class PaymentService(
      * @return An [SpendableUnspentOutputs] object, which wraps a list of spendable outputs
      * for the given inputs
      */
-    @Throws(UnsupportedEncodingException::class)
     internal fun getSpendableCoins(
         unspentCoins: UnspentOutputs,
         paymentAmount: BigInteger,
         feePerKb: BigInteger,
-        includeReplayProtection: Boolean,
-        useNewCoinSelection: Boolean
+        includeReplayProtection: Boolean
     ): SpendableUnspentOutputs =
-        payment.getSpendableCoins(unspentCoins, paymentAmount, feePerKb, includeReplayProtection, useNewCoinSelection)
+        payment.getSpendableCoins(unspentCoins, paymentAmount, feePerKb, includeReplayProtection)
 
     /**
      * Calculates the total amount of bitcoin that can be swept from an [UnspentOutputs]
@@ -215,13 +212,11 @@ class PaymentService(
     internal fun getMaximumAvailable(
         unspentCoins: UnspentOutputs,
         feePerKb: BigInteger,
-        includeReplayProtection: Boolean,
-        useNewCoinSelection: Boolean
+        includeReplayProtection: Boolean
     ): Pair<BigInteger, BigInteger> = payment.getMaximumAvailable(
         unspentCoins,
         feePerKb,
-        includeReplayProtection,
-        useNewCoinSelection
+        includeReplayProtection
     )
 
     /**

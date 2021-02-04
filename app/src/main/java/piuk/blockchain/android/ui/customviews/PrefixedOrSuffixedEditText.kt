@@ -6,12 +6,12 @@ import android.text.Editable
 import android.text.Selection
 import android.util.AttributeSet
 import android.view.KeyEvent
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import info.blockchain.utils.tryParseBigDecimal
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
-import piuk.blockchain.androidcoreui.ui.customviews.AutofitEdittext
-import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
+import piuk.blockchain.android.util.AfterTextChangedWatcher
 import java.math.BigDecimal
 import kotlin.properties.Delegates
 
@@ -27,7 +27,8 @@ class PrefixedOrSuffixedEditText : AutofitEdittext {
     constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(
         context,
         attrs,
-        defStyle)
+        defStyle
+    )
 
     private val imeActionsSubject: PublishSubject<ImeOptions> = PublishSubject.create()
     private val textSizeSubject: PublishSubject<Int> = PublishSubject.create()
@@ -63,6 +64,7 @@ class PrefixedOrSuffixedEditText : AutofitEdittext {
                 setText(text.toString().replace(digitsOnlyRegex, ""))
             }
         }
+        importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
 
         setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_NEXT) {
@@ -88,11 +90,16 @@ class PrefixedOrSuffixedEditText : AutofitEdittext {
 
     override fun onSelectionChanged(selStart: Int, selEnd: Int) {
         super.onSelectionChanged(selStart, selEnd)
+        val textLength = text.toString().length
         suffix?.let {
-            if (selEnd > text.toString().length - it.length) Selection.setSelection(text, 0)
+            if (selEnd > textLength - it.length) {
+                Selection.setSelection(text, 0, textLength - it.length)
+            }
         }
         prefix?.let {
-            if (selEnd < it.length) Selection.setSelection(text, text.toString().length)
+            if (selEnd < it.length && textLength >= it.length) {
+                Selection.setSelection(text, textLength)
+            }
         }
     }
 
@@ -107,7 +114,8 @@ class PrefixedOrSuffixedEditText : AutofitEdittext {
     private var suffix: String? = null
 
     internal var configuration: Configuration by Delegates.observable(
-        Configuration()) { _, oldValue, newValue ->
+        Configuration()
+    ) { _, oldValue, newValue ->
         if (newValue != oldValue) {
             if (newValue.isPrefix) {
                 suffix = null

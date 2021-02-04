@@ -4,7 +4,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.Currency
 
-sealed class ExchangeRate(var rate: BigDecimal) {
+sealed class ExchangeRate(val rate: BigDecimal) {
 
     abstract fun convert(value: Money, round: Boolean = true): Money
     abstract fun price(): Money

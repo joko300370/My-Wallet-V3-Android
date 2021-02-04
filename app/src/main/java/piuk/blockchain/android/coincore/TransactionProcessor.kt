@@ -1,8 +1,10 @@
 package piuk.blockchain.android.coincore
 
 import androidx.annotation.CallSuper
+import androidx.annotation.VisibleForTesting
 import com.blockchain.extensions.replace
 import com.blockchain.koin.payloadScope
+import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -49,13 +51,26 @@ enum class FeeLevel {
     Custom
 }
 
+data class TxFee(
+    val fee: Money,
+    val type: FeeType,
+    val asset: CryptoCurrency
+) {
+    enum class FeeType {
+        DEPOSIT_FEE,
+        WITHDRAWAL_FEE
+    }
+}
+
 data class PendingTx(
     val amount: Money,
-    val available: Money,
+    val totalBalance: Money,
+    val availableBalance: Money,
     val fees: Money,
     val selectedFiat: String,
-    val feeLevel: FeeLevel = FeeLevel.Regular,
+    val feeLevel: FeeLevel = FeeLevel.None,
     val customFeeAmount: Long = -1L,
+    val availableFeeLevels: Set<FeeLevel> = setOf(FeeLevel.None),
     val confirmations: List<TxConfirmationValue> = emptyList(),
     val minLimit: Money? = null,
     val maxLimit: Money? = null,
@@ -147,9 +162,6 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
             val regularFee: Long,
             val priorityFee: Long
         )
-
-        fun hasOptionChanged(oldLevel: FeeLevel, oldAmount: Long) =
-            selectedLevel != oldLevel || (selectedLevel == FeeLevel.Custom && oldAmount != customFeeAmount)
     }
 
     data class BitPayCountdown(
@@ -161,19 +173,12 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
 
     data class Description(val text: String = "") : TxConfirmationValue(TxConfirmation.DESCRIPTION)
 
-    data class Memo(val text: String?, val isRequired: Boolean, val id: Long?) :
+    data class Memo(val text: String?, val isRequired: Boolean, val id: Long?, val editable: Boolean = true) :
         TxConfirmationValue(TxConfirmation.MEMO)
 
     data class NetworkFee(
-        val fee: Money,
-        val type: FeeType,
-        val asset: CryptoCurrency
-    ) : TxConfirmationValue(TxConfirmation.NETWORK_FEE) {
-        enum class FeeType {
-            DEPOSIT_FEE,
-            WITHDRAWAL_FEE
-        }
-    }
+        val txFee: TxFee
+    ) : TxConfirmationValue(TxConfirmation.NETWORK_FEE)
 
     data class TxBooleanConfirmation<T>(
         override val confirmation: TxConfirmation,
@@ -187,15 +192,16 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
         TxConfirmationValue(TxConfirmation.READ_ONLY)
 }
 
-sealed class FeeState
-object FeeTooHigh : FeeState()
-object FeeUnderMinLimit : FeeState()
-object FeeUnderRecommended : FeeState()
-object FeeOverRecommended : FeeState()
-object ValidCustomFee : FeeState()
-data class FeeDetails(
-    val absoluteFee: Money
-) : FeeState()
+sealed class FeeState {
+    object FeeTooHigh : FeeState()
+    object FeeUnderMinLimit : FeeState()
+    object FeeUnderRecommended : FeeState()
+    object FeeOverRecommended : FeeState()
+    object ValidCustomFee : FeeState()
+    data class FeeDetails(
+        val absoluteFee: Money
+    ) : FeeState()
+}
 
 abstract class TxEngine : KoinComponent {
 
@@ -217,7 +223,8 @@ abstract class TxEngine : KoinComponent {
     protected val exchangeRates: ExchangeRateDataManager
         get() = _exchangeRates
 
-    protected fun refreshConfirmations(revalidate: Boolean = false) =
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    fun refreshConfirmations(revalidate: Boolean = false) =
         _refresh.refreshConfirmations(revalidate).emptySubscribe()
 
     @CallSuper
@@ -251,7 +258,8 @@ abstract class TxEngine : KoinComponent {
         payloadScope.get<CurrencyPrefs>().selectedFiatCurrency
     }
 
-    protected val asset: CryptoCurrency
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    val asset: CryptoCurrency
         get() = sourceAccount.asset
 
     open val requireSecondPassword: Boolean = false
@@ -292,6 +300,9 @@ abstract class TxEngine : KoinComponent {
     // Return a new PendingTx with the state updated for the UI to update. The pending Tx will
     // be passed to validate after this call.
     abstract fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx>
+
+    // Update the selected fee level of this Tx. This should check & update balances etc
+    abstract fun doUpdateFeeLevel(pendingTx: PendingTx, level: FeeLevel, customFeeAmount: Long): Single<PendingTx>
 
     // Process any TxOption updates, if required. The default just replaces the option and returns
     // the updated pendingTx. Subclasses may want to, eg, update amounts on fee changes etc
@@ -403,6 +414,21 @@ class TransactionProcessor(
             .ignoreElement()
     }
 
+    // Check that the fee level is supported, then call into the engine to set the fee and validate ballances etc
+    // the selected fee level is supported
+    fun updateFeeLevel(level: FeeLevel, customFeeAmount: Long = -1): Completable {
+        Timber.d("!TRANSACTION!> in UpdateFeeLevel")
+        val pendingTx = getPendingTx()
+        check(pendingTx.availableFeeLevels.contains(level)) {
+            "Fee Level $level not supported by engine ${engine::class.java.name}"
+        }
+
+        return engine.doUpdateFeeLevel(pendingTx, level, customFeeAmount)
+            .flatMap { engine.doValidateAmount(it) }
+            .doOnSuccess { updatePendingTx(it) }
+            .ignoreElement()
+    }
+
     // Return a stream of the exchange rate between the source asset and the user's selected
     // fiat currency. This should always return at least once, but can safely either complete
     // or keep sending updated rates, depending on what is useful for Transaction context
@@ -424,20 +450,40 @@ class TransactionProcessor(
     // Ideally, I'd like to return the Tx id/hash. But we get nothing back from the
     // custodial APIs (and are not likely to, since the tx is batched and not executed immediately)
     fun execute(secondPassword: String): Completable {
-        if (requireSecondPassword && secondPassword.isEmpty())
+        if (requireSecondPassword && secondPassword.isEmpty()) {
             throw IllegalArgumentException("Second password not supplied")
+        }
 
-        val pendingTx = getPendingTx()
-        return engine.doValidateAll(pendingTx)
-            .doOnSuccess {
-                if (it.validationState != ValidationState.CAN_EXECUTE)
-                    throw IllegalStateException("PendingTx is not executable")
-            }.flatMapCompletable {
-                engine.doExecute(it, secondPassword).flatMapCompletable { result ->
+        return engine.doValidateAll(getPendingTx())
+            .flatMapCompletable {
+                it.validationState.toErrorStateOrExecute(it, secondPassword)
+            }
+    }
+
+    private fun ValidationState.toErrorStateOrExecute(pendingTx: PendingTx, secondPassword: String): Completable =
+        when (this) {
+            ValidationState.CAN_EXECUTE -> {
+                engine.doExecute(pendingTx, secondPassword).flatMapCompletable { result ->
                     engine.doPostExecute(result)
                 }
             }
-    }
+            ValidationState.UNINITIALISED -> Completable.error(TransactionError.UnexpectedError)
+            ValidationState.HAS_TX_IN_FLIGHT -> Completable.error(TransactionError.OrderLimitReached)
+            ValidationState.INVALID_AMOUNT -> Completable.error(TransactionError.InvalidDestinationAmount)
+            ValidationState.INSUFFICIENT_FUNDS -> Completable.error(TransactionError.InsufficientBalance)
+            ValidationState.INSUFFICIENT_GAS -> Completable.error(TransactionError.InsufficientBalance)
+            ValidationState.INVALID_ADDRESS -> Completable.error(TransactionError.InvalidCryptoAddress)
+            ValidationState.ADDRESS_IS_CONTRACT -> Completable.error(TransactionError.InvalidCryptoAddress)
+            ValidationState.OPTION_INVALID -> Completable.error(TransactionError.UnexpectedError)
+            ValidationState.UNDER_MIN_LIMIT -> Completable.error(TransactionError.OrderBelowMin)
+            ValidationState.PENDING_ORDERS_LIMIT_REACHED ->
+                Completable.error(TransactionError.OrderLimitReached)
+            ValidationState.OVER_MAX_LIMIT,
+            ValidationState.OVER_SILVER_TIER_LIMIT,
+            ValidationState.OVER_GOLD_TIER_LIMIT -> Completable.error(TransactionError.OrderAboveMax)
+            ValidationState.INVOICE_EXPIRED -> Completable.error(TransactionError.UnexpectedError)
+            ValidationState.UNKNOWN_ERROR -> throw IllegalStateException("PendingTx is not executable")
+        }
 
     // If the source and target assets are not the same this MAY return a stream of the exchange rates
     // between them. Or it may simply complete. This is not used yet in the UI, but it may be when
@@ -496,10 +542,12 @@ fun Single<PendingTx>.updateTxValidity(pendingTx: PendingTx): Single<PendingTx> 
 
 private fun updateOptionsWithValidityWarning(pendingTx: PendingTx): PendingTx =
     if (pendingTx.validationState !in setOf(ValidationState.CAN_EXECUTE, ValidationState.UNINITIALISED)) {
-        pendingTx.addOrReplaceOption(TxConfirmationValue.ErrorNotice(
-            status = pendingTx.validationState,
-            money = if (pendingTx.validationState == ValidationState.UNDER_MIN_LIMIT) pendingTx.minLimit else null
-        ))
+        pendingTx.addOrReplaceOption(
+            TxConfirmationValue.ErrorNotice(
+                status = pendingTx.validationState,
+                money = if (pendingTx.validationState == ValidationState.UNDER_MIN_LIMIT) pendingTx.minLimit else null
+            )
+        )
     } else {
         pendingTx.removeOption(TxConfirmation.ERROR_NOTICE)
     }

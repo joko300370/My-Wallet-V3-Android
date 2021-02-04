@@ -48,7 +48,7 @@ data class Settings(
     private val _smsNumber: String? = null,
 
     @JsonProperty("sms_verified")
-    private val smsVerified: String = "",
+    private val smsVerified: Int = 0,
 
     @JsonProperty("is_api_access_enabled")
     private val isApiAccessEnabled: Int = 0,

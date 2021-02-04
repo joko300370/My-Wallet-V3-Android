@@ -71,16 +71,17 @@ class AssetDetailsInteractor(
             Singles.zip(
                 grp.accountBalance,
                 grp.pendingBalance,
-                grp.isEnabled
-            ).toMaybe().map { (accBalance, pendingBalance, enabled) ->
+                grp.isEnabled,
+                grp.actions
+            ) { accBalance, pendingBalance, enable, actions ->
                 Details.DetailsItem(
-                    isEnabled = enabled,
+                    isEnabled = enable,
                     account = grp,
                     balance = accBalance,
                     pendingBalance = pendingBalance,
-                    actions = grp.actions
+                    actions = actions
                 ) as Details
-            }
+            }.toMaybe()
         }.toSingle(Details.NoDetails)
 
     private fun getAssetDisplayDetails(asset: CryptoAsset): Single<AssetDisplayMap> {
@@ -106,8 +107,14 @@ class AssetDetailsInteractor(
         interestRate: Double,
         interestEnabled: Boolean
     ): AssetDisplayMap = mutableMapOf<AssetFilter, AssetDisplayInfo>().apply {
-        addToDisplayMap(this, AssetFilter.NonCustodial, nonCustodial, fiatRate)
-        addToDisplayMap(this, AssetFilter.Custodial, custodial, fiatRate)
+        if (nonCustodial !is Details.NoDetails) {
+            addToDisplayMap(this, AssetFilter.NonCustodial, nonCustodial, fiatRate)
+        }
+
+        if (custodial !is Details.NoDetails) {
+            addToDisplayMap(this, AssetFilter.Custodial, custodial, fiatRate)
+        }
+
         if (interestEnabled && (interest as? Details.DetailsItem)?.isEnabled == true) {
             addToDisplayMap(this, AssetFilter.Interest, interest, fiatRate, interestRate)
         }

@@ -42,10 +42,10 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.goneIf
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.goneIf
+import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.visible
 import timber.log.Timber
 
 class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesIntent, ActivitiesState>(),
@@ -55,13 +55,11 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
 
     private val theAdapter: ActivitiesDelegateAdapter by lazy {
         ActivitiesDelegateAdapter(
-            disposables = disposables,
             prefs = get(),
             onCryptoItemClicked = { cc, tx, type ->
                 onCryptoActivityClicked(cc, tx, type)
             },
-            onFiatItemClicked = { cc, tx -> onFiatActivityClicked(cc, tx) },
-            analytics = get()
+            onFiatItemClicked = { cc, tx -> onFiatActivityClicked(cc, tx) }
         )
     }
 

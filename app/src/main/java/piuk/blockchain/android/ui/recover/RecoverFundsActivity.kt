@@ -15,7 +15,7 @@ import piuk.blockchain.android.ui.createwallet.CreateWalletActivity
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.ViewUtils
+import piuk.blockchain.android.util.ViewUtils
 import java.util.Locale
 
 internal class RecoverFundsActivity :

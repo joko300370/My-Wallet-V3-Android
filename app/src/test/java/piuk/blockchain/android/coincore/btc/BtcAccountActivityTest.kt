@@ -24,6 +24,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.coincore.TradeActivitySummaryItem
+import piuk.blockchain.android.coincore.impl.AccountRefreshTrigger
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -40,6 +41,7 @@ class BtcAccountActivityTest {
     private val networkParameters: NetworkParameters = mock()
     private val walletPrefs: WalletStatus = mock()
     private val custodialWalletManager: CustodialWalletManager = mock()
+    private val refreshTrigger: AccountRefreshTrigger = mock()
 
     private val jsonAccount: Account = mock {
         on { isArchived } itReturns false
@@ -57,7 +59,8 @@ class BtcAccountActivityTest {
             internalAccount = jsonAccount,
             isHDAccount = true,
             walletPreferences = walletPrefs,
-            custodialWalletManager = custodialWalletManager
+            custodialWalletManager = custodialWalletManager,
+            refreshTrigger = refreshTrigger
         )
 
     @get:Rule
@@ -96,9 +99,9 @@ class BtcAccountActivityTest {
             "sendingAddress",
             "receivingAddress",
             CustodialOrderState.FINISHED,
-            CryptoValue.ZeroBtc,
-            CryptoValue.ZeroEth,
-            CryptoValue.ZeroEth,
+            CryptoValue.zero(CryptoCurrency.BTC),
+            CryptoValue.zero(CryptoCurrency.ETHER),
+            CryptoValue.zero(CryptoCurrency.ETHER),
             CurrencyPair.CryptoCurrencyPair(CryptoCurrency.BTC, CryptoCurrency.ETHER),
             FiatValue.zero("USD"),
             "USD"
@@ -120,10 +123,10 @@ class BtcAccountActivityTest {
                 val btcItem = it[0]
 
                 it.size == 1 &&
-                        btcItem is BtcActivitySummaryItem &&
-                        btcItem.txId == summary.hash &&
-                        btcItem.confirmations == summary.confirmations &&
-                        btcItem.transactionType == summary.transactionType
+                    btcItem is BtcActivitySummaryItem &&
+                    btcItem.txId == summary.hash &&
+                    btcItem.confirmations == summary.confirmations &&
+                    btcItem.transactionType == summary.transactionType
             }
 
         verify(payloadDataManager).getAccountTransactions(any(), any(), any())

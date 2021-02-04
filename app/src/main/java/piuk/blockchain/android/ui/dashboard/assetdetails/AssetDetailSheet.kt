@@ -39,10 +39,10 @@ import piuk.blockchain.androidcore.data.exchangerate.PriceSeries
 import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom.TYPE_ERROR
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.invisible
-import piuk.blockchain.androidcoreui.utils.extensions.visible
-import piuk.blockchain.androidcoreui.utils.helperfunctions.setOnTabSelectedListener
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.invisible
+import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.setOnTabSelectedListener
 import java.math.RoundingMode
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -89,8 +89,8 @@ class AssetDetailSheet :
             handleErrorState(newState.errorState)
         }
 
-        newState.assetDisplayMap?.let {
-            onGotAssetDetails(it)
+        newState.assetDisplayMap?.let { assetDisplayMap ->
+            onGotAssetDetails(assetDisplayMap)
         }
 
         dialogView.current_price.text = newState.assetFiatPrice

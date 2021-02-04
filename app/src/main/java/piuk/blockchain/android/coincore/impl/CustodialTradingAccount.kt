@@ -16,7 +16,6 @@ import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
-import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
@@ -44,7 +43,6 @@ open class CustodialTradingAccount(
     private val eligibilityProvider: EligibilityProvider
 ) : CryptoAccountBase(), TradingAccount {
 
-    private val isEligibleForSimpleBuy = AtomicBoolean(false)
     private val hasFunds = AtomicBoolean(false)
 
     override val receiveAddress: Single<ReceiveAddress>
@@ -84,17 +82,12 @@ open class CustodialTradingAccount(
     override val accountBalance: Single<Money>
         get() = custodialWalletManager.getTotalBalanceForAsset(asset)
             .toSingle(CryptoValue.zero(asset))
-            .zipWith(eligibilityProvider.isEligibleForSimpleBuy().doOnSuccess {
-                isEligibleForSimpleBuy.set(it)
-            }).map { (balance, _) ->
-                balance
-            }
             .onErrorReturn {
                 Timber.d("Unable to get custodial trading total balance: $it")
                 CryptoValue.zero(asset)
             }
             .doOnSuccess { hasFunds.set(it.isPositive) }
-            .map { it as Money }
+            .map { it }
 
     override val actionableBalance: Single<Money>
         get() = custodialWalletManager.getActionableBalanceForAsset(asset)
@@ -104,12 +97,12 @@ open class CustodialTradingAccount(
                 CryptoValue.zero(asset)
             }
             .doOnSuccess { hasFunds.set(it.isPositive) }
-            .map { it as Money }
+            .map { it }
 
     override val pendingBalance: Single<Money>
         get() = custodialWalletManager.getPendingBalanceForAsset(asset)
             .toSingle(CryptoValue.zero(asset))
-            .map { it as Money }
+            .map { it }
 
     override val activity: Single<ActivitySummaryList>
         get() = custodialWalletManager.getAllOrdersFor(asset)
@@ -139,19 +132,23 @@ open class CustodialTradingAccount(
             }
         }
 
-    override val actions: AvailableActions
+    override val actions: Single<AvailableActions>
         get() =
-            mutableSetOf(
-                AssetAction.ViewActivity
-            ).apply {
-                if (isFunded && !isArchived) {
-                    add(AssetAction.Send)
-                    if (isEligibleForSimpleBuy.get()) {
-                        add(AssetAction.Sell)
-                        add(AssetAction.Swap)
+            Singles.zip(
+                accountBalance.map { it.isPositive },
+                actionableBalance.map { it.isPositive },
+                eligibilityProvider.isEligibleForSimpleBuy()
+            ) { hasFunds, hasActionableBalance, isEligibleForSimpleBuy ->
+                val actions = mutableSetOf(AssetAction.ViewActivity)
+                if (isArchived.not()) {
+                    if (hasActionableBalance) actions.add(AssetAction.Send)
+                    if (hasFunds && isEligibleForSimpleBuy) {
+                        actions.add(AssetAction.Sell)
+                        actions.add(AssetAction.Swap)
                     }
                 }
-            }.toSet()
+                actions.toSet()
+            }
 
     private fun orderToSummary(order: BuySellOrder): ActivitySummaryItem =
         if (order.type == OrderType.BUY) {

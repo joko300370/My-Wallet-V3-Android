@@ -27,9 +27,9 @@ import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.scan.QRCodeEncoder
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.toast
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.androidcoreui.ui.customviews.toast
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 import timber.log.Timber
 
 class AccountEditSheet : SlidingModalBottomDialog() {

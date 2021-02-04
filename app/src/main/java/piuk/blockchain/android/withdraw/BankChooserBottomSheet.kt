@@ -90,7 +90,8 @@ sealed class BankChooserItem(val clickAction: () -> Unit) {
     class AddBankItem(clickAction: () -> Unit) : BankChooserItem(clickAction)
 }
 
-private class LinkedBankItemDelegate : AdapterDelegate<BankChooserItem> {
+private class LinkedBankItemDelegate :
+    AdapterDelegate<BankChooserItem> {
     override fun isForViewType(items: List<BankChooserItem>, position: Int): Boolean =
         items[position] is BankChooserItem.BankItem
 
@@ -115,14 +116,15 @@ private class LinkedBankItemDelegate : AdapterDelegate<BankChooserItem> {
 
         fun bind(item: BankChooserItem) {
             (item as? BankChooserItem.BankItem)?.let {
-                title.text = it.bank.title.plus(" ${it.bank.account}")
+                title.text = it.bank.name.plus(" ${it.bank.account}")
             }
             root.setOnClickListener { item.clickAction() }
         }
     }
 }
 
-private class AddBankPaymentDelegate : AdapterDelegate<BankChooserItem> {
+private class AddBankPaymentDelegate :
+    AdapterDelegate<BankChooserItem> {
     override fun isForViewType(items: List<BankChooserItem>, position: Int): Boolean =
         items[position] is BankChooserItem.AddBankItem
 
