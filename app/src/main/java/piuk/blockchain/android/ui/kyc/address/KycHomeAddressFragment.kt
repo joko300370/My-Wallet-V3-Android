@@ -36,7 +36,6 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException
 import com.google.android.gms.location.places.AutocompleteFilter
 import com.google.android.gms.location.places.ui.PlaceAutocomplete
 import com.jakewharton.rx.replayingShare
-import com.jakewharton.rxbinding2.view.enabled
 import com.jakewharton.rxbinding2.widget.afterTextChangeEvents
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
