@@ -262,6 +262,12 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
 
             addressSubject.onNext(AddressIntent.State(profileModel.stateCode ?: ""))
 
+            compositeDisposable += editTextState
+                .onDelayedChange(KycStep.State)
+                .filter { !profileModel.isInUs() }
+                .doOnNext { addressSubject.onNext(AddressIntent.State(it)) }
+                .subscribe()
+
             compositeDisposable +=
                 searchViewAddress.getEditText()
                     .apply { isFocusable = false }
@@ -310,8 +316,11 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
         progressDialog = null
     }
 
+    private fun ProfileModel.isInUs() =
+        countryCode.equals("US", ignoreCase = true)
+
     private fun localiseUi() {
-        if (profileModel.countryCode.equals("US", ignoreCase = true)) {
+        if (profileModel.isInUs()) {
             searchViewAddress.queryHint = getString(
                 R.string.kyc_address_search_hint,
                 getString(R.string.kyc_address_search_hint_zipcode)
@@ -321,6 +330,7 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
             textInputCity.hint = getString(R.string.kyc_address_address_city_hint)
             textInputLayoutState.hint = getString(R.string.kyc_address_address_state_hint)
             textInputLayoutZipCode.hint = getString(R.string.kyc_address_address_zip_code_hint_1)
+            textInputLayoutState.editText?.isEnabled = false
         } else {
             searchViewAddress.queryHint = getString(
                 R.string.kyc_address_search_hint,
@@ -331,6 +341,7 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
             textInputCity.hint = getString(R.string.kyc_address_city_town_village)
             textInputLayoutState.hint = getString(R.string.kyc_address_state_region_province_county)
             textInputLayoutZipCode.hint = getString(R.string.kyc_address_postal_code)
+            textInputLayoutState.editText?.isEnabled = true
         }
 
         editTextCountry.setText(
