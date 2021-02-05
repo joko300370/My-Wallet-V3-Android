@@ -688,7 +688,8 @@ val applicationModule = module {
                 applicationContext = get(),
                 prefs = get(),
                 accessState = get(),
-                cryptographyManager = get()
+                cryptographyManager = get(),
+                crashLogger = get()
             )
         }.bind(BiometricAuth::class)
 

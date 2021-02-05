@@ -14,6 +14,7 @@ import androidx.biometric.BiometricPrompt.ERROR_USER_CANCELED
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import com.blockchain.logging.CrashLogger
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
 import piuk.blockchain.androidcore.data.access.AccessState
@@ -42,7 +43,8 @@ class BiometricsController(
     private val applicationContext: Context,
     private val prefs: PrefsUtil,
     private val accessState: AccessState,
-    private val cryptographyManager: CryptographyManager
+    private val cryptographyManager: CryptographyManager,
+    private val crashLogger: CrashLogger
 ) : BiometricAuth, KoinComponent {
 
     private val biometricsManager by lazy {
@@ -164,6 +166,9 @@ class BiometricsController(
                         callback.onAuthSuccess(encryptedString)
                     } catch (e: IllegalBlockSizeException) {
                         callback.onAuthFailed(BiometricKeysInvalidated)
+                    } catch (e: Exception) {
+                        crashLogger.logException(e, "Exception when registering biometrics")
+                        callback.onAuthFailed(BiometricAuthOther(e.message ?: e.toString()))
                     }
                 }
             } else {
@@ -172,6 +177,9 @@ class BiometricsController(
                         callback.onAuthSuccess(processDecryption(it))
                     } catch (e: IllegalBlockSizeException) {
                         callback.onAuthFailed(BiometricKeysInvalidated)
+                    } catch (e: Exception) {
+                        crashLogger.logException(e, "Exception when logging in with biometrics")
+                        callback.onAuthFailed(BiometricAuthOther(e.message ?: e.toString()))
                     }
                 }
             }
@@ -253,10 +261,9 @@ class BiometricsController(
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun processEncryption(cryptoObject: BiometricPrompt.CryptoObject, textToEncrypt: String): String {
-        return cryptoObject.cipher?.let {
+        cryptoObject.cipher?.let {
             val encryptedData = cryptographyManager.encryptData(textToEncrypt, it)
-
-            generateCompositeKey(encryptedData.ciphertext, encryptedData.initializationVector)
+            return generateCompositeKey(encryptedData.ciphertext, encryptedData.initializationVector)
         } ?: throw IllegalStateException("There is no cipher with which to encrypt")
     }
 

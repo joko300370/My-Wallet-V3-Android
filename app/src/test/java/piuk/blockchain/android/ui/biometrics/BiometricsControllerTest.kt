@@ -4,6 +4,7 @@ import android.content.Context
 import android.security.keystore.KeyPermanentlyInvalidatedException
 import android.security.keystore.KeyProperties
 import androidx.biometric.BiometricPrompt
+import com.blockchain.logging.CrashLogger
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doNothing
 import com.nhaarman.mockito_kotlin.doReturn
@@ -47,6 +48,7 @@ class BiometricsControllerTest {
     private val prefsUtil: PrefsUtil = mock()
     private val accessState: AccessState = mock()
     private val cryptographyManager: CryptographyManager = mock()
+    private val crashLogger: CrashLogger = mock()
     private val ENCRYPTION_BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC
     private val ENCRYPTION_PADDING = KeyProperties.ENCRYPTION_PADDING_PKCS7
     private val ENCRYPTION_ALGORITHM = KeyProperties.KEY_ALGORITHM_AES
@@ -57,7 +59,8 @@ class BiometricsControllerTest {
     @Before @Throws(java.lang.Exception::class)
     fun setup() {
         cryptoObject = BiometricPrompt.CryptoObject(cipher)
-        subject = spy(BiometricsController(applicationContext, prefsUtil, accessState, cryptographyManager))
+        subject =
+            spy(BiometricsController(applicationContext, prefsUtil, accessState, cryptographyManager, crashLogger))
     }
 
     @Test
