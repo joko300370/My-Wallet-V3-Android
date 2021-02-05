@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.DialogFragment
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
@@ -19,6 +20,7 @@ import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.ui.customviews.CurrencyType
+import piuk.blockchain.android.ui.customviews.Either
 import piuk.blockchain.android.ui.customviews.FiatCryptoInputView
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
 import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
@@ -208,13 +210,13 @@ class EnterAmountSheet : TransactionFlowSheet() {
     }
 
     private fun onUseMaxClick() {
-        if (dialogView.amount_sheet_input.configuration.input == CurrencyType.Fiat &&
+        if (dialogView.amount_sheet_input.configuration.inputCurrency is Either.Left &&
             state.maxSpendable is CryptoValue
         ) {
             dialogView.amount_sheet_input.configuration =
                 dialogView.amount_sheet_input.configuration.copy(
-                    input = CurrencyType.Crypto,
-                    output = CurrencyType.Crypto
+                    inputCurrency = Either.Right(state.sendingAccount.asset),
+                    outputCurrency = Either.Right(state.sendingAccount.asset)
                 )
         }
         dialogView.amount_sheet_input.showValue(
@@ -231,14 +233,16 @@ class EnterAmountSheet : TransactionFlowSheet() {
         imm.hideSoftInputFromWindow(dialogView.windowToken, 0)
     }
 
-    private fun FiatCryptoInputView.configure(newState: TransactionState, input: CurrencyType) {
-        if (input == CurrencyType.Crypto || newState.amount.isPositive) {
+    private fun FiatCryptoInputView.configure(
+        newState: TransactionState,
+        inputCurrency: Either<String, CryptoCurrency>
+    ) {
+        if (inputCurrency is Either.Right || newState.amount.isPositive) {
             val selectedFiat = newState.pendingTx?.selectedFiat ?: return
             configuration = FiatCryptoViewConfiguration(
-                input = CurrencyType.Crypto,
-                output = CurrencyType.Crypto,
-                fiatCurrency = selectedFiat,
-                cryptoCurrency = newState.sendingAccount.asset,
+                inputCurrency = Either.Right(newState.sendingAccount.asset),
+                outputCurrency = Either.Right(newState.sendingAccount.asset),
+                exchangeCurrency = Either.Left(selectedFiat),
                 predefinedAmount = newState.amount
             )
         } else {
@@ -246,10 +250,9 @@ class EnterAmountSheet : TransactionFlowSheet() {
             val fiatRate = newState.fiatRate ?: return
             val amount = newState.amount as? CryptoValue ?: return
             configuration = FiatCryptoViewConfiguration(
-                input = CurrencyType.Fiat,
-                output = CurrencyType.Fiat,
-                fiatCurrency = selectedFiat,
-                cryptoCurrency = newState.sendingAccount.asset,
+                inputCurrency = Either.Left(selectedFiat),
+                outputCurrency = Either.Left(selectedFiat),
+                exchangeCurrency = Either.Right(newState.sendingAccount.asset),
                 predefinedAmount = fiatRate.applyRate(amount)
             )
         }

@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.transactionflow.flow
 
 import android.content.res.Resources
 import com.blockchain.nabu.datamanagers.TransactionError
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
@@ -14,7 +15,7 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.isCustodial
-import piuk.blockchain.android.ui.customviews.CurrencyType
+import piuk.blockchain.android.ui.customviews.Either
 import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.customviews.account.DefaultCellDecorator
 import piuk.blockchain.android.ui.customviews.account.StatusDecorator
@@ -63,10 +64,10 @@ interface TransactionFlowCustomiser {
     fun transactionProgressIcon(state: TransactionState): Int
     fun transactionProgressExceptionMessage(state: TransactionState): String
     fun amountHeaderConfirmationVisible(state: TransactionState): Boolean
-    fun defInputType(state: TransactionState): CurrencyType
+    fun defInputType(state: TransactionState): Either<String,CryptoCurrency>
 
     // Format those flash error messages:
-    fun issueFlashMessage(state: TransactionState, input: CurrencyType?): String?
+    fun issueFlashMessage(state: TransactionState, input: Either<String,CryptoCurrency>?): String?
     fun selectIssueType(state: TransactionState): IssueType
     fun showTargetIcon(state: TransactionState): Boolean
     fun sourceAccountSelectionStatusDecorator(state: TransactionState): StatusDecorator
@@ -398,7 +399,7 @@ class TransactionFlowCustomiserImpl(
         }
     }
 
-    override fun issueFlashMessage(state: TransactionState, input: CurrencyType?): String? {
+    override fun issueFlashMessage(state: TransactionState, input: Either<String,CryptoCurrency>?): String? {
         if (state.pendingTx?.amount?.toBigInteger() == BigInteger.ZERO && (
                 state.errorState == TransactionErrorState.INVALID_AMOUNT ||
                     state.errorState == TransactionErrorState.BELOW_MIN_LIMIT
@@ -458,7 +459,7 @@ class TransactionFlowCustomiserImpl(
         }
     }
 
-    private fun composeBelowLimitErrorMessage(state: TransactionState, input: CurrencyType?): String {
+    private fun composeBelowLimitErrorMessage(state: TransactionState, input:  Either<String,CryptoCurrency>?): String {
         val exchangeRate = state.fiatRate ?: return ""
         val amount =
             input?.let {
@@ -584,7 +585,7 @@ class TransactionFlowCustomiserImpl(
     override fun amountHeaderConfirmationVisible(state: TransactionState): Boolean =
         state.action != AssetAction.Swap
 
-    override fun defInputType(state: TransactionState): CurrencyType =
+    override fun defInputType(state: TransactionState): Either<String,CryptoCurrency> =
         if (state.action == AssetAction.Swap || state.action == AssetAction.Sell)
             CurrencyType.Fiat else CurrencyType.Crypto
 
@@ -603,7 +604,7 @@ class TransactionFlowCustomiserImpl(
     }
 
     private fun Money.toEnteredCurrency(
-        input: CurrencyType,
+        input:  Either<String,CryptoCurrency>,
         exchangeRate: ExchangeRate.CryptoToFiat,
         roundingMode: RoundingMode
     ): String {

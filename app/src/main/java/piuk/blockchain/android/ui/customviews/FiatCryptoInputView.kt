@@ -27,7 +27,6 @@ import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.android.util.AfterTextChangedWatcher
-import java.math.RoundingMode
 import java.text.DecimalFormatSymbols
 import java.util.Locale
 import java.util.Currency
@@ -41,9 +40,9 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
 
     private val amountSubject: PublishSubject<Money> = PublishSubject.create()
 
-    private val inputToggleSubject: PublishSubject<CurrencyType> = PublishSubject.create()
+    private val inputToggleSubject: PublishSubject<Either<String, CryptoCurrency>> = PublishSubject.create()
 
-    val onInputToggle: Observable<CurrencyType>
+    val onInputToggle: Observable<Either<String, CryptoCurrency>>
         get() = inputToggleSubject
 
     val amount: Observable<Money>
@@ -51,26 +50,25 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
 
     private val defExchangeRateDataManager: ExchangeRateDataManager by scopedInject()
 
-    private val defCryptoToFiat: ExchangeRate.CryptoToFiat
-        get() = ExchangeRate.CryptoToFiat(
-            cryptoCurrency,
-            configuration.fiatCurrency,
-            defExchangeRateDataManager.getLastPrice(cryptoCurrency, configuration.fiatCurrency)
-        )
+    private val defCryptoToFiat: ExchangeRate
+        get() = configuration.exchangeRate()
 
     private val currencyPrefs: CurrencyPrefs by inject()
 
-    var exchangeRate: ExchangeRate.CryptoToFiat? = null
+    var exchangeRate: ExchangeRate? = null
         set(value) {
             field = value
             updateExchangeAmountAndOutput()
         }
 
-    private val cryptoToFiatRate: ExchangeRate.CryptoToFiat
+    private val inputToOutputExchangeRate: ExchangeRate
         get() = exchangeRate ?: defCryptoToFiat
 
-    val cryptoCurrency: CryptoCurrency
-        get() = configuration.cryptoCurrency ?: throw IllegalStateException("Cryptocurrency not set")
+    private val internalExchangeRate: ExchangeRate
+        get() = configuration.exchangeRate()
+
+    val outputCurrency: Either<String, CryptoCurrency>
+        get() = configuration.outputCurrency
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -95,11 +93,11 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
         currency_swap.setOnClickListener {
             configuration =
                 configuration.copy(
-                    input = configuration.input.swap(),
-                    output = configuration.output.swap(),
+                    inputCurrency = outputCurrency,
+                    outputCurrency = configuration.inputCurrency,
                     predefinedAmount = getLastEnteredAmount(configuration)
                 )
-            inputToggleSubject.onNext(configuration.input)
+            inputToggleSubject.onNext(configuration.inputCurrency)
         }
     }
 
@@ -108,9 +106,9 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
         fake_hint.afterMeasured {
             it.translationX =
                 if (hasPrefix) (enter_amount.width / 2f + textSize / 2f) +
-                        resources.getDimensionPixelOffset(R.dimen.smallest_margin) else
+                    resources.getDimensionPixelOffset(R.dimen.smallest_margin) else
                     enter_amount.width / 2f - textSize / 2f - it.width -
-                            resources.getDimensionPixelOffset(R.dimen.smallest_margin)
+                        resources.getDimensionPixelOffset(R.dimen.smallest_margin)
         }
     }
 
@@ -119,41 +117,43 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
 
     private fun getLastEnteredAmount(configuration: FiatCryptoViewConfiguration): Money =
         enter_amount.bigDecimalValue?.let { enterAmount ->
-            if (configuration.input == CurrencyType.Fiat) FiatValue.fromMajor(configuration.fiatCurrency, enterAmount)
-            else CryptoValue.fromMajor(cryptoCurrency, enterAmount)
-        } ?: FiatValue.zero(configuration.fiatCurrency)
+            when (configuration.inputCurrency) {
+                is Either.Left -> FiatValue.fromMajor(configuration.inputCurrency.left, enterAmount)
+                is Either.Right -> CryptoValue.fromMajor(configuration.inputCurrency.right, enterAmount)
+            }
+        } ?: configuration.inputCurrency.zeroValue()
 
     var configuration: FiatCryptoViewConfiguration by Delegates.observable(
         FiatCryptoViewConfiguration(
-            input = CurrencyType.Fiat,
-            output = CurrencyType.Crypto,
-            fiatCurrency = currencyPrefs.selectedFiatCurrency,
-            cryptoCurrency = null)
+            inputCurrency = Either.Left(currencyPrefs.selectedFiatCurrency),
+            outputCurrency = Either.Left(currencyPrefs.selectedFiatCurrency),
+            exchangeCurrency = Either.Left(currencyPrefs.selectedFiatCurrency)
+        )
     ) { _, oldValue, newValue ->
         if (oldValue != newValue) {
 
             enter_amount.filters = emptyArray()
-            val fiatSymbol = Currency.getInstance(newValue.fiatCurrency).getSymbol(Locale.getDefault())
-            val cryptoSymbol = cryptoCurrency.displayTicker
-            currency_swap.visibleIf { newValue.canSwap }
 
-            if (newValue.input == CurrencyType.Fiat) {
-                updateFilters(fiatSymbol)
-                fake_hint.text = FiatValue.zero(newValue.fiatCurrency).toStringWithoutSymbol()
+            val inputSymbol = newValue.inputCurrency.symbol()
+
+            currency_swap.visibleIf { newValue.swapEnabled }
+
+            if (newValue.inputCurrency is Either.Left) {
+                fake_hint.text = FiatValue.zero(newValue.inputCurrency.left).toStringWithoutSymbol()
                 enter_amount.configuration = Configuration(
-                    prefixOrSuffix = fiatSymbol,
+                    prefixOrSuffix = inputSymbol,
                     isPrefix = true,
-                    initialText = newValue.predefinedAmount.inFiat().toStringWithoutSymbol()
+                    initialText = newValue.predefinedAmount.toStringWithoutSymbol()
                         .replace(DecimalFormatSymbols(Locale.getDefault()).groupingSeparator.toString(), "")
                         .removeSuffix("${DecimalFormatSymbols(Locale.getDefault()).decimalSeparator}00")
                 )
-            } else {
-                updateFilters(cryptoSymbol)
-                fake_hint.text = newValue.cryptoCurrency?.let { CryptoValue.zero(it).toStringWithoutSymbol() }
+            } else if (newValue.inputCurrency is Either.Right) {
+                //   updateFilters(outputSymbol)
+                fake_hint.text = CryptoValue.zero(newValue.inputCurrency.right).toStringWithSymbol()
                 enter_amount.configuration = Configuration(
-                    prefixOrSuffix = cryptoSymbol,
+                    prefixOrSuffix = inputSymbol,
                     isPrefix = false,
-                    initialText = newValue.predefinedAmount.inCrypto().toStringWithoutSymbol()
+                    initialText = newValue.predefinedAmount.toStringWithoutSymbol()
                         .replace(DecimalFormatSymbols(Locale.getDefault()).groupingSeparator.toString(), "")
                 )
             }
@@ -162,8 +162,8 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
     }
 
     var maxLimit by Delegates.observable<Money?>(null) { _, oldValue, newValue ->
-        if (newValue != oldValue)
-            updateFilters(enter_amount.configuration.prefixOrSuffix)
+        /*  if (newValue != oldValue)
+              updateFilters(enter_amount.configuration.prefixOrSuffix)*/
     }
 
     fun showError(errorMessage: String, shouldDisableInput: Boolean = false) {
@@ -203,18 +203,18 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
             predefinedAmount = money
         )
     }
-
-    private fun updateFilters(prefixOrSuffix: String) {
-        if (configuration.input == CurrencyType.Fiat) {
-            val maxDecimalDigitsForAmount = maxLimit?.inFiat()?.userDecimalPlaces ?: return
-            val maxIntegerDigitsForAmount = maxLimit?.inFiat()?.toStringParts()?.major?.length ?: return
-            enter_amount.addFilter(maxDecimalDigitsForAmount, maxIntegerDigitsForAmount, prefixOrSuffix)
-        } else {
-            val maxDecimalDigitsForAmount = maxLimit?.inCrypto()?.userDecimalPlaces ?: return
-            val maxIntegerDigitsForAmount = maxLimit?.inCrypto()?.toStringParts()?.major?.length ?: return
-            enter_amount.addFilter(maxDecimalDigitsForAmount, maxIntegerDigitsForAmount, prefixOrSuffix)
-        }
-    }
+    /*
+        private fun updateFilters(prefixOrSuffix: String) {
+            if (configuration.inputCurrency is Either.Left) {
+                val maxDecimalDigitsForAmount = maxLimit?.inFiat()?.userDecimalPlaces ?: return
+                val maxIntegerDigitsForAmount = maxLimit?.inFiat()?.toStringParts()?.major?.length ?: return
+                enter_amount.addFilter(maxDecimalDigitsForAmount, maxIntegerDigitsForAmount, prefixOrSuffix)
+            } else {
+                val maxDecimalDigitsForAmount = maxLimit?.inCrypto()?.userDecimalPlaces ?: return
+                val maxIntegerDigitsForAmount = maxLimit?.inCrypto()?.toStringParts()?.major?.length ?: return
+                enter_amount.addFilter(maxDecimalDigitsForAmount, maxIntegerDigitsForAmount, prefixOrSuffix)
+            }
+        }*/
 
     private fun PrefixedOrSuffixedEditText.addFilter(
         maxDecimalDigitsForAmount: Int,
@@ -230,47 +230,57 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
             )
     }
 
-    private fun Money.inFiat(): FiatValue =
-        when (this) {
-            is CryptoValue -> cryptoToFiatRate.convert(this) as FiatValue
-            is FiatValue -> this
-            else -> throw IllegalStateException("Illegal money type")
-        }
+    /*    private fun Money.inFiat(): FiatValue =
+            when (this) {
+                is CryptoValue -> cryptoToFiatRate.convert(this) as FiatValue
+                is FiatValue -> this
+                else -> throw IllegalStateException("Illegal money type")
+            }
 
-    private fun Money.inCrypto(): CryptoValue =
-        when (this) {
-            is FiatValue -> cryptoToFiatRate.inverse(RoundingMode.CEILING, cryptoCurrency.userDp)
-                .convert(this) as CryptoValue
-            is CryptoValue -> this
-            else -> throw IllegalStateException("Illegal money type")
-        }
+        private fun Money.inCrypto(): CryptoValue =
+            when (this) {
+                is FiatValue -> cryptoToFiatRate.inverse(RoundingMode.CEILING, cryptoCurrency.userDp)
+                    .convert(this) as CryptoValue
+                is CryptoValue -> this
+                else -> throw IllegalStateException("Illegal money type")
+            }*/
 
-    private fun CurrencyType.swap(): CurrencyType =
-        if (this == CurrencyType.Fiat) CurrencyType.Crypto else CurrencyType.Fiat
-
+    /*   private fun Either<String, CryptoCurrency>.swapWith(other: Either<String, CryptoCurrency>): Either<String, CryptoCurrency> =
+           other
+   */
     private fun updateExchangeAmountAndOutput() {
-        if (configuration.input == CurrencyType.Fiat) {
+        val config = configuration.inputCurrency
 
-            val fiatAmount = enter_amount.bigDecimalValue?.let { amount ->
-                FiatValue.fromMajor(configuration.fiatCurrency, amount)
-            } ?: FiatValue.zero(configuration.fiatCurrency)
+        if (config is Either.Left) {
+            // val fiatCurrency = c.left
 
-            val cryptoAmount = cryptoToFiatRate.inverse(RoundingMode.CEILING, cryptoCurrency.userDp).convert(fiatAmount)
-            exchange_amount.text = cryptoAmount.toStringWithSymbol()
+            /*    val fiatAmount = enter_amount.bigDecimalValue?.let { amount ->
+                    FiatValue.fromMajor(configuration.fiatCurrency, amount)
+                } ?: FiatValue.zero(configuration.fiatCurrency)
+
+                val cryptoAmount = cryptoToFiatRate.inverse(RoundingMode.CEILING, cryptoCurrency.userDp).convert(fiatAmount)
+                exchange_amount.text = cryptoAmount.toStringWithSymbol()
+    */
+            val enteredAmount = enter_amount.bigDecimalValue?.let { amount ->
+                FiatValue.fromMajor(config.left, amount)
+            } ?: FiatValue.zero(config.left)
+
+            val exchangedAmount = inputToOutputExchangeRate.convert(enteredAmount)
 
             amountSubject.onNext(
-                if (configuration.output == CurrencyType.Fiat) fiatAmount else cryptoAmount
+                if (configuration.outputCurrency is Either.Left) enteredAmount else exchangedAmount
             )
-        } else {
-            val cryptoAmount = enter_amount.bigDecimalValue?.let { amount ->
-                CryptoValue.fromMajor(cryptoCurrency, amount)
-            } ?: CryptoValue.zero(cryptoCurrency)
+        } else if (config is Either.Right) {
 
-            val fiatAmount = cryptoToFiatRate.convert(cryptoAmount)
+            val cryptoAmount = enter_amount.bigDecimalValue?.let { amount ->
+                CryptoValue.fromMajor(config.right, amount)
+            } ?: CryptoValue.zero(config.right)
+
+            val fiatAmount = inputToOutputExchangeRate.convert(cryptoAmount)
 
             exchange_amount.text = fiatAmount.toStringWithSymbol()
             amountSubject.onNext(
-                if (configuration.output == CurrencyType.Fiat) fiatAmount else cryptoAmount
+                if (configuration.outputCurrency is Either.Left) fiatAmount else cryptoAmount
             )
         }
     }
@@ -283,22 +293,74 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
         super.onDetachedFromWindow()
         compositeDisposable.clear()
     }
-}
 
-data class FiatCryptoViewConfiguration(
-    val fiatCurrency: String,
-    val cryptoCurrency: CryptoCurrency?,
-    val predefinedAmount: Money = FiatValue.zero(fiatCurrency),
-    val input: CurrencyType = (predefinedAmount as? FiatValue)?.let { CurrencyType.Fiat } ?: CurrencyType.Crypto,
-    val output: CurrencyType = (predefinedAmount as? FiatValue)?.let { CurrencyType.Fiat } ?: CurrencyType.Crypto,
-    val canSwap: Boolean = true
-) {
-    val isInitialised: Boolean by unsafeLazy {
-        cryptoCurrency != null
+    private fun FiatCryptoViewConfiguration.internalExchgangeRate() :""
+
+    private fun exchangeRate(
+        input: Either<String, CryptoCurrency>,
+        output: Either<String, CryptoCurrency>
+    ): ExchangeRate {
+        return when (input) {
+            is Either.Left -> when (output) {
+                is Either.Right -> {
+                    ExchangeRate.CryptoToFiat(
+                        output.right,
+                        input.left,
+                        defExchangeRateDataManager.getLastPrice(output.right, input.left)
+                    )
+                }
+                is Either.Left -> {
+                    ExchangeRate.FiatToFiat(
+                        input.left,
+                        output.left,
+                        defExchangeRateDataManager.getLastPriceOfFiat(output.left, input.left)
+                    )
+                }
+            }
+            is Either.Right -> when (output) {
+                is Either.Right -> {
+                    throw NotImplementedError("Crypto->Crypto has not implemented yet")
+                }
+                is Either.Left -> {
+                    ExchangeRate.FiatToCrypto(
+                        output.left,
+                        input.right,
+                        defExchangeRateDataManager.getLastPrice(input.right, output.left)
+                    )
+                }
+            }
+        }
     }
 }
 
-enum class CurrencyType {
-    Fiat,
-    Crypto
+data class FiatCryptoViewConfiguration(
+    val inputCurrency: Either<String, CryptoCurrency>,     // the currency used for input by the user
+    val exchangeCurrency: Either<String, CryptoCurrency>,  // the currency used for the exchanged amount
+    val outputCurrency: Either<String, CryptoCurrency>,   // the currency used for the model output
+    val predefinedAmount: Money = inputCurrency.zeroValue(),
+    val canSwap: Boolean = true
+) {
+    val isInitialised: Boolean by unsafeLazy {
+        outputCurrency != null
+    }
+
+    val swapEnabled: Boolean
+        get() = canSwap && inputCurrency != outputCurrency
+}
+
+private fun Either<String, CryptoCurrency>.zeroValue(): Money =
+    when (this) {
+        is Either.Left -> FiatValue.zero(this.left)
+        is Either.Right -> CryptoValue.zero(this.right)
+    }
+
+private fun Either<String, CryptoCurrency>.symbol(): String =
+    when (this) {
+        is Either.Left -> Currency.getInstance(left).getSymbol(Locale.getDefault())
+        is Either.Right -> right.displayTicker
+    }
+
+sealed class Either<A, B> {
+    data class Left<A, B>(val left: A) : Either<A, B>()
+    data class Right<A, B>(val right: B) : Either<A, B>()
 }
