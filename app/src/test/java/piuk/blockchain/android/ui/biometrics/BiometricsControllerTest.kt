@@ -8,7 +8,6 @@ import com.blockchain.logging.CrashLogger
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doNothing
 import com.nhaarman.mockito_kotlin.doReturn
-import com.nhaarman.mockito_kotlin.given
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.spy
 import com.nhaarman.mockito_kotlin.verify
@@ -26,7 +25,6 @@ import piuk.blockchain.android.BlockchainTestApplication
 import piuk.blockchain.android.data.biometrics.BiometricAuthFailed
 import piuk.blockchain.android.data.biometrics.BiometricAuthLockout
 import piuk.blockchain.android.data.biometrics.BiometricAuthLockoutPermanent
-import piuk.blockchain.android.data.biometrics.BiometricAuthOther
 import piuk.blockchain.android.data.biometrics.BiometricKeysInvalidated
 import piuk.blockchain.android.data.biometrics.BiometricsCallback
 import piuk.blockchain.android.data.biometrics.BiometricsController
