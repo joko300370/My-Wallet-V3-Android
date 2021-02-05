@@ -584,14 +584,14 @@
         exactly as they appear here and in this order.
     </string>
     <string name="backup_header_complete">Backup Complete</string>
-    <string name="backup_complete_message_1">You can use your Secret Private Key Recovery PhraseSecret Private Key Recovery Phrase to restore your funds if
-        you lose your password. Anyone with access to your Secret Private Key Recovery PhraseSecret Private Key Recovery Phrase can access your funds so
+    <string name="backup_complete_message_1">You can use your Secret Private Key Recovery Phrase to restore your funds if
+        you lose your password. Anyone with access to your Secret Private Key Recovery Phrase can access your funds so
         remember to keep it offline somewhere safe and secure.
     </string>
     <string name="backup_again">Backup again</string>
     <string name="backup_confirmed">Backup confirmed</string>
     <string name="backup_last">Last backup: %1$s</string>
-    <string name="backup_verify_heading_1">Enter the following words from your Secret Private Key Recovery PhraseSecret Private Key Recovery Phrase to
+    <string name="backup_verify_heading_1">Enter the following words from your Secret Private Key Recovery Phrase to
         complete the backup process.
     </string>
     <string name="backup_next_word">NEXT WORD</string>
@@ -1529,7 +1529,7 @@
     <string name="withdrawal_amount">%1$s Withdrawal</string>
     <string name="withdrawing_amount">Withdrawing %1$s</string>
     <string name="withdrawing_amount_message">We’re completing your withdrawal now.</string>
-    <string name="withdrawal_success_message">Succeess! We’re are withdrawing the cash from your %1$s Wallet now. The funds should be in your bank in 1&#8211;3 business days.</string>
+    <string name="withdrawal_success_message">Success! We’re are withdrawing the cash from your %1$s Wallet now. The funds should be in your bank in 1&#8211;3 business days.</string>
     <string name="currency_wallet">My %1s Wallet</string>
 
     <string name="dashboard_asset_item_label_title">Please note.</string>
