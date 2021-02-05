@@ -86,7 +86,8 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         compositeDisposable += input_amount.amount.subscribe {
             when (it) {
                 is FiatValue -> model.process(SimpleBuyIntent.AmountUpdated(it))
-                else -> throw IllegalStateException("CryptoValue is not supported as input yet")
+                else -> { /*do nothing*/
+                }
             }
         }
 
@@ -170,15 +171,13 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         }
 
         newState.selectedCryptoCurrency?.let {
-            if (!input_amount.isConfigured) {
-                input_amount.configuration = FiatCryptoViewConfiguration(
-                    inputCurrency = Either.Left(newState.fiatCurrency),
-                    outputCurrency = Either.Right(it),
-                    exchangeCurrency = Either.Right(it),
-                    canSwap = false,
-                    predefinedAmount = newState.order.amount ?: FiatValue.zero(newState.fiatCurrency)
-                )
-            }
+            input_amount.configuration = FiatCryptoViewConfiguration(
+                inputCurrency = Either.Left(newState.fiatCurrency),
+                outputCurrency = Either.Left(newState.fiatCurrency),
+                exchangeCurrency = Either.Right(it),
+                canSwap = false,
+                predefinedAmount = newState.order.amount ?: FiatValue.zero(newState.fiatCurrency)
+            )
             buy_icon.setAssetIconColours(it, activity)
         }
         newState.selectedCryptoCurrency?.let {

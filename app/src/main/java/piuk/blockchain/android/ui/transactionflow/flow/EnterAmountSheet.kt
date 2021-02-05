@@ -19,7 +19,6 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullAddress
-import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.Either
 import piuk.blockchain.android.ui.customviews.FiatCryptoInputView
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
@@ -56,8 +55,10 @@ class EnterAmountSheet : TransactionFlowSheet() {
         with(dialogView) {
             amount_sheet_cta_button.isEnabled = newState.nextEnabled
 
-            if (!amount_sheet_input.isConfigured) {
-                amount_sheet_input.configure(newState, customiser.defInputType(state))
+            if (!amount_sheet_input.configured) {
+                newState.pendingTx?.selectedFiat?.let {
+                    amount_sheet_input.configure(newState, customiser.defInputType(state, it))
+                }
             }
 
             val availableBalance = newState.availableBalance
@@ -65,7 +66,7 @@ class EnterAmountSheet : TransactionFlowSheet() {
                 // The maxLimit set here controls the number of digits that can be entered,
                 // but doesn't restrict the input to be always under that value. Which might be
                 // strange UX, but is currently by design.
-                if (amount_sheet_input.isConfigured) {
+                if (amount_sheet_input.configured) {
                     amount_sheet_input.maxLimit = newState.availableBalance
                     if (amount_sheet_input.exchangeRate != newState.fiatRate)
                         amount_sheet_input.exchangeRate = newState.fiatRate
@@ -85,7 +86,7 @@ class EnterAmountSheet : TransactionFlowSheet() {
             }
             updatePendingTxDetails(newState)
 
-            customiser.issueFlashMessage(newState, amount_sheet_input.configuration.input)?.let {
+            customiser.issueFlashMessage(newState, amount_sheet_input.configuration.inputCurrency)?.let {
                 when (customiser.selectIssueType(newState)) {
                     IssueType.ERROR -> amount_sheet_input.showError(it, customiser.shouldDisableInput(state.errorState))
                     IssueType.INFO -> amount_sheet_input.showInfo(it) {
@@ -210,18 +211,7 @@ class EnterAmountSheet : TransactionFlowSheet() {
     }
 
     private fun onUseMaxClick() {
-        if (dialogView.amount_sheet_input.configuration.inputCurrency is Either.Left &&
-            state.maxSpendable is CryptoValue
-        ) {
-            dialogView.amount_sheet_input.configuration =
-                dialogView.amount_sheet_input.configuration.copy(
-                    inputCurrency = Either.Right(state.sendingAccount.asset),
-                    outputCurrency = Either.Right(state.sendingAccount.asset)
-                )
-        }
-        dialogView.amount_sheet_input.showValue(
-            state.maxSpendable
-        )
+        dialogView.amount_sheet_input.updateWithMaxValue(state.maxSpendable)
     }
 
     private fun onCtaClick() {
