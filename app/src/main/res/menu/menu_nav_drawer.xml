@@ -11,12 +11,6 @@
             android:visible="true" />
 
         <item
-            android:id="@+id/nav_backup"
-            android:icon="@drawable/ic_nav_backup"
-            android:title="@string/item_backup"
-            app:contentDescription="@string/item_backup" />
-
-        <item
             android:id="@+id/nav_addresses"
             android:icon="@drawable/ic_nav_wallet"
             android:title="@string/drawer_addresses"

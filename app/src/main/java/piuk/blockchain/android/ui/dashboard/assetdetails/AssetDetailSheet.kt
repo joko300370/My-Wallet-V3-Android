@@ -31,14 +31,13 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.account.PendingBalanceAccountDecorator
 import piuk.blockchain.android.ui.dashboard.setDeltaColour
 import piuk.blockchain.android.util.getDecimalPlaces
 import piuk.blockchain.android.util.loadInterMedium
 import piuk.blockchain.androidcore.data.exchangerate.PriceSeries
 import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom.TYPE_ERROR
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.invisible
 import piuk.blockchain.android.util.visible
@@ -246,7 +245,7 @@ class AssetDetailSheet :
                 getString(R.string.asset_details_exchange_load_failed_toast)
             else -> "" // this never triggers
         }
-        ToastCustom.makeText(requireContext(), errorString, Toast.LENGTH_SHORT, TYPE_ERROR)
+        ToastCustom.makeText(requireContext(), errorString, Toast.LENGTH_SHORT, ToastCustom.TYPE_ERROR)
     }
 
     private fun chartToLoadingState() {

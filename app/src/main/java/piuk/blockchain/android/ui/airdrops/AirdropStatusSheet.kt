@@ -113,7 +113,7 @@ class AirdropStatusSheet : SlidingModalBottomDialog(), AirdropCentreView {
                     R.color.green_600,
                     R.drawable.bkgd_green_100_rounded
                 )
-            AirdropState.REGISTERED -> TODO()
+            AirdropState.REGISTERED -> throw NotImplementedError("AirdropState.REGISTERED")
         }.exhaustive
     }
 

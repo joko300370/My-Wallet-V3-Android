@@ -1,5 +1,6 @@
 package com.blockchain.nabu.models.data
 
+import android.annotation.SuppressLint
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.responses.banktransfer.LinkBankAttrsResponse
 import java.io.Serializable
@@ -45,6 +46,7 @@ data class LinkedBank(
     override val paymentMethod: PaymentMethodType
         get() = PaymentMethodType.BANK_TRANSFER
 
+    @SuppressLint("DefaultLocale") // Yes, lint is broken
     override fun toHumanReadableAccount(): String =
         accountType.toLowerCase(Locale.getDefault()).capitalize(Locale.getDefault())
 }

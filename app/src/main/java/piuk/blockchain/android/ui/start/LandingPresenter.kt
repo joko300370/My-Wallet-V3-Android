@@ -3,9 +3,9 @@ package piuk.blockchain.android.ui.start
 import com.blockchain.preferences.SecurityPrefs
 import piuk.blockchain.android.ui.base.MvpPresenter
 import piuk.blockchain.android.ui.base.MvpView
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.RootUtil
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 
 interface LandingView : MvpView {
     fun showDebugMenu()

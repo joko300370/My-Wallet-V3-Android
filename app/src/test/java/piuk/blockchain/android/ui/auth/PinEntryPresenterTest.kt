@@ -44,6 +44,7 @@ import org.robolectric.annotation.Config
 import org.spongycastle.crypto.InvalidCipherTextException
 import piuk.blockchain.android.BlockchainTestApplication
 import piuk.blockchain.android.data.biometrics.BiometricsController
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.home.CredentialsWiper
 import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.util.AppUtil
@@ -55,7 +56,6 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.PrngFixer
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import java.net.SocketTimeoutException
 import java.util.Arrays
 

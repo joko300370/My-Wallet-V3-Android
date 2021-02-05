@@ -6,7 +6,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.scan.QrCodeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.ToastCustom
 
 internal class ReceiveQrPresenter(
     val payloadDataManager: PayloadDataManager,

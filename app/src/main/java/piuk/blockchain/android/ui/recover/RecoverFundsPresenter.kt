@@ -50,7 +50,7 @@ class RecoverFundsPresenter(
     fun onContinueClicked(recoveryPhrase: String) =
         try {
             if (recoveryPhrase.isEmpty() || !isValidMnemonic(recoveryPhrase)) {
-                view.showError(R.string.invalid_recovery_phrase)
+                view.showError(R.string.invalid_recovery_phrase_1)
             } else {
                 recoverWallet(recoveryPhrase)
             }
@@ -85,7 +85,8 @@ class RecoverFundsPresenter(
             )
         )
         .map {
-            moshi.adapter(WalletCredentialsMetadata::class.java).fromJson(it) ?: throw NoSuchElementException()
+            moshi.adapter(WalletCredentialsMetadata::class.java)
+                .fromJson(it) ?: throw NoSuchElementException()
         }.toSingle()
     }
 

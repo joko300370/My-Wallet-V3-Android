@@ -26,6 +26,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.customviews.account.DefaultCellDecorator
 import piuk.blockchain.android.ui.customviews.account.PendingBalanceAccountDecorator
@@ -34,7 +35,6 @@ import piuk.blockchain.android.ui.customviews.account.addViewToBottomWithConstra
 import piuk.blockchain.android.ui.customviews.account.removePossibleBottomView
 import piuk.blockchain.android.util.assetFilter
 import piuk.blockchain.android.util.assetTint
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.inflate
 import timber.log.Timber
 

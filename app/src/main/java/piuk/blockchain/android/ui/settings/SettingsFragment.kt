@@ -76,6 +76,7 @@ import piuk.blockchain.android.simplebuy.linkBankEventWithCurrency
 import piuk.blockchain.android.ui.auth.KEY_VALIDATING_PIN_FOR_RESULT
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.auth.REQUEST_CODE_VALIDATE_PIN
+import piuk.blockchain.android.ui.backup.BackupWalletActivity
 import piuk.blockchain.android.ui.base.mvi.MviFragment.Companion.BOTTOM_SHEET
 import piuk.blockchain.android.ui.customviews.PasswordStrengthView
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
@@ -97,13 +98,16 @@ import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.util.Locale
 import kotlin.math.roundToInt
 
-class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePaymentMethodBottomSheetHost, BankLinkingHost,
+class SettingsFragment : PreferenceFragmentCompat(),
+    SettingsView,
+    RemovePaymentMethodBottomSheetHost,
+    BankLinkingHost,
     ReviewHost {
 
     // Profile
@@ -254,6 +258,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         torPref?.setOnPreferenceChangeListener { _, newValue ->
             settingsPresenter.updateTor(newValue as Boolean)
             true
+        }
+
+        findPreference<Preference>("backup")?.apply {
+            onClick { onBackupClicked() }
         }
 
         screenshotPref?.setOnPreferenceChangeListener { _, newValue ->
@@ -732,6 +740,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         settingsPresenter.onEmailShowRequested()
     }
 
+    private fun onBackupClicked() {
+        BackupWalletActivity.start(requireContext())
+    }
+
     private fun onAboutClicked() {
         AboutDialog().show(childFragmentManager, "ABOUT_DIALOG")
     }
@@ -804,7 +816,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                 .setNegativeButton(android.R.string.cancel, null)
 
             if (isSmsVerified && smsNumber.isNotEmpty()) {
-                alertDialogSmsBuilder.setNeutralButton(R.string.verify) { dialogInterface, i ->
+                alertDialogSmsBuilder.setNeutralButton(R.string.verify) { _, _ ->
                     settingsPresenter.updateSms(
                         smsNumber
                     )

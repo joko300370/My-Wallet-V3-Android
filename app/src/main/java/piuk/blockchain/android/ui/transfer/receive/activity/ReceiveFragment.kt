@@ -33,6 +33,8 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.ui.base.MvpFragment
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.ui.share.ReceiveIntentHelper
 import piuk.blockchain.android.ui.share.ShareReceiveIntentAdapter
 import piuk.blockchain.android.util.AppUtil
@@ -42,8 +44,6 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.extensions.toSafeLong
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.ui.customviews.toast
 import piuk.blockchain.android.util.disableSoftKeyboard
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.inflate

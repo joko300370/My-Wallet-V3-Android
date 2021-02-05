@@ -6,12 +6,13 @@ object Versions {
     const val minSdk = 23
     const val targetSdk = 30
     const val compileSdk = 30
+
     const val versionCode = 608
     const val versionName = "8.4.6"
-    const val buildTools = "28.0.3"
+    const val buildTools = "29.0.2"
 
     // Build tools and languages
-    const val androidPlugin = "3.4.1"
+    const val androidPlugin = "4.1.2"
     const val kotlin = "1.4.21"
     const val googleServicesPlugin = "4.3.3"
     const val coveralls = "2.8.2"
@@ -118,7 +119,7 @@ object Versions {
     const val robolectric = "4.3"
     const val json = "20140107"
     const val espresso = "3.2.0"
-    const val jacoco = "0.8.1"
+    const val jacoco = "0.8.6"
     const val androidxTesting = "1.1.1"
 }
 

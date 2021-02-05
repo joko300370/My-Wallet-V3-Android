@@ -22,6 +22,7 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.spongycastle.crypto.InvalidCipherTextException
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.data.biometrics.BiometricsController
 import piuk.blockchain.android.ui.home.CredentialsWiper
 import piuk.blockchain.android.ui.launcher.LauncherActivity
@@ -36,7 +37,6 @@ import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.PrngFixer
 import piuk.blockchain.androidcore.utils.annotations.Thunk
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.net.SocketTimeoutException

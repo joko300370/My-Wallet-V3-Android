@@ -4,14 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.fragment_backup_start.*
 import piuk.blockchain.android.R
 import com.blockchain.koin.scopedInject
 import com.blockchain.koin.scopedInjectActivity
 import com.blockchain.ui.password.SecondPasswordHandler
+import piuk.blockchain.android.databinding.FragmentBackupStartBinding
 import piuk.blockchain.android.ui.backup.wordlist.BackupWalletWordListFragment
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
-import piuk.blockchain.android.util.inflate
 
 class BackupWalletStartingFragment :
     BaseFragment<BackupWalletStartingView, BackupWalletStartingPresenter>(),
@@ -21,16 +20,23 @@ class BackupWalletStartingFragment :
 
     private val secondPasswordHandler: SecondPasswordHandler by scopedInjectActivity()
 
+    private var _binding: FragmentBackupStartBinding? = null
+    // This property is only valid between onCreateView and onDestroyView.
+    private val binding get() = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = container!!.inflate(R.layout.fragment_backup_start)
+    ): View? {
+        _binding = FragmentBackupStartBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        button_start.setOnClickListener {
+        binding.buttonStart.setOnClickListener {
             secondPasswordHandler.validate(
                 requireContext(),
                 object : SecondPasswordHandler.ResultListener {

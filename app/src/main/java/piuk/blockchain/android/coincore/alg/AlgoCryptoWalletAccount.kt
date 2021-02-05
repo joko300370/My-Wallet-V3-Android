@@ -40,6 +40,6 @@ internal class AlgoCryptoWalletAccount(
         get() = Single.just(setOf(AssetAction.ViewActivity))
 
     override fun createTxEngine(): TxEngine {
-        TODO("Not yet implemented")
+        throw NotImplementedError("Custodial ALGO not implemented")
     }
 }

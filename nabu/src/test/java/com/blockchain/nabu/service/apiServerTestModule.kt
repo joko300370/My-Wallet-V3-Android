@@ -7,7 +7,6 @@ import com.blockchain.network.EnvironmentUrls
 import com.blockchain.network.modules.MoshiBuilderInterceptorList
 import com.blockchain.network.modules.OkHttpInterceptors
 import com.nhaarman.mockito_kotlin.spy
-import info.blockchain.balance.CryptoCurrency
 import io.fabric8.mockwebserver.DefaultMockServer
 import okhttp3.OkHttpClient
 import org.koin.dsl.bind
@@ -39,10 +38,6 @@ fun apiServerTestModule(server: DefaultMockServer) = module {
 
             override val everypayHostUrl: String
                 get() = throw NotImplementedError()
-
-            override fun websocketUrl(currency: CryptoCurrency): String {
-                throw NotImplementedError()
-            }
         }
     }.bind(EnvironmentUrls::class)
 

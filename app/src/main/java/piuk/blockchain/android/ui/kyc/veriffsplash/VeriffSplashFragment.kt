@@ -42,8 +42,8 @@ import piuk.blockchain.androidcoreui.ui.base.UiState.CONTENT
 import piuk.blockchain.androidcoreui.ui.base.UiState.EMPTY
 import piuk.blockchain.androidcoreui.ui.base.UiState.FAILURE
 import piuk.blockchain.androidcoreui.ui.base.UiState.LOADING
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.ui.customviews.toast
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.goneIf

@@ -143,7 +143,7 @@ class WalletOptionsDataManager(
             .map { it.xlmTransactionTimeout }
             .first(WalletOptions.XLM_DEFAULT_TIMEOUT_SECS)
 
-    fun isXlmAddressExchange(it: String): Boolean = xlmExchangeAddresses().contains(it.toUpperCase())
+    fun isXlmAddressExchange(it: String): Boolean = xlmExchangeAddresses().contains(it.toUpperCase(Locale.getDefault()))
 }
 
 private fun String.toUpdateType(): UpdateType =

@@ -12,9 +12,7 @@ import okhttp3.ResponseBody
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
-import piuk.blockchain.android.R
 import piuk.blockchain.android.scan.QrCodeDataManager
-import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
@@ -24,17 +22,14 @@ class PairingCodePresenterTest {
     private val mockActivity: PairingCodeView = mock()
 
     private val mockQrCodeDataManager: QrCodeDataManager = mock()
-    private val mockStringUtils: StringUtils = mock()
     private val mockPayloadDataManager: PayloadDataManager =
         mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val mockAuthDataManager: AuthDataManager = mock()
 
     @Before
     fun setUp() {
-        whenever(mockStringUtils.getString(R.string.pairing_code_instruction_1)).thenReturn("")
         subject = PairingCodePresenter(
             mockQrCodeDataManager,
-            mockStringUtils,
             mockPayloadDataManager,
             mockAuthDataManager
         )

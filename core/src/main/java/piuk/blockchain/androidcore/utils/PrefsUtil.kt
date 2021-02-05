@@ -2,6 +2,7 @@ package piuk.blockchain.androidcore.utils
 
 import android.annotation.SuppressLint
 import android.app.backup.BackupManager
+import android.content.Context
 import android.content.SharedPreferences
 import android.util.Base64
 import androidx.annotation.VisibleForTesting
@@ -9,7 +10,6 @@ import com.blockchain.logging.CrashLogger
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.data.Settings.Companion.UNIT_FIAT
 import info.blockchain.wallet.crypto.AESUtil
-import piuk.blockchain.androidcore.BuildConfig
 import piuk.blockchain.androidcore.utils.PersistentPrefs.Companion.KEY_SWIPE_TO_RECEIVE_ENABLED
 import java.util.Currency
 import java.util.Locale
@@ -19,6 +19,7 @@ interface UUIDGenerator {
 }
 
 class PrefsUtil(
+    private val ctx: Context,
     private val store: SharedPreferences,
     private val backupStore: SharedPreferences,
     private val idGenerator: DeviceIdGenerator,
@@ -55,7 +56,7 @@ class PrefsUtil(
         set(value) {
             setValue(KEY_PIN_IDENTIFIER, value)
             backupStore.edit().putString(KEY_PIN_IDENTIFIER, value).commit()
-            BackupManager.dataChanged(BuildConfig.APPLICATION_ID)
+            BackupManager.dataChanged(ctx.packageName)
         }
 
     override var newSwapEnabled: Boolean
@@ -299,7 +300,7 @@ class PrefsUtil(
             )
             .commit()
 
-        BackupManager.dataChanged(BuildConfig.APPLICATION_ID)
+        BackupManager.dataChanged(ctx.packageName)
     }
 
     override fun restoreFromBackup(decryptionKey: String, aes: AESUtilWrapper) {
@@ -354,7 +355,7 @@ class PrefsUtil(
             .putString(KEY_ENCRYPTED_SHARED_KEY, "")
             .commit()
 
-        BackupManager.dataChanged(BuildConfig.APPLICATION_ID)
+        BackupManager.dataChanged(ctx.packageName)
     }
 
     // SwipeToReceive

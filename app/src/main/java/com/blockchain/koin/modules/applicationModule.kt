@@ -284,7 +284,6 @@ val applicationModule = module {
         factory {
             PairingCodePresenter(
                 qrCodeDataManager = get(),
-                stringUtils = get(),
                 payloadDataManager = get(),
                 authDataManager = get()
             )

@@ -16,10 +16,10 @@ import piuk.blockchain.android.coincore.NullCryptoAddress
 import piuk.blockchain.android.scan.QrCodeDataManager
 import piuk.blockchain.android.ui.base.MvpPresenter
 import piuk.blockchain.android.ui.base.MvpView
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 import piuk.blockchain.androidcore.utils.PersistentPrefs
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import timber.log.Timber
 
 interface ReceiveView : MvpView {

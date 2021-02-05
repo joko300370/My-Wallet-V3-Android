@@ -347,7 +347,7 @@ class MainPresenter internal constructor(
                         is ScanResult.TxTarget -> {
                             view?.startTransactionFlowWithTarget(it.targets)
                         }
-                        is ScanResult.ImportedWallet -> TODO()
+                        is ScanResult.ImportedWallet -> { } // TODO: as part of Auth
                     }.exhaustive
                 },
                 onError = {

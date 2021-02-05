@@ -195,6 +195,7 @@ val coreModule = module {
 
     single {
         PrefsUtil(
+            ctx = get(),
             store = get(),
             backupStore = CloudBackupAgent.backupPrefs(ctx = get()),
             idGenerator = get(),

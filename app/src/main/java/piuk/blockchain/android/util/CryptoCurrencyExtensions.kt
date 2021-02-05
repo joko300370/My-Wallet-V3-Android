@@ -23,7 +23,7 @@ fun CryptoCurrency.colorRes(): Int =
         CryptoCurrency.BCH -> R.color.color_bitcoin_cash_logo
         CryptoCurrency.XLM -> R.color.color_stellar_logo
         CryptoCurrency.PAX -> R.color.color_pax_logo
-        CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+        CryptoCurrency.STX -> throw NotImplementedError("STX Not implemented")
         CryptoCurrency.ALGO -> R.color.color_algo_logo
         CryptoCurrency.USDT -> R.color.color_usdt_logo
         CryptoCurrency.DGLD -> R.color.color_dgld_logo
@@ -38,7 +38,7 @@ fun CryptoCurrency.chartLineColour(context: Context) =
             CryptoCurrency.BCH -> R.color.color_bitcoin_cash_logo
             CryptoCurrency.XLM -> R.color.color_stellar_logo
             CryptoCurrency.PAX -> R.color.color_pax_logo
-            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+            CryptoCurrency.STX -> throw NotImplementedError("STX Not implemented")
             CryptoCurrency.ALGO -> R.color.color_algo_logo
             CryptoCurrency.USDT -> R.color.color_usdt_logo
             CryptoCurrency.DGLD -> R.color.dgld_chart
@@ -66,7 +66,7 @@ fun CryptoCurrency.coinIconWhite(): Int =
         CryptoCurrency.BCH -> R.drawable.vector_bitcoin_cash_white
         CryptoCurrency.XLM -> R.drawable.vector_xlm_white
         CryptoCurrency.PAX -> R.drawable.vector_pax_white
-        CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+        CryptoCurrency.STX -> throw NotImplementedError("STX Not implemented")
         CryptoCurrency.ALGO -> R.drawable.vector_algo_white
         CryptoCurrency.USDT -> R.drawable.vector_usdt_white
         CryptoCurrency.DGLD -> R.drawable.vector_dgld_white
@@ -80,7 +80,7 @@ fun CryptoCurrency.maskedAsset(): Int =
         CryptoCurrency.ETHER -> R.drawable.ic_eth_circled_mask
         CryptoCurrency.PAX -> R.drawable.ic_usdd_circled_mask
         CryptoCurrency.BCH -> R.drawable.ic_bch_circled_mask
-        CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+        CryptoCurrency.STX -> throw NotImplementedError("STX Not implemented")
         CryptoCurrency.ALGO -> R.drawable.ic_algo_circled_mask
         CryptoCurrency.USDT -> R.drawable.ic_usdt_circled_mask
         CryptoCurrency.DGLD -> R.drawable.ic_dgld_circled_mask
@@ -102,7 +102,7 @@ fun CryptoCurrency.errorIcon(): Int =
         CryptoCurrency.ETHER -> R.drawable.vector_eth_error
         CryptoCurrency.XLM -> R.drawable.vector_xlm_error
         CryptoCurrency.PAX -> R.drawable.vector_pax_error
-        CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+        CryptoCurrency.STX -> throw NotImplementedError("STX Not implemented")
         CryptoCurrency.ALGO -> R.drawable.vector_algo_error
         CryptoCurrency.USDT -> R.drawable.vector_usdt_error
         CryptoCurrency.DGLD -> R.drawable.vector_dgld_error
@@ -165,7 +165,7 @@ fun CryptoCurrency.makeBlockExplorerUrl(
     CryptoCurrency.USDT,
     CryptoCurrency.DGLD -> "https://www.blockchain.com/eth/tx/"
     CryptoCurrency.ALGO -> "https://algoexplorer.io/tx/"
-    CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+    CryptoCurrency.STX -> throw NotImplementedError("STX Not implemented")
 } + transactionHash
 
 fun CryptoCurrency.getDecimalPlaces(): Int =
@@ -178,7 +178,7 @@ fun CryptoCurrency.getDecimalPlaces(): Int =
         CryptoCurrency.USDT,
         CryptoCurrency.DGLD -> 2
         CryptoCurrency.XLM -> 4
-        CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+        CryptoCurrency.STX -> throw NotImplementedError("STX Not implemented")
     }
 
 fun ImageView.setAssetIconColours(cryptoCurrency: CryptoCurrency, context: Context) {
@@ -200,7 +200,7 @@ internal class ResourceDefaultLabels(
                 CryptoCurrency.BCH -> R.string.bch_default_account_label
                 CryptoCurrency.XLM -> R.string.xlm_default_account_label
                 CryptoCurrency.PAX -> R.string.pax_default_account_label_1
-                CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
+                CryptoCurrency.STX -> throw NotImplementedError("STX Not implemented")
                 CryptoCurrency.ALGO -> R.string.algo_default_account_label
                 CryptoCurrency.USDT -> R.string.usdt_default_account_label
                 CryptoCurrency.DGLD -> R.string.dgld_default_account_label
