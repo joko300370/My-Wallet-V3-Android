@@ -389,9 +389,6 @@ private fun CurrencyType.rawCurrency(): String =
     }
 
 sealed class CurrencyType {
-    fun isFiat(): Boolean = this is Fiat
-    fun isCrypto(): Boolean = this is Crypto
-
     data class Fiat(val fiatCurrency: String) : CurrencyType()
     data class Crypto(val cryptoCurrency: CryptoCurrency) : CurrencyType()
 }

@@ -86,8 +86,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         compositeDisposable += input_amount.amount.subscribe {
             when (it) {
                 is FiatValue -> model.process(SimpleBuyIntent.AmountUpdated(it))
-                else -> { /*do nothing*/
-                }
+                else -> throw IllegalStateException("CryptoValue is not supported as input yet")
             }
         }
 
