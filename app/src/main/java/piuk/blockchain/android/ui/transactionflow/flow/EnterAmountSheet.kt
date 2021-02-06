@@ -67,8 +67,8 @@ class EnterAmountSheet : TransactionFlowSheet() {
                 // strange UX, but is currently by design.
                 if (amount_sheet_input.configured) {
                     amount_sheet_input.maxLimit = newState.availableBalance
-                    if (amount_sheet_input.exchangeRate != newState.fiatRate)
-                        amount_sheet_input.exchangeRate = newState.fiatRate
+                    if (amount_sheet_input.customInternalExchangeRate != newState.fiatRate)
+                        amount_sheet_input.customInternalExchangeRate = newState.fiatRate
                 }
 
                 newState.fiatRate?.let { rate ->

@@ -110,4 +110,38 @@ class ExchangeRateTest {
         val cryptoValue = 20.bitcoin()
         cryptoValue / rate `should equal` 1.bitcoinCash()
     }
+
+    @Test
+    fun `should have same currencies`() {
+        val rate1 = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 10.toBigDecimal())
+        val rate2 = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 12.toBigDecimal())
+        rate1.hasSameCurrencies(rate2) `should be` true
+
+        val rate3 = ExchangeRate.FiatToCrypto("USD", CryptoCurrency.BTC, 10.toBigDecimal())
+        val rate4 = ExchangeRate.FiatToCrypto("USD", CryptoCurrency.BTC, 12.toBigDecimal())
+
+        rate3.hasSameCurrencies(rate4) `should be` true
+    }
+
+    @Test
+    fun `should have opposite currencies`() {
+        val rate1 = ExchangeRate.FiatToCrypto("USD", CryptoCurrency.BTC, 10.toBigDecimal())
+        val rate2 = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 12.toBigDecimal())
+        rate1.hasOppositeCurrencies(rate2) `should be` true
+    }
+
+    @Test
+    fun `should have opposite fiat currencies`() {
+        val rate1 = ExchangeRate.FiatToFiat("USD", "EUR", 10.toBigDecimal())
+        val rate2 = ExchangeRate.FiatToFiat("EUR", "USD", 12.toBigDecimal())
+        rate1.hasOppositeCurrencies(rate2) `should be` true
+    }
+
+    @Test
+    fun `should NOT have opposite or same currencies`() {
+        val rate1 = ExchangeRate.FiatToCrypto("EUR", CryptoCurrency.BTC, 10.toBigDecimal())
+        val rate2 = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 12.toBigDecimal())
+        rate1.hasOppositeCurrencies(rate2) `should be` false
+        rate1.hasSameCurrencies(rate2) `should be` false
+    }
 }

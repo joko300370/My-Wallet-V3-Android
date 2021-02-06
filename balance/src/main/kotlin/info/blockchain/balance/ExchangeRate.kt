@@ -56,9 +56,11 @@ sealed class ExchangeRate(val rate: BigDecimal) {
             FiatValue.fromMajor(to, rate)
 
         override fun inverse(roundingMode: RoundingMode, scale: Int) =
-            FiatToCrypto(to,
+            FiatToCrypto(
+                to,
                 from,
-                BigDecimal.ONE.divide(rate, if (scale == -1) from.dp else scale, roundingMode).stripTrailingZeros())
+                BigDecimal.ONE.divide(rate, if (scale == -1) from.dp else scale, roundingMode).stripTrailingZeros()
+            )
     }
 
     class FiatToCrypto(
@@ -81,7 +83,8 @@ sealed class ExchangeRate(val rate: BigDecimal) {
             CryptoValue.fromMajor(to, rate)
 
         override fun inverse(roundingMode: RoundingMode, scale: Int) =
-            CryptoToFiat(to,
+            CryptoToFiat(
+                to,
                 from,
                 BigDecimal.ONE.divide(
                     rate,
@@ -111,11 +114,14 @@ sealed class ExchangeRate(val rate: BigDecimal) {
             FiatValue.fromMajor(to, rate)
 
         override fun inverse(roundingMode: RoundingMode, scale: Int) =
-            FiatToFiat(to,
+            FiatToFiat(
+                to,
                 from,
-                BigDecimal.ONE.divide(rate,
+                BigDecimal.ONE.divide(
+                    rate,
                     if (scale == -1) Currency.getInstance(from).defaultFractionDigits else scale,
-                    roundingMode).stripTrailingZeros()
+                    roundingMode
+                ).stripTrailingZeros()
             )
     }
 
@@ -166,3 +172,14 @@ fun ExchangeRate?.percentageDelta(previous: ExchangeRate?): Double =
     } catch (t: ArithmeticException) {
         Double.NaN
     }
+
+fun ExchangeRate.hasSameCurrencies(other: ExchangeRate): Boolean =
+    when (this) {
+        is ExchangeRate.CryptoToFiat -> (other as? ExchangeRate.CryptoToFiat)?.from == from && other.to == to
+        is ExchangeRate.FiatToCrypto -> (other as? ExchangeRate.FiatToCrypto)?.from == from && other.to == to
+        is ExchangeRate.FiatToFiat -> (other as? ExchangeRate.FiatToFiat)?.from == from && other.to == to
+        is ExchangeRate.CryptoToCrypto -> (other as? ExchangeRate.CryptoToCrypto)?.from == from && other.to == to
+    }
+
+fun ExchangeRate.hasOppositeCurrencies(other: ExchangeRate): Boolean =
+    this.hasSameCurrencies(other.inverse())

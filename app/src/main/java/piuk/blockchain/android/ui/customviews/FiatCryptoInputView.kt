@@ -12,6 +12,8 @@ import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
+import info.blockchain.balance.hasOppositeCurrencies
+import info.blockchain.balance.hasSameCurrencies
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -50,22 +52,32 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
 
     private val defExchangeRates: ExchangeRates by scopedInject()
 
-    private val defCryptoToFiat: ExchangeRate
-        get() = configuration.defExchgangeRate()
-
     private val currencyPrefs: CurrencyPrefs by inject()
 
-    var exchangeRate: ExchangeRate? = null
+    var customInternalExchangeRate: ExchangeRate? = null
         set(value) {
             field = value
-            //      updateExchangeAmountAndOutput()
+            updateExchangeAmountAndOutput()
         }
 
     private val inputToOutputExchangeRate: ExchangeRate
-        get() = defCryptoToFiat
+        get() = configuration.defInputToOutputExchangeRate()
 
     private val internalExchangeRate: ExchangeRate
-        get() = configuration.internalExchgangeRate()
+        get() {
+            val defInternalExchangeRate = configuration.defInternalExchangeRate()
+            return customInternalExchangeRate?.let {
+                require(
+                    it.hasSameCurrencies(defInternalExchangeRate) ||
+                        it.hasOppositeCurrencies(defInternalExchangeRate)
+                ) {
+                    "Custom exchange rate provided is not supported." +
+                        "Should be from ${configuration.inputCurrency} to ${configuration.exchangeCurrency} " +
+                        "or vice versa"
+                }
+                return if (defInternalExchangeRate.hasSameCurrencies(it)) it else it.inverse(RoundingMode.CEILING)
+            } ?: defInternalExchangeRate
+        }
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -133,9 +145,11 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
             val inputSymbol = newValue.inputCurrency.symbol()
 
             currency_swap.visibleIf { newValue.swapEnabled }
+            exchange_amount.visibleIf { newValue.inputCurrency != newValue.exchangeCurrency }
+
+            maxLimit?.let { updateFilters(inputSymbol, it.toInputCurrency()) }
 
             if (newValue.inputCurrency is CurrencyType.Fiat) {
-                updateFilters(inputSymbol, maxLimit.toInputCurrency())
                 fake_hint.text = FiatValue.zero(newValue.inputCurrency.fiatCurrency).toStringWithoutSymbol()
                 enter_amount.configuration = Configuration(
                     prefixOrSuffix = inputSymbol,
@@ -145,7 +159,6 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
                         .removeSuffix("${DecimalFormatSymbols(Locale.getDefault()).decimalSeparator}00")
                 )
             } else if (newValue.inputCurrency is CurrencyType.Crypto) {
-                updateFilters(inputSymbol, maxLimit.toInputCurrency())
                 fake_hint.text = CryptoValue.zero(newValue.inputCurrency.cryptoCurrency).toStringWithoutSymbol()
                 enter_amount.configuration = Configuration(
                     prefixOrSuffix = inputSymbol,
@@ -158,10 +171,8 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
         }
     }
 
-    var maxLimit by Delegates.observable<Money>(
-        FiatValue.zero(currencyPrefs.selectedFiatCurrency)
-    ) { _, oldValue, newValue ->
-        if (newValue != oldValue)
+    var maxLimit by Delegates.observable<Money?>(null) { _, oldValue, newValue ->
+        if (newValue != oldValue && newValue != null)
             updateFilters(enter_amount.configuration.prefixOrSuffix, newValue.toInputCurrency())
     }
 
@@ -258,10 +269,10 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
         compositeDisposable.clear()
     }
 
-    private fun FiatCryptoViewConfiguration.internalExchgangeRate() =
+    private fun FiatCryptoViewConfiguration.defInternalExchangeRate() =
         exchangeRate(inputCurrency, exchangeCurrency)
 
-    private fun FiatCryptoViewConfiguration.defExchgangeRate() =
+    private fun FiatCryptoViewConfiguration.defInputToOutputExchangeRate() =
         exchangeRate(inputCurrency, outputCurrency)
 
     private fun exchangeRate(
@@ -350,9 +361,9 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
 }
 
 data class FiatCryptoViewConfiguration(
-    val inputCurrency: CurrencyType,     // the currency used for input by the user
-    val exchangeCurrency: CurrencyType,  // the currency used for the exchanged amount
-    val outputCurrency: CurrencyType,   // the currency used for the model output
+    val inputCurrency: CurrencyType, // the currency used for input by the user
+    val exchangeCurrency: CurrencyType, // the currency used for the exchanged amount
+    val outputCurrency: CurrencyType, // the currency used for the model output
     val predefinedAmount: Money = inputCurrency.zeroValue(),
     val canSwap: Boolean = true
 ) {

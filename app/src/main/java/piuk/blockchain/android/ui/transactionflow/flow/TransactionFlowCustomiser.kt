@@ -2,7 +2,6 @@ package piuk.blockchain.android.ui.transactionflow.flow
 
 import android.content.res.Resources
 import com.blockchain.nabu.datamanagers.TransactionError
-import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
