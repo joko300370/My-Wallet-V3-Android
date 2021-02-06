@@ -13,7 +13,7 @@ import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.coincore.TransactionTarget
-import piuk.blockchain.android.ui.customviews.Either
+import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
 
@@ -148,7 +148,7 @@ class TxFlowAnalytics(
         }
     }
 
-    fun onCryptoToggle(inputType: Either<String,CryptoCurrency>, state: TransactionState) {}
+    fun onCryptoToggle(inputType: CurrencyType, state: TransactionState) {}
 
     fun onEnterAmountCtaClick(state: TransactionState) {
         when (state.action) {

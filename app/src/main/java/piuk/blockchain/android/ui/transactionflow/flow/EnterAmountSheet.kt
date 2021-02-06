@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.DialogFragment
-import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
@@ -19,7 +18,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullAddress
-import piuk.blockchain.android.ui.customviews.Either
+import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.FiatCryptoInputView
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
 import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
@@ -225,14 +224,14 @@ class EnterAmountSheet : TransactionFlowSheet() {
 
     private fun FiatCryptoInputView.configure(
         newState: TransactionState,
-        inputCurrency: Either<String, CryptoCurrency>
+        inputCurrency: CurrencyType
     ) {
-        if (inputCurrency is Either.Right || newState.amount.isPositive) {
+        if (inputCurrency is CurrencyType.Crypto || newState.amount.isPositive) {
             val selectedFiat = newState.pendingTx?.selectedFiat ?: return
             configuration = FiatCryptoViewConfiguration(
-                inputCurrency = Either.Right(newState.sendingAccount.asset),
-                outputCurrency = Either.Right(newState.sendingAccount.asset),
-                exchangeCurrency = Either.Left(selectedFiat),
+                inputCurrency = CurrencyType.Crypto(newState.sendingAccount.asset),
+                outputCurrency = CurrencyType.Crypto(newState.sendingAccount.asset),
+                exchangeCurrency = CurrencyType.Fiat(selectedFiat),
                 predefinedAmount = newState.amount
             )
         } else {
@@ -240,9 +239,9 @@ class EnterAmountSheet : TransactionFlowSheet() {
             val fiatRate = newState.fiatRate ?: return
             val amount = newState.amount as? CryptoValue ?: return
             configuration = FiatCryptoViewConfiguration(
-                inputCurrency = Either.Left(selectedFiat),
-                outputCurrency = Either.Left(selectedFiat),
-                exchangeCurrency = Either.Right(newState.sendingAccount.asset),
+                inputCurrency = CurrencyType.Fiat(selectedFiat),
+                outputCurrency = CurrencyType.Fiat(selectedFiat),
+                exchangeCurrency = CurrencyType.Crypto(newState.sendingAccount.asset),
                 predefinedAmount = fiatRate.applyRate(amount)
             )
         }

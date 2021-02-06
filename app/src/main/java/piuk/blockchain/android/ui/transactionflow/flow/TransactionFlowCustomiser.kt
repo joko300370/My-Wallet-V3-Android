@@ -15,7 +15,7 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.isCustodial
-import piuk.blockchain.android.ui.customviews.Either
+import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.customviews.account.DefaultCellDecorator
 import piuk.blockchain.android.ui.customviews.account.StatusDecorator
@@ -64,10 +64,10 @@ interface TransactionFlowCustomiser {
     fun transactionProgressIcon(state: TransactionState): Int
     fun transactionProgressExceptionMessage(state: TransactionState): String
     fun amountHeaderConfirmationVisible(state: TransactionState): Boolean
-    fun defInputType(state: TransactionState, fiatCurrency: String): Either<String, CryptoCurrency>
+    fun defInputType(state: TransactionState, fiatCurrency: String): CurrencyType
 
     // Format those flash error messages:
-    fun issueFlashMessage(state: TransactionState, input: Either<String, CryptoCurrency>?): String?
+    fun issueFlashMessage(state: TransactionState, input: CurrencyType?): String?
     fun selectIssueType(state: TransactionState): IssueType
     fun showTargetIcon(state: TransactionState): Boolean
     fun sourceAccountSelectionStatusDecorator(state: TransactionState): StatusDecorator
@@ -399,7 +399,7 @@ class TransactionFlowCustomiserImpl(
         }
     }
 
-    override fun issueFlashMessage(state: TransactionState, input: Either<String, CryptoCurrency>?): String? {
+    override fun issueFlashMessage(state: TransactionState, input: CurrencyType?): String? {
         if (state.pendingTx?.amount?.toBigInteger() == BigInteger.ZERO && (
                 state.errorState == TransactionErrorState.INVALID_AMOUNT ||
                     state.errorState == TransactionErrorState.BELOW_MIN_LIMIT
@@ -459,7 +459,7 @@ class TransactionFlowCustomiserImpl(
         }
     }
 
-    private fun composeBelowLimitErrorMessage(state: TransactionState, input: Either<String, CryptoCurrency>?): String {
+    private fun composeBelowLimitErrorMessage(state: TransactionState, input: CurrencyType?): String {
         val exchangeRate = state.fiatRate ?: return ""
         val amount =
             input?.let {
@@ -585,9 +585,9 @@ class TransactionFlowCustomiserImpl(
     override fun amountHeaderConfirmationVisible(state: TransactionState): Boolean =
         state.action != AssetAction.Swap
 
-    override fun defInputType(state: TransactionState, fiatCurrency: String): Either<String, CryptoCurrency> =
+    override fun defInputType(state: TransactionState, fiatCurrency: String): CurrencyType =
         if (state.action == AssetAction.Swap || state.action == AssetAction.Sell)
-            Either.Left(fiatCurrency) else Either.Right(state.asset)
+            CurrencyType.Fiat(fiatCurrency) else CurrencyType.Crypto(state.asset)
 
     override fun sourceAccountSelectionStatusDecorator(state: TransactionState): StatusDecorator =
         when (state.action) {
@@ -604,22 +604,22 @@ class TransactionFlowCustomiserImpl(
     }
 
     private fun Money.toEnteredCurrency(
-        input: Either<String, CryptoCurrency>,
+        input: CurrencyType,
         exchangeRate: ExchangeRate.CryptoToFiat,
         roundingMode: RoundingMode
     ): String {
-        if (input is Either.Right && this is CryptoValue)
+        if (input is CurrencyType.Crypto && this is CryptoValue)
             return toStringWithSymbol()
-        if (input is Either.Left && this is FiatValue)
+        if (input is CurrencyType.Fiat && this is FiatValue)
             return toStringWithSymbol()
-        if (input is Either.Left && this is CryptoValue)
+        if (input is CurrencyType.Fiat && this is CryptoValue)
             return FiatValue.fromMajor(
                 exchangeRate.to,
                 exchangeRate.convert(this, round = false).toBigDecimal().setScale(
                     Currency.getInstance(exchangeRate.to).defaultFractionDigits, roundingMode
                 )
             ).toStringWithSymbol()
-        if (input is Either.Right && this is FiatValue)
+        if (input is CurrencyType.Crypto && this is FiatValue)
             return exchangeRate.inverse().convert(this).toStringWithSymbol()
         throw IllegalStateException("Not valid currency")
     }

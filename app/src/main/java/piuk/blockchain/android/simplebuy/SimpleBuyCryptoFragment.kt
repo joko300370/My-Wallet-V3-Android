@@ -27,7 +27,7 @@ import piuk.blockchain.android.cards.icon
 import piuk.blockchain.android.ui.base.ErrorSlidingBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
-import piuk.blockchain.android.ui.customviews.Either
+import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
 import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
@@ -172,9 +172,9 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
 
         newState.selectedCryptoCurrency?.let {
             input_amount.configuration = FiatCryptoViewConfiguration(
-                inputCurrency = Either.Left(newState.fiatCurrency),
-                outputCurrency = Either.Left(newState.fiatCurrency),
-                exchangeCurrency = Either.Right(it),
+                inputCurrency = CurrencyType.Fiat(newState.fiatCurrency),
+                outputCurrency = CurrencyType.Fiat(newState.fiatCurrency),
+                exchangeCurrency = CurrencyType.Crypto(it),
                 canSwap = false,
                 predefinedAmount = newState.order.amount ?: FiatValue.zero(newState.fiatCurrency)
             )
@@ -411,7 +411,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         when (error) {
             InputError.ABOVE_MAX -> {
                 input_amount.showError(
-                    if (input_amount.configuration.inputCurrency is Either.Left)
+                    if (input_amount.configuration.inputCurrency is CurrencyType.Fiat)
                         resources.getString(R.string.maximum_buy, state.maxFiatAmount.toStringWithSymbol())
                     else
                         resources.getString(
@@ -422,7 +422,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             }
             InputError.BELOW_MIN -> {
                 input_amount.showError(
-                    if (input_amount.configuration.inputCurrency is Either.Left)
+                    if (input_amount.configuration.inputCurrency is CurrencyType.Fiat)
                         resources.getString(R.string.minimum_buy, state.minFiatAmount.toStringWithSymbol())
                     else
                         resources.getString(
