@@ -230,7 +230,6 @@ class EnterAmountSheet : TransactionFlowSheet() {
             val selectedFiat = newState.pendingTx?.selectedFiat ?: return
             configuration = FiatCryptoViewConfiguration(
                 inputCurrency = CurrencyType.Crypto(newState.sendingAccount.asset),
-                outputCurrency = CurrencyType.Crypto(newState.sendingAccount.asset),
                 exchangeCurrency = CurrencyType.Fiat(selectedFiat),
                 predefinedAmount = newState.amount
             )
@@ -240,7 +239,6 @@ class EnterAmountSheet : TransactionFlowSheet() {
             val amount = newState.amount as? CryptoValue ?: return
             configuration = FiatCryptoViewConfiguration(
                 inputCurrency = CurrencyType.Fiat(selectedFiat),
-                outputCurrency = CurrencyType.Fiat(selectedFiat),
                 exchangeCurrency = CurrencyType.Crypto(newState.sendingAccount.asset),
                 predefinedAmount = fiatRate.applyRate(amount)
             )
