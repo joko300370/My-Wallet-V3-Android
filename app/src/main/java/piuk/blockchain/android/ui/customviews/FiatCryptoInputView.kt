@@ -12,8 +12,8 @@ import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
-import info.blockchain.balance.hasOppositeCurrencies
-import info.blockchain.balance.hasSameCurrencies
+import info.blockchain.balance.hasOppositeSourceAndTarget
+import info.blockchain.balance.hasSameSourceAndTarget
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -68,14 +68,14 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
             val defInternalExchangeRate = configuration.defInternalExchangeRate()
             return customInternalExchangeRate?.let {
                 require(
-                    it.hasSameCurrencies(defInternalExchangeRate) ||
-                        it.hasOppositeCurrencies(defInternalExchangeRate)
+                    it.hasSameSourceAndTarget(defInternalExchangeRate) ||
+                        it.hasOppositeSourceAndTarget(defInternalExchangeRate)
                 ) {
                     "Custom exchange rate provided is not supported." +
                         "Should be from ${configuration.inputCurrency} to ${configuration.exchangeCurrency} " +
                         "or vice versa"
                 }
-                return if (defInternalExchangeRate.hasSameCurrencies(it)) it else it.inverse(RoundingMode.CEILING)
+                return if (defInternalExchangeRate.hasSameSourceAndTarget(it)) it else it.inverse(RoundingMode.CEILING)
             } ?: defInternalExchangeRate
         }
 

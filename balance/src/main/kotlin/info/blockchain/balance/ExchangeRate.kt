@@ -173,7 +173,7 @@ fun ExchangeRate?.percentageDelta(previous: ExchangeRate?): Double =
         Double.NaN
     }
 
-fun ExchangeRate.hasSameCurrencies(other: ExchangeRate): Boolean =
+fun ExchangeRate.hasSameSourceAndTarget(other: ExchangeRate): Boolean =
     when (this) {
         is ExchangeRate.CryptoToFiat -> (other as? ExchangeRate.CryptoToFiat)?.from == from && other.to == to
         is ExchangeRate.FiatToCrypto -> (other as? ExchangeRate.FiatToCrypto)?.from == from && other.to == to
@@ -181,5 +181,5 @@ fun ExchangeRate.hasSameCurrencies(other: ExchangeRate): Boolean =
         is ExchangeRate.CryptoToCrypto -> (other as? ExchangeRate.CryptoToCrypto)?.from == from && other.to == to
     }
 
-fun ExchangeRate.hasOppositeCurrencies(other: ExchangeRate): Boolean =
-    this.hasSameCurrencies(other.inverse())
+fun ExchangeRate.hasOppositeSourceAndTarget(other: ExchangeRate): Boolean =
+    this.hasSameSourceAndTarget(other.inverse())
