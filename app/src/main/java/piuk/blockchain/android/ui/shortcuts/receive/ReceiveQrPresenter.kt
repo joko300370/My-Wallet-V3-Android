@@ -6,7 +6,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.scan.QrCodeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.ToastCustom
 
 internal class ReceiveQrPresenter(
     val payloadDataManager: PayloadDataManager,
@@ -25,7 +25,7 @@ internal class ReceiveQrPresenter(
 
             // Show QR Code
             receiveAddressString = intent.getStringExtra(ReceiveQrActivity.INTENT_EXTRA_ADDRESS)
-            val labelString = intent.getStringExtra(ReceiveQrActivity.INTENT_EXTRA_LABEL)
+            val labelString = intent.getStringExtra(ReceiveQrActivity.INTENT_EXTRA_LABEL) ?: ""
 
             view.setAddressInfo(receiveAddressString ?: "")
             view.setAddressLabel(labelString)

@@ -37,8 +37,8 @@
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginTop="@dimen/small_margin"
         android:layout_marginEnd="@dimen/standard_margin"
-        android:contentDescription="@string/backup_before_send_body"
-        android:text="@string/backup_before_send_body"
+        android:contentDescription="@string/backup_before_send_body_1"
+        android:text="@string/backup_before_send_body_1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title" />

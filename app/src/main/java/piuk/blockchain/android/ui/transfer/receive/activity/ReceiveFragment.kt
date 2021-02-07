@@ -33,6 +33,8 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.ui.base.MvpFragment
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.ui.share.ReceiveIntentHelper
 import piuk.blockchain.android.ui.share.ShareReceiveIntentAdapter
 import piuk.blockchain.android.util.AppUtil
@@ -42,8 +44,6 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.extensions.toSafeLong
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.ui.customviews.toast
 import piuk.blockchain.android.util.disableSoftKeyboard
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.inflate
@@ -102,7 +102,7 @@ class ReceiveFragment : MvpFragment<ReceiveView, ReceivePresenter>(),
         scrollview?.post { scrollview?.scrollTo(0, 0) }
 
         requireActivity().onBackPressedDispatcher.addCallback(
-            this, object : OnBackPressedCallback(true) {
+            viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (custom_keyboard.isVisible) {
                     closeKeypad()
@@ -302,7 +302,7 @@ class ReceiveFragment : MvpFragment<ReceiveView, ReceivePresenter>(),
                     val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                     val clip = ClipData.newPlainText("Send address", address)
                     toast(R.string.copied_to_clipboard)
-                    clipboard.primaryClip = clip
+                    clipboard.setPrimaryClip(clip)
                 }
                 .setNegativeButton(R.string.common_no, null)
                 .show()

@@ -22,7 +22,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NullFiatAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber

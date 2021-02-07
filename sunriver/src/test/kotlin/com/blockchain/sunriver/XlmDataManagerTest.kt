@@ -453,6 +453,7 @@ class XlmDataManagerTransactionListTest {
             value = 10000.lumens(),
             fee = 1.stroops(),
             hash = "transactionHash",
+            memo = Memo.None,
             to = HorizonKeyPair.Public("GCO724H2FOHPBFF4OQ6IB5GB3CVE4W3UGDY4RIHHG6UPQ2YZSSCINMAI"),
             from = HorizonKeyPair.Public("GAIH3ULLFQ4DGSECF2AR555KZ4KNDGEKN4AFI4SU2M7B43MGK3QJZNSR")
         ),
@@ -461,6 +462,7 @@ class XlmDataManagerTransactionListTest {
             value = (-100).lumens(),
             fee = 1.stroops(),
             hash = "transactionHash",
+            memo = Memo.None,
             to = HorizonKeyPair.Public("GBAHSNSG37BOGBS4GXUPMHZWJQ22WIOJQYORRBHTABMMU6SGSKDEAOPT"),
             from = HorizonKeyPair.Public("GC24LNYWXIYYB6OGCMAZZ5RX6WPI2F74ZV7HNBV4ADALLXJRT7ZTLHP2")
         )

@@ -9,6 +9,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.ShortcutManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.text.Editable
@@ -22,6 +23,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity.RESULT_CANCELED
+import androidx.appcompat.app.AppCompatActivity.RESULT_FIRST_USER
 import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
@@ -30,16 +33,16 @@ import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.notifications.analytics.AnalyticsEvents
-import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
-import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.Bank
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.responses.nabu.KycTiers
+import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvent
+import com.blockchain.notifications.analytics.AnalyticsEvents
+import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
+import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.ui.urllinks.URL_PRIVACY_POLICY
 import com.blockchain.ui.urllinks.URL_TOS_POLICY
 import com.google.android.play.core.review.ReviewInfo
@@ -58,6 +61,14 @@ import piuk.blockchain.android.R.string.success
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.cards.CardDetailsActivity
 import piuk.blockchain.android.cards.RemoveCardBottomSheet
+import piuk.blockchain.android.data.biometrics.BiometricAuthError
+import piuk.blockchain.android.data.biometrics.BiometricAuthLockout
+import piuk.blockchain.android.data.biometrics.BiometricAuthLockoutPermanent
+import piuk.blockchain.android.data.biometrics.BiometricAuthOther
+import piuk.blockchain.android.data.biometrics.BiometricKeysInvalidated
+import piuk.blockchain.android.data.biometrics.BiometricsCallback
+import piuk.blockchain.android.data.biometrics.BiometricsController
+import piuk.blockchain.android.data.biometrics.BiometricsNoSuitableMethods
 import piuk.blockchain.android.simplebuy.RemoveLinkedBankBottomSheet
 import piuk.blockchain.android.simplebuy.RemovePaymentMethodBottomSheetHost
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
@@ -65,13 +76,12 @@ import piuk.blockchain.android.simplebuy.linkBankEventWithCurrency
 import piuk.blockchain.android.ui.auth.KEY_VALIDATING_PIN_FOR_RESULT
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.auth.REQUEST_CODE_VALIDATE_PIN
+import piuk.blockchain.android.ui.backup.BackupWalletActivity
 import piuk.blockchain.android.ui.base.mvi.MviFragment.Companion.BOTTOM_SHEET
 import piuk.blockchain.android.ui.customviews.PasswordStrengthView
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankMethodChooserBottomSheet
-import piuk.blockchain.android.ui.fingerprint.FingerprintDialog
-import piuk.blockchain.android.ui.fingerprint.FingerprintStage
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.linkbank.LinkBankActivity
 import piuk.blockchain.android.ui.settings.preferences.BankPreference
@@ -80,22 +90,24 @@ import piuk.blockchain.android.ui.settings.preferences.KycStatusPreference
 import piuk.blockchain.android.ui.settings.preferences.ThePitStatusPreference
 import piuk.blockchain.android.ui.thepit.PitLaunchBottomDialog
 import piuk.blockchain.android.ui.thepit.PitPermissionsActivity
+import piuk.blockchain.android.util.AfterTextChangedWatcher
+import piuk.blockchain.android.util.AndroidUtils
 import piuk.blockchain.android.util.RootUtil
+import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AndroidUtils
-import piuk.blockchain.android.util.ViewUtils
-import piuk.blockchain.android.util.AfterTextChangedWatcher
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.util.Locale
-import java.lang.IllegalStateException
 import kotlin.math.roundToInt
 
-class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePaymentMethodBottomSheetHost, BankLinkingHost,
+class SettingsFragment : PreferenceFragmentCompat(),
+    SettingsView,
+    RemovePaymentMethodBottomSheetHost,
+    BankLinkingHost,
     ReviewHost {
 
     // Profile
@@ -156,6 +168,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     private val settingsPresenter: SettingsPresenter by scopedInject()
+    private val biometricsController: BiometricsController by scopedInject()
     private val currencyPrefs: CurrencyPrefs by inject()
     private val analytics: Analytics by inject()
     private val rxBus: RxBus by inject()
@@ -245,6 +258,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         torPref?.setOnPreferenceChangeListener { _, newValue ->
             settingsPresenter.updateTor(newValue as Boolean)
             true
+        }
+
+        findPreference<Preference>("backup")?.apply {
+            onClick { onBackupClicked() }
         }
 
         screenshotPref?.setOnPreferenceChangeListener { _, newValue ->
@@ -607,7 +624,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     override fun showDisableFingerprintDialog() {
         AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
             .setTitle(R.string.app_name)
-            .setMessage(R.string.fingerprint_disable_message)
+            .setMessage(R.string.biometric_disable_message)
             .setCancelable(true)
             .setPositiveButton(R.string.common_yes) { _, _ ->
                 settingsPresenter.setFingerprintUnlockEnabled(
@@ -628,8 +645,14 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             .setCancelable(true)
             .setPositiveButton(R.string.common_yes) { _, _ ->
                 startActivityForResult(
-                    Intent(android.provider.Settings.ACTION_SECURITY_SETTINGS),
-                    0
+                    Intent(
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                            android.provider.Settings.ACTION_SECURITY_SETTINGS
+                        } else {
+                            android.provider.Settings.ACTION_BIOMETRIC_ENROLL
+                        }
+                    ),
+                    REQUEST_CODE_BIOMETRIC_ENROLLMENT
                 )
             }
             .setNegativeButton(android.R.string.cancel, null)
@@ -641,20 +664,53 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
     }
 
     override fun showFingerprintDialog(pincode: String) {
-        val dialog = FingerprintDialog.newInstance(pincode, FingerprintStage.REGISTER_FINGERPRINT)
-        dialog.setAuthCallback(object : FingerprintDialog.FingerprintAuthCallback {
-            override fun onAuthenticated(data: String?) {
-                dialog.dismissAllowingStateLoss()
+        biometricsController.init(this, BiometricsController.BiometricsType.TYPE_REGISTER, object : BiometricsCallback {
+            override fun onAuthSuccess(data: String) {
                 settingsPresenter.setFingerprintUnlockEnabled(true)
+                fingerprintPref.isChecked = settingsPresenter.isFingerprintUnlockEnabled
             }
 
-            override fun onCanceled() {
-                dialog.dismissAllowingStateLoss()
+            override fun onAuthFailed(error: BiometricAuthError) {
+                handleAuthFailed(error)
+            }
+
+            override fun onAuthCancelled() {
                 settingsPresenter.setFingerprintUnlockEnabled(false)
                 fingerprintPref.isChecked = settingsPresenter.isFingerprintUnlockEnabled
             }
         })
-        dialog.show(fragmentManager!!, FingerprintDialog.TAG)
+
+        biometricsController.authenticateForRegistration()
+    }
+
+    private fun handleAuthFailed(error: BiometricAuthError) {
+        when (error) {
+            is BiometricKeysInvalidated -> BiometricsController.showActionableInvalidatedKeysDialog(requireContext(),
+                positiveActionCallback = {
+                    settingsPresenter.onFingerprintClicked()
+                },
+                negativeActionCallback = {
+                    startActivityForResult(
+                        Intent(
+                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                                android.provider.Settings.ACTION_SECURITY_SETTINGS
+                            } else {
+                                android.provider.Settings.ACTION_BIOMETRIC_ENROLL
+                            }
+                        ),
+                        REQUEST_CODE_BIOMETRIC_ENROLLMENT
+                    )
+                })
+            is BiometricsNoSuitableMethods -> showNoFingerprintsAddedDialog()
+            is BiometricAuthLockout -> BiometricsController.showAuthLockoutDialog(requireContext())
+            is BiometricAuthLockoutPermanent -> BiometricsController.showPermanentAuthLockoutDialog(requireContext())
+            is BiometricAuthOther -> BiometricsController.showBiometricsGenericError(requireContext(), error.error)
+            else -> {
+                // do nothing
+            }
+        }
+        settingsPresenter.setFingerprintUnlockEnabled(false)
+        fingerprintPref.isChecked = settingsPresenter.isFingerprintUnlockEnabled
     }
 
     override fun showDialogSmsVerified() {
@@ -682,6 +738,10 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
     private fun onUpdateEmailClicked() {
         settingsPresenter.onEmailShowRequested()
+    }
+
+    private fun onBackupClicked() {
+        BackupWalletActivity.start(requireContext())
     }
 
     private fun onAboutClicked() {
@@ -727,7 +787,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             val mobileNumberTextView = smsPickerView.findViewById<TextView>(R.id.tvSms)
 
             val picker = CountryPicker.newInstance(getString(R.string.select_country))
-            val country = picker.getUserCountryInfo(activity!!)
+            val country = picker.getUserCountryInfo(requireActivity())
             if (country.dialCode == "+93") {
                 setCountryFlag(countryTextView, "+1", R.drawable.flag_us)
             } else {
@@ -735,7 +795,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
             }
 
             countryTextView.setOnClickListener {
-                picker.show(fragmentManager!!, "COUNTRY_PICKER")
+                picker.show(requireFragmentManager(), "COUNTRY_PICKER")
                 picker.setListener { _, _, dialCode, flagDrawableResID ->
                     setCountryFlag(countryTextView, dialCode, flagDrawableResID)
                     picker.dismiss()
@@ -756,7 +816,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                 .setNegativeButton(android.R.string.cancel, null)
 
             if (isSmsVerified && smsNumber.isNotEmpty()) {
-                alertDialogSmsBuilder.setNeutralButton(R.string.verify) { dialogInterface, i ->
+                alertDialogSmsBuilder.setNeutralButton(R.string.verify) { _, _ ->
                     settingsPresenter.updateSms(
                         smsNumber
                     )
@@ -791,7 +851,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                 val clipboard =
                     settingsActivity.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 val clip = ClipData.newPlainText("guid", guidPref!!.summary)
-                clipboard.primaryClip = clip
+                clipboard.setPrimaryClip(clip)
                 showCustomToast(R.string.copied_to_clipboard)
                 analytics.logEvent(SettingsAnalyticsEvents.WalletIdCopyCopied)
             }
@@ -861,7 +921,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK)
+        if (resultCode == RESULT_OK) {
             when (requestCode) {
                 REQUEST_CODE_VALIDATE_PIN -> {
                     settingsPresenter.pinCodeValidatedForChange()
@@ -877,7 +937,15 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
                 LinkBankActivity.LINK_BANK_REQUEST_CODE -> {
                     settingsPresenter.updateBanks()
                 }
+                REQUEST_CODE_BIOMETRIC_ENROLLMENT -> {
+                    settingsPresenter.onFingerprintClicked()
+                }
             }
+        } else if (resultCode == RESULT_FIRST_USER || resultCode == RESULT_CANCELED) {
+            if (requestCode == REQUEST_CODE_BIOMETRIC_ENROLLMENT) {
+                settingsPresenter.onFingerprintClicked()
+            }
+        }
     }
 
     private fun showDialogEmailNotifications() {
@@ -1122,6 +1190,7 @@ class SettingsFragment : PreferenceFragmentCompat(), SettingsView, RemovePayment
         internal const val EXTRA_SHOW_TWO_FA_DIALOG = "show_two_fa_dialog"
         private const val ADD_CARD_KEY = "ADD_CARD_KEY"
         private const val LINK_BANK_KEY = "ADD_BANK_KEY"
+        private const val REQUEST_CODE_BIOMETRIC_ENROLLMENT = 666
     }
 
     override fun onCardRemoved(cardId: String) {

@@ -14,19 +14,22 @@ import org.koin.android.ext.android.get
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.backup.completed.BackupWalletCompletedFragment
 import piuk.blockchain.android.ui.backup.start.BackupWalletStartingFragment
+import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
-import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 
-class BackupWalletActivity : BaseAuthActivity() {
+class BackupWalletActivity : BlockchainActivity() {
 
     private val payloadManger: PayloadManager by scopedInject()
+
+    override val alwaysDisableScreenshots: Boolean
+        get() = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_backup_wallet)
         get<Analytics>().logEvent(AnalyticsEvents.Backup)
 
-        setupToolbar(toolbar_general, R.string.backup_wallet)
+        setupToolbar(toolbar_general, R.string.backup_wallet_title)
 
         if (isBackedUp()) {
             startFragment(
@@ -53,8 +56,6 @@ class BackupWalletActivity : BaseAuthActivity() {
             supportFragmentManager.popBackStack()
         }
     }
-
-    override fun enforceFlagSecure() = true
 
     override fun onSupportNavigateUp() =
         consume { onBackPressed() }

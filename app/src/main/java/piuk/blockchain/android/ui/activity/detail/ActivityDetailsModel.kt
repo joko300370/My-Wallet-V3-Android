@@ -42,6 +42,7 @@ data class BuyCryptoWallet(val crypto: CryptoCurrency) : ActivityDetailsType()
 data class SellCryptoWallet(val currency: String) : ActivityDetailsType()
 data class BuyPaymentMethod(val paymentDetails: PaymentDetails) : ActivityDetailsType()
 data class SwapReceiveAmount(val receivedAmount: Money) : ActivityDetailsType()
+data class XlmMemo(val memo: String) : ActivityDetailsType()
 
 data class PaymentDetails(
     val paymentMethodId: String,

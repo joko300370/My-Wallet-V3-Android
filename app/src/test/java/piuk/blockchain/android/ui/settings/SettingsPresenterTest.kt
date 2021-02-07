@@ -29,9 +29,9 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import piuk.blockchain.android.R
+import piuk.blockchain.android.data.biometrics.BiometricsController
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.thepit.PitLinkingState
-import piuk.blockchain.android.ui.fingerprint.FingerprintHelper
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
 import piuk.blockchain.android.ui.tiers
 import piuk.blockchain.androidcore.data.access.AccessState
@@ -58,7 +58,7 @@ class SettingsPresenterTest {
 
     private val activity: SettingsView = mock()
 
-    private val fingerprintHelper: FingerprintHelper = mock()
+    private val biometricsController: BiometricsController = mock()
     private val authDataManager: AuthDataManager = mock()
 
     private val settingsDataManager: SettingsDataManager = mock()
@@ -86,7 +86,6 @@ class SettingsPresenterTest {
     @Before
     fun setUp() {
         subject = SettingsPresenter(
-            fingerprintHelper = fingerprintHelper,
             authDataManager = authDataManager,
             settingsDataManager = settingsDataManager,
             emailUpdater = emailSyncUpdater,
@@ -99,12 +98,13 @@ class SettingsPresenterTest {
             exchangeRateDataManager = exchangeRateDataManager,
             kycStatusHelper = kycStatusHelper,
             pitLinking = pitLinking,
-            analytics = analytics
+            analytics = analytics,
+            biometricsController = biometricsController
         )
         subject.initView(activity)
         whenever(prefsUtil.selectedFiatCurrency).thenReturn("USD")
         whenever(prefsUtil.arePushNotificationsEnabled).thenReturn(false)
-        whenever(fingerprintHelper.isHardwareDetected()).thenReturn(false)
+        whenever(biometricsController.isHardwareDetected).thenReturn(false)
         whenever(prefsUtil.getValue(any(), any<Boolean>())).thenReturn(false)
         whenever(payloadDataManager.syncPayloadWithServer()).thenReturn(Completable.complete())
         whenever(payloadDataManager.syncPayloadAndPublicKeys()).thenReturn(Completable.complete())

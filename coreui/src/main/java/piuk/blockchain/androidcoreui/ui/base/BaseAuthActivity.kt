@@ -1,5 +1,6 @@
 package piuk.blockchain.androidcoreui.ui.base
 
+import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.annotation.CallSuper
@@ -35,6 +36,7 @@ abstract class BaseAuthActivity : ToolBarActivity() {
     /**
      * Allows you to disable Portrait orientation lock on a per-Activity basis.
      */
+    @SuppressLint("SourceLockedOrientationActivity")
     protected open fun lockScreenOrientation() {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }

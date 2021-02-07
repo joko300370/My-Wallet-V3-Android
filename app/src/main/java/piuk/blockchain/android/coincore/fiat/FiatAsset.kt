@@ -34,7 +34,7 @@ class FiatAsset(
             AssetFilter.All,
             AssetFilter.Custodial -> fetchFiatWallets()
             AssetFilter.NonCustodial,
-            AssetFilter.Interest -> TODO()
+            AssetFilter.Interest -> Maybe.empty() // Only support single accounts
         }
 
     private fun fetchFiatWallets(): Maybe<AccountGroup> =

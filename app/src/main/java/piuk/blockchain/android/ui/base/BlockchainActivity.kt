@@ -85,13 +85,15 @@ abstract class BlockchainActivity : ToolBarActivity() {
         }
         appUtil.activityIndicator = activityIndicator
 
-        compositeDisposable += activityIndicator.loading.observeOn(AndroidSchedulers.mainThread()).subscribeBy {
-            if (it == true) {
-                showLoading()
-            } else {
-                hideLoading()
+        compositeDisposable += activityIndicator.loading
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy {
+                if (it == true) {
+                    showLoading()
+                } else {
+                    hideLoading()
+                }
             }
-        }
     }
 
     protected open fun showLoading() {}

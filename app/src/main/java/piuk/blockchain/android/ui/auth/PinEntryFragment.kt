@@ -17,9 +17,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity.RESULT_CANCELED
 import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import androidx.appcompat.widget.AppCompatEditText
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.blockchain.koin.scopedInject
+import com.blockchain.ui.urllinks.APP_STORE_URI
+import com.blockchain.ui.urllinks.APP_STORE_URL
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
@@ -38,31 +39,40 @@ import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
+import piuk.blockchain.android.data.biometrics.BiometricAuthError
+import piuk.blockchain.android.data.biometrics.BiometricAuthLockout
+import piuk.blockchain.android.data.biometrics.BiometricAuthLockoutPermanent
+import piuk.blockchain.android.data.biometrics.BiometricAuthOther
+import piuk.blockchain.android.data.biometrics.BiometricKeysInvalidated
+import piuk.blockchain.android.data.biometrics.BiometricsCallback
+import piuk.blockchain.android.data.biometrics.BiometricsController
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus
 import piuk.blockchain.android.databinding.FragmentPinEntryBinding
 import piuk.blockchain.android.ui.customviews.PinEntryKeypad
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.debug.DebugOptionsBottomDialog
-import piuk.blockchain.android.ui.fingerprint.FingerprintDialog
-import piuk.blockchain.android.ui.fingerprint.FingerprintStage
 import piuk.blockchain.android.ui.home.MobileNoticeDialogFragment
 import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.ui.start.PasswordRequiredActivity
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity
 import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.android.util.ViewUtils
+import piuk.blockchain.android.util.copyHashOnLongClick
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.annotations.Thunk
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.ViewUtils
-import piuk.blockchain.android.util.copyHashOnLongClick
-import piuk.blockchain.android.util.visibleIf
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 
 internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(),
-    PinEntryView {
+    PinEntryView, BiometricsEnrollmentBottomSheet.Host {
 
     private val pinEntryPresenter: PinEntryPresenter by scopedInject()
     private val environmentConfig: EnvironmentConfig by inject()
+    private val biometricsController: BiometricsController by scopedInject()
     private val appUtil: AppUtil by inject()
 
     private val _pinBoxList = mutableListOf<ImageView>()
@@ -71,12 +81,9 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
 
     private var materialProgressDialog: MaterialProgressDialog? = null
     private var binding: FragmentPinEntryBinding? = null
-    private var fingerprintDialog: FingerprintDialog? = null
     private var listener: OnPinEntryFragmentInteractionListener? = null
     private val clearPinNumberRunnable = ClearPinNumberRunnable()
     private var isPaused = false
-
-    private var backPressed: Long = 0
 
     val isValidatingPinForResult: Boolean
         get() = presenter?.isForValidatingPinForResult ?: false
@@ -116,7 +123,7 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         presenter.checkForceUpgradeStatus(BuildConfig.VERSION_NAME)
 
         if (arguments != null) {
-            val showSwipeHint = arguments!!.getBoolean(KEY_SHOW_SWIPE_HINT)
+            val showSwipeHint = requireArguments().getBoolean(KEY_SHOW_SWIPE_HINT)
             if (!showSwipeHint) {
                 binding?.swipeHintLayout?.visibility = View.INVISIBLE
             }
@@ -138,7 +145,8 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
                 activity,
                 "Current environment: " + environmentConfig.environment.getName(),
                 ToastCustom.LENGTH_SHORT,
-                ToastCustom.TYPE_GENERAL)
+                ToastCustom.TYPE_GENERAL
+            )
 
             binding?.buttonSettings?.visibility = View.VISIBLE
             binding?.buttonSettings?.setOnClickListener {
@@ -148,8 +156,11 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
             }
         }
 
-        binding?.textViewVersionCode?.text =
-            "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+        binding?.textViewVersionCode?.text = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+
+        binding?.pinEntryLogout?.setOnClickListener {
+            presenter.resetApp()
+        }
 
         return binding?.root
     }
@@ -163,39 +174,103 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         }
     }
 
-    override fun showFingerprintDialog(pincode: String) {
-        // Show icon for relaunching dialog
-        binding?.fingerprintLogo?.visibility = View.VISIBLE
+    override fun showFingerprintDialog() {
+        binding?.fingerprintLogo?.visible()
         binding?.fingerprintLogo?.setOnClickListener { presenter.checkFingerprintStatus() }
-        // Show dialog itself if not already showing
-        if (fingerprintDialog == null && presenter.canShowFingerprintDialog()) {
-            fingerprintDialog =
-                FingerprintDialog.newInstance(pincode, FingerprintStage.AUTHENTICATE)
-            fingerprintDialog?.setAuthCallback(object : FingerprintDialog.FingerprintAuthCallback {
-                override fun onAuthenticated(data: String?) {
-                    dismissFingerprintDialog()
-                    presenter.loginWithDecryptedPin(data ?: "")
+
+        if (presenter.canShowFingerprintDialog()) {
+            biometricsController.init(
+                this, BiometricsController.BiometricsType.TYPE_LOGIN,
+                object : BiometricsCallback {
+                    override fun onAuthSuccess(data: String) {
+                        presenter.loginWithDecryptedPin(data)
+                    }
+
+                    override fun onAuthFailed(error: BiometricAuthError) {
+                        showKeyboard()
+                        when (error) {
+                            is BiometricAuthLockout -> BiometricsController.showAuthLockoutDialog(requireContext())
+                            is BiometricAuthLockoutPermanent -> {
+                                hideBiometricsUi()
+                                BiometricsController.showPermanentAuthLockoutDialog(requireContext())
+                            }
+                            is BiometricKeysInvalidated -> {
+                                hideBiometricsUi()
+                                BiometricsController.showInfoInvalidatedKeysDialog(requireContext())
+                            }
+                            is BiometricAuthOther -> {
+                                hideBiometricsUi()
+                                BiometricsController.showBiometricsGenericError(requireContext(), error.error)
+                            }
+                            else -> {
+                                // do nothing - this is handled by the Biometric Prompt framework
+                            }
+                        }
+                    }
+
+                    override fun onAuthCancelled() {
+                        showKeyboard()
+                    }
+                })
+
+            biometricsController.authenticateForLogin()
+            hideKeyboard()
+        }
+    }
+
+    private fun hideBiometricsUi() {
+        showKeyboard()
+        binding?.fingerprintLogo?.gone()
+    }
+
+    override fun askToUseBiometrics() {
+        BiometricsEnrollmentBottomSheet.newInstance().show(childFragmentManager, "BOTTOM_SHEET")
+    }
+
+    override fun enrollBiometrics() {
+        biometricsController.init(
+            this, BiometricsController.BiometricsType.TYPE_REGISTER,
+            object : BiometricsCallback {
+                override fun onAuthSuccess(data: String) {
+                    restartAppWithVerifiedPin()
+                    biometricsController.setFingerprintUnlockEnabled(true)
                 }
 
-                override fun onCanceled() {
-                    dismissFingerprintDialog()
-                    showKeyboard()
+                override fun onAuthFailed(error: BiometricAuthError) {
+                    when (error) {
+                        is BiometricAuthLockout -> BiometricsController.showAuthLockoutDialog(requireContext())
+                        is BiometricAuthLockoutPermanent -> {
+                            hideBiometricsUi()
+                            BiometricsController.showPermanentAuthLockoutDialog(requireContext())
+                        }
+                        is BiometricKeysInvalidated -> {
+                            hideBiometricsUi()
+                            BiometricsController.showInfoInvalidatedKeysDialog(requireContext())
+                        }
+                        is BiometricAuthOther -> {
+                            hideBiometricsUi()
+                            BiometricsController.showBiometricsGenericError(requireContext(), error.error)
+                        }
+                        else -> {
+                            // do nothing - this is handled by the Biometric Prompt framework
+                        }
+                    }
+                }
+
+                override fun onAuthCancelled() {
+                    // do nothing, the sheet is not dismissed when the user starts the flow
                 }
             })
 
-            HANDLER.postDelayed({
-                activity?.let {
-                    if (it.isFinishing.not() && !isPaused && fingerprintDialog != null) {
-                        it.supportFragmentManager
-                            .beginTransaction()
-                            .add(fingerprintDialog!!, FingerprintDialog.TAG)
-                            .commitAllowingStateLoss()
-                    }
-                } ?: run { fingerprintDialog = null }
-            }, 200)
+        biometricsController.authenticateForRegistration()
+    }
 
-            hideKeyboard()
-        }
+    override fun cancel() {
+        presenter.finishSignupProcess()
+    }
+
+    override fun onSheetClosed() {
+        presenter.finishSignupProcess()
     }
 
     override fun showKeyboard() {
@@ -217,11 +292,12 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
     private fun showConnectionDialogIfNeeded() {
         if (context != null) {
             if (!ConnectivityStatus.hasConnectivity(context)) {
-                AlertDialog.Builder(context!!, R.style.AlertDialogStyle)
+                AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle)
                     .setMessage(getString(R.string.check_connectivity_exit))
                     .setCancelable(false)
                     .setPositiveButton(
-                        R.string.dialog_continue) { dialog, id -> restartPageAndClearTop() }
+                        R.string.dialog_continue
+                    ) { _, _ -> restartPageAndClearTop() }
                     .create()
                     .show()
             }
@@ -230,14 +306,16 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
 
     override fun showMaxAttemptsDialog() {
         if (context != null) {
-            AlertDialog.Builder(context!!, R.style.AlertDialogStyle)
+            AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle)
                 .setTitle(R.string.app_name)
                 .setMessage(R.string.password_or_wipe)
-                .setCancelable(false)
+                .setCancelable(true)
                 .setPositiveButton(
-                    R.string.use_password) { dialog, whichButton -> showValidationDialog() }
+                    R.string.use_password
+                ) { _, _ -> showValidationDialog() }
                 .setNegativeButton(
-                    R.string.wipe_wallet) { dialog, whichButton -> presenter.resetApp() }
+                    R.string.common_cancel
+                ) { di, _ -> di.dismiss() }
                 .show()
         }
     }
@@ -252,14 +330,19 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
 
     override fun showWalletVersionNotSupportedDialog(walletVersion: String?) {
         if (context != null && walletVersion != null) {
-            AlertDialog.Builder(context!!, R.style.AlertDialogStyle)
+            AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle)
                 .setTitle(R.string.warning)
-                .setMessage(String.format(getString(R.string.unsupported_encryption_version),
-                    walletVersion))
+                .setMessage(
+                    String.format(
+                        getString(R.string.unsupported_encryption_version),
+                        walletVersion
+                    )
+                )
                 .setCancelable(false)
                 .setPositiveButton(
-                    R.string.exit) { dialog, whichButton -> presenter.clearLoginState() }
-                .setNegativeButton(R.string.logout) { dialog, which ->
+                    R.string.exit
+                ) { _, _ -> presenter.clearLoginState() }
+                .setNegativeButton(R.string.logout) { _, _ ->
                     presenter.clearLoginState()
                     restartApp()
                 }
@@ -297,7 +380,7 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
     }
 
     fun resetPinEntry() {
-        if (activity != null && !activity!!.isFinishing && presenter != null) {
+        if (activity != null && !requireActivity().isFinishing && presenter != null) {
             presenter.clearPinBoxes()
         }
     }
@@ -314,13 +397,15 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
 
     override fun showCommonPinWarning(callback: DialogButtonCallback) {
         if (context != null) {
-            AlertDialog.Builder(context!!, R.style.AlertDialogStyle)
+            AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle)
                 .setTitle(R.string.common_pin_dialog_title)
                 .setMessage(R.string.common_pin_dialog_message)
                 .setPositiveButton(
-                    R.string.common_pin_dialog_try_again) { _, _ -> callback.onPositiveClicked() }
+                    R.string.common_pin_dialog_try_again
+                ) { _, _ -> callback.onPositiveClicked() }
                 .setNegativeButton(
-                    R.string.common_pin_dialog_continue) { _, _ -> callback.onNegativeClicked() }
+                    R.string.common_pin_dialog_continue
+                ) { _, _ -> callback.onNegativeClicked() }
                 .setCancelable(false)
                 .create()
                 .show()
@@ -358,11 +443,11 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
 
     override fun showAccountLockedDialog() {
         if (context != null) {
-            AlertDialog.Builder(context!!, R.style.AlertDialogStyle)
+            AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle)
                 .setTitle(R.string.account_locked_title)
                 .setMessage(R.string.account_locked_message)
                 .setCancelable(false)
-                .setPositiveButton(R.string.exit) { dialogInterface, i -> activity!!.finish() }
+                .setPositiveButton(R.string.exit) { _, _ -> activity?.finish() }
                 .create()
                 .show()
         }
@@ -376,6 +461,16 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
     override fun showToast(@StringRes message: Int, @ToastCustom.ToastType toastType: String) {
         if (isNotFinishing()) {
             ToastCustom.makeText(context, getString(message), ToastCustom.LENGTH_LONG, toastType)
+        }
+    }
+
+    override fun showParameteredToast(
+        @StringRes message: Int,
+        @ToastCustom.ToastType toastType: String,
+        parameter: Int
+    ) {
+        if (isNotFinishing()) {
+            ToastCustom.makeText(context, getString(message, parameter), ToastCustom.LENGTH_LONG, toastType)
         }
     }
 
@@ -429,8 +524,10 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         val appUpdateManager = AppUpdateManagerFactory.create(context)
         if (isForced) {
             compositeDisposable.add(updateInfo(appUpdateManager).subscribe { appUpdateInfoTask ->
-                if (canTriggerAnUpdateOfType(AppUpdateType.IMMEDIATE,
-                        appUpdateInfoTask) && activity != null
+                if (canTriggerAnUpdateOfType(
+                        AppUpdateType.IMMEDIATE,
+                        appUpdateInfoTask
+                    ) && activity != null
                 ) {
                     updateForcedNatively(appUpdateManager, appUpdateInfoTask.result)
                 } else {
@@ -439,8 +536,10 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
             })
         } else {
             compositeDisposable.add(updateInfo(appUpdateManager).subscribe { appUpdateInfoTask ->
-                if (canTriggerAnUpdateOfType(AppUpdateType.FLEXIBLE,
-                        appUpdateInfoTask) && activity != null
+                if (canTriggerAnUpdateOfType(
+                        AppUpdateType.FLEXIBLE,
+                        appUpdateInfoTask
+                    ) && activity != null
                 ) {
                     updateFlexibleNatively(appUpdateManager, appUpdateInfoTask.result)
                 }
@@ -459,10 +558,10 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         appUpdateInfoTask: Task<AppUpdateInfo>
     ): Boolean {
         return (appUpdateInfoTask.result.updateAvailability() ==
-                UpdateAvailability.UPDATE_AVAILABLE ||
-                appUpdateInfoTask.result.updateAvailability() ==
-                UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) &&
-                appUpdateInfoTask.result.isUpdateTypeAllowed(updateAvailabilityType)
+            UpdateAvailability.UPDATE_AVAILABLE ||
+            appUpdateInfoTask.result.updateAvailability() ==
+            UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) &&
+            appUpdateInfoTask.result.isUpdateTypeAllowed(updateAvailabilityType)
     }
 
     private fun updateFlexibleNatively(
@@ -484,14 +583,15 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
             appUpdateInfo,
             AppUpdateType.FLEXIBLE,
             activity,
-            PinEntryActivity.REQUEST_CODE_UPDATE)
+            PinEntryActivity.REQUEST_CODE_UPDATE
+        )
     }
 
     private fun shouldBeUnregistered(installStatus: Int): Boolean {
         return installStatus == InstallStatus.CANCELED ||
-                installStatus == InstallStatus.DOWNLOADED ||
-                installStatus == InstallStatus.INSTALLED ||
-                installStatus == InstallStatus.FAILED
+            installStatus == InstallStatus.DOWNLOADED ||
+            installStatus == InstallStatus.INSTALLED ||
+            installStatus == InstallStatus.FAILED
     }
 
     private fun updateForcedNatively(
@@ -502,11 +602,12 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
             appUpdateInfo,
             AppUpdateType.IMMEDIATE,
             activity,
-            PinEntryActivity.REQUEST_CODE_UPDATE)
+            PinEntryActivity.REQUEST_CODE_UPDATE
+        )
     }
 
     private fun handleForcedUpdateFromStore() {
-        val alertDialog = AlertDialog.Builder(context!!, R.style.AlertDialogStyle)
+        val alertDialog = AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle)
             .setTitle(R.string.app_name)
             .setMessage(R.string.force_upgrade_message)
             .setPositiveButton(R.string.update, null)
@@ -519,17 +620,17 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             val appPackageName = context?.packageName
             try {
-                startActivity(
-                    Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName")))
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(APP_STORE_URI + appPackageName)))
             } catch (e: ActivityNotFoundException) {
                 // Device doesn't have the Play Store installed, direct them to the official
                 // store web page anyway
-                startActivity(Intent(Intent.ACTION_VIEW,
-                    Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")))
+                startActivity(
+                    Intent(Intent.ACTION_VIEW, Uri.parse(APP_STORE_URL + appPackageName))
+                )
             }
         }
         alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-            .setOnClickListener { v -> presenter.clearLoginState() }
+            .setOnClickListener { presenter.clearLoginState() }
     }
 
     override val pageIntent: Intent?
@@ -553,11 +654,6 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
 
     @Thunk
     internal fun dismissFingerprintDialog() {
-        if (fingerprintDialog?.isVisible == true) {
-            fingerprintDialog!!.dismissAllowingStateLoss()
-            fingerprintDialog = null
-        }
-
         // Hide if fingerprint unlock has become unavailable
         if (!presenter.ifShouldShowFingerprintLogin) {
             binding?.fingerprintLogo?.visibility = View.GONE
@@ -575,19 +671,19 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
     override fun showMobileNotice(mobileNoticeDialog: MobileNoticeDialog) {
         if (activity?.isFinishing == false && fragmentManager != null) {
             val alertFragment = MobileNoticeDialogFragment.newInstance(mobileNoticeDialog)
-            alertFragment.show(fragmentManager!!, alertFragment.tag)
+            alertFragment.show(requireFragmentManager(), alertFragment.tag)
         }
     }
 
     override fun showTestnetWarning() {
-        if (activity != null && !activity!!.isFinishing) {
+        if (activity != null && !requireActivity().isFinishing) {
             val snack = Snackbar.make(
-                activity!!.findViewById(android.R.id.content),
+                requireActivity().findViewById(android.R.id.content),
                 R.string.testnet_warning,
                 Snackbar.LENGTH_LONG
             )
             val view = snack.view
-            view.setBackgroundColor(ContextCompat.getColor(activity!!, R.color.product_red_medium))
+            view.setBackgroundColor(requireContext().getResolvedColor(R.color.product_red_medium))
             snack.show()
         }
     }
@@ -596,7 +692,7 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         appUtil.restartAppWithVerifiedPin(LauncherActivity::class.java, isAfterWalletCreation)
     }
 
-    override fun createPresenter(): PinEntryPresenter? {
+    override fun createPresenter(): PinEntryPresenter {
         return pinEntryPresenter
     }
 

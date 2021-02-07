@@ -6,11 +6,9 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import kotlinx.android.synthetic.main.receive_share_row.view.*
-
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcoreui.ui.customviews.toast
+import piuk.blockchain.android.ui.customviews.toast
 
 internal class ShareReceiveIntentAdapter(private val paymentCodeData: List<SendPaymentCodeData>) :
     RecyclerView.Adapter<ShareReceiveIntentAdapter.ViewHolder>() {

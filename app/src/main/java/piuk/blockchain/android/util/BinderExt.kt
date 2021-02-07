@@ -18,7 +18,7 @@ fun Intent.putAccount(key: String, account: BlockchainAccount) =
 
 @Suppress("UNCHECKED_CAST")
 fun Intent.getAccount(key: String): BlockchainAccount? =
-    (getBundleExtra(key).getBinder(key) as? ParamBinder<BlockchainAccount>)?.account
+    (getBundleExtra(key)?.getBinder(key) as? ParamBinder<BlockchainAccount>)?.account
 
 fun Intent.putSendTarget(key: String, target: TransactionTarget) =
     this.putExtra(key, Bundle().apply { putBinder(key, ParamBinder(target)) })

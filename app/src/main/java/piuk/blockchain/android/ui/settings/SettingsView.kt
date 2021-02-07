@@ -32,7 +32,7 @@ interface SettingsView : View {
     fun setEmailSummary(email: String, isVerified: Boolean)
     fun setEmailUnknown()
 
-    fun setSmsSummary(summary: String, isVerified: Boolean)
+    fun setSmsSummary(smsNumber: String, isVerified: Boolean)
     fun setSmsUnknown()
 
     fun setFiatSummary(summary: String)

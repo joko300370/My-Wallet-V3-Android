@@ -13,7 +13,7 @@ import org.mockito.Mockito
 import piuk.blockchain.android.util.RootUtil
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.PersistentPrefs
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.ToastCustom
 
 class LandingPresenterTest {
 

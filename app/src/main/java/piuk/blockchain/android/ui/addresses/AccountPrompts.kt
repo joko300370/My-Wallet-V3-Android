@@ -12,8 +12,8 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatEditText
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.ui.customviews.toast
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.getTextString
 
@@ -121,7 +121,7 @@ fun showAddressQrCode(
             val clipboard = ctx.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip: ClipData = ClipData.newPlainText("Send address", qrString)
             ctx.toast(R.string.copied_to_clipboard)
-            clipboard.primaryClip = clip
+            clipboard.setPrimaryClip(clip)
         }
         .create()
         .show()
@@ -154,7 +154,7 @@ fun promptTransferFunds(
 ) {
     AlertDialog.Builder(ctx, R.style.AlertDialogStyle)
         .setTitle(R.string.transfer_funds_title)
-        .setMessage(R.string.transfer_funds_description)
+        .setMessage(R.string.transfer_funds_description_1)
         .setPositiveButton(R.string.transfer_all) { _, _ -> okAction() }
         .setNegativeButton(R.string.not_now, null)
         .show()

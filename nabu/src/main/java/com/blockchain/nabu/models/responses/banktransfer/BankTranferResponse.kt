@@ -60,5 +60,5 @@ data class LinkedBankDetailsResponse(
     val accountNumber: String,
     val accountName: String,
     val bankName: String,
-    val bankAccountType: String
+    val bankAccountType: String?
 )

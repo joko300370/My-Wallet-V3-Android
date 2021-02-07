@@ -23,18 +23,18 @@ class StxCryptoWalletAccount(
     override val isDefault: Boolean = true // Only one account ever, so always default
 
     override val accountBalance: Single<Money>
-        get() = TODO("not implemented")
+        get() = throw NotImplementedError("STX Not Implemented")
 
     override val actionableBalance: Single<Money>
         get() = accountBalance
 
     override val receiveAddress: Single<ReceiveAddress>
-        get() = TODO("not implemented")
+        get() = throw NotImplementedError("STX Not Implemented")
 
     override val activity: Single<ActivitySummaryList>
         get() = Single.just(emptyList())
 
     override fun createTxEngine(): TxEngine {
-        TODO("Not yet implemented")
+        throw NotImplementedError("STX Not Implemented")
     }
 }

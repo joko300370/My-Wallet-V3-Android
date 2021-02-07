@@ -47,7 +47,7 @@
  Neues Kennwort
 </string>
     <string name="no_private_key">Privater Schlüssel kann nicht erstellt werden.</string>
-    <string name="pin_4_strikes">4 fehlgeschlagene PIN-Versuche. Bitte geben Sie Ihr Passwort ein.</string>
+    <string name="pin_max_strikes">%1$d fehlgeschlagene PIN-Versuche. Bitte geben Sie Ihr Passwort ein.</string>
     <string name="pin_4_strikes_password_accepted">Passwort akzeptiert. Bitte definieren Sie eine neue PIN.
 </string>
     <string name="bip38_password_entry">Bitte geben Sie das Passwort für den privaten Schlüssel ein</string>

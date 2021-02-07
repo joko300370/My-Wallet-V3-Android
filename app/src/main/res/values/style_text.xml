@@ -69,6 +69,10 @@
         <item name="android:textColor">@color/blue_600</item>
     </style>
 
+    <style name="Text.Blue.14">
+        <item name="android:textSize">14sp</item>
+    </style>
+
     <style name="Text.White">
         <item name="android:textColor">@color/white</item>
     </style>
@@ -211,6 +215,10 @@
 
     <style name="Text.Bold">
         <item name="fontFamily">@font/inter_bold</item>
+    </style>
+
+    <style name="Text.Bold.14">
+        <item name="android:textSize">14sp</item>
     </style>
 
     <style name="Text.Bold.Centered">

@@ -1,4 +1,4 @@
-package piuk.blockchain.androidcoreui.ui.customviews
+package piuk.blockchain.android.ui.customviews
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -10,7 +10,7 @@ import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import piuk.blockchain.androidcoreui.R
+import piuk.blockchain.android.R
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 
 object ToastCustom {

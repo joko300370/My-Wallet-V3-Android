@@ -51,7 +51,7 @@
  Nova senha 
 </string>
     <string name="no_private_key">Não é possível produzir chave privada.</string>
-    <string name="pin_4_strikes">4 tentativas falhas de PIN. Por favor, forneça a senha.</string>
+    <string name="pin_max_strikes">%1$d tentativas falhas de PIN. Por favor, forneça a senha.</string>
     <string name="pin_4_strikes_password_accepted">Senha aceita. Defina um novo PIN.
 </string>
     <string name="bip38_password_entry">Digite a senha da chave privada</string>

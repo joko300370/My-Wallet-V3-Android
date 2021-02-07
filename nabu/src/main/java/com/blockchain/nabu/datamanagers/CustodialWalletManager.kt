@@ -1,5 +1,6 @@
 package com.blockchain.nabu.datamanagers
 
+import android.annotation.SuppressLint
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.LiveCustodialWalletManager
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
@@ -454,6 +455,7 @@ sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val 
         override fun detailedLabel() =
             "$bankName $accountEnding"
 
+        @SuppressLint("DefaultLocale") // Yes, lint is broken
         val uiAccountType: String =
             accountType.toLowerCase(Locale.getDefault()).capitalize(Locale.getDefault())
     }

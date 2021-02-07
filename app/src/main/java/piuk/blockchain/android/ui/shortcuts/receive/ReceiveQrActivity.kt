@@ -11,9 +11,9 @@ import androidx.appcompat.app.AlertDialog
 import com.blockchain.koin.scopedInject
 import kotlinx.android.synthetic.main.activity_receive_qr.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.shortcuts.LauncherShortcutHelper
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 
 internal class ReceiveQrActivity :
     BaseMvpActivity<ReceiveQrView, ReceiveQrPresenter>(), ReceiveQrView {
@@ -72,7 +72,7 @@ internal class ReceiveQrActivity :
                     getString(R.string.copied_to_clipboard),
                     ToastCustom.LENGTH_LONG,
                     ToastCustom.TYPE_GENERAL)
-                clipboard.primaryClip = clip
+                clipboard.setPrimaryClip(clip)
             }
             .setNegativeButton(R.string.common_no, null)
             .show()

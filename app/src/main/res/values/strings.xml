@@ -42,7 +42,7 @@
         <item quantity="other">%d imported addresses</item>
     </plurals>
     <string name="upgrade_wallet">Upgrade</string>
-    <string name="backup_wallet">Backup funds</string>
+    <string name="backup_wallet_title">Secret Private Key Recovery</string>
     <string name="action_settings">Settings</string>
 
     <!-- nav menu -->
@@ -92,7 +92,7 @@
     </string>
     <string name="no_private_key">Cannot produce private key.</string>
 
-    <string name="pin_4_strikes">4 failed PIN attempts. Please provide password.</string>
+    <string name="pin_max_strikes">%1$d failed PIN attempts. Please provide password.</string>
 
     <string name="pin_4_strikes_password_accepted">Password accepted. Please define new PIN.
     </string>
@@ -146,14 +146,15 @@
     <string name="recover_funds_instructions">Enter your 12 backup words with spaces to recover your
         funds &amp; transactions
     </string>
-    <string name="recovery_passphrase">Backup phrase</string>
-    <string name="invalid_recovery_phrase">Invalid backup phrase. Please try again</string>
+    <string name="recovery_passphrase_1">Secret Private Key Recovery Phrase</string>
+    <string name="invalid_recovery_phrase_1">Invalid Secret Private Key Recovery Phrase. Please try again</string>
     <string name="creating_wallet">Creating wallet</string>
 
     <string name="restore_failed">Restoring wallet failed. Please try again</string>
     <string name="restoring_wallet">Restoring wallet.</string>
     <string name="password">Password</string>
     <string name="email">Your Email</string>
+    <string name="password_disclaimer">I understand that Blockchain.com cannot recover my password for me. If I lose access to my Wallet, I must use my <annotation link="backup">Secret Phrase</annotation> to access my funds.</string>
     <string name="you_agree_terms_of_service">By creating an account, you agree to Blockchain’s <annotation link="terms">Terms of Service</annotation> &amp; <annotation link="privacy">Privacy Policy</annotation>.</string>
     <string name="new_account_cta_text">Continue</string>
     <string name="new_account_title">Create an Account</string>
@@ -381,7 +382,7 @@
     <!-- FUNDS TRANSFER -->
     <string name="transfer">Transfer</string>
     <string name="transfer_funds_title">Transfer From Imported Address?</string>
-    <string name="transfer_funds_description">Imported addresses are not backed up by your Backup Phrase. To secure these funds, we
+    <string name="transfer_funds_description_1">Imported addresses are not backed up by your Secret Private Key Recovery Phrase. To secure these funds, we
         recommend transferring these balances to your Blockchain.com non-custodial Wallet.
     </string>
 
@@ -430,7 +431,7 @@
     <string name="mobile_description">Your mobile phone can be used to enable two-factor
         authentication, helping to secure your wallet from unauthorized access.
     </string>
-    <string name="enable_fingerprint">Fingerprint Unlock</string>
+    <string name="enable_fingerprint">Biometric Unlock</string>
 
     <string name="notification_2fa_summary">2FA Notifications</string>
     <string name="notification_2fa_description">Notifications related to Two Factor Authentication</string>
@@ -492,8 +493,7 @@
     <string name="pairing_code_instruction_3">Using your computer’s camera, scan the QR code below.</string>
     <string name="pairing_code_show_qr">Show QR code</string>
     <string name="pairing_code_hide_qr">Hide QR code</string>
-    <string name="pairing_code_warning_1">Keep this code hidden until you’re ready.</string>
-    <string name="pairing_code_warning_2">Keep this code safe!\nDo not share with others.</string>
+    <string name="pairing_code_instructions_alert">Never share your mobile pairing QR code with anyone. Anyone who can view this QR code can withdraw funds. Blockchain.com will never ask to view or receive your mobile pairing QR code.</string>
     <string name="email_request_subject_btc">Bitcoin payment request</string>
 
     <!-- SHARE RECEIVE ADDRESS -->
@@ -567,27 +567,31 @@
 
     <!-- SECURITY CENTRE -->
     <string name="security_centre_email_check">Check email</string>
-    <string name="backup_header">Backup Phrase</string>
 
     <!-- BACKUP -->
-    <string name="backup_explanation">For your security, Blockchain does not keep any passwords on
-        file. The following 12 word Backup Phrase will give you access to your funds in case you
-        lose your password. Be sure to write it on a piece of paper and to keep it somewhere safe
-        and secure.
-    </string>
-    <string name="backup_button_start">Start backup</string>
+    <string name="backup_title">Secret Private Key Recovery</string>
+    <string name="backup_subtitle">Secret Private Key Recovery Phrase</string>
+    <string name="backup_instructions_1">In crypto, when you hold the private keys, you\'re in control of the funds in your Private Key Wallet. The downside is that WHOEVER holds your private keys can control your Private Key Wallet.</string>
+    <string name="backup_instructions_2">So you must:</string>
+    <string name="backup_instructions_3">1. Write down the 12 word phrase on the next screen in the exact order it appears</string>
+    <string name="backup_instructions_4">2. Keep it safe, ideally on a securely stored piece of paper (in other words, not a digital copy).</string>
+    <string name="backup_instructions_5">3. NEVER share your backup phrase with anyone.</string>
+    <string name="backup_instructions_warn">Warning: If someone has your backup phrase they will have access to your Private Key Wallet and can withdraw funds.</string>
+    <string name="backup_instructions_alert">Blockchain.com will never ask to view or receive your recovery phrase.</string>
+    <string name="backup_button_begin">View Recovery Phrase</string>
+
     <string name="backup_write_down_words">It is important to make sure you write down your words
         exactly as they appear here and in this order.
     </string>
     <string name="backup_header_complete">Backup Complete</string>
-    <string name="backup_complete_message">You can use your Backup Phrase to restore your funds if
-        you lose your password. Anyone with access to your Backup Phrase can access your funds so
+    <string name="backup_complete_message_1">You can use your Secret Private Key Recovery Phrase to restore your funds if
+        you lose your password. Anyone with access to your Secret Private Key Recovery Phrase can access your funds so
         remember to keep it offline somewhere safe and secure.
     </string>
     <string name="backup_again">Backup again</string>
     <string name="backup_confirmed">Backup confirmed</string>
     <string name="backup_last">Last backup: %1$s</string>
-    <string name="backup_verify_heading">Enter the following words from your Backup Phrase to
+    <string name="backup_verify_heading_1">Enter the following words from your Secret Private Key Recovery Phrase to
         complete the backup process.
     </string>
     <string name="backup_next_word">NEXT WORD</string>
@@ -596,34 +600,31 @@
     <string name="backup_of">of</string>
     <string name="backup_word_mismatch">Word Mismatch</string>
     <string name="backup_done">DONE</string>
-    <string name="backup_lost_mnemonic">Lost your 12 word backup phrase?</string>
-    <string name="fingerprint_prompt">Use your fingerprint for faster, easier access to your
-        wallet.\n\nConfirm fingerprint to continue
-    </string>
+    <string name="backup_lost_mnemonic_1">Lost your 12 word Secret Private Key Recovery Phrase?</string>
 
-    <!-- FINGERPRINT -->
+    <!-- BIOMETRICS -->
     <string name="fingerprint_description">Confirm fingerprint to continue</string>
     <string name="fingerprint_hint">Touch sensor</string>
-    <string name="fingerprint_login_title">Fingerprint login</string>
-    <string name="fingerprint_not_recognized">Fingerprint not recognized. Try again</string>
-    <string name="fingerprint_success">Fingerprint recognized</string>
+    <string name="fingerprint_login_title">Biometric login</string>
+    <string name="fingerprint_login_description">Use your biometrics to log into the Wallet</string>
+    <string name="fingerprint_register_description">Use your biometrics for faster, easier access to your wallet.\n\nConfirm it’s you to continue</string>
     <string name="fingerprint_use_pin">Use PIN</string>
-    <string name="fingerprint_disable_message">Are you sure you want to disable fingerprint login?
-    </string>
-    <string name="fingerprint_no_fingerprints_added">No fingerprints have been registered to this
-        device yet. Do you want to register a fingerprint now?
-    </string>
-    <string name="fingerprint_key_invalidated_description">Either the fingerprints stored on this
-        device have changed or the keyguard has been disabled
-    </string>
-    <string name="fingerprint_key_invalidated_brief">Keys invalidated, PIN code required</string>
-    <string name="fingerprint_fatal_error_register_description">There have been too many failed
-        attempts in the last 30 minutes. Please attempt setup again later.
-    </string>
-    <string name="fingerprint_fatal_error_authenticate_description">There have been too many failed
-        attempts. Please log in using your PIN instead.
-    </string>
+    <string name="biometric_disable_message">Are you sure you want to disable biometric login?</string>
+    <string name="fingerprint_no_fingerprints_added">No fingerprints have been registered to this device yet. Do you want to register a fingerprint now?</string>
+    <string name="biometrics_key_invalidated_title">Biometrics changed</string>
+    <string name="biometrics_key_invalidated_description">Either the biometrics stored on this device have changed or the keyguard has been disabled. Please use your PIN instead.\n\nYou can then set up Biometric Login again from Settings.</string>
+    <string name="biometrics_key_invalidated_settings_description">Either the biometrics stored on this device have changed or the keyguard has been disabled.\n\nPlease re-add your biometrics and try again.</string>
+    <string name="fingerprint_fatal_error_authenticate_description">There have been too many failed attempts. Please log in using your PIN instead.</string>
     <string name="fingerprint_fatal_error_brief">Unexpected error</string>
+    <string name="fingerprint_fatal_error_desc">Something went wrong while trying to use biometrics, please use your PIN instead.\n\nYou can then set up Biometric Login again from Settings.\nError: %1$s</string>
+    <string name="biometrics_disabled_lockout_title">Authentication failure</string>
+    <string name="biometrics_disabled_lockout_desc">You have failed too many attempts to authenticate, please wait 30 seconds and try again</string>
+    <string name="biometrics_disabled_lockout_perm_desc">Your biometrics sensors are disabled, please lock your device and un-lock it using your PIN, Pattern or Password to re-enable them.\n\nOnce this is done, please try again.</string>
+    <string name="biometrics_action_settings">Go to Settings</string>
+    <string name="biometrics_enrollment_title">Enable Biometrics</string>
+    <string name="biometrics_enrollment_desc">Quickly sign into your wallet instead of using your PIN.</string>
+
+
     <string name="shortcut_receive_copy_short">Copy Address</string>
 
     <!-- LAUNCHER SHORTCUTS -->
@@ -864,8 +865,8 @@
     <string name="transfer_btc_card_cta">Get Started</string>
 
     <!-- Wallet Recovery announcement -->
-    <string name="recovery_card_title">Wallet Recovery Phrase</string>
-    <string name="recovery_card_body">You control your crypto. Write down your recovery phrase to restore all your funds in case you lose your password.</string>
+    <string name="recovery_card_title_1">Secret Private Key Recovery Phrase</string>
+    <string name="recovery_card_body_1">You control your crypto. Write down your Secret Private Key Recovery Phrase to restore all your funds in case you lose your password.</string>
     <string name="recovery_card_cta">Backup Phrase</string>
 
     <!-- Simple buy finish signup -->
@@ -933,7 +934,7 @@
 
     <!-- force backup before send sheet -->
     <string name="backup_before_send_title">Backup Your Wallet</string>
-    <string name="backup_before_send_body">Your backup phrase will allow you to recover your crypto if you lose access to your wallet. \n\nPlease write down these 12 words in order and keep them somewhere safe. Never share it with anyone. Your backup phrase is the key to recovering your crypto if you ever get locked out.</string>
+    <string name="backup_before_send_body_1">Your Secret Private Key Recovery Phrase will allow you to recover your crypto if you lose access to your wallet. \n\nPlease write down these 12 words in order and keep them somewhere safe. Never share it with anyone. Your Secret Private Key Recovery Phrase is the key to recovering your crypto if you ever get locked out.</string>
     <string name="backup_before_send_cta">Backup Now</string>
     <string name="backup_before_send_later_cta">Continue without Backup</string>
     <plurals name="backup_before_send_later_label">
@@ -1286,7 +1287,7 @@
     <string name="add_credit_or_debit_card">Add a Credit or Debit Card</string>
     <string name="select_payment_method">Select a Payment Method</string>
     <string name="payment_method_limit">%1$s Limit</string>
-    <string name="payment_method_type_account_info">%1$s account %2$s</string>
+    <string name="payment_method_type_account_info">%1$s Account %2$s</string>
     <string name="checkout">Checkout</string>
     <string name="order_details">Order Details</string>
     <string name="fees">Fees</string>
@@ -1528,7 +1529,7 @@
     <string name="withdrawal_amount">%1$s Withdrawal</string>
     <string name="withdrawing_amount">Withdrawing %1$s</string>
     <string name="withdrawing_amount_message">We’re completing your withdrawal now.</string>
-    <string name="withdrawal_success_message">Succeess! We’re are withdrawing the cash from your %1$s Wallet now. The funds should be in your bank in 1&#8211;3 business days.</string>
+    <string name="withdrawal_success_message">Success! We’re are withdrawing the cash from your %1$s Wallet now. The funds should be in your bank in 1&#8211;3 business days.</string>
     <string name="currency_wallet">My %1s Wallet</string>
 
     <string name="dashboard_asset_item_label_title">Please note.</string>

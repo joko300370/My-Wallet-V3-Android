@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:paddingTop="32dp"
             android:paddingBottom="16dp"
-            android:text="@string/backup_verify_heading"
+            android:text="@string/backup_verify_heading_1"
             android:textColor="@color/primary_grey_dark"
             android:textSize="14sp" />
 

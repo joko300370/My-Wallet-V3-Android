@@ -51,7 +51,7 @@
  nouveau mot de passe 
 </string>
     <string name="no_private_key">Impossible de produire la clé privée.</string>
-    <string name="pin_4_strikes">4 tentatives de PIN échouées. Veuillez fournir un mot de passe.</string>
+    <string name="pin_max_strikes">%1$d tentatives de PIN échouées. Veuillez fournir un mot de passe.</string>
     <string name="pin_4_strikes_password_accepted">Mot de passe accepté. Veuillez définir un nouveau code PIN.
 </string>
     <string name="bip38_password_entry">Veuillez saisir le mot de passe de la clé privée</string>

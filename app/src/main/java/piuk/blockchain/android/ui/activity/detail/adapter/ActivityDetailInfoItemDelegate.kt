@@ -29,6 +29,7 @@ import piuk.blockchain.android.ui.activity.detail.SwapReceiveAmount
 import piuk.blockchain.android.ui.activity.detail.To
 import piuk.blockchain.android.ui.activity.detail.TransactionId
 import piuk.blockchain.android.ui.activity.detail.Value
+import piuk.blockchain.android.ui.activity.detail.XlmMemo
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.inflate
@@ -99,6 +100,7 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
                 R.string.tx_confirmation_network_fee,
                 (infoType.feeValue as CryptoValue).currency.displayTicker
             )
+            is XlmMemo -> parent.context.getString(R.string.xlm_memo_text)
             else -> parent.context.getString(R.string.empty)
         }
 
@@ -145,21 +147,27 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
             is BuyPaymentMethod -> {
                 when {
                     infoType.paymentDetails.endDigits != null &&
-                        infoType.paymentDetails.label != null &&
-                        infoType.paymentDetails.accountType != null -> {
-                        val accountInfo = parent.context.getString(
-                            R.string.common_hyphenated_strings, infoType.paymentDetails.label,
-                            infoType.paymentDetails.endDigits
-                        )
+                        infoType.paymentDetails.label != null -> {
 
-                        parent.context.getString(
-                            R.string.common_newlined_strings,
-                            accountInfo,
-                            parent.context.getString(
-                                R.string.payment_method_type_account_info, infoType.paymentDetails.accountType, ""
+                        with(parent.context) {
+                            infoType.paymentDetails.accountType?.let {
+                                val accType = getString(
+                                    R.string.payment_method_type_account_info,
+                                    infoType.paymentDetails.accountType,
+                                    infoType.paymentDetails.endDigits
+                                )
+
+                                getString(
+                                    R.string.common_spaced_strings,
+                                    infoType.paymentDetails.label,
+                                    accType
+                                )
+                            } ?: getString(
+                                R.string.common_hyphenated_strings,
+                                infoType.paymentDetails.label,
+                                infoType.paymentDetails.endDigits
                             )
-
-                        )
+                        }
                     }
                     infoType.paymentDetails.paymentMethodId == PaymentMethod.FUNDS_PAYMENT_ID -> {
                         parent.context.getString(R.string.checkout_funds_label)
@@ -171,6 +179,7 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
             }
             is SwapReceiveAmount -> infoType.receivedAmount.toStringWithSymbol()
             is NetworkFee -> infoType.feeValue.toStringWithSymbol()
+            is XlmMemo -> infoType.memo
             else -> ""
         }
 }

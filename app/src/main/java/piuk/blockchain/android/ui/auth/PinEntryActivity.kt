@@ -31,7 +31,6 @@ class PinEntryActivity : BaseAuthActivity(), PinEntryFragment.OnPinEntryFragment
     @Thunk
     private lateinit var binding: ActivityPinEntryBinding
 
-    private var backPressed: Long = 0
     private val pinEntryFragment: PinEntryFragment by lazy {
         PinEntryFragment.newInstance(!shouldHideSwipeToReceive(), isAfterCreateWallet)
     }

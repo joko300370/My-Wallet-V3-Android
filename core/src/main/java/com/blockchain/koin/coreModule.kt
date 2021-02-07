@@ -8,6 +8,7 @@ import com.blockchain.logging.NullLogger
 import com.blockchain.logging.TimberLogger
 import com.blockchain.metadata.MetadataRepository
 import com.blockchain.payload.PayloadDecrypt
+import com.blockchain.preferences.AuthPrefs
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.DashboardPrefs
 import com.blockchain.preferences.NotificationPrefs
@@ -194,6 +195,7 @@ val coreModule = module {
 
     single {
         PrefsUtil(
+            ctx = get(),
             store = get(),
             backupStore = CloudBackupAgent.backupPrefs(ctx = get()),
             idGenerator = get(),
@@ -211,6 +213,7 @@ val coreModule = module {
         .bind(WalletStatus::class)
         .bind(EncryptedPrefs::class)
         .bind(OfflineCachePrefs::class)
+        .bind(AuthPrefs::class)
 
     factory { PaymentService(get(), get(), get()) }
 
