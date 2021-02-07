@@ -40,7 +40,7 @@ class KycEmailEntryFragment : BaseFragment<KycEmailEntryView, KycEmailEntryPrese
 
     private val presenter: KycEmailEntryPresenter by scopedInject()
     private val analytics: Analytics by inject()
-    private val progressListener: KycProgressListener by ParentActivityDelegate(
+    private val emailEntryHost: EmailEntryHost by ParentActivityDelegate(
         this
     )
     private val compositeDisposable = CompositeDisposable()
@@ -69,7 +69,7 @@ class KycEmailEntryFragment : BaseFragment<KycEmailEntryView, KycEmailEntryPrese
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        progressListener.setHostTitle(R.string.kyc_email_title)
+        emailEntryHost.onEmailEntryFragmentShown()
 
         editTextEmail.setOnFocusChangeListener { _, hasFocus ->
             inputLayoutEmail.hint = if (hasFocus) {
@@ -148,3 +148,7 @@ class KycEmailEntryFragment : BaseFragment<KycEmailEntryView, KycEmailEntryPrese
 
 private fun emailIsValid(target: String) =
     !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches()
+
+interface EmailEntryHost {
+    fun onEmailEntryFragmentShown()
+}

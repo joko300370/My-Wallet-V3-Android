@@ -14,10 +14,11 @@ import com.blockchain.notifications.analytics.NotificationAppOpened
 import kotlinx.android.synthetic.main.activity_launcher.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.simplebuy.SimpleBuyIntroFragment
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.ui.home.MainActivity
+import piuk.blockchain.android.ui.kyc.email.entry.EmailEntryHost
+import piuk.blockchain.android.ui.kyc.email.entry.KycEmailEntryFragment
 import piuk.blockchain.android.ui.start.LandingActivity
 import piuk.blockchain.android.ui.start.PasswordRequiredActivity
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity
@@ -26,7 +27,7 @@ import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 
-class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), LauncherView {
+class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), LauncherView, EmailEntryHost {
 
     private val analytics: Analytics by inject()
     private val launcherPresenter: LauncherPresenter by scopedInject()
@@ -83,9 +84,9 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
         startActivity(intent)
     }
 
-    override fun launchBuySellIntro() {
+    override fun launchEmailVerification() {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.content_frame, SimpleBuyIntroFragment(), SimpleBuyIntroFragment::class.simpleName)
+            .replace(R.id.content_frame, KycEmailEntryFragment(), KycEmailEntryFragment::class.simpleName)
             .commitAllowingStateLoss()
     }
 
@@ -155,4 +156,6 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
             }
         }
     }
+
+    override fun onEmailEntryFragmentShown() {}
 }
