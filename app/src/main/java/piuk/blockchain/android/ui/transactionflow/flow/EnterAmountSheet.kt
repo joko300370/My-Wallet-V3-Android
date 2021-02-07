@@ -19,7 +19,7 @@ import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.ui.customviews.CurrencyType
-import piuk.blockchain.android.ui.customviews.FiatCryptoInputView
+import piuk.blockchain.android.ui.customviews.CurrencyAmountInputView
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
 import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
@@ -222,7 +222,7 @@ class EnterAmountSheet : TransactionFlowSheet() {
         imm.hideSoftInputFromWindow(dialogView.windowToken, 0)
     }
 
-    private fun FiatCryptoInputView.configure(
+    private fun CurrencyAmountInputView.configure(
         newState: TransactionState,
         inputCurrency: CurrencyType
     ) {

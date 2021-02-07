@@ -82,7 +82,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 
-    <piuk.blockchain.android.ui.customviews.FiatCryptoInputView
+    <piuk.blockchain.android.ui.customviews.CurrencyAmountInputView
         android:id="@+id/input_amount"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
