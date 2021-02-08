@@ -30,6 +30,7 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.cards.CardIntent
 import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.networking.PollService
 import piuk.blockchain.android.util.AppUtil
 import java.util.concurrent.TimeUnit
 
@@ -136,11 +137,13 @@ class SimpleBuyInteractor(
             accountId = accountId
         )
 
-    fun pollForLinkedBankState(id: String): Single<LinkedBank> = custodialWalletManager.getLinkedBank(id)
-        .repeatWhen { it.delay(5, TimeUnit.SECONDS).zipWith(Flowable.range(0, 12)) }
-        .takeUntil {
-            it.state != LinkedBankState.PENDING
-        }.lastOrError()
+    fun pollForLinkedBankState(id: String): Single<LinkedBank> = PollService(
+        custodialWalletManager.getLinkedBank(id)
+    ) {
+        it.state != LinkedBankState.PENDING
+    }.start(timerInSec = 5, retries = 12).map {
+        it.value
+    }
 
     fun checkTierLevel(): Single<SimpleBuyIntent.KycStateUpdated> {
 
@@ -223,17 +226,17 @@ class SimpleBuyInteractor(
             }.lastOrError()
 
     fun pollForCardStatus(cardId: String): Single<CardIntent.CardUpdated> =
-        custodialWalletManager.getCardDetails(cardId)
-            .repeatWhen { it.delay(5, TimeUnit.SECONDS).zipWith(Flowable.range(0, 24)) }
-            .takeUntil {
-                it.status == CardStatus.BLOCKED ||
-                    it.status == CardStatus.EXPIRED ||
-                    it.status == CardStatus.ACTIVE
-            }
+        PollService(
+            custodialWalletManager.getCardDetails(cardId)
+        ) {
+            it.status == CardStatus.BLOCKED ||
+                it.status == CardStatus.EXPIRED ||
+                it.status == CardStatus.ACTIVE
+        }
+            .start()
             .map {
-                CardIntent.CardUpdated(it)
+                CardIntent.CardUpdated(it.value)
             }
-            .lastOrError()
 
     fun fetchPaymentMethods(fiatCurrency: String): Single<List<PaymentMethod>> =
         tierService.tiers().flatMap {
