@@ -63,7 +63,7 @@ interface TransactionFlowCustomiser {
     fun transactionProgressIcon(state: TransactionState): Int
     fun transactionProgressExceptionMessage(state: TransactionState): String
     fun amountHeaderConfirmationVisible(state: TransactionState): Boolean
-    fun defInputType(state: TransactionState): CurrencyType
+    fun defInputType(state: TransactionState, fiatCurrency: String): CurrencyType
 
     // Format those flash error messages:
     fun issueFlashMessage(state: TransactionState, input: CurrencyType?): String?
@@ -584,9 +584,9 @@ class TransactionFlowCustomiserImpl(
     override fun amountHeaderConfirmationVisible(state: TransactionState): Boolean =
         state.action != AssetAction.Swap
 
-    override fun defInputType(state: TransactionState): CurrencyType =
+    override fun defInputType(state: TransactionState, fiatCurrency: String): CurrencyType =
         if (state.action == AssetAction.Swap || state.action == AssetAction.Sell)
-            CurrencyType.Fiat else CurrencyType.Crypto
+            CurrencyType.Fiat(fiatCurrency) else CurrencyType.Crypto(state.asset)
 
     override fun sourceAccountSelectionStatusDecorator(state: TransactionState): StatusDecorator =
         when (state.action) {
@@ -607,18 +607,16 @@ class TransactionFlowCustomiserImpl(
         exchangeRate: ExchangeRate.CryptoToFiat,
         roundingMode: RoundingMode
     ): String {
-        if (input == CurrencyType.Crypto && this is CryptoValue)
+        if (input.isSameType(this))
             return toStringWithSymbol()
-        if (input == CurrencyType.Fiat && this is FiatValue)
-            return toStringWithSymbol()
-        if (input == CurrencyType.Fiat && this is CryptoValue)
+        if (input.isFiat() && this is CryptoValue)
             return FiatValue.fromMajor(
                 exchangeRate.to,
                 exchangeRate.convert(this, round = false).toBigDecimal().setScale(
                     Currency.getInstance(exchangeRate.to).defaultFractionDigits, roundingMode
                 )
             ).toStringWithSymbol()
-        if (input == CurrencyType.Crypto && this is FiatValue)
+        if (input.isCrypto() && this is FiatValue)
             return exchangeRate.inverse().convert(this).toStringWithSymbol()
         throw IllegalStateException("Not valid currency")
     }

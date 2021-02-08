@@ -54,8 +54,10 @@ class EnterAmountSheet : TransactionFlowSheet() {
         with(dialogView) {
             amount_sheet_cta_button.isEnabled = newState.nextEnabled
 
-            if (!amount_sheet_input.isConfigured) {
-                amount_sheet_input.configure(newState, customiser.defInputType(state))
+            if (!amount_sheet_input.configured) {
+                newState.pendingTx?.selectedFiat?.let {
+                    amount_sheet_input.configure(newState, customiser.defInputType(state, it))
+                }
             }
 
             val availableBalance = newState.availableBalance
@@ -63,10 +65,10 @@ class EnterAmountSheet : TransactionFlowSheet() {
                 // The maxLimit set here controls the number of digits that can be entered,
                 // but doesn't restrict the input to be always under that value. Which might be
                 // strange UX, but is currently by design.
-                if (amount_sheet_input.isConfigured) {
+                if (amount_sheet_input.configured) {
                     amount_sheet_input.maxLimit = newState.availableBalance
-                    if (amount_sheet_input.exchangeRate != newState.fiatRate)
-                        amount_sheet_input.exchangeRate = newState.fiatRate
+                    if (amount_sheet_input.customInternalExchangeRate != newState.fiatRate)
+                        amount_sheet_input.customInternalExchangeRate = newState.fiatRate
                 }
 
                 newState.fiatRate?.let { rate ->
@@ -83,7 +85,7 @@ class EnterAmountSheet : TransactionFlowSheet() {
             }
             updatePendingTxDetails(newState)
 
-            customiser.issueFlashMessage(newState, amount_sheet_input.configuration.input)?.let {
+            customiser.issueFlashMessage(newState, amount_sheet_input.configuration.inputCurrency)?.let {
                 when (customiser.selectIssueType(newState)) {
                     IssueType.ERROR -> amount_sheet_input.showError(it, customiser.shouldDisableInput(state.errorState))
                     IssueType.INFO -> amount_sheet_input.showInfo(it) {
@@ -208,18 +210,7 @@ class EnterAmountSheet : TransactionFlowSheet() {
     }
 
     private fun onUseMaxClick() {
-        if (dialogView.amount_sheet_input.configuration.input == CurrencyType.Fiat &&
-            state.maxSpendable is CryptoValue
-        ) {
-            dialogView.amount_sheet_input.configuration =
-                dialogView.amount_sheet_input.configuration.copy(
-                    input = CurrencyType.Crypto,
-                    output = CurrencyType.Crypto
-                )
-        }
-        dialogView.amount_sheet_input.showValue(
-            state.maxSpendable
-        )
+        dialogView.amount_sheet_input.updateWithMaxValue(state.maxSpendable)
     }
 
     private fun onCtaClick() {
@@ -231,14 +222,15 @@ class EnterAmountSheet : TransactionFlowSheet() {
         imm.hideSoftInputFromWindow(dialogView.windowToken, 0)
     }
 
-    private fun FiatCryptoInputView.configure(newState: TransactionState, input: CurrencyType) {
-        if (input == CurrencyType.Crypto || newState.amount.isPositive) {
+    private fun FiatCryptoInputView.configure(
+        newState: TransactionState,
+        inputCurrency: CurrencyType
+    ) {
+        if (inputCurrency is CurrencyType.Crypto || newState.amount.isPositive) {
             val selectedFiat = newState.pendingTx?.selectedFiat ?: return
             configuration = FiatCryptoViewConfiguration(
-                input = CurrencyType.Crypto,
-                output = CurrencyType.Crypto,
-                fiatCurrency = selectedFiat,
-                cryptoCurrency = newState.sendingAccount.asset,
+                inputCurrency = CurrencyType.Crypto(newState.sendingAccount.asset),
+                exchangeCurrency = CurrencyType.Fiat(selectedFiat),
                 predefinedAmount = newState.amount
             )
         } else {
@@ -246,10 +238,8 @@ class EnterAmountSheet : TransactionFlowSheet() {
             val fiatRate = newState.fiatRate ?: return
             val amount = newState.amount as? CryptoValue ?: return
             configuration = FiatCryptoViewConfiguration(
-                input = CurrencyType.Fiat,
-                output = CurrencyType.Fiat,
-                fiatCurrency = selectedFiat,
-                cryptoCurrency = newState.sendingAccount.asset,
+                inputCurrency = CurrencyType.Fiat(selectedFiat),
+                exchangeCurrency = CurrencyType.Crypto(newState.sendingAccount.asset),
                 predefinedAmount = fiatRate.applyRate(amount)
             )
         }
