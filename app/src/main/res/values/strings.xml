@@ -1869,4 +1869,5 @@
     <string name="kyc_address_header_1">Blockchain.com is required by law to collect this information.</string>
     <string name="kyc_country_selection_search_hint_1">Select Your Country</string>
     <string name="kyc_country_selection_title_1">Select Your Country</string>
+    <string name="security_check">Security Check</string>
 </resources>

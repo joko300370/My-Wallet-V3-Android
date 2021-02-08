@@ -12,6 +12,7 @@ import com.blockchain.notifications.NotificationsUtil
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.NotificationAppOpened
 import kotlinx.android.synthetic.main.activity_launcher.*
+import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.auth.PinEntryActivity
@@ -24,6 +25,8 @@ import piuk.blockchain.android.ui.start.PasswordRequiredActivity
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.android.util.ViewUtils
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 
@@ -35,7 +38,8 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launcher)
-
+        setSupportActionBar(toolbar_general)
+        toolbar_general.gone()
         if (intent.hasExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION) &&
             intent.getBooleanExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION, false)
         ) {
@@ -149,7 +153,6 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
     private class DelayStartRunnable internal constructor(
         private val activity: LauncherActivity
     ) : Runnable {
-
         override fun run() {
             if (activity.presenter != null && !activity.isFinishing) {
                 activity.onViewReady()
@@ -157,5 +160,8 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
         }
     }
 
-    override fun onEmailEntryFragmentShown() {}
+    override fun onEmailEntryFragmentShown() {
+        setupToolbar(toolbar_general, R.string.security_check)
+        toolbar_general.visible()
+    }
 }
