@@ -410,7 +410,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         when (error) {
             InputError.ABOVE_MAX -> {
                 input_amount.showError(
-                    if (input_amount.configuration.inputCurrency is CurrencyType.Fiat)
+                    if (input_amount.configuration.inputCurrency.isFiat())
                         resources.getString(R.string.maximum_buy, state.maxFiatAmount.toStringWithSymbol())
                     else
                         resources.getString(
@@ -421,7 +421,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             }
             InputError.BELOW_MIN -> {
                 input_amount.showError(
-                    if (input_amount.configuration.inputCurrency is CurrencyType.Fiat)
+                    if (input_amount.configuration.inputCurrency.isFiat())
                         resources.getString(R.string.minimum_buy, state.minFiatAmount.toStringWithSymbol())
                     else
                         resources.getString(

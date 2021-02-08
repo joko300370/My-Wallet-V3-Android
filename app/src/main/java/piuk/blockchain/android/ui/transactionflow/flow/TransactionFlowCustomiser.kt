@@ -607,18 +607,16 @@ class TransactionFlowCustomiserImpl(
         exchangeRate: ExchangeRate.CryptoToFiat,
         roundingMode: RoundingMode
     ): String {
-        if (input is CurrencyType.Crypto && this is CryptoValue)
+        if (input.isSameType(this))
             return toStringWithSymbol()
-        if (input is CurrencyType.Fiat && this is FiatValue)
-            return toStringWithSymbol()
-        if (input is CurrencyType.Fiat && this is CryptoValue)
+        if (input.isFiat() && this is CryptoValue)
             return FiatValue.fromMajor(
                 exchangeRate.to,
                 exchangeRate.convert(this, round = false).toBigDecimal().setScale(
                     Currency.getInstance(exchangeRate.to).defaultFractionDigits, roundingMode
                 )
             ).toStringWithSymbol()
-        if (input is CurrencyType.Crypto && this is FiatValue)
+        if (input.isCrypto() && this is FiatValue)
             return exchangeRate.inverse().convert(this).toStringWithSymbol()
         throw IllegalStateException("Not valid currency")
     }

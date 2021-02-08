@@ -67,7 +67,7 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
         get() {
             val defInternalExchangeRate = configuration.defInternalExchangeRate()
             return customInternalExchangeRate?.let {
-                require(
+                check(
                     it.hasSameSourceAndTarget(defInternalExchangeRate) ||
                         it.hasOppositeSourceAndTarget(defInternalExchangeRate)
                 ) {
@@ -382,4 +382,13 @@ private fun CurrencyType.rawCurrency(): String =
 sealed class CurrencyType {
     data class Fiat(val fiatCurrency: String) : CurrencyType()
     data class Crypto(val cryptoCurrency: CryptoCurrency) : CurrencyType()
+
+    fun isCrypto() = this is Crypto
+    fun isFiat() = this is Fiat
+
+    fun isSameType(money: Money) =
+        when (this) {
+            is Fiat -> money is FiatValue
+            is Crypto -> money is CryptoValue
+        }
 }
