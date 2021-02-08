@@ -109,7 +109,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/amount_sheet_to" />
 
-    <piuk.blockchain.android.ui.customviews.CurrencyAmountInputView
+    <piuk.blockchain.android.ui.customviews.FiatCryptoInputView
         android:id="@+id/amount_sheet_input"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
