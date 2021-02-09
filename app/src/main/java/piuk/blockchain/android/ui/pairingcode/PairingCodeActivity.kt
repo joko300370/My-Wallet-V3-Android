@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.view.View
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
@@ -37,11 +40,23 @@ class PairingCodeActivity : BaseMvpActivity<PairingCodeView, PairingCodePresente
         with(binding) {
             val toolbarBinding = ToolbarGeneralBinding.bind(root)
             setupToolbar(toolbarBinding.toolbarGeneral, R.string.pairing_code_log_in)
-            pairingFirstStep.text = getString(R.string.pairing_code_instruction_1, WEB_WALLET_LOGIN_URI)
+            pairingFirstStep.text = prepareHighlighedStep()
             buttonQrToggle.setOnClickListener { onClickQRToggle() }
         }
         onViewReady()
     }
+
+    private fun prepareHighlighedStep() =
+        SpannableString(getString(R.string.pairing_code_instruction_1, WEB_WALLET_LOGIN_URI)).apply {
+            val span = indexOf(WEB_WALLET_LOGIN_URI)
+            setSpan(
+                ForegroundColorSpan(
+                    getColor(R.color.blue_600)),
+                    span,
+                    span + WEB_WALLET_LOGIN_URI.length,
+                    Spannable.SPAN_EXCLUSIVE_INCLUSIVE
+            )
+        }
 
     override fun onSupportNavigateUp(): Boolean =
         consume { onBackPressed() }
