@@ -1870,4 +1870,11 @@
     <string name="kyc_country_selection_search_hint_1">Select Your Country</string>
     <string name="kyc_country_selection_title_1">Select Your Country</string>
     <string name="security_check">Security Check</string>
+    <string name="success_email_veriff">Success! Your email has been confirmed.</string>
+    <string name="email_verified">Email Verified</string>
+    <string name="sent_email_verification">We sent a verification email to %1$s. Please tap the link in the email to continue.</string>
+    <string name="email_verify">Verify Your Email</string>
+    <string name="edit_email_address">Edit Email Address</string>
+    <string name="common_save">Save</string>
+    <string name="change_email_instructions">Enter your email address below and click Save. We’ll send you a verification email to this new address.</string>
 </resources>
