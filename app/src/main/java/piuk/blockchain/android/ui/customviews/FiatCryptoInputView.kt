@@ -308,15 +308,15 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
         }
     }
 
-    fun updateWithMaxValue(maxSpendable: Money) {
-        if (configuration.inputCurrency is CurrencyType.Fiat && maxSpendable is CryptoValue) {
+    fun updateValue(amount: Money) {
+        if (configuration.inputCurrency is CurrencyType.Fiat && amount is CryptoValue) {
             configuration = configuration.copy(
-                inputCurrency = CurrencyType.Crypto(maxSpendable.currency),
+                inputCurrency = CurrencyType.Crypto(amount.currency),
                 exchangeCurrency = configuration.inputCurrency,
-                outputCurrency = CurrencyType.Crypto(maxSpendable.currency)
+                outputCurrency = CurrencyType.Crypto(amount.currency)
             )
         }
-        showValue(maxSpendable)
+        showValue(amount)
     }
 
     private fun Money.toInputCurrency(): Money {

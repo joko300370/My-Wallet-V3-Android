@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -115,62 +116,26 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/standard_margin"
         android:layout_marginBottom="@dimen/standard_margin"
-        app:layout_constraintBottom_toTopOf="@id/amount_sheet_max_available_label"
+        app:layout_constraintBottom_toTopOf="@id/frame_lower_slot"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/amount_sheet_separator" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/amount_sheet_max_available_label"
-        style="@style/Text.Light.12"
-        android:layout_width="wrap_content"
+    <FrameLayout
+        android:id="@+id/frame_lower_slot"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/standard_margin"
-        android:layout_marginTop="@dimen/small_margin"
-        android:layout_marginEnd="@dimen/small_margin"
-        android:text="@string/send_enter_amount_available"
-        app:layout_constraintBottom_toTopOf="@id/amount_sheet_max_available"
-        app:layout_constraintEnd_toStartOf="@+id/amount_sheet_use_max"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/amount_sheet_max_available" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/amount_sheet_max_available"
-        style="@style/Text.Semibold.12"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/tiny_margin"
-        android:ellipsize="end"
-        app:layout_constraintBottom_toBottomOf="@id/amount_sheet_use_max"
-        app:layout_constraintEnd_toStartOf="@+id/amount_sheet_use_max"
-        app:layout_constraintStart_toStartOf="@id/amount_sheet_max_available_label"
-        app:layout_constraintTop_toBottomOf="@id/amount_sheet_max_available_label"
-        tools:text="Max: 1.00000 BTC" />
-
-    <Button
-        android:id="@+id/amount_sheet_use_max"
-        style="@style/CtaButton.White.Slim"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/small_margin"
-        android:layout_marginTop="@dimen/small_margin"
-        android:layout_marginEnd="@dimen/standard_margin"
-        android:layout_marginBottom="@dimen/very_small_margin"
-        android:text="@string/send_enter_amount_max"
-        android:textSize="14sp"
+        android:paddingBottom="@dimen/small_margin"
         app:layout_constraintBottom_toTopOf="@id/amount_sheet_cta_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/amount_sheet_max_available"
-        app:layout_constraintTop_toBottomOf="@id/amount_sheet_input"
-        app:layout_constraintVertical_bias="1" />
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <Button
         android:id="@+id/amount_sheet_cta_button"
         style="@style/CtaButton.Blue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/standard_margin"
+        android:layout_marginBottom="@dimen/very_small_margin"
         android:contentDescription="@string/next"
         android:text="@string/next"
         app:layout_constraintBottom_toBottomOf="parent"

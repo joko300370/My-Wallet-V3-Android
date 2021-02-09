@@ -72,6 +72,7 @@ data class TransactionState(
     val passwordRequired: Boolean = false,
     val secondPassword: String = "",
     val nextEnabled: Boolean = false,
+    val setMax: Boolean = false,
     val errorState: TransactionErrorState = TransactionErrorState.NONE,
     val pendingTx: PendingTx? = null,
     val allowFiatInput: Boolean = false,
@@ -177,6 +178,7 @@ class TransactionModel(
             is TransactionIntent.EnteredAddressReset -> null
             is TransactionIntent.AvailableAccountsListUpdated -> null
             is TransactionIntent.ShowMoreAccounts -> null
+            is TransactionIntent.UseMaxSpendable -> null
             is TransactionIntent.InvalidateTransaction -> processInvalidateTransaction()
             is TransactionIntent.ResetFlow -> {
                 interactor.reset()
