@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.FrameLayout
 import androidx.fragment.app.DialogFragment
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
@@ -25,10 +26,11 @@ import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
+import piuk.blockchain.android.ui.transactionflow.plugin.SmallBalanceView
+import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.visible
 import timber.log.Timber
 import java.math.RoundingMode
 
@@ -37,6 +39,8 @@ class EnterAmountSheet : TransactionFlowSheet() {
 
     private val customiser: TransactionFlowCustomiser by inject()
     private val compositeDisposable = CompositeDisposable()
+
+    private var lowerSlot: TxFlowWidget? = null
 
     private val imm: InputMethodManager by lazy {
         requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -54,8 +58,10 @@ class EnterAmountSheet : TransactionFlowSheet() {
         with(dialogView) {
             amount_sheet_cta_button.isEnabled = newState.nextEnabled
 
-            if (!amount_sheet_input.isConfigured) {
-                amount_sheet_input.configure(newState, customiser.defInputType(state))
+            if (!amount_sheet_input.configured) {
+                newState.pendingTx?.selectedFiat?.let {
+                    amount_sheet_input.configure(newState, customiser.defInputType(state, it))
+                }
             }
 
             val availableBalance = newState.availableBalance
@@ -63,27 +69,24 @@ class EnterAmountSheet : TransactionFlowSheet() {
                 // The maxLimit set here controls the number of digits that can be entered,
                 // but doesn't restrict the input to be always under that value. Which might be
                 // strange UX, but is currently by design.
-                if (amount_sheet_input.isConfigured) {
+                if (amount_sheet_input.configured) {
                     amount_sheet_input.maxLimit = newState.availableBalance
-                    if (amount_sheet_input.exchangeRate != newState.fiatRate)
-                        amount_sheet_input.exchangeRate = newState.fiatRate
+                    if (amount_sheet_input.customInternalExchangeRate != newState.fiatRate)
+                        amount_sheet_input.customInternalExchangeRate = newState.fiatRate
                 }
+            }
 
-                newState.fiatRate?.let { rate ->
-                    amount_sheet_max_available.text =
-                        "${rate.convert(availableBalance).toStringWithSymbol()} " +
-                            "(${availableBalance.toStringWithSymbol()})"
-                }
+            if (state.setMax) {
+                dialogView.amount_sheet_input.updateValue(state.maxSpendable)
             }
 
             amount_sheet_title.text = customiser.enterAmountTitle(newState)
-            amount_sheet_use_max.text = customiser.enterAmountMaxButton(newState)
-            if (customiser.shouldDisableInput(state.errorState)) {
-                amount_sheet_use_max.gone()
-            }
+
+            lowerSlot?.update(newState)
+
             updatePendingTxDetails(newState)
 
-            customiser.issueFlashMessage(newState, amount_sheet_input.configuration.input)?.let {
+            customiser.issueFlashMessage(newState, amount_sheet_input.configuration.inputCurrency)?.let {
                 when (customiser.selectIssueType(newState)) {
                     IssueType.ERROR -> amount_sheet_input.showError(it, customiser.shouldDisableInput(state.errorState))
                     IssueType.INFO -> amount_sheet_input.showInfo(it) {
@@ -101,10 +104,6 @@ class EnterAmountSheet : TransactionFlowSheet() {
 
     override fun initControls(view: View) {
         view.apply {
-            amount_sheet_use_max.setOnClickListener {
-                analyticsHooks.onMaxClicked(state)
-                onUseMaxClick()
-            }
             amount_sheet_cta_button.setOnClickListener {
                 analyticsHooks.onEnterAmountCtaClick(state)
                 onCtaClick()
@@ -114,12 +113,14 @@ class EnterAmountSheet : TransactionFlowSheet() {
                 model.process(TransactionIntent.InvalidateTransaction)
             }
 
-            amount_sheet_use_max.gone()
+            lowerSlot = customiser.installEnterAmountLowerSlotView(requireContext(), frame_lower_slot).apply {
+                initControl(model, customiser, analyticsHooks)
+            }
         }
 
         compositeDisposable += view.amount_sheet_input.amount.subscribe { amount ->
             state.fiatRate?.let { rate ->
-                val px = state.pendingTx ?: throw IllegalStateException("Px is not initialised yet")
+                check(state.pendingTx != null) { "Px is not initialised yet" }
                 model.process(
                     TransactionIntent.AmountChanged(
                         if (!state.allowFiatInput && amount is FiatValue) {
@@ -134,22 +135,24 @@ class EnterAmountSheet : TransactionFlowSheet() {
             }
         }
 
-        compositeDisposable += view.amount_sheet_input.onImeAction.subscribe {
-            when (it) {
-                PrefixedOrSuffixedEditText.ImeOptions.NEXT -> {
-                    if (state.nextEnabled) {
-                        onCtaClick()
+        compositeDisposable += view.amount_sheet_input
+            .onImeAction
+            .subscribe {
+                when (it) {
+                    PrefixedOrSuffixedEditText.ImeOptions.NEXT -> {
+                        if (state.nextEnabled) {
+                            onCtaClick()
+                        }
+                    }
+                    PrefixedOrSuffixedEditText.ImeOptions.BACK -> {
+                        hideKeyboard()
+                        dismiss()
+                    }
+                    else -> {
+                        // do nothing
                     }
                 }
-                PrefixedOrSuffixedEditText.ImeOptions.BACK -> {
-                    hideKeyboard()
-                    dismiss()
-                }
-                else -> {
-                    // do nothing
-                }
             }
-        }
 
         compositeDisposable += view.amount_sheet_input.onInputToggle.subscribe {
             analyticsHooks.onCryptoToggle(it, state)
@@ -207,21 +210,6 @@ class EnterAmountSheet : TransactionFlowSheet() {
         }
     }
 
-    private fun onUseMaxClick() {
-        if (dialogView.amount_sheet_input.configuration.input == CurrencyType.Fiat &&
-            state.maxSpendable is CryptoValue
-        ) {
-            dialogView.amount_sheet_input.configuration =
-                dialogView.amount_sheet_input.configuration.copy(
-                    input = CurrencyType.Crypto,
-                    output = CurrencyType.Crypto
-                )
-        }
-        dialogView.amount_sheet_input.showValue(
-            state.maxSpendable
-        )
-    }
-
     private fun onCtaClick() {
         hideKeyboard()
         model.process(TransactionIntent.PrepareTransaction)
@@ -231,14 +219,15 @@ class EnterAmountSheet : TransactionFlowSheet() {
         imm.hideSoftInputFromWindow(dialogView.windowToken, 0)
     }
 
-    private fun FiatCryptoInputView.configure(newState: TransactionState, input: CurrencyType) {
-        if (input == CurrencyType.Crypto || newState.amount.isPositive) {
+    private fun FiatCryptoInputView.configure(
+        newState: TransactionState,
+        inputCurrency: CurrencyType
+    ) {
+        if (inputCurrency is CurrencyType.Crypto || newState.amount.isPositive) {
             val selectedFiat = newState.pendingTx?.selectedFiat ?: return
             configuration = FiatCryptoViewConfiguration(
-                input = CurrencyType.Crypto,
-                output = CurrencyType.Crypto,
-                fiatCurrency = selectedFiat,
-                cryptoCurrency = newState.sendingAccount.asset,
+                inputCurrency = CurrencyType.Crypto(newState.sendingAccount.asset),
+                exchangeCurrency = CurrencyType.Fiat(selectedFiat),
                 predefinedAmount = newState.amount
             )
         } else {
@@ -246,15 +235,12 @@ class EnterAmountSheet : TransactionFlowSheet() {
             val fiatRate = newState.fiatRate ?: return
             val amount = newState.amount as? CryptoValue ?: return
             configuration = FiatCryptoViewConfiguration(
-                input = CurrencyType.Fiat,
-                output = CurrencyType.Fiat,
-                fiatCurrency = selectedFiat,
-                cryptoCurrency = newState.sendingAccount.asset,
+                inputCurrency = CurrencyType.Fiat(selectedFiat),
+                exchangeCurrency = CurrencyType.Crypto(newState.sendingAccount.asset),
                 predefinedAmount = fiatRate.applyRate(amount)
             )
         }
         showKeyboard()
-        dialogView.amount_sheet_use_max.visible()
     }
 
     private fun showKeyboard() {
@@ -265,5 +251,12 @@ class EnterAmountSheet : TransactionFlowSheet() {
             requestFocus()
             imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
         }
+    }
+}
+
+// todo This should be an actual method on the customiser, but for now:
+fun TransactionFlowCustomiser.installEnterAmountLowerSlotView(ctx: Context, frame: FrameLayout): TxFlowWidget {
+    return SmallBalanceView(ctx).also {
+        frame.addView(it)
     }
 }

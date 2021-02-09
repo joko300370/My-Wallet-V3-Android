@@ -170,16 +170,13 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         }
 
         newState.selectedCryptoCurrency?.let {
-            if (!input_amount.isConfigured) {
-                input_amount.configuration = FiatCryptoViewConfiguration(
-                    input = CurrencyType.Fiat,
-                    output = CurrencyType.Fiat,
-                    fiatCurrency = newState.fiatCurrency,
-                    cryptoCurrency = it,
-                    canSwap = false,
-                    predefinedAmount = newState.order.amount ?: FiatValue.zero(newState.fiatCurrency)
-                )
-            }
+            input_amount.configuration = FiatCryptoViewConfiguration(
+                inputCurrency = CurrencyType.Fiat(newState.fiatCurrency),
+                outputCurrency = CurrencyType.Fiat(newState.fiatCurrency),
+                exchangeCurrency = CurrencyType.Crypto(it),
+                canSwap = false,
+                predefinedAmount = newState.order.amount ?: FiatValue.zero(newState.fiatCurrency)
+            )
             buy_icon.setAssetIconColours(it, activity)
         }
         newState.selectedCryptoCurrency?.let {
@@ -413,7 +410,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         when (error) {
             InputError.ABOVE_MAX -> {
                 input_amount.showError(
-                    if (input_amount.configuration.input == CurrencyType.Fiat)
+                    if (input_amount.configuration.inputCurrency.isFiat())
                         resources.getString(R.string.maximum_buy, state.maxFiatAmount.toStringWithSymbol())
                     else
                         resources.getString(
@@ -424,7 +421,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             }
             InputError.BELOW_MIN -> {
                 input_amount.showError(
-                    if (input_amount.configuration.input == CurrencyType.Fiat)
+                    if (input_amount.configuration.inputCurrency.isFiat())
                         resources.getString(R.string.minimum_buy, state.minFiatAmount.toStringWithSymbol())
                     else
                         resources.getString(

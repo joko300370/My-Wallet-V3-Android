@@ -282,8 +282,14 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
     ) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState.copy(
-                nextEnabled = false
+                nextEnabled = false,
+                setMax = false
             ).updateBackstack(oldState)
+    }
+
+    object UseMaxSpendable : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(setMax = true)
     }
 
     class ModifyTxOption(
