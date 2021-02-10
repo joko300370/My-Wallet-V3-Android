@@ -87,7 +87,7 @@ class BalanceAndFeeView @JvmOverloads constructor(
     private fun updateSendMax(state: TransactionState) =
         with(binding.useMax) {
             text = customiser.enterAmountMaxButton(state)
-            visibleIf { !customiser.shouldDisableInput(state.errorState) }
+            visibleIf { !customiser.shouldDisableInput(state.errorState) && !binding.dropdown.isVisible() }
             setOnClickListener {
                 analytics.onMaxClicked(state)
                 model.process(TransactionIntent.UseMaxSpendable)
