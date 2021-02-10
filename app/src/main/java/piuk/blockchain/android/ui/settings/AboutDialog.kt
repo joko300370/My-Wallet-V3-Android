@@ -4,24 +4,25 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager.NameNotFoundException
 import android.net.Uri
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.appcompat.app.AlertDialog
 import kotlinx.android.synthetic.main.activity_about.view.*
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.ActivityAboutBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.util.copyHashOnLongClick
 import piuk.blockchain.android.util.gone
 import timber.log.Timber
 import java.util.Calendar
 
-class AboutDialog : SlidingModalBottomDialog() {
-    override val layoutResource: Int
-        get() = R.layout.activity_about
+class AboutDialog : SlidingModalBottomDialog<ActivityAboutBinding>() {
 
-    override fun initControls(view: View) {
-        with(view) {
+    override fun initControls(binding: ActivityAboutBinding) {
+        with(binding) {
             about.text = getString(
                 R.string.about,
                 "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) ${BuildConfig.COMMIT_HASH}",
@@ -43,9 +44,9 @@ class AboutDialog : SlidingModalBottomDialog() {
             }
 
             if (hasWallet()) {
-                free_wallet.gone()
+                freeWallet.gone()
             } else {
-                free_wallet.setOnClickListener {
+                freeWallet.setOnClickListener {
                     try {
                         val marketIntent =
                             Intent(
@@ -58,7 +59,7 @@ class AboutDialog : SlidingModalBottomDialog() {
                     }
                 }
             }
-            rate_us.setOnClickListener {
+            rateUs.setOnClickListener {
                 (parentFragment as? ReviewHost)?.showReviewDialog()
                 dismiss()
             }
@@ -78,4 +79,7 @@ class AboutDialog : SlidingModalBottomDialog() {
     companion object {
         private const val STR_MERCHANT_PACKAGE = "info.blockchain.merchant"
     }
+
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): ActivityAboutBinding =
+        ActivityAboutBinding.inflate(inflater, container, false)
 }

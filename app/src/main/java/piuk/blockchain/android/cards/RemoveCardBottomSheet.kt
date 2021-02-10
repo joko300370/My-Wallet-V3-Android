@@ -1,7 +1,10 @@
 package piuk.blockchain.android.cards
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.viewbinding.ViewBinding
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.PaymentMethod
@@ -12,12 +15,14 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.remove_card_bottom_sheet.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.FragmentKycAddEmailBinding
+import piuk.blockchain.android.databinding.RemoveCardBottomSheetBinding
 import piuk.blockchain.android.simplebuy.RemovePaymentMethodBottomSheetHost
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.android.util.visibleIf
 
-class RemoveCardBottomSheet : SlidingModalBottomDialog() {
+class RemoveCardBottomSheet : SlidingModalBottomDialog<RemoveCardBottomSheetBinding>() {
 
     private val custodialWalletManager: CustodialWalletManager by scopedInject()
 
@@ -28,14 +33,12 @@ class RemoveCardBottomSheet : SlidingModalBottomDialog() {
 
     private val compositeDisposable = CompositeDisposable()
 
-    override val layoutResource: Int = R.layout.remove_card_bottom_sheet
-
-    override fun initControls(view: View) {
-        with(view) {
+    override fun initControls(binding: RemoveCardBottomSheetBinding) {
+        with(binding) {
             title.text = card.uiLabel()
-            end_digits.text = card.dottedEndDigits()
+            endDigits.text = card.dottedEndDigits()
             icon.setImageResource(card.cardType.icon())
-            rmv_card_btn.setOnClickListener {
+            rmvCardBtn.setOnClickListener {
                 compositeDisposable += custodialWalletManager.deleteCard(card.id)
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSubscribe {
@@ -74,4 +77,7 @@ class RemoveCardBottomSheet : SlidingModalBottomDialog() {
                 }
             }
     }
+
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): RemoveCardBottomSheetBinding =
+        RemoveCardBottomSheetBinding.inflate(inflater, container, false)
 }

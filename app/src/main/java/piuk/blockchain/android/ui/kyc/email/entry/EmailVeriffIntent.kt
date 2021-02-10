@@ -6,15 +6,16 @@ import piuk.blockchain.androidcore.data.settings.Email
 sealed class EmailVeriffIntent : MviIntent<EmailVeriffState> {
 
     class EmailUpdated(private val mail: Email) : EmailVeriffIntent() {
-        override fun reduce(oldState: EmailVeriffState): EmailVeriffState = oldState.copy(email = mail)
+        override fun reduce(oldState: EmailVeriffState): EmailVeriffState =
+            oldState.copy(email = mail, isLoading = false)
     }
 
-    object PollForStatus : EmailVeriffIntent() {
-        override fun reduce(oldState: EmailVeriffState): EmailVeriffState = oldState
+    class UpdateEmailInput(private val emailInput: String) : EmailVeriffIntent() {
+        override fun reduce(oldState: EmailVeriffState): EmailVeriffState = oldState.copy(emailInput = emailInput)
     }
 
     object FetchEmail : EmailVeriffIntent() {
-        override fun reduce(oldState: EmailVeriffState): EmailVeriffState = oldState
+        override fun reduce(oldState: EmailVeriffState): EmailVeriffState = oldState.copy(isLoading = true)
     }
 
     object CancelEmailVerification : EmailVeriffIntent() {
@@ -23,5 +24,9 @@ sealed class EmailVeriffIntent : MviIntent<EmailVeriffState> {
 
     object StartEmailVerification : EmailVeriffIntent() {
         override fun reduce(oldState: EmailVeriffState): EmailVeriffState = oldState
+    }
+
+    object UpdateEmail : EmailVeriffIntent() {
+        override fun reduce(oldState: EmailVeriffState): EmailVeriffState  = oldState.copy(isLoading = true)
     }
 }

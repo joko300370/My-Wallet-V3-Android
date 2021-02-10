@@ -1,8 +1,6 @@
 package piuk.blockchain.android.ui.kyc.email.entry
 
 import android.os.Bundle
-import android.text.TextUtils
-import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,10 +17,6 @@ import piuk.blockchain.androidcore.data.settings.Email
 class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, EmailVeriffState>(),
     SlidingModalBottomDialog.Host {
 
-    /* private val presenter: KycEmailEntryPresenter by scopedInject()*/
-    /*
-        private val analytics: Analytics by inject()
-    */
     private val emailEntryHost: EmailEntryHost by ParentActivityDelegate(
         this
     )
@@ -44,11 +38,7 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         emailEntryHost.onEmailEntryFragmentShown()
-        model.process(EmailVeriffIntent.FetchEmail)
-        binding.editEmailAddress.setOnClickListener {
-            model.process(EmailVeriffIntent.CancelEmailVerification)
-            ChangeEmailAddressBottomSheet().show(childFragmentManager, "BOTTOM_SHEET")
-        }
+        model.process(EmailVeriffIntent.StartEmailVerification)
     }
 
     override fun onDestroyView() {
@@ -56,21 +46,12 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
         _binding = null
     }
 
-    override fun onResume() {
-        super.onResume()
-        model.process(EmailVeriffIntent.StartEmailVerification)
-    }
-
-    override fun onPause() {
-        super.onPause()
-    }
-
     override val model: EmailVeriffModel by scopedInject()
 
     override fun render(newState: EmailVeriffState) {
-        if (newState.email?.verified == true) {
+        if (newState.email.verified) {
             drawVerifiedEmailUi()
-        } else if (newState.email?.verified == false) {
+        } else {
             drawUnVerifiedEmailUi(newState.email)
         }
     }
@@ -88,59 +69,17 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
         binding.emailStatusText.text = getString(R.string.email_verify)
         binding.txStateIndicator.gone()
         binding.editEmailAddress.visible()
+
+        binding.editEmailAddress.setOnClickListener {
+            model.process(EmailVeriffIntent.CancelEmailVerification)
+            EditEmailAddressBottomSheet.newInstance(email.address).show(childFragmentManager, "BOTTOM_SHEET")
+        }
     }
 
     override fun onSheetClosed() {
         model.process(EmailVeriffIntent.StartEmailVerification)
     }
-
-    /*override fun preFillEmail(email: String) {
-        editTextEmail.setText(email)
-    }
-*//*
-    override fun showError(message: Int) =
-        toast(message, ToastCustom.TYPE_ERROR)
-*/
-    /* override fun continueSignUp(email: String) {
-         navigate(KycEmailEntryFragmentDirections.actionValidateEmail(email))
-     }*/
-
-    /* override fun showProgressDialog() {
-         progressDialog = MaterialProgressDialog(requireContext()).apply {
-             setOnCancelListener { presenter.onProgressCancelled() }
-             setMessage(R.string.kyc_country_selection_please_wait)
-             show()
-         }
-     }*/
-
-    /* override fun dismissProgressDialog() {
-         progressDialog?.apply { dismiss() }
-         progressDialog = null
-     }*/
-
-    /*private fun TextView.onDelayedChange(
-        kycStep: KycStep
-    ): Observable<Boolean> =
-        this.afterTextChangeEvents()
-            .debounce(300, TimeUnit.MILLISECONDS)
-            .map { it.editable()?.toString() ?: "" }
-            .skipFirstUnless { it.isNotEmpty() }
-            .observeOn(AndroidSchedulers.mainThread())
-            .map { mapToCompleted(it) }
-            .distinctUntilChanged()
-            .doOnNext {
-                buttonNext.isEnabled = it
-            }
-
-    private fun mapToCompleted(text: String): Boolean = emailIsValid(text)
-
-    override fun createPresenter(): KycEmailEntryPresenter = presenter
-
-    override fun getMvpView(): KycEmailEntryView = this*/
 }
-
-private fun emailIsValid(target: String) =
-    !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches()
 
 interface EmailEntryHost {
     fun onEmailEntryFragmentShown()

@@ -162,6 +162,7 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
 
     override fun onEmailEntryFragmentShown() {
         setupToolbar(toolbar_general, R.string.security_check)
+        toolbar_general.navigationIcon = null
         toolbar_general.visible()
     }
 }

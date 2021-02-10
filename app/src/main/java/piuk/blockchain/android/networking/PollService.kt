@@ -4,7 +4,6 @@ import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.withLatestFrom
 import io.reactivex.rxkotlin.zipWith
-import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
 
@@ -25,7 +24,6 @@ class PollService<T : Any>(
             .toObservable()
             .withLatestFrom(cancel.startWith(false))
             .takeUntil { (value, canceled) ->
-                println("Polling value 111 $value")
                 matcher(value) || canceled
             }
             .lastOrError()

@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
 import android.content.Context
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -24,6 +25,7 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.databinding.DialogAssetActionsSheetBinding
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.customviews.ToastCustom
@@ -38,7 +40,8 @@ import piuk.blockchain.android.util.assetTint
 import piuk.blockchain.android.util.inflate
 import timber.log.Timber
 
-class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, AssetDetailsState>() {
+class AssetActionsSheet :
+    MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, AssetDetailsState, DialogAssetActionsSheetBinding>() {
     private val disposables = CompositeDisposable()
 
     private val kycTierService: TierService by scopedInject()
@@ -69,15 +72,15 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
         }
     }
 
-    override fun initControls(view: View) {
-        view.asset_actions_list.apply {
+    override fun initControls(binding: DialogAssetActionsSheetBinding) {
+        binding.assetActionsList.apply {
             layoutManager =
                 LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             addItemDecoration(BlockchainListDividerDecor(requireContext()))
             adapter = itemAdapter
         }
 
-        view.asset_actions_back.setOnClickListener {
+        binding.assetActionsBack.setOnClickListener {
             model.process(ClearActionStates)
             model.process(ReturnToPreviousStep)
             dispose()
@@ -99,9 +102,11 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
 
     private fun showError(error: AssetDetailsError) =
         when (error) {
-            AssetDetailsError.TX_IN_FLIGHT -> ToastCustom.makeText(requireContext(),
+            AssetDetailsError.TX_IN_FLIGHT -> ToastCustom.makeText(
+                requireContext(),
                 getString(R.string.dashboard_asset_actions_tx_in_progress), Toast.LENGTH_SHORT,
-                ToastCustom.TYPE_ERROR)
+                ToastCustom.TYPE_ERROR
+            )
             else -> {
                 // do nothing
             }
@@ -133,47 +138,64 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
         when (action) {
             // using the secondary ctor ensures the action is always enabled if it is present
             AssetAction.ViewActivity ->
-                AssetActionItem(getString(R.string.activities_title),
+                AssetActionItem(
+                    getString(R.string.activities_title),
                     R.drawable.ic_tx_activity_clock,
                     getString(R.string.fiat_funds_detail_activity_details), asset,
-                    action) {
+                    action
+                ) {
                     processAction(AssetAction.ViewActivity)
                 }
             AssetAction.Send ->
-                AssetActionItem(account, getString(R.string.common_send), R.drawable.ic_tx_sent,
-                    getString(R.string.dashboard_asset_actions_send_dsc,
-                        asset.displayTicker), asset, action) {
+                AssetActionItem(
+                    account, getString(R.string.common_send), R.drawable.ic_tx_sent,
+                    getString(
+                        R.string.dashboard_asset_actions_send_dsc,
+                        asset.displayTicker
+                    ), asset, action
+                ) {
                     processAction(AssetAction.Send)
                 }
             AssetAction.Receive ->
-                AssetActionItem(getString(R.string.common_receive), R.drawable.ic_tx_receive,
-                    getString(R.string.dashboard_asset_actions_receive_dsc,
-                        asset.displayTicker), asset, action) {
+                AssetActionItem(
+                    getString(R.string.common_receive), R.drawable.ic_tx_receive,
+                    getString(
+                        R.string.dashboard_asset_actions_receive_dsc,
+                        asset.displayTicker
+                    ), asset, action
+                ) {
                     processAction(AssetAction.Receive)
                 }
-            AssetAction.Swap -> AssetActionItem(account, getString(R.string.common_swap),
+            AssetAction.Swap -> AssetActionItem(
+                account, getString(R.string.common_swap),
                 R.drawable.ic_tx_swap,
                 getString(R.string.dashboard_asset_actions_swap_dsc, asset.displayTicker),
-                asset, action) {
+                asset, action
+            ) {
                 processAction(AssetAction.Swap)
             }
             AssetAction.Summary -> AssetActionItem(
                 getString(R.string.dashboard_asset_actions_summary_title),
                 R.drawable.ic_tx_interest,
                 getString(R.string.dashboard_asset_actions_summary_dsc, asset.displayTicker),
-                asset, action) {
+                asset, action
+            ) {
                 goToSummary()
             }
-            AssetAction.Deposit -> AssetActionItem(getString(R.string.common_transfer),
+            AssetAction.Deposit -> AssetActionItem(
+                getString(R.string.common_transfer),
                 R.drawable.ic_tx_deposit_arrow,
                 getString(R.string.dashboard_asset_actions_deposit_dsc, asset.displayTicker),
-                asset, action) {
+                asset, action
+            ) {
                 goToDeposit()
             }
-            AssetAction.Sell -> AssetActionItem(getString(R.string.common_sell),
+            AssetAction.Sell -> AssetActionItem(
+                getString(R.string.common_sell),
                 R.drawable.ic_tx_sell,
                 getString(R.string.convert_your_crypto_to_cash),
-                asset, action) {
+                asset, action
+            ) {
                 processAction(AssetAction.Sell)
             }
             AssetAction.Withdraw -> throw IllegalStateException("Cannot Withdraw a non-fiat currency")
@@ -215,6 +237,9 @@ class AssetActionsSheet : MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, 
     companion object {
         fun newInstance(): AssetActionsSheet = AssetActionsSheet()
     }
+
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogAssetActionsSheetBinding =
+        DialogAssetActionsSheetBinding.inflate(inflater, container, false)
 }
 
 private class AssetActionAdapter(

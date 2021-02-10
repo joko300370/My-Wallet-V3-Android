@@ -24,6 +24,9 @@ class EmailVerifyInteractor(private val emailUpdater: EmailSyncUpdater) {
         }
     }
 
+    fun updateEmail(email: String): Single<Email> =
+        emailUpdater.updateEmailAndSync(email)
+
     fun cancelPolling(): Completable =
         Completable.fromCallable {
             pollEmail.cancel.onNext(true)

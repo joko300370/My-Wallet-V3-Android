@@ -1,7 +1,7 @@
 package piuk.blockchain.android.ui.kyc.email.entry
 
+import io.reactivex.Observable
 import io.reactivex.Scheduler
-import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.ui.base.mvi.MviModel
@@ -24,15 +24,21 @@ class EmailVeriffModel(
                 onError = {
                 }
             )
-            EmailVeriffIntent.StartEmailVerification -> interactor.fetchEmail().flatMap {
+            EmailVeriffIntent.StartEmailVerification -> interactor.fetchEmail().flatMapObservable {
                 if (!it.verified) {
-                    interactor.pollForEmailStatus()
-                } else Single.just(it)
-            }.subscribeBy(onSuccess = {
+                    interactor.pollForEmailStatus().toObservable().startWith(it)
+                } else Observable.just(it)
+            }.subscribeBy(onNext = {
                 process(EmailVeriffIntent.EmailUpdated(it))
             }, onError = {
 
             })
+            EmailVeriffIntent.UpdateEmail -> interactor.updateEmail(previousState.emailInput)
+                .subscribeBy(onSuccess = {
+                    process(EmailVeriffIntent.EmailUpdated(it))
+                }, onError = {
+
+                })
             else -> null
         }
 }

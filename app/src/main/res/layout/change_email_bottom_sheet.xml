@@ -25,22 +25,21 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"
-        android:layout_marginTop="@dimen/xhuge_margin"
+        android:layout_marginTop="@dimen/large_margin"
         android:layout_marginEnd="@dimen/standard_margin"
-        android:layout_marginBottom="@dimen/xhuge_margin"
+        android:layout_marginBottom="@dimen/large_margin"
         android:hint="@string/email"
         app:layout_constraintBottom_toTopOf="@+id/save"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/instructions">
 
-        <com.google.android.material.textfield.TextInputEditText
+        <piuk.blockchain.android.ui.customviews.KeyPrimeImeEditText
             android:id="@+id/edit_email_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textEmailAddress"
-            android:textSize="16sp">
-        </com.google.android.material.textfield.TextInputEditText>
+            android:textSize="16sp"/>
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -55,6 +54,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintVertical_bias="1"  />
+        app:layout_constraintVertical_bias="1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
