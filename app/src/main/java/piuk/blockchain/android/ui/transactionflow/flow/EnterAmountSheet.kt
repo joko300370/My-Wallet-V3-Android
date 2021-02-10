@@ -17,6 +17,7 @@ import kotlinx.android.synthetic.main.dialog_tx_flow_enter_amount.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.ui.customviews.CurrencyType
@@ -26,12 +27,14 @@ import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
+import piuk.blockchain.android.ui.transactionflow.plugin.BalanceAndFeeView
 import piuk.blockchain.android.ui.transactionflow.plugin.SmallBalanceView
 import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.android.util.gone
 import timber.log.Timber
+import java.lang.IllegalStateException
 import java.math.RoundingMode
 
 class EnterAmountSheet : TransactionFlowSheet() {
@@ -82,6 +85,15 @@ class EnterAmountSheet : TransactionFlowSheet() {
 
             amount_sheet_title.text = customiser.enterAmountTitle(newState)
 
+            if (lowerSlot == null) {
+                lowerSlot = customiser.installEnterAmountLowerSlotView(
+                    requireContext(),
+                    frame_lower_slot,
+                    newState
+                ).apply {
+                    initControl(model, customiser, analyticsHooks)
+                }
+            }
             lowerSlot?.update(newState)
 
             updatePendingTxDetails(newState)
@@ -112,28 +124,25 @@ class EnterAmountSheet : TransactionFlowSheet() {
                 analyticsHooks.onStepBackClicked(state)
                 model.process(TransactionIntent.InvalidateTransaction)
             }
-
-            lowerSlot = customiser.installEnterAmountLowerSlotView(requireContext(), frame_lower_slot).apply {
-                initControl(model, customiser, analyticsHooks)
-            }
         }
 
-        compositeDisposable += view.amount_sheet_input.amount.subscribe { amount ->
-            state.fiatRate?.let { rate ->
-                check(state.pendingTx != null) { "Px is not initialised yet" }
-                model.process(
-                    TransactionIntent.AmountChanged(
-                        if (!state.allowFiatInput && amount is FiatValue) {
-                            convertFiatToCrypto(amount, rate, state).also {
-                                view.amount_sheet_input.fixExchange(it)
+        compositeDisposable += view.amount_sheet_input.amount
+            .subscribe { amount ->
+                state.fiatRate?.let { rate ->
+                    check(state.pendingTx != null) { "Px is not initialised yet" }
+                    model.process(
+                        TransactionIntent.AmountChanged(
+                            if (!state.allowFiatInput && amount is FiatValue) {
+                                convertFiatToCrypto(amount, rate, state).also {
+                                    view.amount_sheet_input.fixExchange(it)
+                                }
+                            } else {
+                                amount
                             }
-                        } else {
-                            amount
-                        }
+                        )
                     )
-                )
+                }
             }
-        }
 
         compositeDisposable += view.amount_sheet_input
             .onImeAction
@@ -154,9 +163,10 @@ class EnterAmountSheet : TransactionFlowSheet() {
                 }
             }
 
-        compositeDisposable += view.amount_sheet_input.onInputToggle.subscribe {
-            analyticsHooks.onCryptoToggle(it, state)
-        }
+        compositeDisposable += view.amount_sheet_input.onInputToggle
+            .subscribe {
+                analyticsHooks.onCryptoToggle(it, state)
+            }
     }
 
     // in this method we try to convert the fiat value coming out from
@@ -255,8 +265,18 @@ class EnterAmountSheet : TransactionFlowSheet() {
 }
 
 // todo This should be an actual method on the customiser, but for now:
-fun TransactionFlowCustomiser.installEnterAmountLowerSlotView(ctx: Context, frame: FrameLayout): TxFlowWidget {
-    return SmallBalanceView(ctx).also {
-        frame.addView(it)
+fun TransactionFlowCustomiser.installEnterAmountLowerSlotView(
+    ctx: Context,
+    frame: FrameLayout,
+    state: TransactionState
+): TxFlowWidget =
+    when(state.action) {
+        AssetAction.ViewActivity -> throw IllegalStateException()
+        AssetAction.Send -> BalanceAndFeeView(ctx).also { frame.addView(it) }
+        AssetAction.Withdraw,
+        AssetAction.Receive,
+        AssetAction.Deposit,
+        AssetAction.Sell,
+        AssetAction.Swap -> SmallBalanceView(ctx).also { frame.addView(it) }
+        AssetAction.Summary -> throw IllegalStateException()
     }
-}
