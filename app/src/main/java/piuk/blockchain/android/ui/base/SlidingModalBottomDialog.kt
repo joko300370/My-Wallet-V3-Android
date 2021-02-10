@@ -42,9 +42,9 @@ abstract class SlidingModalBottomDialog<T : ViewBinding> : BottomSheetDialogFrag
 
         _binding = initBinding(layoutInflater, null)
 
-        val bottomSheetBehavior = BottomSheetBehavior.from(binding.root)
-
         dlg.setContentView(binding.root)
+
+        val bottomSheetBehavior = BottomSheetBehavior.from(binding.root.parent as View)
 
         dlg.setCanceledOnTouchOutside(false)
 
@@ -119,7 +119,7 @@ abstract class SlidingModalBottomDialog<T : ViewBinding> : BottomSheetDialogFrag
     }
 
     private fun resetSheetParent() {
-        val bottomSheetBehavior = BottomSheetBehavior.from(binding.root)
+        val bottomSheetBehavior = BottomSheetBehavior.from(binding.root.parent as View)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 }

@@ -50,8 +50,8 @@ import java.util.Currency
 import java.util.Date
 import java.util.Locale
 
-class AssetDetailSheet :
-    MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, AssetDetailsState, DialogSheetDashboardAssetDetailsBinding>() {
+class AssetDetailSheet : MviBottomSheet<AssetDetailsModel,
+    AssetDetailsIntent, AssetDetailsState, DialogSheetDashboardAssetDetailsBinding>() {
     private val currencyPrefs: CurrencyPrefs by inject()
     private val locale = Locale.getDefault()
 

@@ -1,7 +1,8 @@
 package piuk.blockchain.android.ui.interest
 
 import android.content.DialogInterface
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
@@ -16,13 +17,13 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.dialog_sheet_interest_details.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.databinding.DialogSheetInterestDetailsBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.util.assetName
@@ -34,7 +35,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class InterestSummarySheet : SlidingModalBottomDialog() {
+class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetailsBinding>() {
     interface Host : SlidingModalBottomDialog.Host {
         fun gotoActivityFor(account: BlockchainAccount)
         fun goToDeposit(
@@ -46,14 +47,15 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
 
     override val host: Host by lazy {
         super.host as? Host ?: throw IllegalStateException(
-            "Host fragment is not a InterestSummarySheet.Host")
+            "Host fragment is not a InterestSummarySheet.Host"
+        )
     }
 
     private lateinit var account: SingleAccount
     private lateinit var cryptoCurrency: CryptoCurrency
 
-    override val layoutResource: Int
-        get() = R.layout.dialog_sheet_interest_details
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogSheetInterestDetailsBinding =
+        DialogSheetInterestDetailsBinding.inflate(inflater, container, false)
 
     private val disposables = CompositeDisposable()
     private val custodialWalletManager: CustodialWalletManager by scopedInject()
@@ -63,20 +65,20 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
 
     private val listAdapter: InterestSummaryAdapter by lazy { InterestSummaryAdapter() }
 
-    override fun initControls(view: View) {
-        view.interest_details_list.apply {
+    override fun initControls(binding: DialogSheetInterestDetailsBinding) {
+        binding.interestDetailsList.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             addItemDecoration(BlockchainListDividerDecor(requireContext()))
             adapter = listAdapter
         }
 
-        view.apply {
-            interest_details_title.text = account.label
-            interest_details_sheet_header.text = getString(cryptoCurrency.assetName())
-            interest_details_label.text = getString(cryptoCurrency.assetName())
-            interest_details_asset_icon.setImageResource(cryptoCurrency.drawableResFilled())
+        binding.apply {
+            interestDetailsTitle.text = account.label
+            interestDetailsSheetHeader.text = getString(cryptoCurrency.assetName())
+            interestDetailsLabel.text = getString(cryptoCurrency.assetName())
+            interestDetailsAssetIcon.setImageResource(cryptoCurrency.drawableResFilled())
 
-            interest_details_activity_cta.setOnClickListener {
+            interestDetailsActivityCta.setOnClickListener {
                 host.gotoActivityFor(account as BlockchainAccount)
             }
             disposables += account.actions
@@ -84,9 +86,9 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
                 .onErrorReturn { false }
                 .subscribeBy {
                     if (it) {
-                        interest_details_deposit_cta.text =
+                        interestDetailsDepositCta.text =
                             getString(R.string.tx_title_deposit, cryptoCurrency.displayTicker)
-                        interest_details_deposit_cta.setOnClickListener {
+                        interestDetailsDepositCta.setOnClickListener {
                             // TODO how do we select accounts from here? For now choose default non-custodial
                             disposables += coincore[cryptoCurrency].accountGroup(AssetFilter.NonCustodial).subscribe {
                                 val defaultAccount = it.accounts.first { acc -> acc.isDefault }
@@ -95,7 +97,7 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
                             }
                         }
                     } else {
-                        interest_details_deposit_cta.gone()
+                        interestDetailsDepositCta.gone()
                     }
                 }
         }
@@ -116,7 +118,7 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
         }.observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = {
-                    compositeToView(it, view)
+                    compositeToView(it)
                 },
                 onError = {
                     Timber.e("Error loading interest summary details: $it")
@@ -124,29 +126,41 @@ class InterestSummarySheet : SlidingModalBottomDialog() {
             )
     }
 
-    private fun compositeToView(composite: CompositeInterestDetails, view: View) {
+    private fun compositeToView(composite: CompositeInterestDetails) {
         val itemList = mutableListOf<InterestSummaryInfoItem>()
         itemList.apply {
-            add(InterestSummaryInfoItem(getString(R.string.interest_summary_total),
-                composite.totalInterest.toStringWithSymbol()))
+            add(
+                InterestSummaryInfoItem(
+                    getString(R.string.interest_summary_total),
+                    composite.totalInterest.toStringWithSymbol()
+                )
+            )
 
             val sdf = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
             val formattedDate = sdf.format(composite.nextInterestPayment)
             add(InterestSummaryInfoItem(getString(R.string.interest_summary_next_payment), formattedDate))
 
-            add(InterestSummaryInfoItem(getString(R.string.interest_summary_accrued),
-                composite.pendingInterest.toStringWithSymbol()))
+            add(
+                InterestSummaryInfoItem(
+                    getString(R.string.interest_summary_accrued),
+                    composite.pendingInterest.toStringWithSymbol()
+                )
+            )
 
-            add(InterestSummaryInfoItem(getString(R.string.interest_summary_hold_period),
-                getString(R.string.interest_summary_hold_period_days, composite.lockupDuration)))
+            add(
+                InterestSummaryInfoItem(
+                    getString(R.string.interest_summary_hold_period),
+                    getString(R.string.interest_summary_hold_period_days, composite.lockupDuration)
+                )
+            )
 
             add(InterestSummaryInfoItem(getString(R.string.interest_summary_rate), "${composite.interestRate}%"))
         }
 
         composite.balance.run {
-            view.apply {
-                interest_details_crypto_value.text = toStringWithSymbol()
-                interest_details_fiat_value.text = toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
+            binding.apply {
+                interestDetailsCryptoValue.text = toStringWithSymbol()
+                interestDetailsFiatValue.text = toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency)
                     .toStringWithSymbol()
             }
         }

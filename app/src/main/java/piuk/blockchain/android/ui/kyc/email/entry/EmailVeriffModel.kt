@@ -13,16 +13,14 @@ class EmailVeriffModel(
 
     override fun performAction(previousState: EmailVeriffState, intent: EmailVeriffIntent): Disposable? =
         when (intent) {
-            EmailVeriffIntent.FetchEmail -> interactor.fetchEmail().subscribeBy(onSuccess = {
-                process(EmailVeriffIntent.EmailUpdated(it))
-            }, onError = {
-
-            })
+            EmailVeriffIntent.FetchEmail -> interactor.fetchEmail().subscribeBy(
+                onSuccess = {
+                    process(EmailVeriffIntent.EmailUpdated(it))
+                }, onError = {}
+            )
             EmailVeriffIntent.CancelEmailVerification -> interactor.cancelPolling().subscribeBy(
-                onComplete = {
-                },
-                onError = {
-                }
+                onComplete = {},
+                onError = {}
             )
             EmailVeriffIntent.StartEmailVerification -> interactor.fetchEmail().flatMapObservable {
                 if (!it.verified) {
@@ -30,15 +28,11 @@ class EmailVeriffModel(
                 } else Observable.just(it)
             }.subscribeBy(onNext = {
                 process(EmailVeriffIntent.EmailUpdated(it))
-            }, onError = {
-
-            })
+            }, onError = {})
             EmailVeriffIntent.UpdateEmail -> interactor.updateEmail(previousState.emailInput)
                 .subscribeBy(onSuccess = {
                     process(EmailVeriffIntent.EmailUpdated(it))
-                }, onError = {
-
-                })
+                }, onError = {})
             else -> null
         }
 }

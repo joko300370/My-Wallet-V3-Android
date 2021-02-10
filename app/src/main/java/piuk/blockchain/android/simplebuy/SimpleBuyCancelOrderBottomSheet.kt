@@ -1,15 +1,16 @@
 package piuk.blockchain.android.simplebuy
 
 import android.os.Bundle
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import com.blockchain.koin.scopedInject
-import kotlinx.android.synthetic.main.simple_buy_cancel_order_bottom_sheet.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.SimpleBuyCancelOrderBottomSheetBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.util.setOnClickListenerDebounced
 import java.lang.IllegalStateException
 
-class SimpleBuyCancelOrderBottomSheet : SlidingModalBottomDialog() {
+class SimpleBuyCancelOrderBottomSheet : SlidingModalBottomDialog<SimpleBuyCancelOrderBottomSheetBinding>() {
 
     interface Host : SlidingModalBottomDialog.Host {
         fun cancelOrderConfirmAction(cancelOrder: Boolean, orderId: String?)
@@ -22,28 +23,29 @@ class SimpleBuyCancelOrderBottomSheet : SlidingModalBottomDialog() {
 
     private val stateFactory: SimpleBuySyncFactory by scopedInject()
 
-    override val layoutResource: Int = R.layout.simple_buy_cancel_order_bottom_sheet
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): SimpleBuyCancelOrderBottomSheetBinding =
+        SimpleBuyCancelOrderBottomSheetBinding.inflate(inflater, container, false)
 
-    override fun initControls(view: View) {
+    override fun initControls(binding: SimpleBuyCancelOrderBottomSheetBinding) {
         val state = stateFactory.currentState()
 
         if (state?.selectedCryptoCurrency != null) {
-            with(view) {
+            with(binding) {
 
                 if (arguments.fromDashboard()) {
-                    cancel_order.text = getString(R.string.cancel_order_do_cancel_dashboard)
-                    go_back.text = getString(R.string.cancel_order_go_back_dashboard)
+                    cancelOrder.text = getString(R.string.cancel_order_do_cancel_dashboard)
+                    goBack.text = getString(R.string.cancel_order_go_back_dashboard)
                 }
 
-                cancel_order_token.text = getString(
+                cancelOrderToken.text = getString(
                     R.string.cancel_token_instruction,
                     state.selectedCryptoCurrency.displayTicker
                 )
-                cancel_order.setOnClickListenerDebounced {
+                cancelOrder.setOnClickListenerDebounced {
                     dismiss()
                     host.cancelOrderConfirmAction(true, state.id)
                 }
-                go_back.setOnClickListenerDebounced {
+                goBack.setOnClickListenerDebounced {
                     dismiss()
                     host.cancelOrderConfirmAction(false, null)
                 }

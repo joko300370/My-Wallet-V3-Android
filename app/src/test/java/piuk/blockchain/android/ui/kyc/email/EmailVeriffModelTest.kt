@@ -27,7 +27,7 @@ class EmailVeriffModelTest {
     }
 
     @Before
-    fun setUp(){
+    fun setUp() {
         model = EmailVeriffModel(
             interactor = interactor,
             observeScheduler = Schedulers.io()

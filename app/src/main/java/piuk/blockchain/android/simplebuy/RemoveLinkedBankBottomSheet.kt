@@ -2,7 +2,8 @@ package piuk.blockchain.android.simplebuy
 
 import android.content.DialogInterface
 import android.os.Bundle
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.models.data.Bank
@@ -10,13 +11,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.remove_bank_bottom_sheet.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.RemoveBankBottomSheetBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 
-class RemoveLinkedBankBottomSheet : SlidingModalBottomDialog() {
+class RemoveLinkedBankBottomSheet : SlidingModalBottomDialog<RemoveBankBottomSheetBinding>() {
 
     private val compositeDisposable = CompositeDisposable()
     private val custodialWalletManager: CustodialWalletManager by scopedInject()
@@ -24,15 +25,16 @@ class RemoveLinkedBankBottomSheet : SlidingModalBottomDialog() {
     private val bank: Bank by unsafeLazy {
         arguments?.getSerializable(BANK_KEY) as Bank
     }
-    override val layoutResource: Int = R.layout.remove_bank_bottom_sheet
 
-    override fun initControls(view: View) {
-        with(view) {
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): RemoveBankBottomSheetBinding =
+        RemoveBankBottomSheetBinding.inflate(inflater, container, false)
+
+    override fun initControls(binding: RemoveBankBottomSheetBinding) {
+        with(binding) {
             title.text = resources.getString(R.string.common_spaced_strings, bank.name, bank.currency)
-            end_digits.text = resources.getString(R.string.dotted_suffixed_string, bank.account)
-            account_info.text =
-                context.getString(R.string.payment_method_type_account_info, bank.toHumanReadableAccount(), "")
-            rmv_bank_btn.setOnClickListener {
+            endDigits.text = resources.getString(R.string.dotted_suffixed_string, bank.account)
+            accountInfo.text = getString(R.string.payment_method_type_account_info, bank.toHumanReadableAccount(), "")
+            rmvBankBtn.setOnClickListener {
                 compositeDisposable += custodialWalletManager.removeBank(bank)
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSubscribe {
@@ -51,9 +53,9 @@ class RemoveLinkedBankBottomSheet : SlidingModalBottomDialog() {
     }
 
     private fun updateUi(isLoading: Boolean) {
-        dialogView.progress.visibleIf { isLoading }
-        dialogView.icon.visibleIf { !isLoading }
-        dialogView.rmv_bank_btn.isEnabled = !isLoading
+        binding.progress.visibleIf { isLoading }
+        binding.icon.visibleIf { !isLoading }
+        binding.rmvBankBtn.isEnabled = !isLoading
     }
 
     override fun onDismiss(dialog: DialogInterface) {

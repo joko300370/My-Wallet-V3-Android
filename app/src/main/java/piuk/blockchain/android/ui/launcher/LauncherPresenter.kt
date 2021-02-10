@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.launcher
 
-import android.annotation.SuppressLint
 import android.app.LauncherActivity
 import android.content.Intent
 import com.blockchain.logging.CrashLogger
@@ -169,7 +168,7 @@ class LauncherPresenter(
                         if (emailVerifShouldLaunched) {
                             launchEmailVerification()
                         } else {
-                            launchEmailVerification()
+                            startMainActivity()
                         }
                     }, onError = { throwable ->
                         view.updateProgressVisibility(false)

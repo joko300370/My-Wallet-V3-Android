@@ -43,7 +43,7 @@ class EnterTargetAddressSheet : TransactionFlowSheet<DialogTxFlowEnterAddressBin
     private val disposables = CompositeDisposable()
 
     override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogTxFlowEnterAddressBinding =
-        DialogTxFlowEnterAddressBinding.inflate(inflater,container,false)
+        DialogTxFlowEnterAddressBinding.inflate(inflater, container, false)
 
     private val addressTextWatcher = object : AfterTextChangedWatcher() {
         override fun afterTextChanged(s: Editable?) {

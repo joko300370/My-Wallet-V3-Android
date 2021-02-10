@@ -2,13 +2,14 @@ package piuk.blockchain.android.ui.customviews
 
 import android.os.Bundle
 import android.os.Parcelable
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import kotlinx.android.parcel.Parcelize
-import kotlinx.android.synthetic.main.kyc_benefits_bottom_sheet.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.KycBenefitsBottomSheetBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 
-class KycBenefitsBottomSheet : SlidingModalBottomDialog() {
+class KycBenefitsBottomSheet : SlidingModalBottomDialog<KycBenefitsBottomSheetBinding>() {
 
     interface Host : SlidingModalBottomDialog.Host {
         fun verificationCtaClicked()
@@ -20,15 +21,16 @@ class KycBenefitsBottomSheet : SlidingModalBottomDialog() {
 
     override val host: Host by lazy {
         super.host as? Host ?: throw IllegalStateException(
-            "Host fragment is not a KycBenefitsBottomSheet.Host")
+            "Host fragment is not a KycBenefitsBottomSheet.Host"
+        )
     }
 
-    override val layoutResource: Int
-        get() = R.layout.kyc_benefits_bottom_sheet
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): KycBenefitsBottomSheetBinding =
+        KycBenefitsBottomSheetBinding.inflate(inflater, container, false)
 
-    override fun initControls(view: View) {
-        with(view) {
-            benefits_view.initWithBenefits(
+    override fun initControls(binding: KycBenefitsBottomSheetBinding) {
+        with(binding) {
+            benefitsView.initWithBenefits(
                 benefits = benefitsDetails.listOfBenefits,
                 title = benefitsDetails.title,
                 description = benefitsDetails.description,

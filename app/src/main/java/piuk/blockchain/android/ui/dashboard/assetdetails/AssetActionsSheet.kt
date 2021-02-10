@@ -18,7 +18,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.dialog_asset_actions_sheet.view.*
 import kotlinx.android.synthetic.main.item_asset_action.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
@@ -54,9 +53,6 @@ class AssetActionsSheet :
             statusDecorator = ::statusDecorator
         )
     }
-
-    override val layoutResource: Int
-        get() = R.layout.dialog_asset_actions_sheet
 
     override fun render(newState: AssetDetailsState) {
         if (this.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
@@ -113,7 +109,7 @@ class AssetActionsSheet :
         }
 
     private fun showAssetBalances(state: AssetDetailsState) {
-        dialogView.asset_actions_account_details.updateAccount(
+        binding.assetActionsAccountDetails.updateAccount(
             state.selectedAccount.selectFirstAccount(),
             {},
             PendingBalanceAccountDecorator(state.selectedAccount.selectFirstAccount())

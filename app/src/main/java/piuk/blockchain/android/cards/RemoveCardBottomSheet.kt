@@ -2,9 +2,7 @@ package piuk.blockchain.android.cards
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.viewbinding.ViewBinding
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.PaymentMethod
@@ -14,8 +12,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.remove_card_bottom_sheet.view.*
-import piuk.blockchain.android.R
-import piuk.blockchain.android.databinding.FragmentKycAddEmailBinding
 import piuk.blockchain.android.databinding.RemoveCardBottomSheetBinding
 import piuk.blockchain.android.simplebuy.RemovePaymentMethodBottomSheetHost
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
