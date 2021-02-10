@@ -84,7 +84,9 @@ class CryptographyManagerImpl : CryptographyManager {
     private fun removeKey(keyName: String) {
         val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE)
         keyStore.load(null) // Keystore must be loaded before it can be accessed
-        keyStore.deleteEntry(keyName)
+        if (keyStore.containsAlias(keyName)) {
+            keyStore.deleteEntry(keyName)
+        }
     }
 
     override fun clearData(secretKeyName: String) {
