@@ -152,7 +152,7 @@ class LauncherPresenter(
                     walletJustCreated()
                 }
             }.flatMap { emailVerifShouldLaunched ->
-                if (!emailVerifShouldLaunched && noCurrencySet())
+                if ( noCurrencySet())
                     updateFiatWithDefault.toSingleDefault(emailVerifShouldLaunched)
                 else {
                     Single.just(emailVerifShouldLaunched)
@@ -168,7 +168,7 @@ class LauncherPresenter(
                         if (emailVerifShouldLaunched) {
                             launchEmailVerification()
                         } else {
-                            startMainActivity()
+                            launchEmailVerification()
                         }
                     }, onError = { throwable ->
                         view.updateProgressVisibility(false)

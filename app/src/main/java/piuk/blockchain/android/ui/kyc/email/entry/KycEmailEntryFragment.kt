@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.blockchain.koin.scopedInject
+import piuk.blockchain.android.EmailVerificationArgs
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.FragmentKycAddEmailBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
@@ -12,6 +13,7 @@ import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.data.settings.Email
 
 class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, EmailVeriffState>(),
@@ -20,6 +22,11 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
     private val emailEntryHost: EmailEntryHost by ParentActivityDelegate(
         this
     )
+    private val emailMustBeValidated by lazy {
+        if (arguments?.containsKey("mustBeValidated") == true)
+            EmailVerificationArgs.fromBundle(arguments ?: Bundle()).mustBeValidated
+        else false
+    }
 
     private var _binding: FragmentKycAddEmailBinding? = null
 
@@ -43,6 +50,7 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
 
     override fun onDestroyView() {
         super.onDestroyView()
+
         _binding = null
     }
 
@@ -84,7 +92,7 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
             }
         }
         binding.ctaSecondary.apply {
-            visible()
+            visibleIf { !emailMustBeValidated }
             text = getString(R.string.common_skip)
             setOnClickListener {
                 emailEntryHost.onEmailVerificationSkipped()

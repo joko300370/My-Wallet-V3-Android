@@ -179,6 +179,9 @@
                 android:id="@+id/action_ValidateEmail"
                 app:destination="@id/kycEmailValidationFragment" />
         </fragment>
+        <argument
+            android:name="mustBeValidated"
+            app:argType="boolean" />
     </navigation>
     <action
         android:id="@+id/action_StartTier2NeedMoreInfo"
