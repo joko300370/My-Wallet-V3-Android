@@ -945,7 +945,7 @@
     <string name="daily_swap_and_buy_limit">Échange quotidien et limite d\'achat</string>
     <string name="simple_buy_own_crypto">Posséder la crypto en quelques minutes</string>
     <string name="simple_buy_verify_your_identity">Vérifiez votre identité et achetez une crypto</string>
-    <string name="simple_buy_skip">Sauter</string>
+    <string name="common_skip">Sauter</string>
     <string name="simple_buy_currency_selection_header">Votre devise locale pour stocker des fonds dans cette devise en tant que fonds dans votre portefeuille Blockchain.</string>
     <string name="payment_methods">méthodes de payement</string>
     <string name="payment_method">Mode de paiement</string>

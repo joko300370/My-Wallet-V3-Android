@@ -108,6 +108,12 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
         toolBar.title = getString(R.string.kyc_email_title)
     }
 
+    override fun onEmailVerified() {
+    }
+
+    override fun onEmailVerificationSkipped() {
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         supportFragmentManager.fragments.forEach { fragment ->

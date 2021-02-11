@@ -118,8 +118,8 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
         editText.setHint(R.string.password)
         editText.inputType =
             InputType.TYPE_CLASS_TEXT or
-                    InputType.TYPE_TEXT_VARIATION_PASSWORD or
-                    InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+                InputType.TYPE_TEXT_VARIATION_PASSWORD or
+                InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
 
         val frameLayout = ViewUtils.getAlertDialogPaddedView(this, editText)
 
@@ -164,5 +164,13 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
         setupToolbar(toolbar_general, R.string.security_check)
         toolbar_general.navigationIcon = null
         toolbar_general.visible()
+    }
+
+    override fun onEmailVerified() {
+        onStartMainActivity(null, false)
+    }
+
+    override fun onEmailVerificationSkipped() {
+        onStartMainActivity(null, false)
     }
 }

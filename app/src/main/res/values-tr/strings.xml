@@ -941,7 +941,7 @@
     <string name="daily_swap_and_buy_limit">Günlük Takas ve Satın Alma Limiti</string>
     <string name="simple_buy_own_crypto">Birkaç Dakika İçinde Kendi Kripto Param</string>
     <string name="simple_buy_verify_your_identity">Kimliğinizi doğrulayın ve kripto satın alın</string>
-    <string name="simple_buy_skip">Atla</string>
+    <string name="common_skip">Atla</string>
     <string name="simple_buy_currency_selection_header">Blockchain Cüzdanınızda para olarak bu para biriminde para saklamak için yerel para biriminiz.</string>
     <string name="payment_methods">Ödeme metodları</string>
     <string name="payment_method">Ödeme şekli</string>

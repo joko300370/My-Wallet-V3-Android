@@ -943,7 +943,7 @@ Euros/Dolares</string>
     <string name="daily_swap_and_buy_limit">Límite diario de intercambio y compra</string>
     <string name="simple_buy_own_crypto">Cripto propio en pocos minutos</string>
     <string name="simple_buy_verify_your_identity">Verifique su identidad y compre Criptomonedas</string>
-    <string name="simple_buy_skip">Omitir</string>
+    <string name="common_skip">Omitir</string>
     <string name="simple_buy_currency_selection_header">Su moneda local para almacenar fondos en esa moneda como fondos en su billetera Blockchain.</string>
     <string name="payment_methods">Métodos de pago</string>
     <string name="payment_method">Método de pago</string>

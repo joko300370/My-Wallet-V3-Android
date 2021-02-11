@@ -54,14 +54,24 @@
         app:layout_constraintTop_toBottomOf="@+id/email_status_text"
         tools:text="We sent a verification email to example@example.com. Please tap the link in the email to continue." />
 
-
     <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/cta_primary"
         style="@style/CtaButton.Blue"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/small_margin"
+        tools:text="@string/edit_email_address"
+        app:layout_constraintBottom_toTopOf="@+id/cta_secondary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/cta_secondary"
+        style="@style/CtaButton.White"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/standard_margin"
-        android:text="@string/edit_email_address"
-        android:id="@+id/edit_email_address"
+        tools:text="@string/edit_email_address"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

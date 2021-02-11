@@ -1261,7 +1261,7 @@
     <string name="simple_buy_intro_main_button_action">Buy Crypto Now</string>
     <string name="simple_buy_deposit_my_crypto">Tour the Wallet</string>
     <string name="simple_buy_skip_text">Explore your new Blockchain Wallet.</string>
-    <string name="simple_buy_skip">Skip</string>
+    <string name="common_skip">Skip</string>
     <string name="simple_buy_currency_selection_header">Your local currency to store funds in that currency as funds in your Blockchain Wallet.</string>
     <string name="simple_buy_get_started">Get Started</string>
     <string name="simple_buy_what_you_want_to_buy">What would you like to buy?</string>
