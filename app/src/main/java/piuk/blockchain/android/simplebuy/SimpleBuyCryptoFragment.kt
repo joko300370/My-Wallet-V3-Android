@@ -188,7 +188,9 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             crypto_exchange_rate.text = it.toStringWithSymbol()
         }
 
-        input_amount.maxLimit = newState.maxFiatAmount
+        newState.maxFiatAmount.takeIf { it.currencyCode == currencyPrefs.selectedFiatCurrency }?.let {
+            input_amount.maxLimit = it
+        }
 
         newState.selectedPaymentMethodDetails?.let {
             renderPaymentMethod(it)
