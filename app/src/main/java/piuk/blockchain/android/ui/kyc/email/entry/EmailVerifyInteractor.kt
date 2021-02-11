@@ -24,6 +24,10 @@ class EmailVerifyInteractor(private val emailUpdater: EmailSyncUpdater) {
         }
     }
 
+    fun resendEmail(email: String): Single<Email> {
+        return emailUpdater.updateEmailAndSync(email)
+    }
+
     fun updateEmail(email: String): Single<Email> =
         emailUpdater.updateEmailAndSync(email)
 

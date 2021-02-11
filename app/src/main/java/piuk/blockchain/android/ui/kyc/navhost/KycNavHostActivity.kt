@@ -20,6 +20,7 @@ import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.ui.kyc.email.entry.EmailEntryHost
+import piuk.blockchain.android.ui.kyc.email.entry.KycEmailEntryFragmentDirections
 import piuk.blockchain.android.util.invisibleIf
 import kotlinx.android.synthetic.main.activity_kyc_nav_host.frame_layout_fragment_wrapper as fragmentWrapper
 import kotlinx.android.synthetic.main.activity_kyc_nav_host.nav_host as navHostFragment
@@ -109,9 +110,13 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
     }
 
     override fun onEmailVerified() {
+        navigate(
+            KycEmailEntryFragmentDirections.actionAfterValidation()
+        )
     }
 
     override fun onEmailVerificationSkipped() {
+        throw IllegalStateException("Email must be verified")
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

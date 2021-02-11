@@ -45,7 +45,12 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         emailEntryHost.onEmailEntryFragmentShown()
-        model.process(EmailVeriffIntent.StartEmailVerification)
+
+        if (emailMustBeValidated && savedInstanceState == null) {
+            model.process(EmailVeriffIntent.ResendEmail)
+        } else {
+            model.process(EmailVeriffIntent.StartEmailVerification)
+        }
     }
 
     override fun onDestroyView() {

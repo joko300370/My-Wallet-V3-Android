@@ -29,4 +29,8 @@ sealed class EmailVeriffIntent : MviIntent<EmailVeriffState> {
     object UpdateEmail : EmailVeriffIntent() {
         override fun reduce(oldState: EmailVeriffState): EmailVeriffState = oldState.copy(isLoading = true)
     }
+
+    object ResendEmail : EmailVeriffIntent() {
+        override fun reduce(oldState: EmailVeriffState): EmailVeriffState = oldState.copy(isLoading = true)
+    }
 }
