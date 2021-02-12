@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import android.view.KeyEvent
 import com.google.android.material.textfield.TextInputEditText
 
-class KeyPrimeImeEditText : TextInputEditText {
+class KeyPreImeEditText : TextInputEditText {
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(

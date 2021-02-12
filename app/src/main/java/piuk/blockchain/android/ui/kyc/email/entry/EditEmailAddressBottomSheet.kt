@@ -14,7 +14,7 @@ import com.google.android.material.textfield.TextInputEditText
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.ChangeEmailBottomSheetBinding
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
-import piuk.blockchain.android.ui.customviews.KeyPrimeImeEditText
+import piuk.blockchain.android.ui.customviews.KeyPreImeEditText
 import piuk.blockchain.android.util.AfterTextChangedWatcher
 
 class EditEmailAddressBottomSheet :
@@ -55,7 +55,7 @@ class EditEmailAddressBottomSheet :
         model.process(EmailVeriffIntent.FetchEmail)
         showKeyboard()
         with(binding) {
-            editEmailInput.keyImeChangeListener = object : KeyPrimeImeEditText.KeyImeChange {
+            editEmailInput.keyImeChangeListener = object : KeyPreImeEditText.KeyImeChange {
                 override fun onKeyIme(keyCode: Int, event: KeyEvent?) {
                     if (keyCode == KEYCODE_BACK) {
                         dismiss()
