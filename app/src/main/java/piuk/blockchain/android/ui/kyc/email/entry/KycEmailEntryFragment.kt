@@ -97,17 +97,27 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
             visible()
             text = getString(R.string.check_my_inbox)
             setOnClickListener {
-                model.process(EmailVeriffIntent.CancelEmailVerification)
-                EditEmailAddressBottomSheet.newInstance(email.address).show(childFragmentManager, "BOTTOM_SHEET")
+              /*  model.process(EmailVeriffIntent.CancelEmailVerification)
+                EditEmailAddressBottomSheet.newInstance(email.address).show(childFragmentManager, "BOTTOM_SHEET")*/
             }
         }
         binding.ctaSecondary.apply {
             visible()
             text = getString(R.string.did_not_get_email)
             setOnClickListener {
+                model.process(EmailVeriffIntent.CancelEmailVerification)
                 ResendOrChangeEmailBottomSheet().show(childFragmentManager, "BOTTOM_SHEET")
             }
         }
+    }
+
+    override fun resendEmail() {
+        model.process(EmailVeriffIntent.ResendEmail)
+    }
+
+    override fun editEmail() {
+        model.process(EmailVeriffIntent.CancelEmailVerification)
+        EditEmailAddressBottomSheet.newInstance(email.address).show(childFragmentManager, "BOTTOM_SHEET")
     }
 
     override fun onSheetClosed() {
