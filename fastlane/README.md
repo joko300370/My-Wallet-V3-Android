@@ -40,7 +40,7 @@ Build Prod Release
 ```
 fastlane android test
 ```
-Run tests. Optional flags: environment (Staging), build_type (Debug), test_name (runs all by default).
+Run tests. Optional flags: environment (Staging), build_type (Debug), module(app), test_name (runs all by default). Environment and build_type are app module-only.
 ### android upload_to_internal_track
 ```
 fastlane android upload_to_internal_track

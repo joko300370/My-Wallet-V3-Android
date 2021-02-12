@@ -23,7 +23,7 @@ platform :android do
     lane :staging_release do
 
       gradle(
-        task: 'assemble',
+        task: 'bundle',
         build_type: 'Release',
         flavor: 'EnvStaging',
         print_command: false
@@ -47,7 +47,7 @@ platform :android do
     lane :prod_release do
 
       gradle(
-        task: 'assemble',
+        task: 'bundle',
         build_type: 'Release',
         flavor: 'EnvProd',
         print_command: false
@@ -56,7 +56,7 @@ platform :android do
     end
 
 
-    desc "Run tests. Optional flags: environment (Staging), build_type (Debug), test_name (runs all by default)."
+    desc "Run tests. Optional flags: environment (Staging), build_type (Debug), module(app), test_name (runs all by default). Environment and build_type are app module-only."
     lane :test do | options |
 
       environment = options[:environment] ? options[:environment] : "Staging"
@@ -65,20 +65,41 @@ platform :android do
 
       if options[:test_name]
 
-        gradle(
-          task: "test",
-          build_type: build_type + "UnitTest",
-          flavor: 'Env' + environment,
-          flags: "--tests " + options[:test_name]
-        )
+        if options[:module] != "app"
+
+          gradle(
+            task: ":" + options[:module] + ":test",
+            flags: "--tests " + options[:test_name]
+          )
+
+        else
+
+          gradle(
+            task: "test",
+            build_type: build_type + "UnitTest",
+            flavor: 'Env' + environment,
+            flags: "--tests " + options[:test_name]
+          )
+
+        end
 
       else
 
-        gradle(
-          task: "test",
-          build_type: build_type + "UnitTest",
-          flavor: 'Env' + environment,
-        )
+        if options[:module] != "app"
+
+          gradle(
+            task: ":" + options[:module] + ":test",
+          )
+
+        else
+
+          gradle(
+            task: "test",
+            build_type: build_type + "UnitTest",
+            flavor: 'Env' + environment,
+          )
+
+        end
         
       end
 
@@ -164,12 +185,10 @@ platform :android do
       #  APPCENTER_DISTRIBUTE_DESTINATIONS APPCENTER_DISTRIBUTE_RELEASE_NOTES and APPCENTER_APP_NAME
       file_path = options[:appcenter_file_path] ? options[:appcenter_file_path] : ENV["APPCENTER_DISTRIBUTE_FILE"]
       app_name = options[:app_name] ? options[:app_name] : ENV["APPCENTER_APP_NAME"]
-      testers_group = options[:testers_group] ? options[:testers_group] : ENV["APPCENTER_TESTERS_GROUP"]
 
       appcenter_upload(
         app_name: app_name,
-        file: file_path,
-        destinations: testers_group
+        file: file_path
       )
       
     end

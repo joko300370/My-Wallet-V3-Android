@@ -106,12 +106,29 @@ You can run any of the lane tasks defined in the `./fastlane/FastFile` (summary 
     # The <options> are given in the format of key1:value1 key2:value2 and so on
     bundle exec fastlane <lane> <options>
     
+    # For all the available options run
+    bundle exec fastlane
+    
     # Alternative, the bundle is preferred
     fastlane <lane> <options>
     
-Runing the unit tests
+Running builds
+    
+    # Staging and Debug are the default arguments for <environment> and <build_type>.
+    # Use environment:<environment> and build_type:<build_type> for specific builds.
+    bundle exec fastlane build
+    
+    # Use <environment>_<build_type> for building staging and prod debug and release builds like:
+    bundle exec fastlane prod_release
+    
+Running the unit tests
 
-    bundle exec fastlane execute_tests
+    # Staging and Debug are the default arguments for <environment> and <build_type>.
+    # Use environment:<environment> and build_type:<build_type> for specific test executions (app module only).
+    bundle exec fastlane test
+    
+    # Use <module> and  <test_name> to run tests for a single class only (or to run a single test). Example:
+    bundle exec fastlane test module:sunriver test_name:com.blockchain.sunriver.HorizonOperationMappingTest
     
 ### Troubleshooting
 
