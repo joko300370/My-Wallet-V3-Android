@@ -14,7 +14,6 @@ import piuk.blockchain.android.ui.kyc.address.Tier2Decision
 import piuk.blockchain.android.ui.kyc.address.Tier2DecisionAdapter
 import piuk.blockchain.android.ui.kyc.countryselection.KycCountrySelectionPresenter
 import piuk.blockchain.android.ui.kyc.email.entry.KycEmailEntryPresenter
-import piuk.blockchain.android.ui.kyc.email.validation.KycEmailValidationPresenter
 import piuk.blockchain.android.ui.kyc.invalidcountry.KycInvalidCountryPresenter
 import piuk.blockchain.android.ui.kyc.mobile.entry.KycMobileEntryPresenter
 import piuk.blockchain.android.ui.kyc.mobile.validation.KycMobileValidationPresenter
@@ -91,8 +90,6 @@ val kycUiModule = module {
         }
 
         factory { KycEmailEntryPresenter(get()) }
-
-        factory { KycEmailValidationPresenter(get(), get()) }
 
         factory {
             VeriffSplashPresenter(

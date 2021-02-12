@@ -168,7 +168,7 @@ class LauncherPresenter(
                         if (emailVerifShouldLaunched) {
                             launchEmailVerification()
                         } else {
-                            launchEmailVerification()
+                            startMainActivity()
                         }
                     }, onError = { throwable ->
                         view.updateProgressVisibility(false)
