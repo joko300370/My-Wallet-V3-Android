@@ -17,7 +17,7 @@ import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.data.settings.Email
 
 class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, EmailVeriffState>(),
-    SlidingModalBottomDialog.Host {
+    SlidingModalBottomDialog.Host, ResendOrChangeEmailBottomSheet.ResendOrChangeEmailHost {
 
     private val emailEntryHost: EmailEntryHost by ParentActivityDelegate(
         this
@@ -105,7 +105,7 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
             visible()
             text = getString(R.string.did_not_get_email)
             setOnClickListener {
-                emailEntryHost.onEmailNeverArrived()
+                ResendOrChangeEmailBottomSheet().show(childFragmentManager, "BOTTOM_SHEET")
             }
         }
     }
@@ -119,5 +119,4 @@ interface EmailEntryHost {
     fun onEmailEntryFragmentShown()
     fun onEmailVerified()
     fun onEmailVerificationSkipped()
-    fun onEmailNeverArrived()
 }
