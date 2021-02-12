@@ -5,6 +5,7 @@ import io.reactivex.Single
 import piuk.blockchain.android.networking.PollService
 import piuk.blockchain.androidcore.data.settings.Email
 import piuk.blockchain.androidcore.data.settings.EmailSyncUpdater
+import piuk.blockchain.androidcore.utils.extensions.thenSingle
 
 class EmailVerifyInteractor(private val emailUpdater: EmailSyncUpdater) {
 
@@ -18,9 +19,10 @@ class EmailVerifyInteractor(private val emailUpdater: EmailSyncUpdater) {
         emailUpdater.email()
 
     fun pollForEmailStatus(): Single<Email> {
-
-        return pollEmail.start(timerInSec = 1, retries = Integer.MAX_VALUE).map {
-            it.value
+        return cancelPolling().thenSingle {
+            pollEmail.start(timerInSec = 1, retries = Integer.MAX_VALUE).map {
+                it.value
+            }
         }
     }
 

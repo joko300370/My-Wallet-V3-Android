@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.kyc.email.entry
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -30,7 +31,6 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
 
     private var _binding: FragmentKycAddEmailBinding? = null
 
-    // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -58,7 +58,6 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
 
     override fun onDestroyView() {
         super.onDestroyView()
-
         _binding = null
     }
 
@@ -70,6 +69,7 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
         } else {
             drawUnVerifiedEmailUi(newState.email)
         }
+        lastSubmittedEmail = newState.email.address
     }
 
     private fun drawVerifiedEmailUi() {
@@ -97,8 +97,7 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
             visible()
             text = getString(R.string.check_my_inbox)
             setOnClickListener {
-              /*  model.process(EmailVeriffIntent.CancelEmailVerification)
-                EditEmailAddressBottomSheet.newInstance(email.address).show(childFragmentManager, "BOTTOM_SHEET")*/
+                openInbox()
             }
         }
         binding.ctaSecondary.apply {
@@ -111,18 +110,25 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
         }
     }
 
+    private fun openInbox() {
+        val intent = Intent(Intent.ACTION_MAIN)
+        intent.addCategory(Intent.CATEGORY_APP_EMAIL)
+        requireActivity().startActivity(intent)
+    }
+
     override fun resendEmail() {
         model.process(EmailVeriffIntent.ResendEmail)
     }
 
     override fun editEmail() {
         model.process(EmailVeriffIntent.CancelEmailVerification)
-        EditEmailAddressBottomSheet.newInstance(email.address).show(childFragmentManager, "BOTTOM_SHEET")
+        EditEmailAddressBottomSheet.newInstance(lastSubmittedEmail).show(childFragmentManager, "BOTTOM_SHEET")
     }
 
     override fun onSheetClosed() {
         model.process(EmailVeriffIntent.StartEmailVerification)
     }
+    private var lastSubmittedEmail = ""
 }
 
 interface EmailEntryHost {

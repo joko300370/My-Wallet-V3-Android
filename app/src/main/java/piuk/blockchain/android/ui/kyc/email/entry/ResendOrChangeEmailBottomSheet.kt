@@ -27,9 +27,11 @@ class ResendOrChangeEmailBottomSheet : SlidingModalBottomDialog<ResendOrEditEmai
         binding.apply {
             editEmail.setOnClickListener {
                 host.editEmail()
+                dismiss()
             }
             resend.setOnClickListener {
                 host.resendEmail()
+                dismiss()
             }
         }
     }
