@@ -51,6 +51,9 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
         } else {
             model.process(EmailVeriffIntent.StartEmailVerification)
         }
+        binding.skip.setOnClickListener {
+            emailEntryHost.onEmailVerificationSkipped()
+        }
     }
 
     override fun onDestroyView() {
@@ -88,7 +91,7 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
     private fun drawUnVerifiedEmailUi(email: Email) {
         binding.emailInstructions.text = getString(R.string.sent_email_verification, email.address)
         binding.emailStatusText.text = getString(R.string.email_verify)
-        binding.skip.visible()
+        binding.skip.visibleIf { !emailMustBeValidated }
         binding.txStateIndicator.gone()
         binding.ctaPrimary.apply {
             visible()
@@ -99,10 +102,10 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
             }
         }
         binding.ctaSecondary.apply {
-            visibleIf { !emailMustBeValidated }
-            text = getString(R.string.common_skip)
+            visible()
+            text = getString(R.string.did_not_get_email)
             setOnClickListener {
-                emailEntryHost.onEmailVerificationSkipped()
+                emailEntryHost.onEmailNeverArrived()
             }
         }
     }
@@ -116,4 +119,5 @@ interface EmailEntryHost {
     fun onEmailEntryFragmentShown()
     fun onEmailVerified()
     fun onEmailVerificationSkipped()
+    fun onEmailNeverArrived()
 }
