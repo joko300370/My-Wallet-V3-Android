@@ -1877,4 +1877,6 @@
     <string name="edit_email_address">Edit Email Address</string>
     <string name="common_save">Save</string>
     <string name="change_email_instructions">Enter your email address below and click Save. We’ll send you a verification email to this new address.</string>
+    <string name="check_my_inbox">Check My Inbox</string>
+    <string name="did_not_get_the_">Check My Inbox</string>
 </resources>

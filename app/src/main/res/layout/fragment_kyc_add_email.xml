@@ -19,6 +19,20 @@
         app:layout_constraintVertical_bias="0.35"
         app:srcCompat="@drawable/ic_verify_email" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/skip"
+        style="@style/Text.Blue.14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="@string/common_skip"
+        android:textAllCaps="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/tx_state_indicator"
         android:layout_width="20dp"

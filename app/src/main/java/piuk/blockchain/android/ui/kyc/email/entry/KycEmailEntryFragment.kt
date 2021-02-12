@@ -72,6 +72,7 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
     private fun drawVerifiedEmailUi() {
         binding.emailInstructions.text = getString(R.string.success_email_veriff)
         binding.emailStatusText.text = getString(R.string.email_verified)
+        binding.skip.gone()
         binding.txStateIndicator.setImageResource(R.drawable.ic_check_circle)
         binding.txStateIndicator.visible()
         binding.ctaPrimary.apply {
@@ -87,10 +88,11 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
     private fun drawUnVerifiedEmailUi(email: Email) {
         binding.emailInstructions.text = getString(R.string.sent_email_verification, email.address)
         binding.emailStatusText.text = getString(R.string.email_verify)
+        binding.skip.visible()
         binding.txStateIndicator.gone()
         binding.ctaPrimary.apply {
             visible()
-            text = getString(R.string.edit_email_address)
+            text = getString(R.string.check_my_inbox)
             setOnClickListener {
                 model.process(EmailVeriffIntent.CancelEmailVerification)
                 EditEmailAddressBottomSheet.newInstance(email.address).show(childFragmentManager, "BOTTOM_SHEET")
