@@ -187,7 +187,7 @@ private fun tiers(tier1: Pair<KycTierState, FiatValue>, tier2: Pair<KycTierState
         )
     )
 
-private fun email(): NavDirections = KycNavXmlDirections.actionStartEmailVerification()
+private fun email(): NavDirections = KycNavXmlDirections.actionStartEmailVerification(true)
 private fun mobile(): NavDirections = KycNavXmlDirections.actionStartMobileVerification("DE")
 private fun veriff(): NavDirections = KycNavXmlDirections.actionStartVeriff("DE")
 
