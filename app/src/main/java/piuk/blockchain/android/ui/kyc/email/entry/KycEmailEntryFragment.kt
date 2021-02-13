@@ -48,9 +48,8 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
 
         if (emailMustBeValidated && savedInstanceState == null) {
             model.process(EmailVeriffIntent.ResendEmail)
-        } else {
-            model.process(EmailVeriffIntent.StartEmailVerification)
         }
+        model.process(EmailVeriffIntent.StartEmailVerification)
         binding.skip.setOnClickListener {
             emailEntryHost.onEmailVerificationSkipped()
         }
@@ -120,7 +119,6 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
     }
 
     override fun editEmail() {
-        model.process(EmailVeriffIntent.CancelEmailVerification)
         EditEmailAddressBottomSheet().show(childFragmentManager, BOTTOM_SHEET)
     }
 

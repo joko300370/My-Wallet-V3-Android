@@ -23,20 +23,19 @@ class EmailVeriffModel(
                 onError = {}
             )
             EmailVeriffIntent.StartEmailVerification -> interactor.fetchEmail().flatMapObservable {
-                if (!it.verified) {
-                    interactor.pollForEmailStatus().toObservable().startWith(it)
-                } else Observable.just(it)
-            }.subscribeBy(onNext = {
+                    if (!it.verified) {
+                        interactor.pollForEmailStatus().toObservable().startWith(it)
+                    } else Observable.just(it)
+                }.subscribeBy(onNext = {
                 process(EmailVeriffIntent.EmailUpdated(it))
             }, onError = {})
 
             EmailVeriffIntent.ResendEmail -> interactor.fetchEmail().flatMap { interactor.resendEmail(it.address) }
                 .subscribeBy(onSuccess = {
                     process(EmailVeriffIntent.EmailUpdated(it))
-                    process(EmailVeriffIntent.StartEmailVerification)
                 }, onError = {})
 
-            EmailVeriffIntent.UpdateEmail -> {
+             EmailVeriffIntent.UpdateEmail -> {
                 check(previousState.emailInput != null)
                 interactor.updateEmail(previousState.emailInput).subscribeBy(onSuccess = {
                     process(EmailVeriffIntent.EmailUpdated(it))

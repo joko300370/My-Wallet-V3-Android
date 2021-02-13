@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.kyc.email
 
 import com.blockchain.android.testutils.rxInit
 import com.nhaarman.mockito_kotlin.whenever
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import org.amshove.kluent.mock
@@ -36,6 +37,7 @@ class EmailVeriffModelTest {
 
     @Test
     fun `for unverified email, it should return the unverified email and then the polling result`() {
+        whenever(interactor.cancelPolling()).thenReturn(Completable.complete())
         whenever(interactor.fetchEmail()).thenReturn(Single.just(Email("address@example.com", false)))
         whenever(interactor.pollForEmailStatus()).thenReturn(Single.just(Email("address@example.com", true)))
 
