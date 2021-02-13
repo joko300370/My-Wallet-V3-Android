@@ -7,7 +7,13 @@ sealed class EmailVeriffIntent : MviIntent<EmailVeriffState> {
 
     class EmailUpdated(private val mail: Email) : EmailVeriffIntent() {
         override fun reduce(oldState: EmailVeriffState): EmailVeriffState =
-            oldState.copy(email = mail, isLoading = false)
+            oldState.copy(
+                email = mail,
+                isLoading = false,
+                emailChanged = oldState.email != mail &&
+                    oldState.email.address.isNotEmpty() &&
+                    mail.address.isNotEmpty()
+            )
     }
 
     class UpdateEmailInput(private val emailInput: String) : EmailVeriffIntent() {

@@ -36,10 +36,12 @@ class EmailVeriffModel(
                     process(EmailVeriffIntent.StartEmailVerification)
                 }, onError = {})
 
-            EmailVeriffIntent.UpdateEmail -> interactor.updateEmail(previousState.emailInput)
-                .subscribeBy(onSuccess = {
+            EmailVeriffIntent.UpdateEmail -> {
+                check(previousState.emailInput != null)
+                interactor.updateEmail(previousState.emailInput).subscribeBy(onSuccess = {
                     process(EmailVeriffIntent.EmailUpdated(it))
                 }, onError = {})
+            }
             else -> null
         }
 }

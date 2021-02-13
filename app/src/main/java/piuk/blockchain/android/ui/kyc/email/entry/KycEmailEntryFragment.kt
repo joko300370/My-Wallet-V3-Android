@@ -69,7 +69,6 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
         } else {
             drawUnVerifiedEmailUi(newState.email)
         }
-        lastSubmittedEmail = newState.email.address
     }
 
     private fun drawVerifiedEmailUi() {
@@ -105,7 +104,7 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
             text = getString(R.string.did_not_get_email)
             setOnClickListener {
                 model.process(EmailVeriffIntent.CancelEmailVerification)
-                ResendOrChangeEmailBottomSheet().show(childFragmentManager, "BOTTOM_SHEET")
+                ResendOrChangeEmailBottomSheet().show(childFragmentManager, BOTTOM_SHEET)
             }
         }
     }
@@ -122,13 +121,16 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
 
     override fun editEmail() {
         model.process(EmailVeriffIntent.CancelEmailVerification)
-        EditEmailAddressBottomSheet.newInstance(lastSubmittedEmail).show(childFragmentManager, "BOTTOM_SHEET")
+        EditEmailAddressBottomSheet().show(childFragmentManager, BOTTOM_SHEET)
     }
 
     override fun onSheetClosed() {
         model.process(EmailVeriffIntent.StartEmailVerification)
     }
-    private var lastSubmittedEmail = ""
+
+    companion object {
+        const val BOTTOM_SHEET = "BOTTOM_SHEET"
+    }
 }
 
 interface EmailEntryHost {

@@ -23,6 +23,7 @@ class PollService<T : Any>(
         fetcher.repeatWhen { it.delay(timerInSec, TimeUnit.SECONDS).zipWith(Flowable.range(0, retries)) }
             .toObservable()
             .withLatestFrom(cancel.startWith(false))
+            .doOnNext { println("fetched email ${it.first}") }
             .takeUntil { (value, canceled) ->
                 matcher(value) || canceled
             }

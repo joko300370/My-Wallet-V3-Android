@@ -7,13 +7,16 @@ import piuk.blockchain.androidcore.data.settings.Email
 
 data class EmailVeriffState(
     val email: Email = Email("", false),
-    val emailInput: String = "",
-    val isLoading: Boolean = false
+    val emailInput: String? = null,
+    val isLoading: Boolean = false,
+    val emailChanged: Boolean = false
 ) : MviState {
 
     val canUpdateEmail: Boolean
         get() = emailInputIsValid() && email.address != emailInput
 
     private fun emailInputIsValid(): Boolean =
-        !TextUtils.isEmpty(emailInput) && Patterns.EMAIL_ADDRESS.matcher(emailInput).matches()
+        emailInput?.let {
+            !TextUtils.isEmpty(it) && Patterns.EMAIL_ADDRESS.matcher(it).matches()
+        } ?: false
 }

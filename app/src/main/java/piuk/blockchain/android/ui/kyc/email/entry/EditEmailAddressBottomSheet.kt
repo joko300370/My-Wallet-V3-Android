@@ -21,20 +21,19 @@ class EditEmailAddressBottomSheet :
     MviBottomSheet<EmailVeriffModel, EmailVeriffIntent, EmailVeriffState, ChangeEmailBottomSheetBinding>() {
     override val model: EmailVeriffModel by scopedInject()
 
-    private val defaultEmail: String by lazy {
-        check(arguments?.getString(CURRENT_EMAIL) != null) {
-            ("Current email not provided")
-        }
-        arguments?.getString(CURRENT_EMAIL) ?: ""
-    }
-
     override fun render(newState: EmailVeriffState) {
         binding.save.isEnabled =
             newState.canUpdateEmail &&
                 !newState.isLoading
 
-        if (newState.email.address.isNotEmpty() && newState.email.address != defaultEmail) {
+        if (newState.emailChanged) {
             dismiss()
+        }
+        if (newState.emailInput == null && newState.email.address.isNotEmpty()) {
+            binding.editEmailInput.apply {
+                setText(newState.email.address)
+                setSelection(newState.email.address.length)
+            }
         }
     }
 
@@ -68,11 +67,6 @@ class EditEmailAddressBottomSheet :
                 }
             })
 
-            editEmailInput.apply {
-                setText(defaultEmail)
-                setSelection(defaultEmail.length)
-            }
-
             save.setOnClickListener {
                 model.process(EmailVeriffIntent.UpdateEmail)
             }
@@ -86,15 +80,6 @@ class EditEmailAddressBottomSheet :
         inputView?.run {
             requestFocus()
             imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
-        }
-    }
-
-    companion object {
-        private const val CURRENT_EMAIL = "CURRENT_EMAIL_KEY"
-        fun newInstance(currentEmail: String) = EditEmailAddressBottomSheet().apply {
-            arguments = Bundle().also {
-                it.putString(CURRENT_EMAIL, currentEmail)
-            }
         }
     }
 }
