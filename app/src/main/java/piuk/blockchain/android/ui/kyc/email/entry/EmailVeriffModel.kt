@@ -35,11 +35,13 @@ class EmailVeriffModel(
                     process(EmailVeriffIntent.EmailUpdated(it))
                 }, onError = {})
 
-             EmailVeriffIntent.UpdateEmail -> {
+            EmailVeriffIntent.UpdateEmail -> {
                 check(previousState.emailInput != null)
                 interactor.updateEmail(previousState.emailInput).subscribeBy(onSuccess = {
                     process(EmailVeriffIntent.EmailUpdated(it))
-                }, onError = {})
+                }, onError = {
+                    process(EmailVeriffIntent.EmailUpdateFailed)
+                })
             }
             else -> null
         }
