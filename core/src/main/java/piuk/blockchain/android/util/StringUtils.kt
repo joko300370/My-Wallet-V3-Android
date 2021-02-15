@@ -24,7 +24,7 @@ class StringUtils(private val context: Context) {
     fun getStringWithMappedAnnotations(
         @StringRes stringId: Int,
         linksMap: Map<String, Uri?>,
-        launchActivity: Activity,
+        ctx: Context, //launchActivity: Activity,
         onClick: () -> Unit = {}
     ): CharSequence {
 
@@ -37,7 +37,7 @@ class StringUtils(private val context: Context) {
                 out.setSpan(
                     ClickableSpanWithoutUnderline {
                         linksMap[annotation.value]?.let {
-                            launchActivity.startActivity(Intent(Intent.ACTION_VIEW, it))
+                            ctx.startActivity(Intent(Intent.ACTION_VIEW, it))
                         }
                         onClick()
                     },

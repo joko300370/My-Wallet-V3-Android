@@ -104,7 +104,7 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
             item: TxConfirmationValue.FeeSelection,
             model: TransactionModel,
             analytics: TxFlowAnalytics,
-            activityContext: Activity,
+            activityContext: Context,
             stringUtils: StringUtils
         ) {
             updateFeeList(item.availableLevels.toList())
