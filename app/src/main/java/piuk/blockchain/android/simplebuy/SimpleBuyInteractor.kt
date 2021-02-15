@@ -196,15 +196,13 @@ class SimpleBuyInteractor(
                 ).map { paymentMethods ->
                     SimpleBuyIntent.PaymentMethodsUpdated(
                         availablePaymentMethods = paymentMethods,
-                   
-                        preselectedId = if (tier.isApprovedFor(
-                                KycTierLevel.GOLD
-                            ) || preselectedId != null
-                        ) {
-                            preselectedId
-                        } else {
-                            PaymentMethod.UNDEFINED_PAYMENT_ID
-                        }
+                        canLinkBank = paymentMethods.filterIsInstance<PaymentMethod.UndefinedBankTransfer>()
+                            .firstOrNull()?.isEligible ?: false,
+                        canAddCard = paymentMethods.filterIsInstance<PaymentMethod.UndefinedCard>()
+                            .firstOrNull()?.isEligible ?: false,
+                        canLinkFunds = paymentMethods.filterIsInstance<PaymentMethod.UndefinedFunds>()
+                            .firstOrNull()?.isEligible ?: false,
+                        preselectedId = preselectedId ?: PaymentMethod.UNDEFINED_PAYMENT_ID
                     )
                 }
             }

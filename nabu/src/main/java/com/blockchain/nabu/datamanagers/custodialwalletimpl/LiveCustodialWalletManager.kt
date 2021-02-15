@@ -358,7 +358,7 @@ class LiveCustodialWalletManager(
         fiatCurrency: String
     ): Completable =
         authenticator.authenticate {
-            nabuService.paymentMethods(it, fiatCurrency, true).doOnSuccess { paymentMethods ->
+            nabuService.paymentMethods(it, fiatCurrency, false).doOnSuccess { paymentMethods ->
                 updateSupportedCards(paymentMethods)
             }
         }.ignoreElement()
@@ -455,7 +455,7 @@ class LiveCustodialWalletManager(
                 getSupportedPaymentMethods(
                     sessionTokenResponse = it,
                     fiatCurrency = fiatCurrency,
-                    onlyEligible = onlyEligible || sddEligible,
+                    onlyEligible = onlyEligible,
                     sddEligible = sddEligible
                 )
             ) { custodialFiatBalance, cardsResponse, linkedBanks, paymentMethods ->
@@ -581,8 +581,7 @@ class LiveCustodialWalletManager(
             nabuService.paymentMethods(
                 sessionToken = it,
                 currency = fiatCurrency,
-                eligibleOnly = true,
-                tier = null
+                eligibleOnly = true
             ).map { methodsResponse ->
                 methodsResponse.mapNotNull { method ->
                     when (method.type) {
@@ -761,7 +760,7 @@ class LiveCustodialWalletManager(
 
     private fun getSupportedCurrenciesForWireTransfer(fiatCurrency: String): Single<List<String>> {
         return authenticator.authenticate {
-            nabuService.paymentMethods(it, fiatCurrency, true)
+            nabuService.paymentMethods(sessionToken = it, currency = fiatCurrency, eligibleOnly = true)
         }.map { methods ->
             methods.filter {
                 it.type == PaymentMethodResponse.BANK_ACCOUNT &&

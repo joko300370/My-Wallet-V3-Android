@@ -238,7 +238,7 @@ class NabuService(retrofit: Retrofit) {
         SendToMercuryAddressRequest(cryptoSymbol)
     ).wrapErrorMessage()
 
-    internal fun isSDDEligible():Single<SDDEligibilityResponse> =
+    internal fun isSDDEligible(): Single<SDDEligibilityResponse> =
         service.isSDDEligible(
         ).wrapErrorMessage()
 
@@ -512,12 +512,12 @@ class NabuService(retrofit: Retrofit) {
     fun paymentMethods(
         sessionToken: NabuSessionTokenResponse,
         currency: String,
-        tier: Int?,
-        eligibleOnly: Boolean
+        eligibleOnly: Boolean,
+        tier: Int? = null
     ) = service.getPaymentMethodsForSimpleBuy(
         authorization = sessionToken.authHeader,
         currency = currency,
-        tier=tier,
+        tier = tier,
         eligibleOnly = eligibleOnly
     ).wrapErrorMessage()
 
