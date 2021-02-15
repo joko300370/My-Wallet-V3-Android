@@ -138,6 +138,7 @@ interface CustodialWalletManager {
 
     fun fetchSuggestedPaymentMethod(
         fiatCurrency: String,
+        sddEligible: Boolean,
         onlyEligible: Boolean
     ): Single<List<PaymentMethod>>
 
@@ -184,7 +185,7 @@ interface CustodialWalletManager {
 
     fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String>
 
-    fun isSDDEligible():Single<Boolean>
+    fun isSDDEligible(): Single<Boolean>
 
     fun createCustodialOrder(
         direction: TransferDirection,
@@ -427,7 +428,7 @@ sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val 
     Serializable {
     object Undefined : PaymentMethod(UNDEFINED_PAYMENT_ID, null, UNDEFINED_PAYMENT_METHOD_ORDER)
 
-    data class UndefinedCard(override val limits: PaymentLimits) :
+    data class UndefinedCard(override val limits: PaymentLimits, val isEligible: Boolean) :
         PaymentMethod(UNDEFINED_CARD_PAYMENT_ID, limits, UNDEFINED_CARD_PAYMENT_METHOD_ORDER)
 
     data class Funds(
@@ -437,10 +438,10 @@ sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val 
     ) :
         PaymentMethod(FUNDS_PAYMENT_ID, limits, FUNDS_PAYMENT_METHOD_ORDER)
 
-    data class UndefinedFunds(val fiatCurrency: String, override val limits: PaymentLimits) :
+    data class UndefinedFunds(val fiatCurrency: String, override val limits: PaymentLimits, val isEligible: Boolean) :
         PaymentMethod(UNDEFINED_FUNDS_PAYMENT_ID, limits, UNDEFINED_FUNDS_PAYMENT_METHOD_ORDER)
 
-    data class UndefinedBankTransfer(override val limits: PaymentLimits) :
+    data class UndefinedBankTransfer(override val limits: PaymentLimits, val isEligible: Boolean) :
         PaymentMethod(UNDEFINED_BANK_TRANSFER_PAYMENT_ID, limits, UNDEFINED_BANK_TRANSFER_METHOD_ORDER)
 
     data class Bank(
