@@ -3,28 +3,30 @@ package piuk.blockchain.android.ui.base
 import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import kotlinx.android.parcel.Parcelize
-import kotlinx.android.synthetic.main.error_sliding_bottom_dialog.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.ErrorSlidingBottomDialogBinding
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.lang.IllegalStateException
 
-class ErrorSlidingBottomDialog : SlidingModalBottomDialog() {
-    override val layoutResource: Int
-        get() = R.layout.error_sliding_bottom_dialog
+class ErrorSlidingBottomDialog : SlidingModalBottomDialog<ErrorSlidingBottomDialogBinding>() {
+
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): ErrorSlidingBottomDialogBinding =
+        ErrorSlidingBottomDialogBinding.inflate(inflater, container, false)
 
     private val errorDialogData: ErrorDialogData by unsafeLazy {
         arguments?.getParcelable(ERROR_DIALOG_DATA_KEY) as? ErrorDialogData
             ?: throw IllegalStateException("No Dialog date provided")
     }
 
-    override fun initControls(view: View) {
-        view.title.text = errorDialogData.title
-        view.description.text = errorDialogData.description
-        view.cta_button.text = errorDialogData.buttonText
+    override fun initControls(binding: ErrorSlidingBottomDialogBinding) {
+        binding.title.text = errorDialogData.title
+        binding.description.text = errorDialogData.description
+        binding.ctaButton.text = errorDialogData.buttonText
 
-        view.cta_button.setOnClickListener {
+        binding.ctaButton.setOnClickListener {
             dismiss()
         }
     }
@@ -40,12 +42,14 @@ class ErrorSlidingBottomDialog : SlidingModalBottomDialog() {
         fun newInstance(context: Context): ErrorSlidingBottomDialog =
             ErrorSlidingBottomDialog().apply {
                 arguments = Bundle().apply {
-                    putParcelable(ERROR_DIALOG_DATA_KEY,
+                    putParcelable(
+                        ERROR_DIALOG_DATA_KEY,
                         ErrorDialogData(
                             context.getString(R.string.ops),
                             context.getString(R.string.something_went_wrong_try_again),
                             context.getString(R.string.ok_cap)
-                        ))
+                        )
+                    )
                 }
             }
     }

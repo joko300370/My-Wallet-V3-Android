@@ -19,6 +19,8 @@ import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.toast
+import piuk.blockchain.android.ui.kyc.email.entry.EmailEntryHost
+import piuk.blockchain.android.ui.kyc.email.entry.KycEmailEntryFragmentDirections
 import piuk.blockchain.android.util.invisibleIf
 import kotlinx.android.synthetic.main.activity_kyc_nav_host.frame_layout_fragment_wrapper as fragmentWrapper
 import kotlinx.android.synthetic.main.activity_kyc_nav_host.nav_host as navHostFragment
@@ -103,6 +105,20 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
     }
 
+    override fun onEmailEntryFragmentShown() {
+        toolBar.title = getString(R.string.kyc_email_title)
+    }
+
+    override fun onEmailVerified() {
+        navigate(
+            KycEmailEntryFragmentDirections.actionAfterValidation()
+        )
+    }
+
+    override fun onEmailVerificationSkipped() {
+        throw IllegalStateException("Email must be verified")
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         supportFragmentManager.fragments.forEach { fragment ->
@@ -134,8 +150,8 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
     private fun flowShouldBeClosedAfterBackAction() =
         // If on final page, close host Activity on navigate up
         currentFragment is ApplicationCompleteFragment ||
-                // If not coming from settings, we want the 1st launched screen to be the 1st screen in the stack
-                (navInitialDestination != null && navInitialDestination?.id == navController.currentDestination?.id)
+            // If not coming from settings, we want the 1st launched screen to be the 1st screen in the stack
+            (navInitialDestination != null && navInitialDestination?.id == navController.currentDestination?.id)
 
     override fun createPresenter(): KycNavHostPresenter = presenter
 
@@ -145,7 +161,7 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
 
     companion object {
 
-//        const val RESULT_KYC_STX_COMPLETE = 5
+        //        const val RESULT_KYC_STX_COMPLETE = 5
 
         private const val EXTRA_CAMPAIGN_TYPE = "piuk.blockchain.android.EXTRA_CAMPAIGN_TYPE"
         const val EXTRA_SHOW_TIERS_LIMITS_SPLASH = "piuk.blockchain.android.EXTRA_SHOW_TIERS_LIMITS_SPLASH"
@@ -188,7 +204,7 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
     }
 }
 
-interface KycProgressListener {
+interface KycProgressListener : EmailEntryHost {
 
     val campaignType: CampaignType
 

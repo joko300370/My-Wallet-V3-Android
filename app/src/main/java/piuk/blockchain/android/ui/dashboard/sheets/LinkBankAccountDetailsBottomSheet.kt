@@ -3,7 +3,8 @@ package piuk.blockchain.android.ui.dashboard.sheets
 import android.net.Uri
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import com.blockchain.koin.scopedInject
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import piuk.blockchain.android.simplebuy.linkBankEventWithCurrency
@@ -15,12 +16,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.bank_details_error_layout.view.*
-import kotlinx.android.synthetic.main.dialog_sheet_link_bank_account.view.*
-import kotlinx.android.synthetic.main.dialog_sheet_link_bank_account.view.title
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.databinding.DialogSheetLinkBankAccountBinding
 import piuk.blockchain.android.simplebuy.BankDetailField
 import piuk.blockchain.android.simplebuy.CopyFieldListener
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
@@ -30,7 +29,7 @@ import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 
-class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog() {
+class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog<DialogSheetLinkBankAccountBinding>() {
 
     private val compositeDisposable = CompositeDisposable()
     private val custodialWalletManager: CustodialWalletManager by scopedInject()
@@ -45,20 +44,21 @@ class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog() {
         arguments?.getBoolean(IS_FOR_LINK) ?: false
     }
 
-    override val layoutResource = R.layout.dialog_sheet_link_bank_account
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogSheetLinkBankAccountBinding =
+        DialogSheetLinkBankAccountBinding.inflate(inflater, container, false)
 
-    override fun initControls(view: View) {
+    override fun initControls(binding: DialogSheetLinkBankAccountBinding) {
         compositeDisposable += custodialWalletManager.getBankAccountDetails(fiatCurrency)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { bankAccount ->
-                    view.bank_details.initWithBankDetailsAndAmount(
+                    binding.bankDetails.initWithBankDetailsAndAmount(
                         bankAccount.details.map {
                             BankDetailField(it.title, it.value, it.isCopyable)
                         },
                         copyListener
                     )
-                    configureUi(fiatCurrency, view)
+                    configureUi(fiatCurrency)
 
                     analytics.logEvent(
                         linkBankEventWithCurrency(
@@ -68,7 +68,7 @@ class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog() {
                     )
                 },
                 onError = {
-                    renderErrorUi(view)
+                    renderErrorUi()
                     analytics.logEvent(
                         linkBankEventWithCurrency(
                             SimpleBuyAnalytics.LINK_BANK_LOADING_ERROR,
@@ -79,39 +79,39 @@ class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog() {
             )
     }
 
-    private fun renderErrorUi(view: View) {
-        with(view) {
-            bank_details_error.visible()
-            bank_details_error.error_button.setOnClickListener {
+    private fun renderErrorUi() {
+        with(binding) {
+            bankDetailsError.errorContainer.visible()
+            bankDetailsError.errorButton.setOnClickListener {
                 dismiss()
             }
             title.gone()
             subtitle.gone()
-            bank_details.gone()
-            bank_transfer_only.gone()
-            processing_time.gone()
-            bank_deposit_instruction.gone()
+            bankDetails.gone()
+            bankTransferOnly.gone()
+            processingTime.gone()
+            bankDepositInstruction.gone()
         }
     }
 
-    private fun configureUi(fiatCurrency: String, view: View) {
-        with(view) {
+    private fun configureUi(fiatCurrency: String) {
+        with(binding) {
             if (fiatCurrency == "GBP") {
                 val linksMap = mapOf<String, Uri>(
                     "modular_terms_and_conditions" to Uri.parse(MODULAR_TERMS_AND_CONDITIONS)
                 )
-                bank_deposit_instruction.text =
+                bankDepositInstruction.text =
                     stringUtils.getStringWithMappedAnnotations(
                         R.string.by_depositing_funds_terms_and_conds,
                         linksMap,
                         requireActivity()
                     )
-                bank_deposit_instruction.movementMethod = LinkMovementMethod.getInstance()
+                bankDepositInstruction.movementMethod = LinkMovementMethod.getInstance()
             } else {
-                bank_deposit_instruction.gone()
+                bankDepositInstruction.gone()
             }
 
-            processing_time.updateSubtitle(
+            processingTime.updateSubtitle(
                 if (fiatCurrency == "GBP") getString(R.string.processing_time_subtitle_gbp)
                 else getString(R.string.processing_time_subtitle_eur)
             )
@@ -119,8 +119,8 @@ class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog() {
                 getString(R.string.deposit_currency, fiatCurrency)
             subtitle.text = getString(R.string.bank_transfer)
 
-            bank_transfer_only.visible()
-            processing_time.visible()
+            bankTransferOnly.visible()
+            processingTime.visible()
         }
     }
 

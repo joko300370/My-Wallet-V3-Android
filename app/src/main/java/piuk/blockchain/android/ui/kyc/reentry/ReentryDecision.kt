@@ -41,7 +41,7 @@ class ReentryDecisionKycNavigator(
 
     override fun userAndReentryPointToDirections(user: NabuUser, reentryPoint: ReentryPoint) =
         when (reentryPoint) {
-            ReentryPoint.EmailEntry -> KycNavXmlDirections.actionStartEmailVerification()
+            ReentryPoint.EmailEntry -> KycNavXmlDirections.actionStartEmailVerification(true)
             ReentryPoint.CountrySelection -> KycNavXmlDirections.actionStartCountrySelection()
             ReentryPoint.Profile -> KycNavXmlDirections.actionStartProfile(
                 user.requireCountryCode(), user.address?.state ?: "", user.address?.state ?: ""

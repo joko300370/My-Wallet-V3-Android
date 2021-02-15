@@ -20,7 +20,7 @@ interface LauncherView : View {
 
     fun onStartMainActivity(uri: Uri?, launchBuySellIntro: Boolean = false)
 
-    fun launchBuySellIntro()
+    fun launchEmailVerification()
 
     fun onReEnterPassword()
 

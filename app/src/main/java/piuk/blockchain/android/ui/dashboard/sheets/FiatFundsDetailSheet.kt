@@ -1,7 +1,8 @@
 package piuk.blockchain.android.ui.dashboard.sheets
 
 import android.content.Context
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import com.blockchain.koin.scopedInject
@@ -14,20 +15,19 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.dialog_sheet_fiat_funds_detail.view.*
-import kotlinx.android.synthetic.main.item_dashboard_funds.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NullFiatAccount
+import piuk.blockchain.android.databinding.DialogSheetFiatFundsDetailBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 
-class FiatFundsDetailSheet : SlidingModalBottomDialog() {
+class FiatFundsDetailSheet : SlidingModalBottomDialog<DialogSheetFiatFundsDetailBinding>() {
 
     interface Host : SlidingModalBottomDialog.Host {
         fun depositFiat(account: FiatAccount)
@@ -38,7 +38,8 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
 
     override val host: Host by lazy {
         super.host as? Host ?: throw IllegalStateException(
-            "Host fragment is not a FiatFundsDetailSheet.Host")
+            "Host fragment is not a FiatFundsDetailSheet.Host"
+        )
     }
 
     private val prefs: CurrencyPrefs by scopedInject()
@@ -48,18 +49,18 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
 
     private var account: FiatAccount = NullFiatAccount
 
-    override val layoutResource: Int
-        get() = R.layout.dialog_sheet_fiat_funds_detail
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogSheetFiatFundsDetailBinding =
+        DialogSheetFiatFundsDetailBinding.inflate(inflater, container, false)
 
-    override fun initControls(view: View) {
+    override fun initControls(binding: DialogSheetFiatFundsDetailBinding) {
         val ticker = account.fiatCurrency
-        view.apply {
-            funds_title.setStringFromTicker(context, ticker)
-            funds_fiat_ticker.text = ticker
-            funds_icon.setIcon(ticker)
+        binding.apply {
+            fundDetails.fundsTitle.setStringFromTicker(requireContext(), ticker)
+            fundDetails.fundsFiatTicker.text = ticker
+            fundDetails.fundsIcon.setIcon(ticker)
 
-            funds_balance.gone()
-            funds_user_fiat_balance.gone()
+            fundDetails.fundsBalance.gone()
+            fundDetails.fundsUserFiatBalance.gone()
 
             disposables += Singles.zip(
                 account.accountBalance,
@@ -67,14 +68,14 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
                 account.actions
             ).observeOn(AndroidSchedulers.mainThread()).subscribeBy(
                 onSuccess = { (fiatBalance, userFiatBalance, actions) ->
-                    funds_user_fiat_balance.visibleIf { prefs.selectedFiatCurrency != ticker }
-                    funds_user_fiat_balance.text = userFiatBalance.toStringWithSymbol()
+                    fundDetails.fundsUserFiatBalance.visibleIf { prefs.selectedFiatCurrency != ticker }
+                    fundDetails.fundsUserFiatBalance.text = userFiatBalance.toStringWithSymbol()
 
-                    funds_balance.text = fiatBalance.toStringWithSymbol()
-                    funds_balance.visibleIf { fiatBalance.isZero || fiatBalance.isPositive }
-                    funds_withdraw_holder.visibleIf { actions.contains(AssetAction.Withdraw) }
-                    funds_deposit_holder.visibleIf { actions.contains(AssetAction.Deposit) }
-                    funds_activity_holder.visibleIf { actions.contains(AssetAction.ViewActivity) }
+                    fundDetails.fundsBalance.text = fiatBalance.toStringWithSymbol()
+                    fundDetails.fundsBalance.visibleIf { fiatBalance.isZero || fiatBalance.isPositive }
+                    fundsWithdrawHolder.visibleIf { actions.contains(AssetAction.Withdraw) }
+                    fundsDepositHolder.visibleIf { actions.contains(AssetAction.Deposit) }
+                    fundsActivityHolder.visibleIf { actions.contains(AssetAction.ViewActivity) }
                 },
                 onError = {
                     Timber.e("Error getting fiat funds balances: $it")
@@ -86,7 +87,7 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onSuccess = { tiers ->
-                        funds_deposit_holder.setOnClickListener {
+                        fundsDepositHolder.setOnClickListener {
                             dismiss()
                             if (!tiers.isApprovedFor(KycTierLevel.GOLD)) {
                                 host.showFundsKyc()
@@ -101,12 +102,12 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
                     }
                 )
 
-            funds_withdraw_holder.setOnClickListener {
+            fundsWithdrawHolder.setOnClickListener {
                 dismiss()
                 host.withdrawFiat(account.fiatCurrency)
             }
 
-            funds_activity_holder.setOnClickListener {
+            fundsActivityHolder.setOnClickListener {
                 dismiss()
                 host.gotoActivityFor(account)
             }
@@ -114,8 +115,10 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog() {
     }
 
     private fun showErrorToast() {
-        ToastCustom.makeText(requireContext(), getString(R.string.common_error), Toast.LENGTH_SHORT,
-            ToastCustom.TYPE_ERROR)
+        ToastCustom.makeText(
+            requireContext(), getString(R.string.common_error), Toast.LENGTH_SHORT,
+            ToastCustom.TYPE_ERROR
+        )
     }
 
     companion object {

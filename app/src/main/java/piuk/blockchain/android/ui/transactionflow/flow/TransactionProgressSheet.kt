@@ -1,17 +1,20 @@
 package piuk.blockchain.android.ui.transactionflow.flow
 
 import android.util.DisplayMetrics
-import android.view.View
-import kotlinx.android.synthetic.main.dialog_tx_flow_in_progress.view.*
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.DialogTxFlowInProgressBinding
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
 import piuk.blockchain.android.ui.transactionflow.engine.TxExecutionStatus
 import timber.log.Timber
 
-class TransactionProgressSheet : TransactionFlowSheet() {
-    override val layoutResource: Int = R.layout.dialog_tx_flow_in_progress
+class TransactionProgressSheet : TransactionFlowSheet<DialogTxFlowInProgressBinding>() {
+
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogTxFlowInProgressBinding =
+        DialogTxFlowInProgressBinding.inflate(inflater, container, false)
 
     private val customiser: TransactionFlowCustomiser by inject()
     private val MAX_STACKTRACE_CHARS = 400
@@ -20,16 +23,16 @@ class TransactionProgressSheet : TransactionFlowSheet() {
         Timber.d("!TRANSACTION!> Rendering! TransactionProgressSheet")
         require(newState.currentStep == TransactionStep.IN_PROGRESS)
 
-        dialogView.tx_progress_view.setAssetIcon(customiser.transactionProgressIcon(newState))
+        binding.txProgressView.setAssetIcon(customiser.transactionProgressIcon(newState))
 
         when (newState.executionStatus) {
-            is TxExecutionStatus.InProgress -> dialogView.tx_progress_view.showTxInProgress(
+            is TxExecutionStatus.InProgress -> binding.txProgressView.showTxInProgress(
                 customiser.transactionProgressTitle(newState),
                 customiser.transactionProgressMessage(newState)
             )
             is TxExecutionStatus.Completed -> {
                 analyticsHooks.onTransactionSuccess(newState)
-                dialogView.tx_progress_view.showTxSuccess(
+                binding.txProgressView.showTxSuccess(
                     customiser.transactionCompleteTitle(newState),
                     customiser.transactionCompleteMessage(newState)
                 )
@@ -38,7 +41,7 @@ class TransactionProgressSheet : TransactionFlowSheet() {
                 analyticsHooks.onTransactionFailure(
                     newState, collectStackTraceString(newState.executionStatus.exception)
                 )
-                dialogView.tx_progress_view.showTxError(
+                binding.txProgressView.showTxError(
                     customiser.transactionProgressExceptionMessage(newState),
                     getString(R.string.send_progress_error_subtitle)
                 )
@@ -61,15 +64,15 @@ class TransactionProgressSheet : TransactionFlowSheet() {
         return stackTraceString
     }
 
-    override fun initControls(view: View) {
-        view.tx_progress_view.onCtaClick {
+    override fun initControls(binding: DialogTxFlowInProgressBinding) {
+        binding.txProgressView.onCtaClick {
             dismiss()
         }
 
         // this is needed to show the expanded dialog, with space at the top and bottom
         val metrics = DisplayMetrics()
         requireActivity().windowManager?.defaultDisplay?.getMetrics(metrics)
-        dialogView.layoutParams.height = (metrics.heightPixels - (48 * metrics.density)).toInt()
-        dialogView.requestLayout()
+        binding.root.layoutParams.height = (metrics.heightPixels - (48 * metrics.density)).toInt()
+        binding.root.requestLayout()
     }
 }

@@ -1,16 +1,17 @@
 package piuk.blockchain.android.ui.activity.detail
 
 import android.os.Bundle
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.TransactionState
 import com.blockchain.nabu.datamanagers.TransactionType
-import kotlinx.android.synthetic.main.dialog_sheet_activity_details.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
+import piuk.blockchain.android.databinding.DialogSheetActivityDetailsBinding
 import piuk.blockchain.android.repositories.AssetActivityRepository
 import piuk.blockchain.android.ui.activity.detail.adapter.FiatDetailsSheetAdapter
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
@@ -20,8 +21,7 @@ import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.android.util.gone
 import java.util.Date
 
-class FiatActivityDetailsBottomSheet :
-    SlidingModalBottomDialog() {
+class FiatActivityDetailsBottomSheet : SlidingModalBottomDialog<DialogSheetActivityDetailsBinding>() {
     private val assetActivityRepository: AssetActivityRepository by scopedInject()
     private val fiatDetailsSheetAdapter = FiatDetailsSheetAdapter()
     private val currency: String by unsafeLazy {
@@ -32,14 +32,14 @@ class FiatActivityDetailsBottomSheet :
         arguments?.getString(TX_HASH_KEY) ?: throw IllegalStateException("No tx  provided")
     }
 
-    override val layoutResource: Int
-        get() = R.layout.dialog_sheet_activity_details
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogSheetActivityDetailsBinding =
+        DialogSheetActivityDetailsBinding.inflate(inflater, container, false)
 
-    override fun initControls(view: View) {
-        with(view) {
-            confirmation_progress.gone()
-            confirmation_label.gone()
-            custodial_tx_button.gone()
+    override fun initControls(binding: DialogSheetActivityDetailsBinding) {
+        with(binding) {
+            confirmationProgress.gone()
+            confirmationLabel.gone()
+            custodialTxButton.gone()
 
             assetActivityRepository.findCachedItem(currency, txHash)?.let {
                 title.text =
@@ -51,7 +51,7 @@ class FiatActivityDetailsBottomSheet :
                 status.apply {
                     configureForState(it.state)
                 }
-                with(details_list) {
+                with(detailsList) {
                     addItemDecoration(BlockchainListDividerDecor(requireContext()))
 
                     layoutManager = LinearLayoutManager(
@@ -88,8 +88,10 @@ class FiatActivityDetailsBottomSheet :
                     getString(R.string.common_to)
                 } else {
                     getString(R.string.common_from)
-                }, item.account.label),
-            FiatDetailItem(getString(R.string.amount), item.value.toStringWithSymbol()))
+                }, item.account.label
+            ),
+            FiatDetailItem(getString(R.string.amount), item.value.toStringWithSymbol())
+        )
 
     companion object {
         private const val CURRENCY_KEY = "CURRENCY_KEY"

@@ -940,7 +940,7 @@
     <string name="daily_swap_and_buy_limit">Tägliches Swap- und Kauflimit</string>
     <string name="simple_buy_own_crypto">Eigene Krypto in wenigen Minuten</string>
     <string name="simple_buy_verify_your_identity">Überprüfen Sie Ihre Identität und kaufen Sie Krypto</string>
-    <string name="simple_buy_skip">Überspringen</string>
+    <string name="common_skip">Überspringen</string>
     <string name="simple_buy_currency_selection_header">Ihre lokale Währung, um Geld in dieser Währung als Geld in Ihrer Blockchain-Brieftasche zu speichern.</string>
     <string name="payment_methods">Zahlungsmethoden</string>
     <string name="payment_method">Bezahlverfahren</string>

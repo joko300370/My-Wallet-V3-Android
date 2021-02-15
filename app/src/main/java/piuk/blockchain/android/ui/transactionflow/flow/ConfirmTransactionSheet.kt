@@ -1,13 +1,13 @@
 package piuk.blockchain.android.ui.transactionflow.flow
 
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.ExchangeRates
-import kotlinx.android.synthetic.main.dialog_tx_flow_confirm.view.*
 import org.koin.android.ext.android.inject
-import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.DialogTxFlowConfirmBinding
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
@@ -18,8 +18,7 @@ import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 
-class ConfirmTransactionSheet : TransactionFlowSheet() {
-    override val layoutResource: Int = R.layout.dialog_tx_flow_confirm
+class ConfirmTransactionSheet : TransactionFlowSheet<DialogTxFlowConfirmBinding>() {
 
     private val stringUtils: StringUtils by inject()
     private val exchangeRates: ExchangeRates by scopedInject()
@@ -39,6 +38,9 @@ class ConfirmTransactionSheet : TransactionFlowSheet() {
         )
     }
 
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogTxFlowConfirmBinding =
+        DialogTxFlowConfirmBinding.inflate(inflater, container, false)
+
     override fun render(newState: TransactionState) {
         Timber.d("!TRANSACTION!> Rendering! ConfirmTransactionSheet")
         require(newState.currentStep == TransactionStep.CONFIRM_DETAIL)
@@ -47,28 +49,28 @@ class ConfirmTransactionSheet : TransactionFlowSheet() {
         newState.pendingTx?.let {
             listAdapter.items = newState.pendingTx.confirmations.toList()
             listAdapter.notifyDataSetChanged()
-            dialogView.amount.text = newState.pendingTx.amount.toStringWithSymbol()
-            dialogView.amount.visibleIf { customiser.amountHeaderConfirmationVisible(newState) }
+            binding.amount.text = newState.pendingTx.amount.toStringWithSymbol()
+            binding.amount.visibleIf { customiser.amountHeaderConfirmationVisible(newState) }
         }
 
-        with(dialogView) {
-            confirm_cta_button.text = customiser.confirmCtaText(newState)
-            confirm_sheet_title.text = customiser.confirmTitle(newState)
-            confirm_cta_button.isEnabled = newState.nextEnabled
-            confirm_sheet_back.visibleIf { newState.canGoBack }
+        with(binding) {
+            confirmCtaButton.text = customiser.confirmCtaText(newState)
+            confirmSheetTitle.text = customiser.confirmTitle(newState)
+            confirmCtaButton.isEnabled = newState.nextEnabled
+            confirmSheetBack.visibleIf { newState.canGoBack }
 
             if (customiser.confirmDisclaimerVisibility(newState.action)) {
-                confirm_disclaimer.visible()
-                confirm_disclaimer.text = customiser.confirmDisclaimerBlurb(newState.action)
+                confirmDisclaimer.visible()
+                confirmDisclaimer.text = customiser.confirmDisclaimerBlurb(newState.action)
             }
         }
         cacheState(newState)
     }
 
-    override fun initControls(view: View) {
-        view.confirm_cta_button.setOnClickListener { onCtaClick() }
+    override fun initControls(binding: DialogTxFlowConfirmBinding) {
+        binding.confirmCtaButton.setOnClickListener { onCtaClick() }
 
-        with(view.confirm_details_list) {
+        with(binding.confirmDetailsList) {
             addItemDecoration(BlockchainListDividerDecor(requireContext()))
 
             layoutManager = LinearLayoutManager(
@@ -79,7 +81,7 @@ class ConfirmTransactionSheet : TransactionFlowSheet() {
             adapter = listAdapter
         }
 
-        view.confirm_sheet_back.setOnClickListener {
+        binding.confirmSheetBack.setOnClickListener {
             analyticsHooks.onStepBackClicked(state)
             model.process(TransactionIntent.ReturnToPreviousStep)
         }

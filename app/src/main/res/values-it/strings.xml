@@ -944,7 +944,7 @@
     <string name="daily_swap_and_buy_limit">Scambio giornaliero e limite di acquisto</string>
     <string name="simple_buy_own_crypto">Possiedi Crypto in pochi minuti</string>
     <string name="simple_buy_verify_your_identity">Verifica la tua identità e acquista criptovaluta</string>
-    <string name="simple_buy_skip">Salta</string>
+    <string name="common_skip">Salta</string>
     <string name="simple_buy_currency_selection_header">La tua valuta locale per archiviare fondi in quella valuta come fondi nel tuo Portafoglio Blockchain.</string>
     <string name="payment_methods">Modalità di pagamento</string>
     <string name="payment_method">Metodo di pagamento</string>

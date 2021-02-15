@@ -944,7 +944,7 @@
     <string name="daily_swap_and_buy_limit">Troca diária e limite de compra</string>
     <string name="simple_buy_own_crypto">Própria criptografia em alguns minutos</string>
     <string name="simple_buy_verify_your_identity">Verifique sua identidade e compre criptografia</string>
-    <string name="simple_buy_skip">Pular</string>
+    <string name="common_skip">Pular</string>
     <string name="simple_buy_currency_selection_header">A sua moeda local para armazenar fundos nessa moeda como fundos na sua Blockchain Wallet.</string>
     <string name="payment_methods">Métodos de Pagamento</string>
     <string name="payment_method">Forma de pagamento</string>

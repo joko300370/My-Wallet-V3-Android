@@ -134,7 +134,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
                 layoutElements.textTierState.text = getString(R.string.in_review)
                 layoutElements.textTierState.setTextColor(
                     ContextCompat.getColor(
-                        context!!,
+                        requireContext(),
                         R.color.kyc_in_progress
                     )
                 )

@@ -1,18 +1,18 @@
 package piuk.blockchain.android.ui.dashboard.sheets
 
 import android.content.DialogInterface
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import com.blockchain.preferences.DashboardPrefs
-import kotlinx.android.synthetic.main.dialog_backup_for_send.view.*
-import kotlinx.android.synthetic.main.dialog_custodial_intro.view.cta_button
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.databinding.DialogBackupForSendBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 
-class ForceBackupForSendSheet : SlidingModalBottomDialog() {
+class ForceBackupForSendSheet : SlidingModalBottomDialog<DialogBackupForSendBinding>() {
 
     interface Host : SlidingModalBottomDialog.Host {
         fun startBackupForTransfer()
@@ -28,27 +28,30 @@ class ForceBackupForSendSheet : SlidingModalBottomDialog() {
         super.host as? Host ?: throw IllegalStateException("Host fragment is not a ForceBackupForSendSheet.Host")
     }
 
-    override val layoutResource: Int = R.layout.dialog_backup_for_send
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogBackupForSendBinding =
+        DialogBackupForSendBinding.inflate(inflater, container, false)
 
-    override fun initControls(view: View) {
+    override fun initControls(binding: DialogBackupForSendBinding) {
         analytics.logEvent(SimpleBuyAnalytics.BACK_UP_YOUR_WALLET_SHOWN)
 
-        view.cta_button.setOnClickListener { onCtaClick() }
+        binding.ctaButton.setOnClickListener { onCtaClick() }
 
-        view.cta_later.setOnClickListener {
+        binding.ctaLater.setOnClickListener {
             reduceAttemptsAndNavigate()
         }
 
         val remainingSendsWithoutBackup = dashboardPrefs.remainingSendsWithoutBackup
 
         if (remainingSendsWithoutBackup == 0) {
-            view.cta_later.isEnabled = false
-            view.backup_sends_label.text = getString(R.string.backup_before_send_now_label)
+            binding.ctaLater.isEnabled = false
+            binding.backupSendsLabel.text = getString(R.string.backup_before_send_now_label)
         } else {
-            view.cta_later.isEnabled = true
-            view.backup_sends_label.text =
-                resources.getQuantityString(R.plurals.backup_before_send_later_label, remainingSendsWithoutBackup,
-                    remainingSendsWithoutBackup)
+            binding.ctaLater.isEnabled = true
+            binding.backupSendsLabel.text =
+                resources.getQuantityString(
+                    R.plurals.backup_before_send_later_label, remainingSendsWithoutBackup,
+                    remainingSendsWithoutBackup
+                )
         }
     }
 

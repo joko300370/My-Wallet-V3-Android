@@ -1261,7 +1261,7 @@
     <string name="simple_buy_intro_main_button_action">Buy Crypto Now</string>
     <string name="simple_buy_deposit_my_crypto">Tour the Wallet</string>
     <string name="simple_buy_skip_text">Explore your new Blockchain Wallet.</string>
-    <string name="simple_buy_skip">Skip</string>
+    <string name="common_skip">Skip</string>
     <string name="simple_buy_currency_selection_header">Your local currency to store funds in that currency as funds in your Blockchain Wallet.</string>
     <string name="simple_buy_get_started">Get Started</string>
     <string name="simple_buy_what_you_want_to_buy">What would you like to buy?</string>
@@ -1869,4 +1869,15 @@
     <string name="kyc_address_header_1">Blockchain.com is required by law to collect this information.</string>
     <string name="kyc_country_selection_search_hint_1">Select Your Country</string>
     <string name="kyc_country_selection_title_1">Select Your Country</string>
+    <string name="security_check">Security Check</string>
+    <string name="success_email_veriff">Success! Your email has been confirmed.</string>
+    <string name="email_verified">Email Verified</string>
+    <string name="sent_email_verification">We sent a verification email to %1$s. Please tap the link in the email to continue.</string>
+    <string name="email_verify">Verify Your Email</string>
+    <string name="edit_email_address">Edit Email Address</string>
+    <string name="common_save">Save</string>
+    <string name="change_email_instructions">Enter your email address below and click Save. We’ll send you a verification email to this new address.</string>
+    <string name="check_my_inbox">Check My Inbox</string>
+    <string name="did_not_get_email">Didn\'t get the email?</string>
+    <string name="send_again">Send Again</string>
 </resources>

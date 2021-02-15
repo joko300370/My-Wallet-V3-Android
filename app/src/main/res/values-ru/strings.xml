@@ -944,7 +944,7 @@
     <string name="daily_swap_and_buy_limit">Дневной своп и лимит покупки</string>
     <string name="simple_buy_own_crypto">Собственная криптография за несколько минут</string>
     <string name="simple_buy_verify_your_identity">Подтвердите свою личность и купите крипто</string>
-    <string name="simple_buy_skip">Пропускать</string>
+    <string name="common_skip">Пропускать</string>
     <string name="simple_buy_currency_selection_header">Ваша местная валюта для хранения средств в этой валюте в качестве средств в вашем Криптовалютном Кошельке Blockchain.</string>
     <string name="payment_methods">Способы оплаты</string>
     <string name="payment_method">Способ оплаты</string>

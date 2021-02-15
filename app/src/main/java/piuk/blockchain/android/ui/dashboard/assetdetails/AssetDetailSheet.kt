@@ -2,7 +2,8 @@ package piuk.blockchain.android.ui.dashboard.assetdetails
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.UiThread
 import androidx.appcompat.widget.AppCompatTextView
@@ -21,7 +22,6 @@ import com.google.android.material.tabs.TabLayout
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import info.blockchain.wallet.prices.data.PriceDatum
-import kotlinx.android.synthetic.main.dialog_sheet_dashboard_asset_details.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetFilter
@@ -29,6 +29,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
+import piuk.blockchain.android.databinding.DialogSheetDashboardAssetDetailsBinding
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.customviews.ToastCustom
@@ -49,8 +50,8 @@ import java.util.Currency
 import java.util.Date
 import java.util.Locale
 
-class AssetDetailSheet :
-    MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, AssetDetailsState>() {
+class AssetDetailSheet : MviBottomSheet<AssetDetailsModel,
+    AssetDetailsIntent, AssetDetailsState, DialogSheetDashboardAssetDetailsBinding>() {
     private val currencyPrefs: CurrencyPrefs by inject()
     private val locale = Locale.getDefault()
 
@@ -79,8 +80,8 @@ class AssetDetailSheet :
 
     override val model: AssetDetailsModel by scopedInject()
 
-    override val layoutResource: Int
-        get() = R.layout.dialog_sheet_dashboard_asset_details
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogSheetDashboardAssetDetailsBinding =
+        DialogSheetDashboardAssetDetailsBinding.inflate(inflater, container, false)
 
     @UiThread
     override fun render(newState: AssetDetailsState) {
@@ -92,9 +93,9 @@ class AssetDetailSheet :
             onGotAssetDetails(assetDisplayMap)
         }
 
-        dialogView.current_price.text = newState.assetFiatPrice
+        binding.currentPrice.text = newState.assetFiatPrice
 
-        configureTimespanSelectionUI(dialogView, newState.timeSpan)
+        configureTimespanSelectionUI(binding, newState.timeSpan)
 
         if (newState.chartLoading) {
             chartToLoadingState()
@@ -102,29 +103,31 @@ class AssetDetailSheet :
             chartToDataState()
         }
 
-        dialogView.chart.apply {
+        binding.chart.apply {
             if (newState.chartData != state.chartData) {
                 updateChart(this, newState.chartData)
             }
         }
 
-        updatePriceChange(dialogView.price_change, newState.chartData)
+        updatePriceChange(binding.priceChange, newState.chartData)
 
         state = newState
     }
 
-    override fun initControls(view: View) {
-        with(view) {
-            configureChart(chart,
+    override fun initControls(binding: DialogSheetDashboardAssetDetailsBinding) {
+        with(binding) {
+            configureChart(
+                chart,
                 getFiatSymbol(currencyPrefs.selectedFiatCurrency),
-                cryptoCurrency.getDecimalPlaces())
+                cryptoCurrency.getDecimalPlaces()
+            )
 
-            configureTabs(view.chart_price_periods)
+            configureTabs(chartPricePeriods)
 
-            current_price_title.text =
+            currentPriceTitle.text =
                 getString(R.string.dashboard_price_for_asset, cryptoCurrency.displayTicker)
 
-            asset_list.apply {
+            assetList.apply {
                 adapter = detailsAdapter
 
                 layoutManager = LinearLayoutManager(requireContext())
@@ -205,7 +208,7 @@ class AssetDetailSheet :
             visible()
             clear()
             if (data.isEmpty()) {
-                dialogView.price_change?.text = "--"
+                binding.priceChange.text = "--"
                 return
             }
             val entries = data
@@ -213,7 +216,8 @@ class AssetDetailSheet :
                 .map {
                     Entry(
                         it.timestamp.toFloat(),
-                        it.price!!.toFloat())
+                        it.price!!.toFloat()
+                    )
                 }
 
             this.data = LineData(LineDataSet(entries, null).apply {
@@ -249,10 +253,10 @@ class AssetDetailSheet :
     }
 
     private fun chartToLoadingState() {
-        with(dialogView) {
-            prices_loading?.visible()
-            chart?.invisible()
-            price_change?.apply {
+        with(binding) {
+            pricesLoading?.visible()
+            chart.invisible()
+            priceChange.apply {
                 text = "--"
                 setTextColor(ContextCompat.getColor(context, R.color.dashboard_chart_unknown))
             }
@@ -260,8 +264,8 @@ class AssetDetailSheet :
     }
 
     private fun chartToDataState() {
-        dialogView.prices_loading?.gone()
-        dialogView.chart?.visible()
+        binding.pricesLoading.gone()
+        binding.chart.visible()
     }
 
     private fun configureTabs(chartPricePeriods: TabLayout) {
@@ -356,7 +360,7 @@ class AssetDetailSheet :
         }
     }
 
-    private fun configureTimespanSelectionUI(view: View, selection: TimeSpan) {
+    private fun configureTimespanSelectionUI(binding: DialogSheetDashboardAssetDetailsBinding, selection: TimeSpan) {
         val dateFormat = when (selection) {
             TimeSpan.ALL_TIME -> SimpleDateFormat("yyyy", locale)
             TimeSpan.YEAR -> SimpleDateFormat("MMM ''yy", locale)
@@ -371,8 +375,8 @@ class AssetDetailSheet :
             TimeSpan.DAY -> 60 * 60 * 4F
         }
 
-        with(view) {
-            chart.chart.xAxis.apply {
+        with(binding) {
+            chart.xAxis.apply {
                 this.granularity = granularity
                 valueFormatter = object : ValueFormatter() {
                     override fun getFormattedValue(value: Float): String {
@@ -381,7 +385,7 @@ class AssetDetailSheet :
                 }
             }
 
-            price_change_period.text = resources.getString(
+            priceChangePeriod.text = resources.getString(
                 when (selection) {
                     TimeSpan.YEAR -> R.string.dashboard_time_span_last_year
                     TimeSpan.MONTH -> R.string.dashboard_time_span_last_month
@@ -391,7 +395,7 @@ class AssetDetailSheet :
                 }
             )
 
-            chart_price_periods.getTabAt(selection.ordinal)?.select()
+            chartPricePeriods.getTabAt(selection.ordinal)?.select()
         }
     }
 
