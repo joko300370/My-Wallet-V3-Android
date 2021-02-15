@@ -23,6 +23,7 @@ import com.blockchain.nabu.models.responses.nabu.SendToMercuryAddressResponse
 import com.blockchain.nabu.models.responses.nabu.SendWithdrawalAddressesRequest
 import com.blockchain.nabu.models.responses.nabu.SupportedDocuments
 import com.blockchain.nabu.models.responses.nabu.WalletMercuryLink
+import com.blockchain.nabu.models.responses.sdd.SDDEligibilityResponse
 import com.blockchain.nabu.models.responses.simplebuy.AddNewCardBodyRequest
 import com.blockchain.nabu.models.responses.simplebuy.BankAccountResponse
 import com.blockchain.nabu.models.responses.simplebuy.CardPartnerAttributes
@@ -236,6 +237,10 @@ class NabuService(retrofit: Retrofit) {
         sessionToken.authHeader,
         SendToMercuryAddressRequest(cryptoSymbol)
     ).wrapErrorMessage()
+
+    internal fun isSDDEligible():Single<SDDEligibilityResponse> =
+        service.isSDDEligible(
+        ).wrapErrorMessage()
 
     internal fun fetchQuote(
         sessionToken: NabuSessionTokenResponse,
@@ -507,10 +512,12 @@ class NabuService(retrofit: Retrofit) {
     fun paymentMethods(
         sessionToken: NabuSessionTokenResponse,
         currency: String,
+        tier: Int?,
         eligibleOnly: Boolean
     ) = service.getPaymentMethodsForSimpleBuy(
         authorization = sessionToken.authHeader,
         currency = currency,
+        tier=tier,
         eligibleOnly = eligibleOnly
     ).wrapErrorMessage()
 

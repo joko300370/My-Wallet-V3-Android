@@ -32,6 +32,7 @@ import com.blockchain.nabu.models.responses.nabu.SupportedDocumentsResponse
 import com.blockchain.nabu.models.responses.nabu.TierUpdateJson
 import com.blockchain.nabu.models.responses.nabu.VeriffToken
 import com.blockchain.nabu.models.responses.nabu.WalletMercuryLink
+import com.blockchain.nabu.models.responses.sdd.SDDEligibilityResponse
 import com.blockchain.nabu.models.responses.simplebuy.ActivateCardResponse
 import com.blockchain.nabu.models.responses.simplebuy.AddNewCardBodyRequest
 import com.blockchain.nabu.models.responses.simplebuy.AddNewCardResponse
@@ -212,6 +213,9 @@ internal interface Nabu {
         @Body currency: SendToMercuryAddressRequest
     ): Single<SendToMercuryAddressResponse>
 
+    @GET(SDD_ELIGIBLE)
+    fun isSDDEligible(): Single<SDDEligibilityResponse>
+
     @GET(NABU_SIMPLE_BUY_PAIRS)
     fun getSupportedSimpleBuyPairs(
         @Query("fiatCurrency") fiatCurrency: String? = null
@@ -363,6 +367,7 @@ internal interface Nabu {
     fun getPaymentMethodsForSimpleBuy(
         @Header("authorization") authorization: String,
         @Query("currency") currency: String,
+        @Query("tier") tier: Int?,
         @Query("eligibleOnly") eligibleOnly: Boolean
     ): Single<List<PaymentMethodResponse>>
 

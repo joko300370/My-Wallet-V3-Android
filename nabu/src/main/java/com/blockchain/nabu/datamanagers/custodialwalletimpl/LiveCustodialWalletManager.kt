@@ -1,6 +1,7 @@
 package com.blockchain.nabu.datamanagers.custodialwalletimpl
 
 import com.blockchain.nabu.Authenticator
+import com.blockchain.nabu.api.nabu.SDD_ELIGIBLE
 import com.blockchain.nabu.datamanagers.BankAccount
 import com.blockchain.nabu.datamanagers.Beneficiary
 import com.blockchain.nabu.datamanagers.BillingAddress
@@ -426,15 +427,20 @@ class LiveCustodialWalletManager(
         sessionTokenResponse: NabuSessionTokenResponse,
         fiatCurrency: String,
         onlyEligible: Boolean
-    ) = nabuService.paymentMethods(sessionTokenResponse, fiatCurrency, onlyEligible).map { methods ->
-        methods.filter { method -> method.eligible || !onlyEligible }
-    }.doOnSuccess {
-        updateSupportedCards(it)
-    }.zipWith(bankLinkingEnabledProvider.bankLinkingEnabled()).map { (methods, enabled) ->
-        methods.filter {
-            it.type != PaymentMethodResponse.BANK_TRANSFER || enabled
+    ) = nabuService.paymentMethods(
+        sessionToken = sessionTokenResponse,
+        currency = fiatCurrency,
+        tier = null,
+        eligibleOnly = onlyEligible
+    ).map { methods ->
+            methods.filter { method -> method.eligible || !onlyEligible }
+        }.doOnSuccess {
+            updateSupportedCards(it)
+        }.zipWith(bankLinkingEnabledProvider.bankLinkingEnabled()).map { (methods, enabled) ->
+            methods.filter {
+                it.type != PaymentMethodResponse.BANK_TRANSFER || enabled
+            }
         }
-    }
 
     private fun paymentMethods(fiatCurrency: String, onlyEligible: Boolean) = authenticator.authenticate {
         Singles.zip(
@@ -773,6 +779,11 @@ class LiveCustodialWalletManager(
                 .onErrorComplete()
         }
 
+    override fun isSDDEligible(): Single<Boolean> =
+        nabuService.isSDDEligible().map {
+            it.eligible && it.tier == SDD_ELIGIBLE_TIER
+        }
+
     override fun createCustodialOrder(
         direction: TransferDirection,
         quoteId: String,
@@ -1000,6 +1011,7 @@ class LiveCustodialWalletManager(
         private val SUPPORTED_FUNDS_FOR_WIRE_TRANSFER = listOf(
             "GBP", "EUR"
         )
+        private const val SDD_ELIGIBLE_TIER = 3
     }
 
     private fun String.canWireTransfer(): Boolean =

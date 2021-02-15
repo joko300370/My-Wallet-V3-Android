@@ -184,6 +184,8 @@ interface CustodialWalletManager {
 
     fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String>
 
+    fun isSDDEligible():Single<Boolean>
+
     fun createCustodialOrder(
         direction: TransferDirection,
         quoteId: String,
