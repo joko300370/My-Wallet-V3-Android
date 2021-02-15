@@ -1,12 +1,12 @@
 package piuk.blockchain.android.simplebuy
 
 import android.os.Bundle
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.nabu.datamanagers.PaymentMethod
-import kotlinx.android.synthetic.main.simple_buy_crypto_currency_chooser.view.recycler
-import kotlinx.android.synthetic.main.simple_buy_payment_method_chooser.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.SimpleBuyPaymentMethodChooserBinding
 import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
 import piuk.blockchain.android.ui.adapters.DelegationAdapter
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
@@ -14,30 +14,30 @@ import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.io.Serializable
 
-class PaymentMethodChooserBottomSheet : SlidingModalBottomDialog() {
+class PaymentMethodChooserBottomSheet : SlidingModalBottomDialog<SimpleBuyPaymentMethodChooserBinding>() {
     private val paymentMethods: List<PaymentMethod> by unsafeLazy {
         arguments?.getSerializable(SUPPORTED_PAYMENT_METHODS) as? List<PaymentMethod>
             ?: emptyList()
     }
 
-    override val layoutResource: Int
-        get() = R.layout.simple_buy_payment_method_chooser
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): SimpleBuyPaymentMethodChooserBinding =
+        SimpleBuyPaymentMethodChooserBinding.inflate(inflater, container, false)
 
-    override fun initControls(view: View) {
-        view.recycler.adapter =
+    override fun initControls(binding: SimpleBuyPaymentMethodChooserBinding) {
+        binding.recycler.adapter =
             PaymentMethodsAdapter(
                 paymentMethods
                     .map {
                         it.toPaymentMethodItem()
                     })
 
-        view.recycler.layoutManager = LinearLayoutManager(context)
+        binding.recycler.layoutManager = LinearLayoutManager(context)
         val isShowingPaymentMethods = paymentMethods.all { it.canUsedForPaying() }
 
-        view.add_payment_method.visibleIf { isShowingPaymentMethods }
-        view.title.text =
+        binding.addPaymentMethod.visibleIf { isShowingPaymentMethods }
+        binding.title.text =
             if (isShowingPaymentMethods) getString(R.string.pay_with_my_dotted) else getString(R.string.payment_methods)
-        view.add_payment_method.setOnClickListener {
+        binding.addPaymentMethod.setOnClickListener {
             (parentFragment as? PaymentMethodChangeListener)?.showAvailableToAddPaymentMethods()
             dismiss()
         }

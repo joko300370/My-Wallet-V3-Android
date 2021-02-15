@@ -51,7 +51,6 @@
  nuova password 
 </string>
     <string name="no_private_key">Impossibile produrre la chiave privata.</string>
-    <string name="pin_max_strikes">%1$d tentativi PIN non riusciti. Si prega di fornire la password.</string>
     <string name="pin_4_strikes_password_accepted">Password accettata Si prega di definire un nuovo PIN.
 </string>
     <string name="bip38_password_entry">Inserisci la password della chiave privata</string>
@@ -945,7 +944,7 @@
     <string name="daily_swap_and_buy_limit">Scambio giornaliero e limite di acquisto</string>
     <string name="simple_buy_own_crypto">Possiedi Crypto in pochi minuti</string>
     <string name="simple_buy_verify_your_identity">Verifica la tua identità e acquista criptovaluta</string>
-    <string name="simple_buy_skip">Salta</string>
+    <string name="common_skip">Salta</string>
     <string name="simple_buy_currency_selection_header">La tua valuta locale per archiviare fondi in quella valuta come fondi nel tuo Portafoglio Blockchain.</string>
     <string name="payment_methods">Modalità di pagamento</string>
     <string name="payment_method">Metodo di pagamento</string>
@@ -998,11 +997,6 @@
     <string name="invalid_date">Data non valida</string>
     <string name="invalid_card_number">Numero di carta non valido</string>
     <string name="full_name">Nome e cognome</string>
-    <string name="address_line_1">Indirizzo Linea 1</string>
-    <string name="address_line_2">indirizzo 2</string>
-    <string name="address_city">Città</string>
-    <string name="address_zip">cerniera lampo</string>
-    <string name="address_postcode">Codice postale</string>
     <string name="billing_address_state">Stato</string>
     <string name="currency_not_supported_title">La tua valuta non è supportata</string>
     <string name="activity_no_activity_title">Non hai attività</string>
@@ -1295,7 +1289,6 @@
     <string name="sell_for_cash">Vendi Crypto per contanti</string>
     <string name="select_wallet_to_sell">Seleziona un portafoglio da cui vendere.</string>
     <string name="common_sell">Vendere</string>
-    <string name="quote_price">Prezzo %1$s</string>
     <string name="convert_your_crypto_to_cash">Converti le tue criptovalute in contanti</string>
     <string name="scan_mismatch_transaction_target">Il codice scansionato non è un codice QR %1$s .</string>
     <string name="scan_failed">Codice QR non riconosciuto, riprova.</string>
@@ -1560,4 +1553,84 @@
     <string name="trading_ineligible_for_swap">Ops! Questo servizio non è attualmente disponibile. Contatta l\'assistenza.</string>
     <string name="trading_invalid_destination_amount">Ops! Sembra che non sia un importo valido, riprovare.</string>
     <string name="executing_transaction_error">Ops! Qualcosa è andato storto durante l\'esecuzione della transazione a catena c%1$s.</string>
+    <string name="backup_wallet_title">Recupero della chiave privata segreta</string>
+    <string name="pin_max_strikes">%1$d tentativi di PIN falliti. Si prega di fornire la password.</string>
+    <string name="recovery_passphrase_1">Frase di recupero della chiave privata segreta</string>
+    <string name="invalid_recovery_phrase_1">Frase di ripristino della chiave privata segreta non valida. Per favore riprova</string>
+    <string name="password_disclaimer">Sono consapevole del fatto che Blockchain.com non può recuperare la mia password per me. Se perdo l\'accesso al mio portafogli, devo usare la mia <annotation link="backup">Frase Segreta</annotation> per accedere ai miei fondi.</string>
+    <string name="transfer_funds_description_1">Gli indirizzi importati non vengono sottoposti a backup dalla frase di ripristino della chiave privata segreta. Per proteggere questi fondi,
+         consigliamo di trasferire questi saldi sul tuo portafogli non custodito Blockchain.com.
+    </string>
+    <string name="pairing_code_instructions_alert">Non condividere mai il tuo codice QR di accoppiamento mobile con nessuno. Chiunque possa visualizzare questo codice QR può prelevare fondi. Blockchain.com non chiederà mai di visualizzare o ricevere il codice QR di accoppiamento mobile.</string>
+    <string name="backup_title">Recupero della chiave privata segreta</string>
+    <string name="backup_subtitle">Frase di recupero della chiave privata segreta</string>
+    <string name="backup_instructions_1">In cripto, quando possiedi le chiavi private, hai il controllo dei fondi nel tuo portafogli con chiave privata. Lo svantaggio è che CHIUNQUE detenga le tue chiavi private può controllare il tuo portafogli con chiave privata.</string>
+    <string name="backup_instructions_2">Quindi devi:</string>
+    <string name="backup_instructions_3">1. Annota la frase di 12 parole sulla schermata successiva nell\'ordine esatto in cui appare</string>
+    <string name="backup_instructions_4">2. Tienila al sicuro, idealmente su un pezzo di carta conservato in modo sicuro (in altre parole, non una copia digitale).</string>
+    <string name="backup_instructions_5">3. Non condividere MAI la tua frase di backup con nessuno.</string>
+    <string name="backup_instructions_warn">Attenzione: se qualcuno ha la tua frase di backup, avrà accesso al tuo portafogli con chiave privata e potrà prelevare fondi.</string>
+    <string name="backup_instructions_alert">Blockchain.com non chiederà mai di visualizzare o ricevere la tua frase di recupero.</string>
+    <string name="backup_button_begin">Visualizza frase di recupero</string>
+    <string name="backup_complete_message_1">È possibile utilizzare la frase di recupero della chiave privata segreta per ripristinare i fondi se
+ hai perso la password. Chiunque abbia accesso alla tua frase di recupero della chiave privata segreta può accedere ai tuoi fondi quindi
+ ricordati di tenerla offline in un luogo sicuro e protetto.
+</string>
+    <string name="backup_verify_heading_1">Immettere le seguenti parole dalla frase di recupero della chiave privata segreta per
+ completare il processo di backup.
+</string>
+    <string name="backup_lost_mnemonic_1">Hai perso la tua frase di recupero della chiave privata segreta di 12 parole?</string>
+    <string name="fingerprint_login_description">Usa i tuoi dati biometrici per accedere al portafogli</string>
+    <string name="fingerprint_register_description">Usa la tua biometria per un accesso più facile e veloce al tuo portafogli.
+
+ Conferma la tua identità per continuare</string>
+    <string name="biometric_disable_message">Sei sicuro di voler disabilitare l\'accesso biometrico?</string>
+    <string name="biometrics_key_invalidated_title">La biometria è cambiata</string>
+    <string name="biometrics_key_invalidated_description">I dati biometrici memorizzati su questo dispositivo sono cambiati o il blocco tastiera è stato disabilitato. Utilizza invece il tuo PIN.
+
+ È quindi possibile impostare nuovamente l\'accesso biometrico dalle Impostazioni.</string>
+    <string name="biometrics_key_invalidated_settings_description">I dati biometrici memorizzati su questo dispositivo sono cambiati o il blocco tastiera è stato disabilitato.
+
+ Si prega di aggiungere nuovamente i dati biometrici e riprovare.</string>
+    <string name="fingerprint_fatal_error_desc">Qualcosa è andato storto durante il tentativo di utilizzare la biometria, utilizza invece il tuo PIN.
+
+ È quindi possibile impostare nuovamente l\'accesso biometrico dalle Impostazioni.
+ Errore: %1$s</string>
+    <string name="biometrics_disabled_lockout_title">Autenticazione fallita</string>
+    <string name="biometrics_disabled_lockout_desc">Hai fallito troppi tentativi di autenticazione, attendi 30 secondi e riprova</string>
+    <string name="biometrics_disabled_lockout_perm_desc">I sensori biometrici sono disabilitati, blocca il dispositivo e sbloccalo utilizzando il PIN, la sequenza o la password per riattivarli.
+
+ Fatto ciò, riprova.</string>
+    <string name="biometrics_action_settings">Vai alle Impostazioni</string>
+    <string name="biometrics_enrollment_title">Abilita biometria</string>
+    <string name="biometrics_enrollment_desc">Accedi rapidamente al tuo portafogli invece di utilizzare il PIN.</string>
+    <string name="recovery_card_title_1">Frase di recupero della chiave privata segreta</string>
+    <string name="recovery_card_body_1">Tu controlli la tua cripto. Annota la frase di recupero della chiave privata segreta per ripristinare tutti i fondi in caso di smarrimento della password.</string>
+    <string name="backup_before_send_body_1">La tua frase di recupero della chiave privata segreta ti consentirà di recuperare la tua cripto se perdi l\'accesso al tuo portafogli.
+
+Per favore scrivi queste 12 parole in ordine e conservale in un posto sicuro. Non condividerle mai con nessuno. La tua frase di recupero della chiave privata segreta è la chiave per recuperare la tua cripto se non dovessi più riuscire ad accedere.</string>
+    <string name="kyc_address_address_zip_code_hint_1">Codice postale</string>
+    <string name="payment_method_type_account_info">%1$s Conto %2$s</string>
+    <string name="address_line_1">Indirizzo 1</string>
+    <string name="address_line_2">Indirizzo 2</string>
+    <string name="address_city">Città</string>
+    <string name="address_zip">CAP</string>
+    <string name="address_postcode">Codice postale</string>
+    <string name="quote_price">%1$s Prezzo</string>
+    <string name="pay_with_my_dotted">Paga con il mio ...</string>
+    <string name="failed_to_link_bank">Collegamento alla banca non riuscito</string>
+    <string name="add_a_bank_account">Aggiungi un conto bancario</string>
+    <string name="wire_transfer">Bonifico bancario</string>
+    <string name="link_a_bank_wire_transfer">Collega una banca al tuo portafogli inviando qualsiasi importo tramite bonifico bancario. Nota: ciò è molto più lento e potrebbero essere applicate commissioni bancarie elevate.</string>
+    <string name="link_a_bank_bank_transfer">Collega in modo sicuro una banca per acquistare cripto, depositare contanti e destinare prelievi alla tua banca in qualsiasi momento.</string>
+    <string name="add_credit_or_debit_card_1">Carta di credito o di debito</string>
+    <string name="first_name">Nome</string>
+    <string name="last_name">Cognome</string>
+    <string name="as_it_shows_in_id">Come mostrato sul tuo documento d\'identità o passaporto rilasciato dal tuo governo</string>
+    <string name="date_of_birth">Data di nascita</string>
+    <string name="date_of_birth_instructions">Devi avere almeno 18 anni per acquistare cripto.</string>
+    <string name="kyc_profile_message_1">Blockchain.com è tenuto per legge a raccogliere queste informazioni. Devi avere almeno 18 anni per acquistare e vendere cripto.</string>
+    <string name="kyc_address_header_1">Blockchain.com è tenuto per legge a raccogliere queste informazioni.</string>
+    <string name="kyc_country_selection_search_hint_1">Seleziona il tuo paese</string>
+    <string name="kyc_country_selection_title_1">Seleziona il tuo paese</string>
 </resources>

@@ -158,27 +158,18 @@
         android:label="Email Verification"
         app:startDestination="@id/kycEmailEntryFragment">
         <fragment
-            android:id="@+id/kycEmailValidationFragment"
-            android:name="piuk.blockchain.android.ui.kyc.email.validation.KycEmailValidationFragment"
-            android:label="KycEmailValidationFragment"
-            tools:layout="@layout/fragment_kyc_email_validation">
-            <action
-                android:id="@+id/action_afterValidation"
-                app:destination="@id/kycCountrySelectionFragment"
-                app:popUpTo="@+id/kycTierSplashFragment" />
-            <argument
-                android:name="email"
-                app:argType="string" />
-        </fragment>
-        <fragment
             android:id="@+id/kycEmailEntryFragment"
             android:name="piuk.blockchain.android.ui.kyc.email.entry.KycEmailEntryFragment"
             android:label="KycEmailEntryFragment"
             tools:layout="@layout/fragment_kyc_add_email">
             <action
-                android:id="@+id/action_ValidateEmail"
-                app:destination="@id/kycEmailValidationFragment" />
+                android:id="@+id/action_afterValidation"
+                app:destination="@id/kycCountrySelectionFragment"
+                app:popUpTo="@+id/kycTierSplashFragment" />
         </fragment>
+        <argument
+            android:name="mustBeValidated"
+            app:argType="boolean" />
     </navigation>
     <action
         android:id="@+id/action_StartTier2NeedMoreInfo"

@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.nabu.datamanagers.Beneficiary
 import kotlinx.android.synthetic.main.layout_linked_bank.view.*
-import kotlinx.android.synthetic.main.simple_buy_crypto_currency_chooser.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.LayoutBankChooserBottomSheetBinding
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
 import piuk.blockchain.android.ui.adapters.DelegationAdapter
@@ -18,7 +18,7 @@ import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.io.Serializable
 
-class BankChooserBottomSheet : SlidingModalBottomDialog() {
+class BankChooserBottomSheet : SlidingModalBottomDialog<LayoutBankChooserBottomSheetBinding>() {
 
     private val beneficiaries: List<Beneficiary> by unsafeLazy {
         arguments?.getSerializable(LINKED_BANKS) as? List<Beneficiary>
@@ -29,10 +29,11 @@ class BankChooserBottomSheet : SlidingModalBottomDialog() {
             ?: throw IllegalStateException("Currency not provided")
     }
 
-    override val layoutResource: Int = piuk.blockchain.android.R.layout.layout_bank_chooser_bottom_sheet
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): LayoutBankChooserBottomSheetBinding =
+        LayoutBankChooserBottomSheetBinding.inflate(inflater, container, false)
 
-    override fun initControls(view: View) {
-        view.recycler.adapter =
+    override fun initControls(binding: LayoutBankChooserBottomSheetBinding) {
+        binding.recycler.adapter =
             BanksAdapter(
                 beneficiaries
                     .map {
@@ -46,7 +47,7 @@ class BankChooserBottomSheet : SlidingModalBottomDialog() {
                         )
                     })
 
-        view.recycler.layoutManager = LinearLayoutManager(context)
+        binding.recycler.layoutManager = LinearLayoutManager(context)
     }
 
     private fun Beneficiary.toBankItem(): BankChooserItem.BankItem =
@@ -61,7 +62,7 @@ class BankChooserBottomSheet : SlidingModalBottomDialog() {
         private const val LINKED_BANKS = "linked_banks_key"
         private const val CURRENCY = "currency_key"
         fun newInstance(beneficiaries: List<Beneficiary>, currency: String):
-                BankChooserBottomSheet {
+            BankChooserBottomSheet {
             val bundle = Bundle()
             bundle.putSerializable(LINKED_BANKS, beneficiaries as Serializable)
             bundle.putString(CURRENCY, currency)

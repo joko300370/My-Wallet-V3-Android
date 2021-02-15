@@ -1,19 +1,21 @@
 package piuk.blockchain.android.ui.transactionflow.flow
 
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
-import kotlinx.android.synthetic.main.dialog_tx_flow_password.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.DialogTxFlowPasswordBinding
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionErrorState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
 import timber.log.Timber
 
-class EnterSecondPasswordSheet : TransactionFlowSheet() {
+class EnterSecondPasswordSheet : TransactionFlowSheet<DialogTxFlowPasswordBinding>() {
 
-    override val layoutResource: Int = R.layout.dialog_tx_flow_password
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogTxFlowPasswordBinding =
+        DialogTxFlowPasswordBinding.inflate(inflater, container, false)
 
     override fun render(newState: TransactionState) {
         require(newState.currentStep == TransactionStep.ENTER_PASSWORD)
@@ -26,17 +28,17 @@ class EnterSecondPasswordSheet : TransactionFlowSheet() {
         cacheState(newState)
     }
 
-    override fun initControls(view: View) {
-        view.cta_button.setOnClickListener { onCtaClick(view) }
-        view.password_input.setOnEditorActionListener { _, actionId, _ ->
+    override fun initControls(binding: DialogTxFlowPasswordBinding) {
+        binding.ctaButton.setOnClickListener { onCtaClick() }
+        binding.passwordInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_GO) {
-                onCtaClick(view)
+                onCtaClick()
             }
             true
         }
     }
 
-    private fun onCtaClick(view: View) {
-        model.process(TransactionIntent.ValidatePassword(view.password_input.text.toString()))
+    private fun onCtaClick() {
+        model.process(TransactionIntent.ValidatePassword(binding.passwordInput.text.toString()))
     }
 }

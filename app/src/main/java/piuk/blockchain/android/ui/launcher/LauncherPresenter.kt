@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.launcher
 
-import android.annotation.SuppressLint
 import android.app.LauncherActivity
 import android.content.Intent
 import com.blockchain.logging.CrashLogger
@@ -122,7 +121,6 @@ class LauncherPresenter(
      * Init of the [SettingsDataManager] must complete here so that we can access the [Settings]
      * object from memory when the user is logged in.
      */
-    @SuppressLint("CheckResult")
     private fun initSettings() {
 
         val settings = Single.defer {
@@ -147,55 +145,57 @@ class LauncherPresenter(
         compositeDisposable +=
             settings.zipWith(
                 metadata.toSingleDefault(true)
-            ).flatMap { (_, _) ->
-                if (!shouldCheckForSimpleBuyLaunching())
-                    Single.just(false)
+            ).map { (_, _) ->
+                if (!shouldCheckForEmailVerification())
+                    false
                 else {
-                    Single.just(walletJustCreated())
+                    walletJustCreated()
                 }
-            }.flatMap { simpleBuyShouldLaunched ->
-                if (!simpleBuyShouldLaunched && noCurrencySet())
-                    updateFiatWithDefault.toSingleDefault(simpleBuyShouldLaunched)
+            }.flatMap { emailVerifShouldLaunched ->
+                if (noCurrencySet())
+                    updateFiatWithDefault.toSingleDefault(emailVerifShouldLaunched)
                 else {
-                    Single.just(simpleBuyShouldLaunched)
+                    Single.just(emailVerifShouldLaunched)
                 }
             }
-            .doOnSuccess { accessState.isLoggedIn = true }
-            .doOnSuccess { notificationTokenManager.registerAuthEvent() }
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe { view.updateProgressVisibility(true) }
-            .subscribeBy(
-                onSuccess = { simpleBuyShouldLaunched ->
-                    view.updateProgressVisibility(false)
-                    if (simpleBuyShouldLaunched) {
-                        launchBuySellIntro()
-                    } else {
-                        startMainActivity()
-                    }
-                }, onError = { throwable ->
-                    view.updateProgressVisibility(false)
-                    if (throwable is InvalidCredentialsException || throwable is HDWalletException) {
-                        if (payloadDataManager.isDoubleEncrypted) {
-                            // Wallet double encrypted and needs to be decrypted to set up ether wallet, contacts etc
-                            view?.showSecondPasswordDialog()
+                .doOnSuccess { accessState.isLoggedIn = true }
+                .doOnSuccess { notificationTokenManager.registerAuthEvent() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { view.updateProgressVisibility(true) }
+                .subscribeBy(
+                    onSuccess = { emailVerifShouldLaunched ->
+                        view.updateProgressVisibility(false)
+                        if (emailVerifShouldLaunched) {
+                            launchEmailVerification()
                         } else {
-                        view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
+                            startMainActivity()
+                        }
+                    }, onError = { throwable ->
+                        view.updateProgressVisibility(false)
+                        if (throwable is InvalidCredentialsException || throwable is HDWalletException) {
+                            if (payloadDataManager.isDoubleEncrypted) {
+                                // Wallet double encrypted and needs to be decrypted to set up ether wallet, contacts etc
+                                view?.showSecondPasswordDialog()
+                            } else {
+                                view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
+                                view.onRequestPin()
+                            }
+                        } else {
+                            view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
                             view.onRequestPin()
                         }
-                    } else {
-                        view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
-                        view.onRequestPin()
+                        logException(throwable)
                     }
-                    logException(throwable)
-                }
-            )
-        }
+                )
+    }
 
     private fun isNewAccount(): Boolean = accessState.isNewlyCreated
 
     private fun walletJustCreated() =
-        view?.getPageIntent()?.getBooleanExtra(AppUtil.INTENT_EXTRA_IS_AFTER_WALLET_CREATION,
-            false) == true
+        view?.getPageIntent()?.getBooleanExtra(
+            AppUtil.INTENT_EXTRA_IS_AFTER_WALLET_CREATION,
+            false
+        ) == true
 
     internal fun decryptAndSetupMetadata(secondPassword: String) {
         if (!payloadDataManager.validateSecondPassword(secondPassword)) {
@@ -227,14 +227,14 @@ class LauncherPresenter(
         view?.showMetadataNodeFailure()
     }
 
-    private fun shouldCheckForSimpleBuyLaunching() = accessState.isNewlyCreated && !accessState.isRestored
+    private fun shouldCheckForEmailVerification() = accessState.isNewlyCreated && !accessState.isRestored
 
     private fun startMainActivity() {
         view.onStartMainActivity(deepLinkPersistence.popUriFromSharedPrefs())
     }
 
-    private fun launchBuySellIntro() {
-        view.launchBuySellIntro()
+    private fun launchEmailVerification() {
+        view.launchEmailVerification()
     }
 
     private fun setCurrencyUnits(settings: Settings) {

@@ -9,23 +9,24 @@ import androidx.annotation.StringRes
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
-import kotlinx.android.synthetic.main.link_bank_method_chooser_sheet_layout.view.*
 import kotlinx.android.synthetic.main.link_bank_method_item.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.LinkBankMethodChooserSheetLayoutBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.settings.BankLinkingHost
 import piuk.blockchain.android.ui.settings.LinkableBank
 import piuk.blockchain.android.util.visibleIf
 import java.lang.IllegalStateException
 
-class LinkBankMethodChooserBottomSheet : SlidingModalBottomDialog() {
+class LinkBankMethodChooserBottomSheet : SlidingModalBottomDialog<LinkBankMethodChooserSheetLayoutBinding>() {
     private val bank: LinkableBank
         get() = arguments?.getSerializable(LINKABLE_BANK) as LinkableBank
-    override val layoutResource: Int
-        get() = R.layout.link_bank_method_chooser_sheet_layout
 
-    override fun initControls(view: View) {
-        with(view) {
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): LinkBankMethodChooserSheetLayoutBinding =
+        LinkBankMethodChooserSheetLayoutBinding.inflate(inflater, container, false)
+
+    override fun initControls(binding: LinkBankMethodChooserSheetLayoutBinding) {
+        with(binding) {
             recycler.layoutManager = LinearLayoutManager(activity)
             recycler.adapter = LinkBankMethodChooserAdapter(bank.linkMethods) {
                 when (it) {

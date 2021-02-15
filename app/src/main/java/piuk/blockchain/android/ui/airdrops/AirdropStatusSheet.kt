@@ -4,7 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.net.Uri
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -12,10 +13,10 @@ import androidx.core.content.ContextCompat
 import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
 import com.blockchain.ui.urllinks.STX_STACKS_LEARN_MORE
-import kotlinx.android.synthetic.main.dialog_airdrop_status.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.blockstackCampaignName
 import piuk.blockchain.android.campaign.sunriverCampaignName
+import piuk.blockchain.android.databinding.DialogAirdropStatusBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.android.util.gone
@@ -24,7 +25,7 @@ import piuk.blockchain.android.util.visible
 import java.lang.IllegalStateException
 import java.text.DateFormat
 
-class AirdropStatusSheet : SlidingModalBottomDialog(), AirdropCentreView {
+class AirdropStatusSheet : SlidingModalBottomDialog<DialogAirdropStatusBinding>(), AirdropCentreView {
 
     private val presenter: AirdropCentrePresenter by scopedInject()
 
@@ -32,11 +33,11 @@ class AirdropStatusSheet : SlidingModalBottomDialog(), AirdropCentreView {
         arguments?.getString(ARG_AIRDROP_NAME) ?: blockstackCampaignName
     }
 
-    override val layoutResource: Int = R.layout.dialog_airdrop_status
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogAirdropStatusBinding =
+        DialogAirdropStatusBinding.inflate(inflater, container, false)
 
-    override fun initControls(view: View) {
-        view.cta_button.setOnClickListener { onCtaClick() }
-
+    override fun initControls(binding: DialogAirdropStatusBinding) {
+        binding.ctaButton.setOnClickListener { onCtaClick() }
         presenter.attachView(this)
     }
 
@@ -57,10 +58,10 @@ class AirdropStatusSheet : SlidingModalBottomDialog(), AirdropCentreView {
     }
 
     private fun renderBlockstacks(airdrop: Airdrop) {
-        with(dialogView) {
+        with(binding) {
             title.setText(R.string.airdrop_sheet_stx_title)
             body.setText(R.string.airdrop_sheet_stx_body)
-            icon_crypto.setImageResource(R.drawable.ic_logo_stx)
+            iconCrypto.setImageResource(R.drawable.ic_logo_stx)
         }
 
         renderStatus(airdrop)
@@ -77,10 +78,10 @@ class AirdropStatusSheet : SlidingModalBottomDialog(), AirdropCentreView {
     }
 
     private fun renderSunriver(airdrop: Airdrop) {
-        with(dialogView) {
+        with(binding) {
             title.setText(R.string.airdrop_sheet_xlm_title)
             body.gone()
-            icon_crypto.setImageResource(R.drawable.vector_xlm_colored)
+            iconCrypto.setImageResource(R.drawable.vector_xlm_colored)
         }
         renderStatus(airdrop)
         renderDate(airdrop)
@@ -122,7 +123,7 @@ class AirdropStatusSheet : SlidingModalBottomDialog(), AirdropCentreView {
         @ColorRes textColour: Int,
         @DrawableRes background: Int
     ) {
-        with(dialogView.status_value) {
+        with(binding.statusValue) {
             setText(message)
             setTextColor(ContextCompat.getColor(context, textColour))
             setBackground(ContextCompat.getDrawable(context, background))
@@ -132,7 +133,7 @@ class AirdropStatusSheet : SlidingModalBottomDialog(), AirdropCentreView {
     private fun renderDate(airdrop: Airdrop) {
         airdrop.date?.let {
             val formatted = DateFormat.getDateInstance(DateFormat.SHORT).format(it)
-            dialogView.date_value.text = formatted
+            binding.dateValue.text = formatted
         }
     }
 
@@ -145,27 +146,27 @@ class AirdropStatusSheet : SlidingModalBottomDialog(), AirdropCentreView {
             ""
         }
 
-        with(dialogView) {
-            amount_value.text = amount
-            amount_label.goneIf(amount.isEmpty())
-            amount_value.goneIf(amount.isEmpty())
-            divider_amount.goneIf(amount.isEmpty())
+        with(binding) {
+            amountValue.text = amount
+            amountLabel.goneIf(amount.isEmpty())
+            amountValue.goneIf(amount.isEmpty())
+            dividerAmount.goneIf(amount.isEmpty())
         }
     }
 
     @Suppress("SameParameterValue")
     private fun showSupportInfo(@StringRes title: Int, @StringRes message: Int, link: Uri) {
-        with(dialogView) {
-            support_heading.setText(title)
-            support_heading.visible()
+        with(binding) {
+            supportHeading.setText(title)
+            supportHeading.visible()
 
-            support_message.setText(message)
-            support_message.visible()
+            supportMessage.setText(message)
+            supportMessage.visible()
 
-            support_link.setOnClickListener {
+            supportLink.setOnClickListener {
                 context?.startActivity(Intent(Intent.ACTION_VIEW, link))
             }
-            support_link.visible()
+            supportLink.visible()
         }
     }
 

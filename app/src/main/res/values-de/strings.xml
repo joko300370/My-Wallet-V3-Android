@@ -47,7 +47,6 @@
  Neues Kennwort
 </string>
     <string name="no_private_key">Privater Schlüssel kann nicht erstellt werden.</string>
-    <string name="pin_max_strikes">%1$d fehlgeschlagene PIN-Versuche. Bitte geben Sie Ihr Passwort ein.</string>
     <string name="pin_4_strikes_password_accepted">Passwort akzeptiert. Bitte definieren Sie eine neue PIN.
 </string>
     <string name="bip38_password_entry">Bitte geben Sie das Passwort für den privaten Schlüssel ein</string>
@@ -941,7 +940,7 @@
     <string name="daily_swap_and_buy_limit">Tägliches Swap- und Kauflimit</string>
     <string name="simple_buy_own_crypto">Eigene Krypto in wenigen Minuten</string>
     <string name="simple_buy_verify_your_identity">Überprüfen Sie Ihre Identität und kaufen Sie Krypto</string>
-    <string name="simple_buy_skip">Überspringen</string>
+    <string name="common_skip">Überspringen</string>
     <string name="simple_buy_currency_selection_header">Ihre lokale Währung, um Geld in dieser Währung als Geld in Ihrer Blockchain-Brieftasche zu speichern.</string>
     <string name="payment_methods">Zahlungsmethoden</string>
     <string name="payment_method">Bezahlverfahren</string>
@@ -994,11 +993,6 @@
     <string name="invalid_date">Ungültiges Datum</string>
     <string name="invalid_card_number">Ungültige Kartennummer</string>
     <string name="full_name">Vollständiger Name</string>
-    <string name="address_line_1">Anschrift Zeile 1</string>
-    <string name="address_line_2">Adresszeile 2</string>
-    <string name="address_city">Stadt</string>
-    <string name="address_zip">POSTLEITZAHL</string>
-    <string name="address_postcode">Postleitzahl</string>
     <string name="billing_address_state">Zustand</string>
     <string name="currency_not_supported_title">Ihre Währung wird nicht unterstützt</string>
     <string name="activity_no_activity_title">Sie haben keine Aktivität</string>
@@ -1289,7 +1283,6 @@
     <string name="sell_for_cash">Verkaufe Crypto gegen Bargeld</string>
     <string name="select_wallet_to_sell">Wählen Sie eine Brieftasche aus, aus der Sie verkaufen möchten.</string>
     <string name="common_sell">Verkaufen</string>
-    <string name="quote_price">%1$s Preis</string>
     <string name="convert_your_crypto_to_cash">Wandeln Sie Ihre Krypto in Bargeld um</string>
     <string name="scan_mismatch_transaction_target">Der gescannte Code ist kein %1$s QR-Code.</string>
     <string name="scan_failed">QR-Code nicht erkannt, bitte erneut versuchen.</string>
@@ -1553,4 +1546,79 @@ Beachten Sie: Sie werden diese Gelder von Ihrer Wallet in den nächsten %1$s Tag
     <string name="trading_ineligible_for_swap">Hoppla! Dieser Dienst ist derzeit nicht verfügbar. Bitte wenden Sie sich an den Support.</string>
     <string name="trading_invalid_destination_amount">Hoppla! Scheinbar ist das kein gültiger Betrag, bitte versuchen Sie es erneut.</string>
     <string name="executing_transaction_error">Hoppla! Etwas ist bei der Durchführung der %1$s On-Chain-Transaktion schiefgelaufen.</string>
+    <string name="backup_wallet_title">Wiederherstellung des privaten Geheimschlüssels</string>
+    <string name="pin_max_strikes">%1$d fehlgeschlagene PIN-Versuche. Bitte geben Sie Ihr Passwort ein.</string>
+    <string name="recovery_passphrase_1">Geheimschlüssel-Wiederherstellungssatz</string>
+    <string name="invalid_recovery_phrase_1">Ungültiger Geheimschlüssel-Wiederherstellungssatz. Bitte versuchen Sie es erneut</string>
+    <string name="password_disclaimer">Ich verstehe, dass Blockchain.com mein Passwort nicht für mich wiederherstellen kann. Wenn ich den Zugriff auf meine Wallet verliere, muss ich meinen <annotation link="backup">Geheimsatz</annotation> verwenden, um auf mein Guthaben zuzugreifen.</string>
+    <string name="transfer_funds_description_1">Die importierten Adressen werden nicht von Ihrem Geheimschlüssel-Wiederherstellungssatz gesichert. Um diese Guthaben zu sichern, empfehlen
+       wir die Übertragung dieser Kontostände auf Ihre nicht depotführende Blockchain.com-Wallet.
+    </string>
+    <string name="pairing_code_instructions_alert">Teilen Sie Ihren mobilen Pairing-QR-Code niemandem mit. Jeder, der diesen QR-Code einsehen kann, kann Guthaben abheben. Blockchain.com wird Sie niemals auffordern, Ihren QR-Code für das Pairing von Mobiltelefonen anzuzeigen oder zu erhalten.</string>
+    <string name="backup_title">Wiederherstellung des privaten Geheimschlüssels</string>
+    <string name="backup_subtitle">Geheimschlüssel-Wiederherstellungssatz</string>
+    <string name="backup_instructions_1">Wenn Sie bei Krypto die privaten Schlüssel besitzen, haben Sie die Kontrolle über das Guthaben in Ihrer privaten Schlüssel-Wallet. Der Nachteil ist, dass JEDER, der Ihre privaten Schlüssel besitzt, Ihre private Schlüssel-Wallet steuern kann.</string>
+    <string name="backup_instructions_2">Sie müssen also:</string>
+    <string name="backup_instructions_3">1. Notieren Sie den 12-Wörter-Satz auf dem nächsten Bildschirm in der genauen Reihenfolge, in der er angezeigt wird.</string>
+    <string name="backup_instructions_4">2. Bewahren Sie ihn sicher auf, idealerweise auf einem sicher aufbewahrten Blatt Papier (d. h. nicht auf einer digitalen Kopie).</string>
+    <string name="backup_instructions_5">3. Teilen Sie Ihren Wiederherstellungssatz NIEMALS jemandem mit.</string>
+    <string name="backup_instructions_warn">Warnung: Wenn jemand Ihren Wiederherstellungssatz hat, hat er Zugriff auf Ihre private Schlüssel-Wallet und kann Guthaben abheben.</string>
+    <string name="backup_instructions_alert">Blockchain.com wird Sie niemals darum bitten, Ihren Wiederherstellungssatz anzuzeigen oder zu erhalten.</string>
+    <string name="backup_button_begin">Wiederherstellungssatz anzeigen</string>
+    <string name="backup_complete_message_1">Sie können Ihren Geheimschlüssel-Wiederherstellungssatz verwenden, um Ihr Guthaben wiederherzustellen, wenn Sie Ihr Passwort verlieren. Jeder mit Zugriff auf Ihren Geheimschlüssel-Wiederherstellungssatz kann auf Ihr Guthaben zugreifen, also denken Sie daran, es irgendwo offline sicher aufzubewahren.</string>
+    <string name="backup_verify_heading_1">Geben Sie die folgenden Worte aus Ihrem Geheimschlüssel-Wiederherstellungssatz ein, um den Wiederherstellungsprozess abzuschließen.</string>
+    <string name="backup_lost_mnemonic_1">Haben Sie Ihren 12-stelliges Geheimschlüssel-Wiederherstellungssatz verloren?</string>
+    <string name="fingerprint_login_description">Verwenden Sie Ihre Biometrie, um sich in Ihrer Wallet anzumelden.</string>
+    <string name="fingerprint_register_description">Verwenden Sie Ihre Biometrie für schnelleren, leichteren Zugriff auf Ihre Wallet.
+
+Bestätigen Sie, dass Sie es sind, um fortzufahren</string>
+    <string name="biometric_disable_message">Sind Sie sicher, dass Sie die Biometrie-Anmeldung deaktivieren möchten?</string>
+    <string name="biometrics_key_invalidated_title">Biometrie geändert</string>
+    <string name="biometrics_key_invalidated_description">Entweder hat sich die in diesem Gerät gespeicherte Biometrie geändert oder der Schlüsselschutz wurde deaktiviert.
+
+Sie können die Biometrie-Anmeldung in Ihren Einstellungen erneut einrichten.</string>
+    <string name="biometrics_key_invalidated_settings_description">Entweder hat sich die in diesem Gerät gespeicherte Biometrie geändert oder der Schlüsselschutz wurde deaktiviert.
+
+Bitte fügen Sie Ihre Biometrie nochmals hinzu und versuchen Sie es erneut.</string>
+    <string name="fingerprint_fatal_error_desc">Beim Versuch Biometrie zu verwenden ist etwas schiefgelaufen. Bitte verwenden Sie stattdessen Ihre PIN.
+
+Sie können die Biometrieanmeldung dann wieder in den Einstellungen einrichten.
+Fehler: %1$s</string>
+    <string name="biometrics_disabled_lockout_title">Authentifizierungsfehler</string>
+    <string name="biometrics_disabled_lockout_desc">Sie haben zu viele fehlgeschlagene Versuche zur Anmeldung unternommen. Bitte warten Sie 30 Sekunden und versuchen Sie es erneut.</string>
+    <string name="biometrics_disabled_lockout_perm_desc">Ihre Biometrie-Sensoren sind deaktiviert. Bitte sperren und entsperren Sie Ihr Gerät mit Ihrer PIN, Ihrem Muster oder Ihrem Passwort, um sie wieder zu aktivieren.
+
+Sobald dies erledigt ist, versuchen Sie es bitte erneut.</string>
+    <string name="biometrics_action_settings">Zu Einstellungen gehen</string>
+    <string name="biometrics_enrollment_title">Biometrie aktivieren</string>
+    <string name="biometrics_enrollment_desc">Melden Sie sich schnell in Ihrer Wallet an, anstatt Ihre PIN zu verwenden.</string>
+    <string name="recovery_card_title_1">Geheimschlüssel-Wiederherstellungssatz</string>
+    <string name="recovery_card_body_1">Sie kontrollieren Ihre Krypto. Notieren Sie sich Ihren Geheimschlüssel-Wiederherstellungssatz, um Ihr gesamtes Guthaben wiederherzustellen, falls Sie Ihr Passwort verlieren.</string>
+    <string name="backup_before_send_body_1">Mit Ihrem Geheimschlüssel-Wiederherstellungssatz können Sie Ihre Krypto wiederherstellen, wenn Sie den Zugriff auf Ihre Wallet verlieren.
+
+Bitte schreiben Sie diese 12 Wörter der Reihe nach auf und bewahren Sie sie an einem sicheren Ort auf. Teile diese niemandem mit. Ihr Geheimschlüssel-Wiederherstellungssatz ist der Schlüssel zur Wiederherstellung Ihrer Krypto, falls Sie jemals ausgesperrt werden.</string>
+    <string name="kyc_address_address_zip_code_hint_1">Postleitzahl</string>
+    <string name="payment_method_type_account_info">%1$s Konto %2$s</string>
+    <string name="address_line_1">Adresszeile 1</string>
+    <string name="address_line_2">Adresszeile 2</string>
+    <string name="address_city">Ort</string>
+    <string name="address_zip">PLZ</string>
+    <string name="address_postcode">Postleitzahl</string>
+    <string name="quote_price">%1$s Preis</string>
+    <string name="pay_with_my_dotted">Bezahlen mit meinem …</string>
+    <string name="failed_to_link_bank">Bankverknüpfung fehlgeschlagen</string>
+    <string name="add_a_bank_account">Fügen Sie ein Bankkonto hinzu</string>
+    <string name="wire_transfer">Banküberweisung</string>
+    <string name="link_a_bank_wire_transfer">Verknüpfen Sie eine Bank mit Ihrer Wallet, indem Sie irgendeinen Betrag mittels Banküberweisung senden. Hinweis: Das ist viel langsamer und es können hohe Bankgebühren anfallen.</string>
+    <string name="link_a_bank_bank_transfer">Verknüpfen Sie sicher eine Bank, um jederzeit Krypto zu kaufen sowie Bargeld einzuzahlen und abzuheben.</string>
+    <string name="add_credit_or_debit_card_1">Kredit- oder Debitkarte</string>
+    <string name="first_name">Vorname</string>
+    <string name="last_name">Nachname</string>
+    <string name="as_it_shows_in_id">Wie auf Ihrem amtlichen Ausweis oder Reisepass angegeben</string>
+    <string name="date_of_birth">Geburtsdatum</string>
+    <string name="date_of_birth_instructions">Sie müssen mindestens 18 Jahre alt sein, um Krypto kaufen zu können.</string>
+    <string name="kyc_profile_message_1">Blockchain.com ist gesetzlich verpflichtet, diese Informationen zu sammeln. Sie müssen mindestens 18 Jahre alt sein, um Krypto kaufen und verkaufen zu können.</string>
+    <string name="kyc_address_header_1">Blockchain.com ist gesetzlich verpflichtet, diese Informationen zu sammeln.</string>
+    <string name="kyc_country_selection_search_hint_1">Wählen Sie Ihr Land aus</string>
+    <string name="kyc_country_selection_title_1">Wählen Sie Ihr Land aus</string>
 </resources>
