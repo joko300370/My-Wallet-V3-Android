@@ -96,35 +96,30 @@
         app:tabIndicatorColor="@color/dashboard_chart_indicator_color">
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/day_tab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="1D" />
 
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/week_tab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="1W" />
 
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/month_tab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="1M" />
 
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/year_tab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="1Y" />
 
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/all_tab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="ALL" />
