@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import info.blockchain.balance.Money
+import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.databinding.ViewTxFlowFeeAndBalanceBinding
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
@@ -33,6 +34,8 @@ class BalanceAndFeeView @JvmOverloads constructor(
     private val binding: ViewTxFlowFeeAndBalanceBinding =
         ViewTxFlowFeeAndBalanceBinding.inflate(LayoutInflater.from(context), this, true)
 
+    override var displayMode: TxFlowWidget.DisplayMode = TxFlowWidget.DisplayMode.Crypto
+
     override fun initControl(
         model: TransactionModel,
         customiser: TransactionFlowCustomiser,
@@ -51,48 +54,74 @@ class BalanceAndFeeView @JvmOverloads constructor(
         }
 
         binding.toggleIndicator.rotation += 180f
+
+        binding.feePriority.setOnClickListener {
+            model.process(TransactionIntent.SetFeeLevel(FeeLevel.Priority))
+        }
+
+        binding.feeStandard.setOnClickListener {
+            model.process(TransactionIntent.SetFeeLevel(FeeLevel.Regular))
+        }
     }
 
     override fun update(state: TransactionState) {
         check(::model.isInitialized) { "Control not initialised" }
 
-        updateSendMax(state)
+        updateMaxGroup(state)
         updateBalance(state)
     }
 
     private fun updateBalance(state: TransactionState) {
         val availableBalance = state.availableBalance
-        binding.maxAvailableValue.text = makeFiatString(availableBalance, state)
+        binding.maxAvailableValue.text = makeAmountString(availableBalance, state)
 
         state.pendingTx?.totalBalance?.let {
-            binding.totalAvailableValue.text = makeFiatString(it, state)
+            binding.totalAvailableValue.text = makeAmountString(it, state)
         }
 
         state.pendingTx?.fees?.let {
-            binding.networkFeeValue.text = makeFiatString(it, state)
+            binding.networkFeeValue.text = makeAmountString(it, state)
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun makeFiatString(value: Money, state: TransactionState): String {
+    private fun makeAmountString(value: Money, state: TransactionState): String {
         if (value.isPositive || value.isZero) {
             state.fiatRate?.let { rate ->
-                return "${rate.convert(value).toStringWithSymbol()} " +
-                        "(${value.toStringWithSymbol()})"
+                return when (displayMode) {
+                    TxFlowWidget.DisplayMode.Fiat -> rate.convert(value).toStringWithSymbol()
+                    TxFlowWidget.DisplayMode.Crypto -> value.toStringWithSymbol()
+                }
             }
         }
         return "--"
     }
 
-    private fun updateSendMax(state: TransactionState) =
-        with(binding.useMax) {
-            text = customiser.enterAmountMaxButton(state)
-            visibleIf { !customiser.shouldDisableInput(state.errorState) && !binding.dropdown.isVisible() }
-            setOnClickListener {
-                analytics.onMaxClicked(state)
-                model.process(TransactionIntent.UseMaxSpendable)
+    private fun updateMaxGroup(state: TransactionState) =
+        if (state.amount.isPositive) {
+            binding.networkFeeGroup.visible()
+            binding.useMax.gone()
+        } else {
+            binding.networkFeeGroup.gone()
+            with(binding.useMax) {
+                visibleIf { !customiser.shouldDisableInput(state.errorState) }
+                text = customiser.enterAmountMaxButton(state)
+//                visibleIf { !customiser.shouldDisableInput(state.errorState) && !binding.dropdown.isVisible() }
+                setOnClickListener {
+                    analytics.onMaxClicked(state)
+                    model.process(TransactionIntent.UseMaxSpendable)
+                }
             }
         }
+//
+//    with(binding.useMax) {
+//            text = customiser.enterAmountMaxButton(state)
+//            visibleIf { !customiser.shouldDisableInput(state.errorState) && !binding.dropdown.isVisible() }
+//            setOnClickListener {
+//                analytics.onMaxClicked(state)
+//                model.process(TransactionIntent.UseMaxSpendable)
+//            }
+//        }
 
     private var externalFocus: View? = null
     private fun toggleDropdown() {
@@ -108,7 +137,7 @@ class BalanceAndFeeView @JvmOverloads constructor(
         }
 
         // Hide the use max button
-        binding.useMax.visibleIf { !revealDropdown }
+//        binding.useMax.visibleIf { !revealDropdown }
         // Expand the dropdown view
 //        TransitionManager.beginDelayedTransition(
 //            binding.root,

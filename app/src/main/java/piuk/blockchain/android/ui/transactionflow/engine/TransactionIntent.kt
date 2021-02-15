@@ -5,6 +5,7 @@ import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.InvoiceTarget
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.NullCryptoAccount
@@ -337,6 +338,13 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
                 currentStep = TransactionStep.IN_PROGRESS,
                 executionStatus = TxExecutionStatus.Error(error)
             ).updateBackstack(oldState)
+    }
+
+    data class SetFeeLevel(
+        val feeLevel: FeeLevel
+    ) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState
     }
 
     object InvalidateTransaction : TransactionIntent() {

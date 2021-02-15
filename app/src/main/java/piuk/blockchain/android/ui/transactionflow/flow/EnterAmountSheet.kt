@@ -166,8 +166,16 @@ class EnterAmountSheet : TransactionFlowSheet() {
         compositeDisposable += view.amount_sheet_input.onInputToggle
             .subscribe {
                 analyticsHooks.onCryptoToggle(it, state)
+                lowerSlot?.displayMode = it.toDisplayMode()
             }
     }
+
+    private fun CurrencyType.toDisplayMode() =
+        when {
+            isCrypto() -> TxFlowWidget.DisplayMode.Crypto
+            isFiat() -> TxFlowWidget.DisplayMode.Fiat
+            else -> throw IllegalStateException("Unknown CurrencyType")
+        }
 
     // in this method we try to convert the fiat value coming out from
     // the view to a crypto which is withing the min and max limits allowed.

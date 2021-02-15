@@ -180,6 +180,7 @@ class TransactionModel(
             is TransactionIntent.ShowMoreAccounts -> null
             is TransactionIntent.UseMaxSpendable -> null
             is TransactionIntent.InvalidateTransaction -> processInvalidateTransaction()
+            is TransactionIntent.SetFeeLevel -> processSetFeeLevel(intent)
             is TransactionIntent.ResetFlow -> {
                 interactor.reset()
                 null
@@ -302,6 +303,16 @@ class TransactionModel(
                 onError = {
                     Timber.e("!TRANSACTION!> Unable to get update available balance")
                     errorLogger.log(TxFlowLogError.BalanceFail(it))
+                    process(TransactionIntent.FatalTransactionError(it))
+                }
+            )
+
+    private fun processSetFeeLevel(intent: TransactionIntent.SetFeeLevel): Disposable =
+        interactor.updateTransactionFees(intent.feeLevel)
+            .subscribeBy(
+                onError = {
+                    Timber.e("!TRANSACTION!> Unable to set TX fee level")
+                    errorLogger.log(TxFlowLogError.FeesFail(it))
                     process(TransactionIntent.FatalTransactionError(it))
                 }
             )
