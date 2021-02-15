@@ -10,7 +10,7 @@ sealed class EmailVeriffIntent : MviIntent<EmailVeriffState> {
             oldState.copy(
                 email = mail,
                 isLoading = false,
-                emailChanged = oldState.email != mail &&
+                emailChanged = oldState.email.address != mail.address &&
                     oldState.email.address.isNotEmpty() &&
                     mail.address.isNotEmpty()
             )
