@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.transactionflow.flow.adapter
 
-import android.app.Activity
 import android.content.Context
 import android.graphics.Typeface
 import android.net.Uri
@@ -37,7 +36,6 @@ import piuk.blockchain.android.util.AfterTextChangedWatcher
 class ConfirmInfoItemFeeOptionDelegate<in T>(
     private val model: TransactionModel,
     private val analytics: TxFlowAnalytics,
-    private val activityContext: Activity,
     private val stringUtils: StringUtils
 ) : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
@@ -55,7 +53,6 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
         items[position] as TxConfirmationValue.FeeSelection,
         model,
         analytics,
-        activityContext,
         stringUtils
     )
 
@@ -104,7 +101,6 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
             item: TxConfirmationValue.FeeSelection,
             model: TransactionModel,
             analytics: TxFlowAnalytics,
-            activityContext: Context,
             stringUtils: StringUtils
         ) {
             updateFeeList(item.availableLevels.toList())
@@ -134,7 +130,7 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
                 val linkedText = stringUtils.getStringWithMappedAnnotations(
                     R.string.tx_confirmation_fee_learn_more_3,
                     linksMap,
-                    activityContext
+                    itemView.context
                 )
 
                 val sb = SpannableStringBuilder()
@@ -153,8 +149,7 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
             item.feeDetails?.let {
                 when (it) {
                     is FeeState.FeeUnderMinLimit -> {
-                        setCustomFeeValues(item.customFeeAmount,
-                            context.getString(R.string.fee_options_sat_byte_min_error))
+                        setCustomFeeValues(item.customFeeAmount, context.getString(R.string.fee_options_sat_byte_min_error))
                     }
                     is FeeState.FeeUnderRecommended -> {
                         setCustomFeeValues(item.customFeeAmount, context.getString(R.string.fee_options_fee_too_low))

@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import info.blockchain.balance.Money
-import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.databinding.ViewTxFlowFeeAndBalanceBinding
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
@@ -54,14 +53,6 @@ class BalanceAndFeeView @JvmOverloads constructor(
         }
 
         binding.toggleIndicator.rotation += 180f
-
-        binding.feePriority.setOnClickListener {
-            model.process(TransactionIntent.SetFeeLevel(FeeLevel.Priority))
-        }
-
-        binding.feeStandard.setOnClickListener {
-            model.process(TransactionIntent.SetFeeLevel(FeeLevel.Regular))
-        }
     }
 
     override fun update(state: TransactionState) {
@@ -69,6 +60,9 @@ class BalanceAndFeeView @JvmOverloads constructor(
 
         updateMaxGroup(state)
         updateBalance(state)
+        state.pendingTx?.let {
+            binding.feeEdit.update(it, model)
+        }
     }
 
     private fun updateBalance(state: TransactionState) {

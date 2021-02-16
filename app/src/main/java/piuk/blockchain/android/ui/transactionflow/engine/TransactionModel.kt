@@ -308,7 +308,7 @@ class TransactionModel(
             )
 
     private fun processSetFeeLevel(intent: TransactionIntent.SetFeeLevel): Disposable =
-        interactor.updateTransactionFees(intent.feeLevel)
+        interactor.updateTransactionFees(intent.feeLevel, intent.customFeeAmount)
             .subscribeBy(
                 onError = {
                     Timber.e("!TRANSACTION!> Unable to set TX fee level")

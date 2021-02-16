@@ -94,8 +94,11 @@ class TransactionInteractor(
     fun updateTransactionAmount(amount: Money): Completable =
         transactionProcessor?.updateAmount(amount) ?: throw IllegalStateException("TxProcessor not initialised")
 
-    fun updateTransactionFees(feeLevel: FeeLevel): Completable =
-        transactionProcessor?.updateFeeLevel(feeLevel) ?: throw IllegalStateException("TxProcessor not initialised")
+    fun updateTransactionFees(feeLevel: FeeLevel, customFeeAmount: Long): Completable =
+        transactionProcessor?.updateFeeLevel(
+            level = feeLevel,
+            customFeeAmount = customFeeAmount
+        ) ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun getTargetAccounts(sourceAccount: CryptoAccount, action: AssetAction): Single<SingleAccountList> =
         when (action) {

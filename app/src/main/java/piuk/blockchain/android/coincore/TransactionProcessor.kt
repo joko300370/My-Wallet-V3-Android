@@ -68,9 +68,11 @@ data class PendingTx(
     val availableBalance: Money,
     val fees: Money,
     val selectedFiat: String,
+
     val feeLevel: FeeLevel = FeeLevel.None,
     val customFeeAmount: Long = -1L,
     val availableFeeLevels: Set<FeeLevel> = setOf(FeeLevel.None),
+
     val confirmations: List<TxConfirmationValue> = emptyList(),
     val minLimit: Money? = null,
     val maxLimit: Money? = null,

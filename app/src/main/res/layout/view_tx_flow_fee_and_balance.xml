@@ -129,17 +129,10 @@
 <!--            android:ellipsize="end"-->
 <!--            tools:text="Total: 1.00000 BTC" />-->
 
-        <Button
-            android:id="@+id/fee_standard"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Standard"/>
-
-        <Button
-            android:id="@+id/fee_priority"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Priority"/>
+        <piuk.blockchain.android.ui.transactionflow.plugin.EditFeesControl
+            android:id="@+id/fee_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 
