@@ -1,11 +1,13 @@
 package piuk.blockchain.android.coincore.impl
 
-import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.preferences.WalletStatus
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.service.TierService
+import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.preferences.WalletStatus
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.BankAccount
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FiatAccount
@@ -13,13 +15,16 @@ import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TransferError
+import piuk.blockchain.android.coincore.fiat.LinkedBankAccount
 import piuk.blockchain.android.coincore.impl.txEngine.BitpayTxEngine
-import piuk.blockchain.android.coincore.impl.txEngine.sell.TradingSellTxEngine
+import piuk.blockchain.android.coincore.impl.txEngine.FiatDepositTxEngine
+import piuk.blockchain.android.coincore.impl.txEngine.FiatWithdrawalTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.InterestDepositTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.impl.txEngine.TradingToOnChainTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.android.coincore.impl.txEngine.sell.OnChainSellTxEngine
+import piuk.blockchain.android.coincore.impl.txEngine.sell.TradingSellTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.swap.OnChainSwapTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.swap.TradingToTradingSwapTxEngine
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
@@ -37,14 +42,62 @@ class TxProcessorFactory(
     private val environmentConfig: EnvironmentConfig
 ) {
     fun createProcessor(
-        source: CryptoAccount,
+        source: BlockchainAccount,
         target: TransactionTarget,
         action: AssetAction
     ): Single<TransactionProcessor> =
         when (source) {
             is CryptoNonCustodialAccount -> createOnChainProcessor(source, target, action)
             is CustodialTradingAccount -> createTradingProcessor(source, target, action)
+            is BankAccount -> createFiatDepositProcessor(source, target, action)
+            is FiatAccount -> createFiatWithdrawalProcessor(source, target, action)
             else -> Single.error(NotImplementedError())
+        }
+
+    private fun createFiatDepositProcessor(
+        source: BlockchainAccount,
+        target: TransactionTarget,
+        action: AssetAction
+    ): Single<TransactionProcessor> =
+        when (target) {
+            is FiatAccount -> {
+                Single.just(
+                    TransactionProcessor(
+                        exchangeRates = exchangeRates,
+                        sourceAccount = source,
+                        txTarget = target,
+                        engine = FiatDepositTxEngine(
+                            walletManager = walletManager
+                        )
+                    )
+                )
+            }
+            else -> {
+                Single.error(IllegalStateException("not supported yet"))
+            }
+        }
+
+    private fun createFiatWithdrawalProcessor(
+        source: BlockchainAccount,
+        target: TransactionTarget,
+        action: AssetAction
+    ): Single<TransactionProcessor> =
+        when (target) {
+            is LinkedBankAccount -> {
+                Single.just(
+                    TransactionProcessor(
+                        exchangeRates = exchangeRates,
+                        sourceAccount = source,
+                        txTarget = target,
+                        engine = FiatWithdrawalTxEngine(
+                            walletManager = walletManager
+                        )
+                    )
+                )
+            }
+            else -> {
+                Single.error(IllegalStateException("not supported yet"))
+            }
         }
 
     private fun createOnChainProcessor(
@@ -93,12 +146,12 @@ class TxProcessorFactory(
                 if (action != AssetAction.Swap)
                     target.receiveAddress.map {
                         TransactionProcessor(
-                        exchangeRates = exchangeRates,
-                        sourceAccount = source,
-                        txTarget = it,
-                        engine = engine
-                    )
-                } else {
+                            exchangeRates = exchangeRates,
+                            sourceAccount = source,
+                            txTarget = it,
+                            engine = engine
+                        )
+                    } else {
                     Single.just(
                         TransactionProcessor(
                             exchangeRates = exchangeRates,

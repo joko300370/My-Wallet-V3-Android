@@ -3,8 +3,8 @@ package piuk.blockchain.android.coincore.impl.txEngine
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialOrder
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.TransferDirection
+import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.nabu.models.responses.nabu.NabuApiException
 import com.blockchain.nabu.models.responses.nabu.NabuErrorCodes
@@ -15,6 +15,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.Singles
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.PendingTx
@@ -28,7 +29,6 @@ import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
-import java.lang.IllegalStateException
 import java.math.RoundingMode
 
 const val QUOTE_SUB = "quote_sub"
@@ -57,8 +57,8 @@ abstract class QuotedEngine(
         get() {
             return txTarget.let {
                 when (it) {
-                    is CryptoAccount -> CurrencyPair.CryptoCurrencyPair(sourceAccount.asset, it.asset)
-                    is FiatAccount -> CurrencyPair.CryptoToFiatCurrencyPair(sourceAccount.asset, it.fiatCurrency)
+                    is CryptoAccount -> CurrencyPair.CryptoCurrencyPair(sourceAsset, it.asset)
+                    is FiatAccount -> CurrencyPair.CryptoToFiatCurrencyPair(sourceAsset, it.fiatCurrency)
                     else -> throw IllegalStateException("Unsupported target")
                 }
             }
@@ -81,7 +81,7 @@ abstract class QuotedEngine(
         }
 
     override fun start(
-        sourceAccount: CryptoAccount,
+        sourceAccount: BlockchainAccount,
         txTarget: TransactionTarget,
         exchangeRates: ExchangeRateDataManager,
         refreshTrigger: RefreshTrigger
@@ -122,21 +122,22 @@ abstract class QuotedEngine(
     }
 
     protected fun OnChainTxEngineBase.startFromQuote(quote: PricedQuote) {
+
         start(
-            sourceAccount = sourceAccount,
+            sourceAccount = this@QuotedEngine.sourceAccount,
             txTarget = makeExternalAssetAddress(
-                asset = sourceAccount.asset,
+                asset = this@QuotedEngine.sourceAsset,
                 address = quote.transferQuote.sampleDepositAddress,
                 environmentConfig = environmentConfig
             ),
-            exchangeRates = exchangeRates
+            exchangeRates = this@QuotedEngine.exchangeRates
         )
     }
 
     protected fun OnChainTxEngineBase.restartFromOrder(order: CustodialOrder, pendingTx: PendingTx): Single<PendingTx> =
         restart(
             txTarget = makeExternalAssetAddress(
-                asset = sourceAccount.asset,
+                asset = sourceAsset,
                 address = order.depositAddress ?: throw IllegalStateException("Missing deposit address"),
                 environmentConfig = environmentConfig,
                 postTransactions = { Completable.complete() }
@@ -173,6 +174,6 @@ abstract class QuotedEngine(
 
     protected fun Money.withUserDpRounding(roundingMode: RoundingMode): CryptoValue =
         (this as? CryptoValue)?.let {
-            CryptoValue.fromMajor(it.currency, it.toBigDecimal().setScale(sourceAccount.asset.userDp, roundingMode))
+            CryptoValue.fromMajor(it.currency, it.toBigDecimal().setScale(sourceAsset.userDp, roundingMode))
         } ?: throw IllegalStateException("Method only support cryptovalues")
 }

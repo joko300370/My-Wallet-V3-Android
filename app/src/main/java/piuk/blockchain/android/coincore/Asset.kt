@@ -24,7 +24,8 @@ enum class AssetAction {
     Swap,
     Sell,
     Summary,
-    Deposit
+    InterestDeposit,
+    FiatDeposit
 }
 
 typealias AvailableActions = Set<AssetAction>

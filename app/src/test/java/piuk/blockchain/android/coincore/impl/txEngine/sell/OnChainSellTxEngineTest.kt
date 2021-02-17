@@ -78,7 +78,9 @@ class OnChainSellTxEngineTest {
         on { selectedFiatCurrency } itReturns SELECTED_FIAT
     }
 
-    private val onChainEngine: OnChainTxEngineBase = mock()
+    private val onChainEngine: OnChainTxEngineBase = mock {
+        on { sourceAsset } itReturns SRC_ASSET
+    }
 
     private val subject = OnChainSellTxEngine(
         engine = onChainEngine,
@@ -200,7 +202,7 @@ class OnChainSellTxEngineTest {
             exchangeRates
         )
 
-        val asset = subject.asset
+        val asset = subject.sourceAsset
 
         // Assert
         asset shouldEqual SRC_ASSET
@@ -290,6 +292,7 @@ class OnChainSellTxEngineTest {
         whenOnChainEngineInitOK(totalBalance, availableBalance, expectedFeeLevel, expectedFeeOptions)
 
         val sourceAccount = mockSourceAccount(totalBalance, availableBalance)
+
         val txTarget = mockTransactionTarget()
 
         val txQuote: TransferQuote = mock {

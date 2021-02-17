@@ -93,14 +93,13 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
             FlowScreen.KYC -> startKyc()
             FlowScreen.KYC_VERIFICATION -> goToKycVerificationScreen(false)
             FlowScreen.CHECKOUT -> goToCheckOutScreen(false)
-            FlowScreen.ADD_CARD -> addNewCard()
         }
     }
 
-    private fun addNewCard() {
+ /*   private fun addNewCard() {
         val intent = Intent(this, CardDetailsActivity::class.java)
         startActivityForResult(intent, CardDetailsActivity.ADD_CARD_REQUEST_CODE)
-    }
+    }*/
 
     override fun onDestroy() {
         super.onDestroy()
@@ -201,33 +200,6 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
                 val attributes = bankTransfer.attributes as YodleeAttributes
                 launchYodleeSplash(attributes, bankTransfer.id)
             }
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == KYC_STARTED && resultCode == RESULT_KYC_SIMPLE_BUY_COMPLETE) {
-            simpleBuyModel.process(SimpleBuyIntent.KycCompleted)
-            goToKycVerificationScreen()
-        } else if (requestCode == CardDetailsActivity.ADD_CARD_REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                val card = (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as?
-                    PaymentMethod.Card) ?: return
-                val cardId = card.cardId
-                val cardLabel = card.uiLabel()
-                val cardPartner = card.partner
-
-                simpleBuyModel.process(
-                    SimpleBuyIntent.UpdateSelectedPaymentMethod(
-                        cardId,
-                        cardLabel,
-                        cardPartner,
-                        PaymentMethodType.PAYMENT_CARD
-                    )
-                )
-                goToCheckOutScreen()
-            } else
-                finish()
         }
     }
 

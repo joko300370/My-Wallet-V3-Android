@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/payment_method_root"
@@ -36,18 +37,31 @@
         app:layout_constraintTop_toTopOf="@+id/payment_method_icon" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/subtitle"
+        android:id="@+id/payment_method_subtitle"
+        style="@style/Text.Semibold.14"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:text="@string/payment_deposit_subtitle"
+        app:layout_constraintStart_toEndOf="@+id/payment_method_icon"
+        app:layout_constraintTop_toBottomOf="@id/payment_method_title" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/payment_method_blurb"
         style="@style/Text.Light.14"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/small_margin"
         android:layout_marginEnd="@dimen/standard_margin"
         android:text="@string/instantly_buy_crypto_with_link_a_bank"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/badge"
-        app:layout_goneMarginBottom="@dimen/standard_margin"
+        app:layout_constraintEnd_toStartOf="@id/add_payment_method_icon"
         app:layout_constraintStart_toEndOf="@+id/payment_method_icon"
-        app:layout_constraintTop_toBottomOf="@+id/payment_method_title" />
+        app:layout_constraintTop_toBottomOf="@+id/payment_method_subtitle"
+        app:layout_goneMarginBottom="@dimen/standard_margin" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/add_payment_method_icon"
@@ -66,21 +80,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/small_margin"
+        android:layout_marginBottom="@dimen/standard_margin"
         android:background="@drawable/payment_method_badge_background"
         android:text="@string/most_popular"
         android:textColor="@color/green_500"
-        tools:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/separator"
-        android:layout_marginBottom="@dimen/standard_margin"
-        app:layout_constraintStart_toStartOf="@+id/subtitle"
-        app:layout_constraintTop_toBottomOf="@+id/subtitle" />
-
+        app:layout_constraintStart_toStartOf="@+id/payment_method_blurb"
+        app:layout_constraintTop_toBottomOf="@+id/payment_method_blurb"
+        tools:visibility="visible" />
 
     <View
+        android:id="@+id/separator"
         style="@style/Separator"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:id="@+id/separator"
         android:layout_marginStart="0dp"
         android:layout_marginTop="@dimen/small_margin"
         android:layout_marginBottom="0dp"

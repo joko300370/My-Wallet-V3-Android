@@ -21,6 +21,7 @@ import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.synthetic.main.fragment_simple_buy_buy_crypto.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.cards.CardDetailsActivity
 import piuk.blockchain.android.cards.CardDetailsActivity.Companion.ADD_CARD_REQUEST_CODE
 import piuk.blockchain.android.cards.icon
@@ -31,6 +32,7 @@ import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
 import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
+import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.linkbank.LinkBankActivity
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.drawableResFilled
@@ -207,31 +209,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             newState.kycVerificationState != null &&
             newState.orderState == OrderState.PENDING_CONFIRMATION
         ) {
-            when (newState.kycVerificationState) {
-                // Kyc state unknown because error, or gold docs unsubmitted
-                KycState.PENDING -> {
-                    startKyc()
-                }
-                // Awaiting results state
-                KycState.IN_REVIEW,
-                KycState.UNDECIDED -> {
-                    navigator().goToKycVerificationScreen()
-                }
-                // Got results, kyc verification screen will show error
-                KycState.VERIFIED_BUT_NOT_ELIGIBLE,
-                KycState.FAILED -> {
-                    navigator().goToKycVerificationScreen()
-                }
-                // We have done kyc and are verified
-                KycState.VERIFIED_AND_ELIGIBLE -> {
-                    if (newState.selectedPaymentMethod?.isActive() == true) {
-                        navigator().goToCheckOutScreen()
-                    } else
-                        newState.selectedPaymentMethod?.paymentMethodType?.let {
-                            goToAddNewPaymentMethod(it)
-                        }
-                }
-            }.exhaustive
+            handlePostOrderCreationAction(newState)
         }
 
         if (
@@ -272,6 +250,36 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         }
     }
 
+    private fun handlePostOrderCreationAction(newState: SimpleBuyState) {
+        if (newState.selectedPaymentMethod?.isActive() == true) {
+            navigator().goToCheckOutScreen()
+        } else {
+            require(newState.kycVerificationState != null)
+            when (newState.kycVerificationState) {
+                // Kyc state unknown because error, or gold docs unsubmitted
+                KycState.PENDING -> {
+                    startKyc()
+                }
+                // Awaiting results state
+                KycState.IN_REVIEW,
+                KycState.UNDECIDED -> {
+                    navigator().goToKycVerificationScreen()
+                }
+                // Got results, kyc verification screen will show error
+                KycState.VERIFIED_BUT_NOT_ELIGIBLE,
+                KycState.FAILED -> {
+                    navigator().goToKycVerificationScreen()
+                }
+                // We have done kyc and are verified
+                KycState.VERIFIED_AND_ELIGIBLE -> {
+                    newState.selectedPaymentMethod?.paymentMethodType?.let {
+                        goToAddNewPaymentMethod(it)
+                    }
+                }
+            }.exhaustive
+        }
+    }
+
     /**
      * Once User selects the option to Link a bank then his/her Kyc status is checked.
      * If is VERIFIED_AND_ELIGIBLE then we try to link a bank and if the fetched partner is supported
@@ -297,8 +305,8 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     private fun startKyc() {
         model.process(SimpleBuyIntent.NavigationHandled)
         model.process(SimpleBuyIntent.KycStarted)
-        navigator().startKyc()
         analytics.logEvent(SimpleBuyAnalytics.START_GOLD_FLOW)
+        KycNavHostActivity.startForResult(this, CampaignType.SimpleBuy, SimpleBuyActivity.KYC_STARTED)
     }
 
     private fun goToAddNewPaymentMethod(paymentMethod: PaymentMethodType) {
@@ -507,6 +515,15 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                     (data?.extras?.getString(LinkBankActivity.LINKED_BANK_ID_KEY))
                 )
             )
+        }
+        if (requestCode == SimpleBuyActivity.KYC_STARTED) {
+            if (resultCode == SimpleBuyActivity.RESULT_KYC_SIMPLE_BUY_COMPLETE) {
+                model.process(SimpleBuyIntent.KycCompleted)
+                navigator().goToKycVerificationScreen()
+            } else if (resultCode == SimpleBuyActivity.RESULT_KYC_SIMPLE_BUY_FOR_SDD_COMPLETE) {
+                val intent = Intent(activity, CardDetailsActivity::class.java)
+                startActivityForResult(intent, ADD_CARD_REQUEST_CODE)
+            }
         }
     }
 

@@ -76,7 +76,6 @@ import piuk.blockchain.android.ui.transfer.TransferFragment
 import piuk.blockchain.android.util.AndroidUtils
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.android.util.getAccount
-import piuk.blockchain.android.withdraw.WithdrawActivity
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.gone
@@ -575,13 +574,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     override fun gotoActivityFor(account: BlockchainAccount?) =
         startActivitiesFragment(account)
-
-    override fun goToWithdraw(currency: String) {
-        startActivity(WithdrawActivity.newInstance(
-            context = this,
-            currency = currency
-        ))
-    }
 
     override fun resumeSimpleBuyKyc() {
         startActivity(

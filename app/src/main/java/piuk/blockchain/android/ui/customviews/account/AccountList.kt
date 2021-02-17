@@ -14,6 +14,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import kotlinx.android.synthetic.main.item_account_select_bank.view.*
 import kotlinx.android.synthetic.main.item_account_select_crypto.view.*
 import kotlinx.android.synthetic.main.item_account_select_fiat.view.*
 import kotlinx.android.synthetic.main.item_account_select_group.view.*
@@ -21,6 +22,8 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.fiat.FiatCustodialAccount
+import piuk.blockchain.android.coincore.fiat.LinkedBankAccount
 import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
@@ -185,6 +188,12 @@ private class AccountsDelegateAdapter(
                     compositeDisposable
                 )
             )
+            addAdapterDelegate(
+                BankAccountDelegate(
+                    onAccountClicked,
+                    showSelectionStatus
+                )
+            )
         }
     }
 
@@ -219,12 +228,10 @@ private class CryptoAccountDelegate(
         onAccountClicked
     )
 }
-
 private class CryptoSingleAccountViewHolder(
     private val showSelectionStatus: Boolean,
     itemView: View
 ) : RecyclerView.ViewHolder(itemView), DisposableViewHolder {
-
     fun bind(
         selectableAccountItem: SelectableAccountItem,
         statusDecorator: StatusDecorator,
@@ -255,9 +262,8 @@ private class FiatAccountDelegate(
     private val onAccountClicked: (FiatAccount) -> Unit,
     private val showSelectionStatus: Boolean
 ) : AdapterDelegate<SelectableAccountItem> {
-
     override fun isForViewType(items: List<SelectableAccountItem>, position: Int): Boolean =
-        items[position].account is FiatAccount
+        items[position].account is FiatCustodialAccount
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
         FiatAccountViewHolder(
@@ -277,7 +283,6 @@ private class FiatAccountViewHolder(
     private val showSelectionStatus: Boolean,
     itemView: View
 ) : RecyclerView.ViewHolder(itemView), DisposableViewHolder {
-
     fun bind(
         selectableAccountItem: SelectableAccountItem,
         statusDecorator: StatusDecorator,
@@ -302,6 +307,60 @@ private class FiatAccountViewHolder(
 
     override fun dispose() {
         itemView.fiat_account.dispose()
+    }
+}
+
+private class BankAccountDelegate(
+    private val onAccountClicked: (LinkedBankAccount) -> Unit,
+    private val showSelectionStatus: Boolean
+) : AdapterDelegate<SelectableAccountItem> {
+
+    override fun isForViewType(items: List<SelectableAccountItem>, position: Int): Boolean =
+        items[position].account is LinkedBankAccount
+
+    override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
+        BankAccountViewHolder(
+            showSelectionStatus,
+            parent.inflate(R.layout.item_account_select_bank)
+        )
+
+    override fun onBindViewHolder(
+        items: List<SelectableAccountItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder
+    ) = (holder as BankAccountViewHolder).bind(
+        items[position],
+        onAccountClicked
+    )
+}
+
+private class BankAccountViewHolder(
+    private val showSelectionStatus: Boolean,
+    itemView: View
+) : RecyclerView.ViewHolder(itemView), DisposableViewHolder {
+
+    fun bind(
+        selectableAccountItem: SelectableAccountItem,
+        onAccountClicked: (LinkedBankAccount) -> Unit
+    ) {
+        with(itemView) {
+            if (showSelectionStatus) {
+                if (selectableAccountItem.isSelected) {
+                    bank_container.background = ContextCompat.getDrawable(context, R.drawable.item_selected_bkgd)
+                } else {
+                    bank_container.background = null
+                }
+            }
+            bank_container.alpha = 1f
+            bank_account.updateAccount(
+                selectableAccountItem.account as LinkedBankAccount,
+                onAccountClicked
+            )
+        }
+    }
+
+    override fun dispose() {
+        // nothing to dispose
     }
 }
 

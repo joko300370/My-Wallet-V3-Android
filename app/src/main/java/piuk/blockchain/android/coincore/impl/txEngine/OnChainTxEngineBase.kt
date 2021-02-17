@@ -7,8 +7,8 @@ import info.blockchain.wallet.api.data.FeeOptions
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxEngine
@@ -23,7 +23,7 @@ abstract class OnChainTxEngineBase(
         val tgt = txTarget
         check(tgt is CryptoAddress)
         check(tgt.address.isNotEmpty())
-        check(sourceAccount.asset == tgt.asset)
+        check(sourceAsset == tgt.asset)
     }
 
     override fun doPostExecute(txResult: TxResult): Completable =
@@ -78,7 +78,7 @@ abstract class OnChainTxEngineBase(
 
         return if (pendingTx.hasFeeLevelChanged(level, customFeeAmount)) {
             updateFeeSelection(
-                asset,
+                sourceAsset,
                 pendingTx,
                 level,
                 customFeeAmount
@@ -93,7 +93,7 @@ abstract class OnChainTxEngineBase(
         if (newConfirmation is TxConfirmationValue.FeeSelection) {
             if (pendingTx.hasFeeLevelChanged(newConfirmation.selectedLevel, newConfirmation.customFeeAmount)) {
                 updateFeeSelection(
-                    asset,
+                    sourceAsset,
                     pendingTx,
                     newConfirmation.selectedLevel,
                     newConfirmation.customFeeAmount

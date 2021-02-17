@@ -185,14 +185,14 @@ class SimpleBuyInteractor(
             SimpleBuyIntent.ExchangeRateUpdated(it.price() as FiatValue)
         }
 
-    fun fetchPaymentMethods(fiatCurrency: String, preselectedId: String?):
+    fun eligiblePaymentMethods(fiatCurrency: String, preselectedId: String?):
         Single<SimpleBuyIntent.PaymentMethodsUpdated> =
         tierService.tiers().zipWith(custodialWalletManager.isSDDEligible().onErrorReturn { false })
             .flatMap { (tier, sddEligible) ->
                 custodialWalletManager.fetchSuggestedPaymentMethod(
-                    fiatCurrency,
-                    sddEligible,
-                    tier.isInitialisedFor(KycTierLevel.GOLD)
+                    fiatCurrency = fiatCurrency,
+                    sddLimits = sddEligible && tier.isInInitialState(),
+                    onlyEligible = tier.isInitialisedFor(KycTierLevel.GOLD)
                 ).map { paymentMethods ->
                     SimpleBuyIntent.PaymentMethodsUpdated(
                         availablePaymentMethods = paymentMethods,
@@ -236,18 +236,10 @@ class SimpleBuyInteractor(
                 CardIntent.CardUpdated(it.value)
             }
 
-    fun fetchPaymentMethods(fiatCurrency: String): Single<List<PaymentMethod>> =
-        paymentMethods(fiatCurrency)
-
-    private fun paymentMethods(fiatCurrency: String): Single<List<PaymentMethod>> =
-        tierService.tiers().zipWith(custodialWalletManager.isSDDEligible().onErrorReturn { false })
-            .flatMap { (tier, sddEligible) ->
-                custodialWalletManager.fetchSuggestedPaymentMethod(
-                    fiatCurrency = fiatCurrency,
-                    sddEligible = sddEligible,
-                    onlyEligible = tier.isInitialisedFor(KycTierLevel.GOLD)
-                )
-            }
+    fun eligiblePaymentMethods(fiatCurrency: String): Single<List<PaymentMethod>> =
+        custodialWalletManager.fetchSuggestedPaymentMethod(
+            fiatCurrency = fiatCurrency, sddLimits = false, onlyEligible = true
+        )
 
     fun fetchOrder(orderId: String) = custodialWalletManager.getBuyOrder(orderId)
 

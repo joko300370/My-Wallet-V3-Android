@@ -149,6 +149,12 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
 
     data class Total(val total: Money, val exchange: Money? = null) : TxConfirmationValue(TxConfirmation.READ_ONLY)
 
+    data class FiatTxFee(val fee: Money) : TxConfirmationValue(TxConfirmation.READ_ONLY)
+
+    object EstimatedDepositCompletion : TxConfirmationValue(TxConfirmation.READ_ONLY)
+
+    object EstimatedWithdrawalCompletion : TxConfirmationValue(TxConfirmation.READ_ONLY)
+
     data class FeeSelection(
         val feeDetails: FeeState? = null,
         val exchange: Money? = null,
@@ -209,12 +215,12 @@ abstract class TxEngine : KoinComponent {
         fun refreshConfirmations(revalidate: Boolean = false): Completable
     }
 
-    private lateinit var _sourceAccount: CryptoAccount
+    private lateinit var _sourceAccount: BlockchainAccount
     private lateinit var _txTarget: TransactionTarget
     private lateinit var _exchangeRates: ExchangeRateDataManager
     private lateinit var _refresh: RefreshTrigger
 
-    protected val sourceAccount: CryptoAccount
+    protected val sourceAccount: BlockchainAccount
         get() = _sourceAccount
 
     protected val txTarget: TransactionTarget
@@ -229,7 +235,7 @@ abstract class TxEngine : KoinComponent {
 
     @CallSuper
     open fun start(
-        sourceAccount: CryptoAccount,
+        sourceAccount: BlockchainAccount,
         txTarget: TransactionTarget,
         exchangeRates: ExchangeRateDataManager,
         refreshTrigger: RefreshTrigger = object : RefreshTrigger {
@@ -259,8 +265,11 @@ abstract class TxEngine : KoinComponent {
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
-    val asset: CryptoCurrency
-        get() = sourceAccount.asset
+    // workaround for using engine without cryptocurrency source
+    val sourceAsset: CryptoCurrency
+        get() = (sourceAccount as? CryptoAccount)?.asset ?: throw IllegalStateException(
+            "Trying to use cryptocurrency with non-crypto source"
+        )
 
     open val requireSecondPassword: Boolean = false
 
@@ -270,16 +279,40 @@ abstract class TxEngine : KoinComponent {
     // Return a stream of the exchange rate between the source asset and the user's selected
     // fiat currency. This should always return at least once, but can safely either complete
     // or keep sending updated rates, depending on what is useful for Transaction context
-    open fun userExchangeRate(): Observable<ExchangeRate> =
-        Observable.just(
-            exchangeRates.getLastPrice(sourceAccount.asset, userFiat)
-        ).map { rate ->
-            ExchangeRate.CryptoToFiat(
-                sourceAccount.asset,
-                userFiat,
-                rate
-            )
+    open fun userExchangeRate(): Observable<ExchangeRate> {
+        check(sourceAccount is CryptoAccount || sourceAccount is FiatAccount) {
+            "Attempting to use exchange rate for non crypto or fiat sources"
         }
+
+        return when (sourceAccount) {
+            is CryptoAccount -> {
+                Observable.just(
+                    exchangeRates.getLastPrice((sourceAccount as CryptoAccount).asset, userFiat)
+                ).map { rate ->
+                    ExchangeRate.CryptoToFiat(
+                        (sourceAccount as CryptoAccount).asset,
+                        userFiat,
+                        rate
+                    )
+                }
+            }
+            is FiatAccount -> {
+                Observable.just(
+                    exchangeRates.getLastPriceOfFiat((sourceAccount as FiatAccount).fiatCurrency, userFiat)
+                ).map {
+                    ExchangeRate.FiatToFiat(
+                        (sourceAccount as FiatAccount).fiatCurrency,
+                        userFiat,
+                        it
+                    )
+                }
+            }
+            else -> {
+                Timber.e("Attempting to use exchange rate for non crypto or fiat sources")
+                Observable.empty()
+            }
+        }
+    }
 
     abstract fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx>
 
@@ -331,7 +364,7 @@ abstract class TxEngine : KoinComponent {
 }
 
 class TransactionProcessor(
-    sourceAccount: CryptoAccount,
+    sourceAccount: BlockchainAccount,
     txTarget: TransactionTarget,
     exchangeRates: ExchangeRateDataManager,
     private val engine: TxEngine

@@ -1,12 +1,12 @@
 package piuk.blockchain.android.ui.settings
 
 import android.annotation.SuppressLint
+import com.blockchain.nabu.datamanagers.Bank
+import com.blockchain.nabu.datamanagers.BankState
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
-import com.blockchain.nabu.models.data.Bank
-import com.blockchain.nabu.models.data.LinkedBankState
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.models.responses.nabu.NabuApiException
 import com.blockchain.nabu.models.responses.nabu.NabuErrorStatusCodes
@@ -126,7 +126,7 @@ class SettingsPresenter(
 
     fun updateBanks() {
         compositeDisposable +=
-            linkableBanks(fiatUnit).zipWith(linkedBanks().onErrorReturn { emptySet() })
+            eligibleBankPaymentMethods(fiatUnit).zipWith(linkedBanks().onErrorReturn { emptySet() })
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe {
                     view?.banksEnabled(false)
@@ -157,16 +157,15 @@ class SettingsPresenter(
         }
     }
 
-    private fun linkableBanks(fiat: String): Single<Set<LinkableBank>> =
+    private fun eligibleBankPaymentMethods(fiat: String): Single<Set<LinkablePaymentMethods>> =
         custodialWalletManager.getEligiblePaymentMethodTypes(fiat).map { methods ->
             val bankPaymentMethods = methods.filter {
                 it.paymentMethodType == PaymentMethodType.BANK_TRANSFER ||
-                    // Bank linking through wire transfer has not been implemented for USD
-                    (it.paymentMethodType == PaymentMethodType.FUNDS && it.currency != "USD")
+                    it.paymentMethodType == PaymentMethodType.FUNDS
             }
 
             bankPaymentMethods.map { method ->
-                LinkableBank(
+                LinkablePaymentMethods(
                     method.currency,
                     bankPaymentMethods.filter { it.currency == method.currency }.map { it.paymentMethodType }.distinct()
                 )
@@ -174,13 +173,9 @@ class SettingsPresenter(
         }
 
     private fun linkedBanks(): Single<Set<Bank>> =
-        custodialWalletManager.getLinkedBeneficiaries()
-            .zipWith(custodialWalletManager.getLinkedBanks().map { linkedBanks ->
-                linkedBanks.filter { it.state == LinkedBankState.ACTIVE }
-            })
-            .map { (beneficiaries, linkedBanks) ->
-                beneficiaries.toSet() + linkedBanks
-            }
+        custodialWalletManager.getBanks().map { banks -> banks.filter { it.state == BankState.ACTIVE } }.map { banks ->
+            banks.toSet()
+        }
 
     fun onKycStatusClicked() {
         view?.launchKycFlow()
@@ -595,7 +590,7 @@ class SettingsPresenter(
     }
 }
 
-data class LinkableBank(
+data class LinkablePaymentMethods(
     val currency: String,
     val linkMethods: List<PaymentMethodType>
 ) : Serializable

@@ -46,6 +46,7 @@ import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.KycNavXmlDirections
 import piuk.blockchain.android.R
+import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpFragment
@@ -87,11 +88,11 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
     }
     private val initialState by unsafeLazy {
         AddressModel(
-            "",
+            "Flat 57, Narrow Street 51",
             null,
-            "",
-            profileModel.stateCode ?: "",
-            "",
+            "London",
+            profileModel.stateCode ?: "London",
+            "E14 8DN",
             profileModel.countryCode
         )
     }
@@ -135,7 +136,8 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
     }
 
     override fun onSddVerified() {
-
+        activity?.setResult(SimpleBuyActivity.RESULT_KYC_SIMPLE_BUY_FOR_SDD_COMPLETE)
+        activity?.finish()
     }
 
     override fun continueToTier2MoreInfoNeeded(countryCode: String) {

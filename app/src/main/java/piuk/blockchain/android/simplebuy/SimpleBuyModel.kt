@@ -122,7 +122,7 @@ class SimpleBuyModel(
             }
 
             is SimpleBuyIntent.TryToLinkABankTransfer -> {
-                interactor.fetchPaymentMethods(previousState.fiatCurrency).map {
+                interactor.eligiblePaymentMethods(previousState.fiatCurrency).map {
                     it.any { paymentMethod -> paymentMethod is PaymentMethod.UndefinedBankTransfer }
                 }.subscribeBy(
                     onSuccess = { isEligibleToLinkABank ->
@@ -212,7 +212,7 @@ class SimpleBuyModel(
                     )
             }
 
-            is SimpleBuyIntent.FetchSuggestedPaymentMethod -> interactor.fetchPaymentMethods(
+            is SimpleBuyIntent.FetchSuggestedPaymentMethod -> interactor.eligiblePaymentMethods(
                 intent.fiatCurrency,
                 intent.selectedPaymentMethodId
             )

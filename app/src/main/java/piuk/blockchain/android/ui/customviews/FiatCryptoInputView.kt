@@ -23,11 +23,11 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.customviews.inputview.DecimalDigitsInputFilter
+import piuk.blockchain.android.util.AfterTextChangedWatcher
 import piuk.blockchain.android.util.afterMeasured
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
-import piuk.blockchain.android.util.AfterTextChangedWatcher
 import java.math.RoundingMode
 import java.text.DecimalFormatSymbols
 import java.util.Currency
@@ -138,14 +138,15 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
             exchangeCurrency = CurrencyType.Fiat(currencyPrefs.selectedFiatCurrency)
         )
     ) { _, oldValue, newValue ->
-        if (oldValue != newValue) {
+        if (oldValue != newValue || !configured) {
             configured = true
             enter_amount.filters = emptyArray()
 
             val inputSymbol = newValue.inputCurrency.symbol()
 
             currency_swap.visibleIf { newValue.swapEnabled }
-            exchange_amount.visibleIf { newValue.inputCurrency != newValue.exchangeCurrency }
+
+            exchange_amount.visibleIf { !newValue.inputIsSameAsExchange }
 
             maxLimit?.let { updateFilters(inputSymbol, it.toInputCurrency()) }
             fake_hint.text = newValue.inputCurrency.zeroValue().toStringWithoutSymbol()
@@ -196,7 +197,9 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
     }
 
     private fun showExchangeAmount() {
-        exchange_amount.visible()
+        if (!configuration.inputIsSameAsExchange) {
+            exchange_amount.visible()
+        }
     }
 
     private fun showValue(money: Money) {
@@ -356,6 +359,8 @@ data class FiatCryptoViewConfiguration(
     val predefinedAmount: Money = inputCurrency.zeroValue(),
     val canSwap: Boolean = true
 ) {
+    val inputIsSameAsExchange: Boolean
+        get() = inputCurrency == exchangeCurrency
 
     val swapEnabled: Boolean
         get() = canSwap && inputCurrency != exchangeCurrency

@@ -16,8 +16,8 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmationValue
@@ -56,7 +56,7 @@ class XlmOnChainTxEngine(
     override fun assertInputsValid() {
         check(txTarget is CryptoAddress)
         check((txTarget as CryptoAddress).asset == CryptoCurrency.XLM)
-        check(asset == CryptoCurrency.XLM)
+        check(sourceAsset == CryptoCurrency.XLM)
     }
 
     override fun restart(txTarget: TransactionTarget, pendingTx: PendingTx): Single<PendingTx> {
@@ -74,10 +74,10 @@ class XlmOnChainTxEngine(
     override fun doInitialiseTx(): Single<PendingTx> =
         Single.just(
             PendingTx(
-                amount = CryptoValue.zero(asset),
-                totalBalance = CryptoValue.zero(asset),
-                availableBalance = CryptoValue.zero(asset),
-                fees = CryptoValue.zero(asset),
+                amount = CryptoValue.zero(sourceAsset),
+                totalBalance = CryptoValue.zero(sourceAsset),
+                availableBalance = CryptoValue.zero(sourceAsset),
+                fees = CryptoValue.zero(sourceAsset),
                 feeLevel = FeeLevel.Regular,
                 availableFeeLevels = AVAILABLE_FEE_LEVELS,
                 selectedFiat = userFiat
@@ -118,7 +118,7 @@ class XlmOnChainTxEngine(
 
     private fun validateAmounts(pendingTx: PendingTx): Completable =
         Completable.fromCallable {
-            if (pendingTx.amount <= CryptoValue.zero(asset)) {
+            if (pendingTx.amount <= CryptoValue.zero(sourceAsset)) {
                 throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
             }
         }
@@ -168,7 +168,7 @@ class XlmOnChainTxEngine(
             exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
             selectedLevel = pendingTx.feeLevel,
             availableLevels = AVAILABLE_FEE_LEVELS,
-            asset = sourceAccount.asset
+            asset = sourceAsset
         )
 
     private fun isMemoRequired(): Boolean =

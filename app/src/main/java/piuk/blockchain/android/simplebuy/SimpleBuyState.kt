@@ -172,7 +172,7 @@ enum class KycState {
 }
 
 enum class FlowScreen {
-    ENTER_AMOUNT, KYC, KYC_VERIFICATION, CHECKOUT, ADD_CARD
+    ENTER_AMOUNT, KYC, KYC_VERIFICATION, CHECKOUT
 }
 
 enum class InputError {

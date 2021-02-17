@@ -1,5 +1,8 @@
 package com.blockchain.nabu.api.nabu
 
+import com.blockchain.nabu.models.responses.banktransfer.BankInfoResponse
+import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentBody
+import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentResponse
 import com.blockchain.nabu.models.responses.banktransfer.CreateLinkBankRequestBody
 import com.blockchain.nabu.models.responses.banktransfer.CreateLinkBankResponse
 import com.blockchain.nabu.models.responses.banktransfer.LinkedBankTransferResponse
@@ -488,8 +491,15 @@ internal interface Nabu {
         @Body body: UpdateProviderAccountBody
     ): Completable
 
-    @GET(NABU_LINK_BANK)
-    fun getLinkedBanks(
+    @GET(NABU_BANK_INFO)
+    fun getBanks(
         @Header("authorization") authorization: String
-    ): Single<List<LinkedBankTransferResponse>>
+    ): Single<List<BankInfoResponse>>
+
+    @POST("$NABU_BANK_TRANSFER/{id}/payment")
+    fun startBankTransferPayment(
+        @Header("authorization") authorization: String,
+        @Path("id") id: String,
+        @Body body: BankTransferPaymentBody
+    ): Single<BankTransferPaymentResponse>
 }

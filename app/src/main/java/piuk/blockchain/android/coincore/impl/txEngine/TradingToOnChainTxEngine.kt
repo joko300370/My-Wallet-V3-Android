@@ -24,16 +24,16 @@ class TradingToOnChainTxEngine(
 
     override fun assertInputsValid() {
         check(txTarget is CryptoAddress)
-        check(sourceAccount.asset == (txTarget as CryptoAddress).asset)
+        check(sourceAsset == (txTarget as CryptoAddress).asset)
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
         Single.just(
             PendingTx(
-                amount = CryptoValue.zero(sourceAccount.asset),
-                totalBalance = CryptoValue.zero(sourceAccount.asset),
-                availableBalance = CryptoValue.zero(sourceAccount.asset),
-                fees = CryptoValue.zero(sourceAccount.asset),
+                amount = CryptoValue.zero(sourceAsset),
+                totalBalance = CryptoValue.zero(sourceAsset),
+                availableBalance = CryptoValue.zero(sourceAsset),
+                fees = CryptoValue.zero(sourceAsset),
                 feeLevel = FeeLevel.None,
                 availableFeeLevels = AVAILABLE_FEE_LEVELS,
                 selectedFiat = userFiat
@@ -42,7 +42,7 @@ class TradingToOnChainTxEngine(
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
         require(amount is CryptoValue)
-        require(amount.currency == asset)
+        require(amount.currency == sourceAsset)
 
         return Singles.zip(
             sourceAccount.accountBalance.map { it as CryptoValue },

@@ -18,7 +18,6 @@ import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import java.lang.IllegalStateException
 
 class OnChainSwapTxEngine(
     quotesEngine: TransferQuotesEngine,
@@ -47,7 +46,7 @@ class OnChainSwapTxEngine(
         } else {
             check(txTarget is CustodialTradingAccount)
         }
-        check(asset != (txTarget as CryptoAccount).asset)
+        check(sourceAsset != (txTarget as CryptoAccount).asset)
         // TODO: Re-enable this once start() has been refactored to be Completable
 //        engine.assertInputsValid()
     }
@@ -66,10 +65,10 @@ class OnChainSwapTxEngine(
                 px.copy(feeLevel = defaultFeeLevel(px))
             }.handlePendingOrdersError(
                 PendingTx(
-                    amount = CryptoValue.zero(sourceAccount.asset),
-                    totalBalance = CryptoValue.zero(sourceAccount.asset),
-                    availableBalance = CryptoValue.zero(sourceAccount.asset),
-                    fees = CryptoValue.zero(sourceAccount.asset),
+                    amount = CryptoValue.zero(sourceAsset),
+                    totalBalance = CryptoValue.zero(sourceAsset),
+                    availableBalance = CryptoValue.zero(sourceAsset),
+                    fees = CryptoValue.zero(sourceAsset),
                     feeLevel = FeeLevel.Regular,
                     availableFeeLevels = setOf(FeeLevel.Regular),
                     selectedFiat = userFiat
