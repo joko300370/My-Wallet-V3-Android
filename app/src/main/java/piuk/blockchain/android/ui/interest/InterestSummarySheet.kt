@@ -82,7 +82,7 @@ class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetails
                 host.gotoActivityFor(account as BlockchainAccount)
             }
             disposables += account.actions
-                .map { it.contains(AssetAction.Deposit) }
+                .map { it.contains(AssetAction.InterestDeposit) }
                 .onErrorReturn { false }
                 .subscribeBy {
                     if (it) {
@@ -93,7 +93,7 @@ class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetails
                             disposables += coincore[cryptoCurrency].accountGroup(AssetFilter.NonCustodial).subscribe {
                                 val defaultAccount = it.accounts.first { acc -> acc.isDefault }
                                 analytics.logEvent(InterestAnalytics.INTEREST_SUMMARY_DEPOSIT_CTA)
-                                host.goToDeposit(defaultAccount, account, AssetAction.Deposit)
+                                host.goToDeposit(defaultAccount, account, AssetAction.InterestDeposit)
                             }
                         }
                     } else {

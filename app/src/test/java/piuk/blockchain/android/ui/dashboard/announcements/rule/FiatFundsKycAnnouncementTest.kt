@@ -1,7 +1,9 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
+import com.blockchain.nabu.datamanagers.Bank
+import com.blockchain.nabu.datamanagers.BankState
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.Beneficiary
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.datamanagers.featureflags.Feature
 import com.blockchain.nabu.datamanagers.featureflags.KycFeatureEligibility
 import com.nhaarman.mockito_kotlin.mock
@@ -50,7 +52,7 @@ class FiatFundsKycAnnouncementTest {
         whenever(kycFeatureEligibility.isEligibleFor(Feature.SIMPLEBUY_BALANCE))
             .thenReturn(Single.just(true))
 
-        whenever(custodialWalletManager.getLinkedBeneficiaries()).thenReturn(Single.just(emptyList()))
+        whenever(custodialWalletManager.getBanks()).thenReturn(Single.just(emptyList()))
 
         subject.shouldShow()
             .test()
@@ -65,8 +67,8 @@ class FiatFundsKycAnnouncementTest {
         whenever(kycFeatureEligibility.isEligibleFor(Feature.SIMPLEBUY_BALANCE))
             .thenReturn(Single.just(true))
 
-        whenever(custodialWalletManager.getLinkedBeneficiaries()).thenReturn(
-            Single.just(listOf(Beneficiary("", "", "", "")))
+        whenever(custodialWalletManager.getBanks()).thenReturn(
+            Single.just(listOf(Bank("", "", "", BankState.ACTIVE, "USD", "", PaymentMethodType.FUNDS)))
         )
 
         subject.shouldShow()
@@ -82,7 +84,7 @@ class FiatFundsKycAnnouncementTest {
         whenever(kycFeatureEligibility.isEligibleFor(Feature.SIMPLEBUY_BALANCE))
             .thenReturn(Single.just(false))
 
-        whenever(custodialWalletManager.getLinkedBeneficiaries()).thenReturn(Single.just(emptyList()))
+        whenever(custodialWalletManager.getBanks()).thenReturn(Single.just(emptyList()))
 
         subject.shouldShow()
             .test()

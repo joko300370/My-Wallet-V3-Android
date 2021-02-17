@@ -9,6 +9,7 @@ import piuk.blockchain.android.databinding.DialogTxFlowInProgressBinding
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
 import piuk.blockchain.android.ui.transactionflow.engine.TxExecutionStatus
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionProgressCustomisations
 import timber.log.Timber
 
 class TransactionProgressSheet : TransactionFlowSheet<DialogTxFlowInProgressBinding>() {
@@ -16,7 +17,7 @@ class TransactionProgressSheet : TransactionFlowSheet<DialogTxFlowInProgressBind
     override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogTxFlowInProgressBinding =
         DialogTxFlowInProgressBinding.inflate(inflater, container, false)
 
-    private val customiser: TransactionFlowCustomiser by inject()
+    private val customiser: TransactionProgressCustomisations by inject()
     private val MAX_STACKTRACE_CHARS = 400
 
     override fun render(newState: TransactionState) {

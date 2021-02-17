@@ -197,7 +197,7 @@ class TradingToTradingSwapTxEngineTest {
             exchangeRates
         )
 
-        val asset = subject.asset
+        val asset = subject.sourceAsset
 
         // Assert
         assertEquals(asset, SRC_ASSET)

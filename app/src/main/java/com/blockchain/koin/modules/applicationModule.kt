@@ -13,6 +13,7 @@ import com.blockchain.koin.moshiExplorerRetrofit
 import com.blockchain.koin.pax
 import com.blockchain.koin.payloadScope
 import com.blockchain.koin.payloadScopeQualifier
+import com.blockchain.koin.usd
 import com.blockchain.koin.usdt
 import com.blockchain.logging.DigitalTrust
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentAccountMapper
@@ -63,6 +64,7 @@ import piuk.blockchain.android.simplebuy.SimpleBuyInteractor
 import piuk.blockchain.android.simplebuy.SimpleBuyModel
 import piuk.blockchain.android.simplebuy.SimpleBuyState
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
+import piuk.blockchain.android.simplebuy.USDPaymentAccountMapper
 import piuk.blockchain.android.sunriver.SunriverDeepLinkHelper
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.thepit.PitLinkingImpl
@@ -122,9 +124,6 @@ import piuk.blockchain.android.util.ResourceDefaultLabels
 import piuk.blockchain.android.util.RootUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.lifecycle.LifecycleInterestedComponent
-import piuk.blockchain.android.withdraw.mvi.WithdrawInteractor
-import piuk.blockchain.android.withdraw.mvi.WithdrawModel
-import piuk.blockchain.android.withdraw.mvi.WithdrawStatePersistence
 import piuk.blockchain.androidcore.data.api.ConnectionApi
 import piuk.blockchain.androidcore.data.auth.metadata.WalletCredentialsMetadataUpdater
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
@@ -243,6 +242,10 @@ val applicationModule = module {
 
         factory(eur) {
             EURPaymentAccountMapper(stringUtils = get())
+        }.bind(PaymentAccountMapper::class)
+
+        factory(usd) {
+            USDPaymentAccountMapper(stringUtils = get())
         }.bind(PaymentAccountMapper::class)
 
         scoped {
@@ -409,7 +412,8 @@ val applicationModule = module {
                 simpleBuyPrefs = get(),
                 analytics = get(),
                 crashLogger = get(),
-                assetOrdering = get()
+                assetOrdering = get(),
+                linkedBanksFactory = get()
             )
         }
 
@@ -451,25 +455,6 @@ val applicationModule = module {
                 cardActivators = listOf(
                     EverypayCardActivator(get(), get())
                 )
-            )
-        }
-
-        scoped {
-            WithdrawStatePersistence()
-        }
-
-        factory {
-            WithdrawInteractor(
-                assetBalancesRepository = get(),
-                custodialWalletManager = get()
-            )
-        }
-
-        factory {
-            WithdrawModel(
-                withdrawStatePersistence = get(),
-                mainScheduler = AndroidSchedulers.mainThread(),
-                withdrawInteractor = get()
             )
         }
 

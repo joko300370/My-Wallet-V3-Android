@@ -24,6 +24,11 @@ import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.TradingAccount
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
+import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
+import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
+import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.android.util.gone
@@ -34,7 +39,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
     ctx: Context,
     attr: AttributeSet? = null,
     defStyle: Int = 0
-) : ConstraintLayout(ctx, attr, defStyle), KoinComponent {
+) : ConstraintLayout(ctx, attr, defStyle), KoinComponent, TxFlowWidget {
 
     private val exchangeRates: ExchangeRates by scopedInject()
     private val currencyPrefs: CurrencyPrefs by scopedInject()
@@ -181,6 +186,18 @@ class AccountInfoCrypto @JvmOverloads constructor(
 
     fun dispose() {
         compositeDisposable.clear()
+    }
+
+    override fun initControl(
+        model: TransactionModel,
+        customiser: EnterAmountCustomisations,
+        analytics: TxFlowAnalytics
+    ) {
+        // Do nothing
+    }
+
+    override fun update(state: TransactionState) {
+        updateAccount(state.sendingAccount as CryptoAccount, { })
     }
 }
 

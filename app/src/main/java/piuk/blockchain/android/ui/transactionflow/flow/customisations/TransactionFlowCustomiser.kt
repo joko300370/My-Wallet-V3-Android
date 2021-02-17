@@ -1,6 +1,8 @@
-package piuk.blockchain.android.ui.transactionflow.flow
+package piuk.blockchain.android.ui.transactionflow.flow.customisations
 
+import android.content.Context
 import android.content.res.Resources
+import android.widget.FrameLayout
 import com.blockchain.nabu.datamanagers.TransactionError
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
@@ -15,6 +17,9 @@ import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.ui.customviews.CurrencyType
+import piuk.blockchain.android.ui.customviews.account.AccountInfoBank
+import piuk.blockchain.android.ui.customviews.account.AccountInfoCrypto
+import piuk.blockchain.android.ui.customviews.account.AccountInfoFiat
 import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.customviews.account.DefaultCellDecorator
 import piuk.blockchain.android.ui.customviews.account.StatusDecorator
@@ -22,56 +27,23 @@ import piuk.blockchain.android.ui.swap.SwapAccountSelectSheetFeeDecorator
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionErrorState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TxExecutionStatus
+import piuk.blockchain.android.ui.transactionflow.plugin.AccountLimitsView
+import piuk.blockchain.android.ui.transactionflow.plugin.FromAndToView
+import piuk.blockchain.android.ui.transactionflow.plugin.SmallBalanceView
+import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
 import piuk.blockchain.android.util.assetName
+import piuk.blockchain.android.util.drawableResFilled
 import piuk.blockchain.android.util.maskedAsset
 import java.math.BigInteger
 import java.math.RoundingMode
+import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Currency
+import java.util.Locale
 
-interface TransactionFlowCustomiser {
-    // UI Element text, icons etc may be customised here:
-    fun selectSourceAddressTitle(state: TransactionState): String
-    fun selectTargetAddressTitle(state: TransactionState): String
-    fun selectTargetAddressInputHint(state: TransactionState): String
-    fun selectTargetNoAddressMessageText(state: TransactionState): String?
-    fun selectTargetShowManualEnterAddress(state: TransactionState): Boolean
-    fun selectTargetShouldShowSubtitle(state: TransactionState): Boolean
-    fun selectTargetSubtitle(state: TransactionState): String
-    fun selectTargetSourceLabel(state: TransactionState): String
-    fun selectTargetDestinationLabel(state: TransactionState): String
-    fun selectTargetStatusDecorator(state: TransactionState, account: BlockchainAccount): CellDecorator
-    fun enterAmountTitle(state: TransactionState): String
-    fun enterAmountActionIcon(state: TransactionState): Int
-    fun enterAmountActionIconCustomisation(state: TransactionState): Boolean
-    fun enterAmountMaxButton(state: TransactionState): String
-    fun enterAmountSourceLabel(state: TransactionState): String
-    fun enterAmountTargetLabel(state: TransactionState): String
-    fun confirmTitle(state: TransactionState): String
-    fun confirmCtaText(state: TransactionState): String
-    fun confirmListItemTitle(assetAction: AssetAction): String
-    fun confirmDisclaimerBlurb(assetAction: AssetAction): String
-    fun confirmDisclaimerVisibility(assetAction: AssetAction): Boolean
-    fun transactionProgressTitle(state: TransactionState): String
-    fun transactionProgressMessage(state: TransactionState): String
-    fun transactionCompleteTitle(state: TransactionState): String
-    fun transactionCompleteMessage(state: TransactionState): String
-    fun selectTargetAccountTitle(state: TransactionState): String
-    fun selectSourceAccountTitle(state: TransactionState): String
-    fun selectSourceAccountSubtitle(state: TransactionState): String
-    fun selectTargetAccountDescription(state: TransactionState): String
-    fun enterTargetAddressSheetState(state: TransactionState): TargetAddressSheetState
-    fun transactionProgressIcon(state: TransactionState): Int
-    fun transactionProgressExceptionMessage(state: TransactionState): String
-    fun amountHeaderConfirmationVisible(state: TransactionState): Boolean
-    fun defInputType(state: TransactionState, fiatCurrency: String): CurrencyType
-
-    // Format those flash error messages:
-    fun issueFlashMessage(state: TransactionState, input: CurrencyType?): String?
-    fun selectIssueType(state: TransactionState): IssueType
-    fun showTargetIcon(state: TransactionState): Boolean
-    fun sourceAccountSelectionStatusDecorator(state: TransactionState): StatusDecorator
-    fun shouldDisableInput(errorState: TransactionErrorState): Boolean
-}
+interface TransactionFlowCustomiser :
+    EnterAmountCustomisations, SourceSelectionCustomisations, TargetSelectionCustomisations,
+    TransactionConfirmationCustomisations, TransactionProgressCustomisations
 
 class TransactionFlowCustomiserImpl(
     private val resources: Resources
@@ -79,10 +51,12 @@ class TransactionFlowCustomiserImpl(
     override fun enterAmountActionIcon(state: TransactionState): Int {
         return when (state.action) {
             AssetAction.Send -> R.drawable.ic_tx_sent
-            AssetAction.Deposit -> R.drawable.ic_tx_deposit_arrow
+            AssetAction.InterestDeposit -> R.drawable.ic_tx_deposit_arrow
+            AssetAction.FiatDeposit -> R.drawable.ic_tx_deposit_w_green_bkgd
             AssetAction.Swap -> R.drawable.ic_swap_light_blue
             AssetAction.Sell -> R.drawable.ic_tx_sell
-            else -> throw IllegalArgumentException("Action not supported by Send Flow")
+            AssetAction.Withdraw -> R.drawable.ic_tx_withdraw_arrow
+            else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
         }
     }
 
@@ -91,7 +65,9 @@ class TransactionFlowCustomiserImpl(
 
     override fun enterAmountActionIconCustomisation(state: TransactionState): Boolean =
         when (state.action) {
-            AssetAction.Swap -> false
+            AssetAction.Swap,
+            AssetAction.FiatDeposit,
+            AssetAction.Withdraw -> false
             else -> true
         }
 
@@ -101,18 +77,18 @@ class TransactionFlowCustomiserImpl(
         when (state.action) {
             AssetAction.Send -> resources.getString(
                 R.string.send_enter_asset_address_hint,
-                resources.getString(state.asset.assetName())
+                resources.getString(state.sendingAsset.assetName())
             )
             AssetAction.Sell -> ""
-            else -> throw IllegalArgumentException("Action not supported by Send Flow")
+            else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
         }
 
     override fun selectTargetNoAddressMessageText(state: TransactionState): String? =
         when (state.action) {
             AssetAction.Send -> resources.getString(
                 R.string.send_internal_transfer_message,
-                resources.getString(state.asset.assetName()),
-                state.asset.displayTicker
+                resources.getString(state.sendingAsset.assetName()),
+                state.sendingAsset.displayTicker
             )
             else -> null
         }
@@ -121,9 +97,10 @@ class TransactionFlowCustomiserImpl(
         when (state.action) {
             AssetAction.Send -> resources.getString(R.string.common_send)
             AssetAction.Sell -> resources.getString(R.string.common_sell)
-            AssetAction.Deposit -> resources.getString(R.string.common_transfer)
+            AssetAction.InterestDeposit -> resources.getString(R.string.common_transfer)
             AssetAction.Swap -> resources.getString(R.string.swap_select_target_title)
-            else -> throw IllegalArgumentException("Action not supported by Send Flow")
+            AssetAction.Withdraw -> resources.getString(R.string.common_withdraw)
+            else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
         }
 
     override fun selectTargetShouldShowSubtitle(state: TransactionState): Boolean =
@@ -167,28 +144,36 @@ class TransactionFlowCustomiserImpl(
     override fun enterAmountTitle(state: TransactionState): String {
         return when (state.action) {
             AssetAction.Send -> resources.getString(
-                R.string.send_enter_amount_title, state.sendingAccount.asset.displayTicker
+                R.string.send_enter_amount_title, state.sendingAsset.displayTicker
             )
             AssetAction.Swap -> resources.getString(R.string.common_swap)
-            AssetAction.Deposit -> resources.getString(
+            AssetAction.InterestDeposit -> resources.getString(
                 R.string.tx_title_deposit,
-                state.sendingAccount.asset.displayTicker
+                state.sendingAsset.displayTicker
             )
             AssetAction.Sell -> resources.getString(
                 R.string.tx_title_sell,
-                state.sendingAccount.asset.displayTicker
+                state.sendingAsset.displayTicker
             )
-            else -> throw IllegalArgumentException("Action not supported by Send Flow")
+            AssetAction.FiatDeposit -> resources.getString(
+                R.string.tx_title_fiat_deposit,
+                (state.selectedTarget as FiatAccount).fiatCurrency
+            )
+            AssetAction.Withdraw -> resources.getString(
+                R.string.tx_title_withdraw,
+                (state.sendingAccount as FiatAccount).fiatCurrency
+            )
+            else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
         }
     }
 
     override fun enterAmountMaxButton(state: TransactionState): String =
         when (state.action) {
             AssetAction.Send -> resources.getString(R.string.send_enter_amount_max)
-            AssetAction.Deposit -> resources.getString(R.string.send_enter_amount_deposit_max)
+            AssetAction.InterestDeposit -> resources.getString(R.string.send_enter_amount_deposit_max)
             AssetAction.Swap -> resources.getString(R.string.swap_enter_amount_max)
             AssetAction.Sell -> resources.getString(R.string.sell_enter_amount_max)
-            else -> throw IllegalArgumentException("Action not supported by Send Flow")
+            else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
         }
 
     override fun enterAmountSourceLabel(state: TransactionState): String =
@@ -214,6 +199,25 @@ class TransactionFlowCustomiserImpl(
             else -> resources.getString(R.string.send_enter_amount_to, state.selectedTarget.label)
         }
 
+    override fun enterAmountSourceIcon(state: TransactionState): Int =
+        when (state.action) {
+            AssetAction.FiatDeposit,
+            AssetAction.Withdraw -> {
+                when ((state.selectedTarget as FiatAccount).fiatCurrency) {
+                    "GBP" -> R.drawable.ic_funds_gbp
+                    "EUR" -> R.drawable.ic_funds_euro
+                    else -> R.drawable.ic_funds_usd
+                }
+            }
+            else -> state.sendingAsset.drawableResFilled()
+        }
+
+    override fun shouldShowMaxLimit(state: TransactionState): Boolean =
+        when (state.action) {
+            AssetAction.FiatDeposit -> false
+            else -> true
+        }
+
     override fun confirmTitle(state: TransactionState): String {
         val amount = state.pendingTx?.amount?.toStringWithSymbol() ?: ""
 
@@ -222,9 +226,11 @@ class TransactionFlowCustomiserImpl(
                 R.string.send_confirmation_title, amount
             )
             AssetAction.Swap -> resources.getString(R.string.common_confirm)
-            AssetAction.Deposit -> resources.getString(R.string.common_confirm)
+            AssetAction.InterestDeposit -> resources.getString(R.string.common_confirm)
             AssetAction.Sell -> resources.getString(R.string.checkout)
-            else -> throw IllegalArgumentException("Action not supported by Send Flow")
+            AssetAction.FiatDeposit -> resources.getString(R.string.common_deposit)
+            AssetAction.Withdraw -> resources.getString(R.string.common_withdraw)
+            else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
         }
     }
 
@@ -237,25 +243,33 @@ class TransactionFlowCustomiserImpl(
             )
             AssetAction.Swap -> resources.getString(
                 R.string.swap_confirmation_cta_button,
-                state.sendingAccount.asset.displayTicker,
+                state.sendingAsset.displayTicker,
                 (state.selectedTarget as CryptoAccount).asset.displayTicker
             )
             AssetAction.Sell -> resources.getString(
                 R.string.sell_confirmation_cta_button, amount
             )
-            AssetAction.Deposit -> resources.getString(
+            AssetAction.InterestDeposit -> resources.getString(
                 R.string.send_confirmation_deposit_cta_button
             )
-            else -> throw IllegalArgumentException("Action not supported by Send Flow")
+            AssetAction.FiatDeposit -> resources.getString(
+                R.string.deposit_confirmation_cta_button, amount
+            )
+            AssetAction.Withdraw -> resources.getString(
+                R.string.withdraw_confirmation_cta_button, amount
+            )
+            else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
         }
     }
 
     override fun confirmListItemTitle(assetAction: AssetAction): String {
         return when (assetAction) {
             AssetAction.Send -> resources.getString(R.string.common_send)
-            AssetAction.Deposit -> resources.getString(R.string.common_transfer)
+            AssetAction.InterestDeposit -> resources.getString(R.string.common_transfer)
             AssetAction.Sell -> resources.getString(R.string.common_sell)
-            else -> throw IllegalArgumentException("Action not supported by Send Flow")
+            AssetAction.FiatDeposit -> resources.getString(R.string.common_deposit)
+            AssetAction.Withdraw -> resources.getString(R.string.common_withdraw)
+            else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
         }
     }
 
@@ -287,7 +301,7 @@ class TransactionFlowCustomiserImpl(
                     state.amount.toStringWithSymbol(), receivingAmount.toStringWithSymbol()
                 )
             }
-            AssetAction.Deposit -> resources.getString(
+            AssetAction.InterestDeposit -> resources.getString(
                 R.string.send_confirmation_progress_title,
                 amount
             )
@@ -295,20 +309,30 @@ class TransactionFlowCustomiserImpl(
                 R.string.sell_confirmation_progress_title,
                 amount
             )
-            else -> throw IllegalArgumentException("Action not supported by Send Flow")
+            AssetAction.FiatDeposit -> resources.getString(
+                R.string.deposit_confirmation_progress_title,
+                amount
+            )
+            AssetAction.Withdraw -> resources.getString(
+                R.string.withdraw_confirmation_progress_title,
+                amount
+            )
+            else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
         }
     }
 
     override fun transactionProgressMessage(state: TransactionState): String {
         return when (state.action) {
             AssetAction.Send -> resources.getString(R.string.send_progress_sending_subtitle)
-            AssetAction.Deposit -> resources.getString(
+            AssetAction.InterestDeposit -> resources.getString(
                 R.string.send_confirmation_progress_message,
-                state.sendingAccount.asset.displayTicker
+                state.sendingAsset.displayTicker
             )
             AssetAction.Sell -> resources.getString(R.string.sell_confirmation_progress_message)
             AssetAction.Swap -> resources.getString(R.string.swap_confirmation_progress_message)
-            else -> throw IllegalArgumentException("Action not supported by Send Flow")
+            AssetAction.FiatDeposit -> resources.getString(R.string.deposit_confirmation_progress_message)
+            AssetAction.Withdraw -> resources.getString(R.string.withdraw_confirmation_progress_message)
+            else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
         }
     }
 
@@ -324,23 +348,27 @@ class TransactionFlowCustomiserImpl(
                 resources.getString(
                     R.string.sell_progress_complete_title, state.pendingTx?.amount?.toStringWithSymbol()
                 )
-            AssetAction.Deposit -> resources.getString(
+            AssetAction.InterestDeposit -> resources.getString(
                 R.string.send_confirmation_success_title,
                 amount
             )
-            // AssetAction.Swap -> "Execute Trade"
-            else -> throw IllegalArgumentException("Action not supported by Send Flow")
+            AssetAction.FiatDeposit -> resources.getString(
+                R.string.deposit_confirmation_success_title,
+                amount
+            )
+            AssetAction.Withdraw -> resources.getString(R.string.withdraw_confirmation_success_title, amount)
+            else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
         }
     }
 
     override fun transactionCompleteMessage(state: TransactionState): String {
         return when (state.action) {
             AssetAction.Send -> resources.getString(
-                R.string.send_progress_complete_subtitle, state.sendingAccount.asset.displayTicker
+                R.string.send_progress_complete_subtitle, state.sendingAsset.displayTicker
             )
-            AssetAction.Deposit -> resources.getString(
+            AssetAction.InterestDeposit -> resources.getString(
                 R.string.send_confirmation_success_message,
-                state.sendingAccount.asset.displayTicker
+                state.sendingAsset.displayTicker
             )
             AssetAction.Sell -> resources.getString(
                 R.string.sell_confirmation_success_message,
@@ -350,7 +378,17 @@ class TransactionFlowCustomiserImpl(
                 R.string.swap_confirmation_success_message,
                 (state.selectedTarget as CryptoAccount).asset.displayTicker
             )
-            else -> throw IllegalArgumentException("Action not supported by Send Flow")
+            AssetAction.FiatDeposit -> resources.getString(
+                R.string.deposit_confirmation_success_message,
+                state.pendingTx?.amount?.toStringWithSymbol() ?: "",
+                state.pendingTx?.selectedFiat ?: "",
+                getEstimatedTransactionCompletionTime()
+            )
+            AssetAction.Withdraw -> resources.getString(
+                R.string.withdraw_confirmation_success_message,
+                getEstimatedTransactionCompletionTime()
+            )
+            else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
         }
     }
 
@@ -359,6 +397,8 @@ class TransactionFlowCustomiserImpl(
             AssetAction.Swap -> resources.getString(R.string.receive)
             AssetAction.Send -> resources.getString(R.string.send)
             AssetAction.Sell -> resources.getString(R.string.sell)
+            AssetAction.FiatDeposit -> resources.getString(R.string.common_deposit)
+            AssetAction.Withdraw -> resources.getString(R.string.withdraw_target_select_title)
             else -> ""
         }
     }
@@ -366,6 +406,7 @@ class TransactionFlowCustomiserImpl(
     override fun selectSourceAccountTitle(state: TransactionState): String {
         return when (state.action) {
             AssetAction.Swap -> resources.getString(R.string.common_swap)
+            AssetAction.FiatDeposit -> resources.getString(R.string.deposit_source_select_title)
             else -> ""
         }
     }
@@ -376,6 +417,12 @@ class TransactionFlowCustomiserImpl(
             else -> ""
         }
     }
+
+    override fun selectSourceShouldShowAddNew(state: TransactionState): Boolean =
+        when (state.action) {
+            AssetAction.FiatDeposit -> true
+            else -> false
+        }
 
     override fun selectTargetAccountDescription(state: TransactionState): String {
         return when (state.action) {
@@ -408,15 +455,15 @@ class TransactionFlowCustomiserImpl(
             TransactionErrorState.NONE -> null
             TransactionErrorState.INSUFFICIENT_FUNDS -> resources.getString(
                 R.string.send_enter_amount_error_insufficient_funds,
-                state.sendingAccount.asset.displayTicker
+                state.sendingAsset.displayTicker
             )
             TransactionErrorState.INVALID_AMOUNT -> resources.getString(
                 R.string.send_enter_amount_error_invalid_amount,
-                state.sendingAccount.asset.displayTicker
+                state.sendingAsset.displayTicker
             )
             TransactionErrorState.INVALID_ADDRESS -> resources.getString(
                 R.string.send_error_not_valid_asset_address,
-                state.sendingAccount.asset.displayTicker
+                state.sendingAsset.displayTicker
             )
             TransactionErrorState.ADDRESS_IS_CONTRACT -> resources.getString(
                 R.string.send_error_address_is_eth_contract
@@ -435,7 +482,9 @@ class TransactionFlowCustomiserImpl(
                 val exchangeRate = state.fiatRate ?: return ""
                 val amount =
                     input?.let {
-                        state.pendingTx?.maxLimit?.toEnteredCurrency(it, exchangeRate, RoundingMode.FLOOR)
+                        state.pendingTx?.maxLimit?.toEnteredCurrency(
+                            it, exchangeRate, RoundingMode.FLOOR
+                        )
                     } ?: state.pendingTx?.maxLimit?.toStringWithSymbol()
 
                 resources.getString(R.string.sell_enter_amount_max_error, amount)
@@ -445,7 +494,9 @@ class TransactionFlowCustomiserImpl(
                 val exchangeRate = state.fiatRate ?: return ""
                 val amount =
                     input?.let {
-                        state.pendingTx?.maxLimit?.toEnteredCurrency(it, exchangeRate, RoundingMode.FLOOR)
+                        state.pendingTx?.maxLimit?.toEnteredCurrency(
+                            it, exchangeRate, RoundingMode.FLOOR
+                        )
                     } ?: state.pendingTx?.maxLimit?.toStringWithSymbol()
 
                 resources.getString(R.string.swap_enter_amount_over_limit, amount)
@@ -454,19 +505,67 @@ class TransactionFlowCustomiserImpl(
             TransactionErrorState.TX_OPTION_INVALID -> resources.getString(R.string.send_error_tx_option_invalid)
             TransactionErrorState.UNKNOWN_ERROR -> resources.getString(R.string.send_error_tx_option_invalid)
             TransactionErrorState.PENDING_ORDERS_LIMIT_REACHED ->
-                resources.getString(R.string.too_many_pending_orders_error_message, state.asset.displayTicker)
+                resources.getString(R.string.too_many_pending_orders_error_message, state.sendingAsset.displayTicker)
         }
     }
+
+    override fun installEnterAmountLowerSlotView(
+        ctx: Context,
+        frame: FrameLayout,
+        state: TransactionState
+    ): TxFlowWidget =
+        when (state.action) {
+            AssetAction.ViewActivity,
+            AssetAction.Summary -> throw IllegalStateException()
+            AssetAction.Send,
+            AssetAction.Receive,
+            AssetAction.InterestDeposit,
+            AssetAction.Sell,
+            AssetAction.Swap -> SmallBalanceView(ctx).also { frame.addView(it) }
+            AssetAction.Withdraw,
+            AssetAction.FiatDeposit -> AccountInfoBank(ctx).also { frame.addView(it) }
+        }
+
+    override fun installEnterAmountUpperSlotView(
+        ctx: Context,
+        frame: FrameLayout,
+        state: TransactionState
+    ): TxFlowWidget =
+        when (state.action) {
+            AssetAction.Withdraw,
+            AssetAction.FiatDeposit -> AccountLimitsView(ctx).also {
+                frame.addView(it)
+            }
+            else -> FromAndToView(ctx).also {
+                frame.addView(it)
+            }
+        }
+
+    override fun installAddressSheetSource(
+        ctx: Context,
+        frame: FrameLayout,
+        state: TransactionState
+    ): TxFlowWidget =
+        when (state.action) {
+            AssetAction.Withdraw -> AccountInfoFiat(ctx).also {
+                frame.addView(it)
+            }
+            else -> AccountInfoCrypto(ctx).also {
+                frame.addView(it)
+            }
+        }
 
     private fun composeBelowLimitErrorMessage(state: TransactionState, input: CurrencyType?): String {
         val exchangeRate = state.fiatRate ?: return ""
         val amount =
             input?.let {
-                state.pendingTx?.minLimit?.toEnteredCurrency(it, exchangeRate, RoundingMode.CEILING)
+                state.pendingTx?.minLimit?.toEnteredCurrency(
+                    it, exchangeRate as ExchangeRate.CryptoToFiat, RoundingMode.CEILING
+                )
             } ?: state.pendingTx?.minLimit?.toStringWithSymbol()
 
         return when (state.action) {
-            AssetAction.Deposit -> resources.getString(
+            AssetAction.InterestDeposit -> resources.getString(
                 R.string.send_enter_amount_min_deposit,
                 amount
             )
@@ -482,8 +581,16 @@ class TransactionFlowCustomiserImpl(
                 R.string.swap_enter_amount_min_swap,
                 amount
             )
+            AssetAction.FiatDeposit -> resources.getString(
+                R.string.swap_enter_amount_min_swap,
+                amount
+            )
+            AssetAction.Withdraw -> resources.getString(
+                R.string.withdraw_enter_amount_min,
+                amount
+            )
             else -> throw IllegalArgumentException(
-                "Action not supported by Send Flow ${state.action}"
+                "Action not supported by Transaction Flow ${state.action}"
             )
         }
     }
@@ -500,7 +607,15 @@ class TransactionFlowCustomiserImpl(
     override fun transactionProgressIcon(state: TransactionState): Int =
         when (state.action) {
             AssetAction.Swap -> R.drawable.swap_masked_asset
-            else -> state.sendingAccount.asset.maskedAsset()
+            AssetAction.Withdraw,
+            AssetAction.FiatDeposit -> {
+                when (state.pendingTx?.selectedFiat) {
+                    "GBP" -> R.drawable.ic_funds_gbp_masked
+                    "EUR" -> R.drawable.ic_funds_euro_masked
+                    else -> R.drawable.ic_funds_usd_masked
+                }
+            }
+            else -> state.sendingAsset.maskedAsset()
         }
 
     override fun transactionProgressExceptionMessage(state: TransactionState): String {
@@ -559,7 +674,7 @@ class TransactionFlowCustomiserImpl(
                     R.string.trading_invalid_destination_amount
                 )
                 is TransactionError.ExecutionFailed -> resources.getString(
-                    R.string.executing_transaction_error, state.asset.displayTicker
+                    R.string.executing_transaction_error, state.sendingAsset.displayTicker
                 )
                 TransactionError.UnexpectedError -> resources.getString(R.string.send_progress_error_title)
                 else -> resources.getString(R.string.send_progress_error_title)
@@ -574,7 +689,8 @@ class TransactionFlowCustomiserImpl(
                 AssetAction.Withdraw -> R.string.common_withdraw
                 AssetAction.Swap -> R.string.common_swap
                 AssetAction.Sell -> R.string.common_sell
-                AssetAction.Deposit -> R.string.common_deposit
+                AssetAction.InterestDeposit,
+                AssetAction.FiatDeposit -> R.string.common_deposit
                 AssetAction.ViewActivity -> R.string.common_activity
                 AssetAction.Receive -> R.string.common_receive
                 AssetAction.Summary -> R.string.common_summary
@@ -585,8 +701,13 @@ class TransactionFlowCustomiserImpl(
         state.action != AssetAction.Swap
 
     override fun defInputType(state: TransactionState, fiatCurrency: String): CurrencyType =
-        if (state.action == AssetAction.Swap || state.action == AssetAction.Sell)
-            CurrencyType.Fiat(fiatCurrency) else CurrencyType.Crypto(state.asset)
+        when (state.action) {
+            AssetAction.Swap,
+            AssetAction.Sell,
+            AssetAction.Withdraw,
+            AssetAction.FiatDeposit -> CurrencyType.Fiat(fiatCurrency)
+            else -> CurrencyType.Crypto(state.sendingAsset)
+        }
 
     override fun sourceAccountSelectionStatusDecorator(state: TransactionState): StatusDecorator =
         when (state.action) {
@@ -595,29 +716,46 @@ class TransactionFlowCustomiserImpl(
                     SwapAccountSelectSheetFeeDecorator(it)
                 }
             }
+            AssetAction.Withdraw,
+            AssetAction.FiatDeposit -> {
+                {
+                    DefaultCellDecorator()
+                }
+            }
             else -> throw IllegalStateException("Action is not supported")
         }
 
     companion object {
         const val MAX_ACCOUNTS_FOR_SHEET = 3
+
+        fun getEstimatedTransactionCompletionTime(): String {
+            val cal = Calendar.getInstance()
+            cal.add(Calendar.DAY_OF_YEAR, 5)
+            val sdf = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
+            return sdf.format(cal.time)
+        }
     }
 
     private fun Money.toEnteredCurrency(
         input: CurrencyType,
-        exchangeRate: ExchangeRate.CryptoToFiat,
+        exchangeRate: ExchangeRate,
         roundingMode: RoundingMode
     ): String {
-        if (input.isSameType(this))
+        if (input.isSameType(this)) {
             return toStringWithSymbol()
-        if (input.isFiat() && this is CryptoValue)
+        }
+        if (input.isFiat() && this is CryptoValue) {
+            val cryptoToFiatRate = exchangeRate as ExchangeRate.CryptoToFiat
             return FiatValue.fromMajor(
-                exchangeRate.to,
-                exchangeRate.convert(this, round = false).toBigDecimal().setScale(
+                cryptoToFiatRate.to,
+                cryptoToFiatRate.convert(this, round = false).toBigDecimal().setScale(
                     Currency.getInstance(exchangeRate.to).defaultFractionDigits, roundingMode
                 )
             ).toStringWithSymbol()
-        if (input.isCrypto() && this is FiatValue)
+        }
+        if (input.isCrypto() && this is FiatValue) {
             return exchangeRate.inverse().convert(this).toStringWithSymbol()
+        }
         throw IllegalStateException("Not valid currency")
     }
 }

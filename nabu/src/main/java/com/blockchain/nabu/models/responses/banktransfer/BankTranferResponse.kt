@@ -60,5 +60,33 @@ data class LinkedBankDetailsResponse(
     val accountNumber: String,
     val accountName: String,
     val bankName: String,
+    val bankAccountType: String
+)
+
+data class BankTransferPaymentBody(
+    val amountMinor: String,
+    val currency: String,
+    val product: String = "SIMPLEBUY"
+)
+
+data class BankTransferPaymentResponse(
+    val paymentId: String,
     val bankAccountType: String?
 )
+
+data class BankInfoResponse(
+    val id: String,
+    val name: String,
+    val currency: String,
+    val state: String,
+    val accountNumber: String?,
+    val bankAccountType: String?,
+    val isBankAccount: Boolean,
+    val isBankTransferAccount: Boolean
+) {
+    companion object {
+        const val ACTIVE = "ACTIVE"
+        const val PENDING = "PENDING"
+        const val BLOCKED = "BLOCKED"
+    }
+}

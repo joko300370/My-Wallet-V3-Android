@@ -178,7 +178,8 @@ class AssetActionsSheet :
             ) {
                 goToSummary()
             }
-            AssetAction.Deposit -> AssetActionItem(
+
+            AssetAction.InterestDeposit -> AssetActionItem(
                 getString(R.string.common_transfer),
                 R.drawable.ic_tx_deposit_arrow,
                 getString(R.string.dashboard_asset_actions_deposit_dsc, asset.displayTicker),
@@ -195,11 +196,12 @@ class AssetActionsSheet :
                 processAction(AssetAction.Sell)
             }
             AssetAction.Withdraw -> throw IllegalStateException("Cannot Withdraw a non-fiat currency")
+            AssetAction.FiatDeposit -> throw IllegalStateException("Cannot Deposit a non-fiat currency to Fiat")
         }
 
     private fun goToDeposit() {
         checkForKycStatus {
-            model.process(HandleActionIntent(AssetAction.Deposit))
+            model.process(HandleActionIntent(AssetAction.InterestDeposit))
         }
     }
 

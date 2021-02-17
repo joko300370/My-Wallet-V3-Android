@@ -561,6 +561,7 @@
     <string name="tx_title_transfer">Transfer %1s</string>
     <string name="tx_title_fee">Fee %1s</string>
     <string name="tx_title_interest">%1$s Interest Earned</string>
+    <string name="tx_title_fiat_deposit">Deposit %1$s</string>
 
     <!-- TRANSACTION DETAILS -->
     <string name="transaction_detail_coinbase">No Inputs (Newly Generated Coins)</string>
@@ -1281,6 +1282,12 @@
     <string name="buy_max">Buy Max</string>
     <string name="bank_wire_transfer">Bank Wire Transfer</string>
     <string name="bank_transfer">Bank Transfer</string>
+    <string name="payment_wire_transfer">Wire Transfer</string>
+    <string name="payment_wire_transfer_subtitle">3 – 5 Business Days</string>
+    <string name="payment_wire_transfer_blurb">Send funds directly from your bank account to your Blockchain.com Wallet. Bank fees may apply.</string>
+    <string name="payment_deposit">Bank Deposit</string>
+    <string name="payment_deposit_subtitle">Instantly Available</string>
+    <string name="payment_deposit_blurb">Securely link a bank and send cash to your Blockchain.com Wallet at anytime.</string>
     <string name="credit_or_debit_card">Credit or Debit Card</string>
     <string name="instantly_buy_crypto_with_card">Instantly buy crypto with any Visa or Mastercard.</string>
     <string name="send_funds_directly_from_your_bank">Send funds directly from your bank to your Blockchain Wallet. Once we receive the manual transfer, use that cash to buy crypto.</string>
@@ -1330,6 +1337,7 @@
     <string name="recipient_name">Recipient</string>
     <string name="sort_code">Sort Code</string>
     <string name="bank_name">Bank Name</string>
+    <string name="routing_number">Routing Number</string>
     <string name="bank_country">Bank Country</string>
     <string name="iban">IBAN</string>
     <string name="estonia">Estonia</string>
@@ -1494,10 +1502,17 @@
     <!-- Fiat Funds -->
     <string name="fiat_funds_detail_withdraw_title">Withdraw</string>
     <string name="fiat_funds_detail_deposit_details">Add Cash from Your Bank</string>
-    <string name="fiat_funds_detail_withdraw_details">Cashout to Your Bank</string>
+    <string name="fiat_funds_detail_withdraw_details">Cash Out to Your Bank</string>
     <string name="withdraw_currency">Withdraw %1$s</string>
     <string name="withdraw_title">Withdraw</string>
     <string name="withdraw_to">Withdraw to</string>
+    <string name="withdraw_confirmation_cta_button">Withdraw %1$s</string>
+    <string name="withdraw_confirmation_progress_message">We’re completing your withdrawal now.</string>
+    <string name="withdraw_confirmation_progress_title">Withdrawing %1$s</string>
+    <string name="withdraw_confirmation_success_title">%1$s Withdrawn!</string>
+    <string name="withdraw_confirmation_success_message">We are sending the cash now. Expect the cash to hit your bank on %1$s. Check the status of your Withdrawal at anytime from your Activity Screen</string>
+    <string name="withdraw_target_select_title">Withdraw to...</string>
+    <string name="withdraw_confirmation_eta">Funds Will Arrive by</string>
     <string name="add_a_bank">Add a Bank</string>
     <string name="fiat_funds_detail_activity_title">Activity</string>
     <string name="fiat_funds_detail_activity_details">View All Transactions</string>
@@ -1535,7 +1550,7 @@
     <string name="dashboard_asset_item_label_title">Please note.</string>
     <string name="algorand_asset_label">Functionality to withdraw ALGO from your trading wallet is currently unavailable, but coming soon.</string>
 
-    <!-- new send -->
+    <!-- Transaction flows -->
     <string name="send_enter_amount_from">From: %1$s</string>
     <string name="send_enter_amount_to">To: %1$s</string>
     <string name="send_enter_amount_title">Send %1$s</string>
@@ -1548,17 +1563,28 @@
     <string name="send_enter_amount_min_deposit">Minimum transfer of %1$s required</string>
     <string name="send_enter_amount_min_send">Minimum send of %1$s required</string>
     <string name="swap_enter_amount_min_swap">Minimum swap of %1$s required</string>
+    <string name="deposit_enter_amount_min_swap">Minimum deposit of %1$s required</string>
+    <string name="withdraw_enter_amount_min">Minimum withdrawal of %1$s required</string>
     <string name="send_error_tx_in_flight">A transaction is already in progress</string>
     <string name="send_error_tx_option_invalid">An error has occurred</string>
     <string name="too_many_pending_orders_error_message">Your %1$s Wallet has too many swaps in-progress. Please select a different wallet.</string>
     <string name="send_confirmation_title">Send %1$s</string>
     <string name="send_confirmation_fee">Fee - Regular</string>
     <string name="send_confirmation_tx_fee">Transaction Fee</string>
+    <string name="send_confirmation_eta">Funds Will Arrive</string>
     <string name="send_confirmation_insufficient_fee">Not enough funds for priority fee, please adjust your sending amount.</string>
     <string name="send_confirmation_add_note_hint">Add a note</string>
     <string name="send_confirmation_cta_button">Send %1$s</string>
     <string name="swap_confirmation_cta_button">Swap %1$s for %2$s</string>
     <string name="swap_confirmation_disclaimer">The amounts you send and receive may change slightly due to market activity. Once an order starts, we are unable to stop it.</string>
+    <string name="deposit_source_select_title">Linked Banks</string>
+    <string name="deposit_confirmation_cta_button">Deposit %1$s</string>
+    <string name="deposit_enter_amount_limit_title">Daily Limit</string>
+    <string name="deposit_enter_amount_limit_label">%1$s Available</string>
+    <string name="deposit_confirmation_progress_title">Depositing %1$s</string>
+    <string name="deposit_confirmation_progress_message">We’re completing your deposit now.</string>
+    <string name="deposit_confirmation_success_title">%1$s Deposited!</string>
+    <string name="deposit_confirmation_success_message">While we wait for your bank to send the cash, here’s early access to %1$s in your %2$s Cash Account so you can buy crypto right away.\n\nYour funds will be available to withdraw once the bank transfer is complete on %3$s.</string>
     <string name="sell_confirmation_cta_button">Sell %1$s</string>
     <string name="sell_confirmation_progress_title">Selling %1$s</string>
     <string name="sell_confirmation_progress_message">We’re completing your sell now.</string>
@@ -1787,7 +1813,7 @@
     <string name="swap_faster_cheaper_better">Faster. Cheaper. Better. Our new Swap experience lets you exchange crypto in fewer taps.</string>
     <string name="link_a_bank">Link a Bank</string>
     <string name="instantly_buy_crypto_with_link_a_bank">Link your bank and instantly buy crypto at anytime.</string>
-    <string name="add_payment_method">+Add New</string>
+    <string name="add_payment_method">+ Add New</string>
     <string name="pay_with_my_dotted">Pay with my…</string>
 
     <!-- Yodlee splash -->
@@ -1832,6 +1858,7 @@
     <string name="lockbox_landing_coming_soon_message">We are unable to display your Lockbox balance at this time. Don’t worry, your funds are safe. We’ll be adding this feature soon. While you wait, you can check your balance on the web.</string>
     <string name="lockbox_landing_coming_soon_button">Check my balance</string>
     <string name="add_a_bank_account">Add a Bank Account</string>
+    <string name="add_a_deposit_method">Select a Deposit Method</string>
     <string name="wire_transfer">Wire Transfer</string>
     <string name="link_a_bank_wire_transfer">Link a bank to your Wallet by sending any amount via wire transfer. Note: This is much slower and high bank fees may apply.</string>
     <string name="link_a_bank_bank_transfer">Securely link a bank to buy crypto, deposit cash and withdraw back to your bank at anytime.</string>

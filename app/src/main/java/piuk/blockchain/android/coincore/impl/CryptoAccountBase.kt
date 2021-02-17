@@ -260,8 +260,14 @@ class CryptoAccountCustodialGroup(
         account = accounts[0] as CryptoAccountBase
     }
 
+    override val receiveAddress: Single<ReceiveAddress>
+        get() = account.receiveAddress
+
     override val accountBalance: Single<Money>
         get() = account.accountBalance
+
+    override val actionableBalance: Single<Money>
+        get() = account.actionableBalance
 
     override val pendingBalance: Single<Money>
         get() = account.pendingBalance
@@ -305,6 +311,19 @@ class CryptoAccountNonCustodialGroup(
                     .total()
             }
         }
+
+    override val actionableBalance: Single<Money>
+        get() = if (accounts.isEmpty()) {
+            Single.just(CryptoValue.zero(asset))
+        } else {
+            Single.zip(
+                accounts.map { it.actionableBalance }
+            ) { t: Array<Any> ->
+                t.map { it as Money }
+                    .total()
+            }
+        }
+
     override val pendingBalance: Single<Money>
         get() = Single.just(CryptoValue.zero(asset))
 
@@ -346,6 +365,9 @@ class CryptoAccountNonCustodialGroup(
         } else {
             accountBalance.map { it.toFiat(exchangeRates, fiatCurrency) }
         }
+
+    override val receiveAddress: Single<ReceiveAddress>
+        get() = Single.error(IllegalStateException("Accessing receive address on a group is not allowed"))
 
     override fun includes(account: BlockchainAccount): Boolean =
         accounts.contains(account)

@@ -1214,7 +1214,7 @@
     <string name="send_enter_unexpected_error">Произошла непредвиденная ошибка. Пожалуйста, попробуйте еще раз.</string>
     <string name="send_enter_insufficient_gas">У вас недостаточно ETH для обработки этой транзакции.</string>
     <string name="send_select_a_wallet_title">или выберите кошелек</string>
-    <string name="send_internal_transfer_message">В настоящее время вы можете перевести только %1$s из торгового кошелька %1$s в свои кошельки-хранилища. Как только %1$s окажется в вашем кошельке-хранилище, вы можете переводить на внешние адреса.</string>
+    <string name="send_internal_transfer_message">В настоящее время вы можете перевести только %1$s из торгового кошелька %2$s в свои кошельки-хранилища. Как только %1$s окажется в вашем кошельке-хранилище, вы можете переводить на внешние адреса.</string>
     <string name="purchase_funds_note">Ваша итоговая сумма может измениться из-за активности рынка.</string>
     <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Подробнее. </annotation>

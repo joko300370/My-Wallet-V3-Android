@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bank_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/smallest_margin"
+    android:layout_marginEnd="@dimen/smallest_margin"
+    android:orientation="vertical">
+
+    <piuk.blockchain.android.ui.customviews.account.AccountInfoBank
+        android:id="@+id/bank_account"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

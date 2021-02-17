@@ -4,6 +4,8 @@ import com.blockchain.extensions.withoutNullValues
 import com.blockchain.notifications.analytics.Analytics
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.BankAccount
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.InterestAccount
@@ -20,6 +22,7 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
 const val WALLET_TYPE_NON_CUSTODIAL = "non_custodial"
 const val WALLET_TYPE_CUSTODIAL = "custodial"
 const val WALLET_TYPE_INTEREST = "interest"
+const val WALLET_TYPE_BANK = "bank"
 const val WALLET_TYPE_EXTERNAL = "external"
 const val WALLET_TYPE_UNKNOWN = "unknown"
 
@@ -37,13 +40,14 @@ class TxFlowAnalytics(
                     analytics.logEvent(
                         SellAnalyticsEvent(
                             event = SellAnalytics.CancelTransaction,
-                            asset = state.asset,
+                            asset = state.sendingAsset,
                             source = state.sendingAccount.toCategory()
-                        ))
+                        )
+                    )
             AssetAction.Swap ->
                 if (state.currentStep == TransactionStep.CONFIRM_DETAIL)
                     analytics.logEvent(SwapAnalyticsEvents.CancelTransaction)
-            AssetAction.Deposit ->
+            AssetAction.InterestDeposit ->
                 if (state.currentStep == TransactionStep.CONFIRM_DETAIL)
                     analytics.logEvent(DepositAnalyticsEvent.CancelTransaction)
             else -> {
@@ -56,7 +60,7 @@ class TxFlowAnalytics(
             AssetAction.Send -> triggerSendScreenEvent(state.currentStep)
             AssetAction.Sell -> triggerSellScreenEvent(state)
             AssetAction.Swap -> triggerSwapScreenEvent(state.currentStep)
-            AssetAction.Deposit -> triggerDepositScreenEvent(state.currentStep)
+            AssetAction.InterestDeposit -> triggerDepositScreenEvent(state.currentStep)
             else -> {
             }
         }
@@ -98,9 +102,10 @@ class TxFlowAnalytics(
             TransactionStep.CONFIRM_DETAIL -> analytics.logEvent(
                 SellAnalyticsEvent(
                     event = SellAnalytics.ConfirmationsDisplayed,
-                    asset = state.asset,
+                    asset = state.sendingAsset,
                     source = state.sendingAccount.toCategory()
-                ))
+                )
+            )
             else -> {
             }
         }
@@ -130,10 +135,12 @@ class TxFlowAnalytics(
 
     fun onEnterAddressCtaClick(state: TransactionState) {
         when (state.action) {
-            AssetAction.Swap -> analytics.logEvent(SwapAnalyticsEvents.SwapConfirmPair(
-                asset = state.asset,
-                target = state.selectedTarget.toCategory()
-            ))
+            AssetAction.Swap -> analytics.logEvent(
+                SwapAnalyticsEvents.SwapConfirmPair(
+                    asset = state.sendingAsset,
+                    target = state.selectedTarget.toCategory()
+                )
+            )
             else -> {
             }
         }
@@ -155,18 +162,22 @@ class TxFlowAnalytics(
             AssetAction.Send ->
                 analytics.logEvent(SendAnalyticsEvent.EnterAmountCtaClick)
             AssetAction.Sell ->
-                analytics.logEvent(SellAnalyticsEvent(
-                    event = SellAnalytics.EnterAmountCtaClick,
-                    asset = state.asset,
-                    source = state.sendingAccount.toCategory()
-                ))
-            AssetAction.Deposit ->
-                analytics.logEvent(DepositAnalyticsEvent.EnterAmountCtaClick(state.asset))
+                analytics.logEvent(
+                    SellAnalyticsEvent(
+                        event = SellAnalytics.EnterAmountCtaClick,
+                        asset = state.sendingAsset,
+                        source = state.sendingAccount.toCategory()
+                    )
+                )
+            AssetAction.InterestDeposit ->
+                analytics.logEvent(DepositAnalyticsEvent.EnterAmountCtaClick(state.sendingAsset))
             AssetAction.Swap ->
-                analytics.logEvent(SwapAnalyticsEvents.EnterAmountCtaClick(
-                    source = state.asset,
-                    target = state.selectedTarget.toCategory()
-                ))
+                analytics.logEvent(
+                    SwapAnalyticsEvents.EnterAmountCtaClick(
+                        source = state.sendingAsset,
+                        target = state.selectedTarget.toCategory()
+                    )
+                )
             else -> {
             }
         }
@@ -178,27 +189,33 @@ class TxFlowAnalytics(
             AssetAction.Send ->
                 analytics.logEvent(
                     SendAnalyticsEvent.ConfirmTransaction(
-                        asset = state.asset,
+                        asset = state.sendingAsset,
                         source = state.sendingAccount.toCategory(),
                         target = state.selectedTarget.toCategory(),
                         feeLevel = state.pendingTx?.feeLevel.toString()
                     )
                 )
-            AssetAction.Deposit ->
-                analytics.logEvent(DepositAnalyticsEvent.ConfirmationsCtaClick(
-                    state.asset
-                ))
+            AssetAction.InterestDeposit ->
+                analytics.logEvent(
+                    DepositAnalyticsEvent.ConfirmationsCtaClick(
+                        state.sendingAsset
+                    )
+                )
             AssetAction.Sell ->
-                analytics.logEvent(SellAnalyticsEvent(
-                    event = SellAnalytics.ConfirmTransaction,
-                    asset = state.asset,
-                    source = state.sendingAccount.toCategory()
-                ))
+                analytics.logEvent(
+                    SellAnalyticsEvent(
+                        event = SellAnalytics.ConfirmTransaction,
+                        asset = state.sendingAsset,
+                        source = state.sendingAccount.toCategory()
+                    )
+                )
             AssetAction.Swap ->
-                analytics.logEvent(SwapAnalyticsEvents.SwapConfirmCta(
-                    source = state.asset,
-                    target = state.selectedTarget.toCategory()
-                ))
+                analytics.logEvent(
+                    SwapAnalyticsEvents.SwapConfirmCta(
+                        source = state.sendingAsset,
+                        target = state.selectedTarget.toCategory()
+                    )
+                )
             else -> {
             }
         }
@@ -210,22 +227,28 @@ class TxFlowAnalytics(
             AssetAction.Send ->
                 analytics.logEvent(
                     SendAnalyticsEvent.TransactionSuccess(
-                        asset = state.asset,
+                        asset = state.sendingAsset,
                         target = state.selectedTarget.toCategory(),
                         source = state.sendingAccount.toCategory()
                     )
                 )
-            AssetAction.Sell -> analytics.logEvent(SellAnalyticsEvent(
-                event = SellAnalytics.TransactionSuccess,
-                asset = state.asset,
-                source = state.sendingAccount.toCategory()
-            ))
-            AssetAction.Deposit -> analytics.logEvent(DepositAnalyticsEvent.TransactionSuccess(state.asset))
-            AssetAction.Swap -> analytics.logEvent(SwapAnalyticsEvents.TransactionSuccess(
-                asset = state.asset,
-                target = state.selectedTarget.toCategory(),
-                source = state.sendingAccount.toCategory()
-            ))
+            AssetAction.Sell -> analytics.logEvent(
+                SellAnalyticsEvent(
+                    event = SellAnalytics.TransactionSuccess,
+                    asset = state.sendingAsset,
+                    source = state.sendingAccount.toCategory()
+                )
+            )
+            AssetAction.InterestDeposit -> analytics.logEvent(
+                DepositAnalyticsEvent.TransactionSuccess(state.sendingAsset)
+            )
+            AssetAction.Swap -> analytics.logEvent(
+                SwapAnalyticsEvents.TransactionSuccess(
+                    asset = state.sendingAsset,
+                    target = state.selectedTarget.toCategory(),
+                    source = state.sendingAccount.toCategory()
+                )
+            )
             else -> {
             }
         }
@@ -233,24 +256,32 @@ class TxFlowAnalytics(
 
     fun onTransactionFailure(state: TransactionState, error: String) {
         when (state.action) {
-            AssetAction.Send -> analytics.logEvent(SendAnalyticsEvent.TransactionFailure(
-                asset = state.asset,
-                target = state.selectedTarget.takeIf { it != NullAddress }?.toCategory(),
-                source = state.sendingAccount.takeIf { it !is NullCryptoAccount }?.toCategory(),
-                error = error
-            ))
-            AssetAction.Sell -> analytics.logEvent(SellAnalyticsEvent(
-                event = SellAnalytics.TransactionFailed,
-                asset = state.asset,
-                source = state.sendingAccount.toCategory()
-            ))
-            AssetAction.Deposit -> analytics.logEvent(DepositAnalyticsEvent.TransactionFailed(state.asset))
-            AssetAction.Swap -> analytics.logEvent(SwapAnalyticsEvents.TransactionFailed(
-                asset = state.asset,
-                target = state.selectedTarget.takeIf { it != NullAddress }?.toCategory(),
-                source = state.sendingAccount.takeIf { it !is NullCryptoAccount }?.toCategory(),
-                error = error
-            ))
+            AssetAction.Send -> analytics.logEvent(
+                SendAnalyticsEvent.TransactionFailure(
+                    asset = state.sendingAsset,
+                    target = state.selectedTarget.takeIf { it != NullAddress }?.toCategory(),
+                    source = state.sendingAccount.takeIf { it !is NullCryptoAccount }?.toCategory(),
+                    error = error
+                )
+            )
+            AssetAction.Sell -> analytics.logEvent(
+                SellAnalyticsEvent(
+                    event = SellAnalytics.TransactionFailed,
+                    asset = state.sendingAsset,
+                    source = state.sendingAccount.toCategory()
+                )
+            )
+            AssetAction.InterestDeposit -> analytics.logEvent(
+                DepositAnalyticsEvent.TransactionFailed(state.sendingAsset)
+            )
+            AssetAction.Swap -> analytics.logEvent(
+                SwapAnalyticsEvents.TransactionFailed(
+                    asset = state.sendingAsset,
+                    target = state.selectedTarget.takeIf { it != NullAddress }?.toCategory(),
+                    source = state.sendingAccount.takeIf { it !is NullCryptoAccount }?.toCategory(),
+                    error = error
+                )
+            )
             else -> {
             }
         }
@@ -286,11 +317,12 @@ class TxFlowAnalytics(
     }
 }
 
-fun SingleAccount.toCategory() =
+fun BlockchainAccount.toCategory() =
     when (this) {
         is InterestAccount -> WALLET_TYPE_INTEREST
         is TradingAccount -> WALLET_TYPE_CUSTODIAL
         is NonCustodialAccount -> WALLET_TYPE_NON_CUSTODIAL
+        is BankAccount -> WALLET_TYPE_BANK
         else -> WALLET_TYPE_UNKNOWN
     }
 
@@ -300,5 +332,6 @@ fun TransactionTarget.toCategory(): String =
         is InterestAccount -> WALLET_TYPE_INTEREST
         is TradingAccount -> WALLET_TYPE_CUSTODIAL
         is NonCustodialAccount -> WALLET_TYPE_NON_CUSTODIAL
+        is BankAccount -> WALLET_TYPE_BANK
         else -> WALLET_TYPE_UNKNOWN
     }
