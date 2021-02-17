@@ -1,7 +1,6 @@
 package com.blockchain.nabu.datamanagers.custodialwalletimpl
 
 import com.blockchain.nabu.Authenticator
-import com.blockchain.nabu.api.nabu.SDD_ELIGIBLE
 import com.blockchain.nabu.datamanagers.BankAccount
 import com.blockchain.nabu.datamanagers.Beneficiary
 import com.blockchain.nabu.datamanagers.BillingAddress
@@ -18,7 +17,6 @@ import com.blockchain.nabu.datamanagers.CustodialQuote
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligiblePaymentMethodType
 import com.blockchain.nabu.datamanagers.EveryPayCredentials
-import com.blockchain.nabu.datamanagers.ExtraAttributesProvider
 import com.blockchain.nabu.datamanagers.FiatTransaction
 import com.blockchain.nabu.datamanagers.InterestAccountDetails
 import com.blockchain.nabu.datamanagers.InterestActivityItem
@@ -28,6 +26,7 @@ import com.blockchain.nabu.datamanagers.PartnerCredentials
 import com.blockchain.nabu.datamanagers.PaymentLimits
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.Product
+import com.blockchain.nabu.datamanagers.SDDUserState
 import com.blockchain.nabu.datamanagers.TransactionErrorMapper
 import com.blockchain.nabu.datamanagers.TransactionState
 import com.blockchain.nabu.datamanagers.TransactionType
@@ -61,6 +60,7 @@ import com.blockchain.nabu.models.responses.interest.InterestActivityItemRespons
 import com.blockchain.nabu.models.responses.interest.InterestRateResponse
 import com.blockchain.nabu.models.responses.nabu.AddAddressRequest
 import com.blockchain.nabu.models.responses.nabu.State
+import com.blockchain.nabu.models.responses.sdd.SDDStatusResponse
 import com.blockchain.nabu.models.responses.simplebuy.AddNewCardBodyRequest
 import com.blockchain.nabu.models.responses.simplebuy.AmountResponse
 import com.blockchain.nabu.models.responses.simplebuy.BankAccountResponse
@@ -795,6 +795,16 @@ class LiveCustodialWalletManager(
     override fun isSDDEligible(): Single<Boolean> =
         nabuService.isSDDEligible().map {
             it.eligible && it.tier == SDD_ELIGIBLE_TIER
+        }
+
+    override fun fetchSDDUserState(): Single<SDDUserState> =
+        authenticator.authenticate { sessionToken ->
+            nabuService.isSDDVerified(sessionToken)
+        }.map {
+            SDDUserState(
+                isVerified = it.verified,
+                stateFinalised = it.taskComplete
+            )
         }
 
     override fun createCustodialOrder(

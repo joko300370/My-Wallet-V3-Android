@@ -15,7 +15,6 @@ import piuk.blockchain.android.ui.dashboard.announcements.StandardAnnouncementCa
 
 internal class KycMoreInfoAnnouncement(
     private val tierService: TierService,
-    private val showPopupFeatureFlag: FeatureFlag,
     dismissRecorder: DismissRecorder
 ) : AnnouncementRule(dismissRecorder) {
 
@@ -27,10 +26,7 @@ internal class KycMoreInfoAnnouncement(
             return Single.just(false)
         }
 
-        return Single.merge(
-            didNotStartGoldLevelKyc(),
-            showPopupFeatureFlag.enabled
-        ).all { it }
+        return didNotStartGoldLevelKyc()
     }
 
     private fun didNotStartGoldLevelKyc(): Single<Boolean> =

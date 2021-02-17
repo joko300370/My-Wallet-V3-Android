@@ -4,25 +4,25 @@ import com.blockchain.nabu.NabuToken
 import com.blockchain.nabu.datamanagers.NabuDataManager
 import io.reactivex.Single
 
-internal class Tier2DecisionAdapter(
+internal class KycNextStepDecisionAdapter(
     private val nabuToken: NabuToken,
     private val nabuDataManager: NabuDataManager
-) : Tier2Decision {
+) : KycNextStepDecision {
 
-    override fun progressToTier2(): Single<Tier2Decision.NextStep> =
+    override fun nextStep(): Single<KycNextStepDecision.NextStep> =
         nabuToken.fetchNabuToken()
             .flatMap(nabuDataManager::getUser)
             .map { user ->
                 if (user.tierInProgressOrCurrentTier == 1) {
-                    Tier2Decision.NextStep.Tier1Complete
+                    KycNextStepDecision.NextStep.Tier1Complete
                 } else {
                     val tiers = user.tiers
                     if (tiers == null || tiers.next ?: 0 > tiers.selected ?: 0) {
                         // the backend is telling us the user should be put down path for tier2 even though they
                         // selected tier 1, so we need to inform them
-                        Tier2Decision.NextStep.Tier2ContinueTier1NeedsMoreInfo
+                        KycNextStepDecision.NextStep.Tier2ContinueTier1NeedsMoreInfo
                     } else {
-                        Tier2Decision.NextStep.Tier2Continue
+                        KycNextStepDecision.NextStep.Tier2Continue
                     }
                 }
             }

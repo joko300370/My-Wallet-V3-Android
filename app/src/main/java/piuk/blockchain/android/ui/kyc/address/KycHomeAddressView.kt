@@ -29,6 +29,7 @@ interface KycHomeAddressView : View {
     fun continueToTier2MoreInfoNeeded(countryCode: String)
 
     fun tier1Complete()
+    fun onSddComplete()
 
     fun restoreUiState(
         line1: String,

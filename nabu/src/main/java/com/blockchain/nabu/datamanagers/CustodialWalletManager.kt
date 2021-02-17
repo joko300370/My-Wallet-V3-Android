@@ -187,6 +187,8 @@ interface CustodialWalletManager {
 
     fun isSDDEligible(): Single<Boolean>
 
+    fun fetchSDDUserState(): Single<SDDUserState>
+
     fun createCustodialOrder(
         direction: TransferDirection,
         quoteId: String,
@@ -638,4 +640,9 @@ data class CustodialOrder(
 data class EligiblePaymentMethodType(
     val paymentMethodType: PaymentMethodType,
     val currency: String
+)
+
+data class SDDUserState(
+    val isVerified: Boolean,
+    val stateFinalised: Boolean
 )

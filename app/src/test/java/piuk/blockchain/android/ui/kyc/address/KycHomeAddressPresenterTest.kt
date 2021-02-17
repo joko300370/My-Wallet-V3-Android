@@ -35,8 +35,8 @@ class KycHomeAddressPresenterTest {
     private val nabuToken: NabuToken = mock()
     private val phoneVerificationQuery: PhoneVerificationQuery = mock()
 
-    private val tier2Decision: Tier2Decision = mock {
-        on { progressToTier2() } `it returns` Single.just(Tier2Decision.NextStep.Tier2Continue)
+    private val kycNextStepDecision: KycNextStepDecision = mock {
+        on { nextStep() } `it returns` Single.just(KycNextStepDecision.NextStep.Tier2Continue)
     }
 
     @Suppress("unused")
@@ -51,7 +51,7 @@ class KycHomeAddressPresenterTest {
         subject = KycHomeAddressPresenter(
             nabuToken,
             nabuDataManager,
-            tier2Decision,
+            kycNextStepDecision,
             phoneVerificationQuery
         )
         subject.initView(view)
@@ -317,7 +317,7 @@ class KycHomeAddressPresenterTest {
 
     @Test
     fun `on continue clicked and tier2 decision reports to not continue, tier1 is complete`() {
-        whenever(tier2Decision.progressToTier2()).itReturns(Single.just(Tier2Decision.NextStep.Tier1Complete))
+        whenever(kycNextStepDecision.nextStep()).itReturns(Single.just(KycNextStepDecision.NextStep.Tier1Complete))
         // Arrange
         val firstLine = "1"
         val city = "2"
@@ -352,8 +352,8 @@ class KycHomeAddressPresenterTest {
     @Test
     fun `on continue clicked and tier2 decision reports to get more info, tier2 continues`() {
         whenever(
-            tier2Decision.progressToTier2()
-        ).itReturns(Single.just(Tier2Decision.NextStep.Tier2ContinueTier1NeedsMoreInfo))
+            kycNextStepDecision.nextStep()
+        ).itReturns(Single.just(KycNextStepDecision.NextStep.Tier2ContinueTier1NeedsMoreInfo))
         // Arrange
         val firstLine = "1"
         val city = "2"

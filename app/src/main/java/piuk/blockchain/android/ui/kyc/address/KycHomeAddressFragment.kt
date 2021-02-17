@@ -134,6 +134,10 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
         navigate(KycHomeAddressFragmentDirections.actionTier1Complete())
     }
 
+    override fun onSddComplete() {
+       println("USER IS SDD COMPLETE!!!!")
+    }
+
     override fun continueToTier2MoreInfoNeeded(countryCode: String) {
         closeKeyboard()
         navigate(KycNavXmlDirections.actionStartTier2NeedMoreInfo(countryCode))

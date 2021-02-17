@@ -10,8 +10,8 @@ import org.koin.dsl.module
 import piuk.blockchain.android.ui.kyc.address.CurrentTierAdapter
 import piuk.blockchain.android.ui.kyc.address.EligibilityForFreeEthAdapter
 import piuk.blockchain.android.ui.kyc.address.KycHomeAddressPresenter
-import piuk.blockchain.android.ui.kyc.address.Tier2Decision
-import piuk.blockchain.android.ui.kyc.address.Tier2DecisionAdapter
+import piuk.blockchain.android.ui.kyc.address.KycNextStepDecision
+import piuk.blockchain.android.ui.kyc.address.KycNextStepDecisionAdapter
 import piuk.blockchain.android.ui.kyc.countryselection.KycCountrySelectionPresenter
 import piuk.blockchain.android.ui.kyc.email.entry.KycEmailEntryPresenter
 import piuk.blockchain.android.ui.kyc.invalidcountry.KycInvalidCountryPresenter
@@ -64,18 +64,20 @@ val kycUiModule = module {
         factory { KycCountrySelectionPresenter(nabuDataManager = get()) }
 
         factory {
-            KycProfilePresenter(nabuToken = get(),
+            KycProfilePresenter(
+                nabuToken = get(),
                 nabuDataManager = get(),
                 metadataRepository = get(),
-                stringUtils = get())
+                stringUtils = get()
+            )
         }
 
         factory {
             KycHomeAddressPresenter(
                 nabuToken = get(),
                 nabuDataManager = get(),
-                tier2Decision = get(),
-                phoneVerificationQuery = get()
+                custodialWalletManager = get(),
+                kycNextStepDecision = get()
             )
         }
 
@@ -122,7 +124,7 @@ val kycUiNabuModule = module {
     scope(payloadScopeQualifier) {
 
         factory {
-            Tier2DecisionAdapter(get(), get()) as Tier2Decision
+            KycNextStepDecisionAdapter(get(), get()) as KycNextStepDecision
         }
 
         factory {
