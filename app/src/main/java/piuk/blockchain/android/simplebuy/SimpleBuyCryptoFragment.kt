@@ -454,7 +454,12 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
 
     override fun onPaymentMethodChanged(paymentMethod: PaymentMethod) {
         when (paymentMethod) {
-            is PaymentMethod.UndefinedFunds -> depositFundsSelected()
+        if(paymentMethod.isEligible && paymentMethod.canBeAdded()){
+            //go and add this method
+        }else {
+            // select this payment method and wait until order creation
+        }
+        /* is PaymentMethod.UndefinedFunds -> depositFundsSelected()
             is PaymentMethod.UndefinedBankTransfer -> linkBankSelected()
             else -> {
                 model.process(SimpleBuyIntent.SelectedPaymentMethodUpdate(paymentMethod))
@@ -463,7 +468,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                         paymentMethod.toAnalyticsString()
                     )
                 )
-            }
+            }*/
         }
     }
 

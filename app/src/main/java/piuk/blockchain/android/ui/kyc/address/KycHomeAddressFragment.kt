@@ -88,11 +88,11 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
     }
     private val initialState by unsafeLazy {
         AddressModel(
-            "Flat 57, Narrow Street 51",
+            "",
             null,
-            "London",
-            profileModel.stateCode ?: "London",
-            "E14 8DN",
+            "",
+            profileModel.stateCode ?: "",
+            "",
             profileModel.countryCode
         )
     }
@@ -369,8 +369,6 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
             .skipFirstUnless { !it.isEmpty() }
             .observeOn(AndroidSchedulers.mainThread())
             .distinctUntilChanged()
-
-    private fun mapToCompleted(text: String): Boolean = !text.isEmpty()
 
     private fun setupImeOptions() {
         val editTexts = listOf(

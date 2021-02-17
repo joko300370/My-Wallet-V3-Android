@@ -96,11 +96,6 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
         }
     }
 
- /*   private fun addNewCard() {
-        val intent = Intent(this, CardDetailsActivity::class.java)
-        startActivityForResult(intent, CardDetailsActivity.ADD_CARD_REQUEST_CODE)
-    }*/
-
     override fun onDestroy() {
         super.onDestroy()
         compositeDisposable.clear()

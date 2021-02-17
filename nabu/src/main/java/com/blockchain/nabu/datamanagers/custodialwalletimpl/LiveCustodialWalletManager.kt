@@ -492,7 +492,8 @@ class LiveCustodialWalletManager(
                                 PaymentMethod.Funds(
                                     balance,
                                     paymentMethod.currency,
-                                    fundsLimits
+                                    fundsLimits,
+                                    true
                                 )
                             )
                         }
@@ -968,7 +969,8 @@ class LiveCustodialWalletManager(
                 }.time
             } ?: Date(),
             cardType = card?.type ?: CardType.UNKNOWN,
-            status = state.toCardStatus()
+            status = state.toCardStatus(),
+            true
         )
 
     private fun Bank.toBankPaymentMethod(bankLimits: PaymentLimits) =
@@ -977,7 +979,8 @@ class LiveCustodialWalletManager(
             limits = bankLimits,
             bankName = this.name,
             accountEnding = this.account,
-            accountType = this.accountType
+            accountType = this.accountType,
+            true
         )
 
     private fun String.isActive(): Boolean =
