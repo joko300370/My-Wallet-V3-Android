@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
-import kotlinx.android.synthetic.main.view_account_bank_overview.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.fiat.LinkedBankAccount
@@ -36,8 +35,13 @@ class AccountInfoBank @JvmOverloads constructor(
         with(binding) {
             bankName.text = account.label
             bankLogo.setImageResource(getBankIconFromName(account.label))
-            bankDetails.text = bank_details.context.getString(
-                R.string.common_hyphenated_strings, account.accountType, account.accountNumber
+            bankDetails.text = context.getString(
+                R.string.common_hyphenated_strings,
+                if (account.accountType.isBlank()) {
+                    context.getString(R.string.bank_account_info_default)
+                } else {
+                    account.accountType
+                }, account.accountNumber
             )
         }
         setOnClickListener { onAccountClicked(account) }

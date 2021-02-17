@@ -1280,6 +1280,7 @@
     <string name="minimum_buy">%1$s Minimum</string>
     <string name="buy_min">Buy Min</string>
     <string name="buy_max">Buy Max</string>
+    <string name="bank_account_info_default">Account Ending</string>
     <string name="bank_wire_transfer">Bank Wire Transfer</string>
     <string name="bank_transfer">Bank Transfer</string>
     <string name="payment_wire_transfer">Wire Transfer</string>

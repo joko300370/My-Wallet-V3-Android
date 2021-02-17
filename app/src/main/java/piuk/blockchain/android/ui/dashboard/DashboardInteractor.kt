@@ -446,7 +446,7 @@ class DashboardInteractor(
                 // Ignore any WireTransferMethods In case BankLinkTransfer should launch
                 paymentMethods.filter { it == PaymentMethodType.BANK_TRANSFER || !shouldLaunchBankLinkTransfer }
             },
-            linkedBanksFactory.getNonWireTransferBanks().map {
+            linkedBanksFactory.getAllLinkedBanks().map {
                 it.filter { bank -> bank.currency == sourceAccount.fiatCurrency }
             }
         ).flatMap { (paymentMethods, linkedBanks) ->
