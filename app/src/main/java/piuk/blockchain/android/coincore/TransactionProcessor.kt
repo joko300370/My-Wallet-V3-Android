@@ -67,9 +67,9 @@ data class FeeSelection(
 //    val exchange: Money? = null,
     val selectedLevel: FeeLevel = FeeLevel.None,
     val customAmount: Long = -1L,
-    val availableLevels: Set<FeeLevel> = emptySet(),
+    val availableLevels: Set<FeeLevel> = setOf(FeeLevel.None),
 //    val feeInfo: FeeInfo? = null,
-    val asset: CryptoCurrency = CryptoCurrency.STX // TODO: Temp while I fix tests
+    val asset: CryptoCurrency? = null //CryptoCurrency.STX // TODO: Temp while I fix tests
 ) {
     data class FeeInfo(
         val regularFee: Long,

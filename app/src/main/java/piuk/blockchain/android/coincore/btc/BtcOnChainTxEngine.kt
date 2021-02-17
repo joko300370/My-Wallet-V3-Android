@@ -99,8 +99,8 @@ class BtcOnChainTxEngine(
                 feeAmount = CryptoValue.zero(asset),
                 feeSelection = FeeSelection(
                     selectedLevel = mapSavedFeeToFeeLevel(fetchDefaultFeeLevel(asset)),
-                    //val customAmount: Long = -1L,
-                    availableLevels = AVAILABLE_FEE_OPTIONS
+                    availableLevels = AVAILABLE_FEE_OPTIONS,
+                    asset = CryptoCurrency.BTC
                 ),
                 selectedFiat = userFiat
             )

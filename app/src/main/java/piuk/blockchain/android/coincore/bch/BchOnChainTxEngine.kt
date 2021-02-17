@@ -75,8 +75,8 @@ class BchOnChainTxEngine(
                 feeAmount = CryptoValue.zero(CryptoCurrency.BCH),
                 feeSelection = FeeSelection(
                     selectedLevel = FeeLevel.Regular,
-                    //val customAmount: Long = -1L,
-                    availableLevels = AVAILABLE_FEE_LEVELS
+                    availableLevels = AVAILABLE_FEE_LEVELS,
+                    asset = CryptoCurrency.BCH
                 ),
                 selectedFiat = userFiat
             )

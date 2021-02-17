@@ -281,7 +281,8 @@ class BchOnChainTxEngineTest {
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = FeeLevel.Regular,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = CryptoCurrency.BCH
             )
         )
 
@@ -481,7 +482,8 @@ class BchOnChainTxEngineTest {
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = FeeLevel.Regular,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = CryptoCurrency.BCH
             )
         )
 

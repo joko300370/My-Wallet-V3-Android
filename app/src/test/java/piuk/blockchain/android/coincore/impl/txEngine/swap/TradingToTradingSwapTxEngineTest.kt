@@ -261,7 +261,7 @@ class TradingToTradingSwapTxEngineTest {
                 it.validationState == ValidationState.UNINITIALISED &&
                 it.engineState[USER_TIER] != null
             }
-            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.None) }
+            .assertValue { verifyFeeLevels(it.feeSelection) }
             .assertNoErrors()
             .assertComplete()
 
@@ -316,7 +316,7 @@ class TradingToTradingSwapTxEngineTest {
                 it.validationState == ValidationState.PENDING_ORDERS_LIMIT_REACHED &&
                 it.engineState.isEmpty()
             }
-            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.None) }
+            .assertValue { verifyFeeLevels(it.feeSelection) }
             .assertNoErrors()
             .assertComplete()
 
@@ -373,7 +373,7 @@ class TradingToTradingSwapTxEngineTest {
                     it.availableBalance == totalBalance &&
                     it.feeAmount == expectedFee
             }
-            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.None) }
+            .assertValue { verifyFeeLevels(it.feeSelection) }
             .assertComplete()
             .assertNoErrors()
 
@@ -550,7 +550,7 @@ class TradingToTradingSwapTxEngineTest {
                     it.availableBalance == totalBalance &&
                     it.feeAmount == initialFees
             }
-            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.None) }
+            .assertValue { verifyFeeLevels(it.feeSelection) }
             .assertComplete()
             .assertNoErrors()
 
@@ -597,12 +597,11 @@ class TradingToTradingSwapTxEngineTest {
     }
 
     private fun verifyFeeLevels(
-        feeSelection: FeeSelection,
-        expectedLevel: FeeLevel
-    ) = feeSelection.selectedLevel == expectedLevel &&
+        feeSelection: FeeSelection
+    ) = feeSelection.selectedLevel == FeeLevel.None &&
         feeSelection.availableLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
         feeSelection.availableLevels.contains(feeSelection.selectedLevel) &&
-        feeSelection.asset == FEE_ASSET &&
+        feeSelection.asset == null &&
         feeSelection.customAmount == -1L
 
     private fun noMoreInteractions(txTarget: TransactionTarget) {
@@ -619,7 +618,6 @@ class TradingToTradingSwapTxEngineTest {
         private const val SELECTED_FIAT = "INR"
         private val SRC_ASSET = CryptoCurrency.BTC
         private val TGT_ASSET = CryptoCurrency.XLM
-        private val FEE_ASSET = CryptoCurrency.BTC
         private val EXCHANGE_RATE = 2.toBigDecimal() // 1 btc == 2 INR
 
         private const val SAMPLE_DEPOSIT_ADDRESS = "initial quote deposit address"

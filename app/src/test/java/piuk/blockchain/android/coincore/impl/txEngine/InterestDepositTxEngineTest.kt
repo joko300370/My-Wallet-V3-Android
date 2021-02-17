@@ -202,7 +202,8 @@ class InterestDepositTxEngineTest {
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = FeeLevel.Regular,
-                availableLevels = setOf(FeeLevel.Regular, FeeLevel.Priority)
+                availableLevels = setOf(FeeLevel.Regular, FeeLevel.Priority),
+                asset = FEE_ASSET
             )
         )
 
@@ -262,7 +263,8 @@ class InterestDepositTxEngineTest {
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = FeeLevel.Regular,
-                availableLevels = setOf(FeeLevel.Regular, FeeLevel.Priority)
+                availableLevels = setOf(FeeLevel.Regular, FeeLevel.Priority),
+                asset = FEE_ASSET
             )
         )
 
@@ -305,7 +307,8 @@ class InterestDepositTxEngineTest {
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = FeeLevel.Priority,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = FEE_ASSET
             )
         )
 
@@ -357,7 +360,8 @@ class InterestDepositTxEngineTest {
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = FeeLevel.Priority,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = FEE_ASSET
             )
         )
 
@@ -393,7 +397,8 @@ class InterestDepositTxEngineTest {
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = FeeLevel.Priority,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = FEE_ASSET
             )
         )
 
@@ -429,7 +434,8 @@ class InterestDepositTxEngineTest {
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = FeeLevel.Priority,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = FEE_ASSET
             )
         )
 
@@ -465,7 +471,8 @@ class InterestDepositTxEngineTest {
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = FeeLevel.Priority,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = FEE_ASSET
             )
         )
 
@@ -510,7 +517,7 @@ class InterestDepositTxEngineTest {
         feeSelection.selectedLevel == expectedLevel &&
             feeSelection.availableLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
             feeSelection.availableLevels.contains(feeSelection.selectedLevel) &&
-            feeSelection.asset == ASSET &&
+            feeSelection.asset == FEE_ASSET &&
             feeSelection.customAmount == -1L
 
     private fun noMoreInteractions(sourceAccount: BlockchainAccount, txTarget: TransactionTarget) {
@@ -525,6 +532,7 @@ class InterestDepositTxEngineTest {
     companion object {
         private val ASSET = CryptoCurrency.BTC
         private val WRONG_ASSET = CryptoCurrency.XLM
+        private val FEE_ASSET = CryptoCurrency.BTC
         private const val SELECTED_FIAT = "INR"
 
         private val MIN_DEPOSIT_AMOUNT = CryptoValue.fromMajor(ASSET, 10.toBigDecimal())

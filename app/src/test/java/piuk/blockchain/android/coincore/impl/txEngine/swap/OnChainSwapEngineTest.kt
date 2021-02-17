@@ -439,7 +439,9 @@ class OnChainSwapEngineTest {
                 it.validationState == ValidationState.PENDING_ORDERS_LIMIT_REACHED &&
                 it.engineState.isEmpty()
             }
-            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular, setOf(FeeLevel.Regular)) }
+            .assertValue {
+                verifyFeeLevels(it.feeSelection, FeeLevel.None, setOf(FeeLevel.None), null)
+            }
             .assertNoErrors()
             .assertComplete()
 
@@ -481,7 +483,8 @@ class OnChainSwapEngineTest {
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = expectedFeeLevel,
-                availableLevels = expectedFeeLevelOptions
+                availableLevels = expectedFeeLevelOptions,
+                asset = FEE_ASSET
             )
         )
 
@@ -550,7 +553,8 @@ class OnChainSwapEngineTest {
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = initialFeeLevel,
-                availableLevels = initialFeeLevelOptions
+                availableLevels = initialFeeLevelOptions,
+                asset = FEE_ASSET
             )
         )
 
@@ -563,7 +567,7 @@ class OnChainSwapEngineTest {
         ).thenReturn(
             Single.just(
                 pendingTx.copy(
-                    //feeLevel = FeeLevel.Regular
+                    feeSelection = pendingTx.feeSelection.copy(selectedLevel = FeeLevel.Regular)
                 )
             )
         )
@@ -613,7 +617,8 @@ class OnChainSwapEngineTest {
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = initialFeeLevel,
-                availableLevels = availableFeeOptions
+                availableLevels = availableFeeOptions,
+                asset = FEE_ASSET
             )
         )
         whenever(onChainEngine.doInitialiseTx()).thenReturn(Single.just(initialisedPendingTx))
@@ -659,11 +664,12 @@ class OnChainSwapEngineTest {
     private fun verifyFeeLevels(
         feeSelection: FeeSelection,
         expectedLevel: FeeLevel,
-        expectedFeeOptions: Set<FeeLevel>
+        expectedFeeOptions: Set<FeeLevel>,
+        feeAsset: CryptoCurrency? = FEE_ASSET
     ) = feeSelection.selectedLevel == expectedLevel &&
         feeSelection.availableLevels == expectedFeeOptions &&
         feeSelection.availableLevels.contains(feeSelection.selectedLevel) &&
-        feeSelection.asset == FEE_ASSET &&
+        feeSelection.asset == feeAsset &&
         feeSelection.customAmount == -1L
 
     private fun noMoreInteractions(sourceAccount: CryptoAccount, txTarget: TransactionTarget) {

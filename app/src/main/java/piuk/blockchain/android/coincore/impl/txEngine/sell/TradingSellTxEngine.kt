@@ -36,7 +36,8 @@ class TradingSellTxEngine(
 
     override fun doInitialiseTx(): Single<PendingTx> =
         quotesEngine.pricedQuote.firstOrError()
-            .zipWith(sourceAccount.accountBalance).flatMap { (quote, balance) ->
+            .zipWith(sourceAccount.accountBalance)
+            .flatMap { (quote, balance) ->
                 Single.just(
                     PendingTx(
                         amount = CryptoValue.zero(asset),

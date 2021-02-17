@@ -86,10 +86,14 @@ class EditFeesControl @JvmOverloads constructor(
                 "send_tx_fees" to Uri.parse(URL_TX_FEES)
             )
 
+            val assetName = feeSelection.asset?.assetName()?.let {
+                context.getString(it)
+            } ?: ""
+
             val boldText = context.getString(R.string.tx_confirmation_fee_learn_more_1)
             val networkText = context.getString(
                 R.string.tx_confirmation_fee_learn_more_2,
-                context.getString(feeSelection.asset.assetName())
+                assetName
             )
 
             val linkedText = stringUtils.getStringWithMappedAnnotations(

@@ -174,7 +174,7 @@ class TradingToOnChainTxEngineTest {
                 it.validationState == ValidationState.UNINITIALISED &&
                 it.engineState.isEmpty()
             }
-            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.None) }
+            .assertValue { verifyFeeLevels(it.feeSelection) }
             .assertNoErrors()
             .assertComplete()
 
@@ -226,7 +226,7 @@ class TradingToOnChainTxEngineTest {
                 it.availableBalance == actionableBalance &&
                 it.feeAmount == expectedFee
             }
-            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.None) }
+            .assertValue { verifyFeeLevels(it.feeSelection) }
             .assertComplete()
             .assertNoErrors()
 
@@ -393,7 +393,7 @@ class TradingToOnChainTxEngineTest {
                 it.availableBalance == actionableBalance &&
                 it.feeAmount == initialFee
             }
-            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.None) }
+            .assertValue { verifyFeeLevels(it.feeSelection) }
             .assertComplete()
             .assertNoErrors()
 
@@ -409,11 +409,11 @@ class TradingToOnChainTxEngineTest {
         on { actionableBalance } itReturns Single.just(availableBalance)
     }
 
-    private fun verifyFeeLevels(feeSelection: FeeSelection, expectedLevel: FeeLevel) =
-        feeSelection.selectedLevel == expectedLevel &&
+    private fun verifyFeeLevels(feeSelection: FeeSelection) =
+        feeSelection.selectedLevel == FeeLevel.None &&
             feeSelection.availableLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
             feeSelection.availableLevels.contains(feeSelection.selectedLevel) &&
-            feeSelection.asset == FEE_ASSET &&
+            feeSelection.asset == null &&
             feeSelection.customAmount == -1L
 
     private fun noMoreInteractions(sourceAccount: BlockchainAccount, txTarget: TransactionTarget) {
@@ -427,7 +427,6 @@ class TradingToOnChainTxEngineTest {
     companion object {
         private val ASSET = CryptoCurrency.PAX
         private val WRONG_ASSET = CryptoCurrency.BTC
-        private val FEE_ASSET = CryptoCurrency.ETHER
         private const val SELECTED_FIAT = "INR"
 
         private val EXPECTED_AVAILABLE_FEE_LEVELS = setOf(FeeLevel.None)

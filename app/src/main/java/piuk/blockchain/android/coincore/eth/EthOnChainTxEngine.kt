@@ -53,7 +53,8 @@ open class EthOnChainTxEngine(
                 feeAmount = CryptoValue.zero(asset),
                 feeSelection = FeeSelection(
                     selectedLevel = mapSavedFeeToFeeLevel(fetchDefaultFeeLevel(asset)),
-                    availableLevels = AVAILABLE_FEE_LEVELS
+                    availableLevels = AVAILABLE_FEE_LEVELS,
+                    asset = CryptoCurrency.ETHER
                 ),
                 selectedFiat = userFiat
             )

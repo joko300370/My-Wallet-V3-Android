@@ -305,7 +305,8 @@ class XlmOnChainTxEngineTest {
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = FeeLevel.Regular,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = CryptoCurrency.XLM
             )
         )
 
@@ -483,7 +484,8 @@ class XlmOnChainTxEngineTest {
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = FeeLevel.Regular,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = CryptoCurrency.XLM
             )
         )
 

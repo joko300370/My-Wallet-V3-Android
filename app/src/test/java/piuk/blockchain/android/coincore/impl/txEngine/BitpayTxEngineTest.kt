@@ -39,6 +39,7 @@ import piuk.blockchain.android.coincore.impl.BitPayInvoiceTarget
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.coincore.impl.injectMocks
+import piuk.blockchain.android.coincore.impl.txEngine.swap.TradingToTradingSwapTxEngineTest
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
@@ -220,7 +221,8 @@ class BitpayTxEngineTest {
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = FeeLevel.Regular,
-                availableLevels = setOf(FeeLevel.Regular, FeeLevel.Priority)
+                availableLevels = setOf(FeeLevel.Regular, FeeLevel.Priority),
+                asset = FEE_ASSET
             )
         )
 
@@ -266,7 +268,8 @@ class BitpayTxEngineTest {
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = FeeLevel.Priority,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = FEE_ASSET
             )
         )
 
@@ -423,9 +426,9 @@ class BitpayTxEngineTest {
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = FeeLevel.Priority,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = FEE_ASSET
             )
-
         )
 
         // Act

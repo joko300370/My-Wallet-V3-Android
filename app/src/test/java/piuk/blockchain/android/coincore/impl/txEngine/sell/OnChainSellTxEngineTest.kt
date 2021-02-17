@@ -378,7 +378,9 @@ class OnChainSellTxEngineTest {
                     it.validationState == ValidationState.PENDING_ORDERS_LIMIT_REACHED &&
                     it.engineState.isEmpty()
             }
-            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular, setOf(FeeLevel.Regular)) }
+            .assertValue {
+                verifyFeeLevels(it.feeSelection, FeeLevel.None, setOf(FeeLevel.None), null)
+            }
             .assertNoErrors()
             .assertComplete()
 
@@ -419,7 +421,8 @@ class OnChainSellTxEngineTest {
             selectedFiat = TGT_ASSET,
             feeSelection = FeeSelection(
                 selectedLevel = expectedFeeLevel,
-                availableLevels = expectedAvailableFeeLevels
+                availableLevels = expectedAvailableFeeLevels,
+                asset = FEE_ASSET
             )
         )
 
@@ -486,7 +489,8 @@ class OnChainSellTxEngineTest {
             selectedFiat = TGT_ASSET,
             feeSelection = FeeSelection(
                 selectedLevel = initialFeeLevel,
-                availableLevels = expectedAvailableFeeLevels
+                availableLevels = expectedAvailableFeeLevels,
+                asset = FEE_ASSET
             )
         )
 
@@ -499,7 +503,7 @@ class OnChainSellTxEngineTest {
         ).thenReturn(
             Single.just(
                 pendingTx.copy(
-                    //feeLevel = FeeLevel.Regular
+                    feeSelection = pendingTx.feeSelection.copy(selectedLevel = FeeLevel.Regular)
                 )
             )
         )
@@ -551,7 +555,8 @@ class OnChainSellTxEngineTest {
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = initialFeeLevel,
-                availableLevels = availableFeeOptions
+                availableLevels = availableFeeOptions,
+                asset = FEE_ASSET
             )
         )
         whenever(onChainEngine.doInitialiseTx()).thenReturn(Single.just(initialisedPendingTx))
@@ -597,11 +602,12 @@ class OnChainSellTxEngineTest {
     private fun verifyFeeLevels(
         feeSelection: FeeSelection,
         expectedLevel: FeeLevel,
-        expectedFeeOptions: Set<FeeLevel>
+        expectedFeeOptions: Set<FeeLevel>,
+        feeAsset: CryptoCurrency? = FEE_ASSET
     ) = feeSelection.selectedLevel == expectedLevel &&
         feeSelection.availableLevels == expectedFeeOptions &&
         feeSelection.availableLevels.contains(feeSelection.selectedLevel) &&
-        feeSelection.asset == FEE_ASSET &&
+        feeSelection.asset == feeAsset &&
         feeSelection.customAmount == -1L
 
     private fun noMoreInteractions(sourceAccount: BlockchainAccount, txTarget: TransactionTarget) {

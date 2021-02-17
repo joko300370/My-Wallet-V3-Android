@@ -221,7 +221,8 @@ class EthOnChainTxEngineTest {
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = FeeLevel.Regular,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = CryptoCurrency.ETHER
             )
         )
 
@@ -278,7 +279,8 @@ class EthOnChainTxEngineTest {
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = FeeLevel.Priority,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = CryptoCurrency.ETHER
             )
         )
 
@@ -339,7 +341,8 @@ class EthOnChainTxEngineTest {
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = FeeLevel.Regular,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = CryptoCurrency.ETHER
             )
         )
 
