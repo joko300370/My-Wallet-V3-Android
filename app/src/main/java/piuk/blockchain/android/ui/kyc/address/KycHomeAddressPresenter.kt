@@ -144,13 +144,12 @@ class KycHomeAddressPresenter(
             .doOnError(Timber::e)
             .subscribeBy(
                 onSuccess = {
-                    println("Campaign Type $campaignType")
                     when (it.progressToKycNextStep) {
                         KycNextStepDecision.NextStep.Tier1Complete -> view.tier1Complete()
                         KycNextStepDecision.NextStep.Tier2ContinueTier1NeedsMoreInfo ->
                             view.continueToTier2MoreInfoNeeded(it.countryCode)
                         KycNextStepDecision.NextStep.Tier2Continue -> view.continueToVeriffSplash(it.countryCode)
-                        KycNextStepDecision.NextStep.SDDComplete -> view.onSddComplete()
+                        KycNextStepDecision.NextStep.SDDComplete -> view.onSddVerified()
                     }
                 },
                 onError = { view.showErrorToast(R.string.kyc_address_error_saving) }
