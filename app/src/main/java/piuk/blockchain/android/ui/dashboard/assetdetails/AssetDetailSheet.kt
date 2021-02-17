@@ -115,6 +115,7 @@ class AssetDetailSheet : MviBottomSheet<AssetDetailsModel,
     }
 
     override fun initControls(binding: DialogSheetDashboardAssetDetailsBinding) {
+        model.process(LoadAsset(token))
         with(binding) {
             configureChart(
                 chart,
@@ -254,7 +255,7 @@ class AssetDetailSheet : MviBottomSheet<AssetDetailsModel,
 
     private fun chartToLoadingState() {
         with(binding) {
-            pricesLoading?.visible()
+            pricesLoading.visible()
             chart.invisible()
             priceChange.apply {
                 text = "--"
@@ -407,7 +408,6 @@ class AssetDetailSheet : MviBottomSheet<AssetDetailsModel,
                 arguments = Bundle().apply {
                     putSerializable(ARG_CRYPTO_CURRENCY, cryptoCurrency)
                 }
-                model.process(LoadAsset(token))
             }
         }
 

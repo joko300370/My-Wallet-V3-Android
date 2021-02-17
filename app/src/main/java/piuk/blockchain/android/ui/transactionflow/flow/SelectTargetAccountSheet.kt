@@ -10,13 +10,14 @@ import piuk.blockchain.android.databinding.DialogSheetAccountSelectorBinding
 import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.TargetSelectionCustomisations
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 
 class SelectTargetAccountSheet : TransactionFlowSheet<DialogSheetAccountSelectorBinding>() {
 
-    private val customiser: TransactionFlowCustomiser by inject()
+    private val customiser: TargetSelectionCustomisations by inject()
 
     override fun render(newState: TransactionState) {
         with(binding) {

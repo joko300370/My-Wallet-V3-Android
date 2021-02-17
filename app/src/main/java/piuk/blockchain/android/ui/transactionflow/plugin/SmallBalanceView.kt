@@ -10,7 +10,7 @@ import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
-import piuk.blockchain.android.ui.transactionflow.flow.TransactionFlowCustomiser
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visibleIf
 
@@ -22,7 +22,7 @@ class SmallBalanceView @JvmOverloads constructor(
     TxFlowWidget {
 
     private lateinit var model: TransactionModel
-    private lateinit var customiser: TransactionFlowCustomiser
+    private lateinit var customiser: EnterAmountCustomisations
     private lateinit var analytics: TxFlowAnalytics
 
     private val binding: ViewTxFlowSmallBalanceBinding =
@@ -32,7 +32,7 @@ class SmallBalanceView @JvmOverloads constructor(
 
     override fun initControl(
         model: TransactionModel,
-        customiser: TransactionFlowCustomiser,
+        customiser: EnterAmountCustomisations,
         analytics: TxFlowAnalytics
     ) {
         check(this::model.isInitialized.not()) { "Control already initialised" }

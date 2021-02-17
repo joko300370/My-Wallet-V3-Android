@@ -41,74 +41,19 @@
         app:layout_constraintStart_toEndOf="@id/amount_sheet_back"
         app:layout_constraintTop_toBottomOf="@id/amount_sheet_indicator" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/amount_sheet_from"
-        style="@style/Text.Light.12"
-        android:layout_width="0dp"
+    <FrameLayout
+        android:id="@+id/frame_upper_slot"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/standard_margin"
-        android:layout_marginTop="@dimen/standard_margin"
-        android:layout_marginEnd="@dimen/tiny_margin"
-        android:maxLines="1"
-        app:layout_constraintEnd_toStartOf="@id/amount_sheet_asset_icon"
-        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/amount_sheet_title"
-        tools:text="From: Loaded account" />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/amount_sheet_target_icon"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginEnd="@dimen/standard_margin"
-        app:layout_constraintBottom_toBottomOf="@id/amount_sheet_from"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/amount_sheet_to"
-        tools:src="@drawable/vector_eth_colored" />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/amount_sheet_asset_icon"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        app:layout_constraintBottom_toBottomOf="@id/amount_sheet_from"
-        app:layout_constraintEnd_toEndOf="@+id/amount_sheet_asset_direction"
-        android:layout_marginEnd="@dimen/small_margin"
-        app:layout_constraintTop_toTopOf="@id/amount_sheet_to"
-        tools:src="@drawable/vector_bitcoin_colored" />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/amount_sheet_asset_direction"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:background="@drawable/bkgd_tx_circle"
-        app:layout_constraintBottom_toBottomOf="@id/amount_sheet_from"
-        app:layout_goneMarginEnd="@dimen/standard_margin"
-        app:layout_constraintEnd_toEndOf="@+id/amount_sheet_target_icon"
-        android:layout_marginEnd="@dimen/standard_margin"
-        app:layout_constraintTop_toTopOf="@id/amount_sheet_to"
-        tools:srcCompat="@drawable/ic_tx_sent" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/amount_sheet_to"
-        style="@style/Text.Semibold.14"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/standard_margin"
-        android:layout_marginEnd="@dimen/tiny_margin"
-        android:ellipsize="end"
-        android:maxLines="1"
-        app:layout_constraintEnd_toStartOf="@id/amount_sheet_asset_icon"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/amount_sheet_from"
-        tools:text="To: Empty account" />
+        app:layout_constraintTop_toBottomOf="@id/amount_sheet_title" />
 
     <View
         android:id="@+id/amount_sheet_separator"
         style="@style/SeparatorWithoutMargins"
         android:layout_marginTop="@dimen/very_small_margin"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/amount_sheet_to" />
+        app:layout_constraintTop_toBottomOf="@id/frame_upper_slot" />
 
     <piuk.blockchain.android.ui.customviews.FiatCryptoInputView
         android:id="@+id/amount_sheet_input"
@@ -128,7 +73,7 @@
         android:paddingBottom="@dimen/small_margin"
         app:layout_constraintBottom_toTopOf="@id/amount_sheet_cta_button"
         app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/amount_sheet_cta_button"

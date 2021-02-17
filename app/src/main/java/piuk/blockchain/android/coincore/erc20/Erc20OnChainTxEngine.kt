@@ -40,12 +40,12 @@ open class Erc20OnChainTxEngine(
     override fun doInitialiseTx(): Single<PendingTx> =
         Single.just(
             PendingTx(
-                amount = CryptoValue.zero(asset),
-                totalBalance = CryptoValue.zero(asset),
-                availableBalance = CryptoValue.zero(asset),
+                amount = CryptoValue.zero(sourceAsset),
+                totalBalance = CryptoValue.zero(sourceAsset),
+                availableBalance = CryptoValue.zero(sourceAsset),
                 feeAmount = CryptoValue.zero(CryptoCurrency.ETHER),
                 feeSelection = FeeSelection(
-                    selectedLevel = mapSavedFeeToFeeLevel(fetchDefaultFeeLevel(asset)),
+                    selectedLevel = mapSavedFeeToFeeLevel(fetchDefaultFeeLevel(sourceAsset)),
                     availableLevels = AVAILABLE_FEE_LEVELS,
                     asset = CryptoCurrency.ETHER
                 ),
@@ -101,7 +101,7 @@ open class Erc20OnChainTxEngine(
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
         require(amount is CryptoValue)
-        require(amount.currency == asset)
+        require(amount.currency == sourceAsset)
         return Singles.zip(
             sourceAccount.accountBalance.map { it as CryptoValue },
             sourceAccount.actionableBalance.map { it as CryptoValue },
@@ -156,7 +156,7 @@ open class Erc20OnChainTxEngine(
 
     private fun validateAmounts(pendingTx: PendingTx): Completable =
         Completable.fromCallable {
-            if (pendingTx.amount <= CryptoValue.zero(asset)) {
+            if (pendingTx.amount <= CryptoValue.zero(sourceAsset)) {
                 throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
             }
         }
@@ -202,7 +202,7 @@ open class Erc20OnChainTxEngine(
             .flatMap { ethDataManager.setLastTxHashNowSingle(it) }
             .flatMap { hash ->
                 pendingTx.getOption<TxConfirmationValue.Description>(TxConfirmation.DESCRIPTION)?.let { notes ->
-                    ethDataManager.updateErc20TransactionNotes(hash, notes.text, asset)
+                    ethDataManager.updateErc20TransactionNotes(hash, notes.text, sourceAsset)
                 }?.toSingle {
                     hash
                 } ?: Single.just(hash)
@@ -222,7 +222,7 @@ open class Erc20OnChainTxEngine(
             ethDataManager.createErc20Transaction(
                 nonce = nonce,
                 to = tgt.address,
-                contractAddress = ethDataManager.erc20ContractAddress(asset),
+                contractAddress = ethDataManager.erc20ContractAddress(sourceAsset),
                 gasPriceWei = fees.gasPrice(pendingTx.feeSelection.selectedLevel),
                 gasLimitGwei = fees.gasLimitGwei,
                 amount = pendingTx.amount.toBigInteger()

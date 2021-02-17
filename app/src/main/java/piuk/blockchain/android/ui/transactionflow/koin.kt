@@ -12,8 +12,10 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TxFlowErrorReporting
 import piuk.blockchain.android.ui.transactionflow.flow.ActiveTransactionFlow
+import piuk.blockchain.android.ui.transactionflow.flow.EstimatedCompletionPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.ExchangePriceFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.FeedTotalFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.FiatFeePropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.FromPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.SwapDestinationPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.SwapExchangeRateFormatter
@@ -21,10 +23,15 @@ import piuk.blockchain.android.ui.transactionflow.flow.SwapReceiveFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.SwapSourcePropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.ToPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.TotalFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.TransactionFlowCustomiser
-import piuk.blockchain.android.ui.transactionflow.flow.TransactionFlowCustomiserImpl
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionFlowCustomiser
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionFlowCustomiserImpl
 import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapper
 import piuk.blockchain.android.ui.transactionflow.flow.TxOptionsFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.SourceSelectionCustomisations
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.TargetSelectionCustomisations
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionConfirmationCustomisations
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionProgressCustomisations
 
 val transactionFlowScope = named("TransactionScope")
 
@@ -35,6 +42,11 @@ val transactionModule = module {
             resources = get<Context>().resources
         )
     }.bind(TransactionFlowCustomiser::class)
+        .bind(EnterAmountCustomisations::class)
+        .bind(SourceSelectionCustomisations::class)
+        .bind(TargetSelectionCustomisations::class)
+        .bind(TransactionConfirmationCustomisations::class)
+        .bind(TransactionProgressCustomisations::class)
 
     factory {
         ExchangePriceFormatter(
@@ -91,6 +103,18 @@ val transactionModule = module {
     }.bind(TxOptionsFormatter::class)
 
     factory {
+        FiatFeePropertyFormatter(
+            resources = get<Context>().resources
+        )
+    }.bind(TxOptionsFormatter::class)
+
+    factory {
+        EstimatedCompletionPropertyFormatter(
+            resources = get<Context>().resources
+        )
+    }.bind(TxOptionsFormatter::class)
+
+    factory {
         TxConfirmReadOnlyMapper(
             formatters = getAll()
         )
@@ -118,7 +142,8 @@ val transactionModule = module {
                 custodialWalletManager = payloadScope.get(),
                 currencyPrefs = get(),
                 eligibilityProvider = payloadScope.get(),
-                accountsSorting = get()
+                accountsSorting = get(),
+                linkedBanksFactory = payloadScope.get()
             )
         }
 

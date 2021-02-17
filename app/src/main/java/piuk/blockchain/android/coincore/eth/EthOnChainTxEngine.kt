@@ -41,18 +41,18 @@ open class EthOnChainTxEngine(
     override fun assertInputsValid() {
         check(txTarget is CryptoAddress)
         check((txTarget as CryptoAddress).asset == CryptoCurrency.ETHER)
-        check(asset == CryptoCurrency.ETHER)
+        check(sourceAsset == CryptoCurrency.ETHER)
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
         Single.just(
             PendingTx(
-                amount = CryptoValue.zero(asset),
-                totalBalance = CryptoValue.zero(asset),
-                availableBalance = CryptoValue.zero(asset),
-                feeAmount = CryptoValue.zero(asset),
+                amount = CryptoValue.zero(sourceAsset),
+                totalBalance = CryptoValue.zero(sourceAsset),
+                availableBalance = CryptoValue.zero(sourceAsset),
+                feeAmount = CryptoValue.zero(sourceAsset),
                 feeSelection = FeeSelection(
-                    selectedLevel = mapSavedFeeToFeeLevel(fetchDefaultFeeLevel(asset)),
+                    selectedLevel = mapSavedFeeToFeeLevel(fetchDefaultFeeLevel(sourceAsset)),
                     availableLevels = AVAILABLE_FEE_LEVELS,
                     asset = CryptoCurrency.ETHER
                 ),
@@ -100,7 +100,7 @@ open class EthOnChainTxEngine(
             exchange = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
             selectedLevel = pendingTx.feeSelection.selectedLevel,
             availableLevels = AVAILABLE_FEE_LEVELS,
-            asset = sourceAccount.asset
+            asset = sourceAsset
         )
 
     private fun feeOptions(): Single<FeeOptions> =
@@ -118,7 +118,7 @@ open class EthOnChainTxEngine(
             pendingTx.copy(
                 amount = amount,
                 totalBalance = total,
-                availableBalance = max(available - fees, CryptoValue.zero(asset)) as CryptoValue,
+                availableBalance = max(available - fees, CryptoValue.zero(sourceAsset)) as CryptoValue,
                 feeAmount = fees
             )
         }
@@ -188,7 +188,7 @@ open class EthOnChainTxEngine(
 
     private fun validateAmounts(pendingTx: PendingTx): Completable =
         Completable.fromCallable {
-            if (pendingTx.amount <= CryptoValue.zero(asset)) {
+            if (pendingTx.amount <= CryptoValue.zero(sourceAsset)) {
                 throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
             }
         }

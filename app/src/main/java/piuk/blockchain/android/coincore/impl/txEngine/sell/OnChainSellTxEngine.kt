@@ -57,10 +57,10 @@ class OnChainSellTxEngine(
                 )
             }.handlePendingOrdersError(
                 PendingTx(
-                    amount = CryptoValue.zero(asset),
-                    totalBalance = CryptoValue.zero(asset),
-                    availableBalance = CryptoValue.zero(asset),
-                    feeAmount = CryptoValue.zero(asset),
+                    amount = CryptoValue.zero(sourceAsset),
+                    totalBalance = CryptoValue.zero(sourceAsset),
+                    availableBalance = CryptoValue.zero(sourceAsset),
+                    feeAmount = CryptoValue.zero(sourceAsset),
                     selectedFiat = userFiat,
                     feeSelection = FeeSelection()
                 )

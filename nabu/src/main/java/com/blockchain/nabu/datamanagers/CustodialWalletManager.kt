@@ -8,7 +8,6 @@ import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.datamanagers.repositories.interest.Eligibility
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestLimits
 import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
-import com.blockchain.nabu.models.data.Bank
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
 import com.blockchain.nabu.models.responses.interest.InterestActivityItemResponse
@@ -86,7 +85,7 @@ interface CustodialWalletManager {
     ): Single<BuySellOrder>
 
     fun createWithdrawOrder(
-        amount: FiatValue,
+        amount: Money,
         bankId: String
     ): Completable
 
@@ -130,8 +129,6 @@ interface CustodialWalletManager {
 
     fun updateSupportedCardTypes(fiatCurrency: String): Completable
 
-    fun getLinkedBeneficiaries(): Single<List<Beneficiary>>
-
     fun linkToABank(fiatCurrency: String): Single<LinkBankTransfer>
 
     fun updateAccountProviderId(linkingId: String, providerAccountId: String, accountId: String): Completable
@@ -144,6 +141,11 @@ interface CustodialWalletManager {
     fun getEligiblePaymentMethodTypes(
         fiatCurrency: String
     ): Single<List<EligiblePaymentMethodType>>
+
+    fun getBankTransferLimits(
+        fiatCurrency: String,
+        onlyEligible: Boolean
+    ): Single<PaymentLimits>
 
     fun addNewCard(fiatCurrency: String, billingAddress: BillingAddress): Single<CardToBeActivated>
 
@@ -180,7 +182,7 @@ interface CustodialWalletManager {
 
     fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean): Single<List<String>>
 
-    fun canWireTransferToABankWithCurrency(fiatCurrency: String): Single<Boolean>
+    fun canTransactWithBankMethods(fiatCurrency: String): Single<Boolean>
 
     fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String>
 
@@ -218,9 +220,11 @@ interface CustodialWalletManager {
         id: String
     ): Single<LinkedBank>
 
-    fun getLinkedBanks(): Single<List<LinkedBank>>
+    fun getBanks(): Single<List<Bank>>
 
     fun isFiatCurrencySupported(destination: String): Boolean
+
+    fun startBankTransfer(id: String, amount: Money, currency: String): Single<String>
 }
 
 data class InterestActivityItem(
@@ -299,19 +303,27 @@ data class OrderInput(private val symbol: String, private val amount: String? = 
 
 data class OrderOutput(private val symbol: String, private val amount: String? = null)
 
-data class Beneficiary(
-    override val id: String,
-    override val name: String,
-    override val account: String,
-    override val currency: String
-) : Bank {
-    override val accountType: String
-        get() = ""
+data class Bank(
+    val id: String,
+    val name: String,
+    val account: String,
+    val state: BankState,
+    val currency: String,
+    val accountType: String,
+    val paymentMethodType: PaymentMethodType
+) : Serializable {
 
-    override val paymentMethod: PaymentMethodType
-        get() = PaymentMethodType.FUNDS
+    @SuppressLint("DefaultLocale") // Yes, lint is broken
+    fun toHumanReadableAccount(): String {
+        return accountType.toLowerCase(Locale.getDefault()).capitalize(Locale.getDefault())
+    }
+}
 
-    override fun toHumanReadableAccount(): String = ""
+enum class BankState {
+    PENDING,
+    BLOCKED,
+    ACTIVE,
+    UNKNOWN
 }
 
 data class FiatTransaction(
@@ -448,9 +460,6 @@ sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val 
         val accountEnding: String,
         val accountType: String
     ) : PaymentMethod(bankId, limits, BANK_PAYMENT_METHOD_ORDER), Serializable {
-
-        val accountDottedLastDigits: String
-            get() = "•••• $accountEnding"
 
         override fun detailedLabel() =
             "$bankName $accountEnding"

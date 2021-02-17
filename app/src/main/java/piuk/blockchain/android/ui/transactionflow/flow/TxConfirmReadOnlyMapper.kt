@@ -4,6 +4,7 @@ import android.content.res.Resources
 import info.blockchain.balance.Money
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.TxConfirmationValue
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionFlowCustomiserImpl
 
 class TxConfirmReadOnlyMapper(private val formatters: List<TxOptionsFormatter>) {
     fun map(property: TxConfirmationValue): Pair<String, String> {
@@ -53,8 +54,10 @@ class ExchangePriceFormatter(private val resources: Resources) : TxOptionsFormat
 
     override fun format(property: TxConfirmationValue): Pair<String, String>? =
         if (property is TxConfirmationValue.ExchangePriceConfirmation) {
-            resources.getString(R.string.quote_price,
-                property.asset.displayTicker) to property.money.toStringWithSymbol()
+            resources.getString(
+                R.string.quote_price,
+                property.asset.displayTicker
+            ) to property.money.toStringWithSymbol()
         } else {
             null
         }
@@ -64,8 +67,10 @@ class SwapExchangeRateFormatter(private val resources: Resources) : TxOptionsFor
 
     override fun format(property: TxConfirmationValue): Pair<String, String>? =
         if (property is TxConfirmationValue.SwapExchangeRate) {
-            resources.getString(R.string.exchange_rate) to resources.getString(R.string.current_unit_price,
-                property.unitCryptoCurrency.toStringWithSymbol(), property.price.toStringWithSymbol())
+            resources.getString(R.string.exchange_rate) to resources.getString(
+                R.string.current_unit_price,
+                property.unitCryptoCurrency.toStringWithSymbol(), property.price.toStringWithSymbol()
+            )
         } else {
             null
         }
@@ -111,6 +116,28 @@ class SwapDestinationPropertyFormatter(private val resources: Resources) : TxOpt
         if (property is TxConfirmationValue.SwapDestinationValue)
             resources.getString(R.string.common_receive) to property.receivingAssetValue.toStringWithSymbol()
         else null
+}
+
+class FiatFeePropertyFormatter(private val resources: Resources) : TxOptionsFormatter {
+
+    override fun format(property: TxConfirmationValue): Pair<String, String>? =
+        if (property is TxConfirmationValue.FiatTxFee)
+            resources.getString(R.string.send_confirmation_tx_fee) to property.fee.toStringWithSymbol()
+        else null
+}
+
+class EstimatedCompletionPropertyFormatter(private val resources: Resources) : TxOptionsFormatter {
+
+    override fun format(property: TxConfirmationValue): Pair<String, String>? =
+        when (property) {
+            is TxConfirmationValue.EstimatedDepositCompletion -> resources.getString(
+                R.string.send_confirmation_eta
+            ) to TransactionFlowCustomiserImpl.getEstimatedTransactionCompletionTime()
+            is TxConfirmationValue.EstimatedWithdrawalCompletion -> resources.getString(
+                R.string.withdraw_confirmation_eta
+            ) to TransactionFlowCustomiserImpl.getEstimatedTransactionCompletionTime()
+            else -> null
+        }
 }
 
 fun Money.formatWithExchange(exchange: Money?) =

@@ -33,9 +33,9 @@ import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.blockchain.koin.scopedInject
+import com.blockchain.nabu.datamanagers.Bank
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
-import com.blockchain.nabu.models.data.Bank
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.notifications.analytics.Analytics
@@ -77,6 +77,7 @@ import piuk.blockchain.android.ui.auth.KEY_VALIDATING_PIN_FOR_RESULT
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.auth.REQUEST_CODE_VALIDATE_PIN
 import piuk.blockchain.android.ui.backup.BackupWalletActivity
+import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviFragment.Companion.BOTTOM_SHEET
 import piuk.blockchain.android.ui.customviews.PasswordStrengthView
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
@@ -99,6 +100,7 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.dashboard.LinkablePaymentMethodsForAction
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.util.Locale
@@ -486,13 +488,13 @@ class SettingsFragment : PreferenceFragmentCompat(),
         thePit?.setValue(isLinked)
     }
 
-    override fun updateLinkableBanks(linkableBanks: Set<LinkableBank>, linkedBanksCount: Int) {
-        if (linkableBanks.isEmpty()) {
+    override fun updateLinkableBanks(linkablePaymentMethods: Set<LinkablePaymentMethods>, linkedBanksCount: Int) {
+        if (linkablePaymentMethods.isEmpty()) {
             banksPref?.isVisible = false
         } else {
-            linkableBanks.forEach { linkableBank ->
+            linkablePaymentMethods.forEach { linkableBank ->
                 banksPref?.findPreference<BankPreference>(LINK_BANK_KEY.plus(linkableBank.hashCode()))?.let {
-                    it.order = it.order + linkedBanksCount + linkableBanks.indexOf(linkableBank)
+                    it.order = it.order + linkedBanksCount + linkablePaymentMethods.indexOf(linkableBank)
                 } ?: banksPref?.addPreference(
                     BankPreference(context = requireContext(), fiatCurrency = linkableBank.currency).apply {
                         onClick {
@@ -526,30 +528,38 @@ class SettingsFragment : PreferenceFragmentCompat(),
         RemoveLinkedBankBottomSheet.newInstance(bank).show(childFragmentManager, BOTTOM_SHEET)
     }
 
-    override fun linkBankWithWireTransfer(currency: String) {
+    override fun onBankWireTransferSelected(currency: String) {
         LinkBankAccountDetailsBottomSheet.newInstance(currency).show(childFragmentManager, BOTTOM_SHEET)
         analytics.logEvent(linkBankEventWithCurrency(SimpleBuyAnalytics.LINK_BANK_CLICKED, currency))
     }
 
-    private fun linkBank(linkableBank: LinkableBank) {
-        require(linkableBank.linkMethods.isNotEmpty())
-        if (linkableBank.linkMethods.size > 1) {
-            showDialogForLinkBankMethodChooser(linkableBank)
+    private fun linkBank(linkablePaymentMethods: LinkablePaymentMethods) {
+        require(linkablePaymentMethods.linkMethods.isNotEmpty())
+        if (linkablePaymentMethods.linkMethods.size > 1) {
+            showDialogForLinkBankMethodChooser(linkablePaymentMethods)
         } else {
-            when (linkableBank.linkMethods[0]) {
-                PaymentMethodType.FUNDS -> linkBankWithWireTransfer(linkableBank.currency)
-                PaymentMethodType.BANK_TRANSFER -> linkBankWithBankTransfer(linkableBank.currency)
+            when (linkablePaymentMethods.linkMethods[0]) {
+                PaymentMethodType.FUNDS -> onBankWireTransferSelected(linkablePaymentMethods.currency)
+                PaymentMethodType.BANK_TRANSFER ->
+                    onLinkBankSelected(
+                        LinkablePaymentMethodsForAction.LinkablePaymentMethodsForSettings(linkablePaymentMethods)
+                    )
                 else -> throw IllegalStateException("Not valid linkable bank type")
             }
         }
     }
 
-    override fun linkBankWithBankTransfer(currency: String) {
-        settingsPresenter.linkBank(currency)
+    override fun onLinkBankSelected(paymentMethodForAction: LinkablePaymentMethodsForAction) {
+        settingsPresenter.linkBank(paymentMethodForAction.linkablePaymentMethods.currency)
     }
 
-    private fun showDialogForLinkBankMethodChooser(linkableBank: LinkableBank) {
-        LinkBankMethodChooserBottomSheet.newInstance(linkableBank).show(childFragmentManager, BOTTOM_SHEET)
+    private fun showDialogForLinkBankMethodChooser(linkablePaymentMethods: LinkablePaymentMethods) {
+        LinkBankMethodChooserBottomSheet.newInstance(
+            LinkablePaymentMethodsForAction.LinkablePaymentMethodsForSettings(
+                linkablePaymentMethods
+            )
+        )
+            .show(childFragmentManager, BOTTOM_SHEET)
     }
 
     override fun updateCards(cards: List<PaymentMethod.Card>) {
@@ -1245,7 +1255,7 @@ enum class ReviewAnalytics : AnalyticsEvent {
         get() = emptyMap()
 }
 
-interface BankLinkingHost {
-    fun linkBankWithWireTransfer(currency: String)
-    fun linkBankWithBankTransfer(currency: String)
+interface BankLinkingHost : SlidingModalBottomDialog.Host {
+    fun onBankWireTransferSelected(currency: String)
+    fun onLinkBankSelected(paymentMethodForAction: LinkablePaymentMethodsForAction)
 }

@@ -4,6 +4,7 @@ import com.blockchain.nabu.api.nabu.Nabu
 import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.extensions.wrapErrorMessage
+import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentBody
 import com.blockchain.nabu.models.responses.banktransfer.CreateLinkBankRequestBody
 import com.blockchain.nabu.models.responses.banktransfer.UpdateProviderAccountBody
 import com.blockchain.nabu.models.responses.interest.InterestAccountDetailsResponse
@@ -623,10 +624,20 @@ class NabuService(retrofit: Retrofit) {
     ) = service.getLinkedBank(authorization = sessionToken.authHeader, id = id)
         .wrapErrorMessage()
 
-    fun getLinkedBanks(
+    fun getBanks(
         sessionToken: NabuSessionTokenResponse
-    ) = service.getLinkedBanks(authorization = sessionToken.authHeader)
+    ) = service.getBanks(authorization = sessionToken.authHeader)
         .wrapErrorMessage()
+
+    fun startAchPayment(
+        sessionToken: NabuSessionTokenResponse,
+        id: String,
+        body: BankTransferPaymentBody
+    ) = service.startBankTransferPayment(
+        authorization = sessionToken.authHeader,
+        id = id,
+        body = body
+    ).wrapErrorMessage()
 
     companion object {
         internal const val CLIENT_TYPE = "APP"

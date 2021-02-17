@@ -177,12 +177,12 @@ class Coincore internal constructor(
             }
 
     fun createTransactionProcessor(
-        source: SingleAccount,
+        source: BlockchainAccount,
         target: TransactionTarget,
         action: AssetAction
     ): Single<TransactionProcessor> =
         txProcessorFactory.createProcessor(
-            source as CryptoAccount,
+            source,
             target,
             action
         )

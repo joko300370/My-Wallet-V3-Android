@@ -4,6 +4,7 @@ import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligibilityProvider
 import com.blockchain.nabu.datamanagers.repositories.swap.CustodialRepository
+import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
@@ -17,6 +18,7 @@ import io.reactivex.subjects.PublishSubject
 import piuk.blockchain.android.coincore.AddressFactory
 import piuk.blockchain.android.coincore.AddressParseError
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FeeLevel
@@ -31,7 +33,9 @@ import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
+import piuk.blockchain.android.coincore.fiat.LinkedBanksFactory
 import piuk.blockchain.android.ui.transfer.AccountsSorting
+import piuk.blockchain.androidcore.utils.extensions.mapList
 import timber.log.Timber
 
 class TransactionInteractor(
@@ -41,7 +45,8 @@ class TransactionInteractor(
     private val custodialWalletManager: CustodialWalletManager,
     private val currencyPrefs: CurrencyPrefs,
     private val eligibilityProvider: EligibilityProvider,
-    private val accountsSorting: AccountsSorting
+    private val accountsSorting: AccountsSorting,
+    private val linkedBanksFactory: LinkedBanksFactory
 ) {
     private var transactionProcessor: TransactionProcessor? = null
     private val invalidate = PublishSubject.create<Unit>()
@@ -71,7 +76,7 @@ class TransactionInteractor(
             }
 
     fun initialiseTransaction(
-        sourceAccount: SingleAccount,
+        sourceAccount: BlockchainAccount,
         target: TransactionTarget,
         action: AssetAction
     ): Observable<PendingTx> =
@@ -100,11 +105,12 @@ class TransactionInteractor(
             customFeeAmount = customFeeAmount
         ) ?: throw IllegalStateException("TxProcessor not initialised")
 
-    fun getTargetAccounts(sourceAccount: CryptoAccount, action: AssetAction): Single<SingleAccountList> =
+    fun getTargetAccounts(sourceAccount: BlockchainAccount, action: AssetAction): Single<SingleAccountList> =
         when (action) {
-            AssetAction.Swap -> swapTargets(sourceAccount)
-            AssetAction.Sell -> sellTargets(sourceAccount)
-            else -> coincore.getTransactionTargets(sourceAccount, action)
+            AssetAction.Swap -> swapTargets(sourceAccount as CryptoAccount)
+            AssetAction.Sell -> sellTargets(sourceAccount as CryptoAccount)
+            AssetAction.Withdraw -> linkedBanksFactory.getAllLinkedBanks().mapList { it }
+            else -> coincore.getTransactionTargets(sourceAccount as CryptoAccount, action)
         }
 
     private fun sellTargets(sourceAccount: CryptoAccount): Single<List<SingleAccount>> {
@@ -146,19 +152,25 @@ class TransactionInteractor(
                 }
         }
 
-    fun getAvailableSourceAccounts(action: AssetAction): Single<List<CryptoAccount>> {
-        require(action == AssetAction.Swap) { "Source account should be preselected for action $action" }
-        return coincore.allWalletsWithActions(setOf(action), accountsSorting.sorter())
-            .zipWith(
-                custodialRepository.getSwapAvailablePairs()
-            ).map { (accounts, pairs) ->
-                accounts.filter { account ->
-                    (account as? CryptoAccount)?.isAvailableToSwapFrom(pairs) ?: false
-                }
-            }.map {
-                it.map { account -> account as CryptoAccount }
+    fun getAvailableSourceAccounts(action: AssetAction) =
+        when (action) {
+            AssetAction.Swap -> {
+                coincore.allWalletsWithActions(setOf(action), accountsSorting.sorter())
+                    .zipWith(
+                        custodialRepository.getSwapAvailablePairs()
+                    ).map { (accounts, pairs) ->
+                        accounts.filter { account ->
+                            (account as? CryptoAccount)?.isAvailableToSwapFrom(pairs) ?: false
+                        }
+                    }.map {
+                        it.map { account -> account as CryptoAccount }
+                    }
             }
-    }
+            AssetAction.FiatDeposit -> {
+                linkedBanksFactory.getNonWireTransferBanks()
+            }
+            else -> throw IllegalStateException("Source account should be preselected for action $action")
+        }
 
     fun verifyAndExecute(secondPassword: String): Completable =
         transactionProcessor?.execute(secondPassword) ?: throw IllegalStateException("TxProcessor not initialised")
@@ -166,11 +178,10 @@ class TransactionInteractor(
     fun modifyOptionValue(newConfirmation: TxConfirmationValue): Completable =
         transactionProcessor?.setOption(newConfirmation) ?: throw IllegalStateException("TxProcessor not initialised")
 
-    fun startFiatRateFetch(): Observable<ExchangeRate.CryptoToFiat> =
-        transactionProcessor?.userExchangeRate()
-            ?.takeUntil(invalidate)
-            ?.map { it as ExchangeRate.CryptoToFiat }
-            ?: throw IllegalStateException("TxProcessor not initialised")
+    fun startFiatRateFetch(): Observable<ExchangeRate> =
+        transactionProcessor?.userExchangeRate()?.takeUntil(invalidate) ?: throw IllegalStateException(
+            "TxProcessor not initialised"
+        )
 
     fun startTargetRateFetch(): Observable<ExchangeRate> =
         transactionProcessor?.targetExchangeRate()?.takeUntil(invalidate) ?: throw IllegalStateException(
@@ -184,6 +195,8 @@ class TransactionInteractor(
         invalidate.onNext(Unit)
         transactionProcessor?.reset() ?: Timber.i("TxProcessor is not initialised yet")
     }
+
+    fun linkABank(selectedFiat: String): Single<LinkBankTransfer> = custodialWalletManager.linkToABank(selectedFiat)
 }
 
 private fun CryptoAccount.isAvailableToSwapFrom(pairs: List<CurrencyPair.CryptoCurrencyPair>): Boolean =

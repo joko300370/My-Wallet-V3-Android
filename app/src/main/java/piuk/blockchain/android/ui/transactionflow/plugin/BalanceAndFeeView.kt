@@ -13,7 +13,7 @@ import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
-import piuk.blockchain.android.ui.transactionflow.flow.TransactionFlowCustomiser
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.isVisible
 import piuk.blockchain.android.util.visible
@@ -27,7 +27,7 @@ class BalanceAndFeeView @JvmOverloads constructor(
     TxFlowWidget {
 
     private lateinit var model: TransactionModel
-    private lateinit var customiser: TransactionFlowCustomiser
+    private lateinit var customiser: EnterAmountCustomisations
     private lateinit var analytics: TxFlowAnalytics
 
     private val binding: ViewTxFlowFeeAndBalanceBinding =
@@ -37,7 +37,7 @@ class BalanceAndFeeView @JvmOverloads constructor(
 
     override fun initControl(
         model: TransactionModel,
-        customiser: TransactionFlowCustomiser,
+        customiser: EnterAmountCustomisations,
         analytics: TxFlowAnalytics
     ) {
         check(this::model.isInitialized.not()) { "Control already initialised" }

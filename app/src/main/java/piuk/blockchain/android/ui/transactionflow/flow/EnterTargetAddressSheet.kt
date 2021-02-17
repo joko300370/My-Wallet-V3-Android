@@ -20,25 +20,28 @@ import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.databinding.DialogTxFlowEnterAddressBinding
 import piuk.blockchain.android.scan.QrScanResultProcessor
-import piuk.blockchain.android.ui.customviews.account.DefaultCellDecorator
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.scan.QrExpected
-import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
-import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.scan.QrScanActivity
 import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
-import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
+import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.TargetAddressSheetState
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.TargetSelectionCustomisations
+import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
+import piuk.blockchain.android.util.AfterTextChangedWatcher
 import piuk.blockchain.android.util.getTextString
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.invisible
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
-import piuk.blockchain.android.util.AfterTextChangedWatcher
 import timber.log.Timber
 
 class EnterTargetAddressSheet : TransactionFlowSheet<DialogTxFlowEnterAddressBinding>() {
 
-    private val customiser: TransactionFlowCustomiser by inject()
+    private val customiser: TargetSelectionCustomisations by inject()
     private val qrProcessor: QrScanResultProcessor by scopedInject()
+    private var sourceSlot: TxFlowWidget? = null
 
     private val disposables = CompositeDisposable()
 
@@ -59,7 +62,7 @@ class EnterTargetAddressSheet : TransactionFlowSheet<DialogTxFlowEnterAddressBin
                 } else {
                     binding.walletSelect.clearSelectedAccount()
                 }
-                addressEntered(address, state.asset)
+                addressEntered(address, state.sendingAsset)
             }
         }
     }
@@ -69,11 +72,10 @@ class EnterTargetAddressSheet : TransactionFlowSheet<DialogTxFlowEnterAddressBin
 
         with(binding) {
             if (state.sendingAccount != newState.sendingAccount) {
-                fromDetails.updateAccount(
-                    newState.sendingAccount,
-                    {},
-                    DefaultCellDecorator()
-                )
+                if (sourceSlot == null) {
+                    sourceSlot = customiser.installAddressSheetSource(requireContext(), fromDetails, newState)
+                }
+                sourceSlot?.update(newState)
 
                 setupTransferList(customiser.enterTargetAddressSheetState(newState))
                 setupLabels(newState)
@@ -236,7 +238,7 @@ class EnterTargetAddressSheet : TransactionFlowSheet<DialogTxFlowEnterAddressBin
 
     private fun onLaunchAddressScan() {
         analyticsHooks.onScanQrClicked(state)
-        QrScanActivity.start(this, QrExpected.ASSET_ADDRESS_QR(state.asset))
+        QrScanActivity.start(this, QrExpected.ASSET_ADDRESS_QR(state.sendingAsset))
     }
 
     private fun addressEntered(address: String, asset: CryptoCurrency) {
@@ -264,7 +266,7 @@ class EnterTargetAddressSheet : TransactionFlowSheet<DialogTxFlowEnterAddressBin
         if (resultCode == Activity.RESULT_OK) {
             data.getRawScanData()?.let { rawScan ->
                 disposables += qrProcessor.processScan(rawScan, false)
-                    .flatMapMaybe { qrProcessor.selectAssetTargetFromScan(state.asset, it) }
+                    .flatMapMaybe { qrProcessor.selectAssetTargetFromScan(state.sendingAsset, it) }
                     .subscribeBy(
                         onSuccess = {
                             // TODO update the selected target (address type) instead so the render method knows what to show  & hide
@@ -275,7 +277,7 @@ class EnterTargetAddressSheet : TransactionFlowSheet<DialogTxFlowEnterAddressBin
                         onComplete = {
                             ToastCustom.makeText(
                                 requireContext(),
-                                getString(R.string.scan_mismatch_transaction_target, state.asset.displayTicker),
+                                getString(R.string.scan_mismatch_transaction_target, state.sendingAsset.displayTicker),
                                 ToastCustom.LENGTH_SHORT,
                                 ToastCustom.TYPE_GENERAL
                             )

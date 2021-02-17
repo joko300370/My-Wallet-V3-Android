@@ -1214,7 +1214,7 @@
     <string name="send_enter_unexpected_error">Si è verificato un errore imprevisto. Per favore riprova.</string>
     <string name="send_enter_insufficient_gas">Non hai abbastanza ETH per elaborare questa transazione.</string>
     <string name="send_select_a_wallet_title">o Seleziona un portafoglio</string>
-    <string name="send_internal_transfer_message">Al momento, puoi trasferire solo %1$s dal tuo portafoglio di scambio %1$s ai tuoi portafogli di Vault. Una volta che %1$s è nel tuo Vault Wallet, puoi trasferirlo a indirizzi esterni.</string>
+    <string name="send_internal_transfer_message">Al momento, puoi trasferire solo %1$s dal tuo portafoglio di scambio %2$s ai tuoi portafogli. Una volta che %1$s è nel tuo %2$s portafogli, puoi trasferirlo a indirizzi esterni.</string>
     <string name="purchase_funds_note">L\'importo finale potrebbe cambiare a causa dell\'attività di mercato.</string>
     <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Ulteriori informazioni. </annotation>

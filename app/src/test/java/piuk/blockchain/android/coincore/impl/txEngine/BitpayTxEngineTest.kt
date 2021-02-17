@@ -39,7 +39,6 @@ import piuk.blockchain.android.coincore.impl.BitPayInvoiceTarget
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.coincore.impl.injectMocks
-import piuk.blockchain.android.coincore.impl.txEngine.swap.TradingToTradingSwapTxEngineTest
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
@@ -189,7 +188,7 @@ class BitpayTxEngineTest {
             exchangeRates
         )
 
-        val asset = subject.asset
+        val asset = subject.sourceAsset
 
         // Assert
         asset shouldEqual ASSET

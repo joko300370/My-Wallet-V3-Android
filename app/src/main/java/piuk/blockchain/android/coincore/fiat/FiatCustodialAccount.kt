@@ -80,11 +80,11 @@ internal class FiatCustodialAccount(
             }
 
     override val actions: Single<AvailableActions> =
-        custodialWalletManager.canWireTransferToABankWithCurrency(fiatCurrency).map {
+        custodialWalletManager.canTransactWithBankMethods(fiatCurrency).map {
             if (it) {
                 setOf(
                     AssetAction.ViewActivity,
-                    AssetAction.Deposit,
+                    AssetAction.FiatDeposit,
                     AssetAction.Withdraw
                 )
             } else {
@@ -121,6 +121,9 @@ class FiatAccountGroup(
 ) : AccountGroup {
     // Produce the sum of all balances of all accounts
     override val accountBalance: Single<Money>
+        get() = Single.error(NotImplementedError("No unified balance for All Fiat accounts"))
+
+    override val actionableBalance: Single<Money>
         get() = Single.error(NotImplementedError("No unified balance for All Fiat accounts"))
 
     override val pendingBalance: Single<Money>
@@ -171,6 +174,9 @@ class FiatAccountGroup(
                     .total()
             }
         }
+
+    override val receiveAddress: Single<ReceiveAddress>
+        get() = Single.error(NotImplementedError("No receive addresses for All Fiat accounts"))
 
     override fun includes(account: BlockchainAccount): Boolean =
         accounts.contains(account)

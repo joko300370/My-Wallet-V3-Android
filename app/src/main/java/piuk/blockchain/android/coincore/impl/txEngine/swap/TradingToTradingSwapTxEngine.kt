@@ -27,7 +27,7 @@ class TradingToTradingSwapTxEngine(
     override fun assertInputsValid() {
         check(txTarget is CustodialTradingAccount)
         check(sourceAccount is CustodialTradingAccount)
-        check((txTarget as CustodialTradingAccount).asset != sourceAccount.asset)
+        check((txTarget as CustodialTradingAccount).asset != sourceAsset)
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
@@ -36,10 +36,10 @@ class TradingToTradingSwapTxEngine(
                 availableBalance.flatMap { balance ->
                     Single.just(
                         PendingTx(
-                            amount = CryptoValue.zero(sourceAccount.asset),
+                            amount = CryptoValue.zero(sourceAsset),
                             totalBalance = balance,
                             availableBalance = balance,
-                            feeAmount = CryptoValue.zero(sourceAccount.asset),
+                            feeAmount = CryptoValue.zero(sourceAsset),
                             feeSelection = FeeSelection(
                                 selectedLevel = FeeLevel.None,
                                 availableLevels = AVAILABLE_FEE_LEVELS
@@ -52,10 +52,10 @@ class TradingToTradingSwapTxEngine(
                 }
             }.handlePendingOrdersError(
                 PendingTx(
-                    amount = CryptoValue.zero(sourceAccount.asset),
-                    totalBalance = CryptoValue.zero(sourceAccount.asset),
-                    availableBalance = CryptoValue.zero(sourceAccount.asset),
-                    feeAmount = CryptoValue.zero(sourceAccount.asset),
+                    amount = CryptoValue.zero(sourceAsset),
+                    totalBalance = CryptoValue.zero(sourceAsset),
+                    availableBalance = CryptoValue.zero(sourceAsset),
+                    feeAmount = CryptoValue.zero(sourceAsset),
                     feeSelection = FeeSelection(),
                     selectedFiat = userFiat
                 )

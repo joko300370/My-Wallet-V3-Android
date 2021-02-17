@@ -75,7 +75,7 @@ class InterestDashboardActivity : BlockchainActivity(),
 
     override fun startDepositFlow(fromAccount: SingleAccount, toAccount: SingleAccount) {
         analytics.logEvent(InterestAnalytics.INTEREST_DASHBOARD_ACTION)
-        startDeposit(fromAccount, toAccount, AssetAction.Deposit)
+        startDeposit(fromAccount, toAccount, AssetAction.InterestDeposit)
     }
 
     override fun startAccountSelection(
@@ -85,7 +85,7 @@ class InterestDashboardActivity : BlockchainActivity(),
         showBottomSheet(
             AccountSelectSheet.newInstance(object : AccountSelectSheet.SelectionHost {
                 override fun onAccountSelected(account: BlockchainAccount) {
-                    startDeposit(account as SingleAccount, toAccount, AssetAction.Deposit)
+                    startDeposit(account as SingleAccount, toAccount, AssetAction.InterestDeposit)
                 }
 
                 override fun onSheetClosed() {

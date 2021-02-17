@@ -4,7 +4,7 @@ import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
-import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.ReceiveAddress
@@ -37,7 +37,7 @@ class InterestDepositTxEngine(
     }
 
     override fun start(
-        sourceAccount: CryptoAccount,
+        sourceAccount: BlockchainAccount,
         txTarget: TransactionTarget,
         exchangeRates: ExchangeRateDataManager,
         refreshTrigger: RefreshTrigger
@@ -49,7 +49,7 @@ class InterestDepositTxEngine(
     override fun doInitialiseTx(): Single<PendingTx> =
         onChainEngine.doInitialiseTx()
             .flatMap { pendingTx ->
-                walletManager.getInterestLimits(asset)
+                walletManager.getInterestLimits(sourceAsset)
                     .toSingle()
                     .map {
                         pendingTx.copy(
@@ -99,7 +99,7 @@ class InterestDepositTxEngine(
                     txFee = TxFee(
                         pendingTx.feeAmount,
                         TxFee.FeeType.DEPOSIT_FEE,
-                        sourceAccount.asset
+                        sourceAsset
                     )
                 )
             )

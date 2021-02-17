@@ -171,7 +171,7 @@ class InterestDepositTxEngineTest {
             exchangeRates
         )
 
-        val asset = subject.asset
+        val asset = subject.sourceAsset
 
         // Assert
         asset shouldEqual ASSET

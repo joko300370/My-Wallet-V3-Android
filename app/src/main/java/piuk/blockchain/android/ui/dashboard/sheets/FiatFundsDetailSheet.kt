@@ -7,8 +7,6 @@ import android.widget.TextView
 import android.widget.Toast
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.nabu.models.responses.nabu.KycTierLevel
-import com.blockchain.nabu.service.TierService
 import info.blockchain.balance.ExchangeRates
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -30,10 +28,10 @@ import timber.log.Timber
 class FiatFundsDetailSheet : SlidingModalBottomDialog<DialogSheetFiatFundsDetailBinding>() {
 
     interface Host : SlidingModalBottomDialog.Host {
-        fun depositFiat(account: FiatAccount)
         fun gotoActivityFor(account: BlockchainAccount)
-        fun withdrawFiat(currency: String)
         fun showFundsKyc()
+        fun startBankTransferWithdrawal(fiatAccount: FiatAccount)
+        fun startDepositFlow(fiatAccount: FiatAccount)
     }
 
     override val host: Host by lazy {
@@ -44,7 +42,6 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog<DialogSheetFiatFundsDetail
 
     private val prefs: CurrencyPrefs by scopedInject()
     private val exchangeRates: ExchangeRates by scopedInject()
-    private val tierService: TierService by scopedInject()
     private val disposables = CompositeDisposable()
 
     private var account: FiatAccount = NullFiatAccount
@@ -55,56 +52,41 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog<DialogSheetFiatFundsDetail
     override fun initControls(binding: DialogSheetFiatFundsDetailBinding) {
         val ticker = account.fiatCurrency
         binding.apply {
-            fundDetails.fundsTitle.setStringFromTicker(requireContext(), ticker)
-            fundDetails.fundsFiatTicker.text = ticker
-            fundDetails.fundsIcon.setIcon(ticker)
-
-            fundDetails.fundsBalance.gone()
-            fundDetails.fundsUserFiatBalance.gone()
-
+            with(fundDetails) {
+                fundsTitle.setStringFromTicker(requireContext(), ticker)
+                fundsFiatTicker.text = ticker
+                fundsIcon.setIcon(ticker)
+                fundsBalance.gone()
+                fundsUserFiatBalance.gone()
+            }
             disposables += Singles.zip(
                 account.accountBalance,
                 account.fiatBalance(prefs.selectedFiatCurrency, exchangeRates),
                 account.actions
-            ).observeOn(AndroidSchedulers.mainThread()).subscribeBy(
-                onSuccess = { (fiatBalance, userFiatBalance, actions) ->
-                    fundDetails.fundsUserFiatBalance.visibleIf { prefs.selectedFiatCurrency != ticker }
-                    fundDetails.fundsUserFiatBalance.text = userFiatBalance.toStringWithSymbol()
-
-                    fundDetails.fundsBalance.text = fiatBalance.toStringWithSymbol()
-                    fundDetails.fundsBalance.visibleIf { fiatBalance.isZero || fiatBalance.isPositive }
-                    fundsWithdrawHolder.visibleIf { actions.contains(AssetAction.Withdraw) }
-                    fundsDepositHolder.visibleIf { actions.contains(AssetAction.Deposit) }
-                    fundsActivityHolder.visibleIf { actions.contains(AssetAction.ViewActivity) }
-                },
-                onError = {
-                    Timber.e("Error getting fiat funds balances: $it")
-                    showErrorToast()
-                }
-            )
-
-            disposables += tierService.tiers()
-                .observeOn(AndroidSchedulers.mainThread())
+            ).observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                    onSuccess = { tiers ->
-                        fundsDepositHolder.setOnClickListener {
-                            dismiss()
-                            if (!tiers.isApprovedFor(KycTierLevel.GOLD)) {
-                                host.showFundsKyc()
-                            } else {
-                                host.depositFiat(account)
-                            }
-                        }
+                    onSuccess = { (fiatBalance, userFiatBalance, actions) ->
+                        fundDetails.fundsUserFiatBalance.visibleIf { prefs.selectedFiatCurrency != ticker }
+                        fundDetails.fundsUserFiatBalance.text = userFiatBalance.toStringWithSymbol()
+                        fundDetails.fundsBalance.text = fiatBalance.toStringWithSymbol()
+                        fundDetails.fundsBalance.visibleIf { fiatBalance.isZero || fiatBalance.isPositive }
+                        fundsWithdrawHolder.visibleIf { actions.contains(AssetAction.Withdraw) }
+                        fundsDepositHolder.visibleIf { actions.contains(AssetAction.FiatDeposit) }
+                        fundsActivityHolder.visibleIf { actions.contains(AssetAction.ViewActivity) }
                     },
                     onError = {
-                        Timber.e("Error getting fiat funds tiers: $it")
+                        Timber.e("Error getting fiat funds balances: $it")
                         showErrorToast()
                     }
                 )
 
+            fundsDepositHolder.setOnClickListener {
+                dismiss()
+                host.startDepositFlow(account)
+            }
             fundsWithdrawHolder.setOnClickListener {
                 dismiss()
-                host.withdrawFiat(account.fiatCurrency)
+                host.startBankTransferWithdrawal(fiatAccount = account)
             }
 
             fundsActivityHolder.setOnClickListener {

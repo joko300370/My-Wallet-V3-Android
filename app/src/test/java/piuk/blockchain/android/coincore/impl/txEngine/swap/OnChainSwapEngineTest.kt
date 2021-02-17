@@ -80,7 +80,9 @@ class OnChainSwapEngineTest {
         on { selectedFiatCurrency } itReturns SELECTED_FIAT
     }
 
-    private val onChainEngine: OnChainTxEngineBase = mock()
+    private val onChainEngine: OnChainTxEngineBase = mock {
+        on { sourceAsset } itReturns SRC_ASSET
+    }
 
     private val subject = OnChainSwapTxEngine(
         engine = onChainEngine,
@@ -245,7 +247,7 @@ class OnChainSwapEngineTest {
             exchangeRates
         )
 
-        val asset = subject.asset
+        val asset = subject.sourceAsset
 
         // Assert
         asset shouldEqual SRC_ASSET

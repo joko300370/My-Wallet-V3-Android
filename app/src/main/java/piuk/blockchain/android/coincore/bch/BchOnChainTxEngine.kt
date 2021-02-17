@@ -63,7 +63,7 @@ class BchOnChainTxEngine(
     override fun assertInputsValid() {
         check(txTarget is CryptoAddress)
         check((txTarget as CryptoAddress).asset == CryptoCurrency.BCH)
-        check(asset == CryptoCurrency.BCH)
+        check(sourceAsset == CryptoCurrency.BCH)
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
@@ -100,7 +100,7 @@ class BchOnChainTxEngine(
     }
 
     private fun getUnspentApiResponse(address: String): Single<UnspentOutputs> =
-        if (bchDataManager.getAddressBalance(address) > CryptoValue.zero(asset)) {
+        if (bchDataManager.getAddressBalance(address) > CryptoValue.zero(sourceAsset)) {
             sendDataManager.getUnspentBchOutputs(address)
                 // If we get here, we should have balance and valid UTXOs. IF we don't, then, um... we'd best fail hard
                 .map { utxo ->
@@ -201,7 +201,7 @@ class BchOnChainTxEngine(
             exchange = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
             selectedLevel = pendingTx.feeSelection.selectedLevel,
             availableLevels = AVAILABLE_FEE_LEVELS,
-            asset = sourceAccount.asset
+            asset = sourceAsset
         )
 
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =

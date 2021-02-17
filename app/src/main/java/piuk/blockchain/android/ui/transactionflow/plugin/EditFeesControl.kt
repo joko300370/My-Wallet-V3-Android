@@ -29,7 +29,7 @@ import piuk.blockchain.android.databinding.ViewEditTxFeesCtrlBinding
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
-import piuk.blockchain.android.ui.transactionflow.flow.TransactionFlowCustomiser
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
 import piuk.blockchain.android.ui.transactionflow.flow.formatWithExchange
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.assetName
@@ -49,7 +49,7 @@ class EditFeesControl @JvmOverloads constructor(
 
     private lateinit var textChangedWatcher: AfterTextChangedWatcher
 
-    private lateinit var customiser: TransactionFlowCustomiser
+    private lateinit var customiser: EnterAmountCustomisations
 
     private val binding: ViewEditTxFeesCtrlBinding =
         ViewEditTxFeesCtrlBinding.inflate(LayoutInflater.from(context), this, true)
