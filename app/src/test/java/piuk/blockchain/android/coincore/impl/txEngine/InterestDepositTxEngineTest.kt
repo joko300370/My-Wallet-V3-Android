@@ -32,6 +32,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.ValidationState
@@ -197,10 +198,12 @@ class InterestDepositTxEngineTest {
             amount = CryptoValue.zero(ASSET),
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
-            fees = CryptoValue.zero(ASSET),
+            feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = setOf(FeeLevel.Regular, FeeLevel.Priority)
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = setOf(FeeLevel.Regular, FeeLevel.Priority)
+            )
         )
 
         whenever(onChainEngine.doInitialiseTx()).thenReturn(Single.just(pendingTx))
@@ -218,16 +221,15 @@ class InterestDepositTxEngineTest {
                 it.amount == CryptoValue.zero(ASSET) &&
                     it.totalBalance == CryptoValue.zero(ASSET) &&
                     it.availableBalance == CryptoValue.zero(ASSET) &&
-                    it.fees == CryptoValue.zero(ASSET) &&
+                    it.feeAmount == CryptoValue.zero(ASSET) &&
                     it.selectedFiat == SELECTED_FIAT &&
-                    it.customFeeAmount == -1L &&
                     it.confirmations.isEmpty() &&
                     it.minLimit == MIN_DEPOSIT_AMOUNT &&
                     it.maxLimit == null &&
                     it.validationState == ValidationState.UNINITIALISED &&
                     it.engineState.isEmpty()
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Priority) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Priority) }
             .assertNoErrors()
             .assertComplete()
 
@@ -256,10 +258,12 @@ class InterestDepositTxEngineTest {
             amount = CryptoValue.zero(ASSET),
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
-            fees = CryptoValue.zero(ASSET),
+            feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = setOf(FeeLevel.Regular, FeeLevel.Priority)
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = setOf(FeeLevel.Regular, FeeLevel.Priority)
+            )
         )
 
         whenever(onChainEngine.doInitialiseTx()).thenReturn(Single.just(pendingTx))
@@ -297,10 +301,12 @@ class InterestDepositTxEngineTest {
             amount = CryptoValue.zero(ASSET),
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
-            fees = CryptoValue.zero(ASSET),
+            feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Priority,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Priority,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         val inputAmount = 2.bitcoin()
@@ -317,7 +323,7 @@ class InterestDepositTxEngineTest {
             .assertValue {
                 it.amount == inputAmount
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Priority) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Priority) }
             .assertComplete()
             .assertNoErrors()
 
@@ -347,10 +353,12 @@ class InterestDepositTxEngineTest {
             amount = inputAmount,
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
-            fees = CryptoValue.zero(ASSET),
+            feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Priority,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Priority,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -381,10 +389,12 @@ class InterestDepositTxEngineTest {
             amount = inputAmount,
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
-            fees = CryptoValue.zero(ASSET),
+            feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Priority,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Priority,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -415,10 +425,12 @@ class InterestDepositTxEngineTest {
             amount = inputAmount,
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
-            fees = CryptoValue.zero(ASSET),
+            feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Priority,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Priority,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -449,10 +461,12 @@ class InterestDepositTxEngineTest {
             amount = inputAmount,
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
-            fees = CryptoValue.zero(ASSET),
+            feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Priority,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Priority,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -461,7 +475,7 @@ class InterestDepositTxEngineTest {
             FeeLevel.Priority,
             -1
         ).test()
-            .assertValue { verifyFeeLevels(it, FeeLevel.Priority) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Priority) }
             .assertComplete()
             .assertNoErrors()
 
@@ -492,10 +506,12 @@ class InterestDepositTxEngineTest {
         )
     }
 
-    private fun verifyFeeLevels(pendingTx: PendingTx, expectedLevel: FeeLevel) =
-        pendingTx.feeLevel == expectedLevel &&
-            pendingTx.availableFeeLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
-            pendingTx.availableFeeLevels.contains(pendingTx.feeLevel)
+    private fun verifyFeeLevels(feeSelection: FeeSelection, expectedLevel: FeeLevel) =
+        feeSelection.selectedLevel == expectedLevel &&
+            feeSelection.availableLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
+            feeSelection.availableLevels.contains(feeSelection.selectedLevel) &&
+            feeSelection.asset == ASSET &&
+            feeSelection.customAmount == -1L
 
     private fun noMoreInteractions(sourceAccount: BlockchainAccount, txTarget: TransactionTarget) {
         verifyNoMoreInteractions(txTarget)

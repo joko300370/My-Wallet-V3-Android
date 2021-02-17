@@ -62,16 +62,32 @@ data class TxFee(
     }
 }
 
+data class FeeSelection(
+//    val feeState: FeeState? = null,
+//    val exchange: Money? = null,
+    val selectedLevel: FeeLevel = FeeLevel.None,
+    val customAmount: Long = -1L,
+    val availableLevels: Set<FeeLevel> = emptySet(),
+//    val feeInfo: FeeInfo? = null,
+    val asset: CryptoCurrency = CryptoCurrency.STX // TODO: Temp while I fix tests
+) {
+    data class FeeInfo(
+        val regularFee: Long,
+        val priorityFee: Long
+    )
+}
+
 data class PendingTx(
     val amount: Money,
     val totalBalance: Money,
     val availableBalance: Money,
-    val fees: Money,
     val selectedFiat: String,
 
-    val feeLevel: FeeLevel = FeeLevel.None,
-    val customFeeAmount: Long = -1L,
-    val availableFeeLevels: Set<FeeLevel> = setOf(FeeLevel.None),
+    val feeAmount: Money,
+    val feeSelection: FeeSelection,
+//    val feeLevel: FeeLevel = FeeLevel.None,
+//    val customFeeAmount: Long = -1L,
+//    val availableFeeLevels: Set<FeeLevel> = setOf(FeeLevel.None),
 
     val confirmations: List<TxConfirmationValue> = emptyList(),
     val minLimit: Money? = null,
@@ -421,7 +437,7 @@ class TransactionProcessor(
     fun updateFeeLevel(level: FeeLevel, customFeeAmount: Long = -1): Completable {
         Timber.d("!TRANSACTION!> in UpdateFeeLevel")
         val pendingTx = getPendingTx()
-        check(pendingTx.availableFeeLevels.contains(level)) {
+        check(pendingTx.feeSelection.availableLevels.contains(level)) {
             "Fee Level $level not supported by engine ${engine::class.java.name}"
         }
 

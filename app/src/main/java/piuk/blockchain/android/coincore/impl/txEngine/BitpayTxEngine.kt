@@ -88,8 +88,10 @@ class BitpayTxEngine(
             .map { tx ->
                 tx.copy(
                     amount = bitpayInvoice.amount,
-                    feeLevel = FeeLevel.Priority,
-                    availableFeeLevels = AVAILABLE_FEE_LEVELS
+                    feeSelection = tx.feeSelection.copy(
+                        selectedLevel = FeeLevel.Priority,
+                        availableLevels = AVAILABLE_FEE_LEVELS
+                    )
                 )
             }
 
@@ -152,9 +154,9 @@ class BitpayTxEngine(
     // underlying asset engine.
     private fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
         TxConfirmationValue.FeeSelection(
-            feeDetails = FeeState.FeeDetails(pendingTx.fees),
-            exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
-            selectedLevel = pendingTx.feeLevel,
+            feeDetails = FeeState.FeeDetails(pendingTx.feeAmount),
+            exchange = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+            selectedLevel = pendingTx.feeSelection.selectedLevel,
             availableLevels = setOf(FeeLevel.Priority),
             asset = asset
         )
@@ -168,7 +170,7 @@ class BitpayTxEngine(
         level: FeeLevel,
         customFeeAmount: Long
     ): Single<PendingTx> {
-        require(pendingTx.availableFeeLevels.contains(level))
+        require(pendingTx.feeSelection.availableLevels.contains(level))
         return Single.just(pendingTx)
     }
 

@@ -181,7 +181,7 @@ class TxFlowAnalytics(
                         asset = state.asset,
                         source = state.sendingAccount.toCategory(),
                         target = state.selectedTarget.toCategory(),
-                        feeLevel = state.pendingTx?.feeLevel.toString()
+                        feeLevel = state.pendingTx?.feeSelection?.selectedLevel.toString()
                     )
                 )
             AssetAction.Deposit ->

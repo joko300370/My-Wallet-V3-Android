@@ -33,6 +33,7 @@ import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
@@ -220,16 +221,15 @@ class TradingSellTxEngineTest {
                 it.amount == CryptoValue.zero(SRC_ASSET) &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == totalBalance &&
-                it.fees == CryptoValue.zero(SRC_ASSET) &&
+                it.feeAmount == CryptoValue.zero(SRC_ASSET) &&
                 it.selectedFiat == TGT_ASSET &&
-                it.customFeeAmount == -1L &&
                 it.confirmations.isEmpty() &&
                 it.minLimit == MIN_GOLD_LIMIT_ASSET &&
                 it.maxLimit == MAX_GOLD_LIMIT_ASSET &&
                 it.validationState == ValidationState.UNINITIALISED &&
                 it.engineState.isEmpty()
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.None) }
             .assertNoErrors()
             .assertComplete()
 
@@ -274,17 +274,15 @@ class TradingSellTxEngineTest {
                 it.amount == CryptoValue.zero(SRC_ASSET) &&
                 it.totalBalance == CryptoValue.zero(SRC_ASSET) &&
                 it.availableBalance == CryptoValue.zero(SRC_ASSET) &&
-                it.fees == CryptoValue.zero(SRC_ASSET) &&
+                it.feeAmount == CryptoValue.zero(SRC_ASSET) &&
                 it.selectedFiat == TGT_ASSET &&
-                it.feeLevel == FeeLevel.None &&
-                it.customFeeAmount == -1L &&
                 it.confirmations.isEmpty() &&
                 it.minLimit == null &&
                 it.maxLimit == null &&
                 it.validationState == ValidationState.PENDING_ORDERS_LIMIT_REACHED &&
                 it.engineState.isEmpty()
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.None) }
             .assertNoErrors()
             .assertComplete()
 
@@ -318,10 +316,12 @@ class TradingSellTxEngineTest {
             amount = CryptoValue.zero(SRC_ASSET),
             totalBalance = CryptoValue.zero(SRC_ASSET),
             availableBalance = CryptoValue.zero(SRC_ASSET),
-            fees = CryptoValue.zero(SRC_ASSET),
+            feeAmount = CryptoValue.zero(SRC_ASSET),
             selectedFiat = TGT_ASSET,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel =  FeeLevel.None,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         val inputAmount = 2.bitcoin()
@@ -339,9 +339,9 @@ class TradingSellTxEngineTest {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == totalBalance &&
-                it.fees == expectedFee
+                it.feeAmount == expectedFee
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.None) }
 
         verify(sourceAccount, atLeastOnce()).asset
         verify(sourceAccount).accountBalance
@@ -375,10 +375,12 @@ class TradingSellTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = totalBalance,
-            fees = initialFee,
+            feeAmount = initialFee,
             selectedFiat = TGT_ASSET,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel =  FeeLevel.None,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -412,10 +414,12 @@ class TradingSellTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = totalBalance,
-            fees = initialFee,
+            feeAmount = initialFee,
             selectedFiat = TGT_ASSET,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel =  FeeLevel.None,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -449,10 +453,12 @@ class TradingSellTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = totalBalance,
-            fees = initialFee,
+            feeAmount = initialFee,
             selectedFiat = TGT_ASSET,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel =  FeeLevel.None,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -486,10 +492,12 @@ class TradingSellTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = totalBalance,
-            fees = initialFee,
+            feeAmount = initialFee,
             selectedFiat = TGT_ASSET,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel =  FeeLevel.None,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -504,9 +512,9 @@ class TradingSellTxEngineTest {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == totalBalance &&
-                it.fees == initialFee
+                it.feeAmount == initialFee
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.None) }
 
         verify(sourceAccount, atLeastOnce()).asset
         verify(txTarget, atLeastOnce()).fiatCurrency
@@ -550,10 +558,14 @@ class TradingSellTxEngineTest {
         )
     }
 
-    private fun verifyFeeLevels(pendingTx: PendingTx, expectedLevel: FeeLevel) =
-        pendingTx.feeLevel == expectedLevel &&
-            pendingTx.availableFeeLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
-            pendingTx.availableFeeLevels.contains(pendingTx.feeLevel)
+    private fun verifyFeeLevels(
+        feeSelection: FeeSelection,
+        expectedLevel: FeeLevel
+    ) = feeSelection.selectedLevel == expectedLevel &&
+        feeSelection.availableLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
+        feeSelection.availableLevels.contains(feeSelection.selectedLevel) &&
+        feeSelection.asset == FEE_ASSET &&
+        feeSelection.customAmount == -1L
 
     private fun noMoreInteractions(txTarget: TransactionTarget) {
         verifyNoMoreInteractions(txTarget)
@@ -569,6 +581,7 @@ class TradingSellTxEngineTest {
         private const val SELECTED_FIAT = "INR"
         private val SRC_ASSET = CryptoCurrency.BTC
         private const val TGT_ASSET = "EUR"
+        private val FEE_ASSET = CryptoCurrency.BTC
         private val EXCHANGE_RATE = 2.toBigDecimal() // 1 btc == 2 EUR
 
         private val MIN_GOLD_LIMIT = FiatValue.fromMajor(TGT_ASSET, 100.toBigDecimal())

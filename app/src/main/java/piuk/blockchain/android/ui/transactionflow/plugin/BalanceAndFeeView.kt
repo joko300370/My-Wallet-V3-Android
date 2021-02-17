@@ -61,7 +61,7 @@ class BalanceAndFeeView @JvmOverloads constructor(
         updateMaxGroup(state)
         updateBalance(state)
         state.pendingTx?.let {
-            binding.feeEdit.update(it, model)
+            binding.feeEdit.update(it.feeSelection, model)
         }
     }
 
@@ -73,7 +73,7 @@ class BalanceAndFeeView @JvmOverloads constructor(
             binding.totalAvailableValue.text = makeAmountString(it, state)
         }
 
-        state.pendingTx?.fees?.let {
+        state.pendingTx?.feeAmount?.let {
             binding.networkFeeValue.text = makeAmountString(it, state)
         }
     }

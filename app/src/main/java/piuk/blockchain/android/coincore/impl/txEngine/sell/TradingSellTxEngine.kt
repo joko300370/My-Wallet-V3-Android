@@ -8,6 +8,7 @@ import info.blockchain.balance.Money
 import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxResult
@@ -41,10 +42,12 @@ class TradingSellTxEngine(
                         amount = CryptoValue.zero(asset),
                         totalBalance = balance,
                         availableBalance = balance,
-                        fees = CryptoValue.zero(asset),
+                        feeAmount = CryptoValue.zero(asset),
                         selectedFiat = userFiat,
-                        feeLevel = FeeLevel.None,
-                        availableFeeLevels = AVAILABLE_FEE_LEVELS
+                        feeSelection = FeeSelection(
+                            selectedLevel = FeeLevel.None,
+                            availableLevels = AVAILABLE_FEE_LEVELS
+                        )
                     )
                 ).flatMap {
                     updateLimits(it, quote)
@@ -54,9 +57,9 @@ class TradingSellTxEngine(
                     amount = CryptoValue.zero(asset),
                     totalBalance = CryptoValue.zero(asset),
                     availableBalance = CryptoValue.zero(asset),
-                    fees = CryptoValue.zero(asset),
+                    feeAmount = CryptoValue.zero(asset),
                     selectedFiat = userFiat,
-                    feeLevel = FeeLevel.None
+                    feeSelection = FeeSelection()
                 )
             )
 
@@ -79,7 +82,7 @@ class TradingSellTxEngine(
         level: FeeLevel,
         customFeeAmount: Long
     ): Single<PendingTx> {
-        require(pendingTx.availableFeeLevels.contains(level))
+        require(pendingTx.feeSelection.availableLevels.contains(level))
         // This engine only supports FeeLevel.None, so
         return Single.just(pendingTx)
     }

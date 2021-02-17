@@ -17,14 +17,13 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import com.blockchain.ui.urllinks.URL_TX_FEES
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.FeeLevel
-import piuk.blockchain.android.coincore.PendingTx
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.databinding.ViewEditTxFeesCtrlBinding
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
@@ -48,10 +47,8 @@ class EditFeesControl @JvmOverloads constructor(
     private val stringUtils: StringUtils by inject()
     private val analytics: TxFlowAnalytics by inject()
 
-
     private lateinit var textChangedWatcher: AfterTextChangedWatcher
 
-//    private lateinit var model: TransactionModel
     private lateinit var customiser: TransactionFlowCustomiser
 
     private val binding: ViewEditTxFeesCtrlBinding =
@@ -69,9 +66,9 @@ class EditFeesControl @JvmOverloads constructor(
             }
         }
 
-    fun update(pendingTx: PendingTx, model: TransactionModel) {
-        updateFeeList(pendingTx.availableFeeLevels.toList())
-        val selectedOption = pendingTx.feeLevel
+    fun update(feeSelection: FeeSelection, model: TransactionModel) {
+        updateFeeList(feeSelection.availableLevels.toList())
+        val selectedOption = feeSelection.selectedLevel
 
         if (!::textChangedWatcher.isInitialized) {
             textChangedWatcher = makeTextWatcher(model)
@@ -80,8 +77,8 @@ class EditFeesControl @JvmOverloads constructor(
         with(binding) {
             feeOptionCustom.removeTextChangedListener(textChangedWatcher)
 
-            showFeeSelector(selectedOption, model, analytics, pendingTx)
-            showFeeDetails(pendingTx)
+            showFeeSelector(selectedOption, model, feeSelection)
+            showFeeDetails(feeSelection)
 
             feeOptionCustom.addTextChangedListener(textChangedWatcher)
 
@@ -92,7 +89,7 @@ class EditFeesControl @JvmOverloads constructor(
             val boldText = context.getString(R.string.tx_confirmation_fee_learn_more_1)
             val networkText = context.getString(
                 R.string.tx_confirmation_fee_learn_more_2,
-                context.getString(item.asset.assetName())
+                context.getString(feeSelection.asset.assetName())
             )
 
             val linkedText = stringUtils.getStringWithMappedAnnotations(
@@ -140,7 +137,7 @@ class EditFeesControl @JvmOverloads constructor(
         }
     }
 
-    private fun View.showFeeDetails(pendingTx: PendingTx) {
+    private fun View.showFeeDetails(feeSelection: FeeSelection) {
 //        pendingTx.item.feeDetails?.let {
 //            when (it) {
 //                is FeeState.FeeUnderMinLimit -> {
@@ -154,7 +151,7 @@ class EditFeesControl @JvmOverloads constructor(
 //                    setCustomFeeValues(item.customFeeAmount, context.getString(R.string.fee_options_fee_too_high))
 //                }
 //                is FeeState.ValidCustomFee -> {
-                    setCustomFeeValues(pendingTx.customFeeAmount)
+//                    setCustomFeeValues(pendingTx.customFeeAmount)
 //                }
 //                is FeeState.FeeTooHigh -> {
 //                    binding.feeOptionValue.text = context.getString(R.string.send_confirmation_insufficient_fee)
@@ -168,7 +165,6 @@ class EditFeesControl @JvmOverloads constructor(
 //        }
     }
 
-
     private fun View.setCustomFeeValues(customFee: Long, error: String = "") {
         with(binding) {
             if (customFee != -1L) {
@@ -181,14 +177,13 @@ class EditFeesControl @JvmOverloads constructor(
         }
     }
 
-    private fun View.showFeeSelector(
+    private fun showFeeSelector(
         selectedOption: FeeLevel,
         model: TransactionModel,
-        analytics: TxFlowAnalytics,
-        pendingTx: PendingTx
+        feeSelection: FeeSelection
     ) = with(binding) {
             if (feeList.size > 1) {
-                feeOptionSelectSpinner.setupSpinner(selectedOption, model, analytics, pendingTx)
+                feeOptionSelectSpinner.setupSpinner(selectedOption, model, feeSelection)
                 feeSwitcher.displayedChild = SHOW_DROPDOWN
             } else {
                 feeSwitcher.displayedChild = SHOW_STATIC
@@ -198,8 +193,7 @@ class EditFeesControl @JvmOverloads constructor(
     private fun AppCompatSpinner.setupSpinner(
         currentLevel: FeeLevel,
         model: TransactionModel,
-        analytics: TxFlowAnalytics,
-        pendingTx: PendingTx
+        feeSelection: FeeSelection
     ) {
         val spinnerArrayAdapter: ArrayAdapter<String> =
             CustomPaddingArrayAdapter(
@@ -218,19 +212,18 @@ class EditFeesControl @JvmOverloads constructor(
             FeeLevel.None -> throw IllegalStateException("Fee level None not supported")
             FeeLevel.Regular,
             FeeLevel.Priority -> showStandardUi()
-            FeeLevel.Custom -> showCustomFeeUi(pendingTx)
+            FeeLevel.Custom -> showCustomFeeUi(feeSelection)
         }
 
         post {
-            onItemSelectedListener = createSpinnerListener(model, analytics, currentLevel, pendingTx)
+            onItemSelectedListener = createSpinnerListener(model, currentLevel, feeSelection)
         }
     }
 
     private fun createSpinnerListener(
         model: TransactionModel,
-        analytics: TxFlowAnalytics,
         currentLevel: FeeLevel,
-        item: TxConfirmationValue.FeeSelection
+        item: FeeSelection
     ) = object : AdapterView.OnItemSelectedListener {
         override fun onItemSelected(
             parent: AdapterView<*>?,
@@ -255,14 +248,14 @@ class EditFeesControl @JvmOverloads constructor(
         }
     }
 
-    private fun showCustomFeeUi(pendingTx: PendingTx) =
+    private fun showCustomFeeUi(feeSelection: FeeSelection) =
         with(binding) {
-            feeOptionCustomBounds.text = context.getString(
-                R.string.fee_options_sat_byte_inline_hint,
-                item.feeInfo?.regularFee.toString(),
-                item.feeInfo?.priorityFee.toString()
-            )
-
+//            feeOptionCustomBounds.text = context.getString(
+//                R.string.fee_options_sat_byte_inline_hint,
+//                item.feeInfo?.regularFee.toString(),
+//                item.feeInfo?.priorityFee.toString()
+//            )
+//
             feeTypeSwitcher.displayedChild = SHOW_CUSTOM
         }
 
@@ -274,10 +267,8 @@ class EditFeesControl @JvmOverloads constructor(
         model.process(
             TransactionIntent.SetFeeLevel(
                 feeLevel = FeeLevel.Custom,
-                customFeeAmount = customFee
-                // asset = item.asset)
+                customFeeAmount = customFee)
             )
-        )
 
     companion object {
         private const val SHOW_DROPDOWN = 0

@@ -54,8 +54,10 @@ class InterestDepositTxEngine(
                     .map {
                         pendingTx.copy(
                             minLimit = it.minDepositAmount,
-                            feeLevel = FeeLevel.Priority,
-                            availableFeeLevels = AVAILABLE_FEE_LEVELS
+                            feeSelection = pendingTx.feeSelection.copy(
+                                selectedLevel = FeeLevel.Priority,
+                                availableLevels = AVAILABLE_FEE_LEVELS
+                            )
                         )
                     }
                 }
@@ -68,7 +70,7 @@ class InterestDepositTxEngine(
         level: FeeLevel,
         customFeeAmount: Long
     ): Single<PendingTx> {
-        require(pendingTx.availableFeeLevels.contains(level))
+        require(pendingTx.feeSelection.availableLevels.contains(level))
         return Single.just(pendingTx)
     }
 
@@ -95,7 +97,7 @@ class InterestDepositTxEngine(
             .addOrReplaceOption(
                 TxConfirmationValue.NetworkFee(
                     txFee = TxFee(
-                        pendingTx.fees,
+                        pendingTx.feeAmount,
                         TxFee.FeeType.DEPOSIT_FEE,
                         sourceAccount.asset
                     )

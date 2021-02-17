@@ -30,6 +30,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import kotlin.test.assertEquals
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.ValidationState
@@ -177,17 +178,15 @@ class EthOnChainTxEngineTest {
                 it.amount == CryptoValue.zero(ASSET) &&
                 it.totalBalance == CryptoValue.zero(ASSET) &&
                 it.availableBalance == CryptoValue.zero(ASSET) &&
-                it.fees == CryptoValue.zero(ASSET) &&
+                it.feeAmount == CryptoValue.zero(ASSET) &&
                 it.selectedFiat == SELECTED_FIAT &&
-                it.feeLevel == FeeLevel.Regular &&
-                it.customFeeAmount == -1L &&
                 it.confirmations.isEmpty() &&
                 it.minLimit == null &&
                 it.maxLimit == null &&
                 it.validationState == ValidationState.UNINITIALISED &&
                 it.engineState.isEmpty()
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Regular) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
             .assertNoErrors()
             .assertComplete()
 
@@ -218,10 +217,12 @@ class EthOnChainTxEngineTest {
             amount = CryptoValue.zero(ASSET),
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
-            fees = CryptoValue.zero(ASSET),
+            feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         val inputAmount = 2.ether()
@@ -239,9 +240,9 @@ class EthOnChainTxEngineTest {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == expectedAvailable &&
-                it.fees == expectedFee
+                it.feeAmount == expectedFee
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Regular) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
 
         verify(sourceAccount, atLeastOnce()).asset
         verify(sourceAccount).accountBalance
@@ -273,10 +274,12 @@ class EthOnChainTxEngineTest {
             amount = CryptoValue.zero(CryptoCurrency.ETHER),
             totalBalance = CryptoValue.zero(CryptoCurrency.ETHER),
             availableBalance = CryptoValue.zero(CryptoCurrency.ETHER),
-            fees = CryptoValue.zero(CryptoCurrency.ETHER),
+            feeAmount = CryptoValue.zero(CryptoCurrency.ETHER),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Priority,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Priority,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         val inputAmount = 2.ether()
@@ -294,9 +297,9 @@ class EthOnChainTxEngineTest {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == expectedAvailable &&
-                it.fees == expectedFee
+                it.feeAmount == expectedFee
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Priority) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Priority) }
 
         verify(sourceAccount, atLeastOnce()).asset
         verify(sourceAccount).accountBalance
@@ -332,10 +335,12 @@ class EthOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = regularAvailable,
-            fees = regularFee,
+            feeAmount = regularFee,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         val expectedFee = (GAS_LIMIT * FEE_PRIORITY).gwei()
@@ -353,9 +358,9 @@ class EthOnChainTxEngineTest {
                 it.amount == inputAmount &&
                     it.totalBalance == totalBalance &&
                     it.availableBalance == expectedAvailable &&
-                    it.fees == expectedFee
+                    it.feeAmount == expectedFee
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Priority) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Priority) }
 
         verify(sourceAccount, atLeastOnce()).asset
         verify(sourceAccount).accountBalance
@@ -392,10 +397,12 @@ class EthOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = expectedAvailable,
-            fees = expectedFee,
+            feeAmount = expectedFee,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -432,10 +439,12 @@ class EthOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = expectedAvailable,
-            fees = expectedFee,
+            feeAmount = expectedFee,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -450,9 +459,9 @@ class EthOnChainTxEngineTest {
                 it.amount == inputAmount &&
                     it.totalBalance == totalBalance &&
                     it.availableBalance == expectedAvailable &&
-                    it.fees == expectedFee
+                    it.feeAmount == expectedFee
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Regular) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
 
         noMoreInteractions(sourceAccount, txTarget)
     }
@@ -481,10 +490,12 @@ class EthOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = expectedAvailable,
-            fees = expectedFee,
+            feeAmount = expectedFee,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -518,10 +529,12 @@ class EthOnChainTxEngineTest {
         whenever(ethFeeOptions.limits).thenReturn(FeeLimits(FEE_REGULAR, FEE_PRIORITY))
     }
 
-    private fun verifyFeeLevels(pendingTx: PendingTx, expectedLevel: FeeLevel) =
-        pendingTx.feeLevel == expectedLevel &&
-            pendingTx.availableFeeLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
-            pendingTx.availableFeeLevels.contains(pendingTx.feeLevel)
+    private fun verifyFeeLevels(feeSelection: FeeSelection, expectedLevel: FeeLevel) =
+        feeSelection.selectedLevel == expectedLevel &&
+            feeSelection.availableLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
+            feeSelection.availableLevels.contains(feeSelection.selectedLevel) &&
+            feeSelection.asset == ASSET &&
+            feeSelection.customAmount == -1L
 
     private fun noMoreInteractions(sourceAccount: BlockchainAccount, txTarget: TransactionTarget) {
         verifyNoMoreInteractions(txTarget)

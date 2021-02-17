@@ -8,6 +8,7 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxEngine
@@ -33,9 +34,11 @@ class TradingToOnChainTxEngine(
                 amount = CryptoValue.zero(sourceAccount.asset),
                 totalBalance = CryptoValue.zero(sourceAccount.asset),
                 availableBalance = CryptoValue.zero(sourceAccount.asset),
-                fees = CryptoValue.zero(sourceAccount.asset),
-                feeLevel = FeeLevel.None,
-                availableFeeLevels = AVAILABLE_FEE_LEVELS,
+                feeAmount = CryptoValue.zero(sourceAccount.asset),
+                feeSelection = FeeSelection(
+                    selectedLevel = FeeLevel.None,
+                    availableLevels = AVAILABLE_FEE_LEVELS
+                ),
                 selectedFiat = userFiat
             )
         )
@@ -61,7 +64,7 @@ class TradingToOnChainTxEngine(
         level: FeeLevel,
         customFeeAmount: Long
     ): Single<PendingTx> {
-        require(pendingTx.availableFeeLevels.contains(level))
+        require(pendingTx.feeSelection.availableLevels.contains(level))
         // This engine only supports FeeLevel.None, so
         return Single.just(pendingTx)
     }
@@ -71,7 +74,7 @@ class TradingToOnChainTxEngine(
             pendingTx.copy(confirmations = listOf(
                 TxConfirmationValue.From(from = sourceAccount.label),
                 TxConfirmationValue.To(to = txTarget.label),
-                TxConfirmationValue.FeedTotal(amount = pendingTx.amount, fee = pendingTx.fees)
+                TxConfirmationValue.FeedTotal(amount = pendingTx.amount, fee = pendingTx.feeAmount)
             ).apply {
                 if (isNoteSupported) {
                     toMutableList().add(TxConfirmationValue.Description())

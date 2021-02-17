@@ -14,6 +14,7 @@ import org.web3j.crypto.RawTransaction
 import org.web3j.utils.Convert
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
@@ -49,9 +50,11 @@ open class EthOnChainTxEngine(
                 amount = CryptoValue.zero(asset),
                 totalBalance = CryptoValue.zero(asset),
                 availableBalance = CryptoValue.zero(asset),
-                fees = CryptoValue.zero(asset),
-                feeLevel = mapSavedFeeToFeeLevel(fetchDefaultFeeLevel(asset)),
-                availableFeeLevels = AVAILABLE_FEE_LEVELS,
+                feeAmount = CryptoValue.zero(asset),
+                feeSelection = FeeSelection(
+                    selectedLevel = mapSavedFeeToFeeLevel(fetchDefaultFeeLevel(asset)),
+                    availableLevels = AVAILABLE_FEE_LEVELS
+                ),
                 selectedFiat = userFiat
             )
         )
@@ -64,8 +67,8 @@ open class EthOnChainTxEngine(
                 makeFeeSelectionOption(pendingTx),
                 TxConfirmationValue.FeedTotal(
                     amount = pendingTx.amount,
-                    fee = pendingTx.fees,
-                    exchangeFee = pendingTx.fees.toFiat(exchangeRates, userFiat),
+                    fee = pendingTx.feeAmount,
+                    exchangeFee = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
                     exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
                 ),
                 TxConfirmationValue.Description()
@@ -93,8 +96,8 @@ open class EthOnChainTxEngine(
     override fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
         TxConfirmationValue.FeeSelection(
             feeDetails = getFeeState(pendingTx),
-            exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
-            selectedLevel = pendingTx.feeLevel,
+            exchange = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+            selectedLevel = pendingTx.feeSelection.selectedLevel,
             availableLevels = AVAILABLE_FEE_LEVELS,
             asset = sourceAccount.asset
         )
@@ -109,13 +112,13 @@ open class EthOnChainTxEngine(
         return Singles.zip(
             sourceAccount.accountBalance.map { it as CryptoValue },
             sourceAccount.actionableBalance.map { it as CryptoValue },
-            absoluteFee(pendingTx.feeLevel)
+            absoluteFee(pendingTx.feeSelection.selectedLevel)
         ) { total, available, fees ->
             pendingTx.copy(
                 amount = amount,
                 totalBalance = total,
                 availableBalance = max(available - fees, CryptoValue.zero(asset)) as CryptoValue,
-                fees = fees
+                feeAmount = fees
             )
         }
     }
@@ -163,7 +166,7 @@ open class EthOnChainTxEngine(
             ethDataManager.createEthTransaction(
                 nonce = nonce,
                 to = targetAddress.address,
-                gasPriceWei = fees.gasPrice(pendingTx.feeLevel),
+                gasPriceWei = fees.gasPrice(pendingTx.feeSelection.selectedLevel),
                 gasLimitGwei = fees.getGasLimit(isContract),
                 weiValue = pendingTx.amount.toBigInteger()
             )
@@ -192,7 +195,7 @@ open class EthOnChainTxEngine(
     private fun validateSufficientFunds(pendingTx: PendingTx): Completable =
         Singles.zip(
             sourceAccount.actionableBalance,
-            absoluteFee(pendingTx.feeLevel)
+            absoluteFee(pendingTx.feeSelection.selectedLevel)
         ) { balance: Money, fee: Money ->
             if (fee + pendingTx.amount > balance) {
                 throw TxValidationFailure(ValidationState.INSUFFICIENT_FUNDS)

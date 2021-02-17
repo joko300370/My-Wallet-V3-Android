@@ -21,6 +21,7 @@ import org.koin.core.inject
 import org.spongycastle.util.encoders.Hex
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
@@ -95,9 +96,12 @@ class BtcOnChainTxEngine(
                 amount = CryptoValue.zero(asset),
                 totalBalance = CryptoValue.zero(asset),
                 availableBalance = CryptoValue.zero(asset),
-                fees = CryptoValue.zero(asset),
-                feeLevel = mapSavedFeeToFeeLevel(fetchDefaultFeeLevel(asset)),
-                availableFeeLevels = AVAILABLE_FEE_OPTIONS,
+                feeAmount = CryptoValue.zero(asset),
+                feeSelection = FeeSelection(
+                    selectedLevel = mapSavedFeeToFeeLevel(fetchDefaultFeeLevel(asset)),
+                    //val customAmount: Long = -1L,
+                    availableLevels = AVAILABLE_FEE_OPTIONS
+                ),
                 selectedFiat = userFiat
             )
         )
@@ -142,11 +146,11 @@ class BtcOnChainTxEngine(
     private fun getDynamicFeePerKb(pendingTx: PendingTx): Single<Pair<FeeOptions, CryptoValue>> =
         feeManager.btcFeeOptions
             .map { feeOptions ->
-                when (pendingTx.feeLevel) {
+                when (pendingTx.feeSelection.selectedLevel) {
                     FeeLevel.None -> Pair(feeOptions, CryptoValue.zero(asset))
                     FeeLevel.Regular -> Pair(feeOptions, feeToCrypto(feeOptions.regularFee))
                     FeeLevel.Priority -> Pair(feeOptions, feeToCrypto(feeOptions.priorityFee))
-                    FeeLevel.Custom -> Pair(feeOptions, feeToCrypto(pendingTx.customFeeAmount))
+                    FeeLevel.Custom -> Pair(feeOptions, feeToCrypto(pendingTx.feeSelection.customAmount))
                 }
             }.singleOrError()
 
@@ -177,7 +181,7 @@ class BtcOnChainTxEngine(
             amount = amount,
             totalBalance = balance,
             availableBalance = maxAvailable,
-            fees = CryptoValue.fromMinor(CryptoCurrency.BTC, utxoBundle.absoluteFee),
+            feeAmount = CryptoValue.fromMinor(CryptoCurrency.BTC, utxoBundle.absoluteFee),
             engineState = pendingTx.engineState
                 .copyAndPut(STATE_UTXO, utxoBundle)
                 .copyAndPut(FEE_OPTIONS, feeOptions)
@@ -198,8 +202,8 @@ class BtcOnChainTxEngine(
                     makeFeeSelectionOption(pendingTx),
                     TxConfirmationValue.FeedTotal(
                         amount = pendingTx.amount,
-                        fee = pendingTx.fees,
-                        exchangeFee = pendingTx.fees.toFiat(exchangeRates, userFiat),
+                        fee = pendingTx.feeAmount,
+                        exchangeFee = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
                         exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
                     ),
                     TxConfirmationValue.Description()
@@ -214,10 +218,10 @@ class BtcOnChainTxEngine(
     override fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
         TxConfirmationValue.FeeSelection(
             feeDetails = getFeeState(pendingTx, pendingTx.feeOptions),
-            customFeeAmount = pendingTx.customFeeAmount,
-            exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
-            selectedLevel = pendingTx.feeLevel,
-            availableLevels = AVAILABLE_FEE_OPTIONS,
+            customFeeAmount = pendingTx.feeSelection.customAmount,
+            exchange = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+            selectedLevel = pendingTx.feeSelection.selectedLevel,
+            availableLevels = pendingTx.feeSelection.availableLevels,
             feeInfo = buildFeeInfo(pendingTx),
             asset = sourceAccount.asset
         )
@@ -233,14 +237,14 @@ class BtcOnChainTxEngine(
     //  * the Tx size is over 1kB AND
     //  * the ratio of fee/amount is over 1%
     private fun isLargeTransaction(pendingTx: PendingTx): Boolean {
-        val fiatValue = pendingTx.fees.toFiat(exchangeRates, LARGE_TX_FIAT)
+        val fiatValue = pendingTx.feeAmount.toFiat(exchangeRates, LARGE_TX_FIAT)
 
         val txSize = sendDataManager.estimateSize(
             inputs = pendingTx.utxoBundle.spendableOutputs.size,
             outputs = 2 // assumes change required
         )
 
-        val relativeFee = BigDecimal(100) * (pendingTx.fees.toBigDecimal() / pendingTx.amount.toBigDecimal())
+        val relativeFee = BigDecimal(100) * (pendingTx.feeAmount.toBigDecimal() / pendingTx.amount.toBigDecimal())
         return fiatValue.toBigDecimal() > BigDecimal(LARGE_TX_FEE) &&
             txSize > LARGE_TX_SIZE &&
             relativeFee > LARGE_TX_PERCENTAGE
@@ -298,10 +302,10 @@ class BtcOnChainTxEngine(
                 throw TxValidationFailure(ValidationState.OPTION_INVALID)
             }
 
-            if (pendingTx.feeLevel == FeeLevel.Custom) {
+            if (pendingTx.feeSelection.selectedLevel == FeeLevel.Custom) {
                 when {
-                    pendingTx.customFeeAmount == -1L -> throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
-                    pendingTx.customFeeAmount < MINIMUM_CUSTOM_FEE -> throw TxValidationFailure(
+                    pendingTx.feeSelection.customAmount == -1L -> throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
+                    pendingTx.feeSelection.customAmount < MINIMUM_CUSTOM_FEE -> throw TxValidationFailure(
                         ValidationState.UNDER_MIN_LIMIT)
                 }
             }
@@ -336,7 +340,7 @@ class BtcOnChainTxEngine(
                     keys,
                     btcTarget.address,
                     changeAddress,
-                    pendingTx.fees.toBigInteger(),
+                    pendingTx.feeAmount.toBigInteger(),
                     pendingTx.amount.toBigInteger()
                 )
             )
@@ -393,4 +397,4 @@ class BtcOnChainTxEngine(
 }
 
 private val PendingTx.totalSent: Money
-    get() = amount + fees
+    get() = amount + feeAmount

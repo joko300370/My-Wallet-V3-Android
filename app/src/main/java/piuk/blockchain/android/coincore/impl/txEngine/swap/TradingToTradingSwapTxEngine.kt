@@ -7,6 +7,7 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
@@ -38,9 +39,11 @@ class TradingToTradingSwapTxEngine(
                             amount = CryptoValue.zero(sourceAccount.asset),
                             totalBalance = balance,
                             availableBalance = balance,
-                            fees = CryptoValue.zero(sourceAccount.asset),
-                            feeLevel = FeeLevel.None,
-                            availableFeeLevels = AVAILABLE_FEE_LEVELS,
+                            feeAmount = CryptoValue.zero(sourceAccount.asset),
+                            feeSelection = FeeSelection(
+                                selectedLevel = FeeLevel.None,
+                                availableLevels = AVAILABLE_FEE_LEVELS
+                            ),
                             selectedFiat = userFiat
                         )
                     ).flatMap {
@@ -52,8 +55,8 @@ class TradingToTradingSwapTxEngine(
                     amount = CryptoValue.zero(sourceAccount.asset),
                     totalBalance = CryptoValue.zero(sourceAccount.asset),
                     availableBalance = CryptoValue.zero(sourceAccount.asset),
-                    fees = CryptoValue.zero(sourceAccount.asset),
-                    feeLevel = FeeLevel.None,
+                    feeAmount = CryptoValue.zero(sourceAccount.asset),
+                    feeSelection = FeeSelection(),
                     selectedFiat = userFiat
                 )
             )
@@ -82,7 +85,7 @@ class TradingToTradingSwapTxEngine(
         level: FeeLevel,
         customFeeAmount: Long
     ): Single<PendingTx> {
-        require(pendingTx.availableFeeLevels.contains(level))
+        require(pendingTx.feeSelection.availableLevels.contains(level))
         // This engine only supports FeeLevel.None, so
         return Single.just(pendingTx)
     }

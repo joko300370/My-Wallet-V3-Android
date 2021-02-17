@@ -33,6 +33,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import kotlin.test.assertEquals
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.ValidationState
@@ -193,16 +194,15 @@ class BtcOnChainTxEngineTest {
                 it.amount == CryptoValue.zero(ASSET) &&
                     it.totalBalance == CryptoValue.zero(ASSET) &&
                     it.availableBalance == CryptoValue.zero(ASSET) &&
-                    it.fees == CryptoValue.zero(ASSET) &&
+                    it.feeAmount == CryptoValue.zero(ASSET) &&
                     it.selectedFiat == SELECTED_FIAT &&
-                    it.customFeeAmount == -1L &&
                     it.confirmations.isEmpty() &&
                     it.minLimit == null &&
                     it.maxLimit == null &&
                     it.validationState == ValidationState.UNINITIALISED &&
                     it.engineState.isEmpty()
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Regular) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
             .assertNoErrors()
             .assertComplete()
 
@@ -267,10 +267,12 @@ class BtcOnChainTxEngineTest {
             amount = CryptoValue.zero(ASSET),
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
-            fees = CryptoValue.zero(ASSET),
+            feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -284,9 +286,9 @@ class BtcOnChainTxEngineTest {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == totalSweepable &&
-                it.fees == totalFee
+                it.feeAmount == totalFee
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Regular) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
 
         verify(sourceAccount, atLeastOnce()).asset
         verify(sourceAccount).xpubAddress
@@ -357,10 +359,12 @@ class BtcOnChainTxEngineTest {
             amount = CryptoValue.zero(ASSET),
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
-            fees = CryptoValue.zero(ASSET),
+            feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Priority,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Priority,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -374,9 +378,9 @@ class BtcOnChainTxEngineTest {
                 it.amount == inputAmount &&
                     it.totalBalance == totalBalance &&
                     it.availableBalance == totalSweepable &&
-                    it.fees == totalFee
+                    it.feeAmount == totalFee
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Priority) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Priority) }
 
         verify(sourceAccount, atLeastOnce()).asset
         verify(sourceAccount).xpubAddress
@@ -449,10 +453,12 @@ class BtcOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = regularSweepable,
-            fees = regularFee,
+            feeAmount = regularFee,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -467,9 +473,9 @@ class BtcOnChainTxEngineTest {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == prioritySweepable &&
-                it.fees == priorityFee
+                it.feeAmount == priorityFee
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Priority) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Priority) }
 
         verify(sourceAccount, atLeastOnce()).asset
         verify(sourceAccount).xpubAddress
@@ -513,10 +519,12 @@ class BtcOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = regularSweepable,
-            fees = regularFee,
+            feeAmount = regularFee,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -555,10 +563,12 @@ class BtcOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = regularSweepable,
-            fees = regularFee,
+            feeAmount = regularFee,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -573,9 +583,9 @@ class BtcOnChainTxEngineTest {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == regularSweepable &&
-                it.fees == regularFee
+                it.feeAmount == regularFee
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Regular) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
 
         noMoreInteractions(sourceAccount, txTarget)
     }
@@ -637,10 +647,12 @@ class BtcOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = regularSweepable,
-            fees = regularFee,
+            feeAmount = regularFee,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -655,9 +667,9 @@ class BtcOnChainTxEngineTest {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == expectedSweepable &&
-                it.fees == expectedFee
+                it.feeAmount == expectedFee
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Custom, feeCustom) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Custom, feeCustom) }
 
         verify(sourceAccount, atLeastOnce()).asset
         verify(sourceAccount).xpubAddress
@@ -733,11 +745,13 @@ class BtcOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = customSweepable,
-            fees = initialFee,
+            feeAmount = initialFee,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Custom,
-            customFeeAmount = initialCustomFee,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Custom,
+                customAmount = initialCustomFee,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -753,9 +767,9 @@ class BtcOnChainTxEngineTest {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == expectedSweepable &&
-                it.fees == expectedFee
+                it.feeAmount == expectedFee
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Custom, feeCustom) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Custom, feeCustom) }
 
         verify(sourceAccount, atLeastOnce()).asset
         verify(sourceAccount).xpubAddress
@@ -772,11 +786,12 @@ class BtcOnChainTxEngineTest {
         noMoreInteractions(sourceAccount, txTarget)
     }
 
-    private fun verifyFeeLevels(pendingTx: PendingTx, expectedLevel: FeeLevel, customFee: Long = -1) =
-        pendingTx.feeLevel == expectedLevel &&
-            pendingTx.availableFeeLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
-            pendingTx.availableFeeLevels.contains(pendingTx.feeLevel) &&
-            pendingTx.customFeeAmount == customFee
+    private fun verifyFeeLevels(feeSelection: FeeSelection, expectedLevel: FeeLevel, customFee: Long = -1) =
+        feeSelection.selectedLevel == expectedLevel &&
+            feeSelection.availableLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
+            feeSelection.availableLevels.contains(feeSelection.selectedLevel) &&
+            feeSelection.customAmount == customFee &&
+            feeSelection.asset == CryptoCurrency.BTC
 
     private fun mockSourceAccount(
         totalBalance: Money = CryptoValue.zero(ASSET),

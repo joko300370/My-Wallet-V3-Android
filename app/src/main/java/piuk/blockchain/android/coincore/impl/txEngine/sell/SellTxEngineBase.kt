@@ -99,7 +99,7 @@ abstract class SellTxEngineBase(
                         TxConfirmationValue.To(txTarget.label),
                         TxConfirmationValue.NetworkFee(
                             txFee = TxFee(
-                                fee = pendingTx.fees,
+                                fee = pendingTx.feeAmount,
                                 type = TxFee.FeeType.DEPOSIT_FEE,
                                 asset = sourceAccount.asset
                             )
