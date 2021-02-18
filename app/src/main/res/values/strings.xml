@@ -1395,6 +1395,8 @@
     <string name="card_buying">Buying %1s</string>
     <string name="card_in_progress">%1s Buy In Progress</string>
     <string name="we_will_notify_order_complete">We’ll notify you when your order is complete.</string>
+    <string name="bank_transfer_in_progress_title">%1$s Buy Started</string>
+    <string name="bank_transfer_in_progress_blurb">We are completing your purchase now. Expect the funds to be withdrawn from your bank by %1$s. Check the status of your order at anytime in Activity.</string>
     <string name="completing_card_buy">We’re completing your purchase now.</string>
     <string name="card_purchased">%1s Purchased</string>
     <string name="card_purchased_available_now">Your %1s is now available in your Wallet.</string>
