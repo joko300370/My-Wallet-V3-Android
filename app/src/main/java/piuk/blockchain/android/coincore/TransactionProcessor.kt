@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore
 
 import androidx.annotation.CallSuper
 import androidx.annotation.VisibleForTesting
+import com.blockchain.annotations.CommonCode
 import com.blockchain.extensions.replace
 import com.blockchain.koin.payloadScope
 import com.blockchain.nabu.datamanagers.TransactionError
@@ -62,33 +63,27 @@ data class TxFee(
     }
 }
 
+data class FeeLevelRates(
+    val regularFee: Long,
+    val priorityFee: Long
+)
+
 data class FeeSelection(
-//    val feeState: FeeState? = null,
-//    val exchange: Money? = null,
     val selectedLevel: FeeLevel = FeeLevel.None,
     val customAmount: Long = -1L,
     val availableLevels: Set<FeeLevel> = setOf(FeeLevel.None),
-//    val feeInfo: FeeInfo? = null,
-    val asset: CryptoCurrency? = null //CryptoCurrency.STX // TODO: Temp while I fix tests
-) {
-    data class FeeInfo(
-        val regularFee: Long,
-        val priorityFee: Long
-    )
-}
+    val customLevelRates: FeeLevelRates? = null,
+    val feeState: FeeState? = null,
+    val asset: CryptoCurrency? = null
+)
 
 data class PendingTx(
     val amount: Money,
     val totalBalance: Money,
     val availableBalance: Money,
     val selectedFiat: String,
-
     val feeAmount: Money,
     val feeSelection: FeeSelection,
-//    val feeLevel: FeeLevel = FeeLevel.None,
-//    val customFeeAmount: Long = -1L,
-//    val availableFeeLevels: Set<FeeLevel> = setOf(FeeLevel.None),
-
     val confirmations: List<TxConfirmationValue> = emptyList(),
     val minLimit: Money? = null,
     val maxLimit: Money? = null,
@@ -173,20 +168,16 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
 
     object EstimatedWithdrawalCompletion : TxConfirmationValue(TxConfirmation.READ_ONLY)
 
+    @CommonCode("This structure is repeated in non-confirmation FEeSelection. They should be merged")
     data class FeeSelection(
         val feeDetails: FeeState? = null,
         val exchange: Money? = null,
         val selectedLevel: FeeLevel,
         val customFeeAmount: Long = -1L,
         val availableLevels: Set<FeeLevel> = emptySet(),
-        val feeInfo: FeeInfo? = null,
+        val feeInfo: FeeLevelRates? = null,
         val asset: CryptoCurrency
-    ) : TxConfirmationValue(TxConfirmation.FEE_SELECTION) {
-        data class FeeInfo(
-            val regularFee: Long,
-            val priorityFee: Long
-        )
-    }
+    ) : TxConfirmationValue(TxConfirmation.FEE_SELECTION)
 
     data class BitPayCountdown(
         val timeRemainingSecs: Long

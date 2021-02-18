@@ -21,6 +21,7 @@ import org.koin.core.inject
 import org.spongycastle.util.encoders.Hex
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeLevelRates
 import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmation
@@ -182,11 +183,21 @@ class BtcOnChainTxEngine(
             totalBalance = balance,
             availableBalance = maxAvailable,
             feeAmount = CryptoValue.fromMinor(CryptoCurrency.BTC, utxoBundle.absoluteFee),
+            feeSelection = pendingTx.feeSelection.copy(
+                customLevelRates = feeOptions.toLevelRates()
+//                    getFeeState(pendingTx, pendingTx.feeOptions),
+            ),
             engineState = pendingTx.engineState
                 .copyAndPut(STATE_UTXO, utxoBundle)
                 .copyAndPut(FEE_OPTIONS, feeOptions)
         )
     }
+
+    private fun FeeOptions.toLevelRates(): FeeLevelRates =
+        FeeLevelRates(
+            regularFee = regularFee,
+            priorityFee = priorityFee
+        )
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         validateAmounts(pendingTx)
@@ -218,18 +229,12 @@ class BtcOnChainTxEngine(
     override fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
         TxConfirmationValue.FeeSelection(
             feeDetails = getFeeState(pendingTx, pendingTx.feeOptions),
-            customFeeAmount = pendingTx.feeSelection.customAmount,
             exchange = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
             selectedLevel = pendingTx.feeSelection.selectedLevel,
             availableLevels = pendingTx.feeSelection.availableLevels,
-            feeInfo = buildFeeInfo(pendingTx),
+            customFeeAmount = pendingTx.feeSelection.customAmount,
+            feeInfo = pendingTx.feeSelection.customLevelRates,
             asset = sourceAsset
-        )
-
-    private fun buildFeeInfo(pendingTx: PendingTx): TxConfirmationValue.FeeSelection.FeeInfo =
-        TxConfirmationValue.FeeSelection.FeeInfo(
-            regularFee = pendingTx.feeOptions.regularFee,
-            priorityFee = pendingTx.feeOptions.priorityFee
         )
 
     // Returns true if bitcoin transaction is large by checking against 3 criteria:

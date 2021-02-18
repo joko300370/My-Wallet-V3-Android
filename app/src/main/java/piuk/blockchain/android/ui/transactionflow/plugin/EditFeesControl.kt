@@ -24,16 +24,15 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FeeSelection
-import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.databinding.ViewEditTxFeesCtrlBinding
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
-import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
 import piuk.blockchain.android.ui.transactionflow.flow.formatWithExchange
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.AfterTextChangedWatcher
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 
 class EditFeesControl @JvmOverloads constructor(
     ctx: Context,
@@ -48,8 +47,6 @@ class EditFeesControl @JvmOverloads constructor(
     private val analytics: TxFlowAnalytics by inject()
 
     private lateinit var textChangedWatcher: AfterTextChangedWatcher
-
-    private lateinit var customiser: EnterAmountCustomisations
 
     private val binding: ViewEditTxFeesCtrlBinding =
         ViewEditTxFeesCtrlBinding.inflate(LayoutInflater.from(context), this, true)
@@ -141,35 +138,43 @@ class EditFeesControl @JvmOverloads constructor(
         }
     }
 
-    private fun View.showFeeDetails(feeSelection: FeeSelection) {
-//        pendingTx.item.feeDetails?.let {
-//            when (it) {
-//                is FeeState.FeeUnderMinLimit -> {
-//                    setCustomFeeValues(item.customFeeAmount,
-//                        context.getString(R.string.fee_options_sat_byte_min_error))
-//                }
-//                is FeeState.FeeUnderRecommended -> {
-//                    setCustomFeeValues(item.customFeeAmount, context.getString(R.string.fee_options_fee_too_low))
-//                }
-//                is FeeState.FeeOverRecommended -> {
-//                    setCustomFeeValues(item.customFeeAmount, context.getString(R.string.fee_options_fee_too_high))
-//                }
-//                is FeeState.ValidCustomFee -> {
-//                    setCustomFeeValues(pendingTx.customFeeAmount)
-//                }
-//                is FeeState.FeeTooHigh -> {
-//                    binding.feeOptionValue.text = context.getString(R.string.send_confirmation_insufficient_fee)
-//                    binding.feeOptionValue.setTextColor(ContextCompat.getColor(context, R.color.red_600))
-//                }
-//                is FeeState.FeeDetails -> {
+    private fun showFeeDetails(feeSelection: FeeSelection) {
+        feeSelection.feeState?.let {
+            when (it) {
+                is FeeState.FeeUnderMinLimit -> {
+                    setCustomFeeValues(
+                        feeSelection.customAmount,
+                        context.getString(R.string.fee_options_sat_byte_min_error)
+                    )
+                }
+                is FeeState.FeeUnderRecommended -> {
+                    setCustomFeeValues(
+                        feeSelection.customAmount,
+                        context.getString(R.string.fee_options_fee_too_low)
+                    )
+                }
+                is FeeState.FeeOverRecommended -> {
+                    setCustomFeeValues(
+                        feeSelection.customAmount,
+                        context.getString(R.string.fee_options_fee_too_high)
+                    )
+                }
+                is FeeState.ValidCustomFee -> {
+                    setCustomFeeValues(feeSelection.customAmount)
+                }
+                is FeeState.FeeTooHigh -> {
+                    binding.feeOptionValue.text = context.getString(R.string.send_confirmation_insufficient_fee)
+                    binding.feeOptionValue.setTextColor(context.getResolvedColor(R.color.red_600))
+                }
+                is FeeState.FeeDetails -> {
 //                    binding.feeOptionValue.text = it.absoluteFee.formatWithExchange(item.exchange)
-//                    binding.feeOptionValue.setTextColor(ContextCompat.getColor(context, R.color.grey_800))
-//                }
-//            }
-//        }
+                    binding.feeOptionValue.setTextColor(context.getResolvedColor(R.color.grey_800))
+                }
+            }
+        }
     }
 
-    private fun View.setCustomFeeValues(customFee: Long, error: String = "") {
+    private fun setCustomFeeValues(customFee: Long, error: String = "") {
         with(binding) {
             if (customFee != -1L) {
                 val fee = customFee.toString()
@@ -236,7 +241,6 @@ class EditFeesControl @JvmOverloads constructor(
             id: Long
         ) {
             val newFeeLevel = posToFeeLevel(position)
-
             if (newFeeLevel == FeeLevel.Custom) {
                 showCustomFeeUi(item)
             } else {
@@ -254,12 +258,11 @@ class EditFeesControl @JvmOverloads constructor(
 
     private fun showCustomFeeUi(feeSelection: FeeSelection) =
         with(binding) {
-//            feeOptionCustomBounds.text = context.getString(
-//                R.string.fee_options_sat_byte_inline_hint,
-//                item.feeInfo?.regularFee.toString(),
-//                item.feeInfo?.priorityFee.toString()
-//            )
-//
+            feeOptionCustomBounds.text = context.getString(
+                R.string.fee_options_sat_byte_inline_hint,
+                feeSelection.customLevelRates?.regularFee.toString(),
+                feeSelection.customLevelRates?.priorityFee.toString()
+            )
             feeTypeSwitcher.displayedChild = SHOW_CUSTOM
         }
 
@@ -270,7 +273,7 @@ class EditFeesControl @JvmOverloads constructor(
     private fun sendFeeUpdate(model: TransactionModel, level: FeeLevel, customFee: Long = -1) =
         model.process(
             TransactionIntent.SetFeeLevel(
-                feeLevel = FeeLevel.Custom,
+                feeLevel = level,
                 customFeeAmount = customFee)
             )
 

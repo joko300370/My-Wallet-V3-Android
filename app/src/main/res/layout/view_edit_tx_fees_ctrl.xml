@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="@dimen/standard_margin"
     android:layout_marginEnd="@dimen/standard_margin"
     android:paddingTop="@dimen/very_small_margin"
     android:paddingBottom="@dimen/very_small_margin">
@@ -18,18 +17,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/fee_label"
-                style="@style/Text.Light.14"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/send_confirmation_fee"
-                app:layout_constraintTop_toTopOf="parent" />
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical">-->
 
             <androidx.appcompat.widget.AppCompatSpinner
                 android:id="@+id/fee_option_select_spinner"
@@ -40,7 +31,7 @@
                 android:overlapAnchor="true"
                 android:spinnerMode="dropdown"
                 app:layout_constraintTop_toBottomOf="@id/fee_option_label" />
-        </LinearLayout>
+<!--        </LinearLayout>-->
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/fee_option_label"
