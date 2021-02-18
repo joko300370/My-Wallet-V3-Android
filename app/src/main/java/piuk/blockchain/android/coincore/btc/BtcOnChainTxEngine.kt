@@ -185,12 +185,17 @@ class BtcOnChainTxEngine(
             feeAmount = CryptoValue.fromMinor(CryptoCurrency.BTC, utxoBundle.absoluteFee),
             feeSelection = pendingTx.feeSelection.copy(
                 customLevelRates = feeOptions.toLevelRates()
-//                    getFeeState(pendingTx, pendingTx.feeOptions),
             ),
             engineState = pendingTx.engineState
                 .copyAndPut(STATE_UTXO, utxoBundle)
                 .copyAndPut(FEE_OPTIONS, feeOptions)
-        )
+        ).let {
+            it.copy(
+                feeSelection = it.feeSelection.copy(
+                    feeState =   getFeeState(it, it.feeOptions)
+                )
+            )
+        }
     }
 
     private fun FeeOptions.toLevelRates(): FeeLevelRates =
