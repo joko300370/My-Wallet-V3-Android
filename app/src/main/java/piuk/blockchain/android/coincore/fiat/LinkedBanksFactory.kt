@@ -4,13 +4,12 @@ import com.blockchain.nabu.datamanagers.BankState
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import io.reactivex.Single
-import piuk.blockchain.android.coincore.SingleAccount
 
 class LinkedBanksFactory(
     val custodialWalletManager: CustodialWalletManager
 ) {
 
-    fun getAllLinkedBanks(): Single<List<SingleAccount>> =
+    fun getAllLinkedBanks(): Single<List<LinkedBankAccount>> =
         custodialWalletManager.getBanks().map { banks ->
             banks.filter {
                 it.state == BankState.ACTIVE

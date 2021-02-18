@@ -146,7 +146,7 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
             }
             amountSheetBack.setOnClickListener {
                 analyticsHooks.onStepBackClicked(state)
-                model.process(TransactionIntent.InvalidateTransaction)
+                model.process(TransactionIntent.NavigateBackFromEnterAmount)
             }
         }
 

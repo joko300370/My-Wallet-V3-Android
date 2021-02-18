@@ -15,6 +15,7 @@ import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.ui.base.mvi.MviIntent
+import java.util.Stack
 
 sealed class TransactionIntent : MviIntent<TransactionState> {
 
@@ -107,6 +108,11 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
                 currentStep = TransactionStep.SELECT_SOURCE,
                 nextEnabled = true
             ).updateBackstack(oldState)
+    }
+
+    object ClearBackStack : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(stepsBackStack = Stack())
     }
 
     object ResetFlow : TransactionIntent() {
@@ -389,6 +395,10 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
                 fiatRate = null,
                 targetRate = null
             ).updateBackstack(oldState)
+    }
+
+    object NavigateBackFromEnterAmount : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState = oldState
     }
 
     object InvalidateTransactionKeepingTarget : TransactionIntent() {

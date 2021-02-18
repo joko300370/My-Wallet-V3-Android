@@ -34,6 +34,7 @@ import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.fiat.LinkedBanksFactory
 import piuk.blockchain.android.ui.transfer.AccountsSorting
+import piuk.blockchain.androidcore.utils.extensions.mapList
 import timber.log.Timber
 
 class TransactionInteractor(
@@ -101,7 +102,8 @@ class TransactionInteractor(
         when (action) {
             AssetAction.Swap -> swapTargets(sourceAccount as CryptoAccount)
             AssetAction.Sell -> sellTargets(sourceAccount as CryptoAccount)
-            AssetAction.Withdraw -> linkedBanksFactory.getAllLinkedBanks()
+            AssetAction.FiatDeposit -> linkedBanksFactory.getNonWireTransferBanks().mapList { it }
+            AssetAction.Withdraw -> linkedBanksFactory.getAllLinkedBanks().mapList { it }
             else -> coincore.getTransactionTargets(sourceAccount as CryptoAccount, action)
         }
 
