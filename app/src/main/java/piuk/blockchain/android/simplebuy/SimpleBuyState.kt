@@ -55,8 +55,7 @@ data class SimpleBuyState(
     @Transient val paymentPending: Boolean = false,
     // we use this flag to avoid navigating back and forth, reset after navigating
     @Transient val confirmationActionRequested: Boolean = false,
-    @Transient val depositFundsRequested: Boolean = false,
-    @Transient val linkBankRequested: Boolean = false
+    @Transient val newPaymentMethodToBeAdded: PaymentMethod? = null
 ) : MviState {
 
     @delegate:Transient
@@ -219,10 +218,10 @@ data class SelectedPaymentMethod(
         if (isDefinedBank() || isDefinedCard()) id else null
 
     private fun isDefinedCard() = paymentMethodType == PaymentMethodType.PAYMENT_CARD &&
-            id != PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
+        id != PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
 
     private fun isDefinedBank() = paymentMethodType == PaymentMethodType.BANK_TRANSFER &&
-            id != PaymentMethod.UNDEFINED_BANK_TRANSFER_PAYMENT_ID
+        id != PaymentMethod.UNDEFINED_BANK_TRANSFER_PAYMENT_ID
 
     fun isActive() =
         concreteId() != null || (paymentMethodType == PaymentMethodType.FUNDS && id == PaymentMethod.FUNDS_PAYMENT_ID)

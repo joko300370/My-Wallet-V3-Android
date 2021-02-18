@@ -509,6 +509,7 @@ class LiveCustodialWalletManager(
                         }
                     } else if (
                         paymentMethod.type == PaymentMethodResponse.BANK_ACCOUNT &&
+                        paymentMethod.eligible &&
                         paymentMethod.currency?.isSupportedCurrency() == true &&
                         paymentMethod.currency == fiatCurrency
                     ) {

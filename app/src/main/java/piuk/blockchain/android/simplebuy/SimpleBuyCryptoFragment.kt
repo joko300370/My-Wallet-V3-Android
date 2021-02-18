@@ -12,6 +12,7 @@ import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.UndefinedPaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
@@ -212,35 +213,10 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             handlePostOrderCreationAction(newState)
         }
 
-        if (
-            newState.depositFundsRequested &&
-            newState.kycVerificationState != null
-        ) {
-            when (newState.kycVerificationState) {
-                // Kyc state unknown because error, or gold docs unsubmitted
-                KycState.PENDING -> {
-                    startKyc()
-                }
-                // Awaiting results state
-                KycState.IN_REVIEW,
-                KycState.UNDECIDED,
-                KycState.VERIFIED_BUT_NOT_ELIGIBLE,
-                KycState.FAILED -> {
-                    navigator().goToKycVerificationScreen()
-                }
-                // We have done kyc and are verified
-                KycState.VERIFIED_AND_ELIGIBLE -> {
-                    showBottomSheet(
-                        LinkBankAccountDetailsBottomSheet.newInstance(
-                            lastState?.fiatCurrency ?: return
-                        )
-                    )
-                }
-            }.exhaustive
-            model.process(SimpleBuyIntent.DepositFundsHandled)
+        newState.newPaymentMethodToBeAdded?.let {
+            handleNewPaymentMethodAdding(newState)
         }
 
-        checkForPossibleBankLinkingRequest(newState)
 
         newState.linkBankTransfer?.let {
             model.process(SimpleBuyIntent.ResetLinkBankTransfer)
@@ -248,6 +224,12 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                 LinkBankActivity.newInstance(it, requireContext()), LinkBankActivity.LINK_BANK_REQUEST_CODE
             )
         }
+    }
+
+    private fun handleNewPaymentMethodAdding(state: SimpleBuyState) {
+        require(state.newPaymentMethodToBeAdded is UndefinedPaymentMethod)
+        addPaymentMethod(state.newPaymentMethodToBeAdded.paymentMethodType)
+        model.process(SimpleBuyIntent.AddNewPaymentMethodHandled)
     }
 
     private fun handlePostOrderCreationAction(newState: SimpleBuyState) {
@@ -287,20 +269,6 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
      * In case that user is not VERIFIED_AND_ELIGIBLE then we just select the payment method and when
      * user presses Continue the KYC flow is launched
      */
-
-    private fun checkForPossibleBankLinkingRequest(newState: SimpleBuyState) {
-        if (newState.linkBankRequested) {
-            if (newState.kycVerificationState == KycState.VERIFIED_AND_ELIGIBLE) {
-                model.process(SimpleBuyIntent.LinkBankTransferRequested)
-            } else {
-                model.process(SimpleBuyIntent.SelectedPaymentMethodUpdate(
-                    newState.paymentOptions.availablePaymentMethods.first {
-                        it.id == PaymentMethod.UNDEFINED_BANK_TRANSFER_PAYMENT_ID
-                    }
-                ))
-            }
-        }
-    }
 
     private fun startKyc() {
         model.process(SimpleBuyIntent.NavigationHandled)
@@ -453,7 +421,6 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     }
 
     override fun onPaymentMethodChanged(paymentMethod: PaymentMethod) {
-
         model.process(SimpleBuyIntent.PaymentMethodChangeRequested(paymentMethod))
     }
 

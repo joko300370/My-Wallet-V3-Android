@@ -444,10 +444,18 @@ sealed class PaymentMethod(
     val order: Int,
     open val isEligible: Boolean
 ) : Serializable {
-    object Undefined : PaymentMethod(UNDEFINED_PAYMENT_ID, null, UNDEFINED_PAYMENT_METHOD_ORDER, true)
+    object Undefined : PaymentMethod(UNDEFINED_PAYMENT_ID, null, UNDEFINED_PAYMENT_METHOD_ORDER, true),
+        UndefinedPaymentMethod {
+        override val paymentMethodType: PaymentMethodType
+            get() = PaymentMethodType.UNKNOWN
+    }
 
     data class UndefinedCard(override val limits: PaymentLimits, override val isEligible: Boolean) :
-        PaymentMethod(UNDEFINED_CARD_PAYMENT_ID, limits, UNDEFINED_CARD_PAYMENT_METHOD_ORDER, isEligible)
+        PaymentMethod(UNDEFINED_CARD_PAYMENT_ID, limits, UNDEFINED_CARD_PAYMENT_METHOD_ORDER, isEligible),
+        UndefinedPaymentMethod {
+        override val paymentMethodType: PaymentMethodType
+            get() = PaymentMethodType.PAYMENT_CARD
+    }
 
     data class Funds(
         val balance: FiatValue,
@@ -461,10 +469,18 @@ sealed class PaymentMethod(
         override val limits: PaymentLimits,
         override val isEligible: Boolean
     ) :
-        PaymentMethod(UNDEFINED_FUNDS_PAYMENT_ID, limits, UNDEFINED_FUNDS_PAYMENT_METHOD_ORDER, isEligible)
+        PaymentMethod(UNDEFINED_FUNDS_PAYMENT_ID, limits, UNDEFINED_FUNDS_PAYMENT_METHOD_ORDER, isEligible),
+        UndefinedPaymentMethod {
+        override val paymentMethodType: PaymentMethodType
+            get() = PaymentMethodType.FUNDS
+    }
 
     data class UndefinedBankTransfer(override val limits: PaymentLimits, override val isEligible: Boolean) :
-        PaymentMethod(UNDEFINED_BANK_TRANSFER_PAYMENT_ID, limits, UNDEFINED_BANK_TRANSFER_METHOD_ORDER, isEligible)
+        PaymentMethod(UNDEFINED_BANK_TRANSFER_PAYMENT_ID, limits, UNDEFINED_BANK_TRANSFER_METHOD_ORDER, isEligible),
+        UndefinedPaymentMethod {
+        override val paymentMethodType: PaymentMethodType
+            get() = PaymentMethodType.BANK_TRANSFER
+    }
 
     data class Bank(
         val bankId: String,
@@ -539,6 +555,10 @@ sealed class PaymentMethod(
         private const val UNDEFINED_BANK_TRANSFER_METHOD_ORDER = 5
         private const val UNDEFINED_FUNDS_PAYMENT_METHOD_ORDER = 6
     }
+}
+
+interface UndefinedPaymentMethod {
+    val paymentMethodType: PaymentMethodType
 }
 
 data class PaymentLimits(val min: FiatValue, val max: FiatValue) : Serializable {

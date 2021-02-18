@@ -5,6 +5,7 @@ import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.nabu.datamanagers.BuySellOrder
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.UndefinedPaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.LinkedBankErrorState
 import com.blockchain.nabu.models.data.LinkedBankState
@@ -104,10 +105,10 @@ class SimpleBuyModel(
                 )
 
             is SimpleBuyIntent.LinkBankTransferRequested -> interactor.linkNewBank(previousState.fiatCurrency)
-                    .subscribeBy(
-                        onSuccess = { process(it) },
-                        onError = { process(SimpleBuyIntent.ErrorIntent(ErrorState.LinkedBankNotSupported)) }
-                    )
+                .subscribeBy(
+                    onSuccess = { process(it) },
+                    onError = { process(SimpleBuyIntent.ErrorIntent(ErrorState.LinkedBankNotSupported)) }
+                )
             is SimpleBuyIntent.TryToLinkABankTransfer -> {
                 interactor.eligiblePaymentMethods(previousState.fiatCurrency).map {
                     it.any { paymentMethod -> paymentMethod is PaymentMethod.UndefinedBankTransfer }
@@ -212,32 +213,12 @@ class SimpleBuyModel(
                     }
                 )
             is SimpleBuyIntent.PaymentMethodChangeRequested -> {
-                if (intent.paymentMethod.isEligible) {
-                    when (intent.paymentMethod) {
-                        is PaymentMethod.UndefinedBankTransfer -> kotlin.run {
-                            process(SimpleBuyIntent.LinkBankTransferRequested)
-                        }
-                        is PaymentMethod.UndefinedFunds -> kotlin.run {
-                            process(SimpleBuyIntent.DepositFundsRequested)
-                        }
-                        else -> kotlin.run {
-                            process(
-                                SimpleBuyIntent.SelectedPaymentMethodUpdate(intent.paymentMethod)
-                            )
-                        }
-                    }
-                } else {
-                    process(SimpleBuyIntent.SelectedPaymentMethodUpdate(intent.paymentMethod))
-
+                if (intent.paymentMethod.isEligible && intent.paymentMethod is UndefinedPaymentMethod) {
+                    process(SimpleBuyIntent.AddNewPaymentMethodRequested(intent.paymentMethod))
                 }
+                process(SimpleBuyIntent.SelectedPaymentMethodUpdate(intent.paymentMethod))
                 null
             }
-            is SimpleBuyIntent.LinkBankSelected,
-            is SimpleBuyIntent.DepositFundsRequested -> interactor.checkTierLevel()
-                .subscribeBy(
-                    onSuccess = { process(it) },
-                    onError = { process(SimpleBuyIntent.ErrorIntent()) }
-                )
             is SimpleBuyIntent.MakePayment ->
                 interactor.fetchOrder(intent.orderId)
                     .subscribeBy({
