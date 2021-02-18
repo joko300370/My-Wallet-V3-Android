@@ -395,10 +395,10 @@ class LiveCustodialWalletManager(
 
     override fun fetchSuggestedPaymentMethod(
         fiatCurrency: String,
-        sddLimits: Boolean,
+        fetchSddLimits: Boolean,
         onlyEligible: Boolean
     ): Single<List<PaymentMethod>> =
-        paymentMethods(fiatCurrency = fiatCurrency, onlyEligible = onlyEligible, fetchSdddLimits = sddLimits)
+        paymentMethods(fiatCurrency = fiatCurrency, onlyEligible = onlyEligible, fetchSdddLimits = fetchSddLimits)
 
     private val updateSupportedCards: (List<PaymentMethodResponse>) -> Unit = { paymentMethods ->
         val cardTypes =
