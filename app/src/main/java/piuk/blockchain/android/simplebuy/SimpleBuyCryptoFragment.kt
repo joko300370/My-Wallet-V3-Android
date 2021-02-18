@@ -453,27 +453,8 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     }
 
     override fun onPaymentMethodChanged(paymentMethod: PaymentMethod) {
-        when (paymentMethod) {
-        if(paymentMethod.isEligible && paymentMethod.canBeAdded()){
-            //go and add this method
-        }else {
-            // select this payment method and wait until order creation
-        }
-        /* is PaymentMethod.UndefinedFunds -> depositFundsSelected()
-            is PaymentMethod.UndefinedBankTransfer -> linkBankSelected()
-            else -> {
-                model.process(SimpleBuyIntent.SelectedPaymentMethodUpdate(paymentMethod))
-                analytics.logEvent(
-                    PaymentMethodSelected(
-                        paymentMethod.toAnalyticsString()
-                    )
-                )
-            }*/
-        }
-    }
 
-    private fun linkBankSelected() {
-        model.process(SimpleBuyIntent.LinkBankSelected)
+        model.process(SimpleBuyIntent.PaymentMethodChangeRequested(paymentMethod))
     }
 
     private fun addPaymentMethod(type: PaymentMethodType) {
@@ -496,10 +477,6 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             }
         }
         analytics.logEvent(PaymentMethodSelected(type.toAnalyticsString()))
-    }
-
-    private fun depositFundsSelected() {
-        model.process(SimpleBuyIntent.DepositFundsRequested)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

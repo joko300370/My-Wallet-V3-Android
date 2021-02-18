@@ -1,5 +1,6 @@
 package piuk.blockchain.android.simplebuy
 
+import com.blockchain.nabu.datamanagers.Bank
 import com.blockchain.nabu.datamanagers.BuySellOrder
 import com.blockchain.nabu.datamanagers.BuySellPairs
 import com.blockchain.nabu.datamanagers.CustodialQuote
@@ -54,6 +55,10 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     class ExchangeRateUpdated(private val price: FiatValue) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(exchangePrice = price)
+    }
+
+    class PaymentMethodChangeRequested(val paymentMethod: PaymentMethod) : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState
     }
 
     class PaymentMethodsUpdated(

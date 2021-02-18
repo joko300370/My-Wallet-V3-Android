@@ -103,24 +103,11 @@ class SimpleBuyModel(
                     onError = { process(SimpleBuyIntent.ErrorIntent()) }
                 )
 
-            is SimpleBuyIntent.LinkBankTransferRequested -> {
-                interactor.userIsEligibleToLinkABank(previousState.fiatCurrency).flatMap {
-                    if (it) {
-                        interactor.linkNewBank(previousState.fiatCurrency)
-                    } else {
-                        Single.just(SimpleBuyIntent.SelectedPaymentMethodUpdate(
-                            previousState.paymentOptions.availablePaymentMethods.first { paymentMethod ->
-                                paymentMethod.id == PaymentMethod.UNDEFINED_BANK_TRANSFER_PAYMENT_ID
-                            }
-                        ))
-                    }
-                }
+            is SimpleBuyIntent.LinkBankTransferRequested -> interactor.linkNewBank(previousState.fiatCurrency)
                     .subscribeBy(
                         onSuccess = { process(it) },
                         onError = { process(SimpleBuyIntent.ErrorIntent(ErrorState.LinkedBankNotSupported)) }
                     )
-            }
-
             is SimpleBuyIntent.TryToLinkABankTransfer -> {
                 interactor.eligiblePaymentMethods(previousState.fiatCurrency).map {
                     it.any { paymentMethod -> paymentMethod is PaymentMethod.UndefinedBankTransfer }
@@ -224,6 +211,27 @@ class SimpleBuyModel(
                         process(SimpleBuyIntent.ErrorIntent())
                     }
                 )
+            is SimpleBuyIntent.PaymentMethodChangeRequested -> {
+                if (intent.paymentMethod.isEligible) {
+                    when (intent.paymentMethod) {
+                        is PaymentMethod.UndefinedBankTransfer -> kotlin.run {
+                            process(SimpleBuyIntent.LinkBankTransferRequested)
+                        }
+                        is PaymentMethod.UndefinedFunds -> kotlin.run {
+                            process(SimpleBuyIntent.DepositFundsRequested)
+                        }
+                        else -> kotlin.run {
+                            process(
+                                SimpleBuyIntent.SelectedPaymentMethodUpdate(intent.paymentMethod)
+                            )
+                        }
+                    }
+                } else {
+                    process(SimpleBuyIntent.SelectedPaymentMethodUpdate(intent.paymentMethod))
+
+                }
+                null
+            }
             is SimpleBuyIntent.LinkBankSelected,
             is SimpleBuyIntent.DepositFundsRequested -> interactor.checkTierLevel()
                 .subscribeBy(
