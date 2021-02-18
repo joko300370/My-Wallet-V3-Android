@@ -901,7 +901,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
     override fun showDialogVerifySms() {
         val editText = AppCompatEditText(settingsActivity)
-        editText.setSingleLine(true)
+        editText.isSingleLine = true
 
         val dialog = AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
             .setTitle(R.string.verify_mobile)
