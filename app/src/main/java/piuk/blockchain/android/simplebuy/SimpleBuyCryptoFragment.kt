@@ -217,7 +217,6 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             handleNewPaymentMethodAdding(newState)
         }
 
-
         newState.linkBankTransfer?.let {
             model.process(SimpleBuyIntent.ResetLinkBankTransfer)
             startActivityForResult(

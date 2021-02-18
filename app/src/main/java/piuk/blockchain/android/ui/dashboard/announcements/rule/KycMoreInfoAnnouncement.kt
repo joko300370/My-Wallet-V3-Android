@@ -1,7 +1,6 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import androidx.annotation.VisibleForTesting
-import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.service.TierService
 import io.reactivex.Single

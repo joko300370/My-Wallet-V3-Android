@@ -4,7 +4,6 @@ import com.blockchain.preferences.RatingPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.nabu.datamanagers.BuySellOrder
 import com.blockchain.nabu.datamanagers.OrderState
-import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.UndefinedPaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.LinkedBankErrorState
@@ -13,7 +12,6 @@ import com.blockchain.nabu.models.responses.simplebuy.EverypayPaymentAttrs
 import com.google.gson.Gson
 import io.reactivex.Completable
 import io.reactivex.Scheduler
-import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.cards.partners.CardActivator

@@ -1,12 +1,9 @@
 package piuk.blockchain.android.simplebuy
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import com.blockchain.koin.scopedInject
-import com.blockchain.nabu.datamanagers.PaymentMethod
-import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.BankPartner
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.YodleeAttributes
@@ -19,7 +16,6 @@ import kotlinx.android.synthetic.main.fragment_activity.*
 import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
-import piuk.blockchain.android.cards.CardDetailsActivity
 import piuk.blockchain.android.ui.linkbank.yodlee.LinkBankFragment
 import piuk.blockchain.android.ui.linkbank.yodlee.YodleeSplashFragment
 import piuk.blockchain.android.ui.linkbank.yodlee.YodleeWebViewFragment

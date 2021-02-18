@@ -461,7 +461,7 @@ sealed class PaymentMethod(
         val balance: FiatValue,
         val fiatCurrency: String,
         override val limits: PaymentLimits,
-        override val isEligible: Boolean,
+        override val isEligible: Boolean
     ) : PaymentMethod(FUNDS_PAYMENT_ID, limits, FUNDS_PAYMENT_METHOD_ORDER, isEligible)
 
     data class UndefinedFunds(

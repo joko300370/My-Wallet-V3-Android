@@ -136,7 +136,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
             oldState.copy(confirmationActionRequested = true, orderState = OrderState.INITIALISED)
     }
 
-      object LinkBankTransferRequested : SimpleBuyIntent() {
+    object LinkBankTransferRequested : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState.copy(
             newPaymentMethodToBeAdded = null
         )

@@ -241,8 +241,7 @@ class NabuService(retrofit: Retrofit) {
     ).wrapErrorMessage()
 
     internal fun isSDDEligible(): Single<SDDEligibilityResponse> =
-        service.isSDDEligible(
-        ).wrapErrorMessage()
+        service.isSDDEligible().wrapErrorMessage()
 
     internal fun isSDDVerified(sessionToken: NabuSessionTokenResponse): Single<SDDStatusResponse> =
         service.isSDDVerified(
