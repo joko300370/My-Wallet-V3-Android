@@ -110,8 +110,8 @@ class SimpleBuyModel(
                     onError = { process(SimpleBuyIntent.ErrorIntent(ErrorState.LinkedBankNotSupported)) }
                 )
             is SimpleBuyIntent.TryToLinkABankTransfer -> {
-                interactor.eligiblePaymentMethods(previousState.fiatCurrency).map {
-                    it.any { paymentMethod -> paymentMethod is PaymentMethod.UndefinedBankTransfer }
+                interactor.eligiblePaymentMethodsTypes(previousState.fiatCurrency).map {
+                    it.any { paymentMethod -> paymentMethod.paymentMethodType == PaymentMethodType.BANK_TRANSFER }
                 }.subscribeBy(
                     onSuccess = { isEligibleToLinkABank ->
                         if (isEligibleToLinkABank) {
@@ -215,8 +215,9 @@ class SimpleBuyModel(
             is SimpleBuyIntent.PaymentMethodChangeRequested -> {
                 if (intent.paymentMethod.isEligible && intent.paymentMethod is UndefinedPaymentMethod) {
                     process(SimpleBuyIntent.AddNewPaymentMethodRequested(intent.paymentMethod))
+                } else {
+                    process(SimpleBuyIntent.SelectedPaymentMethodUpdate(intent.paymentMethod))
                 }
-                process(SimpleBuyIntent.SelectedPaymentMethodUpdate(intent.paymentMethod))
                 null
             }
             is SimpleBuyIntent.MakePayment ->

@@ -359,7 +359,7 @@ class LiveCustodialWalletManager(
         fiatCurrency: String
     ): Completable =
         authenticator.authenticate {
-            nabuService.paymentMethods(it, fiatCurrency, true).doOnSuccess { paymentMethods ->
+            paymentMethods(it, fiatCurrency, true).doOnSuccess { paymentMethods ->
                 updateSupportedCards(paymentMethods)
             }
         }.ignoreElement()
@@ -398,7 +398,7 @@ class LiveCustodialWalletManager(
         sddLimits: Boolean,
         onlyEligible: Boolean
     ): Single<List<PaymentMethod>> =
-        paymentMethods(fiatCurrency = fiatCurrency, onlyEligible = onlyEligible, sddLimits = sddLimits)
+        paymentMethods(fiatCurrency = fiatCurrency, onlyEligible = onlyEligible, fetchSdddLimits = sddLimits)
 
     private val updateSupportedCards: (List<PaymentMethodResponse>) -> Unit = { paymentMethods ->
         val cardTypes =
@@ -413,12 +413,12 @@ class LiveCustodialWalletManager(
     private fun getSupportedPaymentMethods(
         sessionTokenResponse: NabuSessionTokenResponse,
         fiatCurrency: String,
-        sddLimits: Boolean,
+        shouldFetchSddLimits: Boolean,
         onlyEligible: Boolean
-    ) = nabuService.paymentMethods(
+    ) = paymentMethods(
         sessionToken = sessionTokenResponse,
         currency = fiatCurrency,
-        tier = if (sddLimits) SDD_ELIGIBLE_TIER else null,
+        shouldFetchSddLimits = shouldFetchSddLimits,
         eligibleOnly = onlyEligible
     ).map { methods ->
         methods.filter { method -> method.eligible || !onlyEligible }
@@ -446,7 +446,7 @@ class LiveCustodialWalletManager(
         }.first()
     }
 
-    private fun paymentMethods(fiatCurrency: String, onlyEligible: Boolean, sddLimits: Boolean = false) =
+    private fun paymentMethods(fiatCurrency: String, onlyEligible: Boolean, fetchSdddLimits: Boolean = false) =
         authenticator.authenticate {
             Singles.zip(
                 assetBalancesRepository.getTotalBalanceForAsset(fiatCurrency)
@@ -459,7 +459,7 @@ class LiveCustodialWalletManager(
                     sessionTokenResponse = it,
                     fiatCurrency = fiatCurrency,
                     onlyEligible = onlyEligible,
-                    sddLimits = sddLimits
+                    shouldFetchSddLimits = fetchSdddLimits
                 )
             ) { custodialFiatBalance, cardsResponse, linkedBanks, paymentMethods ->
                 val availablePaymentMethods = mutableListOf<PaymentMethod>()
@@ -583,7 +583,7 @@ class LiveCustodialWalletManager(
 
     override fun getEligiblePaymentMethodTypes(fiatCurrency: String): Single<List<EligiblePaymentMethodType>> =
         authenticator.authenticate {
-            nabuService.paymentMethods(
+            paymentMethods(
                 sessionToken = it,
                 currency = fiatCurrency,
                 eligibleOnly = true
@@ -752,7 +752,7 @@ class LiveCustodialWalletManager(
     ): Single<List<String>> {
 
         return authenticator.authenticate {
-            nabuService.paymentMethods(it, fiatCurrency, true)
+            paymentMethods(it, fiatCurrency, true)
         }.map { methods ->
             methods.filter {
                 it.type.toPaymentMethodType() == PaymentMethodType.FUNDS &&
@@ -765,7 +765,7 @@ class LiveCustodialWalletManager(
 
     private fun getSupportedCurrenciesForBankTransactions(fiatCurrency: String): Single<List<String>> {
         return authenticator.authenticate {
-            nabuService.paymentMethods(it, fiatCurrency, true)
+            paymentMethods(it, fiatCurrency, true)
         }.map { methods ->
             methods.filter {
                 (it.type == PaymentMethodResponse.BANK_ACCOUNT || it.type == PaymentMethodResponse.BANK_TRANSFER) &&
@@ -774,6 +774,27 @@ class LiveCustodialWalletManager(
                 it.currency
             }
         }
+    }
+
+    /**
+     * Returns a list of the available payment methods. [shouldFetchSddLimits] if true, then the responded
+     * payment methods will contain the limits for SDD user. We use this argument only if we want to get back
+     * these limits. To achieve back-words compatibility with the other platforms we had to use
+     * a flag called visible (instead of not returning the corresponding payment methods at all.
+     * Any payment method with the flag visible=false should be discarded.
+     */
+    private fun paymentMethods(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String,
+        eligibleOnly: Boolean,
+        shouldFetchSddLimits: Boolean = false
+    ) = nabuService.paymentMethods(
+        sessionToken = sessionToken,
+        currency = currency,
+        eligibleOnly = eligibleOnly,
+        tier = if (shouldFetchSddLimits) SDD_ELIGIBLE_TIER else null
+    ).map {
+        it.filter { paymentMethod -> paymentMethod.visible }
     }
 
     override fun canTransactWithBankMethods(fiatCurrency: String): Single<Boolean> {

@@ -230,6 +230,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         require(state.newPaymentMethodToBeAdded is UndefinedPaymentMethod)
         addPaymentMethod(state.newPaymentMethodToBeAdded.paymentMethodType)
         model.process(SimpleBuyIntent.AddNewPaymentMethodHandled)
+        model.process(SimpleBuyIntent.SelectedPaymentMethodUpdate(state.newPaymentMethodToBeAdded))
     }
 
     private fun handlePostOrderCreationAction(newState: SimpleBuyState) {

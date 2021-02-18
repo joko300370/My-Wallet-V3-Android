@@ -236,9 +236,9 @@ class SimpleBuyInteractor(
                 CardIntent.CardUpdated(it.value)
             }
 
-    fun eligiblePaymentMethods(fiatCurrency: String): Single<List<PaymentMethod>> =
-        custodialWalletManager.fetchSuggestedPaymentMethod(
-            fiatCurrency = fiatCurrency, sddLimits = false, onlyEligible = true
+    fun eligiblePaymentMethodsTypes(fiatCurrency: String): Single<List<EligiblePaymentMethodType>> =
+        custodialWalletManager.getEligiblePaymentMethodTypes(
+            fiatCurrency = fiatCurrency
         )
 
     fun fetchOrder(orderId: String) = custodialWalletManager.getBuyOrder(orderId)

@@ -20,6 +20,7 @@ data class AgentResponse(val account: String)
 data class PaymentMethodResponse(
     val type: String,
     val eligible: Boolean,
+    val visible: Boolean,
     val limits: Limits,
     val subTypes: List<String>?,
     val currency: String?
