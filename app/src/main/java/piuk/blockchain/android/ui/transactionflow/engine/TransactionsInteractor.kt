@@ -102,6 +102,7 @@ class TransactionInteractor(
         when (action) {
             AssetAction.Swap -> swapTargets(sourceAccount as CryptoAccount)
             AssetAction.Sell -> sellTargets(sourceAccount as CryptoAccount)
+            AssetAction.FiatDeposit -> linkedBanksFactory.getNonWireTransferBanks().mapList { it }
             AssetAction.Withdraw -> linkedBanksFactory.getAllLinkedBanks().mapList { it }
             else -> coincore.getTransactionTargets(sourceAccount as CryptoAccount, action)
         }
