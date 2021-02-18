@@ -83,7 +83,7 @@ object Versions {
     const val charts = "3.1.0"
     const val circleIndicator = "1.2.2"
     const val bottomNav = "2.2.0"
-    const val countryPicker = "1.1.7"
+    const val countryPicker = "2.0.4"
 
     // zxing 3.4.0 crashes with:
     //      "java.lang.NoSuchMethodError. No interface method sort(Ljava/util/Comparator;)V in class Ljava/util/List;"
