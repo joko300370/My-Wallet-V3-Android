@@ -96,12 +96,6 @@ class SimpleBuyModel(
                 onError = { process(SimpleBuyIntent.ErrorIntent()) }
             )
 
-            is SimpleBuyIntent.BuyButtonClicked -> interactor.checkTierLevel()
-                .subscribeBy(
-                    onSuccess = { process(it) },
-                    onError = { process(SimpleBuyIntent.ErrorIntent()) }
-                )
-
             is SimpleBuyIntent.LinkBankTransferRequested -> interactor.linkNewBank(previousState.fiatCurrency)
                 .subscribeBy(
                     onSuccess = { process(it) },
@@ -249,9 +243,9 @@ class SimpleBuyModel(
                 previousState.id ?: throw IllegalStateException("Order Id not available")
             ).subscribeBy(
                 onSuccess = {
-                    if (it.state == OrderState.FINISHED)
-                        process(SimpleBuyIntent.CardPaymentSucceeded)
-                    else if (it.state == OrderState.AWAITING_FUNDS || it.state == OrderState.PENDING_EXECUTION) {
+                    if (it.state == OrderState.FINISHED) {
+                        process(SimpleBuyIntent.PaymentSucceeded)
+                    } else if (it.state == OrderState.AWAITING_FUNDS || it.state == OrderState.PENDING_EXECUTION) {
                         process(SimpleBuyIntent.CardPaymentPending)
                     } else process(SimpleBuyIntent.ErrorIntent())
                 },
@@ -259,6 +253,16 @@ class SimpleBuyModel(
                     process(SimpleBuyIntent.ErrorIntent())
                 }
             )
+            is SimpleBuyIntent.PaymentSucceeded -> {
+                interactor.checkTierLevel().map { it.kycState != KycState.VERIFIED_AND_ELIGIBLE }.subscribeBy(
+                    onSuccess = {
+                        process(SimpleBuyIntent.UnlockHigherLimits)
+                    },
+                    onError = {
+                        process(SimpleBuyIntent.ErrorIntent())
+                    }
+                )
+            }
             is SimpleBuyIntent.AppRatingShown -> {
                 ratingPrefs.hasSeenRatingDialog = true
                 null

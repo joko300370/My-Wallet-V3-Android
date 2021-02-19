@@ -86,7 +86,8 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
                     selectedPaymentMethodId,
                     (selectedPaymentMethod as? PaymentMethod.Card)?.partner,
                     selectedPaymentMethod?.detailedLabel() ?: "",
-                    type
+                    type,
+                    selectedPaymentMethod?.isEligible ?: false
                 ),
                 paymentOptions = PaymentOptions(
                     availablePaymentMethods = availablePaymentMethods,
@@ -121,7 +122,8 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
                         is PaymentMethod.Funds -> PaymentMethodType.FUNDS
                         is PaymentMethod.UndefinedFunds -> PaymentMethodType.FUNDS
                         else -> PaymentMethodType.PAYMENT_CARD
-                    }
+                    },
+                    paymentMethod.isEligible
                 )
             )
     }
@@ -162,7 +164,8 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
                 selectedPaymentMethod = SelectedPaymentMethod(
                     id = linkedBank.id,
                     paymentMethodType = PaymentMethodType.BANK_TRANSFER,
-                    label = linkedBank.name
+                    label = linkedBank.name,
+                    isEligible = true
                 )
             )
     }
@@ -398,14 +401,14 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
             oldState.copy(showRating = false)
     }
 
-    class UpdateSelectedPaymentMethod(
+    class UpdateSelectedPaymentCard(
         private val id: String,
         private val label: String?,
-        private val partner: Partner?,
-        private val type: PaymentMethodType
+        private val partner: Partner,
+        private val isEligible: Boolean
     ) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(selectedPaymentMethod = SelectedPaymentMethod(id, partner, label, type))
+            oldState.copy(selectedPaymentMethod = SelectedPaymentMethod(id, partner, label, PaymentMethodType.PAYMENT_CARD, isEligible))
     }
 
     object ClearError : SimpleBuyIntent() {
@@ -444,9 +447,14 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
             oldState.copy(isLoading = true)
     }
 
-    object CardPaymentSucceeded : SimpleBuyIntent() {
+    object PaymentSucceeded : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(paymentSucceeded = true, isLoading = false)
+    }
+
+    object UnlockHigherLimits: SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
+            oldState.copy(shouldShowUnlockHigherFunds = true)
     }
 
     object CardPaymentPending : SimpleBuyIntent() {

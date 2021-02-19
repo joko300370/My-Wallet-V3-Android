@@ -235,8 +235,11 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     private fun handlePostOrderCreationAction(newState: SimpleBuyState) {
         if (newState.selectedPaymentMethod?.isActive() == true) {
             navigator().goToCheckOutScreen()
+        } else if (newState.selectedPaymentMethod?.isEligible == true) {
+            addPaymentMethod(newState.selectedPaymentMethod.paymentMethodType)
         } else {
             require(newState.kycVerificationState != null)
+            require(newState.kycVerificationState != KycState.VERIFIED_AND_ELIGIBLE)
             when (newState.kycVerificationState) {
                 // Kyc state unknown because error, or gold docs unsubmitted
                 KycState.PENDING -> {
@@ -252,12 +255,9 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                 KycState.FAILED -> {
                     navigator().goToKycVerificationScreen()
                 }
-                // We have done kyc and are verified
-                KycState.VERIFIED_AND_ELIGIBLE -> {
-                    newState.selectedPaymentMethod?.paymentMethodType?.let {
-                        goToAddNewPaymentMethod(it)
-                    }
-                }
+                KycState.VERIFIED_AND_ELIGIBLE -> throw IllegalStateException(
+                    "User cannot be eligible without having an active or an eligible payment method"
+                )
             }.exhaustive
         }
     }
