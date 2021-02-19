@@ -89,7 +89,6 @@ object Versions {
     //      "java.lang.NoSuchMethodError. No interface method sort(Ljava/util/Comparator;)V in class Ljava/util/List;"
     // List.sort() is not available on Android SDK < 24 so DO NOT UPGRADE until project target min is 24
     const val zxing = "3.3.0"
-    const val wheelPicker = "1.1.2"
     const val materialDatePicker = "3.6.4"
     const val sparkline = "1.2.0"
 
@@ -226,7 +225,6 @@ object Libraries {
     const val bottomNav = "com.aurelhubert:ahbottomnavigation:${Versions.bottomNav}"
     const val countryPicker = "com.github.mukeshsolanki:country-picker-android:${Versions.countryPicker}"
     const val zxing = "com.google.zxing:core:${Versions.zxing}"
-    const val wheelPicker = "cn.aigestudio.wheelpicker:WheelPicker:${Versions.wheelPicker}"
     const val materialDatePicker = "com.wdullaer:materialdatetimepicker:${Versions.materialDatePicker}"
     const val sparkline = "com.robinhood.spark:spark:${Versions.sparkline}"
 

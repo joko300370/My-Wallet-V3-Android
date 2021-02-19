@@ -88,4 +88,6 @@ interface SettingsView : View {
     fun launchKycFlow()
 
     fun linkBankWithPartner(linkBankTransfer: LinkBankTransfer)
+
+    fun showRateUsPreference()
 }

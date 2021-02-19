@@ -104,14 +104,14 @@ import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
+import java.util.Calendar
 import java.util.Locale
 import kotlin.math.roundToInt
 
 class SettingsFragment : PreferenceFragmentCompat(),
     SettingsView,
     RemovePaymentMethodBottomSheetHost,
-    BankLinkingHost,
-    ReviewHost {
+    BankLinkingHost {
 
     // Profile
     private val kycStatusPref by lazy {
@@ -307,12 +307,17 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
         // App
         findPreference<Preference>("about")?.apply {
-            summary = "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) ${BuildConfig.COMMIT_HASH}"
-            onClick { onAboutClicked() }
+            summary = getString(
+                R.string.about,
+                "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) ${BuildConfig.COMMIT_HASH}",
+                Calendar.getInstance().get(Calendar.YEAR).toString()
+            )
         }
 
         findPreference<Preference>("tos").onClick { onTosClicked() }
         findPreference<Preference>("privacy").onClick { onPrivacyClicked() }
+
+        settingsPresenter.checkShouldDisplayRateUs()
 
         val disableRootWarningPref = findPreference<Preference>(PersistentPrefs.KEY_ROOT_WARNING_DISABLED)
         if (disableRootWarningPref != null && !RootUtil().isDeviceRooted) {
@@ -329,6 +334,22 @@ class SettingsFragment : PreferenceFragmentCompat(),
                 settingsPresenter.onTwoStepVerificationRequested()
             intent.hasExtra(EXTRA_SHOW_ADD_EMAIL_DIALOG) ->
                 settingsPresenter.onEmailShowRequested()
+        }
+    }
+
+    override fun showRateUsPreference() {
+        findPreference<Preference>("rate_app")?.apply {
+            isVisible = true
+            onClick {
+                reviewInfo?.let {
+                    reviewManager.launchReviewFlow(activity, reviewInfo).addOnFailureListener {
+                        analytics.logEvent(ReviewAnalytics.LAUNCH_REVIEW_FAILURE)
+                        goToPlayStore()
+                    }.addOnCompleteListener {
+                        analytics.logEvent(ReviewAnalytics.LAUNCH_REVIEW_SUCCESS)
+                    }
+                } ?: goToPlayStore()
+            }
         }
     }
 
@@ -356,17 +377,6 @@ class SettingsFragment : PreferenceFragmentCompat(),
             ToastCustom.LENGTH_SHORT,
             ToastCustom.TYPE_ERROR
         )
-    }
-
-    override fun showReviewDialog() {
-        reviewInfo?.let {
-            reviewManager.launchReviewFlow(activity, reviewInfo).addOnFailureListener {
-                analytics.logEvent(ReviewAnalytics.LAUNCH_REVIEW_FAILURE)
-                goToPlayStore()
-            }.addOnCompleteListener {
-                analytics.logEvent(ReviewAnalytics.LAUNCH_REVIEW_SUCCESS)
-            }
-        } ?: goToPlayStore()
     }
 
     private fun goToPlayStore() {
@@ -753,10 +763,6 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
     private fun onBackupClicked() {
         BackupWalletActivity.start(requireContext())
-    }
-
-    private fun onAboutClicked() {
-        AboutDialog().show(childFragmentManager, "ABOUT_DIALOG")
     }
 
     private fun onTosClicked() {

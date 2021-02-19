@@ -70,6 +70,7 @@
     <string name="options_id">Wallet ID</string>
 
     <string name="preferences_about_title">About Us</string>
+    <string name="preferences_rate_app">Rate the App</string>
 
     <string name="logout_wallet">Log Out</string>
     <string name="ask_you_sure_logout">Are you sure you want to log out from this wallet?</string>
