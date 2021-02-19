@@ -56,9 +56,7 @@ import piuk.blockchain.androidcore.data.settings.PhoneNumberUpdater
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.data.settings.SettingsEmailAndSyncUpdater
 import piuk.blockchain.androidcore.data.settings.SettingsPhoneNumberUpdater
-import piuk.blockchain.androidcore.data.settings.SettingsPhoneVerificationQuery
 import piuk.blockchain.androidcore.data.settings.SettingsService
-import piuk.blockchain.androidcore.data.settings.applyFlag
 import piuk.blockchain.androidcore.data.settings.datastore.SettingsDataStore
 import piuk.blockchain.androidcore.data.settings.datastore.SettingsMemoryStore
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
@@ -157,8 +155,6 @@ val coreModule = module {
         factory { LastTxUpdateDateOnSettingsService(get()) }.bind(LastTxUpdater::class)
 
         factory { SendDataManager(get(), get(), get()) }
-
-        factory { SettingsPhoneVerificationQuery(get()).applyFlag(get(smsVerifFeatureFlag)) }
 
         factory { SettingsPhoneNumberUpdater(get()) }.bind(PhoneNumberUpdater::class)
 

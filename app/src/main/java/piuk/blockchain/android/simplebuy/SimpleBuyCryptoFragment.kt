@@ -12,6 +12,7 @@ import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.UndefinedPaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
@@ -21,6 +22,7 @@ import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.synthetic.main.fragment_simple_buy_buy_crypto.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.cards.CardDetailsActivity
 import piuk.blockchain.android.cards.CardDetailsActivity.Companion.ADD_CARD_REQUEST_CODE
 import piuk.blockchain.android.cards.icon
@@ -31,6 +33,7 @@ import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
 import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
+import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.linkbank.LinkBankActivity
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.drawableResFilled
@@ -207,6 +210,33 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             newState.kycVerificationState != null &&
             newState.orderState == OrderState.PENDING_CONFIRMATION
         ) {
+            handlePostOrderCreationAction(newState)
+        }
+
+        newState.newPaymentMethodToBeAdded?.let {
+            handleNewPaymentMethodAdding(newState)
+        }
+
+        newState.linkBankTransfer?.let {
+            model.process(SimpleBuyIntent.ResetLinkBankTransfer)
+            startActivityForResult(
+                LinkBankActivity.newInstance(it, requireContext()), LinkBankActivity.LINK_BANK_REQUEST_CODE
+            )
+        }
+    }
+
+    private fun handleNewPaymentMethodAdding(state: SimpleBuyState) {
+        require(state.newPaymentMethodToBeAdded is UndefinedPaymentMethod)
+        addPaymentMethod(state.newPaymentMethodToBeAdded.paymentMethodType)
+        model.process(SimpleBuyIntent.AddNewPaymentMethodHandled)
+        model.process(SimpleBuyIntent.SelectedPaymentMethodUpdate(state.newPaymentMethodToBeAdded))
+    }
+
+    private fun handlePostOrderCreationAction(newState: SimpleBuyState) {
+        if (newState.selectedPaymentMethod?.isActive() == true) {
+            navigator().goToCheckOutScreen()
+        } else {
+            require(newState.kycVerificationState != null)
             when (newState.kycVerificationState) {
                 // Kyc state unknown because error, or gold docs unsubmitted
                 KycState.PENDING -> {
@@ -224,51 +254,11 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                 }
                 // We have done kyc and are verified
                 KycState.VERIFIED_AND_ELIGIBLE -> {
-                    if (newState.selectedPaymentMethod?.isActive() == true) {
-                        navigator().goToCheckOutScreen()
-                    } else
-                        newState.selectedPaymentMethod?.paymentMethodType?.let {
-                            goToAddNewPaymentMethod(it)
-                        }
+                    newState.selectedPaymentMethod?.paymentMethodType?.let {
+                        goToAddNewPaymentMethod(it)
+                    }
                 }
             }.exhaustive
-        }
-
-        if (
-            newState.depositFundsRequested &&
-            newState.kycVerificationState != null
-        ) {
-            when (newState.kycVerificationState) {
-                // Kyc state unknown because error, or gold docs unsubmitted
-                KycState.PENDING -> {
-                    startKyc()
-                }
-                // Awaiting results state
-                KycState.IN_REVIEW,
-                KycState.UNDECIDED,
-                KycState.VERIFIED_BUT_NOT_ELIGIBLE,
-                KycState.FAILED -> {
-                    navigator().goToKycVerificationScreen()
-                }
-                // We have done kyc and are verified
-                KycState.VERIFIED_AND_ELIGIBLE -> {
-                    showBottomSheet(
-                        LinkBankAccountDetailsBottomSheet.newInstance(
-                            lastState?.fiatCurrency ?: return
-                        )
-                    )
-                }
-            }.exhaustive
-            model.process(SimpleBuyIntent.DepositFundsHandled)
-        }
-
-        checkForPossibleBankLinkingRequest(newState)
-
-        newState.linkBankTransfer?.let {
-            model.process(SimpleBuyIntent.ResetLinkBankTransfer)
-            startActivityForResult(
-                LinkBankActivity.newInstance(it, requireContext()), LinkBankActivity.LINK_BANK_REQUEST_CODE
-            )
         }
     }
 
@@ -280,25 +270,11 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
      * user presses Continue the KYC flow is launched
      */
 
-    private fun checkForPossibleBankLinkingRequest(newState: SimpleBuyState) {
-        if (newState.linkBankRequested) {
-            if (newState.kycVerificationState == KycState.VERIFIED_AND_ELIGIBLE) {
-                model.process(SimpleBuyIntent.LinkBankTransferRequested)
-            } else {
-                model.process(SimpleBuyIntent.SelectedPaymentMethodUpdate(
-                    newState.paymentOptions.availablePaymentMethods.first {
-                        it.id == PaymentMethod.UNDEFINED_BANK_TRANSFER_PAYMENT_ID
-                    }
-                ))
-            }
-        }
-    }
-
     private fun startKyc() {
         model.process(SimpleBuyIntent.NavigationHandled)
         model.process(SimpleBuyIntent.KycStarted)
-        navigator().startKyc()
         analytics.logEvent(SimpleBuyAnalytics.START_GOLD_FLOW)
+        KycNavHostActivity.startForResult(this, CampaignType.SimpleBuy, SimpleBuyActivity.KYC_STARTED)
     }
 
     private fun goToAddNewPaymentMethod(paymentMethod: PaymentMethodType) {
@@ -445,22 +421,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     }
 
     override fun onPaymentMethodChanged(paymentMethod: PaymentMethod) {
-        when (paymentMethod) {
-            is PaymentMethod.UndefinedFunds -> depositFundsSelected()
-            is PaymentMethod.UndefinedBankTransfer -> linkBankSelected()
-            else -> {
-                model.process(SimpleBuyIntent.SelectedPaymentMethodUpdate(paymentMethod))
-                analytics.logEvent(
-                    PaymentMethodSelected(
-                        paymentMethod.toAnalyticsString()
-                    )
-                )
-            }
-        }
-    }
-
-    private fun linkBankSelected() {
-        model.process(SimpleBuyIntent.LinkBankSelected)
+        model.process(SimpleBuyIntent.PaymentMethodChangeRequested(paymentMethod))
     }
 
     private fun addPaymentMethod(type: PaymentMethodType) {
@@ -485,10 +446,6 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         analytics.logEvent(PaymentMethodSelected(type.toAnalyticsString()))
     }
 
-    private fun depositFundsSelected() {
-        model.process(SimpleBuyIntent.DepositFundsRequested)
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -507,6 +464,15 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                     (data?.extras?.getString(LinkBankActivity.LINKED_BANK_ID_KEY))
                 )
             )
+        }
+        if (requestCode == SimpleBuyActivity.KYC_STARTED) {
+            if (resultCode == SimpleBuyActivity.RESULT_KYC_SIMPLE_BUY_COMPLETE) {
+                model.process(SimpleBuyIntent.KycCompleted)
+                navigator().goToKycVerificationScreen()
+            } else if (resultCode == SimpleBuyActivity.RESULT_KYC_SIMPLE_BUY_FOR_SDD_COMPLETE) {
+                val intent = Intent(activity, CardDetailsActivity::class.java)
+                startActivityForResult(intent, ADD_CARD_REQUEST_CODE)
+            }
         }
     }
 

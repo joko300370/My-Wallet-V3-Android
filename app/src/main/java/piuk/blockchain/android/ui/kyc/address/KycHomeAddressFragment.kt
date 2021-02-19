@@ -46,6 +46,7 @@ import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.KycNavXmlDirections
 import piuk.blockchain.android.R
+import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpFragment
@@ -54,6 +55,7 @@ import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
 import piuk.blockchain.android.util.ViewUtils
+import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.inflate
 import timber.log.Timber
 import java.util.Locale
@@ -118,11 +120,6 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
         onViewReady()
     }
 
-    override fun continueToMobileVerification(countryCode: String) {
-        closeKeyboard()
-        navigate(KycNavXmlDirections.actionStartMobileVerification(countryCode))
-    }
-
     @Suppress("ConstantConditionIf")
     override fun continueToVeriffSplash(countryCode: String) {
         closeKeyboard()
@@ -132,6 +129,11 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
     override fun tier1Complete() {
         closeKeyboard()
         navigate(KycHomeAddressFragmentDirections.actionTier1Complete())
+    }
+
+    override fun onSddVerified() {
+        activity?.setResult(SimpleBuyActivity.RESULT_KYC_SIMPLE_BUY_FOR_SDD_COMPLETE)
+        activity?.finish()
     }
 
     override fun continueToTier2MoreInfoNeeded(countryCode: String) {
@@ -338,8 +340,8 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
             )
             textInputAddress1.hint = getString(R.string.kyc_address_address_line_1)
             textInputAddress2.hint = getString(R.string.kyc_address_address_line_2)
-            textInputCity.hint = getString(R.string.kyc_address_city_town_village)
-            textInputLayoutState.hint = getString(R.string.kyc_address_state_region_province_county)
+            textInputCity.hint = getString(R.string.address_city)
+            textInputLayoutState.gone()
             textInputLayoutZipCode.hint = getString(R.string.kyc_address_postal_code)
             textInputLayoutState.editText?.isEnabled = true
         }
@@ -363,8 +365,6 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
             .skipFirstUnless { !it.isEmpty() }
             .observeOn(AndroidSchedulers.mainThread())
             .distinctUntilChanged()
-
-    private fun mapToCompleted(text: String): Boolean = !text.isEmpty()
 
     private fun setupImeOptions() {
         val editTexts = listOf(

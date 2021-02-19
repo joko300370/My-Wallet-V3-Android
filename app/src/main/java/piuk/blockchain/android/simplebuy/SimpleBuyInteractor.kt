@@ -185,29 +185,27 @@ class SimpleBuyInteractor(
             SimpleBuyIntent.ExchangeRateUpdated(it.price() as FiatValue)
         }
 
-    fun fetchPaymentMethods(fiatCurrency: String, preselectedId: String?):
+    fun eligiblePaymentMethods(fiatCurrency: String, preselectedId: String?):
         Single<SimpleBuyIntent.PaymentMethodsUpdated> =
-        tierService.tiers().flatMap { tier ->
-            custodialWalletManager.fetchSuggestedPaymentMethod(
-                fiatCurrency,
-                tier.isInitialisedFor(KycTierLevel.GOLD)
-            ).map { paymentMethods ->
-                SimpleBuyIntent.PaymentMethodsUpdated(
-                    availablePaymentMethods = paymentMethods,
-                    canAddCard = tier.isApprovedFor(KycTierLevel.GOLD),
-                    canLinkFunds = tier.isApprovedFor(KycTierLevel.GOLD),
-                    canLinkBank = tier.isApprovedFor(KycTierLevel.GOLD),
-                    preselectedId = if (tier.isApprovedFor(
-                            KycTierLevel.GOLD
-                        ) || preselectedId != null
-                    ) {
-                        preselectedId
-                    } else {
-                        PaymentMethod.UNDEFINED_PAYMENT_ID
-                    }
-                )
+        tierService.tiers().zipWith(custodialWalletManager.isSDDEligible().onErrorReturn { false })
+            .flatMap { (tier, sddEligible) ->
+                custodialWalletManager.fetchSuggestedPaymentMethod(
+                    fiatCurrency = fiatCurrency,
+                    fetchSddLimits = sddEligible && tier.isInInitialState(),
+                    onlyEligible = tier.isInitialisedFor(KycTierLevel.GOLD)
+                ).map { paymentMethods ->
+                    SimpleBuyIntent.PaymentMethodsUpdated(
+                        availablePaymentMethods = paymentMethods,
+                        canLinkBank = paymentMethods.filterIsInstance<PaymentMethod.UndefinedBankTransfer>()
+                            .firstOrNull()?.isEligible ?: false,
+                        canAddCard = paymentMethods.filterIsInstance<PaymentMethod.UndefinedCard>()
+                            .firstOrNull()?.isEligible ?: false,
+                        canLinkFunds = paymentMethods.filterIsInstance<PaymentMethod.UndefinedFunds>()
+                            .firstOrNull()?.isEligible ?: false,
+                        preselectedId = preselectedId ?: PaymentMethod.UNDEFINED_PAYMENT_ID
+                    )
+                }
             }
-        }
 
     // attributes are null in case of bank
     fun confirmOrder(
@@ -238,13 +236,10 @@ class SimpleBuyInteractor(
                 CardIntent.CardUpdated(it.value)
             }
 
-    fun fetchPaymentMethods(fiatCurrency: String): Single<List<PaymentMethod>> =
-        tierService.tiers().flatMap {
-            custodialWalletManager.fetchSuggestedPaymentMethod(
-                fiatCurrency,
-                it.isInitialisedFor(KycTierLevel.GOLD)
-            )
-        }
+    fun eligiblePaymentMethodsTypes(fiatCurrency: String): Single<List<EligiblePaymentMethodType>> =
+        custodialWalletManager.getEligiblePaymentMethodTypes(
+            fiatCurrency = fiatCurrency
+        )
 
     fun fetchOrder(orderId: String) = custodialWalletManager.getBuyOrder(orderId)
 

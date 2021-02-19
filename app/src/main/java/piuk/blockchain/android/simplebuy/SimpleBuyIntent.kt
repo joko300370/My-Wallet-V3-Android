@@ -38,7 +38,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
     object ResetLinkBankTransfer : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(linkBankTransfer = null, linkBankRequested = false)
+            oldState.copy(linkBankTransfer = null, newPaymentMethodToBeAdded = null)
     }
 
     class OrderPriceUpdated(private val price: FiatValue?) : SimpleBuyIntent() {
@@ -54,6 +54,10 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     class ExchangeRateUpdated(private val price: FiatValue) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(exchangePrice = price)
+    }
+
+    class PaymentMethodChangeRequested(val paymentMethod: PaymentMethod) : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState
     }
 
     class PaymentMethodsUpdated(
@@ -134,7 +138,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
     object LinkBankTransferRequested : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState.copy(
-            linkBankRequested = false
+            newPaymentMethodToBeAdded = null
         )
     }
 
@@ -262,16 +266,6 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
             oldState.copy(supportedFiatCurrencies = currencies)
     }
 
-    data class UpdatedPredefinedAmounts(private val amounts: List<FiatValue>) : SimpleBuyIntent() {
-        override fun reduce(oldState: SimpleBuyState): SimpleBuyState {
-            return oldState.copy(predefinedAmounts = amounts.filter {
-                val isBiggerThanMin = it.valueMinor >= oldState.minFiatAmount.valueMinor
-                val isSmallerThanMax = it.valueMinor <= oldState.maxFiatAmount.valueMinor
-                isBiggerThanMin && isSmallerThanMax
-            })
-        }
-    }
-
     data class WithdrawLocksTimeUpdated(private val time: BigInteger = BigInteger.ZERO) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState {
             return oldState.copy(withdrawalLockPeriod = time)
@@ -327,7 +321,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
     object NavigationHandled : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(confirmationActionRequested = false, depositFundsRequested = false)
+            oldState.copy(confirmationActionRequested = false, newPaymentMethodToBeAdded = null)
     }
 
     object KycStarted : SimpleBuyIntent() {
@@ -370,7 +364,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
             return oldState.copy(
                 linkBankTransfer = bankTransfer,
                 confirmationActionRequested = false,
-                linkBankRequested = false,
+                newPaymentMethodToBeAdded = null,
                 isLoading = false
             )
         }
@@ -460,23 +454,13 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
             oldState.copy(paymentPending = true, isLoading = false)
     }
 
-    object DepositFundsRequested : SimpleBuyIntent() {
+    class AddNewPaymentMethodRequested(private val paymentMethod: PaymentMethod) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(depositFundsRequested = true)
+            oldState.copy(newPaymentMethodToBeAdded = paymentMethod)
     }
 
-    object LinkBankSelected : SimpleBuyIntent() {
+    object AddNewPaymentMethodHandled : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(linkBankRequested = true)
-    }
-
-    object LinkBankActionHandled : SimpleBuyIntent() {
-        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(linkBankRequested = false)
-    }
-
-    object DepositFundsHandled : SimpleBuyIntent() {
-        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(depositFundsRequested = false)
+            oldState.copy(newPaymentMethodToBeAdded = null)
     }
 }

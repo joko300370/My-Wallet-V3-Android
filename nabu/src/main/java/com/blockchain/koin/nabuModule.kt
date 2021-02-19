@@ -107,7 +107,6 @@ val nabuModule = module {
                 assetBalancesRepository = get(),
                 interestRepository = get(),
                 custodialRepository = get(),
-                extraAttributesProvider = get(),
                 bankLinkingEnabledProvider = get(),
                 transactionErrorMapper = get()
             )

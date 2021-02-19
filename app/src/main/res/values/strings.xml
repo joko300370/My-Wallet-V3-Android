@@ -1902,7 +1902,8 @@
     <string name="security_check">Security Check</string>
     <string name="success_email_veriff">Success! Your email has been confirmed.</string>
     <string name="email_verified">Email Verified</string>
-    <string name="sent_email_verification">We sent a verification email to %1$s. Please tap the link in the email to continue.</string>
+    <string name="email_verification_part_1">We sent a verification email to&#160;</string>
+    <string name="email_verification_part_2">. Please tap the link in the email to continue.</string>
     <string name="email_verify">Verify Your Email</string>
     <string name="edit_email_address">Edit Email Address</string>
     <string name="common_save">Save</string>

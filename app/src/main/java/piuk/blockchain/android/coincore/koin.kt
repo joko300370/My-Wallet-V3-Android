@@ -168,7 +168,6 @@ val coincoreModule = module {
                 assetBalancesRepository = get(),
                 exchangeRateDataManager = get(),
                 custodialWalletManager = get(),
-                tierService = get(),
                 currencyPrefs = get()
             )
         }

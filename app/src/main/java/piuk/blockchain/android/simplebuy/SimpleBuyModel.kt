@@ -4,7 +4,7 @@ import com.blockchain.preferences.RatingPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.nabu.datamanagers.BuySellOrder
 import com.blockchain.nabu.datamanagers.OrderState
-import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.UndefinedPaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.LinkedBankErrorState
 import com.blockchain.nabu.models.data.LinkedBankState
@@ -12,7 +12,6 @@ import com.blockchain.nabu.models.responses.simplebuy.EverypayPaymentAttrs
 import com.google.gson.Gson
 import io.reactivex.Completable
 import io.reactivex.Scheduler
-import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.cards.partners.CardActivator
@@ -103,27 +102,14 @@ class SimpleBuyModel(
                     onError = { process(SimpleBuyIntent.ErrorIntent()) }
                 )
 
-            is SimpleBuyIntent.LinkBankTransferRequested -> {
-                interactor.userIsEligibleToLinkABank(previousState.fiatCurrency).flatMap {
-                    if (it) {
-                        interactor.linkNewBank(previousState.fiatCurrency)
-                    } else {
-                        Single.just(SimpleBuyIntent.SelectedPaymentMethodUpdate(
-                            previousState.paymentOptions.availablePaymentMethods.first { paymentMethod ->
-                                paymentMethod.id == PaymentMethod.UNDEFINED_BANK_TRANSFER_PAYMENT_ID
-                            }
-                        ))
-                    }
-                }
-                    .subscribeBy(
-                        onSuccess = { process(it) },
-                        onError = { process(SimpleBuyIntent.ErrorIntent(ErrorState.LinkedBankNotSupported)) }
-                    )
-            }
-
+            is SimpleBuyIntent.LinkBankTransferRequested -> interactor.linkNewBank(previousState.fiatCurrency)
+                .subscribeBy(
+                    onSuccess = { process(it) },
+                    onError = { process(SimpleBuyIntent.ErrorIntent(ErrorState.LinkedBankNotSupported)) }
+                )
             is SimpleBuyIntent.TryToLinkABankTransfer -> {
-                interactor.fetchPaymentMethods(previousState.fiatCurrency).map {
-                    it.any { paymentMethod -> paymentMethod is PaymentMethod.UndefinedBankTransfer }
+                interactor.eligiblePaymentMethodsTypes(previousState.fiatCurrency).map {
+                    it.any { paymentMethod -> paymentMethod.paymentMethodType == PaymentMethodType.BANK_TRANSFER }
                 }.subscribeBy(
                     onSuccess = { isEligibleToLinkABank ->
                         if (isEligibleToLinkABank) {
@@ -212,7 +198,7 @@ class SimpleBuyModel(
                     )
             }
 
-            is SimpleBuyIntent.FetchSuggestedPaymentMethod -> interactor.fetchPaymentMethods(
+            is SimpleBuyIntent.FetchSuggestedPaymentMethod -> interactor.eligiblePaymentMethods(
                 intent.fiatCurrency,
                 intent.selectedPaymentMethodId
             )
@@ -224,12 +210,14 @@ class SimpleBuyModel(
                         process(SimpleBuyIntent.ErrorIntent())
                     }
                 )
-            is SimpleBuyIntent.LinkBankSelected,
-            is SimpleBuyIntent.DepositFundsRequested -> interactor.checkTierLevel()
-                .subscribeBy(
-                    onSuccess = { process(it) },
-                    onError = { process(SimpleBuyIntent.ErrorIntent()) }
-                )
+            is SimpleBuyIntent.PaymentMethodChangeRequested -> {
+                if (intent.paymentMethod.isEligible && intent.paymentMethod is UndefinedPaymentMethod) {
+                    process(SimpleBuyIntent.AddNewPaymentMethodRequested(intent.paymentMethod))
+                } else {
+                    process(SimpleBuyIntent.SelectedPaymentMethodUpdate(intent.paymentMethod))
+                }
+                null
+            }
             is SimpleBuyIntent.MakePayment ->
                 interactor.fetchOrder(intent.orderId)
                     .subscribeBy({

@@ -5,6 +5,7 @@ import com.blockchain.nabu.models.responses.nabu.Scope
 import piuk.blockchain.android.ui.kyc.address.models.AddressModel
 import piuk.blockchain.android.campaign.CampaignType
 import com.blockchain.nabu.NabuToken
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.NabuDataManager
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -15,27 +16,29 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcore.data.settings.PhoneVerificationQuery
+import piuk.blockchain.android.networking.PollService
+import piuk.blockchain.androidcore.utils.extensions.thenSingle
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
 import java.util.SortedMap
 
-interface Tier2Decision {
+interface KycNextStepDecision {
 
     enum class NextStep {
         Tier1Complete,
         Tier2ContinueTier1NeedsMoreInfo,
-        Tier2Continue
+        Tier2Continue,
+        SDDComplete
     }
 
-    fun progressToTier2(): Single<NextStep>
+    fun nextStep(): Single<NextStep>
 }
 
 class KycHomeAddressPresenter(
     nabuToken: NabuToken,
     private val nabuDataManager: NabuDataManager,
-    private val tier2Decision: Tier2Decision,
-    private val phoneVerificationQuery: PhoneVerificationQuery
+    private val kycNextStepDecision: KycNextStepDecision,
+    private val custodialWalletManager: CustodialWalletManager
 ) : BaseKycPresenter<KycHomeAddressView>(nabuToken) {
 
     val countryCodeSingle: Single<SortedMap<String, String>> by unsafeLazy {
@@ -109,8 +112,7 @@ class KycHomeAddressPresenter(
     }
 
     private data class State(
-        val phoneNeedsToBeVerified: Boolean,
-        val progressToTier2: Tier2Decision.NextStep,
+        val progressToKycNextStep: KycNextStepDecision.NextStep,
         val countryCode: String
     )
 
@@ -118,47 +120,60 @@ class KycHomeAddressPresenter(
         compositeDisposable += view.address
             .firstOrError()
             .flatMap { address ->
-                addAddress(address)
-                    .andThen(phoneVerificationQuery.needsPhoneVerification())
-                    .map { verified -> verified to address.country }
+                addAddress(address).toSingle { address.country }
             }
-            .flatMap { (verified, countryCode) ->
-                updateNabuData(verified)
-                    .andThen(Single.just(verified to countryCode))
+            .flatMap { countryCode ->
+                updateNabuData().thenSingle { Single.just(countryCode) }
             }
-            .map { (verified, countryCode) ->
+            .map { countryCode ->
                 State(
-                    progressToTier2 = Tier2Decision.NextStep.Tier1Complete,
-                    countryCode = countryCode,
-                    phoneNeedsToBeVerified = verified
+                    progressToKycNextStep = KycNextStepDecision.NextStep.Tier1Complete,
+                    countryCode = countryCode
                 )
             }
-            .zipWith(tier2Decision.progressToTier2())
-            .map { (x, progress) -> x.copy(progressToTier2 = progress) }
+            .zipWith(kycNextStepDecision.nextStep())
+            .map { (x, progress) -> x.copy(progressToKycNextStep = progress) }
+            .flatMap { state ->
+                if (campaignType == CampaignType.SimpleBuy) {
+                    tryToVerifyUserForSdd(state)
+                } else Single.just(state)
+            }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { view.showProgressDialog() }
             .doOnEvent { _, _ -> view.dismissProgressDialog() }
             .doOnError(Timber::e)
             .subscribeBy(
                 onSuccess = {
-                    when (it.progressToTier2) {
-                        Tier2Decision.NextStep.Tier1Complete -> view.tier1Complete()
-                        Tier2Decision.NextStep.Tier2ContinueTier1NeedsMoreInfo ->
+                    when (it.progressToKycNextStep) {
+                        KycNextStepDecision.NextStep.Tier1Complete -> view.tier1Complete()
+                        KycNextStepDecision.NextStep.Tier2ContinueTier1NeedsMoreInfo ->
                             view.continueToTier2MoreInfoNeeded(it.countryCode)
-                        Tier2Decision.NextStep.Tier2Continue ->
-                            if (it.phoneNeedsToBeVerified) {
-                                view.continueToMobileVerification(it.countryCode)
-                            } else {
-                                view.continueToVeriffSplash(it.countryCode)
-                            }
+                        KycNextStepDecision.NextStep.Tier2Continue -> view.continueToVeriffSplash(it.countryCode)
+                        KycNextStepDecision.NextStep.SDDComplete -> view.onSddVerified()
                     }
                 },
                 onError = { view.showErrorToast(R.string.kyc_address_error_saving) }
             )
     }
 
-    private fun addAddress(address: AddressModel): Completable = fetchOfflineToken
-        .flatMapCompletable {
+    private fun tryToVerifyUserForSdd(state: State): Single<State> {
+        return custodialWalletManager.isSDDEligible().flatMap {
+            if (!it) {
+                Single.just(state)
+            } else {
+                PollService(custodialWalletManager.fetchSDDUserState()) { sddState ->
+                    sddState.stateFinalised
+                }.start(timerInSec = 1, retries = 10).map { sddState ->
+                    if (sddState.value.isVerified) {
+                        state.copy(progressToKycNextStep = KycNextStepDecision.NextStep.SDDComplete)
+                    } else
+                        state
+                }
+            }
+        }
+    }
+
+    private fun addAddress(address: AddressModel): Completable = fetchOfflineToken.flatMapCompletable {
             nabuDataManager.addAddress(
                 it,
                 address.firstLine,
@@ -170,20 +185,16 @@ class KycHomeAddressPresenter(
             ).subscribeOn(Schedulers.io())
         }
 
-    private fun updateNabuData(isVerified: Boolean): Completable =
-        if (!isVerified) {
-            nabuDataManager.requestJwt()
-                .subscribeOn(Schedulers.io())
-                .flatMap { jwt ->
-                    fetchOfflineToken.flatMap {
-                        nabuDataManager.updateUserWalletInfo(it, jwt)
-                            .subscribeOn(Schedulers.io())
-                    }
+    private fun updateNabuData(): Completable =
+        nabuDataManager.requestJwt()
+            .subscribeOn(Schedulers.io())
+            .flatMap { jwt ->
+                fetchOfflineToken.flatMap {
+                    nabuDataManager.updateUserWalletInfo(it, jwt)
+                        .subscribeOn(Schedulers.io())
                 }
-                .ignoreElement()
-        } else {
-            Completable.complete()
-        }
+            }
+            .ignoreElement()
 
     private fun getCountryName(countryCode: String): Maybe<String> = countryCodeSingle
         .map { it.entries.first { (_, value) -> value == countryCode }.key }
@@ -192,16 +203,16 @@ class KycHomeAddressPresenter(
     private fun enableButtonIfComplete(addressModel: AddressModel) {
         if (addressModel.country.equals("US", ignoreCase = true)) {
             view.setButtonEnabled(
-                !addressModel.firstLine.isEmpty() &&
-                        !addressModel.city.isEmpty() &&
-                        !addressModel.state.isEmpty() &&
-                        !addressModel.postCode.isEmpty()
+                addressModel.firstLine.isNotEmpty() &&
+                    addressModel.city.isNotEmpty() &&
+                    addressModel.state.isNotEmpty() &&
+                    addressModel.postCode.isNotEmpty()
             )
         } else {
             view.setButtonEnabled(
-                !addressModel.firstLine.isEmpty() &&
-                        !addressModel.city.isEmpty() &&
-                        !addressModel.state.isEmpty()
+                addressModel.firstLine.isNotEmpty() &&
+                    addressModel.city.isNotEmpty() &&
+                    addressModel.postCode.isNotEmpty()
             )
         }
     }
@@ -211,9 +222,9 @@ class KycHomeAddressPresenter(
     }
 
     private fun AddressModel.containsData(): Boolean =
-        !firstLine.isEmpty() ||
-                !secondLine.isNullOrEmpty() ||
-                !city.isEmpty() ||
-                !state.isEmpty() ||
-                !postCode.isEmpty()
+        firstLine.isNotEmpty() ||
+            !secondLine.isNullOrEmpty() ||
+            city.isNotEmpty() ||
+            state.isNotEmpty() ||
+            postCode.isNotEmpty()
 }
