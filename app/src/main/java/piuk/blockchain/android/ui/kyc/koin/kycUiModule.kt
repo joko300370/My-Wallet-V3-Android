@@ -124,11 +124,11 @@ val kycUiNabuModule = module {
     scope(payloadScopeQualifier) {
 
         factory {
-            KycNextStepDecisionAdapter(get(), get()) as KycNextStepDecision
+            KycNextStepDecisionAdapter(nabuToken = get(), nabuDataManager = get()) as KycNextStepDecision
         }
 
         factory {
-            CurrentTierAdapter(get(), get()) as CurrentTier
+            CurrentTierAdapter(nabuToken = get(), nabuDataManager = get()) as CurrentTier
         }
 
         factory {
