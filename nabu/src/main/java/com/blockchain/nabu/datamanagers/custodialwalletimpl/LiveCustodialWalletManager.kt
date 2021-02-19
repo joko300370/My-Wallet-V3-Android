@@ -554,10 +554,9 @@ class LiveCustodialWalletManager(
                         )
                     )
                 }
-
-                if (!availablePaymentMethods.any { paymentMethod ->
-                        paymentMethod is PaymentMethod.Card || paymentMethod is PaymentMethod.Funds
-                    }) {
+                // we want the Undefined payment method to be added only in case we have more that 1 available payment
+                // methods, so we present in the UI the option "Select a payment method"
+                if (availablePaymentMethods.size > 1) {
                     availablePaymentMethods.add(PaymentMethod.Undefined)
                 }
 

@@ -55,6 +55,7 @@ import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
 import piuk.blockchain.android.util.ViewUtils
+import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.inflate
 import timber.log.Timber
 import java.util.Locale
@@ -339,8 +340,8 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
             )
             textInputAddress1.hint = getString(R.string.kyc_address_address_line_1)
             textInputAddress2.hint = getString(R.string.kyc_address_address_line_2)
-            textInputCity.hint = getString(R.string.kyc_address_city_town_village)
-            textInputLayoutState.hint = getString(R.string.kyc_address_state_region_province_county)
+            textInputCity.hint = getString(R.string.address_city)
+            textInputLayoutState.gone()
             textInputLayoutZipCode.hint = getString(R.string.kyc_address_postal_code)
             textInputLayoutState.editText?.isEnabled = true
         }
