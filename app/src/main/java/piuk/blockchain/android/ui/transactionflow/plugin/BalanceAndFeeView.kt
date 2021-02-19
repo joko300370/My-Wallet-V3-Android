@@ -121,16 +121,6 @@ class BalanceAndFeeView @JvmOverloads constructor(
             externalFocus = null
         }
 
-        // Hide the use max button
-//        binding.useMax.visibleIf { !revealDropdown }
-        // Expand the dropdown view
-//        TransitionManager.beginDelayedTransition(
-//            binding.root,
-//            Slide(Gravity.BOTTOM).apply {
-//                duration = 600
-//                addTarget(binding.dropdown)
-//            }
-//        )
         with(binding.dropdown) {
             if (revealDropdown) {
                 visible()
@@ -144,7 +134,7 @@ class BalanceAndFeeView @JvmOverloads constructor(
 
     private fun findRootView(): ViewGroup? {
         var v = binding.root.parent as? ViewGroup
-        while(v?.parent is ViewGroup) {
+        while (v?.parent is ViewGroup) {
             v = v.parent as? ViewGroup
         }
         return v

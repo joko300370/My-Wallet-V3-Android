@@ -34,11 +34,9 @@ class TradingToOnChainTxEngine(
                 amount = CryptoValue.zero(sourceAsset),
                 totalBalance = CryptoValue.zero(sourceAsset),
                 availableBalance = CryptoValue.zero(sourceAsset),
+                feeForFullAvailable = CryptoValue.zero(sourceAsset),
                 feeAmount = CryptoValue.zero(sourceAsset),
-                feeSelection = FeeSelection(
-                    selectedLevel = FeeLevel.None,
-                    availableLevels = AVAILABLE_FEE_LEVELS
-                ),
+                feeSelection = FeeSelection(),
                 selectedFiat = userFiat
             )
         )
@@ -112,9 +110,5 @@ class TradingToOnChainTxEngine(
             .map {
                 TxResult.UnHashedTxResult(pendingTx.amount)
             }
-    }
-
-    companion object {
-        private val AVAILABLE_FEE_LEVELS = setOf(FeeLevel.None)
     }
 }

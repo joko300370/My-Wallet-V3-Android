@@ -149,7 +149,10 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
             item.feeDetails?.let {
                 when (it) {
                     is FeeState.FeeUnderMinLimit -> {
-                        setCustomFeeValues(item.customFeeAmount, context.getString(R.string.fee_options_sat_byte_min_error))
+                        setCustomFeeValues(
+                            item.customFeeAmount,
+                            context.getString(R.string.fee_options_sat_byte_min_error)
+                        )
                     }
                     is FeeState.FeeUnderRecommended -> {
                         setCustomFeeValues(item.customFeeAmount, context.getString(R.string.fee_options_fee_too_low))

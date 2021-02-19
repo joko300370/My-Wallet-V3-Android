@@ -39,7 +39,7 @@ import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 
-class Erc20OnChainTxEngineTest {
+@Suppress("UnnecessaryVariable") class Erc20OnChainTxEngineTest {
 
     @get:Rule
     val initSchedulers = rxInit {
@@ -226,6 +226,7 @@ class Erc20OnChainTxEngineTest {
             amount = CryptoValue.zero(ASSET),
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
+            feeForFullAvailable = CryptoValue.zero(ASSET),
             feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -237,6 +238,7 @@ class Erc20OnChainTxEngineTest {
 
         val inputAmount = 2.usdPax()
         val expectedFee = (GAS_LIMIT_CONTRACT * FEE_REGULAR).gwei()
+        val expectedFullFee = expectedFee
 
         // Act
         subject.doUpdateAmount(
@@ -249,6 +251,7 @@ class Erc20OnChainTxEngineTest {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == actionableBalance &&
+                it.feeForFullAvailable == expectedFullFee &&
                 it.feeAmount == expectedFee
             }
             .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
@@ -286,6 +289,7 @@ class Erc20OnChainTxEngineTest {
             amount = CryptoValue.zero(CryptoCurrency.ETHER),
             totalBalance = CryptoValue.zero(CryptoCurrency.ETHER),
             availableBalance = CryptoValue.zero(CryptoCurrency.ETHER),
+            feeForFullAvailable = CryptoValue.zero(CryptoCurrency.ETHER),
             feeAmount = CryptoValue.zero(CryptoCurrency.ETHER),
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -297,6 +301,7 @@ class Erc20OnChainTxEngineTest {
 
         val inputAmount = 2.usdPax()
         val expectedFee = (GAS_LIMIT_CONTRACT * FEE_PRIORITY).gwei()
+        val expectedFullFee = expectedFee
 
         // Act
         subject.doUpdateAmount(
@@ -350,6 +355,7 @@ class Erc20OnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = availableBalance,
+            feeForFullAvailable = regularFee,
             feeAmount = regularFee,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -360,6 +366,7 @@ class Erc20OnChainTxEngineTest {
         )
 
         val expectedFee = (GAS_LIMIT_CONTRACT * FEE_PRIORITY).gwei()
+        val fullFee = expectedFee
 
         // Act
         subject.doUpdateFeeLevel(
@@ -373,6 +380,7 @@ class Erc20OnChainTxEngineTest {
                 it.amount == inputAmount &&
                     it.totalBalance == totalBalance &&
                     it.availableBalance == availableBalance &&
+                    it.feeForFullAvailable == fullFee &&
                     it.feeAmount == expectedFee
             }
             .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Priority) }
@@ -392,11 +400,12 @@ class Erc20OnChainTxEngineTest {
     fun `update fee level from REGULAR to NONE is rejected`() {
         // Arrange
         val totalBalance = 21.usdPax()
-        val actionableBalance = 20.usdPax()
+        val availableBalance = 20.usdPax()
         val inputAmount = 2.usdPax()
         val regularFee = (GAS_LIMIT_CONTRACT * FEE_REGULAR).gwei()
+        val fullFee = regularFee
 
-        val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
+        val sourceAccount = mockSourceAccount(totalBalance, availableBalance)
 
         val txTarget: CryptoAddress = mock {
             on { asset } itReturns ASSET
@@ -413,7 +422,8 @@ class Erc20OnChainTxEngineTest {
         val pendingTx = PendingTx(
             amount = inputAmount,
             totalBalance = totalBalance,
-            availableBalance = actionableBalance,
+            availableBalance = availableBalance,
+            feeForFullAvailable = fullFee,
             feeAmount = regularFee,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -436,11 +446,12 @@ class Erc20OnChainTxEngineTest {
     fun `update fee level from REGULAR to CUSTOM is rejected`() {
         // Arrange
         val totalBalance = 21.usdPax()
-        val actionableBalance = 20.usdPax()
+        val availableBalance = 20.usdPax()
         val inputAmount = 2.usdPax()
         val regularFee = (GAS_LIMIT_CONTRACT * FEE_REGULAR).gwei()
+        val fullFee = regularFee
 
-        val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
+        val sourceAccount = mockSourceAccount(totalBalance, availableBalance)
 
         val txTarget: CryptoAddress = mock {
             on { asset } itReturns ASSET
@@ -457,7 +468,8 @@ class Erc20OnChainTxEngineTest {
         val pendingTx = PendingTx(
             amount = inputAmount,
             totalBalance = totalBalance,
-            availableBalance = actionableBalance,
+            availableBalance = availableBalance,
+            feeForFullAvailable = fullFee,
             feeAmount = regularFee,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -480,11 +492,12 @@ class Erc20OnChainTxEngineTest {
     fun `update fee level from REGULAR to REGULAR has no effect`() {
         // Arrange
         val totalBalance = 21.usdPax()
-        val actionableBalance = 20.usdPax()
+        val availableBalance = 20.usdPax()
         val inputAmount = 2.usdPax()
         val regularFee = (GAS_LIMIT_CONTRACT * FEE_REGULAR).gwei()
+        val fullFee = regularFee
 
-        val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
+        val sourceAccount = mockSourceAccount(totalBalance, availableBalance)
 
         val txTarget: CryptoAddress = mock {
             on { asset } itReturns ASSET
@@ -501,7 +514,8 @@ class Erc20OnChainTxEngineTest {
         val pendingTx = PendingTx(
             amount = inputAmount,
             totalBalance = totalBalance,
-            availableBalance = actionableBalance,
+            availableBalance = availableBalance,
+            feeForFullAvailable = fullFee,
             feeAmount = regularFee,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -522,7 +536,7 @@ class Erc20OnChainTxEngineTest {
             .assertValue {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
-                it.availableBalance == actionableBalance &&
+                it.availableBalance == availableBalance &&
                 it.feeAmount == regularFee
             }
             .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }

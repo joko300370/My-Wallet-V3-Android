@@ -301,6 +301,7 @@ class XlmOnChainTxEngineTest {
             amount = CryptoValue.zero(ASSET),
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
+            feeForFullAvailable = CryptoValue.zero(ASSET),
             feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -313,6 +314,7 @@ class XlmOnChainTxEngineTest {
         val inputAmount = 2.lumens()
         val expectedFee = FEE_REGULAR
         val expectedAvailable = actionableBalance - expectedFee
+        val expectedFullFee = FEE_REGULAR
 
         // Act
         subject.doUpdateAmount(
@@ -325,6 +327,7 @@ class XlmOnChainTxEngineTest {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == expectedAvailable &&
+                it.feeForFullAvailable == expectedFullFee &&
                 it.feeAmount == expectedFee
             }
             .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
@@ -360,12 +363,14 @@ class XlmOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = availableBalance,
+            feeForFullAvailable = expectedFee,
             feeAmount = expectedFee,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
                 selectedLevel = FeeLevel.Regular,
                 availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
-            )        )
+            )
+        )
 
         // Act
         subject.doUpdateFeeLevel(
@@ -399,6 +404,7 @@ class XlmOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = availableBalance,
+            feeForFullAvailable = expectedFee,
             feeAmount = expectedFee,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -439,6 +445,7 @@ class XlmOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = availableBalance,
+            feeForFullAvailable = expectedFee,
             feeAmount = expectedFee,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -480,6 +487,7 @@ class XlmOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = expectedAvailable,
+            feeForFullAvailable = expectedFee,
             feeAmount = expectedFee,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(

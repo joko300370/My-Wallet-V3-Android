@@ -97,6 +97,7 @@ class BtcOnChainTxEngine(
                 amount = CryptoValue.zero(sourceAsset),
                 totalBalance = CryptoValue.zero(sourceAsset),
                 availableBalance = CryptoValue.zero(sourceAsset),
+                feeForFullAvailable = CryptoValue.zero(sourceAsset),
                 feeAmount = CryptoValue.zero(sourceAsset),
                 feeSelection = FeeSelection(
                     selectedLevel = mapSavedFeeToFeeLevel(fetchDefaultFeeLevel(sourceAsset)),
@@ -166,7 +167,7 @@ class BtcOnChainTxEngine(
         feeOptions: FeeOptions,
         coins: UnspentOutputs
     ): PendingTx {
-        val maxAvailable = sendDataManager.getMaximumAvailable(
+        val available = sendDataManager.getMaximumAvailable(
             cryptoCurrency = sourceAsset,
             unspentCoins = coins,
             feePerKb = feePerKb
@@ -181,7 +182,8 @@ class BtcOnChainTxEngine(
         return pendingTx.copy(
             amount = amount,
             totalBalance = balance,
-            availableBalance = maxAvailable,
+            availableBalance = available.maxSpendable,
+            feeForFullAvailable = available.forForMax,
             feeAmount = CryptoValue.fromMinor(CryptoCurrency.BTC, utxoBundle.absoluteFee),
             feeSelection = pendingTx.feeSelection.copy(
                 customLevelRates = feeOptions.toLevelRates()
@@ -192,7 +194,7 @@ class BtcOnChainTxEngine(
         ).let {
             it.copy(
                 feeSelection = it.feeSelection.copy(
-                    feeState =   getFeeState(it, it.feeOptions)
+                    feeState = getFeeState(it, it.feeOptions)
                 )
             )
         }
@@ -314,9 +316,10 @@ class BtcOnChainTxEngine(
 
             if (pendingTx.feeSelection.selectedLevel == FeeLevel.Custom) {
                 when {
-                    pendingTx.feeSelection.customAmount == -1L -> throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
-                    pendingTx.feeSelection.customAmount < MINIMUM_CUSTOM_FEE -> throw TxValidationFailure(
-                        ValidationState.UNDER_MIN_LIMIT)
+                    pendingTx.feeSelection.customAmount == -1L ->
+                        throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
+                    pendingTx.feeSelection.customAmount < MINIMUM_CUSTOM_FEE ->
+                        throw TxValidationFailure(ValidationState.UNDER_MIN_LIMIT)
                 }
             }
         }

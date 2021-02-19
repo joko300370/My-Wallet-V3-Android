@@ -166,6 +166,7 @@ class TradingToOnChainTxEngineTest {
                 it.amount == CryptoValue.zero(ASSET) &&
                 it.totalBalance == CryptoValue.zero(ASSET) &&
                 it.availableBalance == CryptoValue.zero(ASSET) &&
+                it.feeForFullAvailable == CryptoValue.zero(ASSET) &&
                 it.feeAmount == CryptoValue.zero(ASSET) &&
                 it.selectedFiat == SELECTED_FIAT &&
                 it.confirmations.isEmpty() &&
@@ -204,12 +205,10 @@ class TradingToOnChainTxEngineTest {
             amount = CryptoValue.zero(ASSET),
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
+            feeForFullAvailable = CryptoValue.zero(ASSET),
             feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
-            feeSelection = FeeSelection(
-                selectedLevel = FeeLevel.None,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
-            )
+            feeSelection = FeeSelection()
         )
 
         val inputAmount = 2.usdPax()
@@ -242,7 +241,7 @@ class TradingToOnChainTxEngineTest {
         val totalBalance = 21.usdPax()
         val actionableBalance = 20.usdPax()
         val inputAmount = 2.usdPax()
-        val initialFee = 0.usdPax()
+        val zeroPax = 0.usdPax()
 
         val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
         val txTarget: CryptoAddress = mock {
@@ -259,12 +258,10 @@ class TradingToOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = actionableBalance,
-            feeAmount = initialFee,
+            feeAmount = zeroPax,
+            feeForFullAvailable = zeroPax,
             selectedFiat = SELECTED_FIAT,
-            feeSelection = FeeSelection(
-                selectedLevel = FeeLevel.None,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
-            )
+            feeSelection = FeeSelection()
         )
 
         // Act
@@ -280,7 +277,7 @@ class TradingToOnChainTxEngineTest {
         val totalBalance = 21.usdPax()
         val actionableBalance = 20.usdPax()
         val inputAmount = 2.usdPax()
-        val initialFee = 0.usdPax()
+        val zeroPax = 0.usdPax()
 
         val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
         val txTarget: CryptoAddress = mock {
@@ -297,12 +294,10 @@ class TradingToOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = actionableBalance,
-            feeAmount = initialFee,
+            feeForFullAvailable = zeroPax,
+            feeAmount = zeroPax,
             selectedFiat = SELECTED_FIAT,
-            feeSelection = FeeSelection(
-                selectedLevel = FeeLevel.None,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
-            )
+            feeSelection = FeeSelection()
         )
 
         // Act
@@ -318,7 +313,7 @@ class TradingToOnChainTxEngineTest {
         val totalBalance = 21.usdPax()
         val actionableBalance = 20.usdPax()
         val inputAmount = 2.usdPax()
-        val initialFee = 0.usdPax()
+        val zeroPax = 0.usdPax()
 
         val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
         val txTarget: CryptoAddress = mock {
@@ -335,12 +330,10 @@ class TradingToOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = actionableBalance,
-            feeAmount = initialFee,
+            feeForFullAvailable = zeroPax,
+            feeAmount = zeroPax,
             selectedFiat = SELECTED_FIAT,
-            feeSelection = FeeSelection(
-                selectedLevel = FeeLevel.None,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
-            )
+            feeSelection = FeeSelection()
         )
 
         // Act
@@ -356,7 +349,7 @@ class TradingToOnChainTxEngineTest {
         val totalBalance = 21.usdPax()
         val actionableBalance = 20.usdPax()
         val inputAmount = 2.usdPax()
-        val initialFee = 0.usdPax()
+        val zeroPax = 0.usdPax()
 
         val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
         val txTarget: CryptoAddress = mock {
@@ -373,12 +366,10 @@ class TradingToOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = actionableBalance,
-            feeAmount = initialFee,
+            feeForFullAvailable = zeroPax,
+            feeAmount = zeroPax,
             selectedFiat = SELECTED_FIAT,
-            feeSelection = FeeSelection(
-                selectedLevel = FeeLevel.None,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
-            )
+            feeSelection = FeeSelection()
         )
 
         // Act
@@ -391,7 +382,7 @@ class TradingToOnChainTxEngineTest {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == actionableBalance &&
-                it.feeAmount == initialFee
+                it.feeAmount == zeroPax
             }
             .assertValue { verifyFeeLevels(it.feeSelection) }
             .assertComplete()
@@ -411,7 +402,7 @@ class TradingToOnChainTxEngineTest {
 
     private fun verifyFeeLevels(feeSelection: FeeSelection) =
         feeSelection.selectedLevel == FeeLevel.None &&
-            feeSelection.availableLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
+            feeSelection.availableLevels == setOf(FeeLevel.None) &&
             feeSelection.availableLevels.contains(feeSelection.selectedLevel) &&
             feeSelection.asset == null &&
             feeSelection.customAmount == -1L
@@ -428,7 +419,5 @@ class TradingToOnChainTxEngineTest {
         private val ASSET = CryptoCurrency.PAX
         private val WRONG_ASSET = CryptoCurrency.BTC
         private const val SELECTED_FIAT = "INR"
-
-        private val EXPECTED_AVAILABLE_FEE_LEVELS = setOf(FeeLevel.None)
     }
 }

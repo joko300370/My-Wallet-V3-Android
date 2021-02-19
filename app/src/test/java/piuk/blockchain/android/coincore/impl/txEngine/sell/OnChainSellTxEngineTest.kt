@@ -420,6 +420,7 @@ class OnChainSellTxEngineTest {
             amount = CryptoValue.zero(SRC_ASSET),
             totalBalance = CryptoValue.zero(SRC_ASSET),
             availableBalance = CryptoValue.zero(SRC_ASSET),
+            feeForFullAvailable = CryptoValue.zero(SRC_ASSET),
             feeAmount = CryptoValue.zero(SRC_ASSET),
             selectedFiat = TGT_ASSET,
             feeSelection = FeeSelection(
@@ -488,6 +489,7 @@ class OnChainSellTxEngineTest {
             amount = CryptoValue.zero(SRC_ASSET),
             totalBalance = CryptoValue.zero(SRC_ASSET),
             availableBalance = CryptoValue.zero(SRC_ASSET),
+            feeForFullAvailable = CryptoValue.zero(SRC_ASSET),
             feeAmount = CryptoValue.zero(SRC_ASSET),
             selectedFiat = TGT_ASSET,
             feeSelection = FeeSelection(
@@ -554,6 +556,7 @@ class OnChainSellTxEngineTest {
             amount = CryptoValue.zero(SRC_ASSET),
             totalBalance = totalBalance,
             availableBalance = availableBalance,
+            feeForFullAvailable = CryptoValue.zero(SRC_ASSET),
             feeAmount = CryptoValue.zero(SRC_ASSET),
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(

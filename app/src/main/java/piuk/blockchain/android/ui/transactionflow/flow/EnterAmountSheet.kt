@@ -193,7 +193,6 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
                 analyticsHooks.onCryptoToggle(it, state)
                 lowerSlot?.displayMode = it.toDisplayMode()
             }
-
     }
 
     private fun CurrencyType.toDisplayMode() =

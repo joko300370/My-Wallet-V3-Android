@@ -198,6 +198,7 @@ class InterestDepositTxEngineTest {
             amount = CryptoValue.zero(ASSET),
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
+            feeForFullAvailable = CryptoValue.zero(ASSET),
             feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -259,6 +260,7 @@ class InterestDepositTxEngineTest {
             amount = CryptoValue.zero(ASSET),
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
+            feeForFullAvailable = CryptoValue.zero(ASSET),
             feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -303,6 +305,7 @@ class InterestDepositTxEngineTest {
             amount = CryptoValue.zero(ASSET),
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
+            feeForFullAvailable = CryptoValue.zero(ASSET),
             feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -356,6 +359,7 @@ class InterestDepositTxEngineTest {
             amount = inputAmount,
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
+            feeForFullAvailable = CryptoValue.zero(ASSET),
             feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -393,6 +397,7 @@ class InterestDepositTxEngineTest {
             amount = inputAmount,
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
+            feeForFullAvailable = CryptoValue.zero(ASSET),
             feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -430,6 +435,7 @@ class InterestDepositTxEngineTest {
             amount = inputAmount,
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
+            feeForFullAvailable = CryptoValue.zero(ASSET),
             feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -467,6 +473,7 @@ class InterestDepositTxEngineTest {
             amount = inputAmount,
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
+            feeForFullAvailable = CryptoValue.zero(ASSET),
             feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(

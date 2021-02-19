@@ -60,6 +60,7 @@ class OnChainSellTxEngine(
                     amount = CryptoValue.zero(sourceAsset),
                     totalBalance = CryptoValue.zero(sourceAsset),
                     availableBalance = CryptoValue.zero(sourceAsset),
+                    feeForFullAvailable = CryptoValue.zero(sourceAsset),
                     feeAmount = CryptoValue.zero(sourceAsset),
                     selectedFiat = userFiat,
                     feeSelection = FeeSelection()

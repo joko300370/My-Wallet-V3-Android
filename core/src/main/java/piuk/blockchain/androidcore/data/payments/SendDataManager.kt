@@ -21,6 +21,10 @@ class SendDataManager(
     private val lastTxUpdater: LastTxUpdater,
     rxBus: RxBus
 ) {
+    data class MaxAvailable(
+        val maxSpendable: CryptoValue,
+        val forForMax: CryptoValue
+    )
 
     private val rxPinning: RxPinning = RxPinning(rxBus)
 
@@ -190,15 +194,18 @@ class SendDataManager(
         cryptoCurrency: CryptoCurrency,
         unspentCoins: UnspentOutputs,
         feePerKb: CryptoValue
-    ): CryptoValue =
-        CryptoValue(
-            cryptoCurrency,
-            paymentService.getMaximumAvailable(
-                unspentCoins,
-                feePerKb.toBigInteger(),
-        cryptoCurrency == CryptoCurrency.BCH
-            ).left
+    ): MaxAvailable {
+        val available = paymentService.getMaximumAvailable(
+            unspentCoins,
+            feePerKb.toBigInteger(),
+            cryptoCurrency == CryptoCurrency.BCH
         )
+
+        return MaxAvailable(
+            maxSpendable = CryptoValue.fromMinor(cryptoCurrency, available.left),
+            forForMax = CryptoValue.fromMinor(cryptoCurrency, available.right)
+        )
+    }
 
     /**
      * Returns true if the `absoluteFee` is adequate for the number of inputs/outputs in the

@@ -78,6 +78,7 @@ class XlmOnChainTxEngine(
                 amount = CryptoValue.zero(sourceAsset),
                 totalBalance = CryptoValue.zero(sourceAsset),
                 availableBalance = CryptoValue.zero(sourceAsset),
+                feeForFullAvailable = CryptoValue.zero(sourceAsset),
                 feeAmount = CryptoValue.zero(sourceAsset),
                 feeSelection = FeeSelection(
                     selectedLevel = FeeLevel.Regular,
@@ -107,6 +108,7 @@ class XlmOnChainTxEngine(
                 amount = amount,
                 totalBalance = total,
                 availableBalance = Money.max(available - fees, CryptoValue.zero(CryptoCurrency.XLM)) as CryptoValue,
+                feeForFullAvailable = fees,
                 feeAmount = fees
             )
         }

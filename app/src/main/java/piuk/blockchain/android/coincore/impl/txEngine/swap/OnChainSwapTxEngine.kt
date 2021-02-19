@@ -71,6 +71,7 @@ class OnChainSwapTxEngine(
                     amount = CryptoValue.zero(sourceAsset),
                     totalBalance = CryptoValue.zero(sourceAsset),
                     availableBalance = CryptoValue.zero(sourceAsset),
+                    feeForFullAvailable = CryptoValue.zero(sourceAsset),
                     feeAmount = CryptoValue.zero(sourceAsset),
                     feeSelection = FeeSelection(),
                     selectedFiat = userFiat

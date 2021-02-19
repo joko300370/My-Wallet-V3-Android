@@ -123,8 +123,8 @@ class BchOnChainTxEngineTest {
         subject.assertInputsValid()
 
         // Assert
-        verify(txTarget).asset
-        verify(sourceAccount).asset
+        verify(txTarget, atLeastOnce()).asset
+        verify(sourceAccount, atLeastOnce()).asset
 
         noMoreInteractions(sourceAccount, txTarget)
     }
@@ -219,6 +219,7 @@ class BchOnChainTxEngineTest {
             .assertComplete()
 
         verify(currencyPrefs).selectedFiatCurrency
+        verify(sourceAccount, atLeastOnce()).asset
 
         noMoreInteractions(sourceAccount, txTarget)
     }
@@ -255,7 +256,12 @@ class BchOnChainTxEngineTest {
                 unspentOutputs,
                 feePerKb
             )
-        ).thenReturn(totalSweepable as CryptoValue)
+        ).thenReturn(
+            SendDataManager.MaxAvailable(
+                totalSweepable as CryptoValue,
+                totalFee
+            )
+        )
 
         val utxoBundle: SpendableUnspentOutputs = mock {
             on { absoluteFee } itReturns totalFee.toBigInteger()
@@ -277,6 +283,7 @@ class BchOnChainTxEngineTest {
             amount = CryptoValue.zero(ASSET),
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
+            feeForFullAvailable = CryptoValue.zero(ASSET),
             feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -295,6 +302,7 @@ class BchOnChainTxEngineTest {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == totalSweepable &&
+                it.feeForFullAvailable == totalFee &&
                 it.feeAmount == totalFee
             }
             .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
@@ -343,6 +351,7 @@ class BchOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = totalSweepable,
+            feeForFullAvailable = totalFee,
             feeAmount = totalFee,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -388,6 +397,7 @@ class BchOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = totalSweepable,
+            feeForFullAvailable = totalFee,
             feeAmount = totalFee,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -433,6 +443,7 @@ class BchOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = totalSweepable,
+            feeForFullAvailable = totalFee,
             feeAmount = totalFee,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -478,6 +489,7 @@ class BchOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = totalSweepable,
+            feeForFullAvailable = totalFee,
             feeAmount = totalFee,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(

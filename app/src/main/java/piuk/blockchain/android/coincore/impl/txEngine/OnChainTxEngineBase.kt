@@ -49,14 +49,14 @@ abstract class OnChainTxEngineBase(
         if (pTx.feeSelection.selectedLevel == FeeLevel.Custom) {
             when {
                 pTx.feeSelection.customAmount == -1L -> FeeState.ValidCustomFee
-                pTx.feeSelection.customAmount  < MINIMUM_CUSTOM_FEE -> {
+                pTx.feeSelection.customAmount < MINIMUM_CUSTOM_FEE -> {
                     FeeState.FeeUnderMinLimit
                 }
-                pTx.feeSelection.customAmount  >= MINIMUM_CUSTOM_FEE &&
-                    pTx.feeSelection.customAmount  <= feeOptions?.limits?.min ?: 0L -> {
+                pTx.feeSelection.customAmount >= MINIMUM_CUSTOM_FEE &&
+                    pTx.feeSelection.customAmount <= feeOptions?.limits?.min ?: 0L -> {
                     FeeState.FeeUnderRecommended
                 }
-                pTx.feeSelection.customAmount  >= feeOptions?.limits?.max ?: 0L -> {
+                pTx.feeSelection.customAmount >= feeOptions?.limits?.max ?: 0L -> {
                     FeeState.FeeOverRecommended
                 }
                 else -> FeeState.ValidCustomFee

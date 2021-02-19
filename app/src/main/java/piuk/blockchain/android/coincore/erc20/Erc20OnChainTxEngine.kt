@@ -43,6 +43,7 @@ open class Erc20OnChainTxEngine(
                 amount = CryptoValue.zero(sourceAsset),
                 totalBalance = CryptoValue.zero(sourceAsset),
                 availableBalance = CryptoValue.zero(sourceAsset),
+                feeForFullAvailable = CryptoValue.zero(CryptoCurrency.ETHER),
                 feeAmount = CryptoValue.zero(CryptoCurrency.ETHER),
                 feeSelection = FeeSelection(
                     selectedLevel = mapSavedFeeToFeeLevel(fetchDefaultFeeLevel(sourceAsset)),
@@ -111,6 +112,7 @@ open class Erc20OnChainTxEngine(
                 amount = amount,
                 totalBalance = total,
                 availableBalance = available,
+                feeForFullAvailable = fee,
                 feeAmount = fee
             )
         }

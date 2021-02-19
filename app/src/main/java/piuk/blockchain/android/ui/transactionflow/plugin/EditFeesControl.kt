@@ -28,7 +28,6 @@ import piuk.blockchain.android.databinding.ViewEditTxFeesCtrlBinding
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
-import piuk.blockchain.android.ui.transactionflow.flow.formatWithExchange
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.AfterTextChangedWatcher
@@ -166,10 +165,7 @@ class EditFeesControl @JvmOverloads constructor(
                     binding.feeOptionValue.text = context.getString(R.string.send_confirmation_insufficient_fee)
                     binding.feeOptionValue.setTextColor(context.getResolvedColor(R.color.red_600))
                 }
-                is FeeState.FeeDetails -> {
-//                    binding.feeOptionValue.text = it.absoluteFee.formatWithExchange(item.exchange)
-                    binding.feeOptionValue.setTextColor(context.getResolvedColor(R.color.grey_800))
-                }
+                is FeeState.FeeDetails -> { }
             }
         }
     }

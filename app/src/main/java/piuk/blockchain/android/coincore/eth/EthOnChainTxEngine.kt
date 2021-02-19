@@ -2,7 +2,6 @@ package piuk.blockchain.android.coincore.eth
 
 import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
-import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import info.blockchain.balance.Money.Companion.max
@@ -40,8 +39,8 @@ open class EthOnChainTxEngine(
 ) {
     override fun assertInputsValid() {
         check(txTarget is CryptoAddress)
-        check((txTarget as CryptoAddress).asset == CryptoCurrency.ETHER)
-        check(sourceAsset == CryptoCurrency.ETHER)
+        check((txTarget as CryptoAddress).asset == sourceAsset)
+        check(sourceAsset == sourceAsset)
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
@@ -50,11 +49,12 @@ open class EthOnChainTxEngine(
                 amount = CryptoValue.zero(sourceAsset),
                 totalBalance = CryptoValue.zero(sourceAsset),
                 availableBalance = CryptoValue.zero(sourceAsset),
+                feeForFullAvailable = CryptoValue.zero(sourceAsset),
                 feeAmount = CryptoValue.zero(sourceAsset),
                 feeSelection = FeeSelection(
                     selectedLevel = mapSavedFeeToFeeLevel(fetchDefaultFeeLevel(sourceAsset)),
                     availableLevels = AVAILABLE_FEE_LEVELS,
-                    asset = CryptoCurrency.ETHER
+                    asset = sourceAsset
                 ),
                 selectedFiat = userFiat
             )
@@ -78,7 +78,7 @@ open class EthOnChainTxEngine(
     private fun absoluteFee(feeLevel: FeeLevel): Single<CryptoValue> =
         feeOptions().map {
             CryptoValue.fromMinor(
-                CryptoCurrency.ETHER,
+                sourceAsset,
                 Convert.toWei(
                     BigDecimal.valueOf(it.gasLimit * it.mapFeeLevel(feeLevel)),
                     Convert.Unit.GWEI
@@ -108,7 +108,7 @@ open class EthOnChainTxEngine(
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
         require(amount is CryptoValue)
-        require(amount.currency == CryptoCurrency.ETHER)
+        require(amount.currency == sourceAsset)
 
         return Singles.zip(
             sourceAccount.accountBalance.map { it as CryptoValue },
@@ -119,6 +119,7 @@ open class EthOnChainTxEngine(
                 amount = amount,
                 totalBalance = total,
                 availableBalance = max(available - fees, CryptoValue.zero(sourceAsset)) as CryptoValue,
+                feeForFullAvailable = fees,
                 feeAmount = fees
             )
         }

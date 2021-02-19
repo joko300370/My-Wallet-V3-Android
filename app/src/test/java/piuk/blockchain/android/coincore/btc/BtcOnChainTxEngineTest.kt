@@ -1,3 +1,5 @@
+@file:Suppress("UnnecessaryVariable")
+
 package piuk.blockchain.android.coincore.btc
 
 import com.blockchain.android.testutils.rxInit
@@ -245,7 +247,12 @@ class BtcOnChainTxEngineTest {
                 unspentOutputs,
                 feePerKb
             )
-        ).thenReturn(totalSweepable as CryptoValue)
+        ).thenReturn(
+            SendDataManager.MaxAvailable(
+                totalSweepable as CryptoValue,
+                (totalBalance - totalFee) as CryptoValue
+            )
+        )
 
         val utxoBundle: SpendableUnspentOutputs = mock {
             on { absoluteFee } itReturns totalFee.toBigInteger()
@@ -267,6 +274,7 @@ class BtcOnChainTxEngineTest {
             amount = CryptoValue.zero(ASSET),
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
+            feeForFullAvailable = CryptoValue.zero(ASSET),
             feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -296,7 +304,8 @@ class BtcOnChainTxEngineTest {
         verify(sourceAccount).accountBalance
         verify(btcDataManager).getAddressBalance(SOURCE_XPUB)
         verify(feeManager).btcFeeOptions
-        verify(btcFeeOptions).regularFee
+        verify(btcFeeOptions, atLeastOnce()).priorityFee
+        verify(btcFeeOptions, atLeastOnce()).regularFee
         verify(unspentOutputs).unspentOutputs
         verify(sendDataManager).getUnspentBtcOutputs(SOURCE_XPUB)
         verify(sendDataManager).getMaximumAvailable(ASSET, unspentOutputs, feePerKb)
@@ -321,6 +330,7 @@ class BtcOnChainTxEngineTest {
         val totalBalance = 21.bitcoin()
         val actionableBalance = 19.bitcoin()
         val totalSweepable = totalBalance - totalFee
+        val fullFee = totalBalance - actionableBalance
 
         val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
 
@@ -338,7 +348,12 @@ class BtcOnChainTxEngineTest {
                 unspentOutputs,
                 feePerKb
             )
-        ).thenReturn(totalSweepable as CryptoValue)
+        ).thenReturn(
+            SendDataManager.MaxAvailable(
+                totalSweepable as CryptoValue,
+                fullFee as CryptoValue
+            )
+        )
 
         val utxoBundle: SpendableUnspentOutputs = mock {
             on { absoluteFee } itReturns totalFee.toBigInteger()
@@ -360,6 +375,7 @@ class BtcOnChainTxEngineTest {
             amount = CryptoValue.zero(ASSET),
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
+            feeForFullAvailable = CryptoValue.zero(ASSET),
             feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -389,7 +405,8 @@ class BtcOnChainTxEngineTest {
         verify(sourceAccount).accountBalance
         verify(btcDataManager).getAddressBalance(SOURCE_XPUB)
         verify(feeManager).btcFeeOptions
-        verify(btcFeeOptions).priorityFee
+        verify(btcFeeOptions, atLeastOnce()).regularFee
+        verify(btcFeeOptions, atLeastOnce()).priorityFee
         verify(unspentOutputs).unspentOutputs
         verify(sendDataManager).getUnspentBtcOutputs(SOURCE_XPUB)
         verify(sendDataManager).getMaximumAvailable(ASSET, unspentOutputs, feePerKb)
@@ -407,6 +424,7 @@ class BtcOnChainTxEngineTest {
         val totalBalance = 21.bitcoin()
         val actionableBalance = 19.bitcoin()
         val regularSweepable = totalBalance - regularFee
+        val fullFee = totalBalance - actionableBalance
 
         val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
 
@@ -433,7 +451,12 @@ class BtcOnChainTxEngineTest {
                 unspentOutputs,
                 feePerKb
             )
-        ).thenReturn(prioritySweepable as CryptoValue)
+        ).thenReturn(
+            SendDataManager.MaxAvailable(
+                prioritySweepable as CryptoValue,
+                priorityFee
+            )
+        )
 
         val utxoBundle: SpendableUnspentOutputs = mock {
             on { absoluteFee } itReturns priorityFee.toBigInteger()
@@ -455,6 +478,7 @@ class BtcOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = regularSweepable,
+            feeForFullAvailable = fullFee,
             feeAmount = regularFee,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -476,6 +500,7 @@ class BtcOnChainTxEngineTest {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == prioritySweepable &&
+                it.feeForFullAvailable == priorityFee &&
                 it.feeAmount == priorityFee
             }
             .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Priority) }
@@ -485,7 +510,8 @@ class BtcOnChainTxEngineTest {
         verify(sourceAccount).accountBalance
         verify(btcDataManager).getAddressBalance(SOURCE_XPUB)
         verify(feeManager).btcFeeOptions
-        verify(btcFeeOptions).priorityFee
+        verify(btcFeeOptions, atLeastOnce()).regularFee
+        verify(btcFeeOptions, atLeastOnce()).priorityFee
         verify(unspentOutputs).unspentOutputs
         verify(sendDataManager).getUnspentBtcOutputs(SOURCE_XPUB)
         verify(sendDataManager).getMaximumAvailable(ASSET, unspentOutputs, feePerKb)
@@ -522,6 +548,7 @@ class BtcOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = regularSweepable,
+            feeForFullAvailable = regularFee,
             feeAmount = regularFee,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -566,6 +593,7 @@ class BtcOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = regularSweepable,
+            feeForFullAvailable = regularFee,
             feeAmount = regularFee,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -602,6 +630,7 @@ class BtcOnChainTxEngineTest {
         val totalBalance = 21.bitcoin()
         val actionableBalance = 19.bitcoin()
         val regularSweepable = totalBalance - regularFee
+        val fullFee = regularFee
 
         val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
 
@@ -629,7 +658,12 @@ class BtcOnChainTxEngineTest {
                 unspentOutputs,
                 feePerKb
             )
-        ).thenReturn(expectedSweepable as CryptoValue)
+        ).thenReturn(
+            SendDataManager.MaxAvailable(
+                expectedSweepable as CryptoValue,
+                expectedFee
+            )
+        )
 
         val utxoBundle: SpendableUnspentOutputs = mock {
             on { absoluteFee } itReturns expectedFee.toBigInteger()
@@ -651,6 +685,7 @@ class BtcOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = regularSweepable,
+            feeForFullAvailable = fullFee,
             feeAmount = regularFee,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -672,6 +707,7 @@ class BtcOnChainTxEngineTest {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == expectedSweepable &&
+                it.feeForFullAvailable == expectedFee &&
                 it.feeAmount == expectedFee
             }
             .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Custom, feeCustom) }
@@ -681,6 +717,9 @@ class BtcOnChainTxEngineTest {
         verify(sourceAccount).accountBalance
         verify(btcDataManager).getAddressBalance(SOURCE_XPUB)
         verify(feeManager).btcFeeOptions
+        verify(btcFeeOptions, atLeastOnce()).regularFee
+        verify(btcFeeOptions, atLeastOnce()).priorityFee
+        verify(btcFeeOptions, atLeastOnce()).limits
         verify(unspentOutputs).unspentOutputs
         verify(sendDataManager).getUnspentBtcOutputs(SOURCE_XPUB)
         verify(sendDataManager).getMaximumAvailable(ASSET, unspentOutputs, feePerKb)
@@ -701,6 +740,7 @@ class BtcOnChainTxEngineTest {
         val initialCustomFee = 7L
         val initialFee = (initialCustomFee * 1000 * 3).satoshi()
         val customSweepable = totalBalance - initialFee
+        val fullFee = initialFee
 
         val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
 
@@ -728,7 +768,12 @@ class BtcOnChainTxEngineTest {
                 unspentOutputs,
                 feePerKb
             )
-        ).thenReturn(expectedSweepable as CryptoValue)
+        ).thenReturn(
+            SendDataManager.MaxAvailable(
+                expectedSweepable as CryptoValue,
+                expectedFee
+            )
+        )
 
         val utxoBundle: SpendableUnspentOutputs = mock {
             on { absoluteFee } itReturns expectedFee.toBigInteger()
@@ -750,6 +795,7 @@ class BtcOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = customSweepable,
+            feeForFullAvailable = fullFee,
             feeAmount = initialFee,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -773,6 +819,7 @@ class BtcOnChainTxEngineTest {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == expectedSweepable &&
+                it.feeForFullAvailable == expectedFee &&
                 it.feeAmount == expectedFee
             }
             .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Custom, feeCustom) }
@@ -782,6 +829,9 @@ class BtcOnChainTxEngineTest {
         verify(sourceAccount).accountBalance
         verify(btcDataManager).getAddressBalance(SOURCE_XPUB)
         verify(feeManager).btcFeeOptions
+        verify(btcFeeOptions, atLeastOnce()).regularFee
+        verify(btcFeeOptions, atLeastOnce()).priorityFee
+        verify(btcFeeOptions, atLeastOnce()).limits
         verify(unspentOutputs).unspentOutputs
         verify(sendDataManager).getUnspentBtcOutputs(SOURCE_XPUB)
         verify(sendDataManager).getMaximumAvailable(ASSET, unspentOutputs, feePerKb)

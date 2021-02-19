@@ -40,6 +40,7 @@ class FiatDepositTxEngine(
                 amount = zeroFiat,
                 totalBalance = zeroFiat,
                 availableBalance = zeroFiat,
+                feeForFullAvailable = zeroFiat,
                 maxLimit = limits.max,
                 minLimit = limits.min,
                 feeAmount = zeroFiat,

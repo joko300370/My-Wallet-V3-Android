@@ -274,6 +274,7 @@ class TradingSellTxEngineTest {
                 it.amount == CryptoValue.zero(SRC_ASSET) &&
                 it.totalBalance == CryptoValue.zero(SRC_ASSET) &&
                 it.availableBalance == CryptoValue.zero(SRC_ASSET) &&
+                it.feeForFullAvailable == CryptoValue.zero(SRC_ASSET) &&
                 it.feeAmount == CryptoValue.zero(SRC_ASSET) &&
                 it.selectedFiat == TGT_ASSET &&
                 it.confirmations.isEmpty() &&
@@ -316,12 +317,10 @@ class TradingSellTxEngineTest {
             amount = CryptoValue.zero(SRC_ASSET),
             totalBalance = CryptoValue.zero(SRC_ASSET),
             availableBalance = CryptoValue.zero(SRC_ASSET),
+            feeForFullAvailable = CryptoValue.zero(SRC_ASSET),
             feeAmount = CryptoValue.zero(SRC_ASSET),
             selectedFiat = TGT_ASSET,
-            feeSelection = FeeSelection(
-                selectedLevel =  FeeLevel.None,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
-            )
+            feeSelection = FeeSelection()
         )
 
         val inputAmount = 2.bitcoin()
@@ -358,7 +357,7 @@ class TradingSellTxEngineTest {
         val totalBalance: Money = 21.bitcoin()
         val actionableBalance: Money = 20.bitcoin()
         val inputAmount = 2.bitcoin()
-        val initialFee = 0.bitcoin()
+        val zeroBtc = 0.bitcoin()
 
         val sourceAccount = fundedSourceAccount(totalBalance, actionableBalance)
         val txTarget: FiatAccount = mock {
@@ -375,12 +374,10 @@ class TradingSellTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = totalBalance,
-            feeAmount = initialFee,
+            feeForFullAvailable = zeroBtc,
+            feeAmount = zeroBtc,
             selectedFiat = TGT_ASSET,
-            feeSelection = FeeSelection(
-                selectedLevel =  FeeLevel.None,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
-            )
+            feeSelection = FeeSelection()
         )
 
         // Act
@@ -397,7 +394,7 @@ class TradingSellTxEngineTest {
         val totalBalance: Money = 21.bitcoin()
         val actionableBalance: Money = 20.bitcoin()
         val inputAmount = 2.bitcoin()
-        val initialFee = 0.bitcoin()
+        val zeroBtc = 0.bitcoin()
 
         val sourceAccount = fundedSourceAccount(totalBalance, actionableBalance)
         val txTarget: FiatAccount = mock {
@@ -414,12 +411,10 @@ class TradingSellTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = totalBalance,
-            feeAmount = initialFee,
+            feeForFullAvailable = zeroBtc,
+            feeAmount = zeroBtc,
             selectedFiat = TGT_ASSET,
-            feeSelection = FeeSelection(
-                selectedLevel =  FeeLevel.None,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
-            )
+            feeSelection = FeeSelection()
         )
 
         // Act
@@ -436,7 +431,7 @@ class TradingSellTxEngineTest {
         val totalBalance: Money = 21.bitcoin()
         val actionableBalance: Money = 20.bitcoin()
         val inputAmount = 2.bitcoin()
-        val initialFee = 0.bitcoin()
+        val zeroBtc = 0.bitcoin()
 
         val sourceAccount = fundedSourceAccount(totalBalance, actionableBalance)
         val txTarget: FiatAccount = mock {
@@ -453,12 +448,10 @@ class TradingSellTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = totalBalance,
-            feeAmount = initialFee,
+            feeForFullAvailable = zeroBtc,
+            feeAmount = zeroBtc,
             selectedFiat = TGT_ASSET,
-            feeSelection = FeeSelection(
-                selectedLevel =  FeeLevel.None,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
-            )
+            feeSelection = FeeSelection()
         )
 
         // Act
@@ -475,7 +468,7 @@ class TradingSellTxEngineTest {
         val totalBalance: Money = 21.bitcoin()
         val actionableBalance: Money = 20.bitcoin()
         val inputAmount = 2.bitcoin()
-        val initialFee = 0.bitcoin()
+        val zeroBtc = 0.bitcoin()
 
         val sourceAccount = fundedSourceAccount(totalBalance, actionableBalance)
         val txTarget: FiatAccount = mock {
@@ -492,12 +485,10 @@ class TradingSellTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = totalBalance,
-            feeAmount = initialFee,
+            feeForFullAvailable = zeroBtc,
+            feeAmount = zeroBtc,
             selectedFiat = TGT_ASSET,
-            feeSelection = FeeSelection(
-                selectedLevel =  FeeLevel.None,
-                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
-            )
+            feeSelection = FeeSelection()
         )
 
         // Act
@@ -512,7 +503,7 @@ class TradingSellTxEngineTest {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == totalBalance &&
-                it.feeAmount == initialFee
+                it.feeAmount == zeroBtc
             }
             .assertValue { verifyFeeLevels(it.feeSelection) }
 
@@ -561,7 +552,7 @@ class TradingSellTxEngineTest {
     private fun verifyFeeLevels(
         feeSelection: FeeSelection
     ) = feeSelection.selectedLevel == FeeLevel.None &&
-        feeSelection.availableLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
+        feeSelection.availableLevels == setOf(FeeLevel.None) &&
         feeSelection.availableLevels.contains(feeSelection.selectedLevel) &&
         feeSelection.asset == null &&
         feeSelection.customAmount == -1L
@@ -589,7 +580,5 @@ class TradingSellTxEngineTest {
         private val MIN_GOLD_LIMIT_ASSET = CryptoValue.fromMajor(SRC_ASSET, 50.toBigDecimal())
         private val MAX_GOLD_ORDER_ASSET = CryptoValue.fromMajor(SRC_ASSET, 250.toBigDecimal())
         private val MAX_GOLD_LIMIT_ASSET = CryptoValue.fromMajor(SRC_ASSET, 1000.toBigDecimal())
-
-        private val EXPECTED_AVAILABLE_FEE_LEVELS = setOf(FeeLevel.None)
     }
 }

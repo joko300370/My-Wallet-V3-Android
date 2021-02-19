@@ -481,6 +481,7 @@ class OnChainSwapEngineTest {
             amount = CryptoValue.zero(SRC_ASSET),
             totalBalance = CryptoValue.zero(SRC_ASSET),
             availableBalance = CryptoValue.zero(SRC_ASSET),
+            feeForFullAvailable = CryptoValue.zero(SRC_ASSET),
             feeAmount = CryptoValue.zero(SRC_ASSET),
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -531,7 +532,7 @@ class OnChainSwapEngineTest {
         // Arrange
         val totalBalance: Money = 21.bitcoin()
         val availableBalance: Money = 20.bitcoin()
-
+        val fullFee = totalBalance - availableBalance
         val sourceAccount = mockSourceAccount(totalBalance, availableBalance)
         val txTarget = mockTransactionTarget()
 
@@ -551,6 +552,7 @@ class OnChainSwapEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = availableBalance,
+            feeForFullAvailable = fullFee,
             feeAmount = initialFee,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
@@ -615,6 +617,7 @@ class OnChainSwapEngineTest {
             amount = CryptoValue.zero(SRC_ASSET),
             totalBalance = totalBalance,
             availableBalance = availableBalance,
+            feeForFullAvailable = totalBalance - availableBalance,
             feeAmount = CryptoValue.zero(SRC_ASSET),
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(

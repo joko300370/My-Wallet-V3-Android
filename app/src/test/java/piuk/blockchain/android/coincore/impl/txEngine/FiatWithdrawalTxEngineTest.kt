@@ -118,6 +118,7 @@ class FiatWithdrawalTxEngineTest {
                 it.amount == zeroFiat &&
                     it.totalBalance == zeroFiat &&
                     it.availableBalance == zeroFiat &&
+                    it.feeForFullAvailable == zeroFiat &&
                     it.feeAmount == zeroFiat &&
                     it.selectedFiat == SELECTED_FIAT &&
                     it.confirmations.isEmpty() &&
@@ -149,6 +150,7 @@ class FiatWithdrawalTxEngineTest {
             amount = zeroFiat,
             totalBalance = zeroFiat,
             availableBalance = zeroFiat,
+            feeForFullAvailable = zeroFiat,
             feeAmount = zeroFiat,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection()
@@ -190,6 +192,7 @@ class FiatWithdrawalTxEngineTest {
             validationState = ValidationState.UNINITIALISED,
             totalBalance = zeroFiat,
             availableBalance = zeroFiat,
+            feeForFullAvailable = zeroFiat,
             feeAmount = zeroFiat,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection()
@@ -228,6 +231,7 @@ class FiatWithdrawalTxEngineTest {
             amount = amount,
             totalBalance = zeroFiat,
             availableBalance = zeroFiat,
+            feeForFullAvailable = zeroFiat,
             feeAmount = zeroFiat,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(),
@@ -266,6 +270,7 @@ class FiatWithdrawalTxEngineTest {
             amount = amount,
             totalBalance = zeroFiat,
             availableBalance = zeroFiat,
+            feeForFullAvailable = zeroFiat,
             feeAmount = zeroFiat,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(),
@@ -304,6 +309,7 @@ class FiatWithdrawalTxEngineTest {
             amount = amount,
             totalBalance = zeroFiat,
             availableBalance = zeroFiat,
+            feeForFullAvailable = zeroFiat,
             feeAmount = zeroFiat,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(),
@@ -342,6 +348,7 @@ class FiatWithdrawalTxEngineTest {
             amount = amount,
             totalBalance = zeroFiat,
             availableBalance = zeroFiat,
+            feeForFullAvailable = zeroFiat,
             feeAmount = zeroFiat,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(),
@@ -381,6 +388,7 @@ class FiatWithdrawalTxEngineTest {
             amount = amount,
             totalBalance = balance,
             availableBalance = balance,
+            feeForFullAvailable = zeroFiat,
             feeAmount = zeroFiat,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(),
@@ -426,6 +434,7 @@ class FiatWithdrawalTxEngineTest {
             amount = amount,
             totalBalance = zeroFiat,
             availableBalance = zeroFiat,
+            feeForFullAvailable = zeroFiat,
             feeAmount = zeroFiat,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(),
@@ -475,6 +484,7 @@ class FiatWithdrawalTxEngineTest {
             amount = amount,
             totalBalance = zeroFiat,
             availableBalance = zeroFiat,
+            feeForFullAvailable = zeroFiat,
             feeAmount = zeroFiat,
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(),

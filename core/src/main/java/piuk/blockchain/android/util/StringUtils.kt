@@ -1,6 +1,5 @@
 package piuk.blockchain.android.util
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
@@ -24,7 +23,7 @@ class StringUtils(private val context: Context) {
     fun getStringWithMappedAnnotations(
         @StringRes stringId: Int,
         linksMap: Map<String, Uri?>,
-        ctx: Context, //launchActivity: Activity,
+        ctx: Context,
         onClick: () -> Unit = {}
     ): CharSequence {
 

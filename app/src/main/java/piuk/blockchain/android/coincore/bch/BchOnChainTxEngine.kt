@@ -62,17 +62,18 @@ class BchOnChainTxEngine(
 
     override fun assertInputsValid() {
         check(txTarget is CryptoAddress)
-        check((txTarget as CryptoAddress).asset == CryptoCurrency.BCH)
-        check(sourceAsset == CryptoCurrency.BCH)
+        check((txTarget as CryptoAddress).asset == sourceAsset)
+        check(sourceAsset == sourceAsset)
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
         Single.just(
             PendingTx(
-                amount = CryptoValue.zero(CryptoCurrency.BCH),
-                totalBalance = CryptoValue.zero(CryptoCurrency.BCH),
-                availableBalance = CryptoValue.zero(CryptoCurrency.BCH),
-                feeAmount = CryptoValue.zero(CryptoCurrency.BCH),
+                amount = CryptoValue.zero(sourceAsset),
+                totalBalance = CryptoValue.zero(sourceAsset),
+                availableBalance = CryptoValue.zero(sourceAsset),
+                feeForFullAvailable = CryptoValue.zero(sourceAsset),
+                feeAmount = CryptoValue.zero(sourceAsset),
                 feeSelection = FeeSelection(
                     selectedLevel = FeeLevel.Regular,
                     availableLevels = AVAILABLE_FEE_LEVELS,
@@ -84,7 +85,7 @@ class BchOnChainTxEngine(
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
         require(amount is CryptoValue)
-        require(amount.currency == CryptoCurrency.BCH)
+        require(amount.currency == sourceAsset)
 
         return Singles.zip(
             sourceAccount.accountBalance.map { it as CryptoValue },
@@ -122,8 +123,8 @@ class BchOnChainTxEngine(
         feePerKb: CryptoValue,
         coins: UnspentOutputs
     ): PendingTx {
-        val maxAvailable = sendDataManager.getMaximumAvailable(
-            cryptoCurrency = CryptoCurrency.BCH,
+        val available = sendDataManager.getMaximumAvailable(
+            cryptoCurrency = sourceAsset,
             unspentCoins = coins,
             feePerKb = feePerKb
         )
@@ -137,8 +138,9 @@ class BchOnChainTxEngine(
         return pendingTx.copy(
             amount = amount,
             totalBalance = balance,
-            availableBalance = maxAvailable,
-            feeAmount = CryptoValue.fromMinor(CryptoCurrency.BCH, unspentOutputs.absoluteFee),
+            availableBalance = available.maxSpendable,
+            feeForFullAvailable = available.forForMax,
+            feeAmount = CryptoValue.fromMinor(sourceAsset, unspentOutputs.absoluteFee),
             engineState = pendingTx.engineState.copyAndPut(STATE_UTXO, unspentOutputs)
         )
     }
@@ -153,7 +155,7 @@ class BchOnChainTxEngine(
             }.singleOrError()
 
     private fun feeToCrypto(feePerKb: Long): CryptoValue =
-        CryptoValue.fromMinor(CryptoCurrency.BCH, (feePerKb * 1000).toBigInteger())
+        CryptoValue.fromMinor(sourceAsset, (feePerKb * 1000).toBigInteger())
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         validateAmounts(pendingTx)

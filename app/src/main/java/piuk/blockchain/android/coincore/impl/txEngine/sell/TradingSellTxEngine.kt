@@ -44,11 +44,9 @@ class TradingSellTxEngine(
                         totalBalance = balance,
                         availableBalance = balance,
                         feeAmount = CryptoValue.zero(sourceAsset),
+                        feeForFullAvailable = CryptoValue.zero(sourceAsset),
                         selectedFiat = userFiat,
-                        feeSelection = FeeSelection(
-                            selectedLevel = FeeLevel.None,
-                            availableLevels = AVAILABLE_FEE_LEVELS
-                        )
+                        feeSelection = FeeSelection()
                     )
                 ).flatMap {
                     updateLimits(it, quote)
@@ -58,6 +56,7 @@ class TradingSellTxEngine(
                     amount = CryptoValue.zero(sourceAsset),
                     totalBalance = CryptoValue.zero(sourceAsset),
                     availableBalance = CryptoValue.zero(sourceAsset),
+                    feeForFullAvailable = CryptoValue.zero(sourceAsset),
                     feeAmount = CryptoValue.zero(sourceAsset),
                     selectedFiat = userFiat,
                     feeSelection = FeeSelection()
@@ -95,8 +94,4 @@ class TradingSellTxEngine(
         createSellOrder(pendingTx).map {
             TxResult.UnHashedTxResult(pendingTx.amount)
         }
-
-    companion object {
-        private val AVAILABLE_FEE_LEVELS = setOf(FeeLevel.None)
-    }
 }
