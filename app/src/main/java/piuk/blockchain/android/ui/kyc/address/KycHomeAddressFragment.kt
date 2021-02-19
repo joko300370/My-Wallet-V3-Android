@@ -119,11 +119,6 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
         onViewReady()
     }
 
-    override fun continueToMobileVerification(countryCode: String) {
-        closeKeyboard()
-        navigate(KycNavXmlDirections.actionStartMobileVerification(countryCode))
-    }
-
     @Suppress("ConstantConditionIf")
     override fun continueToVeriffSplash(countryCode: String) {
         closeKeyboard()

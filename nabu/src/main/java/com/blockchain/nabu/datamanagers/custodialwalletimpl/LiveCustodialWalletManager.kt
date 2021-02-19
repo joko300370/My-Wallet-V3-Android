@@ -747,8 +747,7 @@ class LiveCustodialWalletManager(
         interestRepository.getEligibilityForAsset(crypto)
 
     override fun getSupportedFundsFiats(
-        fiatCurrency: String,
-        isTier2Approved: Boolean
+        fiatCurrency: String
     ): Single<List<String>> {
 
         return authenticator.authenticate {

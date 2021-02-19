@@ -191,7 +191,7 @@ class SimpleBuyInteractor(
             .flatMap { (tier, sddEligible) ->
                 custodialWalletManager.fetchSuggestedPaymentMethod(
                     fiatCurrency = fiatCurrency,
-                    sddLimits = sddEligible && tier.isInInitialState(),
+                    fetchSddLimits = sddEligible && tier.isInInitialState(),
                     onlyEligible = tier.isInitialisedFor(KycTierLevel.GOLD)
                 ).map { paymentMethods ->
                     SimpleBuyIntent.PaymentMethodsUpdated(

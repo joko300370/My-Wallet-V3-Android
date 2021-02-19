@@ -135,7 +135,7 @@ interface CustodialWalletManager {
 
     fun fetchSuggestedPaymentMethod(
         fiatCurrency: String,
-        sddLimits: Boolean,
+        fetchSddLimits: Boolean,
         onlyEligible: Boolean
     ): Single<List<PaymentMethod>>
 
@@ -181,7 +181,7 @@ interface CustodialWalletManager {
 
     fun getInterestEligibilityForAsset(crypto: CryptoCurrency): Single<Eligibility>
 
-    fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean): Single<List<String>>
+    fun getSupportedFundsFiats(fiatCurrency: String): Single<List<String>>
 
     fun canTransactWithBankMethods(fiatCurrency: String): Single<Boolean>
 

@@ -109,7 +109,7 @@ class TransactionInteractor(
 
     private fun sellTargets(sourceAccount: CryptoAccount): Single<List<SingleAccount>> {
         val availableFiats =
-            custodialWalletManager.getSupportedFundsFiats(currencyPrefs.selectedFiatCurrency, true)
+            custodialWalletManager.getSupportedFundsFiats(currencyPrefs.selectedFiatCurrency)
         val apiPairs = custodialWalletManager.getSupportedBuySellCryptoCurrencies()
             .zipWith(availableFiats) { supportedPairs, fiats ->
                 supportedPairs.pairs.filter { fiats.contains(it.fiatCurrency) }
