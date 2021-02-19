@@ -212,7 +212,7 @@ class KycHomeAddressPresenter(
             view.setButtonEnabled(
                 addressModel.firstLine.isNotEmpty() &&
                     addressModel.city.isNotEmpty() &&
-                    addressModel.state.isNotEmpty()
+                    addressModel.postCode.isNotEmpty()
             )
         }
     }
