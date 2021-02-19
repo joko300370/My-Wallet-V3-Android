@@ -110,23 +110,25 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
             partOne.length + boldText.length,
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
-        binding.emailInstructions.setText(sb, TextView.BufferType.SPANNABLE)
-        binding.emailStatusText.text = getString(R.string.email_verify)
-        binding.skip.visibleIf { !emailMustBeValidated }
-        binding.txStateIndicator.gone()
-        binding.ctaPrimary.apply {
-            visible()
-            text = getString(R.string.check_my_inbox)
-            setOnClickListener {
-                openInbox()
+        with(binding) {
+            emailInstructions.setText(sb, TextView.BufferType.SPANNABLE)
+            emailStatusText.text = getString(R.string.email_verify)
+            skip.visibleIf { !emailMustBeValidated }
+            txStateIndicator.gone()
+            ctaPrimary.apply {
+                visible()
+                text = getString(R.string.check_my_inbox)
+                setOnClickListener {
+                    openInbox()
+                }
             }
-        }
-        binding.ctaSecondary.apply {
-            visible()
-            text = getString(R.string.did_not_get_email)
-            setOnClickListener {
-                model.process(EmailVeriffIntent.CancelEmailVerification)
-                ResendOrChangeEmailBottomSheet().show(childFragmentManager, BOTTOM_SHEET)
+            ctaSecondary.apply {
+                visible()
+                text = getString(R.string.did_not_get_email)
+                setOnClickListener {
+                    model.process(EmailVeriffIntent.CancelEmailVerification)
+                    ResendOrChangeEmailBottomSheet().show(childFragmentManager, BOTTOM_SHEET)
+                }
             }
         }
     }
