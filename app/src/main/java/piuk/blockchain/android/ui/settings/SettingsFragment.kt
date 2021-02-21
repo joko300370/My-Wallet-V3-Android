@@ -583,7 +583,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
         cardsPref?.findPreference<CardPreference>(ADD_CARD_KEY)?.let {
             it.order = it.order + newCards.size + 1
         } ?: cardsPref?.addPreference(
-            CardPreference(context = requireContext(), card = PaymentMethod.Undefined).apply {
+            CardPreference(context = requireContext()).apply {
                 onClick {
                     addNewCard()
                 }

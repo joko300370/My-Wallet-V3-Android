@@ -444,11 +444,6 @@ sealed class PaymentMethod(
     val order: Int,
     open val isEligible: Boolean
 ) : Serializable {
-    object Undefined : PaymentMethod(UNDEFINED_PAYMENT_ID, null, UNDEFINED_PAYMENT_METHOD_ORDER, true),
-        UndefinedPaymentMethod {
-        override val paymentMethodType: PaymentMethodType
-            get() = PaymentMethodType.UNKNOWN
-    }
 
     data class UndefinedCard(override val limits: PaymentLimits, override val isEligible: Boolean) :
         PaymentMethod(UNDEFINED_CARD_PAYMENT_ID, limits, UNDEFINED_CARD_PAYMENT_METHOD_ORDER, isEligible),
@@ -541,7 +536,6 @@ sealed class PaymentMethod(
     open fun detailedLabel(): String = ""
 
     companion object {
-        const val UNDEFINED_PAYMENT_ID = "UNDEFINED_PAYMENT_ID"
         const val UNDEFINED_CARD_PAYMENT_ID = "UNDEFINED_CARD_PAYMENT_ID"
         const val FUNDS_PAYMENT_ID = "FUNDS_PAYMENT_ID"
         const val UNDEFINED_FUNDS_PAYMENT_ID = "UNDEFINED_FUNDS_PAYMENT_ID"

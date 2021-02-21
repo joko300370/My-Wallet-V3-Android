@@ -191,6 +191,11 @@ class SimpleBuyModel(
                         onError = { }
                     )
             }
+            is SimpleBuyIntent.BuyButtonClicked -> interactor.checkTierLevel()
+                .subscribeBy(
+                    onSuccess = { process(it) },
+                    onError = { process(SimpleBuyIntent.ErrorIntent()) }
+                )
 
             is SimpleBuyIntent.FetchSuggestedPaymentMethod -> interactor.eligiblePaymentMethods(
                 intent.fiatCurrency,
@@ -239,6 +244,19 @@ class SimpleBuyModel(
                     },
                     onError = { process(SimpleBuyIntent.ErrorIntent()) }
                 )
+            is SimpleBuyIntent.UpdatePaymentMethodsAndAddTheFirstEligible -> interactor.eligiblePaymentMethods(
+                intent.fiatCurrency, null
+            ).subscribeBy(
+                onSuccess = {
+                    process(it)
+                    it.availablePaymentMethods.firstOrNull { it.isEligible }?.let { paymentMethod ->
+                        process(SimpleBuyIntent.AddNewPaymentMethodRequested(paymentMethod))
+                    }
+                },
+                onError = {
+                    process(SimpleBuyIntent.ErrorIntent())
+                }
+            )
             is SimpleBuyIntent.CheckOrderStatus -> interactor.pollForOrderStatus(
                 previousState.id ?: throw IllegalStateException("Order Id not available")
             ).subscribeBy(

@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Typeface
 import android.text.TextUtils
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import com.blockchain.nabu.datamanagers.PaymentMethod
@@ -20,7 +21,7 @@ import java.util.Date
 import java.util.Locale
 
 class CardPreference(
-    private val card: PaymentMethod,
+    private val card: PaymentMethod? = null,
     context: Context
 ) : Preference(context, null, R.attr.preferenceStyle, 0) {
     private val typeface: Typeface = context.loadInterMedium()
@@ -31,8 +32,9 @@ class CardPreference(
         this.title = title // Forces setting fonts when Title is set via XML
 
         title = (card as? PaymentMethod.Card)?.uiLabel() ?: context.getString(R.string.add_card_title)
-        icon = getContext().getDrawable((card as? PaymentMethod.Card)?.cardType?.icon()
-            ?: R.drawable.ic_payment_card)
+        icon = ContextCompat.getDrawable(context, (card as? PaymentMethod.Card)?.cardType?.icon()
+            ?: R.drawable.ic_payment_card
+        )
     }
 
     override fun setTitle(titleResId: Int) {
