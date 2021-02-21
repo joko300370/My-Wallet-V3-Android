@@ -531,7 +531,8 @@ val applicationModule = module {
                 kycStatusHelper = get(),
                 pitLinking = get(),
                 analytics = get(),
-                biometricsController = get()
+                biometricsController = get(),
+                ratingPrefs = get()
             )
         }
 

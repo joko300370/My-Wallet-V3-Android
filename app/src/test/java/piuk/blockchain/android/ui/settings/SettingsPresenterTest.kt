@@ -6,6 +6,7 @@ import com.blockchain.nabu.models.responses.nabu.KycTierState
 import com.blockchain.nabu.models.responses.nabu.NabuApiException.Companion.fromResponseBody
 import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.preferences.RatingPrefs
 import com.blockchain.remoteconfig.FeatureFlag
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
@@ -75,6 +76,7 @@ class SettingsPresenterTest {
     private val emailSyncUpdater: EmailSyncUpdater = mock()
     private val pitLinking: PitLinking = mock()
     private val pitLinkState: PitLinkingState = mock()
+    private val ratingPrefs: RatingPrefs = mock()
 
     private val featureFlag: FeatureFlag = mock()
 
@@ -99,7 +101,8 @@ class SettingsPresenterTest {
             kycStatusHelper = kycStatusHelper,
             pitLinking = pitLinking,
             analytics = analytics,
-            biometricsController = biometricsController
+            biometricsController = biometricsController,
+            ratingPrefs = ratingPrefs
         )
         subject.initView(activity)
         whenever(prefsUtil.selectedFiatCurrency).thenReturn("USD")

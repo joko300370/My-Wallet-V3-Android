@@ -325,6 +325,6 @@ class SimpleBuyModel(
     }
 
     companion object {
-        private const val COMPLETED_ORDERS_BEFORE_SHOWING_APP_RATING = 1
+        const val COMPLETED_ORDERS_BEFORE_SHOWING_APP_RATING = 1
     }
 }

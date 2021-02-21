@@ -14,6 +14,7 @@ import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
+import com.blockchain.preferences.RatingPrefs
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.settings.SettingsManager
@@ -26,6 +27,7 @@ import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.biometrics.BiometricsController
+import piuk.blockchain.android.simplebuy.SimpleBuyModel
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.thepit.PitLinkingState
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
@@ -56,7 +58,8 @@ class SettingsPresenter(
     private val kycStatusHelper: KycStatusHelper,
     private val pitLinking: PitLinking,
     private val analytics: Analytics,
-    private val biometricsController: BiometricsController
+    private val biometricsController: BiometricsController,
+    private val ratingPrefs: RatingPrefs
 ) : BasePresenter<SettingsView>() {
 
     private val fiatUnit: String
@@ -122,6 +125,12 @@ class SettingsPresenter(
                     Timber.i(it)
                 }
             )
+    }
+
+    fun checkShouldDisplayRateUs() {
+        if (ratingPrefs.preRatingActionCompletedTimes >= SimpleBuyModel.COMPLETED_ORDERS_BEFORE_SHOWING_APP_RATING) {
+            view?.showRateUsPreference()
+        }
     }
 
     fun updateBanks() {

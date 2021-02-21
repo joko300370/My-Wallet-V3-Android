@@ -75,9 +75,6 @@ dependencies {
     implementation(Libraries.firebaseCrashlytics)
     implementation(Libraries.firebaseAnalytics)
 
-    // Custom Views
-    api Libraries.wheelPicker
-
     // Utils
     api Libraries.dexter
 
