@@ -18,7 +18,6 @@ import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.io.Serializable
 import java.math.BigInteger
 import java.util.Date
-import java.util.regex.Pattern
 
 /**
  * This is an object that gets serialized with Gson so any properties that we don't

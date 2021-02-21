@@ -32,7 +32,7 @@ import piuk.blockchain.android.util.maskedAsset
 import piuk.blockchain.android.util.secondsToDays
 
 class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(),
-    SimpleBuyScreen {
+    SimpleBuyScreen, UnlockHigherLimitsBottomSheet.Host {
 
     override val model: SimpleBuyModel by scopedInject()
     private val stringUtils: StringUtils by inject()
@@ -50,8 +50,6 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
     }
 
     private var _binding: FragmentSimpleBuyPaymentBinding? = null
-
-    // This property is only valid between onCreateView and onDestroyView.
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -91,7 +89,6 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
             isFirstLoad = false
         }
         require(newState.selectedPaymentMethod != null)
-
 
         renderTitleAndSubtitle(
             newState
@@ -182,10 +179,10 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
     }
 
     private fun checkForUnlockHigherLimits(shouldShowUnlockMoreFunds: Boolean) {
-        if(!shouldShowUnlockMoreFunds)
+        if (!shouldShowUnlockMoreFunds)
             return
-            binding.transactionProgressView.configureSecondaryButton(getString(R.string.want_to_buy_more)) {
-            // todo show the new bottom sheet
+        binding.transactionProgressView.configureSecondaryButton(getString(R.string.want_to_buy_more)) {
+            showBottomSheet(UnlockHigherLimitsBottomSheet())
         }
     }
 
@@ -237,6 +234,10 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
                 model.process(SimpleBuyIntent.ErrorIntent())
             }
         }
+    }
+
+    override fun unlockHigherLimits() {
+        navigator().startKyc()
     }
 
     override fun navigator(): SimpleBuyNavigator =

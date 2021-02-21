@@ -19,7 +19,7 @@ class VerifyIdentityBenefitsView(context: Context, attrs: AttributeSet) : Constr
     }
 
     fun initWithBenefits(
-        benefits: List<VerifyIdentityBenefit>,
+        benefits: List<VerifyIdentityItem>,
         title: String,
         description: String,
         @DrawableRes icon: Int,
@@ -50,7 +50,7 @@ class VerifyIdentityBenefitsView(context: Context, attrs: AttributeSet) : Constr
         footer_text.visibleIf { footerText.isNotEmpty() }
         footer_text.text = footerText
 
-        val adapter = BenefitsAdapter().apply {
+        val adapter = BenefitsDelegateAdapter().apply {
             items = benefits
         }
 
@@ -64,5 +64,19 @@ class VerifyIdentityBenefitsView(context: Context, attrs: AttributeSet) : Constr
 }
 
 @Parcelize
-data class VerifyIdentityBenefit(val title: String, val subtitle: String) : Parcelable
+data class VerifyIdentityNumericBenefitItem(override val title: String, override val subtitle: String) :
+    VerifyIdentityItem,
+    Parcelable
+
+data class VerifyIdentityIconedBenefitItem(
+    override val title: String,
+    override val subtitle: String,
+    val icon: Int
+) : VerifyIdentityItem
+
 data class ButtonOptions(val visible: Boolean, val text: String? = null, val cta: () -> Unit = {})
+
+interface VerifyIdentityItem {
+    val title: String
+    val subtitle: String
+}

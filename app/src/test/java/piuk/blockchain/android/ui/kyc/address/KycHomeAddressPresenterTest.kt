@@ -413,29 +413,9 @@ class KycHomeAddressPresenterTest {
     }
 
     @Test
-    fun `on continue clicked all data correct, continue to sdd`() {
+    fun `on continue clicked all data correct, continue to sdd for eligible user and campaign Simple buy`() {
         // Arrange
-        val firstLine = "1"
-        val city = "2"
-        val state = "3"
-        val zipCode = "4"
-        val countryCode = "UK"
-        whenever(view.address)
-            .thenReturn(Observable.just(addressModel(firstLine, city, state, zipCode, countryCode)))
-        whenever(
-            nabuToken.fetchNabuToken()
-        ).thenReturn(Single.just(validOfflineToken))
-        whenever(
-            nabuDataManager.addAddress(
-                validOfflineToken,
-                firstLine,
-                null,
-                city,
-                state,
-                zipCode,
-                countryCode
-            )
-        ).thenReturn(Completable.complete())
+        givenAddressCompletes()
         givenRequestJwtAndUpdateWalletInfoSucceds()
         whenever(custodialWalletManager.isSDDEligible()).thenReturn(Single.just(true))
         whenever(custodialWalletManager.fetchSDDUserState()).thenReturn(
@@ -447,6 +427,26 @@ class KycHomeAddressPresenterTest {
         verify(view).showProgressDialog()
         verify(view).dismissProgressDialog()
         verify(view).onSddVerified()
+    }
+
+    @Test
+    fun `all data correct, continue to tier 2 for campaign None but eligible user should get verified`() {
+        // Arrange
+        givenAddressCompletes()
+        givenRequestJwtAndUpdateWalletInfoSucceds()
+        whenever(custodialWalletManager.isSDDEligible()).thenReturn(Single.just(true))
+        whenever(custodialWalletManager.fetchSDDUserState()).thenReturn(
+            Single.just(SDDUserState(isVerified = true, stateFinalised = true))
+        )
+        // Act
+        subject.onContinueClicked(CampaignType.None)
+        // Assert
+        verify(view).showProgressDialog()
+        verify(view).dismissProgressDialog()
+        verify(view, never()).onSddVerified()
+        verify(custodialWalletManager).fetchSDDUserState()
+        verify(custodialWalletManager).isSDDEligible()
+        verify(view).continueToVeriffSplash("UK")
     }
 
     private fun addressModel(
@@ -469,5 +469,29 @@ class KycHomeAddressPresenterTest {
         whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
         whenever(nabuDataManager.updateUserWalletInfo(validOfflineToken, jwt))
             .thenReturn(Single.just(getBlankNabuUser()))
+    }
+
+    private fun givenAddressCompletes() {
+        val firstLine = "1"
+        val city = "2"
+        val state = "3"
+        val zipCode = "4"
+        val countryCode = "UK"
+        whenever(view.address)
+            .thenReturn(Observable.just(addressModel(firstLine, city, state, zipCode, countryCode)))
+        whenever(
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
+        whenever(
+            nabuDataManager.addAddress(
+                validOfflineToken,
+                firstLine,
+                null,
+                city,
+                state,
+                zipCode,
+                countryCode
+            )
+        ).thenReturn(Completable.complete())
     }
 }

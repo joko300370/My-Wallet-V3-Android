@@ -1912,4 +1912,11 @@
     <string name="did_not_get_email">Didn\'t get the email?</string>
     <string name="send_again">Send Again</string>
     <string name="want_to_buy_more">Want to buy more?</string>
+    <string name="unlock_gold_level_trading">Unlock Gold Level Trading</string>
+    <string name="verify_your_identity_limits">Verify your identity, earn interest and trade up to %1$s a day.</string>
+    <string name="apply_and_unlock"><![CDATA[Apply & Unlock Now]]></string>
+    <string name="cash_accounts">Cash Accounts</string>
+    <string name="cash_accounts_description">Store USD, GBP or EUR in your wallet. Use the balance to buy crypto. Sell crypto for cash at anytime.</string>
+    <string name="link_a_bank_description">Store USD, GBP or EUR in your wallet. Use the balance to buy crypto. Sell crypto for cash at anytime.</string>
+    <string name="earn_interest_description">Put your crypto to work. Earn up to 10% monthly by simply doing nothing. Instanly deposit and start earning.</string>
 </resources>
