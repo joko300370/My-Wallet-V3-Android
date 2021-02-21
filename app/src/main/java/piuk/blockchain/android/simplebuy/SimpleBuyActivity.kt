@@ -268,7 +268,6 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
     companion object {
         const val KYC_STARTED = 6788
         const val RESULT_KYC_SIMPLE_BUY_COMPLETE = 7854
-        const val RESULT_KYC_SIMPLE_BUY_FOR_SDD_COMPLETE = 2353
 
         private const val STARTED_FROM_NAVIGATION_KEY = "started_from_navigation_key"
         private const val CRYPTOCURRENCY_KEY = "crypto_currency_key"

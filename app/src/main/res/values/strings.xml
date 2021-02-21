@@ -1141,7 +1141,7 @@
     <string name="kyc_resubmission_splash_description_3">The required photos are missing.</string>
     <string name="kyc_resubmission_splash_description_4">The document you submitted is incorrect.</string>
     <string name="kyc_resubmission_splash_description_5">We were unable to read the images you submitted due to image quality.</string>
-    <string name="sunriver_splash_title">Identity Verification</string>
+    <string name="identity_verification">Identity Verification</string>
     <string name="sunriver_status_message">Your information is being reviewed. The review should complete shortly.</string>
 
     <!-- Sunriver Airdrop -->

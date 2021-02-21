@@ -809,7 +809,7 @@
     <string name="kyc_resubmission_splash_description_3">Требуемые фотографии отсутствуют.</string>
     <string name="kyc_resubmission_splash_description_4">Отправленный вами документ неверен.</string>
     <string name="kyc_resubmission_splash_description_5">Нам не удалось прочитать предоставленные вами изображения из-за качества изображения.</string>
-    <string name="sunriver_splash_title">Подтверждение личности</string>
+    <string name="identity_verification">Подтверждение личности</string>
     <string name="sunriver_status_message">Ваша информация проверяется. Обзор должен завершиться в ближайшее время.</string>
     <string name="buy_sell_splash_title">Купить Продать</string>
     <string name="buy_sell_splash_message">Вы можете покупать и продавать биткойны (BTC) с помощью своей кредитной карты или банковского счета через нашего партнера Coinify.</string>

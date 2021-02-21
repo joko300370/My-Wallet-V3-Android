@@ -134,7 +134,7 @@ class KycHomeAddressPresenter(
             .zipWith(kycNextStepDecision.nextStep())
             .map { (x, progress) -> x.copy(progressToKycNextStep = progress) }
             .flatMap { state ->
-                if (campaignType == CampaignType.SimpleBuy) {
+                if (campaignType?.shouldCheckForSddVerification() == true) {
                     tryToVerifyUserForSdd(state)
                 } else Single.just(state)
             }
@@ -174,16 +174,16 @@ class KycHomeAddressPresenter(
     }
 
     private fun addAddress(address: AddressModel): Completable = fetchOfflineToken.flatMapCompletable {
-            nabuDataManager.addAddress(
-                it,
-                address.firstLine,
-                address.secondLine,
-                address.city,
-                address.state,
-                address.postCode,
-                address.country
-            ).subscribeOn(Schedulers.io())
-        }
+        nabuDataManager.addAddress(
+            it,
+            address.firstLine,
+            address.secondLine,
+            address.city,
+            address.state,
+            address.postCode,
+            address.country
+        ).subscribeOn(Schedulers.io())
+    }
 
     private fun updateNabuData(): Completable =
         nabuDataManager.requestJwt()
@@ -228,3 +228,6 @@ class KycHomeAddressPresenter(
             state.isNotEmpty() ||
             postCode.isNotEmpty()
 }
+
+private fun CampaignType.shouldCheckForSddVerification(): Boolean =
+    this == CampaignType.SimpleBuy || this == CampaignType.None

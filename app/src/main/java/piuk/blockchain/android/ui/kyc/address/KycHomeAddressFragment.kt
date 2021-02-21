@@ -54,6 +54,7 @@ import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
+import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.inflate
@@ -128,11 +129,12 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
 
     override fun tier1Complete() {
         closeKeyboard()
-        navigate(KycHomeAddressFragmentDirections.actionTier1Complete())
+        activity?.setResult(KycNavHostActivity.RESULT_KYC_FOR_TIER_COMPLETE)
+        activity?.finish()
     }
 
     override fun onSddVerified() {
-        activity?.setResult(SimpleBuyActivity.RESULT_KYC_SIMPLE_BUY_FOR_SDD_COMPLETE)
+        activity?.setResult(KycNavHostActivity.RESULT_KYC_FOR_SDD_COMPLETE)
         activity?.finish()
     }
 

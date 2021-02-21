@@ -491,7 +491,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             if (resultCode == SimpleBuyActivity.RESULT_KYC_SIMPLE_BUY_COMPLETE) {
                 model.process(SimpleBuyIntent.KycCompleted)
                 navigator().goToKycVerificationScreen()
-            } else if (resultCode == SimpleBuyActivity.RESULT_KYC_SIMPLE_BUY_FOR_SDD_COMPLETE) {
+            } else if (resultCode == KycNavHostActivity.RESULT_KYC_FOR_SDD_COMPLETE) {
                 model.process(
                     SimpleBuyIntent.UpdatePaymentMethodsAndAddTheFirstEligible(
                         currencyPrefs.selectedFiatCurrency

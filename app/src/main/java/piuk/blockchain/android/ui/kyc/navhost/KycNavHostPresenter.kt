@@ -101,7 +101,7 @@ class KycNavHostPresenter(
                 view.campaignType == CampaignType.SimpleBuy ||
                 view.campaignType == CampaignType.Interest ||
                 view.campaignType == CampaignType.FiatFunds ||
-                (view.campaignType == CampaignType.Swap && !view.showTiersLimitsSplash) -> {
+                view.campaignType == CampaignType.Swap -> {
                 compositeDisposable += kycNavigator.findNextStep()
                     .subscribeBy(
                         onError = { Timber.e(it) },
