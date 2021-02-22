@@ -205,7 +205,7 @@ class CoinsWebSocketStrategy(
             transaction.outputs,
             transaction.hash
         ) { x ->
-            payloadDataManager.wallet?.containsLegacyAddress(x)
+            payloadDataManager.wallet?.containsImportedAddress(x)
         }
 
         updateBtcBalancesAndTransactions()
@@ -220,7 +220,7 @@ class CoinsWebSocketStrategy(
                 transaction.inputs, transaction.outputs,
                 transaction.hash
             ) { x ->
-                bchDataManager.getLegacyAddressStringList().contains(x)
+                bchDataManager.getImportedAddressStringList().contains(x)
             }
 
         updateBchBalancesAndTransactions()
@@ -492,8 +492,8 @@ class CoinsWebSocketStrategy(
     private fun btcReceiveAddresses(): List<String> =
         payloadDataManager.wallet?.let {
             mutableListOf<String>().apply {
-                val legacyList = it.legacyAddressList
-                legacyList.forEach { element ->
+                val importedList = it.importedAddressList
+                importedList.forEach { element ->
                     val address = element.address
                     if (address.isNullOrEmpty().not()) {
                         add(address!!)
@@ -505,8 +505,8 @@ class CoinsWebSocketStrategy(
     private fun bchReceiveAddresses(): List<String> =
         payloadDataManager.wallet?.let {
             mutableListOf<String>().apply {
-                val legacyList = bchDataManager.getLegacyAddressStringList()
-                legacyList.forEach { address ->
+                val importedList = bchDataManager.getImportedAddressStringList()
+                importedList.forEach { address ->
                     if (address.isNotEmpty()) {
                         add(address)
                     }

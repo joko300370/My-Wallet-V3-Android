@@ -10,7 +10,7 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class LegacyAddressTest {
+public class ImportedAddressTest {
 
     @Test
     public void fromJson_1() throws Exception {
@@ -19,9 +19,9 @@ public class LegacyAddressTest {
         String body = new String(Files.readAllBytes(Paths.get(uri)), Charset.forName("utf-8"));
 
         Wallet wallet = Wallet.fromJson(BitcoinMainNetParams.get(), body);
-        Assert.assertEquals(19, wallet.getLegacyAddressList().size());
+        Assert.assertEquals(19, wallet.getImportedAddressList().size());
 
-        LegacyAddress addressBody = wallet.getLegacyAddressList().get(0);
+        ImportedAddress addressBody = wallet.getImportedAddressList().get(0);
         Assert.assertEquals("import 1", addressBody.getLabel());
         Assert.assertEquals("19Axrcn8nsdZkSJtbnyM1rCs1PGwSzzzNn", addressBody.getAddress());
         Assert.assertEquals("g9rIjgOlfASQuJv38i1xdLmP1m2gMTPe96YzJJ9hjI2BBz5RErNOSeHPdeU2ZIOnsk+M1dfFw649MHXb7RAcZg==", addressBody.getPrivateKey());
@@ -30,7 +30,7 @@ public class LegacyAddressTest {
         Assert.assertEquals("android", addressBody.getCreatedDeviceName());
         Assert.assertNull(addressBody.getCreatedDeviceVersion());
 
-        addressBody = wallet.getLegacyAddressList().get(1);
+        addressBody = wallet.getImportedAddressList().get(1);
         Assert.assertEquals("1rW486AbUx2LapYca7kddpULJVqMGMhTH", addressBody.getLabel());
         Assert.assertEquals("1rW486AbUx2LapYca7kddpULJVqMGMhTH", addressBody.getAddress());
         Assert.assertEquals("TIMsVAyWiVcTmcwc6Xv5r494sZcMBRQue6DamkXzDAzOn0cGQSf2XDN+1ZKM/cHgsL0oeJqxrBs9c5TzsNHIZg==", addressBody.getPrivateKey());
@@ -48,7 +48,7 @@ public class LegacyAddressTest {
         String body = new String(Files.readAllBytes(Paths.get(uri)), Charset.forName("utf-8"));
 
         Wallet wallet = Wallet.fromJson(BitcoinMainNetParams.get(), body);
-        LegacyAddress addressBody = wallet.getLegacyAddressList().get(0);
+        ImportedAddress addressBody = wallet.getImportedAddressList().get(0);
 
         String jsonString = addressBody.toJson();
 

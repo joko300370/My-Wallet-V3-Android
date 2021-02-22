@@ -8,7 +8,7 @@ import info.blockchain.wallet.exceptions.HDWalletException
 import info.blockchain.wallet.multiaddress.MultiAddressFactoryBch
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import info.blockchain.wallet.payload.BalanceManagerBch
-import info.blockchain.wallet.payload.data.LegacyAddress
+import info.blockchain.wallet.payload.data.ImportedAddress
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
 import org.bitcoinj.core.ECKey
@@ -66,20 +66,20 @@ open class BitcoinCashWallet : DeterministicWallet {
      * Updates the state of the [BalanceManagerBch], which ingests the balances for each address or
      * xPub.
      *
-     * @param legacyAddressList A list of [LegacyAddress] addresses
-     * @param allAccountsAndAddresses A list of both xPubs from HD accounts and [LegacyAddress]
+     * @param importedAddressList A list of [ImportedAddress] addresses
+     * @param allAccountsAndAddresses A list of both xPubs from HD accounts and [ImportedAddress]
      * addresses
      */
     fun updateAllBalances(
         allAccountsAndAddresses: Set<String>,
-        legacyAddressList: Set<String>
+        importedAddressList: Set<String>
     ): Completable =
         if (isTestnet()) {
             // TODO(bch testnet explorer coming soon)
             Completable.complete()
         } else {
             Completable.fromCallable {
-                balanceManager.updateAllBalances(allAccountsAndAddresses, legacyAddressList)
+                balanceManager.updateAllBalances(allAccountsAndAddresses, importedAddressList)
             }.subscribeOn(Schedulers.io())
         }
 
@@ -91,17 +91,13 @@ open class BitcoinCashWallet : DeterministicWallet {
         balanceManager.importedAddressesBalance
 
     /**
-     *
-     * @param legacyAddressList A list of all xpubs and legacy addresses
-     * @param watchOnly A list of watch-only legacy addresses
      * @param activeXpubs A list of active xPubs addresses.
-     * @param context Xpub or legacy address. Used to fetch transaction only relating to this address.
+     * @param context Xpub address. Used to fetch transaction only relating to this address.
      * @param limit Maximum amount of transactions fetched
      * @param offset Page offset
-     * @return All wallet transactions, all legacy transactions, or transaction relating to a single context/address
+     * @return All wallet transactions, all transactions, or transaction relating to a single context/address
      */
     fun getTransactions(
-        legacyAddressList: List<String>?,
         activeXpubs: List<String>,
         context: String?,
         limit: Int,
@@ -114,7 +110,7 @@ open class BitcoinCashWallet : DeterministicWallet {
         } else {
             multiAddressFactory.getAccountTransactions(
                 activeXpubs,
-                legacyAddressList,
+                null,
                 context,
                 limit,
                 offset,

@@ -8,7 +8,7 @@ import info.blockchain.wallet.api.WalletApi;
 import info.blockchain.wallet.api.WalletExplorerEndpoints;
 import info.blockchain.wallet.multiaddress.MultiAddressFactory;
 import info.blockchain.wallet.payload.data.HDWallet;
-import info.blockchain.wallet.payload.data.LegacyAddress;
+import info.blockchain.wallet.payload.data.ImportedAddress;
 import info.blockchain.wallet.payload.data.Wallet;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.params.BitcoinMainNetParams;
@@ -60,17 +60,17 @@ public final class PayloadManagerIntegTest extends BaseIntegTest {
         walletBody.setHdWallets(new ArrayList<HDWallet>());
 
         //Add legacy so we have at least 1 address
-        LegacyAddress address = new LegacyAddress();
+        ImportedAddress address = new ImportedAddress();
         address.setLabel("HDAddress label");
         address.setAddress("1PbCM934wxCoVc2y5dJqWpi2w8eHur1W2T");
-        LegacyAddress newlyAdded = walletBody.addLegacyAddress(address, null);
+        ImportedAddress newlyAdded = walletBody.addImportedAddress(address, null);
 
         final String guidOriginal = walletBody.getGuid();
 
         walletBody.upgradeV2PayloadToV3(null, "HDAccount Name2");
 
         //Check that existing legacy addresses still exist
-        Assert.assertEquals(newlyAdded.getAddress(), walletBody.getLegacyAddressList().get(0).getAddress());
+        Assert.assertEquals(newlyAdded.getAddress(), walletBody.getImportedAddressList().get(0).getAddress());
 
         //Check that Guid is still same
         Assert.assertEquals(walletBody.getGuid(), guidOriginal);

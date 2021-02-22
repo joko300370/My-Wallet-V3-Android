@@ -44,18 +44,18 @@ public abstract class BalanceManager {
 
     @Nonnull
     public BigInteger getImportedAddressesBalance() {
-        return balanceMap.getTotalSpendableLegacy().toBigInteger();
+        return balanceMap.getTotalSpendableImported().toBigInteger();
     }
 
     public void updateAllBalances(
-            Set<String> xpubs,
-            Set<String> legacyAddresses
+        Set<String> xpubs,
+        Set<String> importedAddresses
     ) {
         balanceMap = CryptoBalanceMapKt.calculateCryptoBalanceMap(
-                cryptoCurrency,
-                getBalanceQuery(),
-                xpubs,
-                legacyAddresses
+            cryptoCurrency,
+            getBalanceQuery(),
+            xpubs,
+            importedAddresses
         );
     }
 

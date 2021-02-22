@@ -2,7 +2,7 @@ package info.blockchain.wallet.util;
 
 import info.blockchain.wallet.api.PersistentUrls;
 import info.blockchain.wallet.bip44.HDAccount;
-import info.blockchain.wallet.payload.data.LegacyAddress;
+import info.blockchain.wallet.payload.data.ImportedAddress;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -110,11 +110,11 @@ public class Tools {
         return ecKey;
     }
 
-    public static List<String> filterLegacyAddress(int filter, @Nonnull List<LegacyAddress> keys) {
+    public static List<String> filterImportedAddress(int filter, @Nonnull List<ImportedAddress> keys) {
 
         List<String> addressList = new ArrayList<>();
 
-        for (LegacyAddress key : keys) {
+        for (ImportedAddress key : keys) {
             if (key.getTag() == filter) {
                 addressList.add(key.getAddress());
             }

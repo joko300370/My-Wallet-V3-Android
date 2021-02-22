@@ -10,7 +10,7 @@ import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.api.data.Balance
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.payload.data.Account
-import info.blockchain.wallet.payload.data.LegacyAddress
+import info.blockchain.wallet.payload.data.ImportedAddress
 import info.blockchain.wallet.payload.data.Wallet
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import info.blockchain.wallet.util.PrivateKeyFactory
@@ -372,15 +372,15 @@ class PayloadDataManagerTest {
     @Test
     fun getAddressECKey() {
         // Arrange
-        val mockLegacyAddress: LegacyAddress = mock()
+        val mockImportedAddress: ImportedAddress = mock()
         val secondPassword = "SECOND_PASSWORD"
         val mockEcKey: ECKey = mock()
-        whenever(payloadManager.getAddressECKey(mockLegacyAddress, secondPassword))
+        whenever(payloadManager.getAddressECKey(mockImportedAddress, secondPassword))
             .thenReturn(mockEcKey)
         // Act
-        val result = subject.getAddressECKey(mockLegacyAddress, secondPassword)
+        val result = subject.getAddressECKey(mockImportedAddress, secondPassword)
         // Assert
-        verify(payloadManager).getAddressECKey(mockLegacyAddress, secondPassword)
+        verify(payloadManager).getAddressECKey(mockImportedAddress, secondPassword)
         verifyNoMoreInteractions(payloadManager)
         result shouldEqual mockEcKey
     }
@@ -400,61 +400,15 @@ class PayloadDataManagerTest {
         assertEquals(mockAccount, observer.values()[0])
     }
 
-//    @Test
-//    fun setPrivateKeySuccessNoDoubleEncryption() {
-//        // Arrange
-//        val mockECKey: ECKey = mock()
-//        val mockLegacyAddress: LegacyAddress = mock()
-//        whenever(payloadService.setKeyForLegacyAddress(eq(mockECKey), isNull()))
-//            .thenReturn(Observable.just(mockLegacyAddress))
-//        // Act
-//        val observer = subject.setKeyForLegacyAddress(mockECKey, null).test()
-//        // Assert
-//        verify(payloadService).setKeyForLegacyAddress(eq(mockECKey), isNull())
-//        observer.assertNoErrors()
-//        observer.assertComplete()
-//        assertEquals(mockLegacyAddress, observer.values()[0])
-//    }
-
-//    @Test
-//    fun setKeyForLegacyAddress() {
-//        // Arrange
-//        val mockECKey: ECKey = mock()
-//        val password = "PASSWORD"
-//        val mockLegacyAddress: LegacyAddress = mock()
-//        whenever(payloadService.setKeyForLegacyAddress(mockECKey, password))
-//            .thenReturn(Observable.just(mockLegacyAddress))
-//        // Act
-//        val observer = subject.setKeyForLegacyAddress(mockECKey, password).test()
-//        // Assert
-//        verify(payloadService).setKeyForLegacyAddress(mockECKey, password)
-//        observer.assertNoErrors()
-//        observer.assertComplete()
-//        assertEquals(mockLegacyAddress, observer.values()[0])
-//    }
-
-//    @Test
-//    fun addLegacyAddress() {
-//        // Arrange
-//        val mockLegacyAddress: LegacyAddress = mock()
-//        whenever(payloadService.addLegacyAddress(mockLegacyAddress)).thenReturn(Completable.complete())
-//        // Act
-//        val observer = subject.addLegacyAddress(mockLegacyAddress).test()
-//        // Assert
-//        verify(payloadService).addLegacyAddress(mockLegacyAddress)
-//        observer.assertNoErrors()
-//        observer.assertComplete()
-//    }
-
     @Test
-    fun updateLegacyAddress() {
+    fun updateImportedAddress() {
         // Arrange
-        val mockLegacyAddress: LegacyAddress = mock()
-        whenever(payloadService.updateLegacyAddress(mockLegacyAddress)).thenReturn(Completable.complete())
+        val mockImportedAddress: ImportedAddress = mock()
+        whenever(payloadService.updateImportedAddress(mockImportedAddress)).thenReturn(Completable.complete())
         // Act
-        val observer = subject.updateLegacyAddress(mockLegacyAddress).test()
+        val observer = subject.updateImportedAddress(mockImportedAddress).test()
         // Assert
-        verify(payloadService).updateLegacyAddress(mockLegacyAddress)
+        verify(payloadService).updateImportedAddress(mockImportedAddress)
         observer.assertNoErrors()
         observer.assertComplete()
     }
@@ -499,45 +453,45 @@ class PayloadDataManagerTest {
     }
 
     @Test
-    fun `getLegacyAddresses returns list of legacy addresses`() {
+    fun `getImportedAddresses returns list of imported addresses`() {
         // Arrange
-        val mockLegacyAddress: LegacyAddress = mock {
+        val mockImportedAddress: ImportedAddress = mock {
             on { privateKey } itReturns("SomeRandomKeyString")
         }
-        val addresses = listOf(mockLegacyAddress)
-        whenever(payloadManager.payload?.legacyAddressList).thenReturn(addresses)
+        val addresses = listOf(mockImportedAddress)
+        whenever(payloadManager.payload?.importedAddressList).thenReturn(addresses)
         // Act
-        val result = subject.legacyAddresses
+        val result = subject.importedAddresses
         // Assert
         verify(payloadManager, atLeastOnce()).payload
         result shouldEqual addresses
     }
 
     @Test
-    fun `getLegacyAddresses returns list of legacy addresses with filters out watch only`() {
+    fun `getImportedAddresses returns list of imported addresses with filters out watch only`() {
         // Arrange
-        val mockLegacyAddress1: LegacyAddress = mock {
+        val mockImportedAddress1: ImportedAddress = mock {
             on { privateKey } itReturns(null)
         }
-        val mockLegacyAddress2: LegacyAddress = mock {
+        val mockImportedAddress2: ImportedAddress = mock {
             on { privateKey } itReturns("SomeRandomKeyString")
         }
-        val addresses = listOf(mockLegacyAddress1, mockLegacyAddress2)
-        whenever(payloadManager.payload?.legacyAddressList).thenReturn(addresses)
+        val addresses = listOf(mockImportedAddress1, mockImportedAddress2)
+        whenever(payloadManager.payload?.importedAddressList).thenReturn(addresses)
         // Act
-        val result = subject.legacyAddresses
+        val result = subject.importedAddresses
         // Assert
         verify(payloadManager, atLeastOnce()).payload
         result.count() shouldEqual 1
-        result[0] shouldEqual mockLegacyAddress2
+        result[0] shouldEqual mockImportedAddress2
     }
 
     @Test
-    fun `getLegacyAddresses returns empty list`() {
+    fun `getImportedAddresses returns empty list`() {
         // Arrange
         whenever(payloadManager.payload).thenReturn(null)
         // Act
-        val result = subject.legacyAddresses
+        val result = subject.importedAddresses
         // Assert
         verify(payloadManager).payload
         result shouldEqual emptyList()
