@@ -218,6 +218,22 @@ class TransactionFlowCustomiserImpl(
             else -> true
         }
 
+    override fun enterAmountLimitsViewTitle(state: TransactionState): String =
+        when (state.action) {
+            AssetAction.FiatDeposit -> resources.getString(R.string.deposit_enter_amount_limit_title)
+            AssetAction.Withdraw -> state.sendingAccount.label
+            else -> throw java.lang.IllegalStateException("Limits title view not configured for ${state.action}")
+        }
+
+    override fun enterAmountLimitsViewInfo(state: TransactionState): String =
+        when (state.action) {
+            AssetAction.FiatDeposit -> resources.getString(
+                R.string.deposit_enter_amount_limit_label, state.pendingTx?.maxLimit?.toStringWithSymbol()
+            )
+            AssetAction.Withdraw -> state.availableBalance.toStringWithSymbol()
+            else -> throw java.lang.IllegalStateException("Limits info view not configured for ${state.action}")
+        }
+
     override fun confirmTitle(state: TransactionState): String {
         val amount = state.pendingTx?.amount?.toStringWithSymbol() ?: ""
 
@@ -455,15 +471,15 @@ class TransactionFlowCustomiserImpl(
             TransactionErrorState.NONE -> null
             TransactionErrorState.INSUFFICIENT_FUNDS -> resources.getString(
                 R.string.send_enter_amount_error_insufficient_funds,
-                state.sendingAsset.displayTicker
+                state.sendingAccount.uiCurrency()
             )
             TransactionErrorState.INVALID_AMOUNT -> resources.getString(
                 R.string.send_enter_amount_error_invalid_amount,
-                state.sendingAsset.displayTicker
+                state.sendingAccount.uiCurrency()
             )
             TransactionErrorState.INVALID_ADDRESS -> resources.getString(
                 R.string.send_error_not_valid_asset_address,
-                state.sendingAsset.displayTicker
+                state.sendingAccount.uiCurrency()
             )
             TransactionErrorState.ADDRESS_IS_CONTRACT -> resources.getString(
                 R.string.send_error_address_is_eth_contract
@@ -757,6 +773,15 @@ class TransactionFlowCustomiserImpl(
             return exchangeRate.inverse().convert(this).toStringWithSymbol()
         }
         throw IllegalStateException("Not valid currency")
+    }
+}
+
+private fun BlockchainAccount.uiCurrency(): String {
+    require(this is CryptoAccount || this is FiatAccount)
+    return when (this) {
+        is CryptoAccount -> asset.displayTicker
+        is FiatAccount -> fiatCurrency
+        else -> throw IllegalStateException("Unsupported account ttype")
     }
 }
 

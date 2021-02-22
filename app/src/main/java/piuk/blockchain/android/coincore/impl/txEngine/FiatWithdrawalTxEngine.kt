@@ -44,11 +44,11 @@ class FiatWithdrawalTxEngine(
                 val zeroFiat = FiatValue.zero((sourceAccount as FiatAccount).fiatCurrency)
                 PendingTx(
                     amount = FiatValue.zero((sourceAccount as FiatAccount).fiatCurrency),
-                    maxLimit = limits.max,
-                    minLimit = limits.min,
+                    maxLimit = actionableBalance,
+                    minLimit = limits.min, // TODO update endpoint to get min limit from `withdrawal/fees`
                     availableBalance = actionableBalance,
                     totalBalance = accountBalance,
-                    fees = zeroFiat,
+                    fees = zeroFiat, // TODO update endpoint to get fee from `withdrawal/fees`
                     selectedFiat = userFiat,
                     feeLevel = FeeLevel.None,
                     availableFeeLevels = setOf(FeeLevel.None)

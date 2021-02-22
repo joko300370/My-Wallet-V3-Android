@@ -98,7 +98,7 @@ class AccountPresenter internal constructor(
             )
     }
 
-    internal fun updateLegacyAddressLabel(newLabel: String, account: CryptoNonCustodialAccount) {
+    internal fun updateImportedAddressLabel(newLabel: String, account: CryptoNonCustodialAccount) {
         compositeDisposable += account.updateLabel(newLabel)
             .observeOn(AndroidSchedulers.mainThread())
             .showProgress()
@@ -170,7 +170,7 @@ class AccountPresenter internal constructor(
         walletSecondPassword: String?
     ) {
         val btcAsset = coincore[CryptoCurrency.BTC] as BtcAsset
-        compositeDisposable += btcAsset.importLegacyAddressFromKey(
+        compositeDisposable += btcAsset.importAddressFromKey(
             keyData,
             keyFormat,
             keyPassword,

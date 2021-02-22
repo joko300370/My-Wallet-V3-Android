@@ -144,7 +144,7 @@ class AccountPresenterTest {
         }
 
         // Act
-        subject.updateLegacyAddressLabel(UPDATED_BTC_LABEL, importedAccount)
+        subject.updateImportedAddressLabel(UPDATED_BTC_LABEL, importedAccount)
 
         // Assert
         verify(activity).showSuccess(R.string.remote_save_ok)
@@ -160,7 +160,7 @@ class AccountPresenterTest {
         }
 
         // Act
-        subject.updateLegacyAddressLabel(UPDATED_BTC_LABEL, importedAccount)
+        subject.updateImportedAddressLabel(UPDATED_BTC_LABEL, importedAccount)
 
         // Assert
         verify(activity).showError(R.string.remote_save_failed)
@@ -241,7 +241,7 @@ class AccountPresenterTest {
 
         val importedAccount: BtcCryptoWalletAccount = mock()
         whenever(
-            btcAsset.importLegacyAddressFromKey(
+            btcAsset.importAddressFromKey(
                 SCANNED_ADDRESS,
                 PrivateKeyFactory.BIP38,
                 BIP38_PASSWORD,
@@ -268,7 +268,7 @@ class AccountPresenterTest {
             .thenReturn(PrivateKeyFactory.BIP38)
 
         whenever(
-            btcAsset.importLegacyAddressFromKey(
+            btcAsset.importAddressFromKey(
                 SCANNED_ADDRESS,
                 PrivateKeyFactory.BIP38,
                 BIP38_PASSWORD,
@@ -294,7 +294,7 @@ class AccountPresenterTest {
 
         val importedAccount: BtcCryptoWalletAccount = mock()
         whenever(
-            btcAsset.importLegacyAddressFromKey(
+            btcAsset.importAddressFromKey(
                 SCANNED_ADDRESS,
                 PrivateKeyFactory.HEX,
                 null,
@@ -321,7 +321,7 @@ class AccountPresenterTest {
             .thenReturn(PrivateKeyFactory.HEX)
 
         whenever(
-            btcAsset.importLegacyAddressFromKey(
+            btcAsset.importAddressFromKey(
                 SCANNED_ADDRESS,
                 PrivateKeyFactory.HEX,
                 null,

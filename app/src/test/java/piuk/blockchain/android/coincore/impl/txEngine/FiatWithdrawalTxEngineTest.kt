@@ -122,7 +122,7 @@ class FiatWithdrawalTxEngineTest {
                     it.customFeeAmount == -1L &&
                     it.confirmations.isEmpty() &&
                     it.minLimit == limits.min &&
-                    it.maxLimit == limits.max &&
+                    it.maxLimit == zeroFiat &&
                     it.validationState == ValidationState.UNINITIALISED &&
                     it.engineState.isEmpty()
             }

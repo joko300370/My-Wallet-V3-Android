@@ -217,7 +217,7 @@ class AccountActivity : MvpActivity<AccountView, AccountPresenter>(),
             title = R.string.app_name,
             msg = R.string.label_address,
             initialText = account.label,
-            okAction = { presenter.updateLegacyAddressLabel(it, account) },
+            okAction = { presenter.updateImportedAddressLabel(it, account) },
             okBtnText = R.string.save_name,
             cancelText = R.string.polite_no
         )

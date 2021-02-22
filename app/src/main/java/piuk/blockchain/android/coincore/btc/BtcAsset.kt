@@ -10,7 +10,7 @@ import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.payload.data.Account
-import info.blockchain.wallet.payload.data.LegacyAddress
+import info.blockchain.wallet.payload.data.ImportedAddress
 import info.blockchain.wallet.util.FormatsUtil
 import info.blockchain.wallet.util.PrivateKeyFactory
 import io.reactivex.Completable
@@ -90,8 +90,8 @@ internal class BtcAsset(
                     result.add(btcAccount)
                 }
 
-                legacyAddresses.forEach { account ->
-                    result.add(btcAccountFromLegacyAccount(account))
+                importedAddresses.forEach { account ->
+                    result.add(btcAccountFromImportedAccount(account))
                 }
                 result
             }
@@ -147,7 +147,7 @@ internal class BtcAsset(
             .doOnSuccess { forceAccountsRefresh() }
             .doOnSuccess { coinsWebsocket.subscribeToXpubBtc(it.xpubAddress) }
 
-    fun importLegacyAddressFromKey(
+    fun importAddressFromKey(
         keyData: String,
         keyFormat: String,
         keyPassword: String? = null, // Required for BIP38 format keys
@@ -164,9 +164,9 @@ internal class BtcAsset(
                 throw Exception()
             key
         }.flatMap { key ->
-            payloadManager.addLegacyAddressFromKey(key, walletSecondPassword)
-        }.map { legacyAddress ->
-            btcAccountFromLegacyAccount(legacyAddress)
+            payloadManager.addImportedAddressFromKey(key, walletSecondPassword)
+        }.map { importedAddress ->
+            btcAccountFromImportedAccount(importedAddress)
         }.doOnSuccess {
             forceAccountsRefresh()
         }.doOnSuccess { btcAccount ->
@@ -194,9 +194,9 @@ internal class BtcAsset(
             refreshTrigger = this
         )
 
-    private fun btcAccountFromLegacyAccount(payloadAccount: LegacyAddress): BtcCryptoWalletAccount =
-        BtcCryptoWalletAccount.createLegacyAccount(
-            legacyAccount = payloadAccount,
+    private fun btcAccountFromImportedAccount(payloadAccount: ImportedAddress): BtcCryptoWalletAccount =
+        BtcCryptoWalletAccount.createImportedAccount(
+            importedAccount = payloadAccount,
             payloadManager = payloadManager,
             sendDataManager = sendDataManager,
             feeDataManager = feeDataManager,

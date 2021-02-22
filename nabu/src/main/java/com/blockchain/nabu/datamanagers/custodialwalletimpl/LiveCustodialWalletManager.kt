@@ -445,7 +445,7 @@ class LiveCustodialWalletManager(
         }.map { paymentMethod ->
             PaymentLimits(
                 min = paymentMethod.limits.min,
-                max = paymentMethod.limits.max,
+                max = paymentMethod.limits.daily?.available ?: paymentMethod.limits.max,
                 currency = fiatCurrency
             )
         }.first()

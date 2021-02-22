@@ -7,7 +7,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import info.blockchain.wallet.payload.data.Account
-import info.blockchain.wallet.payload.data.LegacyAddress
+import info.blockchain.wallet.payload.data.ImportedAddress
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -55,7 +55,7 @@ internal class BtcCryptoWalletAccount(
         get() = if (isHDAccount) {
             (internalAccount as Account).isArchived
         } else {
-            (internalAccount as LegacyAddress).tag == LegacyAddress.ARCHIVED_ADDRESS
+            (internalAccount as ImportedAddress).tag == ImportedAddress.ARCHIVED_ADDRESS
         }
 
     override val isDefault: Boolean
@@ -79,7 +79,7 @@ internal class BtcCryptoWalletAccount(
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = if (!isHDAccount) {
-            Single.error(IllegalStateException("Cannot receive to Legacy Account"))
+            Single.error(IllegalStateException("Cannot receive to Imported Account"))
         } else {
             payloadDataManager.getNextReceiveAddress(
                 payloadDataManager.getAccount(hdAccountIndex)
@@ -161,8 +161,8 @@ internal class BtcCryptoWalletAccount(
         if (isHDAccount) {
             (internalAccount as Account).isArchived = newIsArchived
         } else {
-            with(internalAccount as LegacyAddress) {
-                tag = if (newIsArchived) LegacyAddress.ARCHIVED_ADDRESS else LegacyAddress.NORMAL_ADDRESS
+            with(internalAccount as ImportedAddress) {
+                tag = if (newIsArchived) ImportedAddress.ARCHIVED_ADDRESS else ImportedAddress.NORMAL_ADDRESS
             }
         }
     }
@@ -181,7 +181,7 @@ internal class BtcCryptoWalletAccount(
     override val xpubAddress: String
         get() = when (internalAccount) {
             is Account -> internalAccount.xpub
-            is LegacyAddress -> internalAccount.address
+            is ImportedAddress -> internalAccount.address
             else -> throw java.lang.IllegalStateException("Unknown wallet type")
         }
 
@@ -202,7 +202,7 @@ internal class BtcCryptoWalletAccount(
             return Single.just(
                 listOf(
                     payloadDataManager.getAddressECKey(
-                        legacyAddress = internalAccount as LegacyAddress,
+                        importedAddress = internalAccount as ImportedAddress,
                         secondPassword = password
                     ) ?: throw IllegalStateException("Private key not found for legacy BTC address")
                 )
@@ -215,7 +215,7 @@ internal class BtcCryptoWalletAccount(
             payloadDataManager.getNextChangeAddress(internalAccount as Account)
                 .singleOrError()
         } else {
-            Single.just((internalAccount as LegacyAddress).address)
+            Single.just((internalAccount as ImportedAddress).address)
         }
     }
 
@@ -265,8 +265,8 @@ internal class BtcCryptoWalletAccount(
             refreshTrigger = refreshTrigger
         )
 
-        fun createLegacyAccount(
-            legacyAccount: LegacyAddress,
+        fun createImportedAccount(
+            importedAccount: ImportedAddress,
             payloadManager: PayloadDataManager,
             sendDataManager: SendDataManager,
             feeDataManager: FeeDataManager,
@@ -277,18 +277,18 @@ internal class BtcCryptoWalletAccount(
             refreshTrigger: AccountRefreshTrigger
         ) = BtcCryptoWalletAccount(
             payloadManager = payloadManager,
-            hdAccountIndex = LEGACY_ACCOUNT_NO_INDEX,
+            hdAccountIndex = IMPORTED_ACCOUNT_NO_INDEX,
             sendDataManager = sendDataManager,
             feeDataManager = feeDataManager,
             exchangeRates = exchangeRates,
             networkParameters = networkParameters,
-            internalAccount = legacyAccount,
+            internalAccount = importedAccount,
             isHDAccount = false,
             walletPreferences = walletPreferences,
             custodialWalletManager = custodialWalletManager,
             refreshTrigger = refreshTrigger
         )
 
-        private const val LEGACY_ACCOUNT_NO_INDEX = -1
+        private const val IMPORTED_ACCOUNT_NO_INDEX = -1
     }
 }

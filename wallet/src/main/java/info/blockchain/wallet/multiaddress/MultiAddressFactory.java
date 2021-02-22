@@ -72,19 +72,19 @@ public class MultiAddressFactory {
     }
 
     /**
-     * @param all          A list of all xpubs and legacy addresses whose transactions are to
+     * @param all          A list of all xpubs and imported addresses whose transactions are to
      *                     be retrieved from API.
-     * @param activeLegacy (Hacky! Needs a rethink) Only set this when fetching a transaction list
+     * @param activeImported (Hacky! Needs a rethink) Only set this when fetching a transaction list
      *                     for imported addresses, otherwise set as Null.
-     *                     A list of all active legacy addresses. Used for 'Imported address' transaction list.
-     * @param onlyShow     Xpub or legacy address. Used to fetch transaction only relating to this
+     *                     A list of all active imorted addresses. Used for 'Imported address' transaction list.
+     * @param onlyShow     Xpub or imported address. Used to fetch transaction only relating to this
      *                     address. Set as Null for a consolidated list like 'All Accounts' or 'Imported'.
      * @param limit        Maximum amount of transactions fetched
      * @param offset       Page offset
      */
     public List<TransactionSummary> getAccountTransactions(
         List<String> all,
-        List<String> activeLegacy,
+        List<String> activeImported,
         String onlyShow,
         int limit,
         int offset,
@@ -95,7 +95,7 @@ public class MultiAddressFactory {
             return new ArrayList<>();
         }
 
-        return summarize(all, multiAddress, activeLegacy, startingBlockHeight);
+        return summarize(all, multiAddress, activeImported, startingBlockHeight);
     }
 
     public int getNextChangeAddressIndex(String xpub) {
@@ -174,7 +174,7 @@ public class MultiAddressFactory {
 
     public List<TransactionSummary> summarize(List<String> ownAddressesAndXpubs,
                                               MultiAddress multiAddress,
-                                              List<String> legacy,
+                                              List<String> imported,
                                               int startingBlockHeight) {
 
         List<TransactionSummary> summaryList = new ArrayList<>();
@@ -199,7 +199,7 @@ public class MultiAddressFactory {
                 continue;
             }
 
-            boolean isLegacy = false;
+            boolean isImported = false;
 
             TransactionSummary txSummary = new TransactionSummary();
             txSummary.inputsMap = new HashMap<>();
@@ -238,9 +238,9 @@ public class MultiAddressFactory {
                             txSummary.inputsXpubMap.put(inputAddr, xpubBody.getM());
                         }
 
-                        //Flag as imported legacy address
-                        if (legacy != null && legacy.contains(inputAddr)) {
-                            isLegacy = true;
+                        //Flag as imported address
+                        if (imported != null && imported.contains(inputAddr)) {
+                            isImported = true;
                         }
 
                         //Keep track of inputs
@@ -311,9 +311,9 @@ public class MultiAddressFactory {
                         }
                     }
 
-                    //Flag as imported legacy address
-                    if (legacy != null && legacy.contains(outputAddr)) {
-                        isLegacy = true;
+                    //Flag as imported address
+                    if (imported != null && imported.contains(outputAddr)) {
+                        isImported = true;
                     }
                 } else {
                     //No output address available
@@ -321,8 +321,8 @@ public class MultiAddressFactory {
                 }
             }
 
-            //If we are filtering for legacy and nothing found
-            if (legacy != null && !isLegacy) {
+            //If we are filtering for imported and nothing found
+            if (imported != null && !isImported) {
                 continue;
             }
 

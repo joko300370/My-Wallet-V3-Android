@@ -7,11 +7,11 @@ import java.math.BigInteger
 data class CryptoBalanceMap(
     private val cryptoCurrency: CryptoCurrency,
     private val xpubs: Set<String>,
-    private val legacy: Set<String>,
+    private val imported: Set<String>,
     private val balances: Map<String, BigInteger>
 ) {
-    val totalSpendable = CryptoValue(cryptoCurrency, (xpubs + legacy).sum(balances))
-    val totalSpendableLegacy = CryptoValue(cryptoCurrency, (legacy).sum(balances))
+    val totalSpendable = CryptoValue(cryptoCurrency, (xpubs + imported).sum(balances))
+    val totalSpendableImported = CryptoValue(cryptoCurrency, (imported).sum(balances))
 
     fun subtractAmountFromAddress(address: String, cryptoValue: CryptoValue): CryptoBalanceMap {
         val value =
@@ -42,14 +42,14 @@ fun calculateCryptoBalanceMap(
     cryptoCurrency: CryptoCurrency,
     balanceQuery: BalanceQuery,
     xpubs: Set<String>,
-    legacy: Set<String>
+    imported: Set<String>
 ): CryptoBalanceMap {
 
     return CryptoBalanceMap(
         cryptoCurrency,
         xpubs,
-        legacy,
-        balanceQuery.getBalancesFor(xpubs + legacy)
+        imported,
+        balanceQuery.getBalancesFor(xpubs + imported)
     )
 }
 
