@@ -218,6 +218,22 @@ class TransactionFlowCustomiserImpl(
             else -> true
         }
 
+    override fun enterAmountLimitsViewTitle(state: TransactionState): String =
+        when (state.action) {
+            AssetAction.FiatDeposit -> resources.getString(R.string.deposit_enter_amount_limit_title)
+            AssetAction.Withdraw -> state.sendingAccount.label
+            else -> throw java.lang.IllegalStateException("Limits title view not configured for ${state.action}")
+        }
+
+    override fun enterAmountLimitsViewInfo(state: TransactionState): String =
+        when (state.action) {
+            AssetAction.FiatDeposit -> resources.getString(
+                R.string.deposit_enter_amount_limit_label, state.pendingTx?.maxLimit?.toStringWithSymbol()
+            )
+            AssetAction.Withdraw -> state.availableBalance.toStringWithSymbol()
+            else -> throw java.lang.IllegalStateException("Limits info view not configured for ${state.action}")
+        }
+
     override fun confirmTitle(state: TransactionState): String {
         val amount = state.pendingTx?.amount?.toStringWithSymbol() ?: ""
 
