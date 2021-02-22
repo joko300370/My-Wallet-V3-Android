@@ -137,17 +137,20 @@ open class CustodialTradingAccount(
             Singles.zip(
                 accountBalance.map { it.isPositive },
                 actionableBalance.map { it.isPositive },
-                eligibilityProvider.isEligibleForSimpleBuy()
-            ) { hasFunds, hasActionableBalance, isEligibleForSimpleBuy ->
-                val actions = mutableSetOf(AssetAction.ViewActivity)
-                if (isArchived.not()) {
-                    if (hasActionableBalance) actions.add(AssetAction.Send)
-                    if (hasFunds && isEligibleForSimpleBuy) {
-                        actions.add(AssetAction.Sell)
-                        actions.add(AssetAction.Swap)
-                    }
-                }
-                actions.toSet()
+                eligibilityProvider.isEligibleForSimpleBuy(),
+                custodialWalletManager.getSupportedFundsFiats().onErrorReturn { emptyList() }
+            ) { hasFunds, hasActionableBalance, isEligibleForSimpleBuy, fiatAccounts ->
+                if (isArchived)
+                    setOf(
+                        AssetAction.ViewActivity
+                    )
+                else
+                    setOfNotNull(
+                        AssetAction.ViewActivity,
+                        if (hasActionableBalance) AssetAction.Send else null,
+                        if (hasFunds && isEligibleForSimpleBuy && fiatAccounts.isNotEmpty()) AssetAction.Sell else null,
+                        if (hasFunds && isEligibleForSimpleBuy) AssetAction.Swap else null
+                    )
             }
 
     private fun orderToSummary(order: BuySellOrder): ActivitySummaryItem =
@@ -193,7 +196,7 @@ open class CustodialTradingAccount(
         return flattenAsObservable { list ->
             list.filter {
                 (it is CustodialTradingActivitySummaryItem && displayedStates.contains(it.status)) or
-                        (it is TradeActivitySummaryItem && displayedStates.contains(it.state))
+                    (it is TradeActivitySummaryItem && displayedStates.contains(it.state))
             }
         }.toList()
     }

@@ -76,6 +76,7 @@ import com.blockchain.nabu.models.responses.swap.CreateOrderRequest
 import com.blockchain.nabu.models.responses.swap.CustodialOrderResponse
 import com.blockchain.nabu.models.responses.tokenresponse.NabuSessionTokenResponse
 import com.blockchain.nabu.service.NabuService
+import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.braintreepayments.cardform.utils.CardType
 import info.blockchain.balance.CryptoCurrency
@@ -102,10 +103,14 @@ class LiveCustodialWalletManager(
     private val kycFeatureEligibility: FeatureEligibility,
     private val assetBalancesRepository: AssetBalancesRepository,
     private val interestRepository: InterestRepository,
+    private val currencyPrefs: CurrencyPrefs,
     private val custodialRepository: CustodialRepository,
     private val bankLinkingEnabledProvider: BankLinkingEnabledProvider,
     private val transactionErrorMapper: TransactionErrorMapper
 ) : CustodialWalletManager {
+
+    override val defaultFiatCurrency: String
+        get() = currencyPrefs.defaultFiatCurrency
 
     override fun getQuote(
         cryptoCurrency: CryptoCurrency,

@@ -162,25 +162,27 @@ internal class CryptoExchangeAccount(
 abstract class CryptoNonCustodialAccount(
     // TODO: Build an interface on PayloadDataManager/PayloadManager for 'global' crypto calls; second password etc?
     protected val payloadDataManager: PayloadDataManager,
-    override val asset: CryptoCurrency
+    override val asset: CryptoCurrency,
+    private val custodialWalletManager: CustodialWalletManager
 ) : CryptoAccountBase(), NonCustodialAccount {
 
     override val isFunded: Boolean = true
 
     // The plan here is once we are caching the non custodial balances to remove this isFunded
     override val actions: Single<AvailableActions>
-        get() = Single.just(mutableSetOf(
-            AssetAction.ViewActivity
-        ).apply {
-            if (!isArchived) {
-                add(AssetAction.Receive)
-                if (isFunded) {
-                    add(AssetAction.Send)
-                    add(AssetAction.Sell)
-                    add(AssetAction.Swap)
+        get() = custodialWalletManager.getSupportedFundsFiats().onErrorReturn { emptyList() }.map { fiatAccounts ->
+            mutableSetOf(AssetAction.ViewActivity).apply {
+                if (!isArchived) {
+                    add(AssetAction.Receive)
+                    if (isFunded) {
+                        add(AssetAction.Send)
+                        add(AssetAction.Swap)
+                        if (fiatAccounts.isNotEmpty())
+                            add(AssetAction.Sell)
+                    }
                 }
             }
-        })
+        }
 
     override val directions: Set<TransferDirection> = setOf(TransferDirection.FROM_USERKEY, TransferDirection.ON_CHAIN)
 

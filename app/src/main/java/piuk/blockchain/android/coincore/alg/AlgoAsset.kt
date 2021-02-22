@@ -68,6 +68,7 @@ internal class AlgoAsset(
         AlgoCryptoWalletAccount(
             payloadManager = payloadManager,
             label = labels.getDefaultNonCustodialWalletLabel(asset),
+            custodialWalletManager = custodialManager,
             exchangeRates = exchangeRates)
 
     override fun loadCustodialAccount(): Single<SingleAccountList> =

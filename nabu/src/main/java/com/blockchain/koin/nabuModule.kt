@@ -108,7 +108,8 @@ val nabuModule = module {
                 interestRepository = get(),
                 custodialRepository = get(),
                 bankLinkingEnabledProvider = get(),
-                transactionErrorMapper = get()
+                transactionErrorMapper = get(),
+                currencyPrefs = get()
             )
         }.bind(CustodialWalletManager::class)
 
@@ -215,7 +216,8 @@ val nabuModule = module {
         }.bind(CreateNabuToken::class)
 
         factory { NabuDataUserProviderNabuDataManagerAdapter(get(), get()) }.bind(
-            NabuDataUserProvider::class)
+            NabuDataUserProvider::class
+        )
 
         factory { NabuUserSyncUpdateUserWalletInfoWithJWT(get(), get()) }.bind(NabuUserSync::class)
 
@@ -225,7 +227,8 @@ val nabuModule = module {
 
         scoped {
             NabuUserRepository(
-                nabuDataUserProvider = get())
+                nabuDataUserProvider = get()
+            )
         }
 
         scoped {

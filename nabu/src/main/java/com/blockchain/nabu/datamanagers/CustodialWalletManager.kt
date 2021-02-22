@@ -181,7 +181,7 @@ interface CustodialWalletManager {
 
     fun getInterestEligibilityForAsset(crypto: CryptoCurrency): Single<Eligibility>
 
-    fun getSupportedFundsFiats(fiatCurrency: String): Single<List<String>>
+    fun getSupportedFundsFiats(fiatCurrency: String = defaultFiatCurrency): Single<List<String>>
 
     fun canTransactWithBankMethods(fiatCurrency: String): Single<Boolean>
 
@@ -230,6 +230,8 @@ interface CustodialWalletManager {
     fun isFiatCurrencySupported(destination: String): Boolean
 
     fun startBankTransfer(id: String, amount: Money, currency: String): Single<String>
+
+    val defaultFiatCurrency: String
 }
 
 data class InterestActivityItem(

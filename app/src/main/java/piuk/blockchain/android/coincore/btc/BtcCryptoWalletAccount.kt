@@ -44,7 +44,7 @@ internal class BtcCryptoWalletAccount(
     private val walletPreferences: WalletStatus,
     private val custodialWalletManager: CustodialWalletManager,
     private val refreshTrigger: AccountRefreshTrigger
-) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BTC) {
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BTC, custodialWalletManager) {
 
     private val hasFunds = AtomicBoolean(false)
 
@@ -204,7 +204,8 @@ internal class BtcCryptoWalletAccount(
                     payloadDataManager.getAddressECKey(
                         legacyAddress = internalAccount as LegacyAddress,
                         secondPassword = password
-                    ) ?: throw IllegalStateException("Private key not found for legacy BTC address"))
+                    ) ?: throw IllegalStateException("Private key not found for legacy BTC address")
+                )
             )
         }
     }
