@@ -172,8 +172,6 @@ class XlmDataManager internal constructor(
     private fun <T> Single<T>.ensureUrlUpdated(): Single<T> =
         xlmProxyUrl.flatMap {
             this
-        }.doOnError {
-            println("error $it")
         }
 
     fun memoToEvent(memo: Memo): CustomEventBuilder = if (memo.isEmpty()) {
