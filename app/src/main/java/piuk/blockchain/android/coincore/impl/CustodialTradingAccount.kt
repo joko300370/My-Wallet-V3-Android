@@ -140,17 +140,17 @@ open class CustodialTradingAccount(
                 eligibilityProvider.isEligibleForSimpleBuy(),
                 custodialWalletManager.getSupportedFundsFiats().onErrorReturn { emptyList() }
             ) { hasFunds, hasActionableBalance, isEligibleForSimpleBuy, fiatAccounts ->
-                if (isArchived)
-                    setOf(
-                        AssetAction.ViewActivity
-                    )
-                else
-                    setOfNotNull(
-                        AssetAction.ViewActivity,
-                        if (hasActionableBalance) AssetAction.Send else null,
-                        if (hasFunds && isEligibleForSimpleBuy && fiatAccounts.isNotEmpty()) AssetAction.Sell else null,
-                        if (hasFunds && isEligibleForSimpleBuy) AssetAction.Swap else null
-                    )
+
+                val activity = AssetAction.ViewActivity
+                val receive = AssetAction.Receive.takeIf { !isArchived }
+                val send = AssetAction.Send.takeIf { !isArchived && hasActionableBalance }
+                val swap = AssetAction.Swap.takeIf { !isArchived && hasFunds && isEligibleForSimpleBuy }
+                val sell = AssetAction.Sell.takeIf {
+                    !isArchived && hasFunds && isEligibleForSimpleBuy && fiatAccounts.isNotEmpty()
+                }
+                setOfNotNull(
+                    activity, receive, send, swap, sell
+                )
             }
 
     private fun orderToSummary(order: BuySellOrder): ActivitySummaryItem =

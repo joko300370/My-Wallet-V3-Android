@@ -171,17 +171,14 @@ abstract class CryptoNonCustodialAccount(
     // The plan here is once we are caching the non custodial balances to remove this isFunded
     override val actions: Single<AvailableActions>
         get() = custodialWalletManager.getSupportedFundsFiats().onErrorReturn { emptyList() }.map { fiatAccounts ->
-            mutableSetOf(AssetAction.ViewActivity).apply {
-                if (!isArchived) {
-                    add(AssetAction.Receive)
-                    if (isFunded) {
-                        add(AssetAction.Send)
-                        add(AssetAction.Swap)
-                        if (fiatAccounts.isNotEmpty())
-                            add(AssetAction.Sell)
-                    }
-                }
-            }
+            val activity = AssetAction.ViewActivity
+            val receive = AssetAction.Receive.takeIf { !isArchived }
+            val send = AssetAction.Send.takeIf { !isArchived && isFunded }
+            val swap = AssetAction.Swap.takeIf { !isArchived && isFunded }
+            val sell = AssetAction.Sell.takeIf { !isArchived && isFunded && fiatAccounts.isNotEmpty() }
+            setOfNotNull(
+                activity, receive, send, swap, sell
+            )
         }
 
     override val directions: Set<TransferDirection> = setOf(TransferDirection.FROM_USERKEY, TransferDirection.ON_CHAIN)
