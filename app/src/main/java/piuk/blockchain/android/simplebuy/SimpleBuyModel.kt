@@ -274,7 +274,7 @@ class SimpleBuyModel(
             is SimpleBuyIntent.PaymentSucceeded -> {
                 interactor.checkTierLevel().map { it.kycState != KycState.VERIFIED_AND_ELIGIBLE }.subscribeBy(
                     onSuccess = {
-                        process(SimpleBuyIntent.UnlockHigherLimits)
+                        if (it) process(SimpleBuyIntent.UnlockHigherLimits)
                     },
                     onError = {
                         process(SimpleBuyIntent.ErrorIntent())
