@@ -216,7 +216,7 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
             else -> ""
         }
 
-    private fun getLimitForTier(tier: Tier): String? {
+    private fun getLimitForTier(tier: Tier): String {
         val limits = tier.limits
         return (limits?.annualFiat ?: limits?.dailyFiat)?.toStringWithSymbol() ?: ""
     }
