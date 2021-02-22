@@ -26,7 +26,7 @@
         app:layout_constraintBottom_toBottomOf="@id/bank_details"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/bank_name"
-        tools:src="@drawable/ic_bank_logo_boa" />
+        tools:src="@drawable/ic_bank_transfer" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/bank_name"
@@ -34,8 +34,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:ellipsize="middle"
         android:layout_marginTop="@dimen/small_margin"
+        android:ellipsize="middle"
         android:singleLine="true"
         app:layout_constraintStart_toEndOf="@id/bank_logo"
         app:layout_constraintTop_toTopOf="parent"
@@ -50,12 +50,22 @@
         app:layout_constraintTop_toBottomOf="@+id/bank_name"
         tools:text="Checking - 1234" />
 
+    <piuk.blockchain.android.ui.customviews.StatusPill
+        android:id="@+id/bank_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/tiny_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/bank_details"
+        app:layout_constraintTop_toBottomOf="@id/bank_details"
+        tools:text="Bank status" />
+
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/bank_chevron"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
         android:layout_marginEnd="@dimen/standard_margin"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/bank_details"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/bank_name"

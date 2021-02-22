@@ -1000,7 +1000,7 @@ class LiveCustodialWalletManager(
             bankName = this.name,
             accountEnding = this.account,
             accountType = this.accountType,
-            true
+            isEligible = true
         )
 
     private fun String.isActive(): Boolean =
