@@ -20,11 +20,13 @@ import com.google.android.play.core.review.ReviewInfo
 import com.google.android.play.core.review.ReviewManagerFactory
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.cards.CardAuthoriseWebViewActivity
 import piuk.blockchain.android.cards.CardVerificationFragment
 import piuk.blockchain.android.databinding.FragmentSimpleBuyPaymentBinding
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
+import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionFlowCustomiserImpl.Companion.getEstimatedTransactionCompletionTime
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.assetName
@@ -234,10 +236,15 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
                 model.process(SimpleBuyIntent.ErrorIntent())
             }
         }
+        if (requestCode == SimpleBuyActivity.KYC_STARTED &&
+            resultCode == SimpleBuyActivity.RESULT_KYC_SIMPLE_BUY_COMPLETE
+        ) {
+            navigator().exitSimpleBuyFlow()
+        }
     }
 
     override fun unlockHigherLimits() {
-        navigator().startKyc()
+        KycNavHostActivity.startForResult(this, CampaignType.SimpleBuy, SimpleBuyActivity.KYC_STARTED)
     }
 
     override fun navigator(): SimpleBuyNavigator =
