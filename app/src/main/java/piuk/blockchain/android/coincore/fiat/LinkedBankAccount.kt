@@ -61,6 +61,8 @@ class LinkedBankAccount(
     override val disabledReason: Single<DisabledReason>
         get() = Single.just(DisabledReason.NONE)
 
+    override fun canWithdrawFunds(): Single<Boolean> = Single.just(false)
+
     override fun fiatBalance(fiatCurrency: String, exchangeRates: ExchangeRates): Single<Money> =
         Single.just(FiatValue.zero(fiatCurrency))
 
