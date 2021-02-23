@@ -259,6 +259,7 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             style="@style/Text.Semibold.16"
+            android:id="@+id/select_account_cta"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.8"

@@ -191,7 +191,7 @@ class TransactionModel(
             is TransactionIntent.InitialiseWithSourceAndPreferredTarget ->
                 processAccountsListUpdate(previousState, intent.fromAccount, intent.action)
             is TransactionIntent.PendingTransactionStarted -> null
-            is TransactionIntent.TargetAccountSelected -> processTargetAccountSelected(previousState, intent)
+            is TransactionIntent.TargetAccountSelected -> null
             is TransactionIntent.FatalTransactionError -> null
             is TransactionIntent.AmountChanged -> processAmountChanged(intent.amount)
             is TransactionIntent.ModifyTxOption -> processModifyTxOptionRequest(intent.confirmation)
@@ -231,20 +231,6 @@ class TransactionModel(
             }
         )
         return null
-    }
-
-    private fun processTargetAccountSelected(
-        previousState: TransactionState,
-        intent: TransactionIntent.TargetAccountSelected
-    ) = if (previousState.action == AssetAction.Withdraw) {
-        processTargetSelectionConfirmed(
-            sourceAccount = previousState.sendingAccount,
-            amount = FiatValue.zero((previousState.sendingAccount as FiatAccount).fiatCurrency),
-            transactionTarget = intent.selectedTarget,
-            action = previousState.action
-        )
-    } else {
-        null
     }
 
     private fun processLinkABank(previousState: TransactionState): Disposable =

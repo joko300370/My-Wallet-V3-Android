@@ -2,6 +2,7 @@ package com.blockchain.nabu.models.data
 
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.responses.banktransfer.LinkBankAttrsResponse
+import info.blockchain.balance.FiatValue
 import java.io.Serializable
 
 data class LinkBankTransfer(val id: String, val partner: BankPartner, val attributes: LinkBankAttributes) : Serializable
@@ -59,6 +60,11 @@ enum class LinkedBankState {
     ACTIVE,
     UNKNOWN
 }
+
+data class WithdrawalFeeAndLimit(
+    val minLimit: FiatValue,
+    val fee: FiatValue
+)
 
 /*
 interface Bank : Serializable {

@@ -5,6 +5,10 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.fiat.LinkedBankAccount
@@ -17,7 +21,9 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
 import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
 import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.invisible
 import piuk.blockchain.android.util.visible
+import timber.log.Timber
 
 class AccountInfoBank @JvmOverloads constructor(
     ctx: Context,
@@ -26,11 +32,14 @@ class AccountInfoBank @JvmOverloads constructor(
 ) : ConstraintLayout(ctx, attr, defStyle), TxFlowWidget {
 
     private lateinit var model: TransactionModel
+    private val compositeDisposable = CompositeDisposable()
+    private var accountId: String = ""
 
     val binding: ViewAccountBankOverviewBinding =
         ViewAccountBankOverviewBinding.inflate(LayoutInflater.from(context), this, true)
 
     fun updateAccount(
+        shouldShowBadges: Boolean = true,
         account: LinkedBankAccount,
         onAccountClicked: (LinkedBankAccount) -> Unit
     ) {
@@ -47,27 +56,59 @@ class AccountInfoBank @JvmOverloads constructor(
                 }, account.accountNumber
             )
         }
-        showBadgeForType(account.type)
         setOnClickListener { onAccountClicked(account) }
+
+        if (shouldShowBadges) {
+            require(account.type == PaymentMethodType.BANK_TRANSFER || account.type == PaymentMethodType.BANK_ACCOUNT) {
+                "Using incorrect payment method for Bank view"
+            }
+
+            if (account.accountId == accountId)
+                return
+            accountId = account.accountId
+
+            getFeeOrShowDefault(account)
+        }
     }
 
-    private fun showBadgeForType(type: PaymentMethodType) {
-        require(type == PaymentMethodType.BANK_TRANSFER || type == PaymentMethodType.FUNDS) {
-            "Using incorrect payment method for Bank view"
-        }
-
-        with(binding.bankStatus) {
-            when (type) {
-                PaymentMethodType.BANK_TRANSFER -> update(
-                    context.getString(R.string.common_free), StatusPill.StatusType.UPSELL
-                )
-                // TODO this can be replaced with the fee data when we have that from the endpoint
-                PaymentMethodType.FUNDS -> update(
-                    context.getString(R.string.bank_wire_transfer_fee_default), StatusPill.StatusType.WARNING
-                )
-                else -> gone()
+    private fun getFeeOrShowDefault(account: LinkedBankAccount) {
+        compositeDisposable += account.getWithdrawalFeeAndMinLimit()
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                // total hack.In order to avoid flickering we need to reserve the space for the extra info in the pills
+                // the reason that binding.bankStatusMin is set to gone, is that bankStatusFee should be aligned left if
+                // bankStatusMin is missing
+                binding.bankStatusFee.invisible()
+                binding.bankStatusMin.gone()
             }
-        }
+            .subscribeBy(
+                onSuccess = {
+                    with(binding) {
+                        bankStatusFee.visible()
+                        if (it.fee.isZero) {
+                            bankStatusFee.update(context.getString(R.string.common_free), StatusPill.StatusType.UPSELL)
+                        } else {
+                            bankStatusFee.update(
+                                context.getString(R.string.bank_wire_transfer_fee, it.fee.toStringWithSymbol()),
+                                StatusPill.StatusType.WARNING
+                            )
+                        }
+                        if (!it.minLimit.isZero) {
+                            bankStatusMin.visible()
+                            bankStatusMin.update(
+                                context.getString(
+                                    R.string.bank_wire_transfer_min_withdrawal, it.minLimit.toStringWithSymbol()
+                                ), StatusPill.StatusType.LABEL
+                            )
+                        }
+                    }
+                },
+                onError = {
+                    Timber.e("Error getting account fee $it")
+                    binding.bankStatusFee.gone()
+                    binding.bankStatusMin.gone()
+                }
+            )
     }
 
     override fun initControl(
@@ -78,7 +119,8 @@ class AccountInfoBank @JvmOverloads constructor(
         this.model = model
         binding.bankSeparator.visible()
         binding.bankChevron.visible()
-        binding.bankStatus.gone()
+        binding.bankStatusMin.gone()
+        binding.bankStatusFee.gone()
     }
 
     override fun update(state: TransactionState) {
@@ -86,7 +128,7 @@ class AccountInfoBank @JvmOverloads constructor(
             AssetAction.FiatDeposit ->
                 if (state.sendingAccount is LinkedBankAccount) {
                     // only try to update if we have a linked bank source
-                    updateAccount(state.sendingAccount) {
+                    updateAccount(false, state.sendingAccount) {
                         if (::model.isInitialized) {
                             model.process(TransactionIntent.InvalidateTransactionKeepingTarget)
                         }
@@ -94,7 +136,7 @@ class AccountInfoBank @JvmOverloads constructor(
                 }
             AssetAction.Withdraw ->
                 if (state.selectedTarget is LinkedBankAccount) {
-                    updateAccount(state.selectedTarget) {
+                    updateAccount(false, state.selectedTarget) {
                         if (::model.isInitialized) {
                             model.process(TransactionIntent.InvalidateTransaction)
                         }

@@ -43,7 +43,7 @@ class LinkBankMethodChooserBottomSheet : SlidingModalBottomDialog<LinkBankMethod
                         )
                         dismiss()
                     }
-                    PaymentMethodType.FUNDS -> kotlin.run {
+                    PaymentMethodType.BANK_ACCOUNT -> kotlin.run {
                         host.onBankWireTransferSelected(
                             paymentMethods.linkablePaymentMethods.currency
                         )
@@ -117,7 +117,7 @@ class LinkBankMethodChooserAdapter(
 
 private fun PaymentMethodType.toLinkBankMethodItemUI(isForPayment: Boolean): LinkBankMethodItem =
     when (this) {
-        PaymentMethodType.FUNDS -> LinkBankMethodItem(
+        PaymentMethodType.BANK_ACCOUNT -> LinkBankMethodItem(
             title = if (isForPayment) {
                 R.string.payment_wire_transfer
             } else {

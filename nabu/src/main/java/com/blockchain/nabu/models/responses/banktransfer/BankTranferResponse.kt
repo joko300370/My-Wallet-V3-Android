@@ -90,3 +90,8 @@ data class BankInfoResponse(
         const val BLOCKED = "BLOCKED"
     }
 }
+
+object WithdrawFeeRequest {
+    const val BANK_TRANSFER = "BANK_TRANSFER"
+    const val BANK_ACCOUNT = "BANK_ACCOUNT"
+}

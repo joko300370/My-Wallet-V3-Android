@@ -15,6 +15,7 @@ import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.io.Serializable
 
 class PaymentMethodChooserBottomSheet : SlidingModalBottomDialog<SimpleBuyPaymentMethodChooserBinding>() {
+
     private val paymentMethods: List<PaymentMethod> by unsafeLazy {
         arguments?.getSerializable(SUPPORTED_PAYMENT_METHODS) as? List<PaymentMethod>
             ?: emptyList()

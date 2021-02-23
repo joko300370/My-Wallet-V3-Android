@@ -500,9 +500,6 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
 
     override fun updateLinkableBanks(linkablePaymentMethods: Set<LinkablePaymentMethods>, linkedBanksCount: Int) {
-        if (linkablePaymentMethods.isEmpty()) {
-            banksPref?.isVisible = false
-        } else {
             linkablePaymentMethods.forEach { linkableBank ->
                 banksPref?.findPreference<BankPreference>(LINK_BANK_KEY.plus(linkableBank.hashCode()))?.let {
                     it.order = it.order + linkedBanksCount + linkablePaymentMethods.indexOf(linkableBank)
@@ -515,7 +512,6 @@ class SettingsFragment : PreferenceFragmentCompat(),
                     }
                 )
             }
-        }
     }
 
     override fun updateLinkedBanks(banks: Set<Bank>) {
@@ -550,7 +546,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
             showDialogForLinkBankMethodChooser(linkablePaymentMethods)
         } else {
             when (linkablePaymentMethods.linkMethods[0]) {
-                PaymentMethodType.FUNDS -> onBankWireTransferSelected(linkablePaymentMethods.currency)
+                PaymentMethodType.BANK_ACCOUNT -> onBankWireTransferSelected(linkablePaymentMethods.currency)
                 PaymentMethodType.BANK_TRANSFER ->
                     onLinkBankSelected(
                         LinkablePaymentMethodsForAction.LinkablePaymentMethodsForSettings(linkablePaymentMethods)
