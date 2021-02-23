@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
-import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.databinding.ViewTxFlowAccountLimitsBinding
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
@@ -62,10 +61,9 @@ class AccountLimitsView @JvmOverloads constructor(
         if (state.selectedTarget is NullAddress) {
             return
         }
-        state.pendingTx?.let {
-            binding.amountSheetLimit.text = this@AccountLimitsView.context.getString(
-                R.string.deposit_enter_amount_limit_label, it.maxLimit?.toStringWithSymbol()
-            )
+        with(binding) {
+            amountSheetLimitTitle.text = customiser.enterAmountLimitsViewTitle(state)
+            amountSheetLimit.text = customiser.enterAmountLimitsViewInfo(state)
         }
     }
 

@@ -3,10 +3,6 @@ package com.blockchain.koin
 import org.koin.core.qualifier.StringQualifier
 import org.koin.core.qualifier.named
 
-val coinifyUsersToKyc = StringQualifier("ff_notify_coinify_users_to_kyc")
-val coinifyFeatureFlag = StringQualifier("ff_coinify")
-val smsVerifFeatureFlag = StringQualifier("ff_sms_verification")
-val sunriver = StringQualifier("sunriver")
 val interestAccountFeatureFlag = StringQualifier("ff_interest_account")
 val dgldFeatureFlag = StringQualifier("ff_wdgld")
 val achFeatureFlag = StringQualifier("ff_ach")

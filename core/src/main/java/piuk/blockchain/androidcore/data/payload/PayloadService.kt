@@ -6,7 +6,7 @@ import info.blockchain.wallet.exceptions.DecryptionException
 import info.blockchain.wallet.exceptions.HDWalletException
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.payload.data.Account
-import info.blockchain.wallet.payload.data.LegacyAddress
+import info.blockchain.wallet.payload.data.ImportedAddress
 import info.blockchain.wallet.payload.data.Wallet
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -243,7 +243,7 @@ class PayloadService(private val payloadManager: PayloadManager) {
         Observable.fromCallable { payloadManager.addAccount(networkParameters, accountLabel, secondPassword) }
 
     /**
-     * Sets a private key for an associated [LegacyAddress] which is already in the [Wallet] as a
+     * Sets a private key for an associated [ImportedAddress] which is already in the [Wallet] as a
      * watch only address
      *
      * @param key An [ECKey]
@@ -251,35 +251,35 @@ class PayloadService(private val payloadManager: PayloadManager) {
      * @return An [Observable] representing a successful save
      */
     @WebRequest
-    internal fun setKeyForLegacyAddress(
+    internal fun setKeyForImportedAddress(
         key: ECKey,
         secondPassword: String?
-    ): Observable<LegacyAddress> = Observable.fromCallable {
-        payloadManager.setKeyForLegacyAddress(key, secondPassword)
+    ): Observable<ImportedAddress> = Observable.fromCallable {
+        payloadManager.setKeyForImportedAddress(key, secondPassword)
     }
 
     /**
-     * Allows you to add a [LegacyAddress] to the [Wallet]
+     * Allows you to add a [ImportedAddress] to the [Wallet]
      *
-     * @param legacyAddress The new address
+     * @param importedAddress The new address
      * @return A [Completable] object representing a successful save
      */
     @WebRequest
-    internal fun addLegacyAddress(legacyAddress: LegacyAddress): Completable =
+    internal fun addImportedAddress(importedAddress: ImportedAddress): Completable =
         Completable.fromCallable {
-            payloadManager.addLegacyAddress(legacyAddress)
+            payloadManager.addImportedAddress(importedAddress)
         }
 
     /**
-     * Allows you to propagate changes to a [LegacyAddress] through the [Wallet]
+     * Allows you to propagate changes to a [ImportedAddress] through the [Wallet]
      *
-     * @param legacyAddress The updated address
+     * @param importedAddress The updated address
      * @return A [Completable] object representing a successful save
      */
     @WebRequest
-    internal fun updateLegacyAddress(legacyAddress: LegacyAddress): Completable =
+    internal fun updateImportedAddress(importedAddress: ImportedAddress): Completable =
         Completable.fromCallable {
-            payloadManager.updateLegacyAddress(legacyAddress)
+            payloadManager.updateImportedAddress(importedAddress)
         }
 
     // /////////////////////////////////////////////////////////////////////////

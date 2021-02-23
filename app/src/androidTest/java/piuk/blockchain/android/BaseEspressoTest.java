@@ -41,7 +41,7 @@ public class BaseEspressoTest {
     public void setup() {
         systemAnimations = new SystemAnimations(InstrumentationRegistry.getTargetContext());
 
-        prefs = new PrefsUtil(store, store, idGenerator, uuidGenerator, crashLogger);
+        prefs = new PrefsUtil(InstrumentationRegistry.getTargetContext(), store, store, idGenerator, uuidGenerator, crashLogger);
         clearState();
         ignoreTapJacking(true);
         disableAnimations();

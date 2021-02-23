@@ -13,7 +13,7 @@ import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.wallet.payload.data.Account
-import info.blockchain.wallet.payload.data.LegacyAddress
+import info.blockchain.wallet.payload.data.ImportedAddress
 import info.blockchain.wallet.util.PrivateKeyFactory
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -122,16 +122,16 @@ class BtcAssetTest {
             on { hasPrivKey() } itReturns true
         }
 
-        val internalAccount: LegacyAddress = mock {
+        val internalAccount: ImportedAddress = mock {
             on { address } itReturns IMPORTED_ADDRESS
         }
 
         whenever(payloadManager.getKeyFromImportedData(NON_BIP38_FORMAT, KEY_DATA))
             .thenReturn(Single.just(ecKey))
-        whenever(payloadManager.addLegacyAddressFromKey(ecKey, null))
+        whenever(payloadManager.addImportedAddressFromKey(ecKey, null))
             .thenReturn(Single.just(internalAccount))
 
-        subject.importLegacyAddressFromKey(KEY_DATA, NON_BIP38_FORMAT, null, null)
+        subject.importAddressFromKey(KEY_DATA, NON_BIP38_FORMAT, null, null)
             .test()
             .assertValue {
                 !it.isHDAccount &&
@@ -151,7 +151,7 @@ class BtcAssetTest {
         whenever(payloadManager.getKeyFromImportedData(NON_BIP38_FORMAT, KEY_DATA))
             .thenReturn(Single.just(ecKey))
 
-        subject.importLegacyAddressFromKey(KEY_DATA, NON_BIP38_FORMAT, null, null)
+        subject.importAddressFromKey(KEY_DATA, NON_BIP38_FORMAT, null, null)
             .test()
             .assertError(Exception::class.java)
 
@@ -163,7 +163,7 @@ class BtcAssetTest {
         whenever(payloadManager.getKeyFromImportedData(NON_BIP38_FORMAT, KEY_DATA))
             .thenReturn(Single.error(Exception()))
 
-        subject.importLegacyAddressFromKey(KEY_DATA, NON_BIP38_FORMAT, null, null)
+        subject.importAddressFromKey(KEY_DATA, NON_BIP38_FORMAT, null, null)
             .test()
             .assertError(Exception::class.java)
 
@@ -176,16 +176,16 @@ class BtcAssetTest {
             on { hasPrivKey() } itReturns true
         }
 
-        val internalAccount: LegacyAddress = mock {
+        val internalAccount: ImportedAddress = mock {
             on { address } itReturns IMPORTED_ADDRESS
         }
 
         whenever(payloadManager.getBip38KeyFromImportedData(KEY_DATA, KEY_PASSWORD))
             .thenReturn(Single.just(ecKey))
-        whenever(payloadManager.addLegacyAddressFromKey(ecKey, null))
+        whenever(payloadManager.addImportedAddressFromKey(ecKey, null))
             .thenReturn(Single.just(internalAccount))
 
-        subject.importLegacyAddressFromKey(KEY_DATA, BIP38_FORMAT, KEY_PASSWORD, null)
+        subject.importAddressFromKey(KEY_DATA, BIP38_FORMAT, KEY_PASSWORD, null)
             .test()
             .assertValue {
                 !it.isHDAccount &&
@@ -201,7 +201,7 @@ class BtcAssetTest {
         whenever(payloadManager.getBip38KeyFromImportedData(KEY_DATA, KEY_PASSWORD))
             .thenReturn(Single.error(BadPassphraseException()))
 
-        subject.importLegacyAddressFromKey(KEY_DATA, BIP38_FORMAT, KEY_PASSWORD, null)
+        subject.importAddressFromKey(KEY_DATA, BIP38_FORMAT, KEY_PASSWORD, null)
             .test()
             .assertError(BadPassphraseException::class.java)
 

@@ -262,7 +262,7 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
 
     private fun supportedCryptoCurrencies(): Single<List<CryptoCurrency>> {
         val availableFiats =
-            custodialWalletManager.getSupportedFundsFiats(currencyPrefs.selectedFiatCurrency, true)
+            custodialWalletManager.getSupportedFundsFiats(currencyPrefs.selectedFiatCurrency)
         return custodialWalletManager.getSupportedBuySellCryptoCurrencies()
             .zipWith(availableFiats) { supportedPairs, fiats ->
                 supportedPairs.pairs.filter { fiats.contains(it.fiatCurrency) }

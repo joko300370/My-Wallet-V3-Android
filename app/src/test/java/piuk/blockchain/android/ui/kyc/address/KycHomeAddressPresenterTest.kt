@@ -8,6 +8,8 @@ import com.blockchain.nabu.models.responses.nabu.NabuCountryResponse
 import com.blockchain.nabu.models.responses.nabu.Scope
 import piuk.blockchain.android.ui.validOfflineToken
 import com.blockchain.nabu.NabuToken
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.SDDUserState
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
@@ -24,8 +26,8 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.ui.kyc.address.models.AddressModel
-import piuk.blockchain.androidcore.data.settings.PhoneVerificationQuery
 
 class KycHomeAddressPresenterTest {
 
@@ -33,10 +35,10 @@ class KycHomeAddressPresenterTest {
     private val view: KycHomeAddressView = mock()
     private val nabuDataManager: NabuDataManager = mock()
     private val nabuToken: NabuToken = mock()
-    private val phoneVerificationQuery: PhoneVerificationQuery = mock()
+    private val custodialWalletManager: CustodialWalletManager = mock()
 
-    private val tier2Decision: Tier2Decision = mock {
-        on { progressToTier2() } `it returns` Single.just(Tier2Decision.NextStep.Tier2Continue)
+    private val kycNextStepDecision: KycNextStepDecision = mock {
+        on { nextStep() } `it returns` Single.just(KycNextStepDecision.NextStep.Tier2Continue)
     }
 
     @Suppress("unused")
@@ -51,8 +53,8 @@ class KycHomeAddressPresenterTest {
         subject = KycHomeAddressPresenter(
             nabuToken,
             nabuDataManager,
-            tier2Decision,
-            phoneVerificationQuery
+            kycNextStepDecision,
+            custodialWalletManager
         )
         subject.initView(view)
     }
@@ -246,7 +248,7 @@ class KycHomeAddressPresenterTest {
     }
 
     @Test
-    fun `on continue clicked all data correct, phone number unverified`() {
+    fun `on continue clicked all data correct, continue to veriff`() {
         // Arrange
         val firstLine = "1"
         val city = "2"
@@ -269,13 +271,13 @@ class KycHomeAddressPresenterTest {
                 countryCode
             )
         ).thenReturn(Completable.complete())
-        givenPhoneNumberNeedsToBeVerified()
+        givenRequestJwtAndUpdateWalletInfoSucceds()
         // Act
         subject.onContinueClicked()
         // Assert
         verify(view).showProgressDialog()
         verify(view).dismissProgressDialog()
-        verify(view).continueToMobileVerification(countryCode)
+        verify(view).continueToVeriffSplash(countryCode)
     }
 
     @Test
@@ -302,11 +304,7 @@ class KycHomeAddressPresenterTest {
                 countryCode
             )
         ).thenReturn(Completable.complete())
-        givenPhoneNumberDoesNotNeedToBeVerified()
-        val jwt = "JWT"
-        whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
-        whenever(nabuDataManager.updateUserWalletInfo(validOfflineToken, jwt))
-            .thenReturn(Single.just(getBlankNabuUser()))
+        givenRequestJwtAndUpdateWalletInfoSucceds()
         // Act
         subject.onContinueClicked()
         // Assert
@@ -317,7 +315,7 @@ class KycHomeAddressPresenterTest {
 
     @Test
     fun `on continue clicked and tier2 decision reports to not continue, tier1 is complete`() {
-        whenever(tier2Decision.progressToTier2()).itReturns(Single.just(Tier2Decision.NextStep.Tier1Complete))
+        whenever(kycNextStepDecision.nextStep()).itReturns(Single.just(KycNextStepDecision.NextStep.Tier1Complete))
         // Arrange
         val firstLine = "1"
         val city = "2"
@@ -340,7 +338,7 @@ class KycHomeAddressPresenterTest {
                 countryCode
             )
         ).thenReturn(Completable.complete())
-        givenPhoneNumberNeedsToBeVerified()
+        givenRequestJwtAndUpdateWalletInfoSucceds()
         // Act
         subject.onContinueClicked()
         // Assert
@@ -352,8 +350,8 @@ class KycHomeAddressPresenterTest {
     @Test
     fun `on continue clicked and tier2 decision reports to get more info, tier2 continues`() {
         whenever(
-            tier2Decision.progressToTier2()
-        ).itReturns(Single.just(Tier2Decision.NextStep.Tier2ContinueTier1NeedsMoreInfo))
+            kycNextStepDecision.nextStep()
+        ).itReturns(Single.just(KycNextStepDecision.NextStep.Tier2ContinueTier1NeedsMoreInfo))
         // Arrange
         val firstLine = "1"
         val city = "2"
@@ -365,6 +363,8 @@ class KycHomeAddressPresenterTest {
         whenever(
             nabuToken.fetchNabuToken()
         ).thenReturn(Single.just(validOfflineToken))
+        whenever(custodialWalletManager.isSDDEligible()).thenReturn(Single.just(false))
+        givenRequestJwtAndUpdateWalletInfoSucceds()
         whenever(
             nabuDataManager.addAddress(
                 validOfflineToken,
@@ -376,21 +376,12 @@ class KycHomeAddressPresenterTest {
                 countryCode
             )
         ).thenReturn(Completable.complete())
-        givenPhoneNumberNeedsToBeVerified()
         // Act
         subject.onContinueClicked()
         // Assert
         verify(view).showProgressDialog()
         verify(view).dismissProgressDialog()
         verify(view).continueToTier2MoreInfoNeeded(countryCode)
-    }
-
-    private fun givenPhoneNumberDoesNotNeedToBeVerified() {
-        whenever(phoneVerificationQuery.needsPhoneVerification()).thenReturn(Single.just(false))
-    }
-
-    private fun givenPhoneNumberNeedsToBeVerified() {
-        whenever(phoneVerificationQuery.needsPhoneVerification()).thenReturn(Single.just(true))
     }
 
     @Test
@@ -421,6 +412,43 @@ class KycHomeAddressPresenterTest {
         sortedMap `should equal` expectedMap
     }
 
+    @Test
+    fun `on continue clicked all data correct, continue to sdd`() {
+        // Arrange
+        val firstLine = "1"
+        val city = "2"
+        val state = "3"
+        val zipCode = "4"
+        val countryCode = "UK"
+        whenever(view.address)
+            .thenReturn(Observable.just(addressModel(firstLine, city, state, zipCode, countryCode)))
+        whenever(
+            nabuToken.fetchNabuToken()
+        ).thenReturn(Single.just(validOfflineToken))
+        whenever(
+            nabuDataManager.addAddress(
+                validOfflineToken,
+                firstLine,
+                null,
+                city,
+                state,
+                zipCode,
+                countryCode
+            )
+        ).thenReturn(Completable.complete())
+        givenRequestJwtAndUpdateWalletInfoSucceds()
+        whenever(custodialWalletManager.isSDDEligible()).thenReturn(Single.just(true))
+        whenever(custodialWalletManager.fetchSDDUserState()).thenReturn(
+            Single.just(SDDUserState(isVerified = true, stateFinalised = true))
+        )
+        // Act
+        subject.onContinueClicked(CampaignType.SimpleBuy)
+        // Assert
+        verify(view).showProgressDialog()
+        verify(view).dismissProgressDialog()
+        verify(view).onSddVerified()
+    }
+
     private fun addressModel(
         firstLine: String = "",
         city: String = "",
@@ -435,4 +463,11 @@ class KycHomeAddressPresenterTest {
         postCode,
         country
     )
+
+    private fun givenRequestJwtAndUpdateWalletInfoSucceds() {
+        val jwt = "JWT"
+        whenever(nabuDataManager.requestJwt()).thenReturn(Single.just(jwt))
+        whenever(nabuDataManager.updateUserWalletInfo(validOfflineToken, jwt))
+            .thenReturn(Single.just(getBlankNabuUser()))
+    }
 }

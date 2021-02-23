@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.launcher
 import android.app.LauncherActivity
 import android.content.Intent
 import com.blockchain.logging.CrashLogger
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.CurrencyPrefs
@@ -39,6 +40,7 @@ class LauncherPresenter(
     private val currencyPrefs: CurrencyPrefs,
     private val analytics: Analytics,
     private val prerequisites: Prerequisites,
+    private val custodialWalletManager: CustodialWalletManager,
     private val crashLogger: CrashLogger
 ) : BasePresenter<LauncherView>() {
 
@@ -239,6 +241,15 @@ class LauncherPresenter(
 
     private fun setCurrencyUnits(settings: Settings) {
         prefs.selectedFiatCurrency = settings.currency
+    }
+
+    fun onEmailVerified() {
+        compositeDisposable += custodialWalletManager.isSDDEligible().onErrorReturn { false }
+            .subscribeBy(
+                onSuccess = {
+                    view.onStartMainActivity(null, it)
+                }, onError = {}
+            )
     }
 
     companion object {

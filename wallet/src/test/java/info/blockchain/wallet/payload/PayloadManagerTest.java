@@ -2,7 +2,7 @@ package info.blockchain.wallet.payload;
 
 import info.blockchain.api.blockexplorer.BlockExplorer;
 import info.blockchain.wallet.BlockchainFramework;
-import info.blockchain.wallet.LegacyAddressHelper;
+import info.blockchain.wallet.ImportedAddressHelper;
 import info.blockchain.wallet.WalletApiMockedResponseTest;
 import info.blockchain.wallet.exceptions.HDWalletException;
 import info.blockchain.wallet.exceptions.InvalidCredentialsException;
@@ -13,7 +13,7 @@ import info.blockchain.wallet.multiaddress.TransactionSummary;
 import info.blockchain.wallet.multiaddress.TransactionSummary.TransactionType;
 import info.blockchain.wallet.payload.data.Account;
 import info.blockchain.wallet.payload.data.AddressLabel;
-import info.blockchain.wallet.payload.data.LegacyAddress;
+import info.blockchain.wallet.payload.data.ImportedAddress;
 import info.blockchain.wallet.payload.data.Wallet;
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.ECKey;
@@ -289,7 +289,7 @@ public final class PayloadManagerTest extends WalletApiMockedResponseTest {
         mockInterceptor.setResponseStringList(responseList);
         payloadManager.create("My HDWallet", "name@email.com", "MyTestWallet");
 
-        Assert.assertEquals(0, payloadManager.getPayload().getLegacyAddressList().size());
+        Assert.assertEquals(0, payloadManager.getPayload().getImportedAddressList().size());
 
         responseList = new LinkedList<>();
         responseList.add("MyWallet save successful");
@@ -298,8 +298,8 @@ public final class PayloadManagerTest extends WalletApiMockedResponseTest {
         responseList.add("{}");
         responseList.add("{}");
         mockInterceptor.setResponseStringList(responseList);
-        payloadManager.addLegacyAddress(LegacyAddressHelper.getLegacyAddress());
-        Assert.assertEquals(1, payloadManager.getPayload().getLegacyAddressList().size());
+        payloadManager.addImportedAddress(ImportedAddressHelper.getImportedAddress());
+        Assert.assertEquals(1, payloadManager.getPayload().getImportedAddressList().size());
 
         responseList = new LinkedList<>();
         responseList.add("MyWallet save successful");
@@ -309,8 +309,8 @@ public final class PayloadManagerTest extends WalletApiMockedResponseTest {
         responseList.add("{}");
         responseList.add("{}");
         mockInterceptor.setResponseStringList(responseList);
-        payloadManager.addLegacyAddress(LegacyAddressHelper.getLegacyAddress());
-        Assert.assertEquals(2, payloadManager.getPayload().getLegacyAddressList().size());
+        payloadManager.addImportedAddress(ImportedAddressHelper.getImportedAddress());
+        Assert.assertEquals(2, payloadManager.getPayload().getImportedAddressList().size());
 
     }
 
@@ -325,7 +325,7 @@ public final class PayloadManagerTest extends WalletApiMockedResponseTest {
         mockInterceptor.setResponseStringList(responseList);
         payloadManager.create("My HDWallet", "name@email.com", "MyTestWallet");
 
-        Assert.assertEquals(0, payloadManager.getPayload().getLegacyAddressList().size());
+        Assert.assertEquals(0, payloadManager.getPayload().getImportedAddressList().size());
 
         responseList = new LinkedList<>();
         responseList.add("MyWallet save successful");
@@ -334,19 +334,19 @@ public final class PayloadManagerTest extends WalletApiMockedResponseTest {
         responseList.add("{}");
         responseList.add("{}");
         mockInterceptor.setResponseStringList(responseList);
-        payloadManager.addLegacyAddress(LegacyAddressHelper.getLegacyAddress());
-        Assert.assertEquals(1, payloadManager.getPayload().getLegacyAddressList().size());
+        payloadManager.addImportedAddress(ImportedAddressHelper.getImportedAddress());
+        Assert.assertEquals(1, payloadManager.getPayload().getImportedAddressList().size());
 
-        LegacyAddress legacyAddressBody = payloadManager.getPayload()
-                .getLegacyAddressList().get(0);
+        ImportedAddress importedAddressBody = payloadManager.getPayload()
+                .getImportedAddressList().get(0);
 
         ECKey ecKey = DeterministicKey
-                .fromPrivate(Base58.decode(legacyAddressBody.getPrivateKey()));
+                .fromPrivate(Base58.decode(importedAddressBody.getPrivateKey()));
 
 
-        legacyAddressBody.setPrivateKey(null);
+        importedAddressBody.setPrivateKey(null);
         mockInterceptor.setResponseString("MyWallet save successful.");
-        payloadManager.setKeyForLegacyAddress(ecKey, null);
+        payloadManager.setKeyForImportedAddress(ecKey, null);
     }
 
     @Test
@@ -360,7 +360,7 @@ public final class PayloadManagerTest extends WalletApiMockedResponseTest {
         mockInterceptor.setResponseStringList(responseList);
         payloadManager.create("My HDWallet", "name@email.com", "MyTestWallet");
 
-        Assert.assertEquals(0, payloadManager.getPayload().getLegacyAddressList().size());
+        Assert.assertEquals(0, payloadManager.getPayload().getImportedAddressList().size());
 
         responseList = new LinkedList<>();
         responseList.add("MyWallet save successful");
@@ -369,11 +369,11 @@ public final class PayloadManagerTest extends WalletApiMockedResponseTest {
         responseList.add("{}");
         responseList.add("{}");
         mockInterceptor.setResponseStringList(responseList);
-        payloadManager.addLegacyAddress(LegacyAddressHelper.getLegacyAddress());
-        Assert.assertEquals(1, payloadManager.getPayload().getLegacyAddressList().size());
+        payloadManager.addImportedAddress(ImportedAddressHelper.getImportedAddress());
+        Assert.assertEquals(1, payloadManager.getPayload().getImportedAddressList().size());
 
-        LegacyAddress existingLegacyAddressBody = payloadManager.getPayload()
-                .getLegacyAddressList().get(0);
+        ImportedAddress existingImportedAddressBody = payloadManager.getPayload()
+                .getImportedAddressList().get(0);
 
         //Try non matching ECKey
         ECKey ecKey = new ECKey();
@@ -387,15 +387,15 @@ public final class PayloadManagerTest extends WalletApiMockedResponseTest {
         responseList.add("{}");
         mockInterceptor.setResponseStringList(responseList);
 
-        LegacyAddress newlyAdded = payloadManager
-                .setKeyForLegacyAddress(ecKey, null);
+        ImportedAddress newlyAdded = payloadManager
+                .setKeyForImportedAddress(ecKey, null);
 
         //Ensure new address is created if no match found
         Assert.assertNotNull(newlyAdded);
         Assert.assertNotNull(newlyAdded.getPrivateKey());
         Assert.assertNotNull(newlyAdded.getAddress());
-        Assert.assertNotEquals(existingLegacyAddressBody.getPrivateKey(), newlyAdded.getPrivateKey());
-        Assert.assertNotEquals(existingLegacyAddressBody.getAddress(), newlyAdded.getAddress());
+        Assert.assertNotEquals(existingImportedAddressBody.getPrivateKey(), newlyAdded.getPrivateKey());
+        Assert.assertNotEquals(existingImportedAddressBody.getAddress(), newlyAdded.getAddress());
     }
 
     @Test
@@ -409,7 +409,7 @@ public final class PayloadManagerTest extends WalletApiMockedResponseTest {
         mockInterceptor.setResponseStringList(responseList);
         payloadManager.create("My HDWallet", "name@email.com", "MyTestWallet");
 
-        Assert.assertEquals(0, payloadManager.getPayload().getLegacyAddressList().size());
+        Assert.assertEquals(0, payloadManager.getPayload().getImportedAddressList().size());
 
         responseList = new LinkedList<>();
         responseList.add("MyWallet save successful");
@@ -418,22 +418,22 @@ public final class PayloadManagerTest extends WalletApiMockedResponseTest {
         responseList.add("{}");
         responseList.add("{}");
         mockInterceptor.setResponseStringList(responseList);
-        payloadManager.addLegacyAddress(LegacyAddressHelper.getLegacyAddress());
-        Assert.assertEquals(1, payloadManager.getPayload().getLegacyAddressList().size());
+        payloadManager.addImportedAddress(ImportedAddressHelper.getImportedAddress());
+        Assert.assertEquals(1, payloadManager.getPayload().getImportedAddressList().size());
 
-        LegacyAddress legacyAddressBody = payloadManager.getPayload()
-                .getLegacyAddressList().get(0);
+        ImportedAddress importedAddressBody = payloadManager.getPayload()
+                .getImportedAddressList().get(0);
 
         ECKey ecKey = DeterministicKey
-                .fromPrivate(Base58.decode(legacyAddressBody.getPrivateKey()));
+                .fromPrivate(Base58.decode(importedAddressBody.getPrivateKey()));
 
-        legacyAddressBody.setPrivateKey(null);
+        importedAddressBody.setPrivateKey(null);
         mockInterceptor.setResponseCode(500);
         mockInterceptor.setResponseString("Oops something went wrong");
-        payloadManager.setKeyForLegacyAddress(ecKey, null);
+        payloadManager.setKeyForImportedAddress(ecKey, null);
 
         //Ensure private key reverted on save fail
-        Assert.assertNull(legacyAddressBody.getPrivateKey());
+        Assert.assertNull(importedAddressBody.getPrivateKey());
     }
 
     @Test

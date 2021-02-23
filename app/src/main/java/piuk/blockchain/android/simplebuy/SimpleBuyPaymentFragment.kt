@@ -12,9 +12,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.blockchain.koin.scopedInject
-import com.blockchain.preferences.RatingPrefs
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.preferences.RatingPrefs
 import com.blockchain.ui.urllinks.URL_SUPPORT_BALANCE_LOCKED
 import com.google.android.play.core.review.ReviewInfo
 import com.google.android.play.core.review.ReviewManagerFactory
@@ -26,11 +26,12 @@ import piuk.blockchain.android.cards.CardAuthoriseWebViewActivity
 import piuk.blockchain.android.cards.CardVerificationFragment
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionFlowCustomiserImpl.Companion.getEstimatedTransactionCompletionTime
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.assetName
-import piuk.blockchain.android.util.secondsToDays
-import piuk.blockchain.android.util.maskedAsset
 import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.maskedAsset
+import piuk.blockchain.android.util.secondsToDays
 import java.math.BigInteger
 
 class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(),
@@ -143,8 +144,11 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
                 if (lockedFundDays <= 0L) {
                     transaction_progress_view.showTxSuccess(
                         getString(R.string.card_purchased, value.formatOrSymbolForZero()),
-                        getString(R.string.card_purchased_available_now,
-                            getString(value.currency.assetName())))
+                        getString(
+                            R.string.card_purchased_available_now,
+                            getString(value.currency.assetName())
+                        )
+                    )
                 } else {
                     transaction_progress_view.showPendingTx(
                         getString(R.string.card_purchased, value.formatOrSymbolForZero()),
@@ -155,28 +159,45 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
             loading && value != null -> {
                 transaction_progress_view.showTxInProgress(
                     getString(R.string.card_buying, value.formatOrSymbolForZero()),
-                    getString(R.string.completing_card_buy))
+                    getString(R.string.completing_card_buy)
+                )
             }
             pending && value != null -> {
-                transaction_progress_view.showTxPending(
-                    getString(R.string.card_in_progress, value.formatOrSymbolForZero()),
-                    getString(R.string.we_will_notify_order_complete))
+                when (paymentMethod) {
+                    PaymentMethodType.BANK_TRANSFER -> {
+                        transaction_progress_view.showTxPending(
+                            getString(R.string.bank_transfer_in_progress_title, value.formatOrSymbolForZero()),
+                            getString(R.string.bank_transfer_in_progress_blurb, getEstimatedTransactionCompletionTime())
+                        )
+                    }
+                    else -> {
+                        transaction_progress_view.showTxPending(
+                            getString(R.string.card_in_progress, value.formatOrSymbolForZero()),
+                            getString(R.string.we_will_notify_order_complete)
+                        )
+                    }
+                }
             }
             hasError -> {
                 transaction_progress_view.showTxError(
                     getString(R.string.common_oops),
-                    getString(R.string.order_error_subtitle))
+                    getString(R.string.order_error_subtitle)
+                )
             }
         }
     }
 
     private fun subtitleForLockedFunds(lockedFundDays: Long, paymentMethod: PaymentMethodType): SpannableStringBuilder {
         val intro = when (paymentMethod) {
-            PaymentMethodType.PAYMENT_CARD -> getString(R.string.security_locked_card_funds_explanation,
-                lockedFundDays.toString())
+            PaymentMethodType.PAYMENT_CARD -> getString(
+                R.string.security_locked_card_funds_explanation,
+                lockedFundDays.toString()
+            )
             PaymentMethodType.BANK_TRANSFER ->
-                getString(R.string.security_locked_funds_bank_transfer_payment_screen_explanation,
-                    lockedFundDays.toString())
+                getString(
+                    R.string.security_locked_funds_bank_transfer_payment_screen_explanation,
+                    lockedFundDays.toString()
+                )
             else -> return SpannableStringBuilder()
         }
 
@@ -185,7 +206,8 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
         val learnLink = stringUtils.getStringWithMappedAnnotations(
             R.string.common_linked_learn_more,
             map,
-            activity)
+            activity
+        )
 
         val sb = SpannableStringBuilder()
         sb.append(intro)
@@ -193,7 +215,8 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
             .setSpan(
                 ForegroundColorSpan(ContextCompat.getColor(activity, R.color.blue_600)),
                 intro.length, intro.length + learnLink.length,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
 
         return sb
     }
@@ -216,7 +239,8 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
 
     override fun navigator(): SimpleBuyNavigator =
         (activity as? SimpleBuyNavigator) ?: throw IllegalStateException(
-            "Parent must implement SimpleBuyNavigator")
+            "Parent must implement SimpleBuyNavigator"
+        )
 
     override fun onBackPressed(): Boolean = true
 

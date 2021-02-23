@@ -70,6 +70,7 @@
     <string name="options_id">Wallet ID</string>
 
     <string name="preferences_about_title">About Us</string>
+    <string name="preferences_rate_app">Rate the App</string>
 
     <string name="logout_wallet">Log Out</string>
     <string name="ask_you_sure_logout">Are you sure you want to log out from this wallet?</string>
@@ -1281,6 +1282,7 @@
     <string name="buy_min">Buy Min</string>
     <string name="buy_max">Buy Max</string>
     <string name="bank_account_info_default">Account Ending</string>
+    <string name="bank_wire_transfer_fee_default">Wire Fee</string>
     <string name="bank_wire_transfer">Bank Wire Transfer</string>
     <string name="bank_transfer">Bank Transfer</string>
     <string name="payment_wire_transfer">Wire Transfer</string>
@@ -1395,6 +1397,8 @@
     <string name="card_buying">Buying %1s</string>
     <string name="card_in_progress">%1s Buy In Progress</string>
     <string name="we_will_notify_order_complete">We’ll notify you when your order is complete.</string>
+    <string name="bank_transfer_in_progress_title">%1$s Buy Started</string>
+    <string name="bank_transfer_in_progress_blurb">We are completing your purchase now. Expect the funds to be withdrawn from your bank by %1$s. Check the status of your order at anytime in Activity.</string>
     <string name="completing_card_buy">We’re completing your purchase now.</string>
     <string name="card_purchased">%1s Purchased</string>
     <string name="card_purchased_available_now">Your %1s is now available in your Wallet.</string>
@@ -1504,6 +1508,7 @@
     <string name="fiat_funds_detail_withdraw_title">Withdraw</string>
     <string name="fiat_funds_detail_deposit_details">Add Cash from Your Bank</string>
     <string name="fiat_funds_detail_withdraw_details">Cash Out to Your Bank</string>
+    <string name="fiat_funds_detail_pending_withdrawal">You already have a Withdrawal in progress, please wait until that completes before starting a new one.</string>
     <string name="withdraw_currency">Withdraw %1$s</string>
     <string name="withdraw_title">Withdraw</string>
     <string name="withdraw_to">Withdraw to</string>
@@ -1512,7 +1517,7 @@
     <string name="withdraw_confirmation_progress_title">Withdrawing %1$s</string>
     <string name="withdraw_confirmation_success_title">%1$s Withdrawn!</string>
     <string name="withdraw_confirmation_success_message">We are sending the cash now. Expect the cash to hit your bank on %1$s. Check the status of your Withdrawal at anytime from your Activity Screen</string>
-    <string name="withdraw_target_select_title">Withdraw to...</string>
+    <string name="withdraw_target_select_title">Withdraw to…</string>
     <string name="withdraw_confirmation_eta">Funds Will Arrive by</string>
     <string name="add_a_bank">Add a Bank</string>
     <string name="fiat_funds_detail_activity_title">Activity</string>
@@ -1903,7 +1908,8 @@
     <string name="security_check">Security Check</string>
     <string name="success_email_veriff">Success! Your email has been confirmed.</string>
     <string name="email_verified">Email Verified</string>
-    <string name="sent_email_verification">We sent a verification email to %1$s. Please tap the link in the email to continue.</string>
+    <string name="email_verification_part_1">We sent a verification email to&#160;</string>
+    <string name="email_verification_part_2">. Please tap the link in the email to continue.</string>
     <string name="email_verify">Verify Your Email</string>
     <string name="edit_email_address">Edit Email Address</string>
     <string name="common_save">Save</string>

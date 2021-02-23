@@ -23,4 +23,6 @@ interface EnterAmountCustomisations {
     fun installEnterAmountLowerSlotView(ctx: Context, frame: FrameLayout, state: TransactionState): TxFlowWidget
     fun installEnterAmountUpperSlotView(ctx: Context, frame: FrameLayout, state: TransactionState): TxFlowWidget
     fun shouldShowMaxLimit(state: TransactionState): Boolean
+    fun enterAmountLimitsViewTitle(state: TransactionState): String
+    fun enterAmountLimitsViewInfo(state: TransactionState): String
 }

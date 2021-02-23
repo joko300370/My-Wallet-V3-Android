@@ -109,13 +109,14 @@ class TransactionInteractor(
         when (action) {
             AssetAction.Swap -> swapTargets(sourceAccount as CryptoAccount)
             AssetAction.Sell -> sellTargets(sourceAccount as CryptoAccount)
+            AssetAction.FiatDeposit -> linkedBanksFactory.getNonWireTransferBanks().mapList { it }
             AssetAction.Withdraw -> linkedBanksFactory.getAllLinkedBanks().mapList { it }
             else -> coincore.getTransactionTargets(sourceAccount as CryptoAccount, action)
         }
 
     private fun sellTargets(sourceAccount: CryptoAccount): Single<List<SingleAccount>> {
         val availableFiats =
-            custodialWalletManager.getSupportedFundsFiats(currencyPrefs.selectedFiatCurrency, true)
+            custodialWalletManager.getSupportedFundsFiats(currencyPrefs.selectedFiatCurrency)
         val apiPairs = custodialWalletManager.getSupportedBuySellCryptoCurrencies()
             .zipWith(availableFiats) { supportedPairs, fiats ->
                 supportedPairs.pairs.filter { fiats.contains(it.fiatCurrency) }

@@ -531,7 +531,8 @@ val applicationModule = module {
                 kycStatusHelper = get(),
                 pitLinking = get(),
                 analytics = get(),
-                biometricsController = get()
+                biometricsController = get(),
+                ratingPrefs = get()
             )
         }
 
@@ -632,7 +633,8 @@ val applicationModule = module {
                 currencyPrefs = get(),
                 analytics = get(),
                 crashLogger = get(),
-                prerequisites = get()
+                prerequisites = get(),
+                custodialWalletManager = get()
             )
         }
 

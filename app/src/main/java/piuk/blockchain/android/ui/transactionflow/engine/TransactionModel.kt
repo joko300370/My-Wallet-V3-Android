@@ -209,8 +209,9 @@ class TransactionModel(
             is TransactionIntent.ShowMoreAccounts -> null
             is TransactionIntent.UseMaxSpendable -> null
             is TransactionIntent.SetFeeLevel -> processSetFeeLevel(intent)
-            is TransactionIntent.InvalidateTransaction,
-            is TransactionIntent.InvalidateTransactionKeepingTarget -> processInvalidateTransaction()
+            is TransactionIntent.InvalidateTransaction -> processInvalidateTransaction()
+            is TransactionIntent.InvalidateTransactionKeepingTarget -> processInvalidationAndNavigate(previousState)
+            is TransactionIntent.ClearBackStack -> null
             is TransactionIntent.ResetFlow -> {
                 interactor.reset()
                 null
@@ -219,7 +220,18 @@ class TransactionModel(
             is TransactionIntent.LinkBankInfoSuccess -> null
             is TransactionIntent.LinkBankFailed -> null
             is TransactionIntent.RefreshSourceAccounts -> processSourceAccountsListUpdate(previousState.action)
+            is TransactionIntent.NavigateBackFromEnterAmount -> processTransactionInvalidation(previousState.action)
         }
+    }
+
+    private fun processTransactionInvalidation(assetAction: AssetAction): Disposable? {
+        process(
+            when (assetAction) {
+                AssetAction.FiatDeposit -> TransactionIntent.InvalidateTransactionKeepingTarget
+                else -> TransactionIntent.InvalidateTransaction
+            }
+        )
+        return null
     }
 
     private fun processTargetAccountSelected(
@@ -289,6 +301,23 @@ class TransactionModel(
             .subscribeBy(
                 onComplete = {
                     process(TransactionIntent.ReturnToPreviousStep)
+                },
+                onError = { t ->
+                    errorLogger.log(TxFlowLogError.ResetFail(t))
+                    process(TransactionIntent.FatalTransactionError(t))
+                }
+            )
+
+    private fun processInvalidationAndNavigate(state: TransactionState): Disposable =
+        interactor.invalidateTransaction()
+            .subscribeBy(
+                onComplete = {
+                    process(
+                        TransactionIntent.InitialiseWithTargetAndNoSource(
+                            state.action, state.selectedTarget, state.passwordRequired
+                        )
+                    )
+                    process(TransactionIntent.ClearBackStack)
                 },
                 onError = { t ->
                     errorLogger.log(TxFlowLogError.ResetFail(t))

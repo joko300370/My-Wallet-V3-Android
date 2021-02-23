@@ -83,13 +83,12 @@ object Versions {
     const val charts = "3.1.0"
     const val circleIndicator = "1.2.2"
     const val bottomNav = "2.2.0"
-    const val countryPicker = "1.1.7"
+    const val countryPicker = "2.0.4"
 
     // zxing 3.4.0 crashes with:
     //      "java.lang.NoSuchMethodError. No interface method sort(Ljava/util/Comparator;)V in class Ljava/util/List;"
     // List.sort() is not available on Android SDK < 24 so DO NOT UPGRADE until project target min is 24
     const val zxing = "3.3.0"
-    const val wheelPicker = "1.1.2"
     const val materialDatePicker = "3.6.4"
     const val sparkline = "1.2.0"
 
@@ -226,7 +225,6 @@ object Libraries {
     const val bottomNav = "com.aurelhubert:ahbottomnavigation:${Versions.bottomNav}"
     const val countryPicker = "com.github.mukeshsolanki:country-picker-android:${Versions.countryPicker}"
     const val zxing = "com.google.zxing:core:${Versions.zxing}"
-    const val wheelPicker = "cn.aigestudio.wheelpicker:WheelPicker:${Versions.wheelPicker}"
     const val materialDatePicker = "com.wdullaer:materialdatetimepicker:${Versions.materialDatePicker}"
     const val sparkline = "com.robinhood.spark:spark:${Versions.sparkline}"
 

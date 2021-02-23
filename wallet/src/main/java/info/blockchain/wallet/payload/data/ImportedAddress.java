@@ -14,8 +14,6 @@ import org.bitcoinj.core.ECKey;
 
 import java.io.IOException;
 
-import javax.annotation.Nonnull;
-
 import info.blockchain.wallet.BlockchainFramework;
 import info.blockchain.wallet.api.PersistentUrls;
 
@@ -25,7 +23,7 @@ import info.blockchain.wallet.api.PersistentUrls;
         setterVisibility = Visibility.NONE,
         creatorVisibility = Visibility.NONE,
         isGetterVisibility = Visibility.NONE)
-public class LegacyAddress implements JsonSerializableAccount {
+public class ImportedAddress implements JsonSerializableAccount {
 
     public static final int NORMAL_ADDRESS = 0;
     public static final int ARCHIVED_ADDRESS = 2;
@@ -130,25 +128,25 @@ public class LegacyAddress implements JsonSerializableAccount {
         this.createdDeviceVersion = createdDeviceVersion;
     }
 
-    public static LegacyAddress fromJson(String json) throws IOException {
-        return new ObjectMapper().readValue(json, LegacyAddress.class);
+    public static ImportedAddress fromJson(String json) throws IOException {
+        return new ObjectMapper().readValue(json, ImportedAddress.class);
     }
 
     public String toJson() throws JsonProcessingException {
         return new ObjectMapper().writeValueAsString(this);
     }
 
-    public static LegacyAddress fromECKey(ECKey ecKey) {
+    public static ImportedAddress fromECKey(ECKey ecKey) {
 
-        LegacyAddress legacyAddress = new LegacyAddress();
-        legacyAddress.setPrivateKeyFromBytes(ecKey.getPrivKeyBytes());
-        legacyAddress.setLabel("");
+        ImportedAddress importedAddress = new ImportedAddress();
+        importedAddress.setPrivateKeyFromBytes(ecKey.getPrivKeyBytes());
+        importedAddress.setLabel("");
 
-        legacyAddress.setAddress(ecKey.toAddress(PersistentUrls.getInstance().getBitcoinParams()).toBase58());
-        legacyAddress.setCreatedDeviceName(BlockchainFramework.getDevice());
-        legacyAddress.setCreatedTime(System.currentTimeMillis());
-        legacyAddress.setCreatedDeviceVersion(BlockchainFramework.getAppVersion());
+        importedAddress.setAddress(ecKey.toAddress(PersistentUrls.getInstance().getBitcoinParams()).toBase58());
+        importedAddress.setCreatedDeviceName(BlockchainFramework.getDevice());
+        importedAddress.setCreatedTime(System.currentTimeMillis());
+        importedAddress.setCreatedDeviceVersion(BlockchainFramework.getAppVersion());
 
-        return legacyAddress;
+        return importedAddress;
     }
 }

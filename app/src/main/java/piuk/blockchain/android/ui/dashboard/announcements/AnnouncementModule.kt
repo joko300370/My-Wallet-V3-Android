@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.dashboard.announcements
 
-import com.blockchain.koin.coinifyUsersToKyc
 import com.blockchain.koin.dgldFeatureFlag
 import com.blockchain.koin.payloadScope
 import com.blockchain.koin.payloadScopeQualifier
@@ -82,7 +81,6 @@ val dashboardAnnouncementsModule = module {
         factory {
             KycMoreInfoAnnouncement(
                 tierService = get(),
-                showPopupFeatureFlag = get(coinifyUsersToKyc),
                 dismissRecorder = get()
             )
         }.bind(AnnouncementRule::class)

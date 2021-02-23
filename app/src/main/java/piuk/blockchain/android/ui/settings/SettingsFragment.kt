@@ -23,6 +23,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatActivity.RESULT_CANCELED
 import androidx.appcompat.app.AppCompatActivity.RESULT_FIRST_USER
 import androidx.appcompat.app.AppCompatActivity.RESULT_OK
@@ -48,7 +49,7 @@ import com.blockchain.ui.urllinks.URL_TOS_POLICY
 import com.google.android.play.core.review.ReviewInfo
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
-import com.mukesh.countrypicker.fragments.CountryPicker
+import com.mukesh.countrypicker.CountryPicker
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.util.FormatsUtil
 import info.blockchain.wallet.util.PasswordUtil
@@ -80,7 +81,9 @@ import piuk.blockchain.android.ui.backup.BackupWalletActivity
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviFragment.Companion.BOTTOM_SHEET
 import piuk.blockchain.android.ui.customviews.PasswordStrengthView
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
+import piuk.blockchain.android.ui.dashboard.LinkablePaymentMethodsForAction
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankMethodChooserBottomSheet
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
@@ -99,18 +102,16 @@ import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.ui.dashboard.LinkablePaymentMethodsForAction
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
+import java.util.Calendar
 import java.util.Locale
 import kotlin.math.roundToInt
 
 class SettingsFragment : PreferenceFragmentCompat(),
     SettingsView,
     RemovePaymentMethodBottomSheetHost,
-    BankLinkingHost,
-    ReviewHost {
+    BankLinkingHost {
 
     // Profile
     private val kycStatusPref by lazy {
@@ -306,12 +307,17 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
         // App
         findPreference<Preference>("about")?.apply {
-            summary = "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) ${BuildConfig.COMMIT_HASH}"
-            onClick { onAboutClicked() }
+            summary = getString(
+                R.string.about,
+                "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) ${BuildConfig.COMMIT_HASH}",
+                Calendar.getInstance().get(Calendar.YEAR).toString()
+            )
         }
 
         findPreference<Preference>("tos").onClick { onTosClicked() }
         findPreference<Preference>("privacy").onClick { onPrivacyClicked() }
+
+        settingsPresenter.checkShouldDisplayRateUs()
 
         val disableRootWarningPref = findPreference<Preference>(PersistentPrefs.KEY_ROOT_WARNING_DISABLED)
         if (disableRootWarningPref != null && !RootUtil().isDeviceRooted) {
@@ -328,6 +334,22 @@ class SettingsFragment : PreferenceFragmentCompat(),
                 settingsPresenter.onTwoStepVerificationRequested()
             intent.hasExtra(EXTRA_SHOW_ADD_EMAIL_DIALOG) ->
                 settingsPresenter.onEmailShowRequested()
+        }
+    }
+
+    override fun showRateUsPreference() {
+        findPreference<Preference>("rate_app")?.apply {
+            isVisible = true
+            onClick {
+                reviewInfo?.let {
+                    reviewManager.launchReviewFlow(activity, reviewInfo).addOnFailureListener {
+                        analytics.logEvent(ReviewAnalytics.LAUNCH_REVIEW_FAILURE)
+                        goToPlayStore()
+                    }.addOnCompleteListener {
+                        analytics.logEvent(ReviewAnalytics.LAUNCH_REVIEW_SUCCESS)
+                    }
+                } ?: goToPlayStore()
+            }
         }
     }
 
@@ -355,17 +377,6 @@ class SettingsFragment : PreferenceFragmentCompat(),
             ToastCustom.LENGTH_SHORT,
             ToastCustom.TYPE_ERROR
         )
-    }
-
-    override fun showReviewDialog() {
-        reviewInfo?.let {
-            reviewManager.launchReviewFlow(activity, reviewInfo).addOnFailureListener {
-                analytics.logEvent(ReviewAnalytics.LAUNCH_REVIEW_FAILURE)
-                goToPlayStore()
-            }.addOnCompleteListener {
-                analytics.logEvent(ReviewAnalytics.LAUNCH_REVIEW_SUCCESS)
-            }
-        } ?: goToPlayStore()
     }
 
     private fun goToPlayStore() {
@@ -754,10 +765,6 @@ class SettingsFragment : PreferenceFragmentCompat(),
         BackupWalletActivity.start(requireContext())
     }
 
-    private fun onAboutClicked() {
-        AboutDialog().show(childFragmentManager, "ABOUT_DIALOG")
-    }
-
     private fun onTosClicked() {
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(URL_TOS_POLICY)))
     }
@@ -796,8 +803,17 @@ class SettingsFragment : PreferenceFragmentCompat(),
             val countryTextView = smsPickerView.findViewById<TextView>(R.id.tvCountry)
             val mobileNumberTextView = smsPickerView.findViewById<TextView>(R.id.tvSms)
 
-            val picker = CountryPicker.newInstance(getString(R.string.select_country))
-            val country = picker.getUserCountryInfo(requireActivity())
+            val picker = CountryPicker.Builder()
+                .with(requireActivity())
+                .listener { country ->
+                    setCountryFlag(
+                        countryTextView, country.dialCode, country.flag
+                    )
+                }
+                .theme(CountryPicker.THEME_NEW)
+                .build()
+
+            val country = picker.countryFromSIM
             if (country.dialCode == "+93") {
                 setCountryFlag(countryTextView, "+1", R.drawable.flag_us)
             } else {
@@ -805,11 +821,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
             }
 
             countryTextView.setOnClickListener {
-                picker.show(requireFragmentManager(), "COUNTRY_PICKER")
-                picker.setListener { _, _, dialCode, flagDrawableResID ->
-                    setCountryFlag(countryTextView, dialCode, flagDrawableResID)
-                    picker.dismiss()
-                }
+                picker.showBottomSheet(requireActivity() as AppCompatActivity)
             }
 
             if (smsNumber.isNotEmpty()) {
@@ -895,7 +907,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
     override fun showDialogVerifySms() {
         val editText = AppCompatEditText(settingsActivity)
-        editText.setSingleLine(true)
+        editText.isSingleLine = true
 
         val dialog = AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
             .setTitle(R.string.verify_mobile)

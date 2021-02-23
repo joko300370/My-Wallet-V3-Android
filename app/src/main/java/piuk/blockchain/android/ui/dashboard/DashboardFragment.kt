@@ -202,12 +202,12 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         when {
             state.dashboardNavigationAction?.isBottomSheet() == true -> {
                 handleBottomSheet(state)
+                model.process(ResetDashboardNavigation)
             }
             state.dashboardNavigationAction is LinkBankNavigationAction -> {
                 startBankLinking(state.dashboardNavigationAction.linkBankTransfer)
             }
         }
-        model.process(ResetDashboardNavigation)
     }
 
     private fun startBankLinking(linkBankTransfer: LinkBankTransfer) {
@@ -414,6 +414,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                 }
             }
         }
+
         model.process(ResetDashboardNavigation)
     }
 

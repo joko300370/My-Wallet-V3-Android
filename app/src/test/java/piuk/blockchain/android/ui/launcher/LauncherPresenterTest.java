@@ -85,8 +85,6 @@ public class LauncherPresenterTest {
     @Mock
     private CurrencyPrefs currencyPrefs;
     @Mock
-    private MetadataManager metadataManager;
-    @Mock
     private Analytics analytics;
     @Mock
     private CrashLogger crashLogger;
@@ -109,6 +107,7 @@ public class LauncherPresenterTest {
                 currencyPrefs,
                 analytics,
                 prerequisites,
+                custodialWalletManager,
                 crashLogger
         );
         subject.initView(launcherActivity);

@@ -1,17 +1,24 @@
 package piuk.blockchain.android.ui.kyc.email.entry
 
 import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import com.blockchain.koin.scopedInject
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.EmailVerificationArgs
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.FragmentKycAddEmailBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
+import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
@@ -23,6 +30,8 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
     private val emailEntryHost: EmailEntryHost by ParentActivityDelegate(
         this
     )
+    private val stringUtils: StringUtils by inject()
+
     private val emailMustBeValidated by lazy {
         if (arguments?.containsKey("mustBeValidated") == true)
             EmailVerificationArgs.fromBundle(arguments ?: Bundle()).mustBeValidated
@@ -87,23 +96,39 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
     }
 
     private fun drawUnVerifiedEmailUi(email: Email) {
-        binding.emailInstructions.text = getString(R.string.sent_email_verification, email.address)
-        binding.emailStatusText.text = getString(R.string.email_verify)
-        binding.skip.visibleIf { !emailMustBeValidated }
-        binding.txStateIndicator.gone()
-        binding.ctaPrimary.apply {
-            visible()
-            text = getString(R.string.check_my_inbox)
-            setOnClickListener {
-                openInbox()
+        val boldText = email.address.takeIf { it.isNotEmpty() } ?: return
+        val partOne = getString(R.string.email_verification_part_1)
+        val partTwo = getString(R.string.email_verification_part_2)
+        val sb = SpannableStringBuilder()
+            .append(partOne)
+            .append(boldText)
+            .append(partTwo)
+
+        sb.setSpan(
+            StyleSpan(Typeface.BOLD),
+            partOne.length,
+            partOne.length + boldText.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        with(binding) {
+            emailInstructions.setText(sb, TextView.BufferType.SPANNABLE)
+            emailStatusText.text = getString(R.string.email_verify)
+            skip.visibleIf { !emailMustBeValidated }
+            txStateIndicator.gone()
+            ctaPrimary.apply {
+                visible()
+                text = getString(R.string.check_my_inbox)
+                setOnClickListener {
+                    openInbox()
+                }
             }
-        }
-        binding.ctaSecondary.apply {
-            visible()
-            text = getString(R.string.did_not_get_email)
-            setOnClickListener {
-                model.process(EmailVeriffIntent.CancelEmailVerification)
-                ResendOrChangeEmailBottomSheet().show(childFragmentManager, BOTTOM_SHEET)
+            ctaSecondary.apply {
+                visible()
+                text = getString(R.string.did_not_get_email)
+                setOnClickListener {
+                    model.process(EmailVeriffIntent.CancelEmailVerification)
+                    ResendOrChangeEmailBottomSheet().show(childFragmentManager, BOTTOM_SHEET)
+                }
             }
         }
     }

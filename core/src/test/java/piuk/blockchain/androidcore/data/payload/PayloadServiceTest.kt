@@ -9,7 +9,7 @@ import info.blockchain.api.data.Balance
 import info.blockchain.wallet.exceptions.ApiException
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.payload.data.Account
-import info.blockchain.wallet.payload.data.LegacyAddress
+import info.blockchain.wallet.payload.data.ImportedAddress
 import info.blockchain.wallet.payload.data.Wallet
 import org.amshove.kluent.mock
 import org.bitcoinj.core.ECKey
@@ -316,42 +316,42 @@ class PayloadServiceTest {
     }
 
     @Test
-    fun setKeyForLegacyAddress() {
+    fun setKeyForImportedAddress() {
         // Arrange
         val mockEcKey: ECKey = mock()
         val secondPassword = "SECOND_PASSWORD"
-        val mockLegacyAddress: LegacyAddress = mock()
-        whenever(mockPayloadManager.setKeyForLegacyAddress(mockEcKey, secondPassword))
-            .thenReturn(mockLegacyAddress)
+        val mockImportedAddress: ImportedAddress = mock()
+        whenever(mockPayloadManager.setKeyForImportedAddress(mockEcKey, secondPassword))
+            .thenReturn(mockImportedAddress)
         // Act
-        val testObserver = subject.setKeyForLegacyAddress(mockEcKey, secondPassword).test()
+        val testObserver = subject.setKeyForImportedAddress(mockEcKey, secondPassword).test()
         // Assert
-        verify(mockPayloadManager).setKeyForLegacyAddress(mockEcKey, secondPassword)
+        verify(mockPayloadManager).setKeyForImportedAddress(mockEcKey, secondPassword)
         verifyNoMoreInteractions(mockPayloadManager)
         testObserver.assertComplete()
-        testObserver.assertValue(mockLegacyAddress)
+        testObserver.assertValue(mockImportedAddress)
     }
 
     @Test
-    fun addLegacyAddress() {
+    fun addImportedAddress() {
         // Arrange
-        val mockLegacyAddress: LegacyAddress = mock()
+        val mockImportedAddress: ImportedAddress = mock()
         // Act
-        val testObserver = subject.addLegacyAddress(mockLegacyAddress).test()
+        val testObserver = subject.addImportedAddress(mockImportedAddress).test()
         // Assert
-        verify(mockPayloadManager).addLegacyAddress(mockLegacyAddress)
+        verify(mockPayloadManager).addImportedAddress(mockImportedAddress)
         verifyNoMoreInteractions(mockPayloadManager)
         testObserver.assertComplete()
     }
 
     @Test
-    fun updateLegacyAddress() {
+    fun updateImportedAddress() {
         // Arrange
-        val mockLegacyAddress: LegacyAddress = mock()
+        val mockImportedAddress: ImportedAddress = mock()
         // Act
-        val testObserver = subject.updateLegacyAddress(mockLegacyAddress).test()
+        val testObserver = subject.updateImportedAddress(mockImportedAddress).test()
         // Assert
-        verify(mockPayloadManager).updateLegacyAddress(mockLegacyAddress)
+        verify(mockPayloadManager).updateImportedAddress(mockImportedAddress)
         verifyNoMoreInteractions(mockPayloadManager)
         testObserver.assertComplete()
     }

@@ -1,12 +1,9 @@
 package piuk.blockchain.android.simplebuy
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import com.blockchain.koin.scopedInject
-import com.blockchain.nabu.datamanagers.PaymentMethod
-import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.BankPartner
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.YodleeAttributes
@@ -19,7 +16,6 @@ import kotlinx.android.synthetic.main.fragment_activity.*
 import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
-import piuk.blockchain.android.cards.CardDetailsActivity
 import piuk.blockchain.android.ui.linkbank.yodlee.LinkBankFragment
 import piuk.blockchain.android.ui.linkbank.yodlee.YodleeSplashFragment
 import piuk.blockchain.android.ui.linkbank.yodlee.YodleeWebViewFragment
@@ -93,13 +89,7 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
             FlowScreen.KYC -> startKyc()
             FlowScreen.KYC_VERIFICATION -> goToKycVerificationScreen(false)
             FlowScreen.CHECKOUT -> goToCheckOutScreen(false)
-            FlowScreen.ADD_CARD -> addNewCard()
         }
-    }
-
-    private fun addNewCard() {
-        val intent = Intent(this, CardDetailsActivity::class.java)
-        startActivityForResult(intent, CardDetailsActivity.ADD_CARD_REQUEST_CODE)
     }
 
     override fun onDestroy() {
@@ -204,33 +194,6 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == KYC_STARTED && resultCode == RESULT_KYC_SIMPLE_BUY_COMPLETE) {
-            simpleBuyModel.process(SimpleBuyIntent.KycCompleted)
-            goToKycVerificationScreen()
-        } else if (requestCode == CardDetailsActivity.ADD_CARD_REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                val card = (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as?
-                    PaymentMethod.Card) ?: return
-                val cardId = card.cardId
-                val cardLabel = card.uiLabel()
-                val cardPartner = card.partner
-
-                simpleBuyModel.process(
-                    SimpleBuyIntent.UpdateSelectedPaymentMethod(
-                        cardId,
-                        cardLabel,
-                        cardPartner,
-                        PaymentMethodType.PAYMENT_CARD
-                    )
-                )
-                goToCheckOutScreen()
-            } else
-                finish()
-        }
-    }
-
     override fun onSupportNavigateUp(): Boolean = consume {
         onBackPressed()
     }
@@ -305,6 +268,7 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
     companion object {
         const val KYC_STARTED = 6788
         const val RESULT_KYC_SIMPLE_BUY_COMPLETE = 7854
+        const val RESULT_KYC_SIMPLE_BUY_FOR_SDD_COMPLETE = 2353
 
         private const val STARTED_FROM_NAVIGATION_KEY = "started_from_navigation_key"
         private const val CRYPTOCURRENCY_KEY = "crypto_currency_key"
