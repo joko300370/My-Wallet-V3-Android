@@ -1283,6 +1283,8 @@
     <string name="buy_max">Buy Max</string>
     <string name="bank_account_info_default">Account Ending</string>
     <string name="bank_wire_transfer_fee_default">Wire Fee</string>
+    <string name="bank_wire_transfer_fee">%1$s Fee</string>
+    <string name="bank_wire_transfer_min_withdrawal">%1$s Min Withdraw</string>
     <string name="bank_wire_transfer">Bank Wire Transfer</string>
     <string name="bank_transfer">Bank Transfer</string>
     <string name="payment_wire_transfer">Wire Transfer</string>
@@ -1766,6 +1768,7 @@
     <string name="trending_empty">Fund your Trading Wallets to see Trending Swaps with lower fees.</string>
     <string name="trending_receive">Receive %1$s</string>
     <string name="select_a_wallet">Select a Wallet</string>
+    <string name="select_a_bank">Select a Bank</string>
 
     <!-- Transaction Flow confirmation screen -->
     <string name="confirm_status_msg_insufficient_funds">You have insufficient funds in this account to process this transaction</string>

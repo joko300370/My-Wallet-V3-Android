@@ -49,12 +49,14 @@ import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
 import com.blockchain.nabu.models.data.LinkedBankErrorState
 import com.blockchain.nabu.models.data.LinkedBankState
+import com.blockchain.nabu.models.data.WithdrawalFeeAndLimit
 import com.blockchain.nabu.models.responses.banktransfer.BankInfoResponse
 import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentBody
 import com.blockchain.nabu.models.responses.banktransfer.CreateLinkBankResponse
 import com.blockchain.nabu.models.responses.banktransfer.LinkedBankTransferResponse
 import com.blockchain.nabu.models.responses.banktransfer.ProviderAccountAttrs
 import com.blockchain.nabu.models.responses.banktransfer.UpdateProviderAccountBody
+import com.blockchain.nabu.models.responses.banktransfer.WithdrawFeeRequest
 import com.blockchain.nabu.models.responses.cards.CardResponse
 import com.blockchain.nabu.models.responses.cards.PaymentMethodResponse
 import com.blockchain.nabu.models.responses.interest.InterestAccountDetailsResponse
@@ -160,13 +162,29 @@ class LiveCustodialWalletManager(
             )
         }
 
-    override fun fetchWithdrawFee(currency: String): Single<FiatValue> =
+    override fun fetchWithdrawFeeAndMinLimit(
+        currency: String,
+        paymentMethodType: PaymentMethodType
+    ): Single<WithdrawalFeeAndLimit> =
         authenticator.authenticate {
-            nabuService.fetchWithdrawFee(it)
+            nabuService.fetchWithdrawFee(it, paymentMethodType.mapToRequest())
         }.map { response ->
-            response.fees.firstOrNull { it.symbol == currency }?.let {
-                FiatValue.fromMajor(it.symbol, it.value)
+            val fee = response.fees.firstOrNull { it.symbol == currency }?.let {
+                FiatValue.fromMinor(it.symbol, it.minorValue.toLong())
             } ?: FiatValue.zero(currency)
+
+            val minLimit = response.minAmounts.firstOrNull { it.symbol == currency }?.let {
+                FiatValue.fromMinor(it.symbol, it.minorValue.toLong())
+            } ?: FiatValue.zero(currency)
+
+            WithdrawalFeeAndLimit(minLimit, fee)
+        }
+
+    private fun PaymentMethodType.mapToRequest(): String =
+        when (this) {
+            PaymentMethodType.BANK_TRANSFER -> WithdrawFeeRequest.BANK_TRANSFER
+            PaymentMethodType.BANK_ACCOUNT -> WithdrawFeeRequest.BANK_ACCOUNT
+            else -> throw IllegalStateException("map not specified for $this")
         }
 
     override fun fetchWithdrawLocksTime(paymentMethodType: PaymentMethodType): Single<BigInteger> =
@@ -598,7 +616,7 @@ class LiveCustodialWalletManager(
                             method.currency ?: return@mapNotNull null
                         )
                         PaymentMethodResponse.BANK_ACCOUNT -> EligiblePaymentMethodType(
-                            PaymentMethodType.FUNDS,
+                            PaymentMethodType.BANK_ACCOUNT,
                             method.currency ?: return@mapNotNull null
                         )
                         else -> null
@@ -920,7 +938,7 @@ class LiveCustodialWalletManager(
             account = accountNumber ?: "",
             accountType = bankAccountType ?: "",
             paymentMethodType = if (this.isBankTransferAccount)
-                PaymentMethodType.BANK_TRANSFER else PaymentMethodType.FUNDS
+                PaymentMethodType.BANK_TRANSFER else PaymentMethodType.BANK_ACCOUNT
         )
 
     private fun LinkedBankTransferResponse.toLinkedBank(): LinkedBank? {
@@ -1080,7 +1098,7 @@ class LiveCustodialWalletManager(
 
     private fun Bank.remove(sessionToken: NabuSessionTokenResponse): Completable =
         when (this.paymentMethodType) {
-            PaymentMethodType.FUNDS -> nabuService.removeBeneficiary(sessionToken, id)
+            PaymentMethodType.BANK_ACCOUNT -> nabuService.removeBeneficiary(sessionToken, id)
             PaymentMethodType.BANK_TRANSFER -> nabuService.removeLinkedBank(sessionToken, id)
             else -> Completable.error(java.lang.IllegalStateException("Unknown Bank type"))
         }
@@ -1174,6 +1192,7 @@ private fun String.toSupportedPartner(): Partner =
 
 enum class PaymentMethodType {
     BANK_TRANSFER,
+    BANK_ACCOUNT,
     PAYMENT_CARD,
     FUNDS,
     UNKNOWN

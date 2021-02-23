@@ -117,6 +117,14 @@ class TransactionFlowCustomiserImpl(
             }
         )
 
+    override fun selectTargetAddressWalletsCta(state: TransactionState) =
+        resources.getString(
+            when (state.action) {
+                AssetAction.Withdraw -> R.string.select_a_bank
+                else -> R.string.select_a_wallet
+            }
+        )
+
     override fun selectTargetSourceLabel(state: TransactionState): String =
         when (state.action) {
             AssetAction.Swap -> resources.getString(R.string.common_swap)
@@ -576,7 +584,7 @@ class TransactionFlowCustomiserImpl(
         val amount =
             input?.let {
                 state.pendingTx?.minLimit?.toEnteredCurrency(
-                    it, exchangeRate as ExchangeRate.CryptoToFiat, RoundingMode.CEILING
+                    it, exchangeRate, RoundingMode.CEILING
                 )
             } ?: state.pendingTx?.minLimit?.toStringWithSymbol()
 

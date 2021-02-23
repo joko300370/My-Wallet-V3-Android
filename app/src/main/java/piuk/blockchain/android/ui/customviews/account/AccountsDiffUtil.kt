@@ -22,8 +22,8 @@ internal class AccountsDiffUtil(
 
 internal fun BlockchainAccount.isTheSameWith(other: BlockchainAccount): Boolean =
     this::class == other::class &&
-            this.hasTheSameAsset(other) &&
-            this.label == other.label
+        this.hasTheSameAsset(other) &&
+        this.label == other.label
 
 private fun BlockchainAccount.hasTheSameAsset(other: BlockchainAccount): Boolean {
     val thisCryptoAsset = (this as? CryptoAccount)?.asset

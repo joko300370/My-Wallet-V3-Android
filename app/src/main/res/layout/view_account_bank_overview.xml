@@ -51,12 +51,30 @@
         tools:text="Checking - 1234" />
 
     <piuk.blockchain.android.ui.customviews.StatusPill
-        android:id="@+id/bank_status"
+        android:id="@+id/bank_status_min"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/tiny_margin"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/bank_status_fee"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        android:layout_marginEnd="@dimen/tiny_margin"
+        app:layout_constraintStart_toStartOf="@id/bank_details"
+        app:layout_constraintTop_toBottomOf="@id/bank_details"
+        tools:text="Min Withdrawal"
+        tools:visibility="visible" />
+
+    <piuk.blockchain.android.ui.customviews.StatusPill
+        android:id="@+id/bank_status_fee"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/tiny_margin"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@id/bank_details"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toEndOf="@id/bank_status_min"
         app:layout_constraintTop_toBottomOf="@id/bank_details"
         tools:text="Bank status" />
 

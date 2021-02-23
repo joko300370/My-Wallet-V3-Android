@@ -10,6 +10,7 @@ import com.blockchain.nabu.datamanagers.repositories.interest.InterestLimits
 import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
+import com.blockchain.nabu.models.data.WithdrawalFeeAndLimit
 import com.blockchain.nabu.models.responses.interest.InterestActivityItemResponse
 import com.blockchain.nabu.models.responses.interest.InterestAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CardPartnerAttributes
@@ -75,7 +76,10 @@ interface CustodialWalletManager {
         amount: String
     ): Single<CustodialQuote>
 
-    fun fetchWithdrawFee(currency: String): Single<FiatValue>
+    fun fetchWithdrawFeeAndMinLimit(
+        currency: String,
+        paymentMethodType: PaymentMethodType
+    ): Single<WithdrawalFeeAndLimit>
 
     fun fetchWithdrawLocksTime(paymentMethodType: PaymentMethodType): Single<BigInteger>
 

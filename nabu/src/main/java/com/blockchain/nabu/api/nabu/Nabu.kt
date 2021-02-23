@@ -273,7 +273,8 @@ internal interface Nabu {
     @GET(NABU_SIMPLE_BUY_WITHDRAW_ORDER_FEE)
     fun withdrawFee(
         @Header("authorization") authorization: String,
-        @Query("product") product: String = "SIMPLEBUY"
+        @Query("product") product: String = "SIMPLEBUY",
+        @Query("paymentMethod") type: String
     ): Single<FeesResponse>
 
     @Headers("blockchain-origin: simplebuy")

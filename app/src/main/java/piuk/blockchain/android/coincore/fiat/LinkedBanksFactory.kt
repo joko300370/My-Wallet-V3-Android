@@ -46,7 +46,7 @@ class LinkedBanksFactory(
         custodialWalletManager.getEligiblePaymentMethodTypes(fiat).map { methods ->
             methods.filter {
                 it.paymentMethodType == PaymentMethodType.BANK_TRANSFER ||
-                    it.paymentMethodType == PaymentMethodType.FUNDS
+                    it.paymentMethodType == PaymentMethodType.BANK_ACCOUNT
             }.map { it.paymentMethodType }.toSet()
         }
 }
