@@ -12,6 +12,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.TextView
@@ -44,6 +45,10 @@ class EditFeesControl @JvmOverloads constructor(
 
     private val stringUtils: StringUtils by inject()
     private val analytics: TxFlowAnalytics by inject()
+
+    private val imm: InputMethodManager by lazy {
+        context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    }
 
     private lateinit var textChangedWatcher: AfterTextChangedWatcher
 
@@ -165,7 +170,9 @@ class EditFeesControl @JvmOverloads constructor(
                     binding.feeOptionValue.text = context.getString(R.string.send_confirmation_insufficient_fee)
                     binding.feeOptionValue.setTextColor(context.getResolvedColor(R.color.red_600))
                 }
-                is FeeState.FeeDetails -> { }
+                is FeeState.FeeDetails -> {
+                    setCustomFeeValues(feeSelection.customAmount)
+                }
             }
         }
     }
@@ -177,9 +184,15 @@ class EditFeesControl @JvmOverloads constructor(
                 feeOptionCustom.setText(fee, TextView.BufferType.EDITABLE)
                 feeOptionCustom.setSelection(fee.length)
                 feeOptionCustom.requestFocus()
+            } else {
+                feeOptionValue.setText("", TextView.BufferType.EDITABLE)
             }
             feeOptionCustomIl.error = error
         }
+    }
+
+    private fun hideKeyboard() {
+        imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
     }
 
     private fun showFeeSelector(
@@ -203,7 +216,7 @@ class EditFeesControl @JvmOverloads constructor(
         val spinnerArrayAdapter: ArrayAdapter<String> =
             CustomPaddingArrayAdapter(
                 context,
-                android.R.layout.simple_spinner_dropdown_item,
+                R.layout.tx_fee_spinner_dropdown_item,
                 displayList
             )
 
@@ -236,6 +249,9 @@ class EditFeesControl @JvmOverloads constructor(
             position: Int,
             id: Long
         ) {
+            // This is here to prevent displaying a keyboard layout with text as an inputType.
+            // That is incorrect as we want numeric only, and it's messing up the layouts due to its size.
+            hideKeyboard()
             val newFeeLevel = posToFeeLevel(position)
             if (newFeeLevel == FeeLevel.Custom) {
                 showCustomFeeUi(item)

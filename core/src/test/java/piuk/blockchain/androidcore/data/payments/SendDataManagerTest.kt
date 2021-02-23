@@ -5,13 +5,13 @@ import com.blockchain.logging.LastTxUpdater
 import com.blockchain.testutils.bitcoin
 import com.blockchain.testutils.bitcoinCash
 import com.blockchain.testutils.satoshi
-import com.blockchain.testutils.satoshiCash
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -280,7 +280,11 @@ class SendDataManagerTest {
         // Act
         val result = subject.getMaximumAvailable(CryptoCurrency.BTC, unspent, fee.satoshi())
         // Assert
-        result shouldEqual 2.satoshi()
+        result shouldEqual SendDataManager.MaxAvailable(
+            maxSpendable = CryptoValue.fromMinor(CryptoCurrency.BTC, sweepable.left),
+            forForMax = CryptoValue.fromMinor(CryptoCurrency.BTC, sweepable.right)
+        )
+
         verify(mockPaymentService).getMaximumAvailable(unspent, fee, false)
         verifyNoMoreInteractions(mockPaymentService)
     }
@@ -296,7 +300,10 @@ class SendDataManagerTest {
         // Act
         val result = subject.getMaximumAvailable(CryptoCurrency.BCH, unspent, fee.satoshi())
         // Assert
-        result shouldEqual 2.satoshiCash()
+        result shouldEqual SendDataManager.MaxAvailable(
+            maxSpendable = CryptoValue.fromMinor(CryptoCurrency.BCH, sweepable.left),
+            forForMax = CryptoValue.fromMinor(CryptoCurrency.BCH, sweepable.right)
+        )
         verify(mockPaymentService).getMaximumAvailable(unspent, fee, true)
         verifyNoMoreInteractions(mockPaymentService)
     }

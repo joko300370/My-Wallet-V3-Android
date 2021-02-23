@@ -1563,6 +1563,9 @@
     <string name="send_enter_amount_deposit_max">Transfer Max</string>
     <string name="send_enter_amount_min_deposit">Minimum transfer of %1$s required</string>
     <string name="send_enter_amount_min_send">Minimum send of %1$s required</string>
+    <string name="send_enter_amount_network_fees">Network Fees</string>
+    <string name="send_enter_amount_total">Total</string>
+    <string name="send_enter_amount_max_fee">Max Network Fee</string>
     <string name="swap_enter_amount_min_swap">Minimum swap of %1$s required</string>
     <string name="deposit_enter_amount_min_swap">Minimum deposit of %1$s required</string>
     <string name="withdraw_enter_amount_min">Minimum withdrawal of %1$s required</string>

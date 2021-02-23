@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginEnd="@dimen/standard_margin"
-    android:paddingTop="@dimen/very_small_margin"
-    android:paddingBottom="@dimen/very_small_margin">
+    android:paddingTop="@dimen/tiny_margin"
+    android:paddingBottom="@dimen/tiny_margin">
 
     <ViewSwitcher
         android:id="@+id/fee_switcher"
@@ -24,7 +24,7 @@
 
             <androidx.appcompat.widget.AppCompatSpinner
                 android:id="@+id/fee_option_select_spinner"
-                style="@style/Text.Light.14"
+                style="@style/Text.Semibold.12"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/spinner_arrow_bkgd"
@@ -35,7 +35,7 @@
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/fee_option_label"
-            style="@style/Text.Light.14"
+            style="@style/Text.Semibold.12"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/send_confirmation_tx_fee"
@@ -101,7 +101,6 @@
         style="@style/Text.Semibold.12"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/fee_type_switcher"
         tools:text="Learn more about network fees" />

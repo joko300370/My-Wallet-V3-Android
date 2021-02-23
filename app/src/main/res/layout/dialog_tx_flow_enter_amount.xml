@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/amount_sheet_indicator"
@@ -59,8 +60,9 @@
         android:id="@+id/amount_sheet_input"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:minHeight="32dp"
         android:layout_marginTop="@dimen/standard_margin"
-        android:layout_marginBottom="@dimen/standard_margin"
+        android:layout_marginBottom="@dimen/tiny_margin"
         app:layout_constraintBottom_toTopOf="@id/frame_lower_slot"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -70,7 +72,8 @@
         android:id="@+id/frame_lower_slot"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/small_margin"
+        android:paddingBottom="@dimen/tiny_margin"
+        app:layout_constraintTop_toBottomOf="@+id/amount_sheet_input"
         app:layout_constraintBottom_toTopOf="@id/amount_sheet_cta_button"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent" />
@@ -80,9 +83,11 @@
         style="@style/CtaButton.Blue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/very_small_margin"
+        android:minHeight="32dp"
+        android:layout_marginBottom="@dimen/tiny_margin"
         android:contentDescription="@string/next"
         android:text="@string/next"
+        app:layout_constraintTop_toBottomOf="@+id/frame_lower_slot"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

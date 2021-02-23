@@ -50,8 +50,8 @@
             style="@style/CtaButton.White.Slim"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/small_margin"
             android:layout_marginTop="@dimen/small_margin"
+            android:layout_gravity="end"
             android:text="@string/send_enter_amount_max"
             android:visibility="gone"
             android:textSize="14sp"/>
@@ -68,27 +68,27 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/tiny_margin"
-                android:layout_marginEnd="@dimen/small_margin"
-                android:text="Network Fees" />
+                android:layout_gravity="end"
+                android:text="@string/send_enter_amount_network_fees" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/network_fee_value"
                 style="@style/Text.Semibold.12"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/tiny_margin"
+                android:layout_gravity="end"
                 android:ellipsize="end"
                 tools:text="Total: 1.00000 BTC" />
         </LinearLayout>
     </FrameLayout>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/dropdown"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"
-        android:orientation="vertical"
         android:visibility="gone"
+        tools:visibility="visible"
         app:layout_constraintTop_toBottomOf="@+id/max_available_value"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -98,43 +98,66 @@
             style="@style/Text.Light.12"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/fee_for_full_available_label"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/total_available_value"
             android:layout_marginTop="@dimen/tiny_margin"
             android:layout_marginEnd="@dimen/small_margin"
-            android:text="Total" />
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintVertical_chainStyle="packed"
+            android:text="@string/send_enter_amount_total" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/total_available_value"
             style="@style/Text.Semibold.12"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/fee_for_full_available_value"
+            app:layout_constraintTop_toBottomOf="@+id/total_available_label"
+            app:layout_constraintBottom_toTopOf="@+id/fee_edit"
             android:layout_marginEnd="@dimen/tiny_margin"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
             android:ellipsize="end"
             tools:text="Total: 1.00000 BTC" />
 
-<!--        <androidx.appcompat.widget.AppCompatTextView-->
-<!--            android:id="@+id/network_fee_label"-->
-<!--            style="@style/Text.Light.12"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginTop="@dimen/tiny_margin"-->
-<!--            android:layout_marginEnd="@dimen/small_margin"-->
-<!--            android:text="Network Fees" />-->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/fee_for_full_available_label"
+            style="@style/Text.Light.12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toEndOf="@+id/total_available_label"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/fee_for_full_available_value"
+            android:layout_marginTop="@dimen/tiny_margin"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:text="@string/send_enter_amount_max_fee" />
 
-<!--        <androidx.appcompat.widget.AppCompatTextView-->
-<!--            android:id="@+id/network_fee_value"-->
-<!--            style="@style/Text.Semibold.12"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginEnd="@dimen/tiny_margin"-->
-<!--            android:ellipsize="end"-->
-<!--            tools:text="Total: 1.00000 BTC" />-->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/fee_for_full_available_value"
+            style="@style/Text.Semibold.12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toEndOf="@+id/total_available_value"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/fee_for_full_available_label"
+            app:layout_constraintBottom_toTopOf="@+id/fee_edit"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:ellipsize="end"
+            tools:text="Max: 0.10000 BTC" />
 
         <piuk.blockchain.android.ui.transactionflow.plugin.EditFeesControl
             android:id="@+id/fee_edit"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/total_available_value"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageView
         android:id="@+id/toggle_indicator"

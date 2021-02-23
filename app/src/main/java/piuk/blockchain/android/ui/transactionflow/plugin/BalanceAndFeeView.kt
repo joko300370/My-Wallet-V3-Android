@@ -76,6 +76,9 @@ class BalanceAndFeeView @JvmOverloads constructor(
         state.pendingTx?.feeAmount?.let {
             binding.networkFeeValue.text = makeAmountString(it, state)
         }
+        state.pendingTx?.feeForFullAvailable?.let {
+            binding.feeForFullAvailableValue.text = makeAmountString(it, state)
+        }
     }
 
     @SuppressLint("SetTextI18n")
