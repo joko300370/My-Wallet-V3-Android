@@ -16,9 +16,9 @@ import piuk.blockchain.android.repositories.AssetActivityRepository
 import piuk.blockchain.android.ui.activity.detail.adapter.FiatDetailsSheetAdapter
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
+import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.toFormattedString
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.android.util.gone
 import java.util.Date
 
 class FiatActivityDetailsBottomSheet : SlidingModalBottomDialog<DialogSheetActivityDetailsBinding>() {
@@ -42,15 +42,17 @@ class FiatActivityDetailsBottomSheet : SlidingModalBottomDialog<DialogSheetActiv
             custodialTxButton.gone()
 
             assetActivityRepository.findCachedItem(currency, txHash)?.let {
-                title.text =
-                    if (it.type == TransactionType.DEPOSIT) getString(R.string.common_deposit) else
-                        getString(R.string.fiat_funds_detail_withdraw_title)
-                amount.text =
-                    if (it.type == TransactionType.DEPOSIT) it.value.toStringWithSymbol() else
-                        "- ${it.value.toStringWithSymbol()}"
+                title.text = if (it.type == TransactionType.DEPOSIT) {
+                    getString(R.string.common_deposit)
+                } else {
+                    getString(R.string.fiat_funds_detail_withdraw_title)
+                }
+                amount.text = it.value.toStringWithSymbol()
+
                 status.apply {
                     configureForState(it.state)
                 }
+
                 with(detailsList) {
                     addItemDecoration(BlockchainListDividerDecor(requireContext()))
 
@@ -72,6 +74,11 @@ class FiatActivityDetailsBottomSheet : SlidingModalBottomDialog<DialogSheetActiv
                 text = getString(R.string.activity_details_completed)
                 setBackgroundResource(R.drawable.bkgd_green_100_rounded)
                 setTextColor(ContextCompat.getColor(context, R.color.green_600))
+            }
+            TransactionState.PENDING -> {
+                text = getString(R.string.activity_details_label_pending)
+                setBackgroundResource(R.drawable.bkgd_status_unconfirmed)
+                setTextColor(ContextCompat.getColor(context, R.color.grey_800))
             }
             else -> {
                 gone()

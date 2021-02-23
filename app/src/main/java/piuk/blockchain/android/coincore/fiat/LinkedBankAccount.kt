@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.fiat
 
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.responses.interest.DisabledReason
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.FiatValue
@@ -19,8 +20,15 @@ class LinkedBankAccount(
     val accountId: String,
     val accountType: String,
     val currency: String,
-    val custodialWalletManager: CustodialWalletManager
+    val custodialWalletManager: CustodialWalletManager,
+    val type: PaymentMethodType
 ) : FiatAccount, BankAccount {
+
+    init {
+        check(type == PaymentMethodType.FUNDS || type == PaymentMethodType.BANK_TRANSFER) {
+            "Attempting to initialise a LinkedBankAccount with an incorrect PaymentMethodType of $type"
+        }
+    }
 
     override val accountBalance: Single<Money>
         get() = Single.just(FiatValue.fromMinor(currency, 0L))
@@ -60,6 +68,8 @@ class LinkedBankAccount(
 
     override val disabledReason: Single<DisabledReason>
         get() = Single.just(DisabledReason.NONE)
+
+    override fun canWithdrawFunds(): Single<Boolean> = Single.just(false)
 
     override fun fiatBalance(fiatCurrency: String, exchangeRates: ExchangeRates): Single<Money> =
         Single.just(FiatValue.zero(fiatCurrency))

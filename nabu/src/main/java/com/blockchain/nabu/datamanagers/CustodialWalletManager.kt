@@ -349,6 +349,7 @@ enum class TransactionType {
 
 enum class TransactionState {
     COMPLETED,
+    PENDING,
     UNKNOWN
 }
 

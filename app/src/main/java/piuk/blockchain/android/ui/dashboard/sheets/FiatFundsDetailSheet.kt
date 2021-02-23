@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import com.blockchain.koin.scopedInject
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.ExchangeRates
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -22,6 +23,7 @@ import piuk.blockchain.android.databinding.DialogSheetFiatFundsDetailBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 
@@ -42,6 +44,7 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog<DialogSheetFiatFundsDetail
 
     private val prefs: CurrencyPrefs by scopedInject()
     private val exchangeRates: ExchangeRates by scopedInject()
+    private val custodialWalletManager: CustodialWalletManager by scopedInject()
     private val disposables = CompositeDisposable()
 
     private var account: FiatAccount = NullFiatAccount
@@ -85,8 +88,7 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog<DialogSheetFiatFundsDetail
                 host.startDepositFlow(account)
             }
             fundsWithdrawHolder.setOnClickListener {
-                dismiss()
-                host.startBankTransferWithdrawal(fiatAccount = account)
+                handleWithdrawalChecks()
             }
 
             fundsActivityHolder.setOnClickListener {
@@ -94,6 +96,35 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog<DialogSheetFiatFundsDetail
                 host.gotoActivityFor(account)
             }
         }
+    }
+
+    private fun handleWithdrawalChecks() {
+        disposables += account.canWithdrawFunds()
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                binding.fundsSheetProgress.visible()
+            }.doOnTerminate {
+                binding.fundsSheetProgress.gone()
+            }.subscribeBy(
+                onSuccess = {
+                    if (it) {
+                        dismiss()
+                        host.startBankTransferWithdrawal(fiatAccount = account)
+                    } else {
+                        ToastCustom.makeText(
+                            requireContext(), getString(R.string.fiat_funds_detail_pending_withdrawal),
+                            Toast.LENGTH_LONG, ToastCustom.TYPE_ERROR
+                        )
+                    }
+                },
+                onError = {
+                    Timber.e("Error getting transactions for withdrawal $it")
+                    ToastCustom.makeText(
+                        requireContext(), getString(R.string.common_error),
+                        Toast.LENGTH_LONG, ToastCustom.TYPE_ERROR
+                    )
+                }
+            )
     }
 
     private fun showErrorToast() {

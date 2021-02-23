@@ -78,6 +78,8 @@ interface FiatAccount : SingleAccount {
     val fiatCurrency: String
     override val pendingBalance: Single<Money>
         get() = Single.just(FiatValue.zero(fiatCurrency))
+
+    fun canWithdrawFunds(): Single<Boolean>
 }
 
 interface AccountGroup : BlockchainAccount {
@@ -181,6 +183,8 @@ object NullFiatAccount : FiatAccount {
 
     override val disabledReason: Single<DisabledReason>
         get() = Single.just(DisabledReason.NONE)
+
+    override fun canWithdrawFunds(): Single<Boolean> = Single.just(false)
 
     override fun fiatBalance(
         fiatCurrency: String,

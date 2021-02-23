@@ -999,7 +999,7 @@ class LiveCustodialWalletManager(
             bankName = this.name,
             accountEnding = this.account,
             accountType = this.accountType,
-            true
+            isEligible = true
         )
 
     private fun String.isActive(): Boolean =
@@ -1137,6 +1137,8 @@ private fun String.toCryptoCurrencyPair(): CurrencyPair.CryptoCurrencyPair? {
 private fun String.toTransactionState(): TransactionState =
     when (this) {
         TransactionResponse.COMPLETE -> TransactionState.COMPLETED
+        TransactionResponse.PENDING,
+        TransactionResponse.MANUAL_REVIEW -> TransactionState.PENDING
         else -> TransactionState.UNKNOWN
     }
 
