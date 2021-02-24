@@ -1917,4 +1917,10 @@
     <string name="check_my_inbox">Check My Inbox</string>
     <string name="did_not_get_email">Didn\'t get the email?</string>
     <string name="send_again">Send Again</string>
+    <string name="sb_checkout_daily_limit_title">Daily limit exceeded</string>
+    <string name="sb_checkout_daily_limit_blurb">Oops, looks like you’ve used up your daily transaction limit for Buys and Deposits, please try again tomorrow.</string>
+    <string name="sb_checkout_weekly_limit_title">Weekly limit exceeded</string>
+    <string name="sb_checkout_weekly_limit_blurb">Oops, looks like you’ve used up your weekly transaction limit for Buys and Deposits, please try again tomorrow.</string>
+    <string name="sb_checkout_yearly_limit_title">Yearly limit exceeded</string>
+    <string name="sb_checkout_yearly_limit_blurb">Oops, looks like you’ve used up your yearly transaction limit for Buys and Deposits.</string>
 </resources>
