@@ -177,6 +177,9 @@ sealed class ErrorState : Serializable {
     object LinkedBankAccountUnsupported : ErrorState()
     object LinkedBankNamesMismatched : ErrorState()
     object LinkedBankNotSupported : ErrorState()
+    object DailyLimitExceeded : ErrorState()
+    object WeeklyLimitExceeded : ErrorState()
+    object YearlyLimitExceeded : ErrorState()
 }
 
 data class SimpleBuyOrder(

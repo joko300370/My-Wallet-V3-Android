@@ -1,14 +1,16 @@
 package piuk.blockchain.android.simplebuy
 
-import com.blockchain.preferences.RatingPrefs
-import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.nabu.datamanagers.BuySellOrder
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.UndefinedPaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.LinkedBankErrorState
 import com.blockchain.nabu.models.data.LinkedBankState
+import com.blockchain.nabu.models.responses.nabu.NabuApiException
+import com.blockchain.nabu.models.responses.nabu.NabuErrorCodes
 import com.blockchain.nabu.models.responses.simplebuy.EverypayPaymentAttrs
+import com.blockchain.preferences.RatingPrefs
+import com.blockchain.preferences.SimpleBuyPrefs
 import com.google.gson.Gson
 import io.reactivex.Completable
 import io.reactivex.Scheduler
@@ -229,21 +231,6 @@ class SimpleBuyModel(
                             pollForOrderStatus()
                         }
                     })
-            is SimpleBuyIntent.ConfirmOrder -> interactor.confirmOrder(
-                previousState.id ?: throw IllegalStateException("Order Id not available"),
-                previousState.selectedPaymentMethod?.takeIf { it.isBank() }?.concreteId(),
-                cardActivators.firstOrNull {
-                    previousState.selectedPaymentMethod?.partner == it.partner
-                }?.paymentAttributes()
-            )
-                .subscribeBy(
-                    onSuccess = {
-                        val orderCreatedSuccessfully = it.state == OrderState.FINISHED
-                        if (orderCreatedSuccessfully) updatePreRatingCompletedActionsCounter()
-                        process(SimpleBuyIntent.OrderCreated(it, shouldShowAppRating(orderCreatedSuccessfully)))
-                    },
-                    onError = { process(SimpleBuyIntent.ErrorIntent()) }
-                )
             is SimpleBuyIntent.UpdatePaymentMethodsAndAddTheFirstEligible -> interactor.eligiblePaymentMethods(
                 intent.fiatCurrency, null
             ).subscribeBy(
@@ -257,6 +244,7 @@ class SimpleBuyModel(
                     process(SimpleBuyIntent.ErrorIntent())
                 }
             )
+            is SimpleBuyIntent.ConfirmOrder -> processConfirmOrder(previousState)
             is SimpleBuyIntent.CheckOrderStatus -> interactor.pollForOrderStatus(
                 previousState.id ?: throw IllegalStateException("Order Id not available")
             ).subscribeBy(
@@ -287,6 +275,44 @@ class SimpleBuyModel(
             }
             else -> null
         }
+
+    private fun processConfirmOrder(previousState: SimpleBuyState) =
+        interactor.confirmOrder(
+            previousState.id ?: throw IllegalStateException("Order Id not available"),
+            previousState.selectedPaymentMethod?.takeIf { it.isBank() }?.concreteId(),
+            cardActivators.firstOrNull {
+                previousState.selectedPaymentMethod?.partner == it.partner
+            }?.paymentAttributes()
+        )
+            .subscribeBy(
+                onSuccess = {
+                    val orderCreatedSuccessfully = it.state == OrderState.FINISHED
+                    if (orderCreatedSuccessfully) updatePreRatingCompletedActionsCounter()
+                    process(SimpleBuyIntent.OrderCreated(it, shouldShowAppRating(orderCreatedSuccessfully)))
+                },
+                onError = {
+                    processErrors(it)
+                }
+            )
+
+    private fun processErrors(it: Throwable) {
+        if (it is NabuApiException) {
+            when (it.getErrorCode()) {
+                NabuErrorCodes.DailyLimitExceeded -> process(
+                    SimpleBuyIntent.ErrorIntent(ErrorState.DailyLimitExceeded)
+                )
+                NabuErrorCodes.WeeklyLimitExceeded -> process(
+                    SimpleBuyIntent.ErrorIntent(ErrorState.WeeklyLimitExceeded)
+                )
+                NabuErrorCodes.AnnualLimitExceeded -> process(
+                    SimpleBuyIntent.ErrorIntent(ErrorState.YearlyLimitExceeded)
+                )
+                else -> process(SimpleBuyIntent.ErrorIntent())
+            }
+        } else {
+            process(SimpleBuyIntent.ErrorIntent())
+        }
+    }
 
     private fun updatePreRatingCompletedActionsCounter() {
         ratingPrefs.preRatingActionCompletedTimes = ratingPrefs.preRatingActionCompletedTimes + 1

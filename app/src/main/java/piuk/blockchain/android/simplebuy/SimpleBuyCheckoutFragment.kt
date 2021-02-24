@@ -12,18 +12,19 @@ import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.FiatValue
 import kotlinx.android.synthetic.main.fragment_checkout.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.base.ErrorDialogData
 import piuk.blockchain.android.ui.base.ErrorSlidingBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
-import piuk.blockchain.android.util.secondsToDays
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.goneIf
 import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.secondsToDays
 import piuk.blockchain.android.util.setOnClickListenerDebounced
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 
 class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(), SimpleBuyScreen,
     SimpleBuyCancelOrderBottomSheet.Host {
@@ -262,7 +263,36 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
         }
 
     private fun showErrorState(errorState: ErrorState) {
-        showBottomSheet(ErrorSlidingBottomDialog.newInstance(activity))
+        when (errorState) {
+            ErrorState.DailyLimitExceeded -> showBottomSheet(
+                ErrorSlidingBottomDialog.newInstance(
+                    ErrorDialogData(
+                        getString(R.string.sb_checkout_daily_limit_title),
+                        getString(R.string.sb_checkout_daily_limit_blurb),
+                        getString(R.string.common_ok)
+                    )
+                )
+            )
+            ErrorState.WeeklyLimitExceeded -> showBottomSheet(
+                ErrorSlidingBottomDialog.newInstance(
+                    ErrorDialogData(
+                        getString(R.string.sb_checkout_weekly_limit_title),
+                        getString(R.string.sb_checkout_weekly_limit_blurb),
+                        getString(R.string.common_ok)
+                    )
+                )
+            )
+            ErrorState.YearlyLimitExceeded -> showBottomSheet(
+                ErrorSlidingBottomDialog.newInstance(
+                    ErrorDialogData(
+                        getString(R.string.sb_checkout_yearly_limit_title),
+                        getString(R.string.sb_checkout_yearly_limit_blurb),
+                        getString(R.string.common_ok)
+                    )
+                )
+            )
+            else -> showBottomSheet(ErrorSlidingBottomDialog.newInstance(activity))
+        }
     }
 
     override fun cancelOrderConfirmAction(cancelOrder: Boolean, orderId: String?) {

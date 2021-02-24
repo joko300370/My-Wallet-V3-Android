@@ -1925,4 +1925,11 @@
     <string name="cash_accounts_description">Store USD, GBP or EUR in your wallet. Use the balance to buy crypto. Sell crypto for cash at anytime.</string>
     <string name="link_a_bank_description">Store USD, GBP or EUR in your wallet. Use the balance to buy crypto. Sell crypto for cash at anytime.</string>
     <string name="earn_interest_description">Put your crypto to work. Earn up to 10% monthly by simply doing nothing. Instanly deposit and start earning.</string>
+
+    <string name="sb_checkout_daily_limit_title">Daily limit exceeded</string>
+    <string name="sb_checkout_daily_limit_blurb">Oops, looks like you’ve used up your daily transaction limit for Buys and Deposits, please try again tomorrow.</string>
+    <string name="sb_checkout_weekly_limit_title">Weekly limit exceeded</string>
+    <string name="sb_checkout_weekly_limit_blurb">Oops, looks like you’ve used up your weekly transaction limit for Buys and Deposits, please try again tomorrow.</string>
+    <string name="sb_checkout_yearly_limit_title">Yearly limit exceeded</string>
+    <string name="sb_checkout_yearly_limit_blurb">Oops, looks like you’ve used up your yearly transaction limit for Buys and Deposits.</string>
 </resources>
