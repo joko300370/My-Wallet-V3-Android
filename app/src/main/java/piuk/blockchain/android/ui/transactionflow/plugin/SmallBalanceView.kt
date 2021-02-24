@@ -51,6 +51,10 @@ class SmallBalanceView @JvmOverloads constructor(
         updateBalance(state)
     }
 
+    override fun setVisible(isVisible: Boolean) {
+        binding.root.visibleIf { isVisible }
+    }
+
     @SuppressLint("SetTextI18n")
     private fun updateBalance(state: TransactionState) {
         val availableBalance = state.availableBalance

@@ -11,6 +11,7 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
 import piuk.blockchain.android.util.setAssetIconColours
+import piuk.blockchain.android.util.visibleIf
 
 class AccountLimitsView @JvmOverloads constructor(
     ctx: Context,
@@ -42,6 +43,10 @@ class AccountLimitsView @JvmOverloads constructor(
         check(::model.isInitialized) { "Control not initialised" }
 
         updatePendingTxDetails(state)
+    }
+
+    override fun setVisible(isVisible: Boolean) {
+        binding.root.visibleIf { isVisible }
     }
 
     private fun updatePendingTxDetails(state: TransactionState) {

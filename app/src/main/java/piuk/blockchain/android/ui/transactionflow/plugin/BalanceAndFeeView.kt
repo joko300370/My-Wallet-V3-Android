@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import info.blockchain.balance.Money
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 import piuk.blockchain.android.databinding.ViewTxFlowFeeAndBalanceBinding
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
@@ -24,7 +26,7 @@ class BalanceAndFeeView @JvmOverloads constructor(
     attr: AttributeSet? = null,
     defStyle: Int = 0
 ) : ConstraintLayout(ctx, attr, defStyle),
-    TxFlowWidget {
+    ExpandableTxFlowWidget {
 
     private lateinit var model: TransactionModel
     private lateinit var customiser: EnterAmountCustomisations
@@ -32,6 +34,11 @@ class BalanceAndFeeView @JvmOverloads constructor(
 
     private val binding: ViewTxFlowFeeAndBalanceBinding =
         ViewTxFlowFeeAndBalanceBinding.inflate(LayoutInflater.from(context), this, true)
+
+    private val expandableSubject = PublishSubject.create<Boolean>()
+
+    override val expanded: Observable<Boolean>
+        get() = expandableSubject
 
     override var displayMode: TxFlowWidget.DisplayMode = TxFlowWidget.DisplayMode.Crypto
 
@@ -63,6 +70,10 @@ class BalanceAndFeeView @JvmOverloads constructor(
         state.pendingTx?.let {
             binding.feeEdit.update(it.feeSelection, model)
         }
+    }
+
+    override fun setVisible(isVisible: Boolean) {
+        binding.root.visibleIf { isVisible }
     }
 
     private fun updateBalance(state: TransactionState) {
@@ -114,6 +125,8 @@ class BalanceAndFeeView @JvmOverloads constructor(
     private var externalFocus: View? = null
     private fun toggleDropdown() {
         val revealDropdown = !binding.dropdown.isVisible()
+        expandableSubject.onNext(revealDropdown)
+
         // Clear focus - and keyboard - remember it, so we can set it back when we close
         if (revealDropdown) {
             val viewGroup = findRootView()

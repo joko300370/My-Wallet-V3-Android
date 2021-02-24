@@ -18,6 +18,7 @@ import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmoun
 import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.visibleIf
 
 class AccountInfoBank @JvmOverloads constructor(
     ctx: Context,
@@ -105,5 +106,9 @@ class AccountInfoBank @JvmOverloads constructor(
                 // do nothing
             }
         }
+    }
+
+    override fun setVisible(isVisible: Boolean) {
+        binding.root.visibleIf { isVisible }
     }
 }
