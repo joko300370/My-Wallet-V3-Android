@@ -500,18 +500,18 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
 
     override fun updateLinkableBanks(linkablePaymentMethods: Set<LinkablePaymentMethods>, linkedBanksCount: Int) {
-            linkablePaymentMethods.forEach { linkableBank ->
-                banksPref?.findPreference<BankPreference>(LINK_BANK_KEY.plus(linkableBank.hashCode()))?.let {
-                    it.order = it.order + linkedBanksCount + linkablePaymentMethods.indexOf(linkableBank)
-                } ?: banksPref?.addPreference(
-                    BankPreference(context = requireContext(), fiatCurrency = linkableBank.currency).apply {
-                        onClick {
-                            linkBank(linkableBank)
-                        }
-                        key = LINK_BANK_KEY.plus(linkableBank.hashCode())
+        linkablePaymentMethods.forEach { linkableBank ->
+            banksPref?.findPreference<BankPreference>(LINK_BANK_KEY.plus(linkableBank.hashCode()))?.let {
+                it.order = it.order + linkedBanksCount + linkablePaymentMethods.indexOf(linkableBank)
+            } ?: banksPref?.addPreference(
+                BankPreference(context = requireContext(), fiatCurrency = linkableBank.currency).apply {
+                    onClick {
+                        linkBank(linkableBank)
                     }
-                )
-            }
+                    key = LINK_BANK_KEY.plus(linkableBank.hashCode())
+                }
+            )
+        }
     }
 
     override fun updateLinkedBanks(banks: Set<Bank>) {
@@ -809,7 +809,10 @@ class SettingsFragment : PreferenceFragmentCompat(),
                 .theme(CountryPicker.THEME_NEW)
                 .build()
 
-            val country = picker.countryFromSIM
+            val country =
+                picker.countryFromSIM
+                    ?: picker.getCountryByLocale(Locale.getDefault())
+                    ?: picker.getCountryByISO("US")
             if (country.dialCode == "+93") {
                 setCountryFlag(countryTextView, "+1", R.drawable.flag_us)
             } else {
