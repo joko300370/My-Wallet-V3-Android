@@ -71,7 +71,7 @@ data class VerifyIdentityNumericBenefitItem(override val title: String, override
 data class VerifyIdentityIconedBenefitItem(
     override val title: String,
     override val subtitle: String,
-    val icon: Int
+    @DrawableRes val icon: Int
 ) : VerifyIdentityItem
 
 data class ButtonOptions(val visible: Boolean, val text: String? = null, val cta: () -> Unit = {})

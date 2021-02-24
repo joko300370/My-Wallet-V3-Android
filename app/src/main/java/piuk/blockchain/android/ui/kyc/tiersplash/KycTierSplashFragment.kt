@@ -134,37 +134,13 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
         with(binding) {
             when (tier.state) {
                 KycTierState.Rejected -> {
-                    layoutElements.icon.setImageDrawable(R.drawable.vector_tier_locked)
-                    textHeaderTiersLine1.text = getString(R.string.swap_unavailable)
-                    textHeaderTiersLine2.text = getString(R.string.swap_unavailable_explained)
-                    layoutElements.cardTier.alpha = 0.2F
-                    textContactSupport.visible()
-                    buttonLearnMore.visible()
-                    buttonSwapNow.gone()
+                    renderRejectedState(tier, layoutElements)
                 }
                 KycTierState.Pending -> {
-                    layoutElements.icon.setImageDrawable(R.drawable.vector_tier_review)
-                    layoutElements.textTierState.visible()
-                    layoutElements.textTierState.text = getString(R.string.in_review)
-                    layoutElements.textTierState.setTextColor(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            R.color.kyc_in_progress
-                        )
-                    )
-                    textHeaderTiersLine2.text = getString(R.string.tier_x_in_review, getLevelForTier(tier))
-                    buttonLearnMore.gone()
-                    textContactSupport.gone()
+                    renderPendingState(tier, layoutElements)
                 }
                 KycTierState.Verified -> {
-                    layoutElements.icon.setImageDrawable(R.drawable.vector_tier_verified)
-                    layoutElements.textTierState.visible()
-                    layoutElements.textTierState.text = getString(R.string.approved)
-                    tierAvailableFiat.text = getLimitForTier(tier)
-                    tierAvailableFiat.visible()
-                    textHeaderTiersLine1.text = getString(R.string.available)
-                    textHeaderTiersLine2.text = getString(R.string.swap_limit)
-                    buttonSwapNow.visible()
+                    renderVerifiedState(tier, layoutElements)
                 }
                 else -> {
                     layoutElements.textTierRequires.visible()
@@ -175,6 +151,48 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
             }
             layoutElements.textLimit.text = getLimitForTier(tier)
             layoutElements.textPeriodicLimit.text = getString(getLimitString(tier))
+        }
+    }
+
+    private fun renderRejectedState(tier: Tier, layoutElements: TierLayoutElements) {
+        with(binding) {
+            layoutElements.icon.setImageDrawable(R.drawable.vector_tier_locked)
+            textHeaderTiersLine1.text = getString(R.string.swap_unavailable)
+            textHeaderTiersLine2.text = getString(R.string.swap_unavailable_explained)
+            layoutElements.cardTier.alpha = 0.2F
+            textContactSupport.visible()
+            buttonLearnMore.visible()
+            buttonSwapNow.gone()
+        }
+    }
+
+    private fun renderPendingState(tier: Tier, layoutElements: TierLayoutElements) {
+        with(binding) {
+            layoutElements.icon.setImageDrawable(R.drawable.vector_tier_review)
+            layoutElements.textTierState.visible()
+            layoutElements.textTierState.text = getString(R.string.in_review)
+            layoutElements.textTierState.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.kyc_in_progress
+                )
+            )
+            textHeaderTiersLine2.text = getString(R.string.tier_x_in_review, getLevelForTier(tier))
+            buttonLearnMore.gone()
+            textContactSupport.gone()
+        }
+    }
+
+    private fun renderVerifiedState(tier: Tier, layoutElements: TierLayoutElements) {
+        layoutElements.icon.setImageDrawable(R.drawable.vector_tier_verified)
+        layoutElements.textTierState.visible()
+        layoutElements.textTierState.text = getString(R.string.approved)
+        with(binding) {
+            tierAvailableFiat.text = getLimitForTier(tier)
+            tierAvailableFiat.visible()
+            textHeaderTiersLine1.text = getString(R.string.available)
+            textHeaderTiersLine2.text = getString(R.string.swap_limit)
+            buttonSwapNow.visible()
         }
     }
 
@@ -253,25 +271,25 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
                 onError = { Timber.e(it) }
             )
         disposable += binding.buttonSwapNow
-                .throttledClicks()
-                .subscribeBy(
-                    onNext = {
-                        startSwap()
-                    },
-                    onError = { Timber.e(it) }
-                )
+            .throttledClicks()
+            .subscribeBy(
+                onNext = {
+                    startSwap()
+                },
+                onError = { Timber.e(it) }
+            )
         disposable += binding.buttonLearnMore
-                .throttledClicks()
-                .subscribeBy(
-                    onNext = { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(URL_LEARN_MORE_REJECTED))) },
-                    onError = { Timber.e(it) }
-                )
+            .throttledClicks()
+            .subscribeBy(
+                onNext = { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(URL_LEARN_MORE_REJECTED))) },
+                onError = { Timber.e(it) }
+            )
         disposable += binding.textContactSupport
-                .throttledClicks()
-                .subscribeBy(
-                    onNext = { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(URL_CONTACT_SUPPORT))) },
-                    onError = { Timber.e(it) }
-                )
+            .throttledClicks()
+            .subscribeBy(
+                onNext = { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(URL_CONTACT_SUPPORT))) },
+                onError = { Timber.e(it) }
+            )
     }
 
     private fun startSwap() {
