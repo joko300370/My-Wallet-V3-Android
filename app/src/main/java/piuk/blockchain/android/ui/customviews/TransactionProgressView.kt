@@ -30,6 +30,12 @@ class TransactionProgressView(context: Context, attrs: AttributeSet) :
         }
     }
 
+    fun configureSecondaryButton(text: String, fn: () -> Unit) {
+        secondary_btn.visible()
+        secondary_btn.text = text
+        secondary_btn.setOnClickListener { fn() }
+    }
+
     fun showTxInProgress(title: String, subtitle: String) {
         progress.visible()
         tx_state_indicator.gone()

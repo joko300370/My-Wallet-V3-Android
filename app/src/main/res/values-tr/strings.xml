@@ -807,7 +807,7 @@
     <string name="kyc_resubmission_splash_description_3">Gerekli fotoğraflar eksik.</string>
     <string name="kyc_resubmission_splash_description_4">Gönderdiğiniz belge yanlış.</string>
     <string name="kyc_resubmission_splash_description_5">Görüntü kalitesi nedeniyle gönderdiğiniz resimleri okuyamadık.</string>
-    <string name="sunriver_splash_title">kimlik doğrulama</string>
+    <string name="identity_verification">kimlik doğrulama</string>
     <string name="sunriver_status_message">Bilgileriniz inceleniyor. İnceleme kısa süre içinde tamamlanmalıdır.</string>
     <string name="buy_sell_splash_title">Al sat</string>
     <string name="buy_sell_splash_message">Ortağımız Coinify aracılığıyla kredi kartınızı veya banka hesabınızı kullanarak bitcoin (BTC) satın alabilir ve satabilirsiniz.</string>

@@ -807,7 +807,7 @@ Euros/Dolares</string>
     <string name="kyc_resubmission_splash_description_3">Faltan las fotos requeridas.</string>
     <string name="kyc_resubmission_splash_description_4">El documento que envió es incorrecto.</string>
     <string name="kyc_resubmission_splash_description_5">No pudimos leer las imágenes que envió debido a la calidad de la imagen.</string>
-    <string name="sunriver_splash_title">Verificación de identidad</string>
+    <string name="identity_verification">Verificación de identidad</string>
     <string name="sunriver_status_message">Su información está siendo revisada. La revisión debería completarse en breve.</string>
     <string name="buy_sell_splash_title">Compra y Venda</string>
     <string name="buy_sell_splash_message">Puede comprar y vender bitcoin (BTC) con su tarjeta de crédito o cuenta bancaria a través de nuestro socio Coinify.</string>

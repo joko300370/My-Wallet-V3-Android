@@ -589,7 +589,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
         cardsPref?.findPreference<CardPreference>(ADD_CARD_KEY)?.let {
             it.order = it.order + newCards.size + 1
         } ?: cardsPref?.addPreference(
-            CardPreference(context = requireContext(), card = PaymentMethod.Undefined).apply {
+            CardPreference(context = requireContext()).apply {
                 onClick {
                     addNewCard()
                 }
@@ -963,6 +963,8 @@ class SettingsFragment : PreferenceFragmentCompat(),
             if (requestCode == REQUEST_CODE_BIOMETRIC_ENROLLMENT) {
                 settingsPresenter.onFingerprintClicked()
             }
+        } else if (KycNavHostActivity.kycStatusUpdated(resultCode)) {
+            settingsPresenter.updateKyc()
         }
     }
 
@@ -1184,8 +1186,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
 
     override fun launchKycFlow() {
-        KycNavHostActivity.start(requireContext(), CampaignType.Swap, true)
-        requireActivity().finish()
+        KycNavHostActivity.startForResult(this, CampaignType.None, KYC_START, true)
     }
 
     private fun setCountryFlag(tvCountry: TextView, dialCode: String, flagResourceId: Int) {
@@ -1203,7 +1204,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
     companion object {
         const val URL_LOGIN = "<a href=\"https://login.blockchain.com/\">login.blockchain.com</a>"
-
+        private const val KYC_START = 32542
         internal const val EXTRA_SHOW_ADD_EMAIL_DIALOG = "show_add_email_dialog"
         internal const val EXTRA_SHOW_TWO_FA_DIALOG = "show_two_fa_dialog"
         private const val ADD_CARD_KEY = "ADD_CARD_KEY"

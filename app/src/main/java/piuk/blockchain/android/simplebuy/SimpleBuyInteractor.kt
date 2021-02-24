@@ -202,7 +202,7 @@ class SimpleBuyInteractor(
                             .firstOrNull()?.isEligible ?: false,
                         canLinkFunds = paymentMethods.filterIsInstance<PaymentMethod.UndefinedFunds>()
                             .firstOrNull()?.isEligible ?: false,
-                        preselectedId = preselectedId ?: PaymentMethod.UNDEFINED_PAYMENT_ID
+                        preselectedId = preselectedId
                     )
                 }
             }

@@ -40,7 +40,8 @@ class SimpleBuyModelTest {
         fiatCurrency = "USD",
         selectedPaymentMethod = SelectedPaymentMethod(
             id = "123-321",
-            paymentMethodType = PaymentMethodType.PAYMENT_CARD
+            paymentMethodType = PaymentMethodType.PAYMENT_CARD,
+            isEligible = true
         ))
     private val gson = Gson()
     private val interactor: SimpleBuyInteractor = mock()

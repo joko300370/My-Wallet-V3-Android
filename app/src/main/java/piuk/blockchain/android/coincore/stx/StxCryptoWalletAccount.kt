@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.stx
 
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.Money
 import io.reactivex.Single
@@ -12,10 +13,11 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
 class StxCryptoWalletAccount(
     payloadManager: PayloadDataManager,
+    custodialWalletManager: CustodialWalletManager,
     override val label: String,
     private val address: String,
     override val exchangeRates: ExchangeRateDataManager
-) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.STX) {
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.STX, custodialWalletManager) {
 
     override val isFunded: Boolean
         get() = false
