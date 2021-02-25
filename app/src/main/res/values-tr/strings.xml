@@ -940,7 +940,6 @@
     <string name="daily_swap_and_buy_limit">Günlük Takas ve Satın Alma Limiti</string>
     <string name="simple_buy_own_crypto">Birkaç Dakika İçinde Kendi Kripto Param</string>
     <string name="simple_buy_verify_your_identity">Kimliğinizi doğrulayın ve kripto satın alın</string>
-    <string name="common_skip">Atla</string>
     <string name="simple_buy_currency_selection_header">Blockchain Cüzdanınızda para olarak bu para biriminde para saklamak için yerel para biriminiz.</string>
     <string name="payment_methods">Ödeme metodları</string>
     <string name="payment_method">Ödeme şekli</string>
@@ -1610,6 +1609,7 @@ Lütfen biyometrik bilgilerinizi tekrar ekleyin.</string>
     <string name="backup_before_send_body_1">Gizli Özel Anahtar Kurtarma İfadeniz, cüzdanınıza erişiminizi kaybederseniz kripto parayı kurtarmanıza izin verecektir.
 
 Lütfen bu 12 kelimeyi sırayla yazın ve güvenli bir yerde saklayın. Asla kimseyle paylaşmayın. Gizli Özel Anahtar Kurtarma İfadeniz, sisteme giremediğinizde kripto parayı kurtarmanızı sağlar.</string>
+
     <string name="kyc_address_address_zip_code_hint_1">Posta kodu</string>
     <string name="payment_method_type_account_info">%1$s Hesabı %2$s</string>
     <string name="address_line_1">Adres satırı 1</string>
@@ -1634,4 +1634,52 @@ Lütfen bu 12 kelimeyi sırayla yazın ve güvenli bir yerde saklayın. Asla kim
     <string name="kyc_address_header_1">Blockchain.com kanunen bu bilgileri toplamak zorundadır.</string>
     <string name="kyc_country_selection_search_hint_1">Ülkenizi Seçin</string>
     <string name="kyc_country_selection_title_1">Ülkenizi Seçin</string>
+    <string name="preferences_rate_app">Uygulamayı derecelendirin</string>
+    <string name="tx_title_fiat_deposit">%1$s yatırın</string>
+    <string name="common_skip">Atla</string>
+    <string name="bank_account_info_default">Hrsap Sonu</string>
+    <string name="bank_wire_transfer_fee_default">Ücretsiz Havale Gönderin</string>
+    <string name="payment_wire_transfer">Havale</string>
+    <string name="payment_wire_transfer_subtitle">3-5 İş Günü</string>
+    <string name="payment_wire_transfer_blurb">Doğrudan banka hesabınızdan Blockchain.com Cüzdanınıza para gönderin. Banka ücretleri geçerli olabilir.</string>
+    <string name="payment_deposit">Mevduat hesabı</string>
+    <string name="payment_deposit_subtitle">Anında Kullanılabilir</string>
+    <string name="payment_deposit_blurb">İstediğiniz zaman Blockchain.com Cüzdanınızdan nakit gönderebilmek için güvenli bir şekilde bir banka bağlantısı kurun.</string>
+    <string name="routing_number">Banka Hesap No</string>
+    <string name="bank_transfer_in_progress_title">%1$s Satın Alma Başlatıldı</string>
+    <string name="bank_transfer_in_progress_blurb">Şimdi satın alma işleminizi tamamlıyoruz. banka hesabınızdan %1$s tutarında para çekilebilir. Aktivite sekmesinde emrinizin durumunu istediğiniz zaman görüntüleyebilirsiniz.</string>
+    <string name="fiat_funds_detail_pending_withdrawal">Halihazırda bir Para Çekme işlemi devam ediyor, yenisini başlatmadan önce lütfen devam etmekte olan işlemin sonuçlanmasını bekleyin.</string>
+    <string name="withdraw_confirmation_cta_button">%1$s çek</string>
+    <string name="withdraw_confirmation_progress_message">Şimdi para çekme işleminizi tamamlıyoruz.</string>
+    <string name="withdraw_confirmation_progress_title">%1$s çekiliyor</string>
+    <string name="withdraw_confirmation_success_title">%1$s çekildi!</string>
+    <string name="withdraw_confirmation_success_message">Parayı şu anda göndermekteyiz. Paranın banka hesabınıza %1$s tarihinde geçmesi beklenmektedir. İstediğiniz zaman Para Çekme işleminizin durumunu Aktivite ekranından kontrol edebilirsiniz.</string>
+    <string name="withdraw_target_select_title">Şu hesaba para çek:</string>
+    <string name="withdraw_confirmation_eta">Paranın hesaba geçiş tarihi:</string>
+    <string name="deposit_enter_amount_min_swap">En az %1$s tutarında para yatırmanız gerekli</string>
+    <string name="withdraw_enter_amount_min">En az %1$s tutarında para çekmeniz gerekli</string>
+    <string name="send_confirmation_eta">Paranın hesaba geçiş tarihi:</string>
+    <string name="deposit_source_select_title">Bağlantılı Bankalar</string>
+    <string name="deposit_confirmation_cta_button">%1$s yatırın</string>
+    <string name="deposit_enter_amount_limit_title">Günlük Limit</string>
+    <string name="deposit_enter_amount_limit_label">%1$s Kullanılabilir</string>
+    <string name="deposit_confirmation_progress_title">%1$s yatırılıyor</string>
+    <string name="deposit_confirmation_progress_message">Para yatırma işleminizi şimdi tamamlıyoruz.</string>
+    <string name="deposit_confirmation_success_title">%1$s Yatırıldı!</string>
+    <string name="deposit_confirmation_success_message">Bankanızın parayı göndermesini beklerken hemen kripto para satın alabilmeniz için %2$s Nakit Hesabınızdan %1$s tutara erken erişim sağlayabilirsiniz.
+Banka transferiniz %3$s tarihinde tamamlandıktan sonra para çekme işlemi gerçekleştirebileceksiniz.</string>
+    <string name="add_a_deposit_method">Para Yatırma Yöntemi Seçin</string>
+    <string name="security_check">Güvenlik Denetimi</string>
+    <string name="success_email_veriff">Başarılı! E-posta adresiniz doğrulandı.</string>
+    <string name="email_verified">E-posta Doğrulandı</string>
+    <string name="email_verification_part_1">Şu adrese bir doğrulama e-postası göndereceğiz:</string>
+    <string name="email_verification_part_2">. Devam etmek için lütfen e-postada bulunan bağlantıya tıklayın.</string>
+    <string name="email_verify">Eposta adresinizi doğrulayın</string>
+    <string name="edit_email_address">E-posta Adresini Düzenle</string>
+    <string name="common_save">Kaydet</string>
+    <string name="change_email_instructions">Aşağıya e-posta adresinizi girin ve Kaydet\'i tıklayın. Bu yeni adrese bir doğrulama e-postası göndereceğiz.</string>
+    <string name="check_my_inbox">Gelen Kutumu Kontrol Et</string>
+    <string name="did_not_get_email">E-postayı almadınız mı?</string>
+    <string name="send_again">Tekrar gönderin</string>
+
 </resources>
