@@ -180,6 +180,7 @@ sealed class ErrorState : Serializable {
     object DailyLimitExceeded : ErrorState()
     object WeeklyLimitExceeded : ErrorState()
     object YearlyLimitExceeded : ErrorState()
+    object ExistingPendingOrder : ErrorState()
 }
 
 data class SimpleBuyOrder(
