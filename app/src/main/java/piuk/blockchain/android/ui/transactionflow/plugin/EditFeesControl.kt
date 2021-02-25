@@ -32,6 +32,7 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.AfterTextChangedWatcher
+import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 
 class EditFeesControl @JvmOverloads constructor(
@@ -54,6 +55,8 @@ class EditFeesControl @JvmOverloads constructor(
 
     private val binding: ViewEditTxFeesCtrlBinding =
         ViewEditTxFeesCtrlBinding.inflate(LayoutInflater.from(context), this, true)
+
+    private var shouldHideFeeOptionValue = true
 
     private fun makeTextWatcher(model: TransactionModel) =
         object : AfterTextChangedWatcher() {
@@ -167,6 +170,8 @@ class EditFeesControl @JvmOverloads constructor(
                     setCustomFeeValues(feeSelection.customAmount)
                 }
                 is FeeState.FeeTooHigh -> {
+                    shouldHideFeeOptionValue = false
+                    updateFeeOptionValueVisibility()
                     binding.feeOptionValue.text = context.getString(R.string.send_confirmation_insufficient_fee)
                     binding.feeOptionValue.setTextColor(context.getResolvedColor(R.color.red_600))
                 }
@@ -186,6 +191,8 @@ class EditFeesControl @JvmOverloads constructor(
                 feeOptionCustom.requestFocus()
             } else {
                 feeOptionValue.setText("", TextView.BufferType.EDITABLE)
+                shouldHideFeeOptionValue = true
+                updateFeeOptionValueVisibility()
             }
             feeOptionCustomIl.error = error
         }
@@ -280,7 +287,10 @@ class EditFeesControl @JvmOverloads constructor(
 
     private fun showStandardUi() {
         binding.feeTypeSwitcher.displayedChild = SHOW_STANDARD
+        updateFeeOptionValueVisibility()
     }
+
+    private fun updateFeeOptionValueVisibility() = binding.feeOptionValue.visibleIf { !shouldHideFeeOptionValue }
 
     private fun sendFeeUpdate(model: TransactionModel, level: FeeLevel, customFee: Long = -1) =
         model.process(

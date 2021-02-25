@@ -72,10 +72,8 @@
         android:id="@+id/frame_lower_slot"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/tiny_margin"
         app:layout_constraintTop_toBottomOf="@+id/amount_sheet_input"
         app:layout_constraintBottom_toTopOf="@id/amount_sheet_cta_button"
-        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
