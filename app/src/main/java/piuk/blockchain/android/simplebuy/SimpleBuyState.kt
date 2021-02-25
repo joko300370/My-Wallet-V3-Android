@@ -18,7 +18,6 @@ import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.io.Serializable
 import java.math.BigInteger
 import java.util.Date
-import java.util.regex.Pattern
 
 /**
  * This is an object that gets serialized with Gson so any properties that we don't
@@ -50,6 +49,7 @@ data class SimpleBuyState(
     @Transient val everypayAuthOptions: EverypayAuthOptions? = null,
     val paymentSucceeded: Boolean = false,
     val showRating: Boolean = false,
+    @Transient val shouldShowUnlockHigherFunds: Boolean = false,
     val withdrawalLockPeriod: BigInteger = BigInteger.ZERO,
     @Transient val linkBankTransfer: LinkBankTransfer? = null,
     @Transient val paymentPending: Boolean = false,
@@ -66,15 +66,6 @@ data class SimpleBuyState(
             expirationDate,
             custodialQuote
         )
-    }
-
-    @Transient
-    private val pattern = Pattern.compile("-?\\d+(\\.\\d+)?")
-
-    @delegate:Transient
-    val availableCryptoCurrencies: List<CryptoCurrency> by unsafeLazy {
-        supportedPairsAndLimits?.filter { it.fiatCurrency == fiatCurrency }?.map { it.cryptoCurrency }?.distinct()
-            ?: emptyList()
     }
 
     @delegate:Transient
@@ -166,8 +157,6 @@ enum class KycState {
     VERIFIED_BUT_NOT_ELIGIBLE;
 
     fun verified() = this == VERIFIED_AND_ELIGIBLE || this == VERIFIED_BUT_NOT_ELIGIBLE
-
-    fun docsSubmitted() = this != PENDING
 }
 
 enum class FlowScreen {
@@ -212,7 +201,8 @@ data class SelectedPaymentMethod(
     val id: String,
     val partner: Partner? = null,
     val label: String? = "",
-    val paymentMethodType: PaymentMethodType
+    val paymentMethodType: PaymentMethodType,
+    val isEligible: Boolean
 ) {
     fun isCard() = paymentMethodType == PaymentMethodType.PAYMENT_CARD
     fun isBank() = paymentMethodType == PaymentMethodType.BANK_TRANSFER

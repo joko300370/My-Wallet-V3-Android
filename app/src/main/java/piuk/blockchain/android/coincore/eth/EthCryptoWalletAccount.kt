@@ -27,7 +27,7 @@ internal class EthCryptoWalletAccount(
     private val walletPreferences: WalletStatus,
     override val exchangeRates: ExchangeRateDataManager,
     private val custodialWalletManager: CustodialWalletManager
-) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ETHER) {
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ETHER, custodialWalletManager) {
 
     constructor(
         payloadManager: PayloadDataManager,

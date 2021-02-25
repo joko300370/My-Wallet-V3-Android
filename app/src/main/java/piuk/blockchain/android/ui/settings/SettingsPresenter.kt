@@ -264,6 +264,19 @@ class SettingsPresenter(
         }
     }
 
+    fun updateKyc() {
+        compositeDisposable += kycStatusHelper.getSettingsKycStateTier()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { tiers ->
+                    view?.setKycState(tiers)
+                },
+                onError = {
+                    view?.showError(R.string.settings_error_updating)
+                }
+            )
+    }
+
     private fun String?.isInvalid(): Boolean =
         this.isNullOrEmpty() || this.length >= 256
 

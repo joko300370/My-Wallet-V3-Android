@@ -809,7 +809,7 @@
     <string name="kyc_resubmission_splash_description_3">Les photos requises sont manquantes.</string>
     <string name="kyc_resubmission_splash_description_4">Le document que vous avez soumis est incorrect.</string>
     <string name="kyc_resubmission_splash_description_5">Nous n\'avons pas pu lire les images que vous avez soumises en raison de la qualité de l\'image.</string>
-    <string name="sunriver_splash_title">vérification d\'identité</string>
+    <string name="identity_verification">vérification d\'identité</string>
     <string name="sunriver_status_message">Vos informations sont en cours de révision. L\'examen devrait s\'achever sous peu.</string>
     <string name="buy_sell_splash_title">Acheter vendre</string>
     <string name="buy_sell_splash_message">Vous pouvez acheter et vendre du bitcoin (BTC) en utilisant votre carte de crédit ou votre compte bancaire via notre partenaire Coinify.</string>

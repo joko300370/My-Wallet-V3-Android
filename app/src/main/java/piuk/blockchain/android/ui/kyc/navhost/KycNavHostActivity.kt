@@ -28,12 +28,12 @@ import kotlinx.android.synthetic.main.activity_kyc_nav_host.progress_bar_loading
 import kotlinx.android.synthetic.main.activity_kyc_nav_host.toolbar_kyc as toolBar
 
 interface StartKyc {
-    fun startKycActivity(context: Any)
+    fun startKycActivity(context: Any, campaignType: CampaignType)
 }
 
 internal class KycStarter : StartKyc {
-    override fun startKycActivity(context: Any) {
-        KycNavHostActivity.start(context as Context, CampaignType.Swap, true)
+    override fun startKycActivity(context: Any, campaignType: CampaignType) {
+        KycNavHostActivity.start(context as Context, campaignType, true)
     }
 }
 
@@ -56,15 +56,7 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_kyc_nav_host)
-        val title = when (campaignType) {
-            CampaignType.Swap -> R.string.kyc_splash_title
-            CampaignType.Sunriver,
-            CampaignType.SimpleBuy,
-            CampaignType.Blockstack,
-            CampaignType.Resubmission,
-            CampaignType.FiatFunds,
-            CampaignType.Interest -> R.string.sunriver_splash_title
-        }
+        val title = R.string.identity_verification
         setupToolbar(toolBar, title)
 
         navController.setGraph(R.navigation.kyc_nav, intent.extras)
@@ -162,7 +154,8 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
     companion object {
 
         //        const val RESULT_KYC_STX_COMPLETE = 5
-
+        const val RESULT_KYC_FOR_SDD_COMPLETE = 35432
+        const val RESULT_KYC_FOR_TIER_COMPLETE = 8954234
         private const val EXTRA_CAMPAIGN_TYPE = "piuk.blockchain.android.EXTRA_CAMPAIGN_TYPE"
         const val EXTRA_SHOW_TIERS_LIMITS_SPLASH = "piuk.blockchain.android.EXTRA_SHOW_TIERS_LIMITS_SPLASH"
 
@@ -185,8 +178,13 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
         }
 
         @JvmStatic
-        fun startForResult(fragment: Fragment, campaignType: CampaignType, requestCode: Int) {
-            intentArgs(fragment.requireContext(), campaignType)
+        fun startForResult(
+            fragment: Fragment,
+            campaignType: CampaignType,
+            requestCode: Int,
+            showTiersLimitsSplash: Boolean = false
+        ) {
+            intentArgs(fragment.requireContext(), campaignType, showTiersLimitsSplash)
                 .run { fragment.startActivityForResult(this, requestCode) }
         }
 
@@ -201,6 +199,9 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
                     putExtra(EXTRA_CAMPAIGN_TYPE, campaignType)
                     putExtra(EXTRA_SHOW_TIERS_LIMITS_SPLASH, showTiersLimitsSplash)
                 }
+
+        fun kycStatusUpdated(resultCode: Int) =
+            resultCode == RESULT_KYC_FOR_SDD_COMPLETE || resultCode == RESULT_KYC_FOR_TIER_COMPLETE
     }
 }
 

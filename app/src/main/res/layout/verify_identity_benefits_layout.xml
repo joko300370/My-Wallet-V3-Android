@@ -69,7 +69,7 @@
         app:layout_constraintTop_toBottomOf="@id/kyc_benefits_header_separator"
         app:layout_goneMarginBottom="@dimen/standard_margin"
         tools:itemCount="5"
-        tools:listitem="@layout/verify_identity_benefit_layout" />
+        tools:listitem="@layout/verify_identity_numeric_benefit_layout" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/footer_text"

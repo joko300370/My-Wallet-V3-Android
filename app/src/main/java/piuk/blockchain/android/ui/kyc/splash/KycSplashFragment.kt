@@ -63,6 +63,7 @@ class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), Kyc
         val campaignType = progressListener.campaignType
         logEvent(
             when (campaignType) {
+                CampaignType.None,
                 CampaignType.Swap -> AnalyticsEvents.KycWelcome
                 CampaignType.Sunriver -> AnalyticsEvents.KycSunriverStart
                 CampaignType.Resubmission -> AnalyticsEvents.KycResubmission
@@ -81,6 +82,7 @@ class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), Kyc
             CampaignType.FiatFunds -> R.string.buy_sell_splash_title
             CampaignType.Swap -> R.string.kyc_splash_title
             CampaignType.Interest -> R.string.earn_interest
+            CampaignType.None -> R.string.identity_verification
         }
 
         progressListener.setHostTitle(title)

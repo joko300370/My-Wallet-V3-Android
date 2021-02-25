@@ -39,7 +39,7 @@ import piuk.blockchain.android.simplebuy.SimpleBuyCancelOrderBottomSheet
 import piuk.blockchain.android.ui.airdrops.AirdropStatusSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.customviews.KycBenefitsBottomSheet
-import piuk.blockchain.android.ui.customviews.VerifyIdentityBenefit
+import piuk.blockchain.android.ui.customviews.VerifyIdentityNumericBenefitItem
 import piuk.blockchain.android.ui.dashboard.adapter.DashboardDelegateAdapter
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
@@ -268,15 +268,15 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                 title = getString(R.string.fiat_funds_no_kyc_announcement_title),
                 description = getString(R.string.fiat_funds_no_kyc_announcement_description),
                 listOfBenefits = listOf(
-                    VerifyIdentityBenefit(
+                    VerifyIdentityNumericBenefitItem(
                         getString(R.string.fiat_funds_no_kyc_step_1_title),
                         getString(R.string.fiat_funds_no_kyc_step_1_description)
                     ),
-                    VerifyIdentityBenefit(
+                    VerifyIdentityNumericBenefitItem(
                         getString(R.string.fiat_funds_no_kyc_step_2_title),
                         getString(R.string.fiat_funds_no_kyc_step_2_description)
                     ),
-                    VerifyIdentityBenefit(
+                    VerifyIdentityNumericBenefitItem(
                         getString(R.string.fiat_funds_no_kyc_step_3_title),
                         getString(R.string.fiat_funds_no_kyc_step_3_description)
                     )

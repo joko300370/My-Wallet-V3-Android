@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.alg
 
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -16,10 +17,11 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
 internal class AlgoCryptoWalletAccount(
     payloadManager: PayloadDataManager,
+    custodialWalletManager: CustodialWalletManager,
     override val label: String,
     override val isDefault: Boolean = true,
     override val exchangeRates: ExchangeRateDataManager
-) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ALGO) {
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ALGO, custodialWalletManager) {
 
     override val accountBalance: Single<Money>
         get() = Single.just(CryptoValue.zero(asset))
