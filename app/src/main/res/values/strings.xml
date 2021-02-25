@@ -1923,4 +1923,6 @@
     <string name="sb_checkout_weekly_limit_blurb">Oops, looks like you’ve used up your weekly transaction limit for Buys and Deposits, please try again tomorrow.</string>
     <string name="sb_checkout_yearly_limit_title">Yearly limit exceeded</string>
     <string name="sb_checkout_yearly_limit_blurb">Oops, looks like you’ve used up your yearly transaction limit for Buys and Deposits.</string>
+    <string name="sb_checkout_pending_order_title">Order in progress</string>
+    <string name="sb_checkout_pending_order_blurb">Oops, looks like you’ve already got a Buy order in progress, please wait until it completes before buying again.</string>
 </resources>

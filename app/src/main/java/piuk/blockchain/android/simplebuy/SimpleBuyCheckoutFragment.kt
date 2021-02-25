@@ -291,6 +291,15 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
                     )
                 )
             )
+            ErrorState.ExistingPendingOrder -> showBottomSheet(
+                ErrorSlidingBottomDialog.newInstance(
+                    ErrorDialogData(
+                        getString(R.string.sb_checkout_pending_order_title),
+                        getString(R.string.sb_checkout_pending_order_blurb),
+                        getString(R.string.common_ok)
+                    )
+                )
+            )
             else -> showBottomSheet(ErrorSlidingBottomDialog.newInstance(activity))
         }
     }

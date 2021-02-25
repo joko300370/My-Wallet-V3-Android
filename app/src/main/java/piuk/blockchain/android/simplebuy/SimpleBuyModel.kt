@@ -285,6 +285,9 @@ class SimpleBuyModel(
                 NabuErrorCodes.AnnualLimitExceeded -> process(
                     SimpleBuyIntent.ErrorIntent(ErrorState.YearlyLimitExceeded)
                 )
+                NabuErrorCodes.PendingOrdersLimitReached -> process(
+                    SimpleBuyIntent.ErrorIntent(ErrorState.ExistingPendingOrder)
+                )
                 else -> process(SimpleBuyIntent.ErrorIntent())
             }
         } else {

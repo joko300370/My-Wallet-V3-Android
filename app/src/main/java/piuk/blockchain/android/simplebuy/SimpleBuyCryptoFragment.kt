@@ -68,6 +68,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     private val currencyPrefs: CurrencyPrefs by inject()
 
     override fun onBackPressed(): Boolean = true
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -315,6 +316,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             else -> {
             }
         }
+
         payment_method.visible()
         payment_method_separator.visible()
         payment_method_details_root.visible()
@@ -329,7 +331,6 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             paymentMethod.icon()
         )
         payment_method_title.text = getString(paymentMethod.label())
-
         payment_method_limit.text = paymentMethod.limits.max.toStringWithSymbol()
     }
 
@@ -484,7 +485,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
 
     private fun TextView.showIfPaymentMethodUndefined(paymentMethod: PaymentMethod) {
         visibleIf {
-            paymentMethod is PaymentMethod.Undefined
+            paymentMethod is PaymentMethod.Undefined || paymentMethod is PaymentMethod.UndefinedFunds
         }
     }
 
