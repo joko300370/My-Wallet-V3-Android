@@ -79,6 +79,7 @@ class BalanceAndFeeView @JvmOverloads constructor(
     private fun updateBalance(state: TransactionState) {
         val availableBalance = state.availableBalance
         binding.maxAvailableValue.text = makeAmountString(availableBalance, state)
+        binding.feeForFullAvailableLabel.text = customiser.enterAmountMaxNetworkFeeLabel(state)
 
         state.pendingTx?.totalBalance?.let {
             binding.totalAvailableValue.text = makeAmountString(it, state)
@@ -106,13 +107,11 @@ class BalanceAndFeeView @JvmOverloads constructor(
     }
 
     private fun updateMaxGroup(state: TransactionState) =
-        if (state.amount.isPositive) {
-            binding.networkFeeGroup.visible()
-            binding.useMax.gone()
-        } else {
-            binding.networkFeeGroup.gone()
-            with(binding.useMax) {
-                visibleIf { !customiser.shouldDisableInput(state.errorState) }
+        with(binding) {
+            networkFeeLabel.visibleIf { state.amount.isPositive }
+            networkFeeValue.visibleIf { state.amount.isPositive }
+            with(useMax) {
+                visibleIf { !state.amount.isPositive && !customiser.shouldDisableInput(state.errorState) }
                 text = customiser.enterAmountMaxButton(state)
 //                visibleIf { !customiser.shouldDisableInput(state.errorState) && !binding.dropdown.isVisible() }
                 setOnClickListener {

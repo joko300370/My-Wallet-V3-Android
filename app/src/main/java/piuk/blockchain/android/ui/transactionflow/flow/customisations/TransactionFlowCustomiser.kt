@@ -235,6 +235,12 @@ class TransactionFlowCustomiserImpl(
             else -> throw java.lang.IllegalStateException("Limits info view not configured for ${state.action}")
         }
 
+    override fun enterAmountMaxNetworkFeeLabel(state: TransactionState): String =
+        when (state.action) {
+            AssetAction.Send -> resources.getString(R.string.send_enter_amount_max_fee)
+            else -> throw java.lang.IllegalStateException("Max network fee label not configured for ${state.action}")
+        }
+
     override fun confirmTitle(state: TransactionState): String {
         val amount = state.pendingTx?.amount?.toStringWithSymbol() ?: ""
 

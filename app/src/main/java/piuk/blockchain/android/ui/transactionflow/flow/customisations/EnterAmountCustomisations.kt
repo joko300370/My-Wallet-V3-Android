@@ -25,4 +25,5 @@ interface EnterAmountCustomisations {
     fun shouldShowMaxLimit(state: TransactionState): Boolean
     fun enterAmountLimitsViewTitle(state: TransactionState): String
     fun enterAmountLimitsViewInfo(state: TransactionState): String
+    fun enterAmountMaxNetworkFeeLabel(state: TransactionState): String
 }
