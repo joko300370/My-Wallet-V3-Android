@@ -79,6 +79,7 @@ import com.blockchain.nabu.models.responses.swap.CustodialOrderResponse
 import com.blockchain.nabu.models.responses.tokenresponse.NabuSessionTokenResponse
 import com.blockchain.nabu.service.NabuService
 import com.blockchain.preferences.SimpleBuyPrefs
+import com.blockchain.remoteconfig.FeatureFlag
 import com.braintreepayments.cardform.utils.CardType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -105,6 +106,8 @@ class LiveCustodialWalletManager(
     private val assetBalancesRepository: AssetBalancesRepository,
     private val interestRepository: InterestRepository,
     private val custodialRepository: CustodialRepository,
+    private val achDepositWithdrawFeatureFlag: FeatureFlag,
+    private val sddFeatureFlag: FeatureFlag,
     private val bankLinkingEnabledProvider: BankLinkingEnabledProvider,
     private val transactionErrorMapper: TransactionErrorMapper
 ) : CustodialWalletManager {
@@ -816,9 +819,11 @@ class LiveCustodialWalletManager(
     override fun canTransactWithBankMethods(fiatCurrency: String): Single<Boolean> {
         if (!fiatCurrency.isSupportedCurrency())
             return Single.just(false)
-        return getSupportedCurrenciesForBankTransactions(fiatCurrency).map {
-            it.contains(fiatCurrency)
-        }
+        return getSupportedCurrenciesForBankTransactions(fiatCurrency).zipWith(achDepositWithdrawFeatureFlag.enabled)
+            .map { (supportedCurrencies, achEnabled) ->
+                val currencies = supportedCurrencies.filter { achEnabled || it != ACH_CURRENCY }
+                currencies.contains(fiatCurrency)
+            }
     }
 
     override fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String> =
@@ -835,9 +840,9 @@ class LiveCustodialWalletManager(
         }
 
     override fun isSDDEligible(): Single<Boolean> =
-        nabuService.isSDDEligible().map {
-            it.eligible && it.tier == SDD_ELIGIBLE_TIER
-        }
+        nabuService.isSDDEligible().zipWith(sddFeatureFlag.enabled).map { (response, featureEnabled) ->
+            featureEnabled && response.eligible && response.tier == SDD_ELIGIBLE_TIER
+        }.onErrorReturn { false }
 
     override fun fetchSDDUserState(): Single<SDDUserState> =
         authenticator.authenticate { sessionToken ->
@@ -1110,6 +1115,8 @@ class LiveCustodialWalletManager(
         private val SUPPORTED_FUNDS_FOR_WIRE_TRANSFER = listOf(
             "GBP", "EUR", "USD"
         )
+
+        private const val ACH_CURRENCY = "USD"
 
         private const val SDD_ELIGIBLE_TIER = 3
     }

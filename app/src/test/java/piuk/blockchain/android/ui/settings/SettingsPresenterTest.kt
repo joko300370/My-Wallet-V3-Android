@@ -136,7 +136,6 @@ class SettingsPresenterTest {
         whenever(featureFlag.enabled).thenReturn(Single.just(true))
         whenever(cardsFeatureFlag.enabled).thenReturn(Single.just(true))
         whenever(fundsFeatureFlag.enabled).thenReturn(Single.just(true))
-        whenever(custodialWalletManager.canTransactWithBankMethods(any())).thenReturn(Single.just(false))
         whenever(custodialWalletManager.updateSupportedCardTypes(ArgumentMatchers.anyString())).thenReturn(
             Completable.complete())
         whenever(custodialWalletManager.getBanks()).thenReturn(Single.just(emptyList()))
@@ -164,7 +163,6 @@ class SettingsPresenterTest {
         whenever(prefsUtil.selectedFiatCurrency).thenReturn("USD")
         whenever(cardsFeatureFlag.enabled).thenReturn(Single.just(false))
         whenever(fundsFeatureFlag.enabled).thenReturn(Single.just(false))
-        whenever(custodialWalletManager.canTransactWithBankMethods(any())).thenReturn(Single.just(false))
         whenever(custodialWalletManager.updateSupportedCardTypes(ArgumentMatchers.anyString())).thenReturn(
             Completable.complete())
         whenever(custodialWalletManager.fetchUnawareLimitsCards(ArgumentMatchers.anyList()))
