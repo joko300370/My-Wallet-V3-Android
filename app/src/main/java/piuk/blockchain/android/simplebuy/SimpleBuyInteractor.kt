@@ -47,7 +47,7 @@ class SimpleBuyInteractor(
 
     fun fetchBuyLimitsAndSupportedCryptoCurrencies(targetCurrency: String): Single<Pair<BuySellPairs, TransferLimits>> =
         custodialWalletManager.getSupportedBuySellCryptoCurrencies(targetCurrency).zipWith(
-            custodialWalletManager.getProductTransferLimits(targetCurrency, product = Product.SIMPLEBUY)
+            custodialWalletManager.getProductTransferLimits(targetCurrency, product = Product.SWAP)
         ).trackProgress(appUtil.activityIndicator)
 
     fun fetchSupportedFiatCurrencies(): Single<SimpleBuyIntent.SupportedCurrenciesUpdated> =

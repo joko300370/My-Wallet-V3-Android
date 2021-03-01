@@ -79,24 +79,24 @@ data class SimpleBuyState(
 
     @delegate:Transient
     val maxFiatAmount: Money by unsafeLazy {
-        val maxPaymentMethodLimit = selectedPaymentMethodDetails.maxLimit() ?: return@unsafeLazy FiatValue.fromMinor(
-            fiatCurrency, Long.MAX_VALUE
-        )
+        val maxPaymentMethodLimit = selectedPaymentMethodDetails.maxLimit()
         val maxUserLimit = transferLimits.maxLimit.takeIf { it.isPositive }
-        maxUserLimit?.let {
-            Money.min(it, maxPaymentMethodLimit)
-        } ?: maxPaymentMethodLimit
+
+        if (maxPaymentMethodLimit != null && maxUserLimit != null)
+            Money.min(maxPaymentMethodLimit, maxUserLimit)
+        else
+            maxPaymentMethodLimit ?: maxUserLimit ?: FiatValue.zero(fiatCurrency)
     }
 
     @delegate:Transient
     val minFiatAmount: Money by unsafeLazy {
-        val minPaymentMethodLimit = selectedPaymentMethodDetails.minLimit() ?: return@unsafeLazy FiatValue.zero(
-            fiatCurrency
-        )
+        val minPaymentMethodLimit = selectedPaymentMethodDetails.minLimit()
         val minUserLimit = transferLimits.minLimit.takeIf { it.isPositive }
-        minUserLimit?.let {
-            Money.max(it, minPaymentMethodLimit)
-        } ?: minPaymentMethodLimit
+
+        if (minPaymentMethodLimit != null && minUserLimit != null)
+            Money.max(minPaymentMethodLimit, minUserLimit)
+        else
+            minPaymentMethodLimit ?: minUserLimit ?: FiatValue.zero(fiatCurrency)
     }
 
     fun maxCryptoAmount(exchangeRateDataManager: ExchangeRateDataManager): Money? {
