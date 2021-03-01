@@ -1164,6 +1164,7 @@ private fun String.toTransactionState(): TransactionState =
     when (this) {
         TransactionResponse.COMPLETE -> TransactionState.COMPLETED
         TransactionResponse.PENDING,
+        TransactionResponse.CLEARED,
         TransactionResponse.MANUAL_REVIEW -> TransactionState.PENDING
         else -> TransactionState.UNKNOWN
     }
