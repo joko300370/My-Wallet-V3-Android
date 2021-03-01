@@ -266,10 +266,12 @@ class NabuService(retrofit: Retrofit) {
 
     internal fun getSwapLimits(
         sessionToken: NabuSessionTokenResponse,
-        currency: String
-    ): Single<SwapLimitsResponse> = service.fetchSwapLimits(
-        sessionToken.authHeader,
-        currency
+        currency: String,
+        product: String
+    ): Single<SwapLimitsResponse> = service.fetchLimits(
+        authorization = sessionToken.authHeader,
+        currency = currency,
+        product = product
     ).onErrorResumeNext {
         if ((it as? HttpException)?.code() == 409) {
             Single.just(

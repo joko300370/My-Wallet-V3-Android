@@ -3,6 +3,7 @@ package piuk.blockchain.android.coincore.impl.txEngine
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialOrder
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.Product
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.models.responses.nabu.KycTiers
@@ -48,7 +49,7 @@ abstract class QuotedEngine(
     protected fun updateLimits(pendingTx: PendingTx, pricedQuote: PricedQuote): Single<PendingTx> =
         Singles.zip(
             kycTierService.tiers(),
-            walletManager.getSwapLimits(userFiat)
+            walletManager.getProductTransferLimits(userFiat, Product.SWAP)
         ) { tier, limits ->
             onLimitsForTierFetched(tier, limits, pendingTx, pricedQuote)
         }

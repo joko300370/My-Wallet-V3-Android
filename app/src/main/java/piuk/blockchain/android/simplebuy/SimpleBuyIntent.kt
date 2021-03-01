@@ -6,6 +6,7 @@ import com.blockchain.nabu.datamanagers.CustodialQuote
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.Partner
 import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
@@ -243,7 +244,8 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
     data class UpdatedBuyLimitsAndSupportedCryptoCurrencies(
         val buySellPairs: BuySellPairs,
-        private val selectedCryptoCurrency: CryptoCurrency?
+        private val selectedCryptoCurrency: CryptoCurrency?,
+        private val transferLimits: TransferLimits
     ) : SimpleBuyIntent() {
 
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState {
@@ -253,22 +255,10 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
                 return oldState.copy(errorState = ErrorState.NoAvailableCurrenciesToTrade)
             }
 
-            val minValueForSelectedPair = supportedPairsAndLimits.firstOrNull { pairs ->
-                pairs.fiatCurrency == oldState.fiatCurrency &&
-                    pairs.cryptoCurrency == selectedCryptoCurrency
-            }?.buyLimits?.minLimit(oldState.fiatCurrency)?.valueMinor
-
-            val maxValueForSelectedPair = supportedPairsAndLimits.firstOrNull { pairs ->
-                pairs.fiatCurrency == oldState.fiatCurrency &&
-                    pairs.cryptoCurrency == selectedCryptoCurrency
-            }?.buyLimits?.maxLimit(oldState.fiatCurrency)?.valueMinor
-
             return oldState.copy(
                 supportedPairsAndLimits = supportedPairsAndLimits,
                 selectedCryptoCurrency = selectedCryptoCurrency,
-                predefinedAmounts = oldState.predefinedAmounts.filter {
-                    it.valueMinor >= (minValueForSelectedPair ?: 0) && it.valueMinor <= (maxValueForSelectedPair ?: 0)
-                }
+                transferLimits = transferLimits
             )
         }
     }

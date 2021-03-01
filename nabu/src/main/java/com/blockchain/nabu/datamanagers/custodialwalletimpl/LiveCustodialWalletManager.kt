@@ -872,11 +872,12 @@ class LiveCustodialWalletManager(
             }
         }
 
-    override fun getSwapLimits(currency: String): Single<TransferLimits> =
+    override fun getProductTransferLimits(currency: String, product: Product): Single<TransferLimits> =
         authenticator.authenticate {
             nabuService.getSwapLimits(
                 it,
-                currency
+                currency,
+                product.toString()
             ).map { response ->
                 if (response.maxOrder == null && response.minOrder == null && response.maxPossibleOrder == null) {
                     TransferLimits(currency)

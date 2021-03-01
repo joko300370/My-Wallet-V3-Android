@@ -526,7 +526,7 @@ class TradingSellTxEngineTest {
         val kycTiers: KycTiers = mock()
         whenever(kycTierService.tiers()).thenReturn(Single.just(kycTiers))
 
-        whenever(walletManager.getSwapLimits(TGT_ASSET))
+        whenever(walletManager.getProductTransferLimits(TGT_ASSET))
             .itReturns(
                 Single.just(
                     TransferLimits(
@@ -540,7 +540,7 @@ class TradingSellTxEngineTest {
 
     private fun verifyLimitsFetched() {
         verify(kycTierService).tiers()
-        verify(walletManager).getSwapLimits(TGT_ASSET)
+        verify(walletManager).getProductTransferLimits(TGT_ASSET)
     }
 
     private fun verifyQuotesEngineStarted() {
