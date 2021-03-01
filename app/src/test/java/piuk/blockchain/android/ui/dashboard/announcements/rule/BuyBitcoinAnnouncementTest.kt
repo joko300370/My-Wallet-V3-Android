@@ -2,14 +2,20 @@ package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
+import io.reactivex.Single
+import org.amshove.kluent.itReturns
 import org.junit.Before
 import org.junit.Test
+import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementQueries
 import piuk.blockchain.android.ui.dashboard.announcements.DismissRecorder
 
 class BuyBitcoinAnnouncementTest {
 
     private val dismissRecorder: DismissRecorder = mock()
     private val dismissEntry: DismissRecorder.DismissEntry = mock()
+    private val announcementQueries: AnnouncementQueries = mock {
+        on { isSddEligibleAndNotVerified() } itReturns Single.just(false)
+    }
 
     private lateinit var subject: BuyBitcoinAnnouncement
 
@@ -20,7 +26,8 @@ class BuyBitcoinAnnouncementTest {
 
         subject =
             BuyBitcoinAnnouncement(
-                dismissRecorder = dismissRecorder
+                dismissRecorder = dismissRecorder,
+                announcementQueries
             )
     }
 

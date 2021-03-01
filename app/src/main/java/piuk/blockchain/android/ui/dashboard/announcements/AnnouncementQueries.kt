@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.dashboard.announcements
 import com.blockchain.nabu.datamanagers.NabuDataManager
 import com.blockchain.nabu.models.responses.nabu.Scope
 import com.blockchain.nabu.NabuToken
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.models.responses.nabu.KycTiers
@@ -20,7 +21,8 @@ class AnnouncementQueries(
     private val settings: SettingsDataManager,
     private val nabu: NabuDataManager,
     private val tierService: TierService,
-    private val sbStateFactory: SimpleBuySyncFactory
+    private val sbStateFactory: SimpleBuySyncFactory,
+    private val custodialWalletManager: CustodialWalletManager
 ) {
     // Attempt to figure out if KYC/swap etc is allowed based on location...
     fun canKyc(): Single<Boolean> {
@@ -58,6 +60,14 @@ class AnnouncementQueries(
             .onErrorReturn { false }
     }
 
+    fun isSddEligibleAndNotVerified(): Single<Boolean> =
+        custodialWalletManager.isSDDEligible().flatMap {
+            if (!it)
+                Single.just(false)
+            else
+                custodialWalletManager.fetchSDDUserState().map { it.isVerified.not() }
+        }
+
     fun hasReceivedStxAirdrop(): Single<Boolean> {
         return nabuToken.fetchNabuToken()
             .flatMap { token -> nabu.getAirdropCampaignStatus(token) }
@@ -84,7 +94,8 @@ class AnnouncementQueries(
 
     fun isKycGoldVerifiedAndHasPendingCardToAdd(): Single<Boolean> =
         tierService.tiers().map { it.isApprovedFor(KycTierLevel.GOLD) }.zipWith(
-            hasSelectedToAddNewCard()) { isGold, addNewCard ->
+            hasSelectedToAddNewCard()
+        ) { isGold, addNewCard ->
             isGold && addNewCard
         }
 }
