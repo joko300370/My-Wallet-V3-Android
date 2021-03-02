@@ -440,6 +440,7 @@ val applicationModule = module {
                 custodialWalletManager = get(),
                 appUtil = get(),
                 coincore = get(),
+                analytics = get(),
                 eligibilityProvider = get()
             )
         }

@@ -230,6 +230,7 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
     override fun onResume() {
         super.onResume()
         subscribeToViewObservables()
+        analytics.logEvent(KYCAnalyticsEvents.AddressScreenSeen)
     }
 
     private fun subscribeToViewObservables() {
