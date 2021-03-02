@@ -49,7 +49,7 @@ abstract class QuotedEngine(
     protected fun updateLimits(pendingTx: PendingTx, pricedQuote: PricedQuote): Single<PendingTx> =
         Singles.zip(
             kycTierService.tiers(),
-            walletManager.getProductTransferLimits(userFiat, Product.SWAP)
+            walletManager.getProductTransferLimits(userFiat, Product.TRADE)
         ) { tier, limits ->
             onLimitsForTierFetched(tier, limits, pendingTx, pricedQuote)
         }

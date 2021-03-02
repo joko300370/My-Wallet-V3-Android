@@ -4,6 +4,7 @@ import com.blockchain.android.testutils.rxInit
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.Product
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.models.responses.nabu.KycTiers
@@ -218,16 +219,16 @@ class TradingSellTxEngineTest {
             .test()
             .assertValue {
                 it.amount == CryptoValue.zero(SRC_ASSET) &&
-                it.totalBalance == totalBalance &&
-                it.availableBalance == totalBalance &&
-                it.fees == CryptoValue.zero(SRC_ASSET) &&
-                it.selectedFiat == TGT_ASSET &&
-                it.customFeeAmount == -1L &&
-                it.confirmations.isEmpty() &&
-                it.minLimit == MIN_GOLD_LIMIT_ASSET &&
-                it.maxLimit == MAX_GOLD_LIMIT_ASSET &&
-                it.validationState == ValidationState.UNINITIALISED &&
-                it.engineState.isEmpty()
+                    it.totalBalance == totalBalance &&
+                    it.availableBalance == totalBalance &&
+                    it.fees == CryptoValue.zero(SRC_ASSET) &&
+                    it.selectedFiat == TGT_ASSET &&
+                    it.customFeeAmount == -1L &&
+                    it.confirmations.isEmpty() &&
+                    it.minLimit == MIN_GOLD_LIMIT_ASSET &&
+                    it.maxLimit == MAX_GOLD_LIMIT_ASSET &&
+                    it.validationState == ValidationState.UNINITIALISED &&
+                    it.engineState.isEmpty()
             }
             .assertValue { verifyFeeLevels(it, FeeLevel.None) }
             .assertNoErrors()
@@ -272,17 +273,17 @@ class TradingSellTxEngineTest {
             .test()
             .assertValue {
                 it.amount == CryptoValue.zero(SRC_ASSET) &&
-                it.totalBalance == CryptoValue.zero(SRC_ASSET) &&
-                it.availableBalance == CryptoValue.zero(SRC_ASSET) &&
-                it.fees == CryptoValue.zero(SRC_ASSET) &&
-                it.selectedFiat == TGT_ASSET &&
-                it.feeLevel == FeeLevel.None &&
-                it.customFeeAmount == -1L &&
-                it.confirmations.isEmpty() &&
-                it.minLimit == null &&
-                it.maxLimit == null &&
-                it.validationState == ValidationState.PENDING_ORDERS_LIMIT_REACHED &&
-                it.engineState.isEmpty()
+                    it.totalBalance == CryptoValue.zero(SRC_ASSET) &&
+                    it.availableBalance == CryptoValue.zero(SRC_ASSET) &&
+                    it.fees == CryptoValue.zero(SRC_ASSET) &&
+                    it.selectedFiat == TGT_ASSET &&
+                    it.feeLevel == FeeLevel.None &&
+                    it.customFeeAmount == -1L &&
+                    it.confirmations.isEmpty() &&
+                    it.minLimit == null &&
+                    it.maxLimit == null &&
+                    it.validationState == ValidationState.PENDING_ORDERS_LIMIT_REACHED &&
+                    it.engineState.isEmpty()
             }
             .assertValue { verifyFeeLevels(it, FeeLevel.None) }
             .assertNoErrors()
@@ -337,9 +338,9 @@ class TradingSellTxEngineTest {
             .assertValue {
                 val v = -100
                 it.amount == inputAmount &&
-                it.totalBalance == totalBalance &&
-                it.availableBalance == totalBalance &&
-                it.fees == expectedFee
+                    it.totalBalance == totalBalance &&
+                    it.availableBalance == totalBalance &&
+                    it.fees == expectedFee
             }
             .assertValue { verifyFeeLevels(it, FeeLevel.None) }
 
@@ -496,15 +497,15 @@ class TradingSellTxEngineTest {
         subject.doUpdateFeeLevel(
             pendingTx,
             FeeLevel.None,
-        -1
+            -1
         ).test()
             .assertComplete()
             .assertNoErrors()
             .assertValue {
                 it.amount == inputAmount &&
-                it.totalBalance == totalBalance &&
-                it.availableBalance == totalBalance &&
-                it.fees == initialFee
+                    it.totalBalance == totalBalance &&
+                    it.availableBalance == totalBalance &&
+                    it.fees == initialFee
             }
             .assertValue { verifyFeeLevels(it, FeeLevel.None) }
 
@@ -526,7 +527,7 @@ class TradingSellTxEngineTest {
         val kycTiers: KycTiers = mock()
         whenever(kycTierService.tiers()).thenReturn(Single.just(kycTiers))
 
-        whenever(walletManager.getProductTransferLimits(TGT_ASSET))
+        whenever(walletManager.getProductTransferLimits(TGT_ASSET, Product.TRADE))
             .itReturns(
                 Single.just(
                     TransferLimits(
@@ -540,7 +541,7 @@ class TradingSellTxEngineTest {
 
     private fun verifyLimitsFetched() {
         verify(kycTierService).tiers()
-        verify(walletManager).getProductTransferLimits(TGT_ASSET)
+        verify(walletManager).getProductTransferLimits(TGT_ASSET, Product.TRADE)
     }
 
     private fun verifyQuotesEngineStarted() {

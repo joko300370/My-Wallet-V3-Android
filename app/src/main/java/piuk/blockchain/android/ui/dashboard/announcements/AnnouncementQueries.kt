@@ -60,7 +60,7 @@ class AnnouncementQueries(
             .onErrorReturn { false }
     }
 
-    fun isSddEligibleAndNotVerified(): Single<Boolean> =
+    fun isSDDEligibleAndNotVerified(): Single<Boolean> =
         custodialWalletManager.isSDDEligible().flatMap {
             if (!it)
                 Single.just(false)

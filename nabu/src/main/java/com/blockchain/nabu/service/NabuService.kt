@@ -264,7 +264,7 @@ class NabuService(retrofit: Retrofit) {
         createOrderRequest
     ).wrapErrorMessage()
 
-    internal fun getSwapLimits(
+    internal fun fetchProductLimits(
         sessionToken: NabuSessionTokenResponse,
         currency: String,
         product: String

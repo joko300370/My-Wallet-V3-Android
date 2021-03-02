@@ -133,7 +133,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
             Singles.zip(
                 kycTierService.tiers(),
                 trendingPairsProvider.getTrendingPairs(),
-                walletManager.getProductTransferLimits(currencyPrefs.selectedFiatCurrency, Product.SWAP),
+                walletManager.getProductTransferLimits(currencyPrefs.selectedFiatCurrency, Product.TRADE),
                 walletManager.getSwapTrades().onErrorReturn { emptyList() },
                 coincore.allWalletsWithActions(setOf(AssetAction.Swap))
                     .map { it.isNotEmpty() }) { tiers: KycTiers,

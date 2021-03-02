@@ -14,7 +14,7 @@ class BuyBitcoinAnnouncementTest {
     private val dismissRecorder: DismissRecorder = mock()
     private val dismissEntry: DismissRecorder.DismissEntry = mock()
     private val announcementQueries: AnnouncementQueries = mock {
-        on { isSddEligibleAndNotVerified() } itReturns Single.just(false)
+        on { isSDDEligibleAndNotVerified() } itReturns Single.just(false)
     }
 
     private lateinit var subject: BuyBitcoinAnnouncement

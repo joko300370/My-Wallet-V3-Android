@@ -248,7 +248,7 @@ class AnnouncementQueriesTest {
         whenever(custodialWalletManager.isSDDEligible()).thenReturn(Single.just(true))
         whenever(custodialWalletManager.fetchSDDUserState()).thenReturn(Single.just(SDDUserState(true, true)))
 
-        subject.isSddEligibleAndNotVerified()
+        subject.isSDDEligibleAndNotVerified()
             .test()
             .assertValue { !it }
     }
@@ -258,7 +258,7 @@ class AnnouncementQueriesTest {
         whenever(custodialWalletManager.isSDDEligible()).thenReturn(Single.just(false))
         whenever(custodialWalletManager.fetchSDDUserState()).thenReturn(Single.just(SDDUserState(false, false)))
 
-        subject.isSddEligibleAndNotVerified()
+        subject.isSDDEligibleAndNotVerified()
             .test()
             .assertValue { !it }
     }
@@ -268,7 +268,7 @@ class AnnouncementQueriesTest {
         whenever(custodialWalletManager.isSDDEligible()).thenReturn(Single.just(true))
         whenever(custodialWalletManager.fetchSDDUserState()).thenReturn(Single.just(SDDUserState(false, false)))
 
-        subject.isSddEligibleAndNotVerified()
+        subject.isSDDEligibleAndNotVerified()
             .test()
             .assertValue { it }
     }
