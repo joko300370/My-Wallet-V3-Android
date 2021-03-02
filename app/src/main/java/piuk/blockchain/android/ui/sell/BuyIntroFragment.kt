@@ -109,7 +109,8 @@ class BuyIntroFragment : Fragment() {
         introHeaderView.setDetails(
             icon = R.drawable.ic_cart,
             label = R.string.select_crypto_you_want,
-            title = R.string.buy_with_cash)
+            title = R.string.buy_with_cash
+        )
 
         rv_cryptos.removeAllHeaderDecorations()
         rv_cryptos.addItemDecoration(

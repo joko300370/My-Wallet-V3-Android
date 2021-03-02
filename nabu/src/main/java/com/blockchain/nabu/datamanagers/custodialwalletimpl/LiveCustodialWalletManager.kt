@@ -78,6 +78,7 @@ import com.blockchain.nabu.models.responses.swap.CreateOrderRequest
 import com.blockchain.nabu.models.responses.swap.CustodialOrderResponse
 import com.blockchain.nabu.models.responses.tokenresponse.NabuSessionTokenResponse
 import com.blockchain.nabu.service.NabuService
+import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.remoteconfig.FeatureFlag
 import com.braintreepayments.cardform.utils.CardType
@@ -105,12 +106,16 @@ class LiveCustodialWalletManager(
     private val kycFeatureEligibility: FeatureEligibility,
     private val assetBalancesRepository: AssetBalancesRepository,
     private val interestRepository: InterestRepository,
+    private val currencyPrefs: CurrencyPrefs,
     private val custodialRepository: CustodialRepository,
     private val achDepositWithdrawFeatureFlag: FeatureFlag,
     private val sddFeatureFlag: FeatureFlag,
     private val bankLinkingEnabledProvider: BankLinkingEnabledProvider,
     private val transactionErrorMapper: TransactionErrorMapper
 ) : CustodialWalletManager {
+
+    override val defaultFiatCurrency: String
+        get() = currencyPrefs.defaultFiatCurrency
 
     override fun getQuote(
         cryptoCurrency: CryptoCurrency,
@@ -575,12 +580,6 @@ class LiveCustodialWalletManager(
                         )
                     )
                 }
-                // we want the Undefined payment method to be added only in case we have more that 1 available payment
-                // methods, so we present in the UI the option "Select a payment method"
-                if (availablePaymentMethods.size > 1) {
-                    availablePaymentMethods.add(PaymentMethod.Undefined)
-                }
-
                 availablePaymentMethods.sortedBy { paymentMethod -> paymentMethod.order }.toList()
             }
         }
@@ -878,11 +877,12 @@ class LiveCustodialWalletManager(
             }
         }
 
-    override fun getSwapLimits(currency: String): Single<TransferLimits> =
+    override fun getProductTransferLimits(currency: String, product: Product): Single<TransferLimits> =
         authenticator.authenticate {
-            nabuService.getSwapLimits(
+            nabuService.fetchProductLimits(
                 it,
-                currency
+                currency,
+                product.toRequestString()
             ).map { response ->
                 if (response.maxOrder == null && response.minOrder == null && response.maxPossibleOrder == null) {
                     TransferLimits(currency)
@@ -1124,6 +1124,12 @@ class LiveCustodialWalletManager(
     private fun String.isSupportedCurrency(): Boolean =
         SUPPORTED_FUNDS_FOR_WIRE_TRANSFER.contains(this)
 }
+
+private fun Product.toRequestString(): String =
+    when (this) {
+        Product.TRADE -> "SWAP"
+        else -> this.toString()
+    }
 
 private fun String.toLinkedBankState(): LinkedBankState =
     when (this) {

@@ -17,6 +17,7 @@ import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.CustodialOrder
+import com.blockchain.nabu.datamanagers.Product
 import com.blockchain.nabu.service.TierService
 import info.blockchain.balance.Money
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -35,7 +36,7 @@ import piuk.blockchain.android.ui.customviews.ButtonOptions
 import piuk.blockchain.android.ui.customviews.KycBenefitsBottomSheet
 import piuk.blockchain.android.ui.customviews.TrendingPair
 import piuk.blockchain.android.ui.customviews.TrendingPairsProvider
-import piuk.blockchain.android.ui.customviews.VerifyIdentityBenefit
+import piuk.blockchain.android.ui.customviews.VerifyIdentityNumericBenefitItem
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
@@ -132,7 +133,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
             Singles.zip(
                 kycTierService.tiers(),
                 trendingPairsProvider.getTrendingPairs(),
-                walletManager.getSwapLimits(currencyPrefs.selectedFiatCurrency),
+                walletManager.getProductTransferLimits(currencyPrefs.selectedFiatCurrency, Product.TRADE),
                 walletManager.getSwapTrades().onErrorReturn { emptyList() },
                 coincore.allWalletsWithActions(setOf(AssetAction.Swap))
                     .map { it.isNotEmpty() }) { tiers: KycTiers,
@@ -199,15 +200,15 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
                     title = getString(R.string.swap_kyc_upsell_title),
                     description = getString(R.string.swap_kyc_upsell_desc),
                     listOfBenefits = listOf(
-                        VerifyIdentityBenefit(
+                        VerifyIdentityNumericBenefitItem(
                             getString(R.string.swap_kyc_upsell_1_title),
                             getString(R.string.swap_kyc_upsell_1_desc)
                         ),
-                        VerifyIdentityBenefit(
+                        VerifyIdentityNumericBenefitItem(
                             getString(R.string.swap_kyc_upsell_2_title),
                             getString(R.string.swap_kyc_upsell_2_desc)
                         ),
-                        VerifyIdentityBenefit(
+                        VerifyIdentityNumericBenefitItem(
                             getString(R.string.swap_kyc_upsell_3_title),
                             getString(R.string.swap_kyc_upsell_3_desc)
                         )
@@ -239,15 +240,15 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
     private fun initKycView() {
         binding.swapKycBenefits.initWithBenefits(
             listOf(
-                VerifyIdentityBenefit(
+                VerifyIdentityNumericBenefitItem(
                     getString(R.string.swap_kyc_1_title),
                     getString(R.string.swap_kyc_1_label)
                 ),
-                VerifyIdentityBenefit(
+                VerifyIdentityNumericBenefitItem(
                     getString(R.string.swap_kyc_2_title),
                     getString(R.string.swap_kyc_2_label)
                 ),
-                VerifyIdentityBenefit(
+                VerifyIdentityNumericBenefitItem(
                     getString(R.string.swap_kyc_3_title),
                     getString(R.string.swap_kyc_3_label)
                 )

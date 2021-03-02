@@ -136,7 +136,8 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
     private fun openInbox() {
         val intent = Intent(Intent.ACTION_MAIN)
         intent.addCategory(Intent.CATEGORY_APP_EMAIL)
-        requireActivity().startActivity(intent)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(Intent.createChooser(intent, getString(R.string.security_centre_email_check)))
     }
 
     override fun resendEmail() {

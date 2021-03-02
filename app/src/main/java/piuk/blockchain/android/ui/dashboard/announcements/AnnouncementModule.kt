@@ -58,7 +58,8 @@ val dashboardAnnouncementsModule = module {
                 settings = get(),
                 nabu = get(),
                 tierService = get(),
-                sbStateFactory = get()
+                sbStateFactory = get(),
+                custodialWalletManager = get()
             )
         }
 
@@ -140,7 +141,8 @@ val dashboardAnnouncementsModule = module {
 
         factory {
             BuyBitcoinAnnouncement(
-                dismissRecorder = get()
+                dismissRecorder = get(),
+                announcementQueries = get()
             )
         }.bind(AnnouncementRule::class)
 

@@ -39,11 +39,12 @@ class SimpleBuyModel(
             is SimpleBuyIntent.FetchBuyLimits ->
                 interactor.fetchBuyLimitsAndSupportedCryptoCurrencies(intent.fiatCurrency)
                     .subscribeBy(
-                        onSuccess = { pairs ->
+                        onSuccess = { (pairs, transferLimits) ->
                             process(
                                 SimpleBuyIntent.UpdatedBuyLimitsAndSupportedCryptoCurrencies(
                                     pairs,
-                                    intent.cryptoCurrency
+                                    intent.cryptoCurrency,
+                                    transferLimits
                                 )
                             )
                             process(SimpleBuyIntent.NewCryptoCurrencySelected(intent.cryptoCurrency))
@@ -97,12 +98,6 @@ class SimpleBuyModel(
                 onSuccess = { process(it) },
                 onError = { process(SimpleBuyIntent.ErrorIntent()) }
             )
-
-            is SimpleBuyIntent.BuyButtonClicked -> interactor.checkTierLevel()
-                .subscribeBy(
-                    onSuccess = { process(it) },
-                    onError = { process(SimpleBuyIntent.ErrorIntent()) }
-                )
 
             is SimpleBuyIntent.LinkBankTransferRequested -> interactor.linkNewBank(previousState.fiatCurrency)
                 .subscribeBy(
@@ -199,6 +194,11 @@ class SimpleBuyModel(
                         onError = { }
                     )
             }
+            is SimpleBuyIntent.BuyButtonClicked -> interactor.checkTierLevel()
+                .subscribeBy(
+                    onSuccess = { process(it) },
+                    onError = { process(SimpleBuyIntent.ErrorIntent()) }
+                )
 
             is SimpleBuyIntent.FetchSuggestedPaymentMethod -> interactor.eligiblePaymentMethods(
                 intent.fiatCurrency,
@@ -232,14 +232,27 @@ class SimpleBuyModel(
                             pollForOrderStatus()
                         }
                     })
+            is SimpleBuyIntent.UpdatePaymentMethodsAndAddTheFirstEligible -> interactor.eligiblePaymentMethods(
+                intent.fiatCurrency, null
+            ).subscribeBy(
+                onSuccess = {
+                    process(it)
+                    it.availablePaymentMethods.firstOrNull { it.isEligible }?.let { paymentMethod ->
+                        process(SimpleBuyIntent.AddNewPaymentMethodRequested(paymentMethod))
+                    }
+                },
+                onError = {
+                    process(SimpleBuyIntent.ErrorIntent())
+                }
+            )
             is SimpleBuyIntent.ConfirmOrder -> processConfirmOrder(previousState)
             is SimpleBuyIntent.CheckOrderStatus -> interactor.pollForOrderStatus(
                 previousState.id ?: throw IllegalStateException("Order Id not available")
             ).subscribeBy(
                 onSuccess = {
-                    if (it.state == OrderState.FINISHED)
-                        process(SimpleBuyIntent.CardPaymentSucceeded)
-                    else if (it.state == OrderState.AWAITING_FUNDS || it.state == OrderState.PENDING_EXECUTION) {
+                    if (it.state == OrderState.FINISHED) {
+                        process(SimpleBuyIntent.PaymentSucceeded)
+                    } else if (it.state == OrderState.AWAITING_FUNDS || it.state == OrderState.PENDING_EXECUTION) {
                         process(SimpleBuyIntent.CardPaymentPending)
                     } else process(SimpleBuyIntent.ErrorIntent())
                 },
@@ -247,6 +260,16 @@ class SimpleBuyModel(
                     process(SimpleBuyIntent.ErrorIntent())
                 }
             )
+            is SimpleBuyIntent.PaymentSucceeded -> {
+                interactor.checkTierLevel().map { it.kycState != KycState.VERIFIED_AND_ELIGIBLE }.subscribeBy(
+                    onSuccess = {
+                        if (it) process(SimpleBuyIntent.UnlockHigherLimits)
+                    },
+                    onError = {
+                        process(SimpleBuyIntent.ErrorIntent())
+                    }
+                )
+            }
             is SimpleBuyIntent.AppRatingShown -> {
                 ratingPrefs.hasSeenRatingDialog = true
                 null
@@ -284,6 +307,9 @@ class SimpleBuyModel(
                 )
                 NabuErrorCodes.AnnualLimitExceeded -> process(
                     SimpleBuyIntent.ErrorIntent(ErrorState.YearlyLimitExceeded)
+                )
+                NabuErrorCodes.PendingOrdersLimitReached -> process(
+                    SimpleBuyIntent.ErrorIntent(ErrorState.ExistingPendingOrder)
                 )
                 else -> process(SimpleBuyIntent.ErrorIntent())
             }

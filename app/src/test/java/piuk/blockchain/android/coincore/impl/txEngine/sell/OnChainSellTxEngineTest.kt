@@ -4,6 +4,7 @@ import com.blockchain.android.testutils.rxInit
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.Product
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.TransferQuote
@@ -560,7 +561,7 @@ class OnChainSellTxEngineTest {
         val kycTiers: KycTiers = mock()
         whenever(kycTierService.tiers()).thenReturn(Single.just(kycTiers))
 
-        whenever(walletManager.getSwapLimits(TGT_ASSET))
+        whenever(walletManager.getProductTransferLimits(TGT_ASSET, Product.TRADE))
             .itReturns(
                 Single.just(
                     TransferLimits(
@@ -574,7 +575,7 @@ class OnChainSellTxEngineTest {
 
     private fun verifyLimitsFetched() {
         verify(kycTierService).tiers()
-        verify(walletManager).getSwapLimits(TGT_ASSET)
+        verify(walletManager).getProductTransferLimits(TGT_ASSET, Product.TRADE)
     }
 
     private fun verifyOnChainEngineStarted(srcAccount: CryptoAccount) {

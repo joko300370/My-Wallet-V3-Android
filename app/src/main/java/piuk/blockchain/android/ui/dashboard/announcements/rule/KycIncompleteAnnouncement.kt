@@ -61,7 +61,7 @@ internal class KycIncompleteAnnouncement(
                 val campaignType = if (cardType == SunriverCardType.FinishSignUp) {
                     CampaignType.Sunriver
                 } else {
-                    CampaignType.Swap
+                    CampaignType.None
                 }
                 host.startKyc(campaignType)
             },
