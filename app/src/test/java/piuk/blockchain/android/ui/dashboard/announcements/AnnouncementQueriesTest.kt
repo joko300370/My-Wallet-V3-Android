@@ -1,7 +1,9 @@
 package piuk.blockchain.android.ui.dashboard.announcements
 
 import com.blockchain.nabu.NabuToken
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.NabuDataManager
+import com.blockchain.nabu.datamanagers.SDDUserState
 import com.blockchain.nabu.models.responses.nabu.KycTierState
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.nabu.models.responses.nabu.LimitsJson
@@ -23,6 +25,7 @@ class AnnouncementQueriesTest {
     private val settings: SettingsDataManager = mock()
     private val nabu: NabuDataManager = mock()
     private val tierService: TierService = mock()
+    private val custodialWalletManager: CustodialWalletManager = mock()
 
     private val sbSync: SimpleBuySyncFactory = mock()
 
@@ -37,7 +40,8 @@ class AnnouncementQueriesTest {
             settings = settings,
             nabu = nabu,
             tierService = tierService,
-            sbStateFactory = sbSync
+            sbStateFactory = sbSync,
+            custodialWalletManager = custodialWalletManager
         )
     }
 
@@ -48,17 +52,20 @@ class AnnouncementQueriesTest {
             Single.just(
                 KycTiers(
                     listOf(
-                        TierResponse(0,
+                        TierResponse(
+                            0,
                             "",
                             KycTierState.None,
                             sampleLimits
                         ),
-                        TierResponse(0,
+                        TierResponse(
+                            0,
                             "",
                             KycTierState.Verified,
                             sampleLimits
                         ),
-                        TierResponse(0,
+                        TierResponse(
+                            0,
                             "",
                             KycTierState.None,
                             sampleLimits
@@ -234,6 +241,36 @@ class AnnouncementQueriesTest {
             .assertValue { !it }
             .assertValueCount(1)
             .assertComplete()
+    }
+
+    @Test
+    fun `user isSddEligible but verified`() {
+        whenever(custodialWalletManager.isSDDEligible()).thenReturn(Single.just(true))
+        whenever(custodialWalletManager.fetchSDDUserState()).thenReturn(Single.just(SDDUserState(true, true)))
+
+        subject.isSDDEligibleAndNotVerified()
+            .test()
+            .assertValue { !it }
+    }
+
+    @Test
+    fun `user not SddEligible neither verified`() {
+        whenever(custodialWalletManager.isSDDEligible()).thenReturn(Single.just(false))
+        whenever(custodialWalletManager.fetchSDDUserState()).thenReturn(Single.just(SDDUserState(false, false)))
+
+        subject.isSDDEligibleAndNotVerified()
+            .test()
+            .assertValue { !it }
+    }
+
+    @Test
+    fun `user  SddEligible and not verified`() {
+        whenever(custodialWalletManager.isSDDEligible()).thenReturn(Single.just(true))
+        whenever(custodialWalletManager.fetchSDDUserState()).thenReturn(Single.just(SDDUserState(false, false)))
+
+        subject.isSDDEligibleAndNotVerified()
+            .test()
+            .assertValue { it }
     }
 
     companion object {

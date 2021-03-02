@@ -5,15 +5,17 @@ import com.blockchain.nabu.datamanagers.CustodialQuote
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.Partner
 import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
+import info.blockchain.balance.Money
 import piuk.blockchain.android.cards.EverypayAuthOptions
 import piuk.blockchain.android.ui.base.mvi.MviState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.io.Serializable
 import java.math.BigInteger
@@ -29,7 +31,6 @@ data class SimpleBuyState(
     val supportedPairsAndLimits: List<BuySellPair>? = null,
     private val amount: FiatValue? = null,
     val fiatCurrency: String = "USD",
-    val predefinedAmounts: List<FiatValue> = emptyList(),
     val selectedCryptoCurrency: CryptoCurrency? = null,
     val orderState: OrderState = OrderState.UNINITIALISED,
     private val expirationDate: Date? = null,
@@ -53,6 +54,7 @@ data class SimpleBuyState(
     val withdrawalLockPeriod: BigInteger = BigInteger.ZERO,
     @Transient val linkBankTransfer: LinkBankTransfer? = null,
     @Transient val paymentPending: Boolean = false,
+    @Transient val transferLimits: TransferLimits = TransferLimits(fiatCurrency),
     // we use this flag to avoid navigating back and forth, reset after navigating
     @Transient val confirmationActionRequested: Boolean = false,
     @Transient val newPaymentMethodToBeAdded: PaymentMethod? = null
@@ -76,47 +78,49 @@ data class SimpleBuyState(
     }
 
     @delegate:Transient
-    val maxFiatAmount: FiatValue by unsafeLazy {
-        val maxPairBuyLimit = maxPairsLimit() ?: return@unsafeLazy FiatValue.fromMinor(fiatCurrency, Long.MAX_VALUE)
-
+    val maxFiatAmount: Money by unsafeLazy {
         val maxPaymentMethodLimit = selectedPaymentMethodDetails.maxLimit()
+        val maxUserLimit = transferLimits.maxLimit.takeIf { it.isPositive }
 
-        maxPaymentMethodLimit?.let {
-            FiatValue.fromMinor(fiatCurrency, it.coerceAtMost(maxPairBuyLimit))
-        } ?: FiatValue.fromMinor(fiatCurrency, maxPairBuyLimit)
+        if (maxPaymentMethodLimit != null && maxUserLimit != null)
+            Money.min(maxPaymentMethodLimit, maxUserLimit)
+        else
+            maxPaymentMethodLimit ?: maxUserLimit ?: FiatValue.zero(fiatCurrency)
     }
 
     @delegate:Transient
-    val minFiatAmount: FiatValue by unsafeLazy {
-        val minPairBuyLimit = minPairsLimit() ?: return@unsafeLazy FiatValue.zero(fiatCurrency)
-
+    val minFiatAmount: Money by unsafeLazy {
         val minPaymentMethodLimit = selectedPaymentMethodDetails.minLimit()
+        val minUserLimit = transferLimits.minLimit.takeIf { it.isPositive }
 
-        minPaymentMethodLimit?.let {
-            FiatValue.fromMinor(fiatCurrency, it.coerceAtLeast(minPairBuyLimit))
-        } ?: FiatValue.fromMinor(fiatCurrency, minPairBuyLimit)
+        if (minPaymentMethodLimit != null && minUserLimit != null)
+            Money.max(minPaymentMethodLimit, minUserLimit)
+        else
+            minPaymentMethodLimit ?: minUserLimit ?: FiatValue.zero(fiatCurrency)
     }
 
-    fun maxCryptoAmount(exchangeRateDataManager: ExchangeRateDataManager): CryptoValue? =
-        selectedCryptoCurrency?.let {
-            maxFiatAmount.toCrypto(exchangeRateDataManager, it)
-        }
+    fun maxCryptoAmount(exchangeRateDataManager: ExchangeRateDataManager): Money? {
+        val exchangeRate = ExchangeRate.FiatToCrypto(
+            from = fiatCurrency,
+            to = selectedCryptoCurrency ?: return null,
+            rate = exchangeRateDataManager.getLastPrice(selectedCryptoCurrency, fiatCurrency)
 
-    fun minCryptoAmount(exchangeRateDataManager: ExchangeRateDataManager): CryptoValue? =
-        selectedCryptoCurrency?.let {
-            minFiatAmount.toCrypto(exchangeRateDataManager, it)
-        }
+        )
+        return exchangeRate.convert(maxFiatAmount)
+    }
 
-    private fun PaymentMethod?.maxLimit(): Long? = this?.limits?.max?.valueMinor
-    private fun PaymentMethod?.minLimit(): Long? = this?.limits?.min?.valueMinor
+    fun minCryptoAmount(exchangeRateDataManager: ExchangeRateDataManager): Money? {
+        val exchangeRate = ExchangeRate.FiatToCrypto(
+            from = fiatCurrency,
+            to = selectedCryptoCurrency ?: return null,
+            rate = exchangeRateDataManager.getLastPrice(selectedCryptoCurrency, fiatCurrency)
 
-    private fun maxPairsLimit(): Long? = supportedPairsAndLimits?.find {
-        it.cryptoCurrency == selectedCryptoCurrency && it.fiatCurrency == fiatCurrency
-    }?.buyLimits?.maxLimit(fiatCurrency)?.valueMinor
+        )
+        return exchangeRate.convert(minFiatAmount)
+    }
 
-    private fun minPairsLimit(): Long? = supportedPairsAndLimits?.find {
-        it.cryptoCurrency == selectedCryptoCurrency && it.fiatCurrency == fiatCurrency
-    }?.buyLimits?.minLimit(fiatCurrency)?.valueMinor
+    private fun PaymentMethod?.maxLimit(): Money? = this?.limits?.max
+    private fun PaymentMethod?.minLimit(): Money? = this?.limits?.min
 
     @delegate:Transient
     val isAmountValid: Boolean by unsafeLazy {
@@ -127,7 +131,7 @@ data class SimpleBuyState(
 
     @delegate:Transient
     val error: InputError? by unsafeLazy {
-        order.amount?.takeIf { it.isZero.not() }?.let {
+        order.amount?.takeIf { it.isPositive }?.let {
             when {
                 it > maxFiatAmount -> InputError.ABOVE_MAX
                 it < minFiatAmount -> InputError.BELOW_MIN

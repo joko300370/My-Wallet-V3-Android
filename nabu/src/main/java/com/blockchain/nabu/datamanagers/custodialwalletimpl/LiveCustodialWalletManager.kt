@@ -872,11 +872,12 @@ class LiveCustodialWalletManager(
             }
         }
 
-    override fun getSwapLimits(currency: String): Single<TransferLimits> =
+    override fun getProductTransferLimits(currency: String, product: Product): Single<TransferLimits> =
         authenticator.authenticate {
-            nabuService.getSwapLimits(
+            nabuService.fetchProductLimits(
                 it,
-                currency
+                currency,
+                product.toRequestString()
             ).map { response ->
                 if (response.maxOrder == null && response.minOrder == null && response.maxPossibleOrder == null) {
                     TransferLimits(currency)
@@ -1116,6 +1117,12 @@ class LiveCustodialWalletManager(
     private fun String.isSupportedCurrency(): Boolean =
         SUPPORTED_FUNDS_FOR_WIRE_TRANSFER.contains(this)
 }
+
+private fun Product.toRequestString(): String =
+    when (this) {
+        Product.TRADE -> "SWAP"
+        else -> this.toString()
+    }
 
 private fun String.toLinkedBankState(): LinkedBankState =
     when (this) {

@@ -39,11 +39,12 @@ class SimpleBuyModel(
             is SimpleBuyIntent.FetchBuyLimits ->
                 interactor.fetchBuyLimitsAndSupportedCryptoCurrencies(intent.fiatCurrency)
                     .subscribeBy(
-                        onSuccess = { pairs ->
+                        onSuccess = { (pairs, transferLimits) ->
                             process(
                                 SimpleBuyIntent.UpdatedBuyLimitsAndSupportedCryptoCurrencies(
                                     pairs,
-                                    intent.cryptoCurrency
+                                    intent.cryptoCurrency,
+                                    transferLimits
                                 )
                             )
                             process(SimpleBuyIntent.NewCryptoCurrencySelected(intent.cryptoCurrency))

@@ -11,6 +11,8 @@ import com.blockchain.nabu.datamanagers.OrderInput
 import com.blockchain.nabu.datamanagers.OrderOutput
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.Product
+import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.datamanagers.repositories.WithdrawLocksRepository
@@ -43,10 +45,10 @@ class SimpleBuyInteractor(
     private val coincore: Coincore
 ) {
 
-    fun fetchBuyLimitsAndSupportedCryptoCurrencies(targetCurrency: String):
-        Single<BuySellPairs> =
-        custodialWalletManager.getSupportedBuySellCryptoCurrencies(targetCurrency)
-            .trackProgress(appUtil.activityIndicator)
+    fun fetchBuyLimitsAndSupportedCryptoCurrencies(targetCurrency: String): Single<Pair<BuySellPairs, TransferLimits>> =
+        custodialWalletManager.getSupportedBuySellCryptoCurrencies(targetCurrency).zipWith(
+            custodialWalletManager.getProductTransferLimits(targetCurrency, product = Product.SIMPLEBUY)
+        ).trackProgress(appUtil.activityIndicator)
 
     fun fetchSupportedFiatCurrencies(): Single<SimpleBuyIntent.SupportedCurrenciesUpdated> =
         custodialWalletManager.getSupportedFiatCurrencies()

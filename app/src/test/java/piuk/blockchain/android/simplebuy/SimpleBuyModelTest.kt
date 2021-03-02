@@ -8,6 +8,7 @@ import com.blockchain.nabu.datamanagers.BuySellOrder
 import com.blockchain.nabu.datamanagers.BuySellPair
 import com.blockchain.nabu.datamanagers.BuySellPairs
 import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.responses.simplebuy.CardPaymentAttributes
@@ -79,8 +80,8 @@ class SimpleBuyModelTest {
     @Test
     fun `interactor fetched limits and pairs should be applied to state`() {
         whenever(interactor.fetchBuyLimitsAndSupportedCryptoCurrencies("USD"))
-            .thenReturn(Single.just(
-                BuySellPairs(listOf(
+            .thenReturn(
+                Single.just(BuySellPairs(listOf(
                     BuySellPair(pair = "BTC-USD",
                         buyLimits = BuySellLimits(100, 5024558),
                         sellLimits = BuySellLimits(100, 5024558)),
@@ -90,7 +91,7 @@ class SimpleBuyModelTest {
                         sellLimits = BuySellLimits(100, 5024558)),
                     BuySellPair(pair = "BCH-EUR", buyLimits = BuySellLimits(1001, 10000),
                         sellLimits = BuySellLimits(100, 5024558))
-                ))))
+                )) to TransferLimits("USD")))
         val testObserver = model.state.test()
         model.process(SimpleBuyIntent.FetchBuyLimits("USD", CryptoCurrency.BTC))
 
@@ -220,7 +221,8 @@ class SimpleBuyModelTest {
                         sellLimits = BuySellLimits(100, 5024558)),
                     BuySellPair(pair = "BCH-EUR", buyLimits = BuySellLimits(1001, 10000),
                         sellLimits = BuySellLimits(100, 5024558))
-                ))))
+                )) to TransferLimits("USD")
+            ))
 
         val testObserver = model.state.test()
         model.process(SimpleBuyIntent.FetchBuyLimits("USD", CryptoCurrency.BTC))

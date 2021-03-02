@@ -2,6 +2,8 @@ package piuk.blockchain.android.ui.settings
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.EligiblePaymentMethodType
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.responses.nabu.KycTierState
 import com.blockchain.nabu.models.responses.nabu.NabuApiException.Companion.fromResponseBody
 import com.blockchain.notifications.NotificationTokenManager
@@ -136,9 +138,13 @@ class SettingsPresenterTest {
         whenever(featureFlag.enabled).thenReturn(Single.just(true))
         whenever(cardsFeatureFlag.enabled).thenReturn(Single.just(true))
         whenever(fundsFeatureFlag.enabled).thenReturn(Single.just(true))
+        whenever(custodialWalletManager.getEligiblePaymentMethodTypes("USD")).thenReturn(
+            Single.just(listOf(EligiblePaymentMethodType(PaymentMethodType.PAYMENT_CARD, "USD")))
+        )
         whenever(custodialWalletManager.canTransactWithBankMethods(any())).thenReturn(Single.just(false))
         whenever(custodialWalletManager.updateSupportedCardTypes(ArgumentMatchers.anyString())).thenReturn(
-            Completable.complete())
+            Completable.complete()
+        )
         whenever(custodialWalletManager.getBanks()).thenReturn(Single.just(emptyList()))
         whenever(custodialWalletManager.getEligiblePaymentMethodTypes(any())).thenReturn(Single.just(emptyList()))
         // Act
@@ -155,7 +161,8 @@ class SettingsPresenterTest {
     fun onViewReadyFailed() {
         // Arrange
         whenever(
-            settingsDataManager.fetchSettings()).thenReturn(Observable.error(Throwable()))
+            settingsDataManager.fetchSettings()
+        ).thenReturn(Observable.error(Throwable()))
         whenever(pitLinkState.isLinked).thenReturn(false)
         whenever(kycStatusHelper.getSettingsKycStateTier())
             .thenReturn(Single.just(tiers(KycTierState.Verified, KycTierState.Verified)))
@@ -165,8 +172,12 @@ class SettingsPresenterTest {
         whenever(cardsFeatureFlag.enabled).thenReturn(Single.just(false))
         whenever(fundsFeatureFlag.enabled).thenReturn(Single.just(false))
         whenever(custodialWalletManager.canTransactWithBankMethods(any())).thenReturn(Single.just(false))
+        whenever(custodialWalletManager.getEligiblePaymentMethodTypes("USD")).thenReturn(
+            Single.just(listOf(EligiblePaymentMethodType(PaymentMethodType.PAYMENT_CARD, "USD")))
+        )
         whenever(custodialWalletManager.updateSupportedCardTypes(ArgumentMatchers.anyString())).thenReturn(
-            Completable.complete())
+            Completable.complete()
+        )
         whenever(custodialWalletManager.fetchUnawareLimitsCards(ArgumentMatchers.anyList()))
             .thenReturn(Single.just(emptyList()))
         whenever(custodialWalletManager.getBanks()).thenReturn(Single.just(emptyList()))
@@ -295,9 +306,11 @@ class SettingsPresenterTest {
         val phoneNumber = "PHONE_NUMBER"
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(mockSettings))
         whenever(
-            settingsDataManager.updateSms(phoneNumber)).thenReturn(Observable.just(mockSettings))
+            settingsDataManager.updateSms(phoneNumber)
+        ).thenReturn(Observable.just(mockSettings))
         whenever(
-            settingsDataManager.disableNotification(Settings.NOTIFICATION_TYPE_SMS, notifications))
+            settingsDataManager.disableNotification(Settings.NOTIFICATION_TYPE_SMS, notifications)
+        )
             .thenReturn(Observable.just(mockSettings))
         val responseBody = ResponseBody.create("application/json".toMediaTypeOrNull(), "{}")
         val error = fromResponseBody(HttpException(error<Any>(409, responseBody)))
@@ -395,7 +408,8 @@ class SettingsPresenterTest {
         val mockSettings = Settings()
         val authType = SettingsManager.AUTH_TYPE_YUBI_KEY
         Mockito.`when`(
-            settingsDataManager.updateTwoFactor(authType)).thenReturn(Observable.just(mockSettings))
+            settingsDataManager.updateTwoFactor(authType)
+        ).thenReturn(Observable.just(mockSettings))
         // Act
         subject.updateTwoFa(authType)
         // Assert
@@ -407,7 +421,8 @@ class SettingsPresenterTest {
         // Arrange
         val authType = SettingsManager.AUTH_TYPE_YUBI_KEY
         whenever(
-            settingsDataManager.updateTwoFactor(authType)).thenReturn(Observable.error(Throwable()))
+            settingsDataManager.updateTwoFactor(authType)
+        ).thenReturn(Observable.error(Throwable()))
 
         // Act
         subject.updateTwoFa(authType)
@@ -429,17 +444,22 @@ class SettingsPresenterTest {
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(mockSettings))
 
         whenever(
-            settingsDataManager.enableNotification(SettingsManager.NOTIFICATION_TYPE_EMAIL, listOf(
-                SettingsManager.NOTIFICATION_TYPE_NONE
-            )))
+            settingsDataManager.enableNotification(
+                SettingsManager.NOTIFICATION_TYPE_EMAIL, listOf(
+                    SettingsManager.NOTIFICATION_TYPE_NONE
+                )
+            )
+        )
             .thenReturn(Observable.just(mockSettingsResponse))
         // Act
         subject.updateEmailNotification(true)
         // Assert
         verify(settingsDataManager)
-            .enableNotification(SettingsManager.NOTIFICATION_TYPE_EMAIL, listOf(
-                SettingsManager.NOTIFICATION_TYPE_NONE
-            ))
+            .enableNotification(
+                SettingsManager.NOTIFICATION_TYPE_EMAIL, listOf(
+                    SettingsManager.NOTIFICATION_TYPE_NONE
+                )
+            )
         verify(payloadDataManager).syncPayloadAndPublicKeys()
         verify(activity).setEmailNotificationPref(true)
     }
@@ -456,14 +476,19 @@ class SettingsPresenterTest {
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(mockSettings))
 
         whenever(
-            settingsDataManager.disableNotification(SettingsManager.NOTIFICATION_TYPE_EMAIL,
-                listOf(SettingsManager.NOTIFICATION_TYPE_EMAIL))).thenReturn(Observable.just(mockSettingsResponse))
+            settingsDataManager.disableNotification(
+                SettingsManager.NOTIFICATION_TYPE_EMAIL,
+                listOf(SettingsManager.NOTIFICATION_TYPE_EMAIL)
+            )
+        ).thenReturn(Observable.just(mockSettingsResponse))
         // Act
         subject.updateEmailNotification(false)
         // Assert
         verify(settingsDataManager)
-            .disableNotification(SettingsManager.NOTIFICATION_TYPE_EMAIL,
-                listOf(SettingsManager.NOTIFICATION_TYPE_EMAIL))
+            .disableNotification(
+                SettingsManager.NOTIFICATION_TYPE_EMAIL,
+                listOf(SettingsManager.NOTIFICATION_TYPE_EMAIL)
+            )
 
         verify(payloadDataManager).syncPayloadWithServer()
         verify(activity).setEmailNotificationPref(ArgumentMatchers.anyBoolean())
@@ -512,15 +537,21 @@ class SettingsPresenterTest {
             notificationsType = listOf(SettingsManager.NOTIFICATION_TYPE_NONE)
         )
         whenever(settingsDataManager.getSettings()).thenReturn(Observable.just(mockSettings))
-        whenever(settingsDataManager.enableNotification(SettingsManager.NOTIFICATION_TYPE_EMAIL,
-            listOf(SettingsManager.NOTIFICATION_TYPE_NONE))).thenReturn(Observable.error(Throwable()))
+        whenever(
+            settingsDataManager.enableNotification(
+                SettingsManager.NOTIFICATION_TYPE_EMAIL,
+                listOf(SettingsManager.NOTIFICATION_TYPE_NONE)
+            )
+        ).thenReturn(Observable.error(Throwable()))
 
         // Act
         subject.updateEmailNotification(true)
 
         // Assert
-        verify(settingsDataManager).enableNotification(SettingsManager.NOTIFICATION_TYPE_EMAIL,
-            listOf(SettingsManager.NOTIFICATION_TYPE_NONE))
+        verify(settingsDataManager).enableNotification(
+            SettingsManager.NOTIFICATION_TYPE_EMAIL,
+            listOf(SettingsManager.NOTIFICATION_TYPE_NONE)
+        )
         verify(activity).showError(R.string.update_failed)
     }
 
