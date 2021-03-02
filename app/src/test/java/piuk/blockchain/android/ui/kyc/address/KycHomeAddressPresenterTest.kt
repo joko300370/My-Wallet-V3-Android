@@ -54,7 +54,8 @@ class KycHomeAddressPresenterTest {
             nabuToken,
             nabuDataManager,
             kycNextStepDecision,
-            custodialWalletManager
+            custodialWalletManager,
+            mock()
         )
         subject.initView(view)
     }
