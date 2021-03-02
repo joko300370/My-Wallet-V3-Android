@@ -407,8 +407,9 @@ class DashboardInteractor(
         paymentMethodForAction: LinkablePaymentMethodsForAction
     ) =
         when {
-            paymentMethodForAction.linkablePaymentMethods.linkMethods.contains(PaymentMethodType.BANK_TRANSFER) &&
-                paymentMethodForAction.linkablePaymentMethods.linkMethods.contains(PaymentMethodType.FUNDS) -> {
+            paymentMethodForAction.linkablePaymentMethods.linkMethods.containsAll(
+                listOf(PaymentMethodType.BANK_TRANSFER, PaymentMethodType.BANK_ACCOUNT)
+            ) -> {
                 Single.just(
                     FiatTransactionRequestResult.LaunchPaymentMethodChooser(
                         paymentMethodForAction
@@ -422,7 +423,7 @@ class DashboardInteractor(
                     FiatTransactionRequestResult.NotSupportedPartner
                 }
             }
-            paymentMethodForAction.linkablePaymentMethods.linkMethods.contains(PaymentMethodType.FUNDS) -> {
+            paymentMethodForAction.linkablePaymentMethods.linkMethods.contains(PaymentMethodType.BANK_ACCOUNT) -> {
                 Single.just(FiatTransactionRequestResult.LaunchDepositDetailsSheet(targetAccount))
             }
             else -> {

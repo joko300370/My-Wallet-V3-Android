@@ -57,7 +57,7 @@ class BankPreference(
             addBank.visible()
         }
         titleView?.ellipsize = TextUtils.TruncateAt.END
-        titleView?.setSingleLine(true)
+        titleView?.isSingleLine = true
         holder.isDividerAllowedAbove = true
     }
 }

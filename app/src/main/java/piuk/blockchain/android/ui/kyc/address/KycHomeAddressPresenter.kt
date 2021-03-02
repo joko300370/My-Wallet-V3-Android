@@ -26,9 +26,9 @@ interface KycNextStepDecision {
 
     enum class NextStep {
         Tier1Complete,
+        SDDComplete,
         Tier2ContinueTier1NeedsMoreInfo,
-        Tier2Continue,
-        SDDComplete
+        Tier2Continue
     }
 
     fun nextStep(): Single<NextStep>
@@ -134,8 +134,8 @@ class KycHomeAddressPresenter(
             .zipWith(kycNextStepDecision.nextStep())
             .map { (x, progress) -> x.copy(progressToKycNextStep = progress) }
             .flatMap { state ->
-                if (campaignType == CampaignType.SimpleBuy) {
-                    tryToVerifyUserForSdd(state)
+                if (campaignType?.shouldCheckForSddVerification() == true) {
+                    tryToVerifyUserForSdd(state, campaignType)
                 } else Single.just(state)
             }
             .observeOn(AndroidSchedulers.mainThread())
@@ -156,7 +156,7 @@ class KycHomeAddressPresenter(
             )
     }
 
-    private fun tryToVerifyUserForSdd(state: State): Single<State> {
+    private fun tryToVerifyUserForSdd(state: State, campaignType: CampaignType): Single<State> {
         return custodialWalletManager.isSDDEligible().flatMap {
             if (!it) {
                 Single.just(state)
@@ -165,7 +165,9 @@ class KycHomeAddressPresenter(
                     sddState.stateFinalised
                 }.start(timerInSec = 1, retries = 10).map { sddState ->
                     if (sddState.value.isVerified) {
-                        state.copy(progressToKycNextStep = KycNextStepDecision.NextStep.SDDComplete)
+                        if (shouldNotContinueToNextKycTier(state, campaignType))
+                            state.copy(progressToKycNextStep = KycNextStepDecision.NextStep.SDDComplete)
+                        else state
                     } else
                         state
                 }
@@ -173,17 +175,25 @@ class KycHomeAddressPresenter(
         }
     }
 
+    private fun shouldNotContinueToNextKycTier(
+        state: State,
+        campaignType: CampaignType
+    ): Boolean {
+        return state.progressToKycNextStep < KycNextStepDecision.NextStep.SDDComplete ||
+            campaignType == CampaignType.SimpleBuy
+    }
+
     private fun addAddress(address: AddressModel): Completable = fetchOfflineToken.flatMapCompletable {
-            nabuDataManager.addAddress(
-                it,
-                address.firstLine,
-                address.secondLine,
-                address.city,
-                address.state,
-                address.postCode,
-                address.country
-            ).subscribeOn(Schedulers.io())
-        }
+        nabuDataManager.addAddress(
+            it,
+            address.firstLine,
+            address.secondLine,
+            address.city,
+            address.state,
+            address.postCode,
+            address.country
+        ).subscribeOn(Schedulers.io())
+    }
 
     private fun updateNabuData(): Completable =
         nabuDataManager.requestJwt()
@@ -228,3 +238,6 @@ class KycHomeAddressPresenter(
             state.isNotEmpty() ||
             postCode.isNotEmpty()
 }
+
+private fun CampaignType.shouldCheckForSddVerification(): Boolean =
+    this == CampaignType.SimpleBuy || this == CampaignType.None

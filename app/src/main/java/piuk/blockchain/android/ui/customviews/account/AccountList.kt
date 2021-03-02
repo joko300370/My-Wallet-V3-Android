@@ -228,6 +228,7 @@ private class CryptoAccountDelegate(
         onAccountClicked
     )
 }
+
 private class CryptoSingleAccountViewHolder(
     private val showSelectionStatus: Boolean,
     itemView: View
@@ -353,8 +354,8 @@ private class BankAccountViewHolder(
             }
             bank_container.alpha = 1f
             bank_account.updateAccount(
-                selectableAccountItem.account as LinkedBankAccount,
-                onAccountClicked
+                account = selectableAccountItem.account as LinkedBankAccount,
+                onAccountClicked = onAccountClicked
             )
         }
     }

@@ -500,21 +500,17 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
 
     override fun updateLinkableBanks(linkablePaymentMethods: Set<LinkablePaymentMethods>, linkedBanksCount: Int) {
-        if (linkablePaymentMethods.isEmpty()) {
-            banksPref?.isVisible = false
-        } else {
-            linkablePaymentMethods.forEach { linkableBank ->
-                banksPref?.findPreference<BankPreference>(LINK_BANK_KEY.plus(linkableBank.hashCode()))?.let {
-                    it.order = it.order + linkedBanksCount + linkablePaymentMethods.indexOf(linkableBank)
-                } ?: banksPref?.addPreference(
-                    BankPreference(context = requireContext(), fiatCurrency = linkableBank.currency).apply {
-                        onClick {
-                            linkBank(linkableBank)
-                        }
-                        key = LINK_BANK_KEY.plus(linkableBank.hashCode())
+        linkablePaymentMethods.forEach { linkableBank ->
+            banksPref?.findPreference<BankPreference>(LINK_BANK_KEY.plus(linkableBank.hashCode()))?.let {
+                it.order = it.order + linkedBanksCount + linkablePaymentMethods.indexOf(linkableBank)
+            } ?: banksPref?.addPreference(
+                BankPreference(context = requireContext(), fiatCurrency = linkableBank.currency).apply {
+                    onClick {
+                        linkBank(linkableBank)
                     }
-                )
-            }
+                    key = LINK_BANK_KEY.plus(linkableBank.hashCode())
+                }
+            )
         }
     }
 
@@ -550,7 +546,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
             showDialogForLinkBankMethodChooser(linkablePaymentMethods)
         } else {
             when (linkablePaymentMethods.linkMethods[0]) {
-                PaymentMethodType.FUNDS -> onBankWireTransferSelected(linkablePaymentMethods.currency)
+                PaymentMethodType.BANK_ACCOUNT -> onBankWireTransferSelected(linkablePaymentMethods.currency)
                 PaymentMethodType.BANK_TRANSFER ->
                     onLinkBankSelected(
                         LinkablePaymentMethodsForAction.LinkablePaymentMethodsForSettings(linkablePaymentMethods)
@@ -593,7 +589,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
         cardsPref?.findPreference<CardPreference>(ADD_CARD_KEY)?.let {
             it.order = it.order + newCards.size + 1
         } ?: cardsPref?.addPreference(
-            CardPreference(context = requireContext(), card = PaymentMethod.Undefined).apply {
+            CardPreference(context = requireContext()).apply {
                 onClick {
                     addNewCard()
                 }
@@ -813,7 +809,10 @@ class SettingsFragment : PreferenceFragmentCompat(),
                 .theme(CountryPicker.THEME_NEW)
                 .build()
 
-            val country = picker.countryFromSIM
+            val country =
+                picker.countryFromSIM
+                    ?: picker.getCountryByLocale(Locale.getDefault())
+                    ?: picker.getCountryByISO("US")
             if (country.dialCode == "+93") {
                 setCountryFlag(countryTextView, "+1", R.drawable.flag_us)
             } else {
@@ -967,6 +966,8 @@ class SettingsFragment : PreferenceFragmentCompat(),
             if (requestCode == REQUEST_CODE_BIOMETRIC_ENROLLMENT) {
                 settingsPresenter.onFingerprintClicked()
             }
+        } else if (KycNavHostActivity.kycStatusUpdated(resultCode)) {
+            settingsPresenter.updateKyc()
         }
     }
 
@@ -1188,8 +1189,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
 
     override fun launchKycFlow() {
-        KycNavHostActivity.start(requireContext(), CampaignType.Swap, true)
-        requireActivity().finish()
+        KycNavHostActivity.startForResult(this, CampaignType.None, KYC_START, true)
     }
 
     private fun setCountryFlag(tvCountry: TextView, dialCode: String, flagResourceId: Int) {
@@ -1207,7 +1207,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
     companion object {
         const val URL_LOGIN = "<a href=\"https://login.blockchain.com/\">login.blockchain.com</a>"
-
+        private const val KYC_START = 32542
         internal const val EXTRA_SHOW_ADD_EMAIL_DIALOG = "show_add_email_dialog"
         internal const val EXTRA_SHOW_TWO_FA_DIALOG = "show_two_fa_dialog"
         private const val ADD_CARD_KEY = "ADD_CARD_KEY"

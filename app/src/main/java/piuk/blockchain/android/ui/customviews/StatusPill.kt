@@ -30,7 +30,14 @@ class StatusPill(context: Context, attrs: AttributeSet) : AppCompatTextView(cont
             StatusType.WARNING -> setupWarning()
             StatusType.INFO -> setupInfo()
             StatusType.ERROR -> setupError()
+            StatusType.LABEL -> setupLabel()
         }
+
+    private fun setupLabel() {
+        setupStyle(R.style.Text_Semibold_12)
+        background = context.getResolvedDrawable(R.drawable.bkgd_grey_100_rounded)
+        setTextColor(context.getResolvedColor(R.color.grey_600))
+    }
 
     private fun setupError() {
         setupStyle(R.style.Text_Error)
@@ -74,7 +81,8 @@ class StatusPill(context: Context, attrs: AttributeSet) : AppCompatTextView(cont
         UPSELL,
         WARNING,
         INFO,
-        ERROR
+        ERROR,
+        LABEL
     }
 
     private inline fun <reified T : Enum<T>> TypedArray.getEnum(index: Int, default: T) =

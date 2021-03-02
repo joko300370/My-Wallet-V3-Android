@@ -44,9 +44,8 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             TransactionState(
                 action = action,
                 passwordRequired = passwordRequired,
-                errorState = TransactionErrorState.NONE,
-                currentStep = TransactionStep.SELECT_SOURCE
-            ).updateBackstack(oldState)
+                errorState = TransactionErrorState.NONE
+            )
     }
 
     data class InitialiseWithSourceAndTargetAccount(
@@ -106,9 +105,8 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
                 selectedTarget = target,
                 errorState = TransactionErrorState.NONE,
                 passwordRequired = passwordRequired,
-                currentStep = TransactionStep.SELECT_SOURCE,
                 nextEnabled = true
-            ).updateBackstack(oldState)
+            )
     }
 
     object ClearBackStack : TransactionIntent() {
@@ -176,7 +174,8 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
     class AvailableSourceAccountsListUpdated(private val accounts: List<BlockchainAccount>) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState.copy(
-                availableSources = accounts
+                availableSources = accounts,
+                currentStep = TransactionStep.SELECT_SOURCE
             ).updateBackstack(oldState)
     }
 
@@ -282,7 +281,7 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
     }
 
     class TargetAccountSelected(
-        val selectedTarget: TransactionTarget
+        private val selectedTarget: TransactionTarget
     ) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState.copy(

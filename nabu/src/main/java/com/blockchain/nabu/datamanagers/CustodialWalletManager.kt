@@ -10,6 +10,7 @@ import com.blockchain.nabu.datamanagers.repositories.interest.InterestLimits
 import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
+import com.blockchain.nabu.models.data.WithdrawalFeeAndLimit
 import com.blockchain.nabu.models.responses.interest.InterestActivityItemResponse
 import com.blockchain.nabu.models.responses.interest.InterestAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CardPartnerAttributes
@@ -75,7 +76,10 @@ interface CustodialWalletManager {
         amount: String
     ): Single<CustodialQuote>
 
-    fun fetchWithdrawFee(currency: String): Single<FiatValue>
+    fun fetchWithdrawFeeAndMinLimit(
+        currency: String,
+        paymentMethodType: PaymentMethodType
+    ): Single<WithdrawalFeeAndLimit>
 
     fun fetchWithdrawLocksTime(paymentMethodType: PaymentMethodType): Single<BigInteger>
 
@@ -181,7 +185,7 @@ interface CustodialWalletManager {
 
     fun getInterestEligibilityForAsset(crypto: CryptoCurrency): Single<Eligibility>
 
-    fun getSupportedFundsFiats(fiatCurrency: String): Single<List<String>>
+    fun getSupportedFundsFiats(fiatCurrency: String = defaultFiatCurrency): Single<List<String>>
 
     fun canTransactWithBankMethods(fiatCurrency: String): Single<Boolean>
 
@@ -230,6 +234,8 @@ interface CustodialWalletManager {
     fun isFiatCurrencySupported(destination: String): Boolean
 
     fun startBankTransfer(id: String, amount: Money, currency: String): Single<String>
+
+    val defaultFiatCurrency: String
 }
 
 data class InterestActivityItem(
@@ -445,11 +451,6 @@ sealed class PaymentMethod(
     val order: Int,
     open val isEligible: Boolean
 ) : Serializable {
-    object Undefined : PaymentMethod(UNDEFINED_PAYMENT_ID, null, UNDEFINED_PAYMENT_METHOD_ORDER, true),
-        UndefinedPaymentMethod {
-        override val paymentMethodType: PaymentMethodType
-            get() = PaymentMethodType.UNKNOWN
-    }
 
     data class UndefinedCard(override val limits: PaymentLimits, override val isEligible: Boolean) :
         PaymentMethod(UNDEFINED_CARD_PAYMENT_ID, limits, UNDEFINED_CARD_PAYMENT_METHOD_ORDER, isEligible),
@@ -542,7 +543,6 @@ sealed class PaymentMethod(
     open fun detailedLabel(): String = ""
 
     companion object {
-        const val UNDEFINED_PAYMENT_ID = "UNDEFINED_PAYMENT_ID"
         const val UNDEFINED_CARD_PAYMENT_ID = "UNDEFINED_CARD_PAYMENT_ID"
         const val FUNDS_PAYMENT_ID = "FUNDS_PAYMENT_ID"
         const val UNDEFINED_FUNDS_PAYMENT_ID = "UNDEFINED_FUNDS_PAYMENT_ID"

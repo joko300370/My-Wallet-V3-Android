@@ -38,12 +38,13 @@ class KycNavHostPresenter(
             fetchOfflineToken.flatMap {
                 nabuDataManager.getUser(it)
                     .subscribeOn(Schedulers.io())
+            }.flatMap {
+                updateTier2SelectedTierIfNeeded().toSingle { it }
             }.observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe { view.displayLoading(true) }
                 .subscribeBy(
                     onSuccess = {
                         registerForCampaignsIfNeeded()
-                        updateTier2SelectedTierIfNeeded()
                         redirectUserFlow(it)
                     },
                     onError = {
@@ -81,15 +82,14 @@ class KycNavHostPresenter(
             .subscribe()
     }
 
-    private fun updateTier2SelectedTierIfNeeded() {
+    private fun updateTier2SelectedTierIfNeeded(): Completable {
         if (view.campaignType != CampaignType.Sunriver) {
-            return
+            return Completable.complete()
         }
 
-        compositeDisposable += tierUpdater
+        return tierUpdater
             .setUserTier(2)
-            .doOnError(Timber::e)
-            .subscribe()
+            .onErrorComplete()
     }
 
     private fun redirectUserFlow(user: NabuUser) {
@@ -101,7 +101,7 @@ class KycNavHostPresenter(
                 view.campaignType == CampaignType.SimpleBuy ||
                 view.campaignType == CampaignType.Interest ||
                 view.campaignType == CampaignType.FiatFunds ||
-                (view.campaignType == CampaignType.Swap && !view.showTiersLimitsSplash) -> {
+                view.campaignType == CampaignType.Swap -> {
                 compositeDisposable += kycNavigator.findNextStep()
                     .subscribeBy(
                         onError = { Timber.e(it) },

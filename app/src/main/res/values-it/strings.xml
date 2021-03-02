@@ -809,7 +809,7 @@
     <string name="kyc_resubmission_splash_description_3">Mancano le foto richieste.</string>
     <string name="kyc_resubmission_splash_description_4">Il documento che hai inviato non è corretto.</string>
     <string name="kyc_resubmission_splash_description_5">Impossibile leggere le immagini inviate a causa della qualità dell\'immagine.</string>
-    <string name="sunriver_splash_title">Verifica dell\'identità</string>
+    <string name="identity_verification">Verifica dell\'identità</string>
     <string name="sunriver_status_message">Le tue informazioni sono in fase di revisione. La revisione dovrebbe essere completata a breve.</string>
     <string name="buy_sell_splash_title">Comprare vendere</string>
     <string name="buy_sell_splash_message">Puoi acquistare e vendere bitcoin (BTC) utilizzando la tua carta di credito o conto bancario tramite il nostro partner Coinify.</string>
@@ -1633,4 +1633,53 @@ Per favore scrivi queste 12 parole in ordine e conservale in un posto sicuro. No
     <string name="kyc_address_header_1">Blockchain.com è tenuto per legge a raccogliere queste informazioni.</string>
     <string name="kyc_country_selection_search_hint_1">Seleziona il tuo paese</string>
     <string name="kyc_country_selection_title_1">Seleziona il tuo paese</string>
+
+    <string name="preferences_rate_app">Valuta l\'app</string>
+    <string name="tx_title_fiat_deposit">Deposita %1$s</string>
+    <string name="bank_account_info_default">Chiusura account</string>
+    <string name="bank_wire_transfer_fee_default">Commissione di bonifico</string>
+    <string name="payment_wire_transfer">Bonifico bancario</string>
+    <string name="payment_wire_transfer_subtitle">3–5 giorni lavorativi</string>
+    <string name="payment_wire_transfer_blurb">Invia fondi direttamente dal tuo conto bancario al tuo portafogli Blockchain.com. Potrebbero essere applicate commissioni bancarie.</string>
+    <string name="payment_deposit">Deposito bancario</string>
+    <string name="payment_deposit_subtitle">Immediatamente disponibile</string>
+    <string name="payment_deposit_blurb">Collega in modo sicuro una banca e invia contanti al tuo portafogli Blockchain.com in qualsiasi momento.</string>
+    <string name="routing_number">Numero di routing</string>
+    <string name="bank_transfer_in_progress_title">%1$s Acquisto iniziato</string>
+    <string name="bank_transfer_in_progress_blurb">Stiamo completando il suo acquisto ora. Aspettati che i fondi vengano prelevati dalla tua banca entro %1$s. Controlla lo stato del tuo ordine in qualsiasi momento in Attività.</string>
+    <string name="fiat_funds_detail_pending_withdrawal">Hai già un prelievo in corso, attendi fino al completamento prima di iniziarne uno nuovo.</string>
+    <string name="withdraw_confirmation_cta_button">Preleva %1$s</string>
+    <string name="withdraw_confirmation_progress_message">Stiamo completando il tuo prelievo ora.</string>
+    <string name="withdraw_confirmation_progress_title">Prelievo %1$s</string>
+    <string name="withdraw_confirmation_success_title">%1$s Prelevato!</string>
+    <string name="withdraw_confirmation_success_message">Stiamo inviando il denaro ora. Aspettati che il contante raggiunga la tua banca il %1$s. Controlla lo stato del tuo prelievo in qualsiasi momento dalla tua schermata delle attività</string>
+    <string name="withdraw_target_select_title">Preleva verso…</string>
+    <string name="withdraw_confirmation_eta">I fondi arriveranno entro</string>
+    <string name="deposit_enter_amount_min_swap">È richiesto un deposito minimo di %1$s</string>
+    <string name="withdraw_enter_amount_min">È richiesto un prelievo minimo di %1$s</string>
+    <string name="send_confirmation_eta">I fondi arriveranno</string>
+    <string name="deposit_source_select_title">Banche collegate</string>
+    <string name="deposit_confirmation_cta_button">Deposita %1$s</string>
+    <string name="deposit_enter_amount_limit_title">Limite giornaliero</string>
+    <string name="deposit_enter_amount_limit_label">%1$s Disponibile</string>
+    <string name="deposit_confirmation_progress_title">Deposito %1$s</string>
+    <string name="deposit_confirmation_progress_message">Stiamo completando il tuo deposito ora.</string>
+    <string name="deposit_confirmation_success_title">%1$s Depositato!</string>
+    <string name="deposit_confirmation_success_message">Mentre aspettiamo che la tua banca invii il denaro, ecco l\'accesso anticipato a %1$s nel tuo %2$s conto in contanti così puoi comprare subito cripto.
+
+I tuoi fondi saranno disponibili per il prelievo una volta che il trasferimento bancario sarà completato il %3$s.</string>
+    <string name="add_a_deposit_method">Seleziona un metodo di deposito</string>
+    <string name="security_check">Controllo di sicurezza</string>
+    <string name="success_email_veriff">La tua e-mail è stata confermata.</string>
+    <string name="email_verified">E-mail verificata</string>
+    <string name="email_verification_part_1">Abbiamo inviato un\'e-mail di verifica a</string>
+    <string name="email_verification_part_2">. Tocca il link nell\'e-mail per continuare.</string>
+    <string name="email_verify">Verifica la tua e-mail</string>
+    <string name="edit_email_address">Modifica indirizzo e-mail</string>
+    <string name="common_save">Salva</string>
+    <string name="change_email_instructions">Inserisci il tuo indirizzo e-mail qui sotto e clicca su Salva. Ti invieremo un\'e-mail di verifica a questo nuovo indirizzo.</string>
+    <string name="check_my_inbox">Controlla la tua casella di posta</string>
+    <string name="did_not_get_email">Non hai ricevuto l\'e-mail?</string>
+    <string name="send_again">Invia di nuovo</string>
+
 </resources>

@@ -137,6 +137,7 @@ class EnterTargetAddressSheet : TransactionFlowSheet<DialogTxFlowEnterAddressBin
             title.text = customiser.selectTargetAddressTitle(state)
             subtitle.visibleIf { customiser.selectTargetShouldShowSubtitle(state) }
             subtitle.text = customiser.selectTargetSubtitle(state)
+            selectAccountCta.text = customiser.selectTargetAddressWalletsCta(state)
         }
     }
 

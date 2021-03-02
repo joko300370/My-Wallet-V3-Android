@@ -40,17 +40,17 @@ class FiatWithdrawalTxEngine(
         return Singles.zip(
             sourceAccount.actionableBalance,
             sourceAccount.accountBalance,
-            walletManager.getBankTransferLimits(userFiat, true),
-            { actionableBalance, accountBalance, limits ->
+            (txTarget as LinkedBankAccount).getWithdrawalFeeAndMinLimit(),
+            { actionableBalance, accountBalance, limitAndFee ->
                 val zeroFiat = FiatValue.zero((sourceAccount as FiatAccount).fiatCurrency)
                 PendingTx(
                     amount = zeroFiat,
                     maxLimit = actionableBalance,
-                    minLimit = limits.min, // TODO update endpoint to get min limit from `withdrawal/fees`
+                    minLimit = limitAndFee.minLimit,
                     availableBalance = actionableBalance,
                     feeForFullAvailable = zeroFiat,
                     totalBalance = accountBalance,
-                    feeAmount = zeroFiat, // TODO update endpoint to get fee from `withdrawal/fees`
+                    feeAmount = limitAndFee.fee,
                     selectedFiat = userFiat,
                     feeSelection = FeeSelection()
                 )

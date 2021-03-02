@@ -58,7 +58,7 @@ class DashboardInteractorTest {
     fun `for both available methods with no available bank transfer banks, chooser should be triggered`() {
         whenever(linkedBanksFactory.eligibleBankPaymentMethods(any())).thenReturn(
             Single.just(
-                setOf(PaymentMethodType.BANK_TRANSFER, PaymentMethodType.FUNDS)
+                setOf(PaymentMethodType.BANK_TRANSFER, PaymentMethodType.BANK_ACCOUNT)
             )
         )
         whenever(linkedBanksFactory.getNonWireTransferBanks()).thenReturn(
@@ -80,7 +80,7 @@ class DashboardInteractorTest {
                     LinkablePaymentMethods(
                         "USD",
                         listOf(
-                            PaymentMethodType.BANK_TRANSFER, PaymentMethodType.FUNDS
+                            PaymentMethodType.BANK_TRANSFER, PaymentMethodType.BANK_ACCOUNT
                         )
                     )
                 )
@@ -129,7 +129,7 @@ class DashboardInteractorTest {
     fun `for only funds with no available bank transfer banks, wire transfer should launched`() {
         whenever(linkedBanksFactory.eligibleBankPaymentMethods(any())).thenReturn(
             Single.just(
-                setOf(PaymentMethodType.FUNDS)
+                setOf(PaymentMethodType.BANK_ACCOUNT)
             )
         )
         whenever(linkedBanksFactory.getNonWireTransferBanks()).thenReturn(
@@ -157,7 +157,7 @@ class DashboardInteractorTest {
         }
         whenever(linkedBanksFactory.eligibleBankPaymentMethods(any())).thenReturn(
             Single.just(
-                setOf(PaymentMethodType.FUNDS, PaymentMethodType.BANK_TRANSFER)
+                setOf(PaymentMethodType.BANK_ACCOUNT, PaymentMethodType.BANK_TRANSFER)
             )
         )
         whenever(linkedBanksFactory.getNonWireTransferBanks()).thenReturn(
@@ -182,7 +182,7 @@ class DashboardInteractorTest {
     fun `if linked bank should launched then wire transfer should get ignored and link bank should be launched`() {
         whenever(linkedBanksFactory.eligibleBankPaymentMethods(any())).thenReturn(
             Single.just(
-                setOf(PaymentMethodType.FUNDS, PaymentMethodType.BANK_TRANSFER)
+                setOf(PaymentMethodType.BANK_ACCOUNT, PaymentMethodType.BANK_TRANSFER)
             )
         )
         whenever(linkedBanksFactory.getNonWireTransferBanks()).thenReturn(

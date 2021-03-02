@@ -8,6 +8,7 @@ import android.widget.Toast
 import io.reactivex.Single
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.databinding.DialogSheetAccountSelectorBinding
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.linkbank.LinkBankActivity
@@ -22,19 +23,18 @@ import piuk.blockchain.android.util.visibleIf
 class SelectSourceAccountSheet : TransactionFlowSheet<DialogSheetAccountSelectorBinding>() {
     private val customiser: SourceSelectionCustomisations by inject()
 
+    private var availableSources: List<BlockchainAccount>? = null
+    private var linkingBankState: BankLinkingState = BankLinkingState.NotStarted
+
     override fun render(newState: TransactionState) {
-        if (state.availableSources == newState.availableSources && state.linkBankState == newState.linkBankState) {
-            // If list displays already the same accounts return so to avoid the annoying flickering
-            return
-        }
+        if (availableSources != newState.availableSources)
+            updateSources(newState)
 
-        updateUI(newState)
-
-        if (newState.linkBankState !is BankLinkingState.NotStarted) {
+        if (newState.linkBankState != BankLinkingState.NotStarted && linkingBankState != newState.linkBankState)
             handleBankLinking(newState)
-        }
 
-        cacheState(newState)
+        availableSources = newState.availableSources
+        linkingBankState = newState.linkBankState
     }
 
     private fun handleBankLinking(
@@ -55,7 +55,7 @@ class SelectSourceAccountSheet : TransactionFlowSheet<DialogSheetAccountSelector
         }
     }
 
-    private fun updateUI(newState: TransactionState) {
+    private fun updateSources(newState: TransactionState) {
         with(binding) {
             accountList.initialise(
                 source = Single.just(newState.availableSources.map { it }),
@@ -82,8 +82,8 @@ class SelectSourceAccountSheet : TransactionFlowSheet<DialogSheetAccountSelector
     override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogSheetAccountSelectorBinding =
         DialogSheetAccountSelectorBinding.inflate(inflater, container, false)
 
-    override fun initControls(view: DialogSheetAccountSelectorBinding) {
-        view.apply {
+    override fun initControls(binding: DialogSheetAccountSelectorBinding) {
+        binding.apply {
             accountList.onAccountSelected = {
                 model.process(TransactionIntent.SourceAccountSelected(it))
             }

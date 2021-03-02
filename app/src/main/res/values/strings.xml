@@ -1142,7 +1142,7 @@
     <string name="kyc_resubmission_splash_description_3">The required photos are missing.</string>
     <string name="kyc_resubmission_splash_description_4">The document you submitted is incorrect.</string>
     <string name="kyc_resubmission_splash_description_5">We were unable to read the images you submitted due to image quality.</string>
-    <string name="sunriver_splash_title">Identity Verification</string>
+    <string name="identity_verification">Identity Verification</string>
     <string name="sunriver_status_message">Your information is being reviewed. The review should complete shortly.</string>
 
     <!-- Sunriver Airdrop -->
@@ -1283,6 +1283,8 @@
     <string name="buy_max">Buy Max</string>
     <string name="bank_account_info_default">Account Ending</string>
     <string name="bank_wire_transfer_fee_default">Wire Fee</string>
+    <string name="bank_wire_transfer_fee">%1$s Fee</string>
+    <string name="bank_wire_transfer_min_withdrawal">%1$s Min Withdraw</string>
     <string name="bank_wire_transfer">Bank Wire Transfer</string>
     <string name="bank_transfer">Bank Transfer</string>
     <string name="payment_wire_transfer">Wire Transfer</string>
@@ -1769,6 +1771,7 @@
     <string name="trending_empty">Fund your Trading Wallets to see Trending Swaps with lower fees.</string>
     <string name="trending_receive">Receive %1$s</string>
     <string name="select_a_wallet">Select a Wallet</string>
+    <string name="select_a_bank">Select a Bank</string>
 
     <!-- Transaction Flow confirmation screen -->
     <string name="confirm_status_msg_insufficient_funds">You have insufficient funds in this account to process this transaction</string>
@@ -1917,4 +1920,21 @@
     <string name="check_my_inbox">Check My Inbox</string>
     <string name="did_not_get_email">Didn\'t get the email?</string>
     <string name="send_again">Send Again</string>
+    <string name="want_to_buy_more">Want to buy more?</string>
+    <string name="unlock_gold_level_trading">Unlock Gold Level Trading</string>
+    <string name="verify_your_identity_limits">Verify your identity, earn interest and trade up to %1$s a day.</string>
+    <string name="apply_and_unlock"><![CDATA[Apply & Unlock Now]]></string>
+    <string name="cash_accounts">Cash Accounts</string>
+    <string name="cash_accounts_description">Store USD, GBP or EUR in your wallet. Use the balance to buy crypto. Sell crypto for cash at anytime.</string>
+    <string name="link_a_bank_description">Store USD, GBP or EUR in your wallet. Use the balance to buy crypto. Sell crypto for cash at anytime.</string>
+    <string name="earn_interest_description">Put your crypto to work. Earn up to 10% monthly by simply doing nothing. Instanly deposit and start earning.</string>
+
+    <string name="sb_checkout_daily_limit_title">Daily limit exceeded</string>
+    <string name="sb_checkout_daily_limit_blurb">Oops, looks like you’ve used up your daily transaction limit for Buys and Deposits, please try again tomorrow.</string>
+    <string name="sb_checkout_weekly_limit_title">Weekly limit exceeded</string>
+    <string name="sb_checkout_weekly_limit_blurb">Oops, looks like you’ve used up your weekly transaction limit for Buys and Deposits, please try again tomorrow.</string>
+    <string name="sb_checkout_yearly_limit_title">Yearly limit exceeded</string>
+    <string name="sb_checkout_yearly_limit_blurb">Oops, looks like you’ve used up your yearly transaction limit for Buys and Deposits.</string>
+    <string name="sb_checkout_pending_order_title">Order in progress</string>
+    <string name="sb_checkout_pending_order_blurb">Oops, looks like you’ve already got a Buy order in progress, please wait until it completes before buying again.</string>
 </resources>

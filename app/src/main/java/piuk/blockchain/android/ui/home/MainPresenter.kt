@@ -233,13 +233,13 @@ class MainPresenter internal constructor(
     private fun handleKycDeepLink(linkState: LinkState.KycDeepLink) {
         when (linkState.link) {
             is KycLinkState.Resubmit -> view?.launchKyc(CampaignType.Resubmission)
-            is KycLinkState.EmailVerified -> view?.launchKyc(CampaignType.Swap)
+            is KycLinkState.EmailVerified -> view?.launchKyc(CampaignType.None)
             is KycLinkState.General -> {
                 val data = linkState.link.campaignData
                 if (data != null) {
                     registerForCampaign(data)
                 } else {
-                    view?.launchKyc(CampaignType.Swap)
+                    view?.launchKyc(CampaignType.None)
                 }
             }
             else -> {

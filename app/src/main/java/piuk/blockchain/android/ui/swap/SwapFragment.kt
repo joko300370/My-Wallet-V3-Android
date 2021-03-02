@@ -28,13 +28,14 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.databinding.FragmentSwapBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.ButtonOptions
 import piuk.blockchain.android.ui.customviews.KycBenefitsBottomSheet
 import piuk.blockchain.android.ui.customviews.TrendingPair
 import piuk.blockchain.android.ui.customviews.TrendingPairsProvider
-import piuk.blockchain.android.ui.customviews.VerifyIdentityBenefit
+import piuk.blockchain.android.ui.customviews.VerifyIdentityNumericBenefitItem
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
@@ -62,6 +63,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
     }
 
     private val kycTierService: TierService by scopedInject()
+    private val coincore: Coincore by scopedInject()
     private val exchangeRateDataManager: ExchangeRateDataManager by scopedInject()
     private val trendingPairsProvider: TrendingPairsProvider by scopedInject()
     private val walletManager: CustodialWalletManager by scopedInject()
@@ -131,13 +133,19 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
                 kycTierService.tiers(),
                 trendingPairsProvider.getTrendingPairs(),
                 walletManager.getSwapLimits(currencyPrefs.selectedFiatCurrency),
-                walletManager.getSwapTrades().onErrorReturn { emptyList() }
-            ) { tiers: KycTiers, pairs: List<TrendingPair>, limits: TransferLimits, orders: List<CustodialOrder> ->
+                walletManager.getSwapTrades().onErrorReturn { emptyList() },
+                coincore.allWalletsWithActions(setOf(AssetAction.Swap))
+                    .map { it.isNotEmpty() }) { tiers: KycTiers,
+                                                pairs: List<TrendingPair>,
+                                                limits: TransferLimits,
+                                                orders: List<CustodialOrder>,
+                                                hasAtLeastOneAccountToSwapFrom ->
                 SwapComposite(
                     tiers,
                     pairs,
                     limits,
-                    orders
+                    orders,
+                    hasAtLeastOneAccountToSwapFrom
                 )
             }
                 .observeOn(AndroidSchedulers.mainThread())
@@ -147,7 +155,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
                 }
                 .subscribeBy(
                     onSuccess = { composite ->
-                        showSwapUi(composite.orders)
+                        showSwapUi(composite.orders, composite.hasAtLeastOneAccountToSwapFrom)
 
                         if (composite.tiers.isVerified()) {
                             binding.swapViewSwitcher.displayedChild = SWAP_VIEW
@@ -191,15 +199,15 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
                     title = getString(R.string.swap_kyc_upsell_title),
                     description = getString(R.string.swap_kyc_upsell_desc),
                     listOfBenefits = listOf(
-                        VerifyIdentityBenefit(
+                        VerifyIdentityNumericBenefitItem(
                             getString(R.string.swap_kyc_upsell_1_title),
                             getString(R.string.swap_kyc_upsell_1_desc)
                         ),
-                        VerifyIdentityBenefit(
+                        VerifyIdentityNumericBenefitItem(
                             getString(R.string.swap_kyc_upsell_2_title),
                             getString(R.string.swap_kyc_upsell_2_desc)
                         ),
-                        VerifyIdentityBenefit(
+                        VerifyIdentityNumericBenefitItem(
                             getString(R.string.swap_kyc_upsell_3_title),
                             getString(R.string.swap_kyc_upsell_3_desc)
                         )
@@ -231,15 +239,15 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
     private fun initKycView() {
         binding.swapKycBenefits.initWithBenefits(
             listOf(
-                VerifyIdentityBenefit(
+                VerifyIdentityNumericBenefitItem(
                     getString(R.string.swap_kyc_1_title),
                     getString(R.string.swap_kyc_1_label)
                 ),
-                VerifyIdentityBenefit(
+                VerifyIdentityNumericBenefitItem(
                     getString(R.string.swap_kyc_2_title),
                     getString(R.string.swap_kyc_2_label)
                 ),
-                VerifyIdentityBenefit(
+                VerifyIdentityNumericBenefitItem(
                     getString(R.string.swap_kyc_3_title),
                     getString(R.string.swap_kyc_3_label)
                 )
@@ -261,13 +269,14 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
         binding.swapError.visible()
     }
 
-    private fun showSwapUi(orders: List<CustodialOrder>) {
+    private fun showSwapUi(orders: List<CustodialOrder>, hasAtLeastOneAccountToSwapFrom: Boolean) {
         val pendingOrders = orders.filter { it.state.isPending }
         val hasPendingOrder = pendingOrders.isNotEmpty()
         binding.swapLoadingIndicator.gone()
         binding.swapViewSwitcher.visible()
         binding.swapError.gone()
         binding.swapCta.visible()
+        binding.swapCta.isEnabled = hasAtLeastOneAccountToSwapFrom
         binding.swapTrending.visibleIf { !hasPendingOrder }
         binding.pendingSwaps.container.visibleIf { hasPendingOrder }
         binding.pendingSwaps.pendingList.apply {
@@ -306,7 +315,8 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
         val tiers: KycTiers,
         val pairs: List<TrendingPair>,
         val limits: TransferLimits,
-        val orders: List<CustodialOrder>
+        val orders: List<CustodialOrder>,
+        val hasAtLeastOneAccountToSwapFrom: Boolean
     )
 
     override fun onDestroyView() {
