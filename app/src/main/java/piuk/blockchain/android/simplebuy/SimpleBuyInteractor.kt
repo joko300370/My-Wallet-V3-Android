@@ -23,6 +23,7 @@ import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.nabu.models.responses.simplebuy.CardPartnerAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
 import com.blockchain.nabu.service.TierService
+import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.ui.trackProgress
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
@@ -33,6 +34,7 @@ import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.cards.CardIntent
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.networking.PollService
+import piuk.blockchain.android.sdd.SDDAnalytics
 import piuk.blockchain.android.util.AppUtil
 import java.util.concurrent.TimeUnit
 
@@ -41,6 +43,7 @@ class SimpleBuyInteractor(
     private val custodialWalletManager: CustodialWalletManager,
     private val withdrawLocksRepository: WithdrawLocksRepository,
     private val appUtil: AppUtil,
+    private val analytics: Analytics,
     private val eligibilityProvider: EligibilityProvider,
     private val coincore: Coincore
 ) {
@@ -189,7 +192,12 @@ class SimpleBuyInteractor(
 
     fun eligiblePaymentMethods(fiatCurrency: String, preselectedId: String?):
         Single<SimpleBuyIntent.PaymentMethodsUpdated> =
-        tierService.tiers().zipWith(custodialWalletManager.isSDDEligible().onErrorReturn { false })
+        tierService.tiers().zipWith(custodialWalletManager.isSDDEligible().onErrorReturn { false }
+            .doOnSuccess {
+            if (it) {
+                analytics.logEventOnce(SDDAnalytics.SDD_ELIGIBLE)
+            }
+        })
             .flatMap { (tier, sddEligible) ->
                 custodialWalletManager.fetchSuggestedPaymentMethod(
                     fiatCurrency = fiatCurrency,

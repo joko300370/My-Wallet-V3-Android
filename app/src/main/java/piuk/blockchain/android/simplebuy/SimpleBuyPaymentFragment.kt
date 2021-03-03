@@ -24,6 +24,7 @@ import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.cards.CardAuthoriseWebViewActivity
 import piuk.blockchain.android.cards.CardVerificationFragment
 import piuk.blockchain.android.databinding.FragmentSimpleBuyPaymentBinding
+import piuk.blockchain.android.sdd.SDDAnalytics
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
@@ -245,6 +246,7 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
 
     override fun unlockHigherLimits() {
         KycNavHostActivity.startForResult(this, CampaignType.SimpleBuy, SimpleBuyActivity.KYC_STARTED)
+        analytics.logEvent(SDDAnalytics.UPGRADE_TO_GOLD_CLICKED)
     }
 
     override fun navigator(): SimpleBuyNavigator =
