@@ -103,6 +103,8 @@ val nabuModule = module {
                 paymentAccountMapperMappers = mapOf(
                     "EUR" to get(eur), "GBP" to get(gbp), "USD" to get(usd)
                 ),
+                achDepositWithdrawFeatureFlag = get(achDepositWithdrawFeatureFlag),
+                sddFeatureFlag = get(sddFeatureFlag),
                 kycFeatureEligibility = get(),
                 assetBalancesRepository = get(),
                 interestRepository = get(),
