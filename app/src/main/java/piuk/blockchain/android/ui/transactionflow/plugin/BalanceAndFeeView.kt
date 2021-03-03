@@ -10,6 +10,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import info.blockchain.balance.Money
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.databinding.ViewTxFlowFeeAndBalanceBinding
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
@@ -68,7 +69,12 @@ class BalanceAndFeeView @JvmOverloads constructor(
         updateMaxGroup(state)
         updateBalance(state)
         state.pendingTx?.let {
-            binding.feeEdit.update(it.feeSelection, model)
+            if (it.feeSelection.selectedLevel == FeeLevel.None) {
+                binding.feeEdit.gone()
+            } else {
+                binding.feeEdit.update(it.feeSelection, model)
+                binding.feeEdit.visible()
+            }
         }
     }
 
