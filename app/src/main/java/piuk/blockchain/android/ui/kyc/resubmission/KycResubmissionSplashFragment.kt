@@ -15,7 +15,6 @@ import com.blockchain.ui.extensions.throttledClicks
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
 import piuk.blockchain.android.util.inflate
