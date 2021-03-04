@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.dashboard
 
 import androidx.annotation.VisibleForTesting
+import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -231,11 +232,13 @@ class DashboardModel(
     initialState: DashboardState,
     mainScheduler: Scheduler,
     private val interactor: DashboardInteractor,
-    environmentConfig: EnvironmentConfig
+    environmentConfig: EnvironmentConfig,
+    crashLogger: CrashLogger
 ) : MviModel<DashboardState, DashboardIntent>(
     initialState,
     mainScheduler,
-    environmentConfig
+    environmentConfig,
+    crashLogger
 ) {
     override fun performAction(
         previousState: DashboardState,
@@ -324,11 +327,6 @@ class DashboardModel(
                     }
                 }, onError = { Timber.e(it) }
             )
-
-    override fun onScanLoopError(t: Throwable) {
-        super.onScanLoopError(t)
-        Timber.e("***> Scan loop failed: $t")
-    }
 
     override fun distinctIntentFilter(
         previousIntent: DashboardIntent,

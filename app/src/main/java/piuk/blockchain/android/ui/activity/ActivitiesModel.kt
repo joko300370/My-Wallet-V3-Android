@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.activity
 
+import com.blockchain.logging.CrashLogger
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
@@ -42,11 +43,13 @@ class ActivitiesModel(
     initialState: ActivitiesState,
     mainScheduler: Scheduler,
     private val interactor: ActivitiesInteractor,
-    environmentConfig: EnvironmentConfig
+    environmentConfig: EnvironmentConfig,
+    crashLogger: CrashLogger
 ) : MviModel<ActivitiesState, ActivitiesIntent>(
     initialState,
     mainScheduler,
-    environmentConfig
+    environmentConfig,
+    crashLogger
 ) {
 
     private var fetchSubscription: Disposable? = null
@@ -84,10 +87,5 @@ class ActivitiesModel(
             is CancelSimpleBuyOrderIntent -> interactor.cancelSimpleBuyOrder(intent.orderId)
             else -> null
         }
-    }
-
-    override fun onScanLoopError(t: Throwable) {
-        super.onScanLoopError(t)
-        Timber.e("***> Scan loop failed: $t")
     }
 }

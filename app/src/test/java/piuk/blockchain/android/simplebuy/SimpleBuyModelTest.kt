@@ -78,7 +78,8 @@ class SimpleBuyModelTest {
                     mock()
                 ),
                 ratingPrefs = ratingPrefs,
-                environmentConfig = environmentConfig
+                environmentConfig = environmentConfig,
+                crashLogger = mock()
             )
     }
 

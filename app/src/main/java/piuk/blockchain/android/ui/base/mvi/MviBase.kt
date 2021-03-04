@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.base.mvi
 
 import androidx.annotation.CallSuper
+import com.blockchain.logging.CrashLogger
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Observable
 import io.reactivex.Scheduler
@@ -24,7 +25,8 @@ interface MviIntent<S : MviState> {
 abstract class MviModel<S : MviState, I : MviIntent<S>>(
     initialState: S,
     observeScheduler: Scheduler,
-    private val environmentConfig: EnvironmentConfig
+    private val environmentConfig: EnvironmentConfig,
+    private val crashLogger: CrashLogger
 ) {
 
     private val _state: BehaviorRelay<S> = BehaviorRelay.createDefault(initialState)
@@ -69,6 +71,8 @@ abstract class MviModel<S : MviState, I : MviIntent<S>>(
 
     @CallSuper
     protected open fun onScanLoopError(t: Throwable) {
+        Timber.e("***> Scan loop failed: $t")
+        crashLogger.logException(t)
         if (environmentConfig.isRunningInDebugMode()) {
             throw t
         }

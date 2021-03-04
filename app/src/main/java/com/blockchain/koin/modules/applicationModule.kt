@@ -399,7 +399,8 @@ val applicationModule = module {
                 initialState = DashboardState(),
                 mainScheduler = AndroidSchedulers.mainThread(),
                 interactor = get(),
-                environmentConfig = get()
+                environmentConfig = get(),
+                crashLogger = get()
             )
         }
 
@@ -423,7 +424,8 @@ val applicationModule = module {
                 initialState = AssetDetailsState(),
                 mainScheduler = AndroidSchedulers.mainThread(),
                 interactor = get(),
-                environmentConfig = get()
+                environmentConfig = get(),
+                crashLogger = get()
             )
         }
 
@@ -458,7 +460,8 @@ val applicationModule = module {
                 cardActivators = listOf(
                     EverypayCardActivator(get(), get())
                 ),
-                environmentConfig = get()
+                environmentConfig = get(),
+                crashLogger = get()
             )
         }
 
@@ -472,7 +475,8 @@ val applicationModule = module {
                 ),
                 gson = get(),
                 prefs = get(),
-                environmentConfig = get()
+                environmentConfig = get(),
+                crashLogger = get()
             )
         }
 
@@ -694,7 +698,8 @@ val applicationModule = module {
             EmailVeriffModel(
                 interactor = get(),
                 observeScheduler = AndroidSchedulers.mainThread(),
-                environmentConfig = get()
+                environmentConfig = get(),
+                crashLogger = get()
             )
         }
 

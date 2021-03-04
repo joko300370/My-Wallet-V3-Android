@@ -1,5 +1,6 @@
 package piuk.blockchain.android.simplebuy
 
+import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.BuySellOrder
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.UndefinedPaymentMethod
@@ -30,11 +31,13 @@ class SimpleBuyModel(
     private val gson: Gson,
     private val cardActivators: List<CardActivator>,
     private val interactor: SimpleBuyInteractor,
-    environmentConfig: EnvironmentConfig
+    environmentConfig: EnvironmentConfig,
+    crashLogger: CrashLogger
 ) : MviModel<SimpleBuyState, SimpleBuyIntent>(
     gson.fromJson(prefs.simpleBuyState(), SimpleBuyState::class.java) ?: initialState,
     scheduler,
-    environmentConfig
+    environmentConfig,
+    crashLogger
 ) {
 
     override fun performAction(previousState: SimpleBuyState, intent: SimpleBuyIntent): Disposable? =

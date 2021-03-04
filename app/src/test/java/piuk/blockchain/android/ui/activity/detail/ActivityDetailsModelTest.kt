@@ -89,7 +89,7 @@ class ActivityDetailsModelTest {
 
     @Before
     fun setup() {
-        model = ActivityDetailsModel(state, Schedulers.io(), interactor, environmentConfig)
+        model = ActivityDetailsModel(state, Schedulers.io(), interactor, environmentConfig, mock())
     }
 
     @Test

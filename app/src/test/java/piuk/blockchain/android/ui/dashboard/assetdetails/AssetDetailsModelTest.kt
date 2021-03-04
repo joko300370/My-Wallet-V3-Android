@@ -54,7 +54,7 @@ class AssetDetailsModelTest {
     @Before
     fun setUp() {
         model =
-            AssetDetailsModel(defaultState, Schedulers.io(), interactor, environmentConfig)
+            AssetDetailsModel(defaultState, Schedulers.io(), interactor, environmentConfig, mock())
     }
 
     @Test

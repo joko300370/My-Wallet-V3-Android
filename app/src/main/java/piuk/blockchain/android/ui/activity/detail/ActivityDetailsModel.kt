@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.activity.detail
 
+import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.InterestState
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
@@ -76,8 +77,9 @@ class ActivityDetailsModel(
     initialState: ActivityDetailState,
     mainScheduler: Scheduler,
     private val interactor: ActivityDetailsInteractor,
-    environmentConfig: EnvironmentConfig
-) : MviModel<ActivityDetailState, ActivityDetailsIntents>(initialState, mainScheduler, environmentConfig) {
+    environmentConfig: EnvironmentConfig,
+    crashLogger: CrashLogger
+) : MviModel<ActivityDetailState, ActivityDetailsIntents>(initialState, mainScheduler, environmentConfig, crashLogger) {
 
     override fun performAction(
         previousState: ActivityDetailState,

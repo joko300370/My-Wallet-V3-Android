@@ -158,7 +158,8 @@ val transactionModule = module {
                 mainScheduler = AndroidSchedulers.mainThread(),
                 interactor = get(),
                 errorLogger = get(),
-                environmentConfig = get()
+                environmentConfig = get(),
+                crashLogger = get()
             )
         }
     }

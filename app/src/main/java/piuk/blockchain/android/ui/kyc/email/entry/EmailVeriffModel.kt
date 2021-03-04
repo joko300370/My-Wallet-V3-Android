@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.kyc.email.entry
 
+import com.blockchain.logging.CrashLogger
 import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
@@ -10,8 +11,11 @@ import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 class EmailVeriffModel(
     private val interactor: EmailVerifyInteractor,
     observeScheduler: Scheduler,
-    environmentConfig: EnvironmentConfig
-) : MviModel<EmailVeriffState, EmailVeriffIntent>(EmailVeriffState(), observeScheduler, environmentConfig) {
+    environmentConfig: EnvironmentConfig,
+    crashLogger: CrashLogger
+) : MviModel<EmailVeriffState, EmailVeriffIntent>(
+    EmailVeriffState(), observeScheduler, environmentConfig, crashLogger
+) {
 
     override fun performAction(previousState: EmailVeriffState, intent: EmailVeriffIntent): Disposable? =
         when (intent) {

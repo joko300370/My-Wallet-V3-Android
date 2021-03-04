@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.transactionflow.engine
 
+import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -143,11 +144,13 @@ class TransactionModel(
     mainScheduler: Scheduler,
     private val interactor: TransactionInteractor,
     private val errorLogger: TxFlowErrorReporting,
-    environmentConfig: EnvironmentConfig
+    environmentConfig: EnvironmentConfig,
+    crashLogger: CrashLogger
 ) : MviModel<TransactionState, TransactionIntent>(
     initialState,
     mainScheduler,
-    environmentConfig
+    environmentConfig,
+    crashLogger
 ) {
     override fun performAction(previousState: TransactionState, intent: TransactionIntent): Disposable? {
         Timber.v("!TRANSACTION!> Transaction Model: performAction: ${intent.javaClass.simpleName}")
@@ -275,9 +278,7 @@ class TransactionModel(
         )
 
     override fun onScanLoopError(t: Throwable) {
-        Timber.e("!TRANSACTION!> Transaction Model: loop error -> $t")
-        errorLogger.log(TxFlowLogError.LoopFail(t))
-        super.onScanLoopError(t)
+        super.onScanLoopError(TxFlowLogError.LoopFail(t))
         throw t
     }
 

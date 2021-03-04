@@ -39,7 +39,8 @@ class EmailVeriffModelTest {
         model = EmailVeriffModel(
             interactor = interactor,
             observeScheduler = Schedulers.io(),
-            environmentConfig = environmentConfig
+            environmentConfig = environmentConfig,
+            crashLogger = mock()
         )
     }
 

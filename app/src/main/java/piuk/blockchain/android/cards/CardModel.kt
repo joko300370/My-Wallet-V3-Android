@@ -1,5 +1,6 @@
 package piuk.blockchain.android.cards
 
+import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.nabu.datamanagers.Partner
@@ -22,10 +23,11 @@ class CardModel(
     private val prefs: SimpleBuyPrefs,
     private val cardActivators: List<CardActivator>,
     private val gson: Gson,
-    val environmentConfig: EnvironmentConfig
+    val environmentConfig: EnvironmentConfig,
+    crashLogger: CrashLogger
 ) : MviModel<CardState, CardIntent>(
     gson.fromJson(prefs.cardState(), CardState::class.java)
-        ?: CardState(currencyPrefs.selectedFiatCurrency), scheduler, environmentConfig
+        ?: CardState(currencyPrefs.selectedFiatCurrency), scheduler, environmentConfig, crashLogger
 ) {
 
     override fun performAction(previousState: CardState, intent: CardIntent): Disposable? =
