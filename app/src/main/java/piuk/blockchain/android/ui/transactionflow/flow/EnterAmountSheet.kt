@@ -19,7 +19,9 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.databinding.DialogTxFlowEnterAmountBinding
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.FiatCryptoInputView
@@ -61,6 +63,15 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
     override fun render(newState: TransactionState) {
         Timber.d("!TRANSACTION!> Rendering! EnterAmountSheet")
         cacheState(newState)
+        try {
+            doRender(newState)
+        } catch (t: Throwable) {
+            Timber.e("!TRANSACTION!> Rendering Exception! $t")
+            throw t
+        }
+    }
+
+    private fun doRender(newState: TransactionState) {
         with(binding) {
             amountSheetCtaButton.isEnabled = newState.nextEnabled
 
@@ -96,24 +107,43 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
                 lowerSlot?.update(newState)
                 upperSlot?.update(newState)
 
-                customiser.issueFlashMessage(newState, amountSheetInput.configuration.inputCurrency)?.let {
-                    when (customiser.selectIssueType(newState)) {
-                        IssueType.ERROR -> {
-                            amountSheetInput.showError(it, customiser.shouldDisableInput(state.errorState))
-                        }
-                        IssueType.INFO -> {
-                            amountSheetInput.showInfo(it) {
-                                dismiss()
-                                KycNavHostActivity.start(requireActivity(), CampaignType.Swap, true)
-                            }
-                        }
-                    }
-                } ?: binding.amountSheetInput.hideLabels()
+                showFlashMessageIfNeeded(newState)
 
                 if (!newState.canGoBack) {
                     amountSheetBack.gone()
                 }
             }
+        }
+    }
+
+    private fun DialogTxFlowEnterAmountBinding.showFlashMessageIfNeeded(
+        newState: TransactionState
+    ) {
+        customiser.issueFlashMessage(newState, amountSheetInput.configuration.inputCurrency)?.let {
+            when (customiser.selectIssueType(newState)) {
+                IssueType.ERROR -> {
+                    amountSheetInput.showError(it, customiser.shouldDisableInput(state.errorState))
+                }
+                IssueType.INFO -> {
+                    amountSheetInput.showInfo(it) {
+                        dismiss()
+                        KycNavHostActivity.start(requireActivity(), CampaignType.Swap, true)
+                    }
+                }
+            }
+        } ?: showFeesTooHighMessageOrHide(newState)
+    }
+
+    private fun DialogTxFlowEnterAmountBinding.showFeesTooHighMessageOrHide(
+        newState: TransactionState
+    ) {
+        val feesTooHighMsg = customiser.issueFeesTooHighMessage(state)
+        if (newState.pendingTx != null && newState.pendingTx.isLowOnBalance() && feesTooHighMsg != null) {
+            amountSheetInput.showError(
+                errorMessage = feesTooHighMsg
+            )
+        } else {
+            binding.amountSheetInput.hideLabels()
         }
     }
 
@@ -286,3 +316,7 @@ private fun BlockchainAccount.currencyType(): CurrencyType =
         is FiatAccount -> CurrencyType.Fiat(this.fiatCurrency)
         else -> throw IllegalStateException("Account not supported")
     }
+
+private fun PendingTx.isLowOnBalance() =
+    feeSelection.selectedLevel != FeeLevel.None &&
+        availableBalance.isZero && totalBalance.isPositive

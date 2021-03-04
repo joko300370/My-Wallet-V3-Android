@@ -239,6 +239,9 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
             val output = inputToOutputExchangeRate.convert(enteredAmount)
             val internalExchangeAmount = internalExchangeRate.convert(enteredAmount)
             exchange_amount.text = internalExchangeAmount.toStringWithSymbol()
+            if (output.isZero) {
+                updateValue(output)
+            }
             amountSubject.onNext(output)
         } else if (config is CurrencyType.Crypto) {
 
@@ -250,6 +253,9 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
             val internalExchangeAmount = internalExchangeRate.convert(cryptoAmount)
 
             exchange_amount.text = internalExchangeAmount.toStringWithSymbol()
+            if (output.isZero) {
+                updateValue(output)
+            }
             amountSubject.onNext(output)
         }
     }

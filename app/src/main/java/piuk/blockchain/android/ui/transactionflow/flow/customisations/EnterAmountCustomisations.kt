@@ -20,6 +20,7 @@ interface EnterAmountCustomisations {
     fun showTargetIcon(state: TransactionState): Boolean
     fun shouldDisableInput(errorState: TransactionErrorState): Boolean
     fun issueFlashMessage(state: TransactionState, input: CurrencyType?): String?
+    fun issueFeesTooHighMessage(state: TransactionState): String?
     fun installEnterAmountLowerSlotView(ctx: Context, frame: FrameLayout, state: TransactionState): TxFlowWidget
     fun installEnterAmountUpperSlotView(ctx: Context, frame: FrameLayout, state: TransactionState): TxFlowWidget
     fun shouldShowMaxLimit(state: TransactionState): Boolean

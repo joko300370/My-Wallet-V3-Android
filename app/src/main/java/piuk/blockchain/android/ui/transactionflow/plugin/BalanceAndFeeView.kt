@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.constraintlayout.widget.ConstraintLayout
 import info.blockchain.balance.Money
 import io.reactivex.Observable
@@ -32,6 +33,9 @@ class BalanceAndFeeView @JvmOverloads constructor(
     private lateinit var model: TransactionModel
     private lateinit var customiser: EnterAmountCustomisations
     private lateinit var analytics: TxFlowAnalytics
+    private val imm: InputMethodManager by lazy {
+        context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    }
 
     private val binding: ViewTxFlowFeeAndBalanceBinding =
         ViewTxFlowFeeAndBalanceBinding.inflate(LayoutInflater.from(context), this, true)
@@ -137,8 +141,12 @@ class BalanceAndFeeView @JvmOverloads constructor(
             val viewGroup = findRootView()
             externalFocus = viewGroup?.findFocus()
             externalFocus?.clearFocus()
+            hideKeyboard()
         } else {
-            externalFocus?.requestFocus()
+            externalFocus?.let {
+                it.requestFocus()
+                showKeyboard(it)
+            }
             externalFocus = null
         }
 
@@ -159,5 +167,13 @@ class BalanceAndFeeView @JvmOverloads constructor(
             v = v.parent as? ViewGroup
         }
         return v
+    }
+
+    private fun showKeyboard(inputView: View) {
+        imm.showSoftInput(inputView, InputMethodManager.SHOW_IMPLICIT)
+    }
+
+    private fun hideKeyboard() {
+        imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
     }
 }

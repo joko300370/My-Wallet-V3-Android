@@ -76,6 +76,7 @@
         app:layout_constraintTop_toBottomOf="@+id/network_fee_label"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/max_group_barrier"
+        app:layout_constraintHorizontal_bias="1"
         android:ellipsize="end"
         tools:text="Total: 1.00000 BTC" />
 

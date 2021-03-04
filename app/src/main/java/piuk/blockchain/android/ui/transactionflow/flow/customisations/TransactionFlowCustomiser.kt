@@ -540,6 +540,32 @@ class TransactionFlowCustomiserImpl(
         }
     }
 
+    override fun issueFeesTooHighMessage(state: TransactionState): String? {
+        return when (state.action) {
+            AssetAction.Send ->
+                resources.getString(
+                    R.string.send_enter_amount_error_insufficient_funds_for_fees,
+                    state.sendingAsset.displayTicker
+                )
+            AssetAction.Swap ->
+                resources.getString(
+                    R.string.swap_enter_amount_error_insufficient_funds_for_fees,
+                    state.sendingAsset.displayTicker
+                )
+            AssetAction.Sell ->
+                resources.getString(
+                    R.string.sell_enter_amount_error_insufficient_funds_for_fees,
+                    state.sendingAsset.displayTicker
+                )
+            AssetAction.InterestDeposit ->
+                resources.getString(
+                    R.string.interest_enter_amount_error_insufficient_funds_for_fees,
+                    state.sendingAsset.displayTicker
+                )
+            else -> null
+        }
+    }
+
     override fun installEnterAmountLowerSlotView(
         ctx: Context,
         frame: FrameLayout,
