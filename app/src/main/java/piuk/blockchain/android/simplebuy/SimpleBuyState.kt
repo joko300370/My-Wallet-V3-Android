@@ -54,7 +54,7 @@ data class SimpleBuyState(
     val withdrawalLockPeriod: BigInteger = BigInteger.ZERO,
     @Transient val linkBankTransfer: LinkBankTransfer? = null,
     @Transient val paymentPending: Boolean = false,
-    @Transient val transferLimits: TransferLimits = TransferLimits(fiatCurrency),
+    @Transient val transferLimits: TransferLimits? = null,
     // we use this flag to avoid navigating back and forth, reset after navigating
     @Transient val confirmationActionRequested: Boolean = false,
     @Transient val newPaymentMethodToBeAdded: PaymentMethod? = null
@@ -80,7 +80,7 @@ data class SimpleBuyState(
     @delegate:Transient
     val maxFiatAmount: Money by unsafeLazy {
         val maxPaymentMethodLimit = selectedPaymentMethodDetails.maxLimit()
-        val maxUserLimit = transferLimits.maxLimit.takeIf { it.isPositive }
+        val maxUserLimit = transferLimits?.maxLimit
 
         if (maxPaymentMethodLimit != null && maxUserLimit != null)
             Money.min(maxPaymentMethodLimit, maxUserLimit)
@@ -91,7 +91,7 @@ data class SimpleBuyState(
     @delegate:Transient
     val minFiatAmount: Money by unsafeLazy {
         val minPaymentMethodLimit = selectedPaymentMethodDetails.minLimit()
-        val minUserLimit = transferLimits.minLimit.takeIf { it.isPositive }
+        val minUserLimit = transferLimits?.minLimit
 
         if (minPaymentMethodLimit != null && minUserLimit != null)
             Money.max(minPaymentMethodLimit, minUserLimit)

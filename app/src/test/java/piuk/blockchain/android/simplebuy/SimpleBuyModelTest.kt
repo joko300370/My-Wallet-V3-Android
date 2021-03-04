@@ -30,6 +30,7 @@ import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.cards.EverypayAuthOptions
 import piuk.blockchain.android.cards.partners.EverypayCardActivator
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import java.util.Date
 
 class SimpleBuyModelTest {
@@ -48,6 +49,9 @@ class SimpleBuyModelTest {
     private val interactor: SimpleBuyInteractor = mock()
     private val prefs: SimpleBuyPrefs = mock {
         on { simpleBuyState() } `it returns` gson.toJson(defaultState)
+    }
+    private val environmentConfig: EnvironmentConfig = mock {
+        on { isRunningInDebugMode() } `it returns` false
     }
 
     private val ratingPrefs: RatingPrefs = mock {
@@ -73,7 +77,9 @@ class SimpleBuyModelTest {
                 cardActivators = listOf(
                     mock()
                 ),
-                ratingPrefs = ratingPrefs
+                ratingPrefs = ratingPrefs,
+                environmentConfig = environmentConfig,
+                crashLogger = mock()
             )
     }
 
@@ -100,6 +106,7 @@ class SimpleBuyModelTest {
             BuySellPair("BTC-USD", BuySellLimits(min = 100, max = 5024558),
                 sellLimits = BuySellLimits(100, 5024558))),
             fiatCurrency = "USD",
+            transferLimits = TransferLimits("USD"),
             selectedCryptoCurrency = CryptoCurrency.BTC
         ))
     }
@@ -233,7 +240,8 @@ class SimpleBuyModelTest {
                 BuySellPair(pair = "BTC-USD", buyLimits = BuySellLimits(100, 3000),
                     sellLimits = BuySellLimits(100, 5024558))
             ),
-            selectedCryptoCurrency = CryptoCurrency.BTC
+            selectedCryptoCurrency = CryptoCurrency.BTC,
+            transferLimits = TransferLimits("USD")
         ))
     }
 }

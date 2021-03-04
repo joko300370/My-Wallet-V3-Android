@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.dashboard
 
 import androidx.annotation.VisibleForTesting
+import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -23,6 +24,7 @@ import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.android.ui.dashboard.sheets.BackupDetails
 import piuk.blockchain.android.ui.settings.LinkablePaymentMethods
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
 import java.io.Serializable
@@ -229,10 +231,14 @@ sealed class LinkablePaymentMethodsForAction(
 class DashboardModel(
     initialState: DashboardState,
     mainScheduler: Scheduler,
-    private val interactor: DashboardInteractor
+    private val interactor: DashboardInteractor,
+    environmentConfig: EnvironmentConfig,
+    crashLogger: CrashLogger
 ) : MviModel<DashboardState, DashboardIntent>(
     initialState,
-    mainScheduler
+    mainScheduler,
+    environmentConfig,
+    crashLogger
 ) {
     override fun performAction(
         previousState: DashboardState,
@@ -321,10 +327,6 @@ class DashboardModel(
                     }
                 }, onError = { Timber.e(it) }
             )
-
-    override fun onScanLoopError(t: Throwable) {
-        Timber.e("***> Scan loop failed: $t")
-    }
 
     override fun distinctIntentFilter(
         previousIntent: DashboardIntent,

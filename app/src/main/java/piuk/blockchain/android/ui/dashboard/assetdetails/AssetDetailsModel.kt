@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
+import com.blockchain.logging.CrashLogger
 import info.blockchain.balance.Money
 import info.blockchain.wallet.prices.data.PriceDatum
 import io.reactivex.Scheduler
@@ -11,6 +12,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 import timber.log.Timber
 
@@ -42,8 +44,10 @@ enum class AssetDetailsError {
 class AssetDetailsModel(
     initialState: AssetDetailsState,
     mainScheduler: Scheduler,
-    private val interactor: AssetDetailsInteractor
-) : MviModel<AssetDetailsState, AssetDetailsIntent>(initialState, mainScheduler) {
+    private val interactor: AssetDetailsInteractor,
+    environmentConfig: EnvironmentConfig,
+    crashLogger: CrashLogger
+) : MviModel<AssetDetailsState, AssetDetailsIntent>(initialState, mainScheduler, environmentConfig, crashLogger) {
     override fun performAction(
         previousState: AssetDetailsState,
         intent: AssetDetailsIntent
@@ -124,8 +128,4 @@ class AssetDetailsModel(
             },
             onError = { Timber.e("***> Error Loading account actions: $it") }
         )
-
-    override fun onScanLoopError(t: Throwable) {
-        Timber.e("***> Scan loop failed: $t")
-    }
 }

@@ -12,6 +12,7 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -104,7 +105,12 @@ class TransactionFlow(
             // Trigger intent to set initial state: source account & password required
             disposables += state.subscribeBy(
                 onNext = { handleStateChange(it) },
-                onError = { Timber.e("Transaction state is broken: $it") }
+                onError = {
+                    if (BuildConfig.DEBUG) {
+                        throw it
+                    }
+                    Timber.e("Transaction state is broken: $it")
+                }
             )
         }
 
