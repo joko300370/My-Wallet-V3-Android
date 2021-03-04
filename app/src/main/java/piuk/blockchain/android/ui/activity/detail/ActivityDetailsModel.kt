@@ -12,6 +12,7 @@ import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import java.util.Date
 
 sealed class ActivityDetailsType
@@ -74,8 +75,9 @@ data class ActivityDetailState(
 class ActivityDetailsModel(
     initialState: ActivityDetailState,
     mainScheduler: Scheduler,
-    private val interactor: ActivityDetailsInteractor
-) : MviModel<ActivityDetailState, ActivityDetailsIntents>(initialState, mainScheduler) {
+    private val interactor: ActivityDetailsInteractor,
+    environmentConfig: EnvironmentConfig
+) : MviModel<ActivityDetailState, ActivityDetailsIntents>(initialState, mainScheduler, environmentConfig) {
 
     override fun performAction(
         previousState: ActivityDetailState,

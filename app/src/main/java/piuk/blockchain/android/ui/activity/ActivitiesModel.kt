@@ -8,6 +8,7 @@ import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import timber.log.Timber
 
 enum class ActivitiesSheet {
@@ -40,10 +41,12 @@ data class ActivitiesState(
 class ActivitiesModel(
     initialState: ActivitiesState,
     mainScheduler: Scheduler,
-    private val interactor: ActivitiesInteractor
+    private val interactor: ActivitiesInteractor,
+    environmentConfig: EnvironmentConfig
 ) : MviModel<ActivitiesState, ActivitiesIntent>(
     initialState,
-    mainScheduler
+    mainScheduler,
+    environmentConfig
 ) {
 
     private var fetchSubscription: Disposable? = null
@@ -84,6 +87,7 @@ class ActivitiesModel(
     }
 
     override fun onScanLoopError(t: Throwable) {
+        super.onScanLoopError(t)
         Timber.e("***> Scan loop failed: $t")
     }
 }

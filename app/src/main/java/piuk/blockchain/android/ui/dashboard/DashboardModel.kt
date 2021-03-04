@@ -23,6 +23,7 @@ import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.android.ui.dashboard.sheets.BackupDetails
 import piuk.blockchain.android.ui.settings.LinkablePaymentMethods
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
 import java.io.Serializable
@@ -229,10 +230,12 @@ sealed class LinkablePaymentMethodsForAction(
 class DashboardModel(
     initialState: DashboardState,
     mainScheduler: Scheduler,
-    private val interactor: DashboardInteractor
+    private val interactor: DashboardInteractor,
+    environmentConfig: EnvironmentConfig
 ) : MviModel<DashboardState, DashboardIntent>(
     initialState,
-    mainScheduler
+    mainScheduler,
+    environmentConfig
 ) {
     override fun performAction(
         previousState: DashboardState,
@@ -323,6 +326,7 @@ class DashboardModel(
             )
 
     override fun onScanLoopError(t: Throwable) {
+        super.onScanLoopError(t)
         Timber.e("***> Scan loop failed: $t")
     }
 

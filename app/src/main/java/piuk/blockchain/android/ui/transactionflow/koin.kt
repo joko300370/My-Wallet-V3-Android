@@ -157,7 +157,8 @@ val transactionModule = module {
                 initialState = TransactionState(),
                 mainScheduler = AndroidSchedulers.mainThread(),
                 interactor = get(),
-                errorLogger = get()
+                errorLogger = get(),
+                environmentConfig = get()
             )
         }
     }

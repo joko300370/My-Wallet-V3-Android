@@ -19,6 +19,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.cards.partners.CardActivator
 import piuk.blockchain.android.cards.partners.EverypayCardActivator
 import piuk.blockchain.android.ui.base.mvi.MviModel
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
 
 class SimpleBuyModel(
@@ -28,10 +29,12 @@ class SimpleBuyModel(
     scheduler: Scheduler,
     private val gson: Gson,
     private val cardActivators: List<CardActivator>,
-    private val interactor: SimpleBuyInteractor
+    private val interactor: SimpleBuyInteractor,
+    environmentConfig: EnvironmentConfig
 ) : MviModel<SimpleBuyState, SimpleBuyIntent>(
     gson.fromJson(prefs.simpleBuyState(), SimpleBuyState::class.java) ?: initialState,
-    scheduler
+    scheduler,
+    environmentConfig
 ) {
 
     override fun performAction(previousState: SimpleBuyState, intent: SimpleBuyIntent): Disposable? =

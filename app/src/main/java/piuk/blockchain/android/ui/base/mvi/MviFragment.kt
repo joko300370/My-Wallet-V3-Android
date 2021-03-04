@@ -9,6 +9,7 @@ import com.blockchain.notifications.analytics.Analytics
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
+import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import timber.log.Timber
@@ -24,7 +25,12 @@ abstract class MviFragment<M : MviModel<S, I>, I : MviIntent<S>, S : MviState> :
         subscription?.dispose()
         subscription = model.state.subscribeBy(
             onNext = { render(it) },
-            onError = { Timber.e(it) },
+            onError = {
+                if (BuildConfig.DEBUG) {
+                    throw it
+                }
+                Timber.e(it)
+            },
             onComplete = { Timber.d("***> State on complete!!") }
         )
     }

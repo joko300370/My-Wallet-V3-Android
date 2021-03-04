@@ -14,6 +14,7 @@ import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import org.amshove.kluent.`it returns`
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -22,6 +23,7 @@ import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.ui.activity.CryptoActivityType
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import java.util.Date
 
@@ -61,6 +63,10 @@ class ActivityDetailsModelTest {
         depositPaymentId = ""
     )
 
+    private val environmentConfig: EnvironmentConfig = mock {
+        on { isRunningInDebugMode() } `it returns` false
+    }
+
     private val custodialInterestItem = CustodialInterestActivitySummaryItem(
         exchangeRates = mock(),
         cryptoCurrency = mock(),
@@ -83,7 +89,7 @@ class ActivityDetailsModelTest {
 
     @Before
     fun setup() {
-        model = ActivityDetailsModel(state, Schedulers.io(), interactor)
+        model = ActivityDetailsModel(state, Schedulers.io(), interactor, environmentConfig)
     }
 
     @Test
@@ -134,14 +140,16 @@ class ActivityDetailsModelTest {
         model.process(LoadNonCustodialHeaderDataIntent(item))
 
         testObserver.assertValueAt(0, state)
-        testObserver.assertValueAt(1, state.copy(
-            transactionType = item.transactionType,
-            amount = item.value,
-            isPending = item.isPending,
-            isFeeTransaction = item.isFeeTransaction,
-            confirmations = item.confirmations,
-            totalConfirmations = item.cryptoCurrency.requiredConfirmations
-        ))
+        testObserver.assertValueAt(
+            1, state.copy(
+                transactionType = item.transactionType,
+                amount = item.value,
+                isPending = item.isPending,
+                isFeeTransaction = item.isFeeTransaction,
+                confirmations = item.confirmations,
+                totalConfirmations = item.cryptoCurrency.requiredConfirmations
+            )
+        )
     }
 
     @Test
@@ -150,14 +158,16 @@ class ActivityDetailsModelTest {
         model.process(LoadCustodialTradingHeaderDataIntent(custodialItem))
 
         testObserver.assertValueAt(0, state)
-        testObserver.assertValueAt(1, state.copy(
-            transactionType = TransactionSummary.TransactionType.BUY,
-            amount = custodialItem.value as CryptoValue,
-            isPending = false,
-            isFeeTransaction = false,
-            confirmations = 0,
-            totalConfirmations = 0
-        ))
+        testObserver.assertValueAt(
+            1, state.copy(
+                transactionType = TransactionSummary.TransactionType.BUY,
+                amount = custodialItem.value as CryptoValue,
+                isPending = false,
+                isFeeTransaction = false,
+                confirmations = 0,
+                totalConfirmations = 0
+            )
+        )
     }
 
     @Test
@@ -228,8 +238,10 @@ class ActivityDetailsModelTest {
         model.process(ListItemsLoadedIntent(list))
 
         testObserver.assertValueAt(0, state)
-        testObserver.assertValueAt(1, state.copy(
-            listOfItems = currentList
-        ))
+        testObserver.assertValueAt(
+            1, state.copy(
+                listOfItems = currentList
+            )
+        )
     }
 }

@@ -5,11 +5,13 @@ import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.ui.base.mvi.MviModel
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 
 class EmailVeriffModel(
     private val interactor: EmailVerifyInteractor,
-    observeScheduler: Scheduler
-) : MviModel<EmailVeriffState, EmailVeriffIntent>(EmailVeriffState(), observeScheduler) {
+    observeScheduler: Scheduler,
+    environmentConfig: EnvironmentConfig
+) : MviModel<EmailVeriffState, EmailVeriffIntent>(EmailVeriffState(), observeScheduler, environmentConfig) {
 
     override fun performAction(previousState: EmailVeriffState, intent: EmailVeriffIntent): Disposable? =
         when (intent) {
@@ -23,10 +25,10 @@ class EmailVeriffModel(
                 onError = {}
             )
             EmailVeriffIntent.StartEmailVerification -> interactor.fetchEmail().flatMapObservable {
-                    if (!it.verified) {
-                        interactor.pollForEmailStatus().toObservable().startWith(it)
-                    } else Observable.just(it)
-                }.subscribeBy(onNext = {
+                if (!it.verified) {
+                    interactor.pollForEmailStatus().toObservable().startWith(it)
+                } else Observable.just(it)
+            }.subscribeBy(onNext = {
                 process(EmailVeriffIntent.EmailUpdated(it))
             }, onError = {})
 

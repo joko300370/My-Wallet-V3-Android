@@ -4,6 +4,7 @@ import androidx.annotation.CallSuper
 import androidx.viewbinding.ViewBinding
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
+import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import timber.log.Timber
 
@@ -19,7 +20,12 @@ abstract class MviBottomSheet<M : MviModel<S, I>, I : MviIntent<S>, S : MviState
         dispose()
         subscription = model.state.subscribeBy(
             onNext = { render(it) },
-            onError = { Timber.e(it) },
+            onError = {
+                if (BuildConfig.DEBUG) {
+                    throw it
+                }
+                Timber.e(it)
+            },
             onComplete = { Timber.d("***> State on complete!!") }
         )
     }

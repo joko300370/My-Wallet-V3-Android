@@ -11,6 +11,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 import timber.log.Timber
 
@@ -42,8 +43,9 @@ enum class AssetDetailsError {
 class AssetDetailsModel(
     initialState: AssetDetailsState,
     mainScheduler: Scheduler,
-    private val interactor: AssetDetailsInteractor
-) : MviModel<AssetDetailsState, AssetDetailsIntent>(initialState, mainScheduler) {
+    private val interactor: AssetDetailsInteractor,
+    environmentConfig: EnvironmentConfig
+) : MviModel<AssetDetailsState, AssetDetailsIntent>(initialState, mainScheduler, environmentConfig) {
     override fun performAction(
         previousState: AssetDetailsState,
         intent: AssetDetailsIntent
@@ -126,6 +128,7 @@ class AssetDetailsModel(
         )
 
     override fun onScanLoopError(t: Throwable) {
+        super.onScanLoopError(t)
         Timber.e("***> Scan loop failed: $t")
     }
 }
