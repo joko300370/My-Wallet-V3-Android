@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.blockchain.koin.scopedInject
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
 import piuk.blockchain.android.ui.kyc.navigate
 import piuk.blockchain.android.ui.kyc.reentry.KycNavigator
@@ -27,7 +28,7 @@ class KycResubmissionSplashFragment : Fragment() {
         this
     )
 
-    private val kycNavigator: KycNavigator by inject()
+    private val kycNavigator: KycNavigator by scopedInject()
 
     override fun onCreateView(
         inflater: LayoutInflater,
