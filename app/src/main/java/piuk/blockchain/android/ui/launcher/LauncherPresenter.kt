@@ -12,6 +12,7 @@ import com.blockchain.notifications.analytics.AnalyticsEvents
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.exceptions.HDWalletException
 import info.blockchain.wallet.exceptions.InvalidCredentialsException
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
@@ -27,6 +28,7 @@ import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcore.data.metadata.MetadataInitException
 import timber.log.Timber
 
 class LauncherPresenter(
@@ -141,7 +143,7 @@ class LauncherPresenter(
             }
         }
 
-        val metadata = prerequisites.initMetadataAndRelatedPrerequisites()
+        val metadata = Completable.defer { prerequisites.initMetadataAndRelatedPrerequisites() }
         val updateFiatWithDefault = settingsDataManager.updateFiatUnit(currencyPrefs.defaultFiatCurrency)
             .ignoreElements()
 
@@ -183,6 +185,8 @@ class LauncherPresenter(
                                 view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
                                 view.onRequestPin()
                             }
+                        } else if (throwable is MetadataInitException) {
+                            view?.showMetadataNodeFailure()
                         } else {
                             view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
                             view.onRequestPin()
@@ -227,7 +231,6 @@ class LauncherPresenter(
 
     private fun logException(throwable: Throwable) {
         crashLogger.logException(throwable)
-        view?.showMetadataNodeFailure()
     }
 
     private fun shouldCheckForEmailVerification() = accessState.isNewlyCreated && !accessState.isRestored

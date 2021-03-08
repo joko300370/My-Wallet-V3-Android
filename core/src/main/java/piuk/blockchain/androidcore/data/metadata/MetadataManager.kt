@@ -52,7 +52,7 @@ class MetadataManager(
             _metadataNodeFactory = it
         }
 
-    fun attemptMetadataSetup() = initMetadataNodes()
+    fun attemptMetadataSetup() = Completable.defer { initMetadataNodes() }
 
     fun decryptAndSetupMetadata(
         secondPassword: String
@@ -83,8 +83,10 @@ class MetadataManager(
 
     fun saveToMetadata(data: String, metadataType: Int): Completable =
         metadataNodeFactory.metadataNode?.let {
-            metadataInteractor.putMetadata(data,
-                Metadata.newInstance(metaDataHDNode = it, type = metadataType, metadataDerivation = metadataDerivation))
+            metadataInteractor.putMetadata(
+                data,
+                Metadata.newInstance(metaDataHDNode = it, type = metadataType, metadataDerivation = metadataDerivation)
+            )
         } ?: Completable.error(IllegalStateException("Metadata node is null"))
 
     /**

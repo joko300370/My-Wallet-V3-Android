@@ -185,7 +185,7 @@ class MainPresenter internal constructor(
             )
     }
 
-    fun handlePossibleDeepLink(url: String) {
+    private fun handlePossibleDeepLink(url: String) {
         try {
             val link = Uri.parse(url).getQueryParameter("link") ?: return
             compositeDisposable += deepLinkProcessor.getLink(link)
