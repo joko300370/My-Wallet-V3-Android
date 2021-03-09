@@ -9,6 +9,7 @@ import com.blockchain.koin.kotlinApiRetrofit
 import com.blockchain.koin.moshiExplorerRetrofit
 import com.blockchain.koin.moshiInterceptor
 import com.blockchain.koin.nabu
+import com.blockchain.koin.status
 import com.blockchain.network.EnvironmentUrls
 import com.blockchain.serialization.BigDecimalAdaptor
 import com.blockchain.serialization.BigIntegerAdapter
@@ -91,6 +92,15 @@ val apiModule = module {
     single(nabu) {
         Retrofit.Builder()
             .baseUrl(get<EnvironmentUrls>().nabuApi)
+            .client(get())
+            .addConverterFactory(get<MoshiConverterFactory>())
+            .addCallAdapterFactory(get<RxJava2CallAdapterFactory>())
+            .build()
+    }
+
+    single(status) {
+        Retrofit.Builder()
+            .baseUrl(get<EnvironmentUrls>().statusUrl)
             .client(get())
             .addConverterFactory(get<MoshiConverterFactory>())
             .addCallAdapterFactory(get<RxJava2CallAdapterFactory>())
