@@ -32,9 +32,9 @@ import piuk.blockchain.android.ui.kyc.veriffsplash.VeriffSplashPresenter
 
 val kycUiModule = module {
 
-    factory { KycStarter() as StartKyc }
+    factory { KycStarter() }.bind(StartKyc::class)
 
-    factory { TiersReentryDecision() as ReentryDecision }
+    factory { TiersReentryDecision() }.bind(ReentryDecision::class)
 
     scope(payloadScopeQualifier) {
 
@@ -77,7 +77,8 @@ val kycUiModule = module {
                 nabuToken = get(),
                 nabuDataManager = get(),
                 custodialWalletManager = get(),
-                kycNextStepDecision = get()
+                kycNextStepDecision = get(),
+                analytics = get()
             )
         }
 

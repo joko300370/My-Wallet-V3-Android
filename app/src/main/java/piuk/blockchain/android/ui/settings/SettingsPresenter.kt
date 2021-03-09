@@ -7,7 +7,6 @@ import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
-import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.models.responses.nabu.NabuApiException
 import com.blockchain.nabu.models.responses.nabu.NabuErrorStatusCodes
 import com.blockchain.notifications.NotificationTokenManager
@@ -95,36 +94,38 @@ class SettingsPresenter(
     }
 
     private fun updateCards() {
-        compositeDisposable += kycStatusHelper.getSettingsKycStateTier()
-            .map { kycTiers -> kycTiers.isApprovedFor(KycTierLevel.GOLD) }
-            .doOnSuccess { isGold ->
-                view?.cardsEnabled(isGold)
+        compositeDisposable +=
+            custodialWalletManager.getEligiblePaymentMethodTypes(fiatUnit).map { eligiblePaymentMethods ->
+                eligiblePaymentMethods.firstOrNull { it.paymentMethodType == PaymentMethodType.PAYMENT_CARD } != null
             }
-            .flatMap { isGold ->
-                if (isGold) {
-                    custodialWalletManager.updateSupportedCardTypes(fiatUnit)
-                        .thenSingle {
-                            custodialWalletManager.fetchUnawareLimitsCards(
-                                listOf(CardStatus.ACTIVE, CardStatus.EXPIRED)
-                            )
-                        }
-                } else {
-                    Single.just(emptyList())
+                .doOnSuccess { isCardEligible ->
+                    view?.cardsEnabled(isCardEligible)
                 }
-            }
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe {
-                view?.cardsEnabled(false)
-                onCardsUpdated(emptyList())
-            }
-            .subscribeBy(
-                onSuccess = { cards ->
-                    onCardsUpdated(cards)
-                },
-                onError = {
-                    Timber.i(it)
+                .flatMap { isCardEligible ->
+                    if (isCardEligible) {
+                        custodialWalletManager.updateSupportedCardTypes(fiatUnit)
+                            .thenSingle {
+                                custodialWalletManager.fetchUnawareLimitsCards(
+                                    listOf(CardStatus.ACTIVE, CardStatus.EXPIRED)
+                                )
+                            }
+                    } else {
+                        Single.just(emptyList())
+                    }
                 }
-            )
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe {
+                    view?.cardsEnabled(false)
+                    onCardsUpdated(emptyList())
+                }
+                .subscribeBy(
+                    onSuccess = { cards ->
+                        onCardsUpdated(cards)
+                    },
+                    onError = {
+                        Timber.i(it)
+                    }
+                )
     }
 
     fun checkShouldDisplayRateUs() {

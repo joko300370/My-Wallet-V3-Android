@@ -24,11 +24,15 @@ fun String.fromStellarUri(): StellarPayment = if (this.contains("web+stellar")) 
 
     val amount = map["amount"]?.let {
         CryptoValue.fromMajor(CryptoCurrency.XLM, it.toBigDecimal())
-    } ?: CryptoValue.ZeroXlm
+    } ?: CryptoValue.zero(CryptoCurrency.XLM)
 
     StellarPayment(HorizonKeyPair.createValidatedPublic(map["pay?destination"]!!), amount, getMemo(map))
 } else {
-    StellarPayment(HorizonKeyPair.createValidatedPublic(this), CryptoValue.ZeroXlm, Memo.None)
+    StellarPayment(
+        HorizonKeyPair.createValidatedPublic(this),
+        CryptoValue.zero(CryptoCurrency.XLM),
+        Memo.None
+    )
 }
 
 private fun getMemo(map: MutableMap<String, String>): Memo {

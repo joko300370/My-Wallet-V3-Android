@@ -44,8 +44,9 @@ class AssetActivityRepository(
         account: BlockchainAccount,
         isRefreshRequested: Boolean
     ): Observable<ActivitySummaryList> {
+        val cacheMaybe = if (isRefreshRequested || isCacheExpired()) Maybe.empty() else getFromCache()
         return Maybe.concat(
-            getFromCache(),
+            cacheMaybe,
             requestNetwork(isRefreshRequested)
         )
             .toObservable()
@@ -144,11 +145,7 @@ class AssetActivityRepository(
             }.toMaybe()
 
     override fun getFromCache(): Maybe<ActivitySummaryList> {
-        return if (transactionCache.isNotEmpty()) {
-            Maybe.just(transactionCache)
-        } else {
-            Maybe.empty()
-        }
+        return Maybe.just(transactionCache)
     }
 
     private fun doOnLogout() {

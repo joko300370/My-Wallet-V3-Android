@@ -11,6 +11,8 @@ import com.blockchain.nabu.datamanagers.OrderInput
 import com.blockchain.nabu.datamanagers.OrderOutput
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.Product
+import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.datamanagers.repositories.WithdrawLocksRepository
@@ -21,6 +23,7 @@ import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.nabu.models.responses.simplebuy.CardPartnerAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
 import com.blockchain.nabu.service.TierService
+import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.ui.trackProgress
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
@@ -31,6 +34,7 @@ import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.cards.CardIntent
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.networking.PollService
+import piuk.blockchain.android.sdd.SDDAnalytics
 import piuk.blockchain.android.util.AppUtil
 import java.util.concurrent.TimeUnit
 
@@ -39,14 +43,15 @@ class SimpleBuyInteractor(
     private val custodialWalletManager: CustodialWalletManager,
     private val withdrawLocksRepository: WithdrawLocksRepository,
     private val appUtil: AppUtil,
+    private val analytics: Analytics,
     private val eligibilityProvider: EligibilityProvider,
     private val coincore: Coincore
 ) {
 
-    fun fetchBuyLimitsAndSupportedCryptoCurrencies(targetCurrency: String):
-        Single<BuySellPairs> =
-        custodialWalletManager.getSupportedBuySellCryptoCurrencies(targetCurrency)
-            .trackProgress(appUtil.activityIndicator)
+    fun fetchBuyLimitsAndSupportedCryptoCurrencies(targetCurrency: String): Single<Pair<BuySellPairs, TransferLimits>> =
+        custodialWalletManager.getSupportedBuySellCryptoCurrencies(targetCurrency).zipWith(
+            custodialWalletManager.getProductTransferLimits(targetCurrency, product = Product.SIMPLEBUY)
+        ).trackProgress(appUtil.activityIndicator)
 
     fun fetchSupportedFiatCurrencies(): Single<SimpleBuyIntent.SupportedCurrenciesUpdated> =
         custodialWalletManager.getSupportedFiatCurrencies()
@@ -187,7 +192,12 @@ class SimpleBuyInteractor(
 
     fun eligiblePaymentMethods(fiatCurrency: String, preselectedId: String?):
         Single<SimpleBuyIntent.PaymentMethodsUpdated> =
-        tierService.tiers().zipWith(custodialWalletManager.isSDDEligible().onErrorReturn { false })
+        tierService.tiers().zipWith(custodialWalletManager.isSDDEligible().onErrorReturn { false }
+            .doOnSuccess {
+            if (it) {
+                analytics.logEventOnce(SDDAnalytics.SDD_ELIGIBLE)
+            }
+        })
             .flatMap { (tier, sddEligible) ->
                 custodialWalletManager.fetchSuggestedPaymentMethod(
                     fiatCurrency = fiatCurrency,

@@ -1,5 +1,6 @@
 package piuk.blockchain.android.simplebuy
 
+import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.BuySellOrder
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.UndefinedPaymentMethod
@@ -19,6 +20,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.cards.partners.CardActivator
 import piuk.blockchain.android.cards.partners.EverypayCardActivator
 import piuk.blockchain.android.ui.base.mvi.MviModel
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
 
 class SimpleBuyModel(
@@ -28,10 +30,14 @@ class SimpleBuyModel(
     scheduler: Scheduler,
     private val gson: Gson,
     private val cardActivators: List<CardActivator>,
-    private val interactor: SimpleBuyInteractor
+    private val interactor: SimpleBuyInteractor,
+    environmentConfig: EnvironmentConfig,
+    crashLogger: CrashLogger
 ) : MviModel<SimpleBuyState, SimpleBuyIntent>(
     gson.fromJson(prefs.simpleBuyState(), SimpleBuyState::class.java) ?: initialState,
-    scheduler
+    scheduler,
+    environmentConfig,
+    crashLogger
 ) {
 
     override fun performAction(previousState: SimpleBuyState, intent: SimpleBuyIntent): Disposable? =
@@ -39,11 +45,12 @@ class SimpleBuyModel(
             is SimpleBuyIntent.FetchBuyLimits ->
                 interactor.fetchBuyLimitsAndSupportedCryptoCurrencies(intent.fiatCurrency)
                     .subscribeBy(
-                        onSuccess = { pairs ->
+                        onSuccess = { (pairs, transferLimits) ->
                             process(
                                 SimpleBuyIntent.UpdatedBuyLimitsAndSupportedCryptoCurrencies(
                                     pairs,
-                                    intent.cryptoCurrency
+                                    intent.cryptoCurrency,
+                                    transferLimits
                                 )
                             )
                             process(SimpleBuyIntent.NewCryptoCurrencySelected(intent.cryptoCurrency))

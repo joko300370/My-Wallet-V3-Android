@@ -6,9 +6,9 @@ import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.sunriver.Memo
 import com.blockchain.sunriver.SendDetails
+import com.blockchain.sunriver.XlmAccountReference
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.XlmFeesFetcher
-import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -254,7 +254,7 @@ class XlmOnChainTxEngine(
     private fun createTransaction(pendingTx: PendingTx): Single<SendDetails> =
         sourceAccount.receiveAddress.map { receiveAddress ->
             SendDetails(
-                from = AccountReference.Xlm(
+                from = XlmAccountReference(
                     sourceAccount.label,
                     (receiveAddress as XlmAddress).address
                 ),

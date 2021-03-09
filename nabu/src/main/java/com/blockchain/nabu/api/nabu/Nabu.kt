@@ -460,10 +460,11 @@ internal interface Nabu {
         @Body order: CreateOrderRequest
     ): Single<CustodialOrderResponse>
 
-    @GET(NABU_SWAP_LIMITS)
-    fun fetchSwapLimits(
+    @GET(NABU_LIMITS)
+    fun fetchLimits(
         @Header("authorization") authorization: String,
         @Query("currency") currency: String,
+        @Query("product") product: String,
         @Query("minor") useMinor: Boolean = true
     ): Single<SwapLimitsResponse>
 

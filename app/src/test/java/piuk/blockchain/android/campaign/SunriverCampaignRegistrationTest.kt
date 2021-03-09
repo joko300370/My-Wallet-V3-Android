@@ -9,12 +9,12 @@ import com.blockchain.nabu.models.responses.nabu.UserState
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.nabu.NabuToken
 import com.blockchain.nabu.models.responses.tokenresponse.NabuOfflineTokenResponse
+import com.blockchain.sunriver.XlmAccountReference
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.balance.AccountReference
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.amshove.kluent.`it returns`
@@ -101,7 +101,7 @@ class SunriverCampaignRegistrationTest {
     @Test
     fun `register as user already has an account`() {
         val offlineToken = NabuOfflineTokenResponse("userId", "token")
-        val accountRef = AccountReference.Xlm("", "GABCDEFHI")
+        val accountRef = XlmAccountReference("", "GABCDEFHI")
         val campaignData = CampaignData("name", false)
         val nabuDataManager = mock<NabuDataManager> {
             on { registerCampaign(any(), any(), any()) } `it returns` Completable.complete()
@@ -132,7 +132,7 @@ class SunriverCampaignRegistrationTest {
     @Test
     fun `register as user has no account`() {
         val offlineToken = NabuOfflineTokenResponse("userId", "token")
-        val accountRef = AccountReference.Xlm("", "GABCDEFHIJ")
+        val accountRef = XlmAccountReference("", "GABCDEFHIJ")
         val campaignData = CampaignData("name", false)
         val nabuDataManager = mock<NabuDataManager> {
             on { registerCampaign(any(), any(), any()) } `it returns` Completable.complete()
@@ -225,7 +225,7 @@ class SunriverCampaignRegistrationTest {
     @Test
     fun `register sunriver campaign`() {
         val offlineToken = NabuOfflineTokenResponse("userId", "token")
-        val accountRef = AccountReference.Xlm("", "GABCDEFHJIK")
+        val accountRef = XlmAccountReference("", "GABCDEFHJIK")
         val nabuDataManager = mock<NabuDataManager> {
             on { registerCampaign(any(), any(), any()) } `it returns` Completable.complete()
         }

@@ -18,7 +18,6 @@
     <string name="action_settings">die Einstellungen</string>
     <string name="please_wait">Warten Sie mal</string>
     <string name="item_backup">Backup-Fonds</string>
-    <string name="item_lockbox">Schließfach</string>
     <string name="item_the_exchange">Austausch</string>
     <string name="item_airdrops">Lufttropfen</string>
     <string name="toolbar_cmd_home">Zuhause</string>
@@ -1513,17 +1512,6 @@ Beachten Sie: Sie werden diese Gelder von Ihrer Wallet in den nächsten %1$s Tag
     <string name="sell_intro_empty_title">Keine Wallets, aus denen verkauft werden kann</string>
     <string name="sell_intro_empty_label">Scheinbar haben Sie keine Wallets mit einem Guthaben, das Sie verkaufen können. Versuchen Sie zuerst einige Brieftaschen zu finanzieren.</string>
     <string name="yodlee_splash_title_partner">Blockchain.com verwendet Yodlee, um Ihre Bankdaten zu überprüfen und Ihre Konten sicher zu verknüpfen.</string>
-    <string name="lockbox_title">Lockbox</string>
-    <string name="lockbox_landing_get_yours_title">Erhalten Sie Ihre Lockbox</string>
-    <string name="lockbox_landing_get_yours_message">Speichern Sie Ihre Kryptowährung sicher offline.</string>
-    <string name="lockbox_landing_get_yours_button">Jetzt kaufen</string>
-    <string name="lockbox_landing_already_owned_title">Haben Sie bereits eine?</string>
-    <string name="lockbox_landing_already_owned_message">Melden Sie sich von Ihrem Computer aus bei blockchain.com an und verbinden Sie sich mit Ihrer Lockbox.</string>
-    <string name="lockbox_landing_learn_more">Möchten Sie mehr erfahren? Tippen Sie für einen Besuch hier
-%1$s</string>
-    <string name="lockbox_landing_coming_soon_title">Guthaben in Kürze</string>
-    <string name="lockbox_landing_coming_soon_message">Derzeit können wir Ihr Lockbox-Guthaben nicht anzeigen. Machen Sie sich keine Sorgen, Ihre Geldmittel sind sicher. Wir werden diese Funktion bald hinzufügen. Während Sie warten, können Sie Ihr Guthaben im Internet überprüfen.</string>
-    <string name="lockbox_landing_coming_soon_button">Mein Guthaben überprüfen</string>
     <string name="trading_order_limit">Sie haben zu viele ausstehende %1$s-Transaktionen. Sobald diese abgeschlossen sind, können Sie eine neue erstellen.</string>
     <string name="trading_order_not_cancelable">Hoppla! Dieser %1$s-Auftrag ist nicht stornierbar.</string>
     <string name="trading_pending_withdrawal">Hoppla! Sie haben bereits eine ausstehende Abhebung, bitte versuchen Sie es erneut, wenn diese abgeschlossen ist.</string>

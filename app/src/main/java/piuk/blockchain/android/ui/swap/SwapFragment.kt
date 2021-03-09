@@ -17,6 +17,7 @@ import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.CustodialOrder
+import com.blockchain.nabu.datamanagers.Product
 import com.blockchain.nabu.service.TierService
 import info.blockchain.balance.Money
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -132,7 +133,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
             Singles.zip(
                 kycTierService.tiers(),
                 trendingPairsProvider.getTrendingPairs(),
-                walletManager.getSwapLimits(currencyPrefs.selectedFiatCurrency),
+                walletManager.getProductTransferLimits(currencyPrefs.selectedFiatCurrency, Product.TRADE),
                 walletManager.getSwapTrades().onErrorReturn { emptyList() },
                 coincore.allWalletsWithActions(setOf(AssetAction.Swap))
                     .map { it.isNotEmpty() }) { tiers: KycTiers,

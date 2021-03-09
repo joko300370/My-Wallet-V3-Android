@@ -22,7 +22,6 @@
     <string name="action_settings">настройки</string>
     <string name="please_wait">пожалуйста, подождите</string>
     <string name="item_backup">Резервные фонды</string>
-    <string name="item_lockbox">сейф в банке</string>
     <string name="item_the_exchange">обмен</string>
     <string name="item_airdrops">Airdrops</string>
     <string name="toolbar_cmd_home">Дом</string>
@@ -1524,17 +1523,6 @@
     <string name="sell_intro_empty_title">Нет кошельков для продаж</string>
     <string name="sell_intro_empty_label">Похоже, у вас нет кошельков со средствами, которые вы можете продать, попробуйте сначала пополнить кошельки.</string>
     <string name="yodlee_splash_title_partner">Blockchain.com использует Yodlee для проверки ваших банковских реквизитов и надежной привязки ваших счетов.</string>
-    <string name="lockbox_title">Lockbox</string>
-    <string name="lockbox_landing_get_yours_title">Получите свое устройство Lockbox</string>
-    <string name="lockbox_landing_get_yours_message">Безопасно храните криптовалюту в автономном режиме.</string>
-    <string name="lockbox_landing_get_yours_button">Купить сейчас</string>
-    <string name="lockbox_landing_already_owned_title">Уже есть?</string>
-    <string name="lockbox_landing_already_owned_message">Перейдите на компьютере по адресу blockchain.com и подключите свой Lockbox.</string>
-    <string name="lockbox_landing_learn_more">Хотите узнать больше? Нажмите здесь, чтобы перейти к
-%1$s</string>
-    <string name="lockbox_landing_coming_soon_title">Средства скоро будут доступны</string>
-    <string name="lockbox_landing_coming_soon_message">В данный момент мы не можем отобразить ваш баланс Lockbox. Не беспокойтесь, ваши средства в безопасности. Мы скоро добавим эту функцию. Пока вы ждете, можете проверить свой баланс в интернете.</string>
-    <string name="lockbox_landing_coming_soon_button">Проверить мой баланс</string>
     <string name="trading_order_limit">У вас слишком много трансакций %1$s в ожидании. Когда они будут завершены, вы сможете создать новую.</string>
     <string name="trading_order_not_cancelable">Ой! Этот заказ %1$s нельзя отменить.</string>
     <string name="trading_pending_withdrawal">Ой! У вас уже есть вывод средств в ожидании. Пожалуйста, попробуйте еще раз, как только он будет завершен.</string>

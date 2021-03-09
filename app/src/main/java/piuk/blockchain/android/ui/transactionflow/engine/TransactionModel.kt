@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.transactionflow.engine
 
+import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -24,6 +25,7 @@ import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.fiat.LinkedBankAccount
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import timber.log.Timber
 import java.util.Stack
 
@@ -141,10 +143,14 @@ class TransactionModel(
     initialState: TransactionState,
     mainScheduler: Scheduler,
     private val interactor: TransactionInteractor,
-    private val errorLogger: TxFlowErrorReporting
+    private val errorLogger: TxFlowErrorReporting,
+    environmentConfig: EnvironmentConfig,
+    crashLogger: CrashLogger
 ) : MviModel<TransactionState, TransactionIntent>(
     initialState,
-    mainScheduler
+    mainScheduler,
+    environmentConfig,
+    crashLogger
 ) {
     override fun performAction(previousState: TransactionState, intent: TransactionIntent): Disposable? {
         Timber.v("!TRANSACTION!> Transaction Model: performAction: ${intent.javaClass.simpleName}")
@@ -273,8 +279,7 @@ class TransactionModel(
         )
 
     override fun onScanLoopError(t: Throwable) {
-        Timber.e("!TRANSACTION!> Transaction Model: loop error -> $t")
-        errorLogger.log(TxFlowLogError.LoopFail(t))
+        super.onScanLoopError(TxFlowLogError.LoopFail(t))
         throw t
     }
 

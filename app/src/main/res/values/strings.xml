@@ -48,7 +48,6 @@
     <!-- nav menu -->
     <string name="please_wait">Please wait</string>
     <string name="item_backup">Backup funds</string>
-    <string name="item_lockbox">Lockbox</string>
     <string name="item_the_exchange">Exchange</string>
     <string name="item_airdrops">Airdrops</string>
     <string name="item_debug_homebrew" translatable="false">Debug Homebrew</string>
@@ -859,6 +858,7 @@
 
     <string name="buy_crypto_card_title">Buy Crypto</string>
     <string name="buy_crypto_card_body">We can help you buy in just a few simple steps.</string>
+    <string name="buy_crypto_card_sdd_body">Select the crypto you want to buy, verify your identity and buy instantly.</string>
     <string name="buy_crypto_card_cta">Buy Crypto Now</string>
 
     <!-- Transfer Bitcoin announcement -->
@@ -1863,17 +1863,6 @@
     <string name="dotted_suffixed_string" translatable="false">•••• %1s</string>
     <string name="failed_to_link_bank">Bank Link Failed</string>
 
-    <!-- lockbox -->
-    <string name="lockbox_title">Lockbox</string>
-    <string name="lockbox_landing_get_yours_title">Get Your Lockbox</string>
-    <string name="lockbox_landing_get_yours_message">Safely store your cryptocurrency offline.</string>
-    <string name="lockbox_landing_get_yours_button">Buy now</string>
-    <string name="lockbox_landing_already_owned_title">Already own one?</string>
-    <string name="lockbox_landing_already_owned_message">From your computer, log into blockchain.com and connect your lockbox.</string>
-    <string name="lockbox_landing_learn_more">Want to learn more? Tap here to visit\n%1$s</string>
-    <string name="lockbox_landing_coming_soon_title">Balances Coming Soon</string>
-    <string name="lockbox_landing_coming_soon_message">We are unable to display your Lockbox balance at this time. Don’t worry, your funds are safe. We’ll be adding this feature soon. While you wait, you can check your balance on the web.</string>
-    <string name="lockbox_landing_coming_soon_button">Check my balance</string>
     <string name="add_a_bank_account">Add a Bank Account</string>
     <string name="add_a_deposit_method">Select a Deposit Method</string>
     <string name="wire_transfer">Wire Transfer</string>

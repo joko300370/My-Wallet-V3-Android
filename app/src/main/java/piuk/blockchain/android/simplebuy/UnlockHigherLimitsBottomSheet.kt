@@ -11,6 +11,7 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.UnlockHigherLimitsLayoutBinding
+import piuk.blockchain.android.sdd.SDDAnalytics
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.ButtonOptions
 import piuk.blockchain.android.ui.customviews.VerifyIdentityIconedBenefitItem
@@ -75,5 +76,7 @@ class UnlockHigherLimitsBottomSheet : SlidingModalBottomDialog<UnlockHigherLimit
                     secondaryButton = ButtonOptions(false)
                 )
             }, onError = {})
+
+        analytics.logEvent(SDDAnalytics.UPGRADE_TO_GOLD_SEEN)
     }
 }

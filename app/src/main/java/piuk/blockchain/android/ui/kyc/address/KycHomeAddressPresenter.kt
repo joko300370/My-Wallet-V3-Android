@@ -7,6 +7,7 @@ import piuk.blockchain.android.campaign.CampaignType
 import com.blockchain.nabu.NabuToken
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.NabuDataManager
+import com.blockchain.notifications.analytics.Analytics
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
@@ -17,6 +18,7 @@ import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
 import piuk.blockchain.android.networking.PollService
+import piuk.blockchain.android.sdd.SDDAnalytics
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
@@ -38,7 +40,8 @@ class KycHomeAddressPresenter(
     nabuToken: NabuToken,
     private val nabuDataManager: NabuDataManager,
     private val kycNextStepDecision: KycNextStepDecision,
-    private val custodialWalletManager: CustodialWalletManager
+    private val custodialWalletManager: CustodialWalletManager,
+    private val analytics: Analytics
 ) : BaseKycPresenter<KycHomeAddressView>(nabuToken) {
 
     val countryCodeSingle: Single<SortedMap<String, String>> by unsafeLazy {
@@ -157,7 +160,11 @@ class KycHomeAddressPresenter(
     }
 
     private fun tryToVerifyUserForSdd(state: State, campaignType: CampaignType): Single<State> {
-        return custodialWalletManager.isSDDEligible().flatMap {
+        return custodialWalletManager.isSDDEligible().doOnSuccess {
+            if (it) {
+                analytics.logEventOnce(SDDAnalytics.SDD_ELIGIBLE)
+            }
+        }.flatMap {
             if (!it) {
                 Single.just(state)
             } else {

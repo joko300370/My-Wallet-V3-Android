@@ -4,6 +4,7 @@ import com.blockchain.android.testutils.rxInit
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.Product
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.TransferQuote
@@ -598,10 +599,10 @@ class OnChainSwapEngineTest {
         totalBalance: Money = CryptoValue.zero(SRC_ASSET),
         availableBalance: Money = CryptoValue.zero(SRC_ASSET)
     ) = mock<BtcCryptoWalletAccount> {
-            on { asset } itReturns SRC_ASSET
-            on { accountBalance } itReturns Single.just(totalBalance)
-            on { actionableBalance } itReturns Single.just(availableBalance)
-        }
+        on { asset } itReturns SRC_ASSET
+        on { accountBalance } itReturns Single.just(totalBalance)
+        on { actionableBalance } itReturns Single.just(availableBalance)
+    }
 
     private fun mockTransactionTarget() = mock<BchCryptoWalletAccount> {
         on { asset } itReturns TGT_ASSET
@@ -633,7 +634,7 @@ class OnChainSwapEngineTest {
         val kycTiers: KycTiers = mock()
         whenever(kycTierService.tiers()).thenReturn(Single.just(kycTiers))
 
-        whenever(walletManager.getSwapLimits(SELECTED_FIAT))
+        whenever(walletManager.getProductTransferLimits(SELECTED_FIAT, Product.TRADE))
             .itReturns(
                 Single.just(
                     TransferLimits(
@@ -647,7 +648,7 @@ class OnChainSwapEngineTest {
 
     private fun verifyLimitsFetched() {
         verify(kycTierService).tiers()
-        verify(walletManager).getSwapLimits(SELECTED_FIAT)
+        verify(walletManager).getProductTransferLimits(SELECTED_FIAT, Product.TRADE)
     }
 
     private fun verifyOnChainEngineStarted(srcAccount: CryptoAccount) {
