@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import com.blockchain.koin.scopedInject
 import kotlinx.android.synthetic.main.activity_landing.*
+import kotlinx.android.synthetic.main.warning_layout.view.*
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus
@@ -78,6 +79,11 @@ class LandingActivity : MvpActivity<LandingView, LandingPresenter>(), LandingVie
             .setPositiveButton(R.string.dialog_continue) { _, _ -> clearAlert() }
             .create()
         )
+
+    override fun showApiOutageMessage() {
+        layout_warning.visible()
+        layout_warning.warning_message.text = getString(R.string.wallet_outage_message)
+    }
 
     override fun showDebugMenu() {
         btn_settings.visible()

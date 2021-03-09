@@ -5,6 +5,7 @@ import android.content.Intent
 import android.view.View
 import android.widget.ImageView
 import com.blockchain.logging.CrashLogger
+import com.blockchain.nabu.datamanagers.ApiStatus
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.remoteconfig.RemoteConfig
 import com.nhaarman.mockito_kotlin.any
@@ -29,6 +30,7 @@ import info.blockchain.wallet.payload.data.Wallet
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import org.amshove.kluent.itReturns
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -84,6 +86,10 @@ class PinEntryPresenterTest {
     private val remoteConfig: RemoteConfig = mock()
     private val credentialsWiper: CredentialsWiper = mock()
 
+    private val apiStatus: ApiStatus = mock {
+        on { isHealthy() } itReturns Single.just(true)
+    }
+
     @Before
     fun setUp() {
 
@@ -105,7 +111,7 @@ class PinEntryPresenterTest {
             prngFixer,
             mobileNoticeRemoteConfig,
             crashLogger,
-            remoteConfig,
+            apiStatus,
             credentialsWiper,
             biometricsController
         )

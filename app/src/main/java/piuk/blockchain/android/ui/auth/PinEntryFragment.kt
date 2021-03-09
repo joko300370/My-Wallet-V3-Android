@@ -227,6 +227,11 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         BiometricsEnrollmentBottomSheet.newInstance().show(childFragmentManager, "BOTTOM_SHEET")
     }
 
+    override fun showApiOutageMessage() {
+        binding?.layoutWarning?.root.visible()
+        binding?.layoutWarning?.warningMessage?.text = getString(R.string.wallet_outage_message)
+    }
+
     override fun enrollBiometrics() {
         biometricsController.init(
             this, BiometricsController.BiometricsType.TYPE_REGISTER,
