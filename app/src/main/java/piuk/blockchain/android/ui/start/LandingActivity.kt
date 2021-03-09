@@ -92,7 +92,7 @@ class LandingActivity : MvpActivity<LandingView, LandingPresenter>(), LandingVie
         layout_warning.warning_message.apply {
             movementMethod = LinkMovementMethod.getInstance()
             text = stringUtils.getStringWithMappedAnnotations(
-                R.string.wallet_outage_message, learnMoreMap, requireActivity()
+                R.string.wallet_outage_message, learnMoreMap, this@LandingActivity
             )
         }
     }
