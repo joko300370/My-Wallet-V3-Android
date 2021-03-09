@@ -4,7 +4,7 @@ import com.blockchain.nabu.models.responses.status.ApiIncidentsResponse
 import io.reactivex.Single
 import retrofit2.http.GET
 
-interface StatusService {
+interface ApiStatusService {
     @GET(INCIDENTS_PATH)
     fun apiIncidents(): Single<ApiIncidentsResponse>
 }
