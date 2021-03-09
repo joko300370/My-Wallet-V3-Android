@@ -22,7 +22,6 @@
     <string name="action_settings">Réglages</string>
     <string name="please_wait">S\'il vous plaît, attendez</string>
     <string name="item_backup">Fonds de sauvegarde</string>
-    <string name="item_lockbox">Lockbox</string>
     <string name="item_the_exchange">Échange</string>
     <string name="item_airdrops">Airdrops</string>
     <string name="toolbar_cmd_home">Accueil</string>
@@ -1520,17 +1519,6 @@ Note : Vous ne pourrez pas envoyer ou retirer ces fonds de votre portefeuille pe
     <string name="sell_intro_empty_title">Aucun portefeuille à partir duquel vous pouvez vendre</string>
     <string name="sell_intro_empty_label">Il semble que vous n\'ayez pas de portefeuilles avec un solde vous permettant de vendre, essayez d\'abord de ravitailler quelques portefeuilles.</string>
     <string name="yodlee_splash_title_partner">Blockchain.com utilise Yodlee pour vérifier vos références bancaires et lier vos comptes de manière sécurisée.</string>
-    <string name="lockbox_title">Lockbox</string>
-    <string name="lockbox_landing_get_yours_title">Obtenez votre Lockbox</string>
-    <string name="lockbox_landing_get_yours_message">Sécurisez votre cryptomonnaie hors ligne</string>
-    <string name="lockbox_landing_get_yours_button">Acheter maintenant</string>
-    <string name="lockbox_landing_already_owned_title">Vous en avez déjà un ?</string>
-    <string name="lockbox_landing_already_owned_message">À partir de votre ordinateur, connectez-vous à blockchain.com et connectez votre lockbox.</string>
-    <string name="lockbox_landing_learn_more">Voulez-vous en savoir plus ? Appuyez ici pour visiter
- %1$s</string>
-    <string name="lockbox_landing_coming_soon_title">Soldes en attente</string>
-    <string name="lockbox_landing_coming_soon_message">Nous ne pouvons pas afficher votre solde Lockbox pour le moment. Ne vous inquiétez pas, vos fonds sont en sécurité. Nous ajouterons cette fonctionnalité bientôt. Pendant que vous attendez, vous pouvez consulter votre solde sur le Web.</string>
-    <string name="lockbox_landing_coming_soon_button">Vérifier mon solde</string>
     <string name="trading_order_limit">Vous avez trop de transactions %1$s en attente. Une fois celles-ci terminées, vous pouvez en créer une nouvelle.</string>
     <string name="trading_order_not_cancelable">Oups ! Cet ordre de %1$s n\'est pas annulable.</string>
     <string name="trading_pending_withdrawal">Oups ! Vous avez déjà un retrait en cours, veuillez réessayer une fois que ce retrait est terminé.</string>

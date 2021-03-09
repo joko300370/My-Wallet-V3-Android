@@ -56,7 +56,6 @@ import piuk.blockchain.android.ui.interest.InterestDashboardActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.kyc.status.KycStatusActivity
 import piuk.blockchain.android.ui.launcher.LauncherActivity
-import piuk.blockchain.android.ui.lockbox.LockboxLandingActivity
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity
 import piuk.blockchain.android.ui.pairingcode.PairingCodeActivity
 import piuk.blockchain.android.ui.scan.QrExpected
@@ -311,7 +310,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     private fun selectDrawerItem(menuItem: MenuItem) {
         analytics.logEvent(SideNavEvent(menuItem.itemId))
         when (menuItem.itemId) {
-            R.id.nav_lockbox -> LockboxLandingActivity.start(this)
             R.id.nav_the_exchange -> presenter.onThePitMenuClicked()
             R.id.nav_airdrops -> AirdropCentreActivity.start(this)
             R.id.nav_addresses -> startActivityForResult(Intent(this, AccountActivity::class.java),
@@ -516,10 +514,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                     startTransactionFlowWithTarget(listOf(it))
                 }
             )
-    }
-
-    override fun displayLockboxMenu(lockboxAvailable: Boolean) {
-        menu.findItem(R.id.nav_lockbox).isVisible = lockboxAvailable
     }
 
     override fun showHomebrewDebugMenu() {

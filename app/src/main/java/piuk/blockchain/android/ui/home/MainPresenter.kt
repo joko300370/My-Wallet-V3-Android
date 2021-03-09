@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import androidx.annotation.StringRes
 import com.blockchain.extensions.exhaustive
-import com.blockchain.lockbox.LockboxDataManager
 import com.blockchain.logging.CrashLogger
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
@@ -60,7 +59,6 @@ interface MainView : MvpView, HomeNavigator {
     fun clearAllDynamicShortcuts()
     fun showHomebrewDebugMenu()
     fun enableSwapButton(isEnabled: Boolean)
-    fun displayLockboxMenu(lockboxAvailable: Boolean)
     fun showTestnetWarning()
     fun launchPendingVerificationScreen(campaignType: CampaignType)
     fun shouldIgnoreDeepLinking(): Boolean
@@ -78,7 +76,6 @@ class MainPresenter internal constructor(
     private val qrProcessor: QrScanResultProcessor,
     private val environmentSettings: EnvironmentConfig,
     private val kycStatusHelper: KycStatusHelper,
-    private val lockboxDataManager: LockboxDataManager,
     private val deepLinkProcessor: DeepLinkProcessor,
     private val sunriverCampaignRegistration: SunriverCampaignRegistration,
     private val xlmDataManager: XlmDataManager,
@@ -110,18 +107,12 @@ class MainPresenter internal constructor(
             view?.kickToLauncherPage()
         } else {
             logEvents()
-            checkLockboxAvailability()
             lightSimpleBuySync()
             doPushNotifications()
         }
     }
 
     override fun onViewDetached() {}
-
-    private fun checkLockboxAvailability() {
-        compositeDisposable += lockboxDataManager.isLockboxAvailable()
-            .subscribe { enabled, _ -> view?.displayLockboxMenu(enabled) }
-    }
 
     /**
      * Initial setup of push notifications. We don't subscribe to addresses for notifications when

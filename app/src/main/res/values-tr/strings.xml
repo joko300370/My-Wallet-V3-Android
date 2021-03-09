@@ -22,7 +22,6 @@
     <string name="action_settings">Ayarlar</string>
     <string name="please_wait">Lütfen bekle</string>
     <string name="item_backup">Yedek fonlar</string>
-    <string name="item_lockbox">Lockbox</string>
     <string name="item_the_exchange">Değiş tokuş</string>
     <string name="item_airdrops">Airdrops</string>
     <string name="toolbar_cmd_home">Ev</string>
@@ -1519,17 +1518,6 @@ Not: Önümüzdeki %1$s gün boyunca Bu tutarı cüzdanınızdan gönderemeyecek
     <string name="sell_intro_empty_title">Satış Yapılabilecek Cüzdan Yok</string>
     <string name="sell_intro_empty_label">Görünüşe göre satış yapabileceğiniz bir bakiyeye sahip Cüzdanınız yok, önce bazı Cüzdanlara para yatırmayı deneyin.</string>
     <string name="yodlee_splash_title_partner">Blockchain.com, banka kimlik bilgilerinizi doğrulamak ve hesaplarınızı güvenli bir şekilde bağlamak için Yodlee kullanır.</string>
-    <string name="lockbox_title">Lockbox</string>
-    <string name="lockbox_landing_get_yours_title">Lockbox cihazınızı Alın</string>
-    <string name="lockbox_landing_get_yours_message">Kripto para biriminizi çevrimdışı güvenle saklayın.</string>
-    <string name="lockbox_landing_get_yours_button">Şimdi satın al</string>
-    <string name="lockbox_landing_already_owned_title">Zaten bir tane var mı?</string>
-    <string name="lockbox_landing_already_owned_message">Bilgisayarınızdan blockchain.com\'da oturum açın ve lockbox cihazınızı bağlayın.</string>
-    <string name="lockbox_landing_learn_more">Daha fazla bilgi edinmek ister misiniz? Ziyaret etmek için buraya dokunun
-%1$s</string>
-    <string name="lockbox_landing_coming_soon_title">Bakiyeler Çok Yakında</string>
-    <string name="lockbox_landing_coming_soon_message">Şu anda Lockbox hesabınızı görüntüleyemiyoruz. Endişelenmeyin, paranız güvende. Bu özelliği yakında ekleyeceğiz. Beklerken, bakiyenizi web üzerinde kontrol edebilirsiniz.</string>
-    <string name="lockbox_landing_coming_soon_button">Bakiyemi kontrol et</string>
     <string name="trading_order_limit">Bekleyen çok fazla %1$s işleminiz var. Bunlar tamamlandıktan sonra yeni bir tane oluşturabilirsiniz.</string>
     <string name="trading_order_not_cancelable">Hata! Bu %1$s siparişi iptal edilemez.</string>
     <string name="trading_pending_withdrawal">Hata! Halihazırda bekleyen bir para çekme işleminiz var, lütfen tamamlandığında tekrar deneyin.</string>

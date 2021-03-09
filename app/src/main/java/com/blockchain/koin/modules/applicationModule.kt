@@ -1,20 +1,14 @@
 package com.blockchain.koin.modules
 
 import android.content.Context
-import com.blockchain.accounts.AccountList
-import com.blockchain.koin.bch
-import com.blockchain.koin.btc
-import com.blockchain.koin.eth
 import com.blockchain.koin.eur
 import com.blockchain.koin.explorerRetrofit
 import com.blockchain.koin.gbp
 import com.blockchain.koin.interestAccountFeatureFlag
 import com.blockchain.koin.moshiExplorerRetrofit
-import com.blockchain.koin.pax
 import com.blockchain.koin.payloadScope
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.koin.usd
-import com.blockchain.koin.usdt
 import com.blockchain.logging.DigitalTrust
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentAccountMapper
 import com.blockchain.network.websocket.Options
@@ -31,11 +25,6 @@ import org.bitcoinj.params.BitcoinMainNetParams
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import piuk.blockchain.android.BuildConfig
-import piuk.blockchain.android.accounts.BchAccountListAdapter
-import piuk.blockchain.android.accounts.BtcAccountListAdapter
-import piuk.blockchain.android.accounts.EthAccountListAdapter
-import piuk.blockchain.android.accounts.PaxAccountListAdapter
-import piuk.blockchain.android.accounts.UsdtAccountListAdapter
 import piuk.blockchain.android.cards.CardModel
 import piuk.blockchain.android.cards.partners.EverypayCardActivator
 import piuk.blockchain.android.coincore.AssetOrdering
@@ -98,7 +87,6 @@ import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
 import piuk.blockchain.android.ui.launcher.DeepLinkPersistence
 import piuk.blockchain.android.ui.launcher.LauncherPresenter
 import piuk.blockchain.android.ui.launcher.Prerequisites
-import piuk.blockchain.android.ui.lockbox.LockboxLandingPresenter
 import piuk.blockchain.android.ui.onboarding.OnboardingPresenter
 import piuk.blockchain.android.ui.pairingcode.PairingCodePresenter
 import piuk.blockchain.android.ui.recover.RecoverFundsPresenter
@@ -223,7 +211,6 @@ val applicationModule = module {
                 qrProcessor = get(),
                 environmentSettings = get(),
                 kycStatusHelper = get(),
-                lockboxDataManager = get(),
                 deepLinkProcessor = get(),
                 sunriverCampaignRegistration = get(),
                 xlmDataManager = get(),
@@ -546,13 +533,6 @@ val applicationModule = module {
         }
 
         factory {
-            LockboxLandingPresenter(
-                lockboxDataManager = get(),
-                walletOptionsDataManager = get()
-            )
-        }
-
-        factory {
             PinEntryPresenter(
                 authDataManager = get(),
                 appUtil = get(),
@@ -673,12 +653,6 @@ val applicationModule = module {
                 crashLogger = get()
             )
         }
-
-        factory(btc) { BtcAccountListAdapter(get()) }.bind(AccountList::class)
-        factory(bch) { BchAccountListAdapter(get()) }.bind(AccountList::class)
-        factory(eth) { EthAccountListAdapter(get()) }.bind(AccountList::class)
-        factory(pax) { PaxAccountListAdapter(get(), get()) }.bind(AccountList::class)
-        factory(usdt) { UsdtAccountListAdapter(get(), get()) }.bind(AccountList::class)
 
         factory {
             BiometricsController(

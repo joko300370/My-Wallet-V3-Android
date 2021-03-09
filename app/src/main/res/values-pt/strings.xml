@@ -22,7 +22,6 @@
     <string name="action_settings">Configurações</string>
     <string name="please_wait">Por favor, espere</string>
     <string name="item_backup">Fundos de backup</string>
-    <string name="item_lockbox">Cofre</string>
     <string name="item_the_exchange">Troca</string>
     <string name="item_airdrops">Airdrops</string>
     <string name="toolbar_cmd_home">Casa</string>
@@ -1521,17 +1520,6 @@ Nota: Não poderá enviar ou retirar estes fundos da sua carteira durante os pr�
     <string name="sell_intro_empty_title">Sem carteiras para vender</string>
     <string name="sell_intro_empty_label">Parece que não tem Carteiras com um saldo que possa Vender, tente financiar algumas Carteiras primeiro.</string>
     <string name="yodlee_splash_title_partner">Blockchain.com utiliza o Yodlee para verificar as suas credenciais bancárias e vincular as suas contas de forma segura.</string>
-    <string name="lockbox_title">Lockbox</string>
-    <string name="lockbox_landing_get_yours_title">Obtenha o seu Lockbox</string>
-    <string name="lockbox_landing_get_yours_message">Armazene a sua criptomoeda offline com segurança.</string>
-    <string name="lockbox_landing_get_yours_button">Compre agora</string>
-    <string name="lockbox_landing_already_owned_title">Já possui um?</string>
-    <string name="lockbox_landing_already_owned_message">A partir do seu computador, inicie sessão no blockchain.com e ligue-se ao seu Lockbox.</string>
-    <string name="lockbox_landing_learn_more">Quer aprender mais? Toque aqui para visitar
- %1$s</string>
-    <string name="lockbox_landing_coming_soon_title">Saldos em breve</string>
-    <string name="lockbox_landing_coming_soon_message">Não podemos apresentar o seu saldo do Lockbox neste momento. Não se preocupe, pois os seus fundos estão seguros. Estaremos a adicionar essa funcionalidade em breve. Enquanto aguarda, pode verificar o seu saldo no website.</string>
-    <string name="lockbox_landing_coming_soon_button">Verificar o meu saldo</string>
     <string name="trading_order_limit">Tem demasiadas transações %1$s pendentes. Depois de concluídas, pode criar uma nova.</string>
     <string name="trading_order_not_cancelable">Ups! Este pedido %1$s não pode ser cancelado.</string>
     <string name="trading_pending_withdrawal">Ups! Já tem um levantamento pendente, tente novamente uma vez que esteja completo.</string>

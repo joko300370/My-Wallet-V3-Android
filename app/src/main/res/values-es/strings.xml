@@ -22,7 +22,6 @@
     <string name="action_settings">Configuraciones</string>
     <string name="please_wait">Espera por favor</string>
     <string name="item_backup">Fondos de respaldo</string>
-    <string name="item_lockbox">Caja de seguridad</string>
     <string name="item_the_exchange">Intercambiar</string>
     <string name="item_airdrops">Gotas de aire</string>
     <string name="toolbar_cmd_home">Inicio</string>
@@ -1514,17 +1513,6 @@ Nota: No podrá enviar ni retirar estos fondos de su monedero durante los próxi
     <string name="sell_intro_empty_title">No hay monederos desde los que poder vender</string>
     <string name="sell_intro_empty_label">Parece que no tiene monederos con un saldo que pueda vender. Intente financiar antes algunos monederos.</string>
     <string name="yodlee_splash_title_partner">Blockchain.com utiliza Yodlee para verificar sus credenciales bancarias y vincular de forma segura sus cuentas.</string>
-    <string name="lockbox_title">Lockbox</string>
-    <string name="lockbox_landing_get_yours_title">Consiga un Lockbox</string>
-    <string name="lockbox_landing_get_yours_message">Almacene de forma segura sus criptomonedas sin conexión.</string>
-    <string name="lockbox_landing_get_yours_button">Comprar ahora</string>
-    <string name="lockbox_landing_already_owned_title">¿Ya tiene uno?</string>
-    <string name="lockbox_landing_already_owned_message">Desde su ordenador, inicie sesión en Blockchain y conecte su Lockbox.</string>
-    <string name="lockbox_landing_learn_more">¿Quiere saber más? Toque aquí para visitar
-%1$s</string>
-    <string name="lockbox_landing_coming_soon_title">Saldos próximamente</string>
-    <string name="lockbox_landing_coming_soon_message">No podemos mostrar su saldo de Lockbox en este momento. No se preocupe, sus fondos están a salvo. Pronto añadiremos esta función. Mientras espera, puede comprobar su saldo en la web.</string>
-    <string name="lockbox_landing_coming_soon_button">Comprobar mi saldo</string>
     <string name="trading_order_limit">Tiene demasiadas transacciones pendientes %1$s. Una vez que se completen, puede crear una nueva.</string>
     <string name="trading_order_not_cancelable">¡Vaya! Este pedido %1$s no se puede cancelar.</string>
     <string name="trading_pending_withdrawal">¡Vaya! Ya tiene un retiro pendiente. Inténtelo de nuevo una vez que se complete.</string>

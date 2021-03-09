@@ -4,12 +4,11 @@ import com.blockchain.preferences.WalletStatus
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.XlmFeesFetcher
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import info.blockchain.balance.AccountReference
+import com.blockchain.sunriver.XlmAccountReference
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import io.reactivex.Single
-import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxEngine
@@ -44,7 +43,7 @@ internal class XlmCryptoWalletAccount(
             .doOnSuccess {
                 hasFunds.set(it > CryptoValue.zero(asset))
             }
-            .map { it as Money }
+            .map { it }
 
     override val actionableBalance: Single<Money>
         get() = xlmManager.getBalanceAndMin().map {
@@ -64,7 +63,7 @@ internal class XlmCryptoWalletAccount(
                     it,
                     exchangeRates,
                     account = this
-                ) as ActivitySummaryItem
+                )
             }.flatMap {
                 appendTradeActivity(custodialWalletManager, asset, it)
             }.doOnSuccess { setHasTransactions(it.isNotEmpty()) }
@@ -80,7 +79,7 @@ internal class XlmCryptoWalletAccount(
 
     constructor(
         payloadManager: PayloadDataManager,
-        account: AccountReference.Xlm,
+        account: XlmAccountReference,
         xlmManager: XlmDataManager,
         exchangeRates: ExchangeRateDataManager,
         xlmFeesFetcher: XlmFeesFetcher,

@@ -8,8 +8,8 @@ import com.blockchain.nabu.models.responses.nabu.UserState
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
 import com.blockchain.nabu.NabuToken
 import com.blockchain.nabu.models.responses.tokenresponse.NabuOfflineTokenResponse
+import com.blockchain.sunriver.XlmAccountReference
 import com.blockchain.sunriver.XlmDataManager
-import info.blockchain.balance.AccountReference
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
@@ -22,7 +22,7 @@ class SunriverCampaignRegistration(
     private val xlmDataManager: XlmDataManager
 ) : CampaignRegistration {
 
-    private fun defaultAccount(): Single<AccountReference.Xlm> = xlmDataManager.defaultAccount()
+    private fun defaultAccount(): Single<XlmAccountReference> = xlmDataManager.defaultAccount()
 
     fun getCampaignCardType(): Single<SunriverCardType> =
         getCardsForUserState()
@@ -58,7 +58,7 @@ class SunriverCampaignRegistration(
 
     private fun doRegisterCampaign(
         token: NabuOfflineTokenResponse,
-        xlmAccount: AccountReference.Xlm,
+        xlmAccount: XlmAccountReference,
         campaignData: CampaignData
     ): Completable =
         nabuDataManager.registerCampaign(

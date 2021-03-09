@@ -22,7 +22,6 @@
     <string name="action_settings">impostazioni</string>
     <string name="please_wait">attendere prego</string>
     <string name="item_backup">Fondi di backup</string>
-    <string name="item_lockbox">lockbox</string>
     <string name="item_the_exchange">Scambio</string>
     <string name="item_airdrops">lanci</string>
     <string name="toolbar_cmd_home">Casa</string>
@@ -1520,17 +1519,6 @@
     <string name="sell_intro_empty_title">Nessun portafoglio da cui vendere</string>
     <string name="sell_intro_empty_label">Sembra che tu non abbia portafogli con un saldo che puoi vendere, prova prima a finanziare alcuni portafogli.</string>
     <string name="yodlee_splash_title_partner">Blockchain.com utilizza Yodlee per verificare le tue credenziali bancarie e collegare in modo sicuro i tuoi conti.</string>
-    <string name="lockbox_title">Lockbox</string>
-    <string name="lockbox_landing_get_yours_title">Ottieni il tuo Lockbox</string>
-    <string name="lockbox_landing_get_yours_message">Memorizza in modo sicuro la tua criptovaluta offline.</string>
-    <string name="lockbox_landing_get_yours_button">Acquista ora</string>
-    <string name="lockbox_landing_already_owned_title">Ne possiedi già uno?</string>
-    <string name="lockbox_landing_already_owned_message">Dal tuo computer, accedi a blockchain.com e connetti il tuo lockbox.</string>
-    <string name="lockbox_landing_learn_more">Vuoi saperne di più? Tocca qui per visitare
- %1$s</string>
-    <string name="lockbox_landing_coming_soon_title">Saldi in arrivo</string>
-    <string name="lockbox_landing_coming_soon_message">Al momento non siamo in grado di visualizzare il saldo del tuo Lockbox. Non preoccuparti, i tuoi fondi sono al sicuro. A breve aggiungeremo questa funzionalità. Nel frattempo, puoi controllare il tuo saldo sul web.</string>
-    <string name="lockbox_landing_coming_soon_button">Controlla il mio saldo</string>
     <string name="trading_order_limit">Hai troppe transazioni in sospeso %1$s. Una volta completate, puoi crearne una nuova.</string>
     <string name="trading_order_not_cancelable">Ops! Questo ordine %1$s non è annullabile.</string>
     <string name="trading_pending_withdrawal">Ops! Hai già un prelievo in sospeso, riprova una volta completato.</string>
