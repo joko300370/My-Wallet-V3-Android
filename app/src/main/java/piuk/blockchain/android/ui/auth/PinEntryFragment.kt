@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.text.InputType
+import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +22,7 @@ import androidx.databinding.DataBindingUtil
 import com.blockchain.koin.scopedInject
 import com.blockchain.ui.urllinks.APP_STORE_URI
 import com.blockchain.ui.urllinks.APP_STORE_URL
+import com.blockchain.ui.urllinks.WALLET_STATUS_URL
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
@@ -57,6 +59,7 @@ import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.ui.start.PasswordRequiredActivity
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity
 import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.copyHashOnLongClick
 import piuk.blockchain.android.util.gone
@@ -72,6 +75,7 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
 
     private val pinEntryPresenter: PinEntryPresenter by scopedInject()
     private val environmentConfig: EnvironmentConfig by inject()
+    private val stringUtils: StringUtils by inject()
     private val biometricsController: BiometricsController by scopedInject()
     private val appUtil: AppUtil by inject()
 
@@ -229,7 +233,13 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
 
     override fun showApiOutageMessage() {
         binding?.layoutWarning?.root.visible()
-        binding?.layoutWarning?.warningMessage?.text = getString(R.string.wallet_outage_message)
+        val learnMoreMap = mapOf<String, Uri>("learn_more" to Uri.parse(WALLET_STATUS_URL))
+        binding?.layoutWarning?.warningMessage?.let {
+            it.movementMethod = LinkMovementMethod.getInstance()
+            it.text = stringUtils.getStringWithMappedAnnotations(
+                    R.string.wallet_outage_message, learnMoreMap, requireActivity()
+                )
+        }
     }
 
     override fun enrollBiometrics() {

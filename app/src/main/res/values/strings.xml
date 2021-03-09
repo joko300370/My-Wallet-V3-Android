@@ -1935,5 +1935,5 @@
     <string name="sb_checkout_yearly_limit_blurb">Oops, looks like you’ve used up your yearly transaction limit for Buys and Deposits.</string>
     <string name="sb_checkout_pending_order_title">Order in progress</string>
     <string name="sb_checkout_pending_order_blurb">Oops, looks like you’ve already got a Buy order in progress, please wait until it completes before buying again.</string>
-    <string name="wallet_outage_message">We are experiencing an outage. Please rest assured your funds are safe.</string>
+    <string name="wallet_outage_message">We are experiencing an outage. Please rest assured your funds are safe.<annotation link="learn_more">Learn more</annotation></string>
 </resources>
