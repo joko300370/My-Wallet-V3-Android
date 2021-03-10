@@ -1,6 +1,5 @@
 package piuk.blockchain.android.identity
 
-import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import io.reactivex.Single
 
 interface UserIdentity {
@@ -9,6 +8,10 @@ interface UserIdentity {
 }
 
 sealed class Feature {
-    class TierLevel(val tierLevel: KycTierLevel) : Feature()
+    class TierLevel(val tier: Tier) : Feature()
     object SimplifiedDueDiligence : Feature()
+}
+
+enum class Tier {
+    BRONZE, SILVER, GOLD
 }
