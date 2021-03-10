@@ -40,6 +40,8 @@ fun walletApiServiceTestModule(server: DefaultMockServer) = module {
 
             override val everypayHostUrl: String
                 get() = throw NotImplementedError()
+            override val statusUrl: String
+                get() = throw NotImplementedError()
         }
     }.bind(EnvironmentUrls::class)
 }

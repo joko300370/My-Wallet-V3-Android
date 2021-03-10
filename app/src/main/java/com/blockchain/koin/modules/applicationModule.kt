@@ -546,7 +546,7 @@ val applicationModule = module {
                 mobileNoticeRemoteConfig = get(),
                 crashLogger = get(),
                 analytics = get(),
-                config = get(),
+                apiStatus = get(),
                 credentialsWiper = get(),
                 biometricsController = get()
             )

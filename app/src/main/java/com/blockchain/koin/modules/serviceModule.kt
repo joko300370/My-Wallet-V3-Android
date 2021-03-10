@@ -3,6 +3,10 @@ package com.blockchain.koin.modules
 import com.blockchain.koin.apiRetrofit
 import com.blockchain.koin.everypayRetrofit
 import com.blockchain.koin.explorerRetrofit
+import com.blockchain.koin.status
+import com.blockchain.nabu.api.status.ApiStatusService
+import com.blockchain.nabu.datamanagers.ApiStatus
+import com.blockchain.nabu.datamanagers.BlockchainApiStatus
 import info.blockchain.wallet.ApiCode
 import info.blockchain.wallet.BlockchainFramework
 import info.blockchain.wallet.api.FeeApi
@@ -32,6 +36,12 @@ val serviceModule = module {
     factory { Payment() }
 
     factory { FeeApi(get()) }
+
+    single { get<Retrofit>(status).create(ApiStatusService::class.java) }
+
+    factory {
+        BlockchainApiStatus(get())
+    }.bind(ApiStatus::class)
 
     factory {
         object : ApiCode {
