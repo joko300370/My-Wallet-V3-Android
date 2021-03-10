@@ -18,7 +18,7 @@ class BlockchainApiStatus(private val apiStatusService: ApiStatusService) : ApiS
                     .filter { component -> component.name == Component.WALLET }
 
             walletComponents.all { component ->
-                component.status.equals(Component.OPERATIONAL,true)
+                component.status.equals(Component.OPERATIONAL, true)
             }
         }.subscribeOn(Schedulers.io())
     }
