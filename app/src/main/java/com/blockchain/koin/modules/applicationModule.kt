@@ -632,7 +632,7 @@ val applicationModule = module {
                 analytics = get(),
                 crashLogger = get(),
                 prerequisites = get(),
-                custodialWalletManager = get()
+                userIdentity = get()
             )
         }
 

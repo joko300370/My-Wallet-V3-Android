@@ -3,7 +3,6 @@ package piuk.blockchain.android.ui.launcher
 import android.app.LauncherActivity
 import android.content.Intent
 import com.blockchain.logging.CrashLogger
-import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.CurrencyPrefs

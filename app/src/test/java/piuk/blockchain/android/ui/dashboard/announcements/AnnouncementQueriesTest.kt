@@ -1,9 +1,7 @@
 package piuk.blockchain.android.ui.dashboard.announcements
 
 import com.blockchain.nabu.NabuToken
-import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.NabuDataManager
-import com.blockchain.nabu.datamanagers.SDDUserState
 import com.blockchain.nabu.models.responses.nabu.KycTierState
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.nabu.models.responses.nabu.LimitsJson
