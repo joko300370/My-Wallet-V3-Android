@@ -9,7 +9,7 @@ import com.blockchain.nabu.models.responses.nabu.Scope
 import piuk.blockchain.android.ui.validOfflineToken
 import com.blockchain.nabu.NabuToken
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.SDDUserState
+import com.blockchain.nabu.datamanagers.SimplifiedDueDiligenceUserState
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
@@ -420,7 +420,7 @@ class KycHomeAddressPresenterTest {
         givenRequestJwtAndUpdateWalletInfoSucceds()
         whenever(custodialWalletManager.isSimplifiedDueDiligenceEligible()).thenReturn(Single.just(true))
         whenever(custodialWalletManager.fetchSimplifiedDueDiligenceUserState()).thenReturn(
-            Single.just(SDDUserState(isVerified = true, stateFinalised = true))
+            Single.just(SimplifiedDueDiligenceUserState(isVerified = true, stateFinalised = true))
         )
         // Act
         subject.onContinueClicked(CampaignType.SimpleBuy)
@@ -437,7 +437,7 @@ class KycHomeAddressPresenterTest {
         givenRequestJwtAndUpdateWalletInfoSucceds()
         whenever(custodialWalletManager.isSimplifiedDueDiligenceEligible()).thenReturn(Single.just(true))
         whenever(custodialWalletManager.fetchSimplifiedDueDiligenceUserState()).thenReturn(
-            Single.just(SDDUserState(isVerified = true, stateFinalised = true))
+            Single.just(SimplifiedDueDiligenceUserState(isVerified = true, stateFinalised = true))
         )
         // Act
         subject.onContinueClicked(CampaignType.None)

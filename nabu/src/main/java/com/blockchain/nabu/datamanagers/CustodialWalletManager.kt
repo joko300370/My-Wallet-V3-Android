@@ -193,7 +193,7 @@ interface CustodialWalletManager {
 
     fun isSimplifiedDueDiligenceEligible(): Single<Boolean>
 
-    fun fetchSimplifiedDueDiligenceUserState(): Single<SDDUserState>
+    fun fetchSimplifiedDueDiligenceUserState(): Single<SimplifiedDueDiligenceUserState>
 
     fun createCustodialOrder(
         direction: TransferDirection,
@@ -683,7 +683,7 @@ data class EligiblePaymentMethodType(
     val currency: String
 )
 
-data class SDDUserState(
+data class SimplifiedDueDiligenceUserState(
     val isVerified: Boolean,
     val stateFinalised: Boolean
 )
