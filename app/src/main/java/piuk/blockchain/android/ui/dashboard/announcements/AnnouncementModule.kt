@@ -59,7 +59,7 @@ val dashboardAnnouncementsModule = module {
                 nabu = get(),
                 tierService = get(),
                 sbStateFactory = get(),
-                custodialWalletManager = get()
+                userIdentity = get()
             )
         }
 

@@ -192,7 +192,7 @@ class SimpleBuyInteractor(
 
     fun eligiblePaymentMethods(fiatCurrency: String, preselectedId: String?):
         Single<SimpleBuyIntent.PaymentMethodsUpdated> =
-        tierService.tiers().zipWith(custodialWalletManager.isSDDEligible().onErrorReturn { false }
+        tierService.tiers().zipWith(custodialWalletManager.isSimplifiedDueDiligenceEligible().onErrorReturn { false }
             .doOnSuccess {
             if (it) {
                 analytics.logEventOnce(SDDAnalytics.SDD_ELIGIBLE)

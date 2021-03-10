@@ -3,7 +3,6 @@ package piuk.blockchain.android.ui.dashboard.announcements
 import com.blockchain.nabu.datamanagers.NabuDataManager
 import com.blockchain.nabu.models.responses.nabu.Scope
 import com.blockchain.nabu.NabuToken
-import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.models.responses.nabu.KycTiers
@@ -13,6 +12,8 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.campaign.blockstackCampaignName
+import piuk.blockchain.android.identity.Feature
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 
@@ -22,7 +23,7 @@ class AnnouncementQueries(
     private val nabu: NabuDataManager,
     private val tierService: TierService,
     private val sbStateFactory: SimpleBuySyncFactory,
-    private val custodialWalletManager: CustodialWalletManager
+    private val userIdentity: UserIdentity
 ) {
     // Attempt to figure out if KYC/swap etc is allowed based on location...
     fun canKyc(): Single<Boolean> {
@@ -60,12 +61,12 @@ class AnnouncementQueries(
             .onErrorReturn { false }
     }
 
-    fun isSDDEligibleAndNotVerified(): Single<Boolean> =
-        custodialWalletManager.isSDDEligible().flatMap {
+    fun isSimplifiedDueDiligenceEligibleAndNotVerified(): Single<Boolean> =
+        userIdentity.isEligibleFor(Feature.SimplifiedDueDiligence).flatMap {
             if (!it)
                 Single.just(false)
             else
-                custodialWalletManager.fetchSDDUserState().map { it.isVerified.not() }
+                userIdentity.isVerifiedFor(Feature.SimplifiedDueDiligence).map { verified -> verified.not() }
         }
 
     fun hasReceivedStxAirdrop(): Single<Boolean> {
