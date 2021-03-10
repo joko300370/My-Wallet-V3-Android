@@ -364,7 +364,7 @@ class KycHomeAddressPresenterTest {
         whenever(
             nabuToken.fetchNabuToken()
         ).thenReturn(Single.just(validOfflineToken))
-        whenever(custodialWalletManager.isSDDEligible()).thenReturn(Single.just(false))
+        whenever(custodialWalletManager.isSimplifiedDueDiligenceEligible()).thenReturn(Single.just(false))
         givenRequestJwtAndUpdateWalletInfoSucceds()
         whenever(
             nabuDataManager.addAddress(
@@ -418,8 +418,8 @@ class KycHomeAddressPresenterTest {
         // Arrange
         givenAddressCompletes()
         givenRequestJwtAndUpdateWalletInfoSucceds()
-        whenever(custodialWalletManager.isSDDEligible()).thenReturn(Single.just(true))
-        whenever(custodialWalletManager.fetchSDDUserState()).thenReturn(
+        whenever(custodialWalletManager.isSimplifiedDueDiligenceEligible()).thenReturn(Single.just(true))
+        whenever(custodialWalletManager.fetchSimplifiedDueDiligenceUserState()).thenReturn(
             Single.just(SDDUserState(isVerified = true, stateFinalised = true))
         )
         // Act
@@ -435,8 +435,8 @@ class KycHomeAddressPresenterTest {
         // Arrange
         givenAddressCompletes()
         givenRequestJwtAndUpdateWalletInfoSucceds()
-        whenever(custodialWalletManager.isSDDEligible()).thenReturn(Single.just(true))
-        whenever(custodialWalletManager.fetchSDDUserState()).thenReturn(
+        whenever(custodialWalletManager.isSimplifiedDueDiligenceEligible()).thenReturn(Single.just(true))
+        whenever(custodialWalletManager.fetchSimplifiedDueDiligenceUserState()).thenReturn(
             Single.just(SDDUserState(isVerified = true, stateFinalised = true))
         )
         // Act
@@ -445,8 +445,8 @@ class KycHomeAddressPresenterTest {
         verify(view).showProgressDialog()
         verify(view).dismissProgressDialog()
         verify(view, never()).onSddVerified()
-        verify(custodialWalletManager).fetchSDDUserState()
-        verify(custodialWalletManager).isSDDEligible()
+        verify(custodialWalletManager).fetchSimplifiedDueDiligenceUserState()
+        verify(custodialWalletManager).isSimplifiedDueDiligenceEligible()
         verify(view).continueToVeriffSplash("UK")
     }
 

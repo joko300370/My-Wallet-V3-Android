@@ -160,7 +160,7 @@ class KycHomeAddressPresenter(
     }
 
     private fun tryToVerifyUserForSdd(state: State, campaignType: CampaignType): Single<State> {
-        return custodialWalletManager.isSDDEligible().doOnSuccess {
+        return custodialWalletManager.isSimplifiedDueDiligenceEligible().doOnSuccess {
             if (it) {
                 analytics.logEventOnce(SDDAnalytics.SDD_ELIGIBLE)
             }
@@ -168,7 +168,7 @@ class KycHomeAddressPresenter(
             if (!it) {
                 Single.just(state)
             } else {
-                PollService(custodialWalletManager.fetchSDDUserState()) { sddState ->
+                PollService(custodialWalletManager.fetchSimplifiedDueDiligenceUserState()) { sddState ->
                     sddState.stateFinalised
                 }.start(timerInSec = 1, retries = 10).map { sddState ->
                     if (sddState.value.isVerified) {

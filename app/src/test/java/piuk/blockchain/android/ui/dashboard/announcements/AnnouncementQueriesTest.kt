@@ -248,7 +248,7 @@ class AnnouncementQueriesTest {
         whenever(userIdentity.isEligibleFor(Feature.SimplifiedDueDiligence)).thenReturn(Single.just(true))
         whenever(userIdentity.isVerifiedFor(Feature.SimplifiedDueDiligence)).thenReturn(Single.just(true))
 
-        subject.isSDDEligibleAndNotVerified()
+        subject.isSimplifiedDueDiligenceEligibleAndNotVerified()
             .test()
             .assertValue { !it }
     }
@@ -258,7 +258,7 @@ class AnnouncementQueriesTest {
         whenever(userIdentity.isEligibleFor(Feature.SimplifiedDueDiligence)).thenReturn(Single.just(false))
         whenever(userIdentity.isVerifiedFor(Feature.SimplifiedDueDiligence)).thenReturn(Single.just(false))
 
-        subject.isSDDEligibleAndNotVerified()
+        subject.isSimplifiedDueDiligenceEligibleAndNotVerified()
             .test()
             .assertValue { !it }
     }
@@ -268,8 +268,7 @@ class AnnouncementQueriesTest {
         whenever(userIdentity.isEligibleFor(Feature.SimplifiedDueDiligence)).thenReturn(Single.just(true))
         whenever(userIdentity.isVerifiedFor(Feature.SimplifiedDueDiligence)).thenReturn(Single.just(false))
 
-
-        subject.isSDDEligibleAndNotVerified()
+        subject.isSimplifiedDueDiligenceEligibleAndNotVerified()
             .test()
             .assertValue { it }
     }

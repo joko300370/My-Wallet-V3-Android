@@ -191,9 +191,9 @@ interface CustodialWalletManager {
 
     fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String>
 
-    fun isSDDEligible(): Single<Boolean>
+    fun isSimplifiedDueDiligenceEligible(): Single<Boolean>
 
-    fun fetchSDDUserState(): Single<SDDUserState>
+    fun fetchSimplifiedDueDiligenceUserState(): Single<SDDUserState>
 
     fun createCustodialOrder(
         direction: TransferDirection,

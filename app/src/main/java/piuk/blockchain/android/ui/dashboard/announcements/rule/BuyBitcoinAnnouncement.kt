@@ -19,7 +19,7 @@ class BuyBitcoinAnnouncement(
     private var isUserSddEligibleButNotVerified = false
 
     override fun shouldShow(): Single<Boolean> {
-        return announcementQueries.isSDDEligibleAndNotVerified()
+        return announcementQueries.isSimplifiedDueDiligenceEligibleAndNotVerified()
             .onErrorReturn { false }
             .doOnSuccess {
                 isUserSddEligibleButNotVerified = it

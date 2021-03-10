@@ -61,7 +61,7 @@ class AnnouncementQueries(
             .onErrorReturn { false }
     }
 
-    fun isSDDEligibleAndNotVerified(): Single<Boolean> =
+    fun isSimplifiedDueDiligenceEligibleAndNotVerified(): Single<Boolean> =
         userIdentity.isEligibleFor(Feature.SimplifiedDueDiligence).flatMap {
             if (!it)
                 Single.just(false)

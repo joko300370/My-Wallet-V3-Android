@@ -838,12 +838,12 @@ class LiveCustodialWalletManager(
                 .onErrorComplete()
         }
 
-    override fun isSDDEligible(): Single<Boolean> =
+    override fun isSimplifiedDueDiligenceEligible(): Single<Boolean> =
         nabuService.isSDDEligible().zipWith(sddFeatureFlag.enabled).map { (response, featureEnabled) ->
             featureEnabled && response.eligible && response.tier == SDD_ELIGIBLE_TIER
         }.onErrorReturn { false }
 
-    override fun fetchSDDUserState(): Single<SDDUserState> =
+    override fun fetchSimplifiedDueDiligenceUserState(): Single<SDDUserState> =
         authenticator.authenticate { sessionToken ->
             nabuService.isSDDVerified(sessionToken)
         }.map {

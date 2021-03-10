@@ -13,7 +13,7 @@ class NabuUserIdentity(
             is Feature.TierLevel -> tierService.tiers().map {
                 it.isNotInitialisedFor(feature.tierLevel)
             }
-            is Feature.SimplifiedDueDiligence -> custodialWalletManager.isSDDEligible()
+            is Feature.SimplifiedDueDiligence -> custodialWalletManager.isSimplifiedDueDiligenceEligible()
         }
     }
 
@@ -22,7 +22,7 @@ class NabuUserIdentity(
             is Feature.TierLevel -> tierService.tiers().map {
                 it.isApprovedFor(feature.tierLevel)
             }
-            is Feature.SimplifiedDueDiligence -> custodialWalletManager.fetchSDDUserState().map {
+            is Feature.SimplifiedDueDiligence -> custodialWalletManager.fetchSimplifiedDueDiligenceUserState().map {
                 it.isVerified
             }
         }
