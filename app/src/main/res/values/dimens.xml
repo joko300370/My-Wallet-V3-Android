@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <dimen name="epic_margin">72dp</dimen>
     <dimen name="xhuge_margin">48dp</dimen>
     <dimen name="huge_margin">40dp</dimen>
     <dimen name="xlarge_margin">36dp</dimen>

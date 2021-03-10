@@ -425,8 +425,8 @@ class TransactionFlowCustomiserImpl(
 
     override fun selectTargetAccountTitle(state: TransactionState): String {
         return when (state.action) {
-            AssetAction.Swap -> resources.getString(R.string.receive)
-            AssetAction.Send -> resources.getString(R.string.send)
+            AssetAction.Swap,
+            AssetAction.Send -> resources.getString(R.string.common_receive)
             AssetAction.Sell -> resources.getString(R.string.sell)
             AssetAction.FiatDeposit -> resources.getString(R.string.common_deposit)
             AssetAction.Withdraw -> resources.getString(R.string.withdraw_target_select_title)
