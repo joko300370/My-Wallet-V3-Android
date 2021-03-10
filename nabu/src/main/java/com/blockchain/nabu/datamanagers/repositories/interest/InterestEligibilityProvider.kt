@@ -40,4 +40,8 @@ data class AssetInterestEligibility(
 data class Eligibility(
     val eligible: Boolean,
     val ineligibilityReason: DisabledReason
-)
+) {
+    companion object {
+        fun notEligible() = Eligibility(false, DisabledReason.OTHER)
+    }
+}
