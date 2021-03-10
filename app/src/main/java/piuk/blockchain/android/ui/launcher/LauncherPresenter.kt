@@ -18,6 +18,8 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.R
+import piuk.blockchain.android.identity.Feature
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.sdd.SDDAnalytics
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
@@ -41,7 +43,7 @@ class LauncherPresenter(
     private val currencyPrefs: CurrencyPrefs,
     private val analytics: Analytics,
     private val prerequisites: Prerequisites,
-    private val custodialWalletManager: CustodialWalletManager,
+    private val userIdentity: UserIdentity,
     private val crashLogger: CrashLogger
 ) : BasePresenter<LauncherView>() {
 
@@ -245,7 +247,7 @@ class LauncherPresenter(
     }
 
     fun onEmailVerified() {
-        compositeDisposable += custodialWalletManager.isSDDEligible().onErrorReturn { false }
+        compositeDisposable += userIdentity.isEligibleFor(Feature.SimplifiedDueDiligence).onErrorReturn { false }
             .doOnSuccess {
                 if (it)
                     analytics.logEventOnce(SDDAnalytics.SDD_ELIGIBLE)
