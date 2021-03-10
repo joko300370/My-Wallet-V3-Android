@@ -231,7 +231,7 @@ class InterestDepositTxEngineTest {
                     it.validationState == ValidationState.UNINITIALISED &&
                     it.engineState.isEmpty()
             }
-            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Priority) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
             .assertNoErrors()
             .assertComplete()
 
@@ -309,7 +309,7 @@ class InterestDepositTxEngineTest {
             feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
-                selectedLevel = FeeLevel.Priority,
+                selectedLevel = FeeLevel.Regular,
                 availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
                 asset = FEE_ASSET
             )
@@ -329,7 +329,7 @@ class InterestDepositTxEngineTest {
             .assertValue {
                 it.amount == inputAmount
             }
-            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Priority) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
             .assertComplete()
             .assertNoErrors()
 
@@ -378,7 +378,7 @@ class InterestDepositTxEngineTest {
     }
 
     @Test(expected = IllegalArgumentException::class)
-        fun `update fee level from PRIORITY to REGULAR is rejected`() {
+        fun `update fee level from REGULAR to PRIORITY is rejected`() {
         // Arrange
         val totalBalance = 21.bitcoin()
         val actionableBalance = 20.bitcoin()
@@ -401,7 +401,7 @@ class InterestDepositTxEngineTest {
             feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
-                selectedLevel = FeeLevel.Priority,
+                selectedLevel = FeeLevel.Regular,
                 availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
                 asset = FEE_ASSET
             )
@@ -410,7 +410,7 @@ class InterestDepositTxEngineTest {
         // Act
         subject.doUpdateFeeLevel(
             pendingTx,
-            FeeLevel.Regular,
+            FeeLevel.Priority,
             -1
         ).test()
     }
@@ -454,7 +454,7 @@ class InterestDepositTxEngineTest {
     }
 
     @Test
-    fun `update fee level from PRIORITY to PRIORITY has no effect`() {
+    fun `update fee level from REGULAR to REGULAR has no effect`() {
         // Arrange
         val totalBalance = 21.bitcoin()
         val actionableBalance = 20.bitcoin()
@@ -477,7 +477,7 @@ class InterestDepositTxEngineTest {
             feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
             feeSelection = FeeSelection(
-                selectedLevel = FeeLevel.Priority,
+                selectedLevel = FeeLevel.Regular,
                 availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
                 asset = FEE_ASSET
             )
@@ -486,10 +486,10 @@ class InterestDepositTxEngineTest {
         // Act
         subject.doUpdateFeeLevel(
             pendingTx,
-            FeeLevel.Priority,
+            FeeLevel.Regular,
             -1
         ).test()
-            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Priority) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
             .assertComplete()
             .assertNoErrors()
 
@@ -543,6 +543,6 @@ class InterestDepositTxEngineTest {
         private const val SELECTED_FIAT = "INR"
 
         private val MIN_DEPOSIT_AMOUNT = CryptoValue.fromMajor(ASSET, 10.toBigDecimal())
-        private val EXPECTED_AVAILABLE_FEE_LEVELS = setOf(FeeLevel.Priority)
+        private val EXPECTED_AVAILABLE_FEE_LEVELS = setOf(FeeLevel.Regular)
     }
 }

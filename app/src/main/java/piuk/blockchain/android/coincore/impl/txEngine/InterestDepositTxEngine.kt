@@ -55,7 +55,7 @@ class InterestDepositTxEngine(
                         pendingTx.copy(
                             minLimit = it.minDepositAmount,
                             feeSelection = pendingTx.feeSelection.copy(
-                                selectedLevel = FeeLevel.Priority,
+                                selectedLevel = FeeLevel.Regular,
                                 availableLevels = AVAILABLE_FEE_LEVELS
                             )
                         )
@@ -177,6 +177,6 @@ class InterestDepositTxEngine(
     override fun doPostExecute(txResult: TxResult): Completable = txTarget.onTxCompleted(txResult)
 
     companion object {
-        private val AVAILABLE_FEE_LEVELS = setOf(FeeLevel.Priority)
+        private val AVAILABLE_FEE_LEVELS = setOf(FeeLevel.Regular)
     }
 }
