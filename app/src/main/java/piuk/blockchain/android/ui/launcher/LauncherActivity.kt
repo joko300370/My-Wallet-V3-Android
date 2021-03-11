@@ -171,6 +171,6 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
     }
 
     override fun onEmailVerificationSkipped() {
-        onStartMainActivity(null, false)
+        presenter.onEmailVerificationFinished()
     }
 }

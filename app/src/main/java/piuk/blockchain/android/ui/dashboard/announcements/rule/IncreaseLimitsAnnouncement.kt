@@ -1,8 +1,10 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import androidx.annotation.VisibleForTesting
+import com.blockchain.preferences.SimpleBuyPrefs
 import io.reactivex.Single
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementQueries
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementRule
@@ -10,21 +12,26 @@ import piuk.blockchain.android.ui.dashboard.announcements.DismissRecorder
 import piuk.blockchain.android.ui.dashboard.announcements.DismissRule
 import piuk.blockchain.android.ui.dashboard.announcements.StandardAnnouncementCard
 
-class BuyBitcoinAnnouncement(
+class IncreaseLimitsAnnouncement(
     dismissRecorder: DismissRecorder,
-    private val announcementQueries: AnnouncementQueries
+    private val announcementQueries: AnnouncementQueries,
+    private val simpleBuyPrefs: SimpleBuyPrefs
 ) : AnnouncementRule(dismissRecorder) {
-
     override val dismissKey = DISMISS_KEY
-    private var isUserSddEligibleButNotVerified = false
+    override val name: String
+        get() = "increase_limits"
 
     override fun shouldShow(): Single<Boolean> {
-        return announcementQueries.isSimplifiedDueDiligenceEligibleAndNotVerified()
-            .onErrorReturn { false }
-            .doOnSuccess {
-                isUserSddEligibleButNotVerified = it
-            }
-            .flatMap { Single.just(dismissEntry.isDismissed).map { !it } }
+        if (dismissEntry.isDismissed)
+            return Single.just(false)
+        return announcementQueries.isGoldComplete().flatMap { isGold ->
+            if (!isGold) {
+                announcementQueries.isSimplifiedDueDiligenceVerified().map { verified ->
+                    verified && simpleBuyPrefs.hasCompletedAtLeastOneBuy
+                }
+            } else
+                Single.just(false)
+        }
     }
 
     override fun show(host: AnnouncementHost) {
@@ -33,26 +40,23 @@ class BuyBitcoinAnnouncement(
                 name = name,
                 dismissRule = DismissRule.CardPeriodic,
                 dismissEntry = dismissEntry,
-                titleText = R.string.buy_crypto_card_title,
-                bodyText = if (isUserSddEligibleButNotVerified)
-                    R.string.buy_crypto_card_sdd_body else R.string.buy_crypto_card_body,
-                ctaText = R.string.buy_crypto_card_cta,
-                iconImage = R.drawable.ic_announce_buy_btc,
+                titleText = R.string.increase_your_limits,
+                bodyText = R.string.increase_your_limits_body,
+                ctaText = R.string.continue_to_gold,
+                iconImage = R.drawable.ic_update_to_gold,
                 dismissFunction = {
                     host.dismissAnnouncementCard()
                 },
                 ctaFunction = {
                     host.dismissAnnouncementCard()
-                    host.startSimpleBuy()
+                    host.startKyc(CampaignType.None)
                 }
             )
         )
     }
 
-    override val name = "buy_btc"
-
     companion object {
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-        const val DISMISS_KEY = "BuyBitcoinAuthAnnouncement_DISMISSED"
+        private const val DISMISS_KEY = "IncreaseLimitsAnnouncement_DISMISSED"
     }
 }

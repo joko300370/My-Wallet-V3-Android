@@ -27,7 +27,7 @@ import com.blockchain.nabu.datamanagers.PartnerCredentials
 import com.blockchain.nabu.datamanagers.PaymentLimits
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.Product
-import com.blockchain.nabu.datamanagers.SDDUserState
+import com.blockchain.nabu.datamanagers.SimplifiedDueDiligenceUserState
 import com.blockchain.nabu.datamanagers.TransactionErrorMapper
 import com.blockchain.nabu.datamanagers.TransactionState
 import com.blockchain.nabu.datamanagers.TransactionType
@@ -838,16 +838,16 @@ class LiveCustodialWalletManager(
                 .onErrorComplete()
         }
 
-    override fun isSDDEligible(): Single<Boolean> =
+    override fun isSimplifiedDueDiligenceEligible(): Single<Boolean> =
         nabuService.isSDDEligible().zipWith(sddFeatureFlag.enabled).map { (response, featureEnabled) ->
             featureEnabled && response.eligible && response.tier == SDD_ELIGIBLE_TIER
         }.onErrorReturn { false }
 
-    override fun fetchSDDUserState(): Single<SDDUserState> =
+    override fun fetchSimplifiedDueDiligenceUserState(): Single<SimplifiedDueDiligenceUserState> =
         authenticator.authenticate { sessionToken ->
             nabuService.isSDDVerified(sessionToken)
         }.map {
-            SDDUserState(
+            SimplifiedDueDiligenceUserState(
                 isVerified = it.verified,
                 stateFinalised = it.taskComplete
             )

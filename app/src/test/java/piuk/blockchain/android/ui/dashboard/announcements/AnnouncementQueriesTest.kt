@@ -1,9 +1,7 @@
 package piuk.blockchain.android.ui.dashboard.announcements
 
 import com.blockchain.nabu.NabuToken
-import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.NabuDataManager
-import com.blockchain.nabu.datamanagers.SDDUserState
 import com.blockchain.nabu.models.responses.nabu.KycTierState
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.nabu.models.responses.nabu.LimitsJson
@@ -14,6 +12,8 @@ import io.reactivex.Single
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
+import piuk.blockchain.android.identity.Feature
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.simplebuy.SimpleBuyState
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.ui.tiers
@@ -25,7 +25,7 @@ class AnnouncementQueriesTest {
     private val settings: SettingsDataManager = mock()
     private val nabu: NabuDataManager = mock()
     private val tierService: TierService = mock()
-    private val custodialWalletManager: CustodialWalletManager = mock()
+    private val userIdentity: UserIdentity = mock()
 
     private val sbSync: SimpleBuySyncFactory = mock()
 
@@ -41,7 +41,7 @@ class AnnouncementQueriesTest {
             nabu = nabu,
             tierService = tierService,
             sbStateFactory = sbSync,
-            custodialWalletManager = custodialWalletManager
+            userIdentity = userIdentity
         )
     }
 
@@ -245,30 +245,30 @@ class AnnouncementQueriesTest {
 
     @Test
     fun `user isSddEligible but verified`() {
-        whenever(custodialWalletManager.isSDDEligible()).thenReturn(Single.just(true))
-        whenever(custodialWalletManager.fetchSDDUserState()).thenReturn(Single.just(SDDUserState(true, true)))
+        whenever(userIdentity.isEligibleFor(Feature.SimplifiedDueDiligence)).thenReturn(Single.just(true))
+        whenever(userIdentity.isVerifiedFor(Feature.SimplifiedDueDiligence)).thenReturn(Single.just(true))
 
-        subject.isSDDEligibleAndNotVerified()
+        subject.isSimplifiedDueDiligenceEligibleAndNotVerified()
             .test()
             .assertValue { !it }
     }
 
     @Test
     fun `user not SddEligible neither verified`() {
-        whenever(custodialWalletManager.isSDDEligible()).thenReturn(Single.just(false))
-        whenever(custodialWalletManager.fetchSDDUserState()).thenReturn(Single.just(SDDUserState(false, false)))
+        whenever(userIdentity.isEligibleFor(Feature.SimplifiedDueDiligence)).thenReturn(Single.just(false))
+        whenever(userIdentity.isVerifiedFor(Feature.SimplifiedDueDiligence)).thenReturn(Single.just(false))
 
-        subject.isSDDEligibleAndNotVerified()
+        subject.isSimplifiedDueDiligenceEligibleAndNotVerified()
             .test()
             .assertValue { !it }
     }
 
     @Test
     fun `user  SddEligible and not verified`() {
-        whenever(custodialWalletManager.isSDDEligible()).thenReturn(Single.just(true))
-        whenever(custodialWalletManager.fetchSDDUserState()).thenReturn(Single.just(SDDUserState(false, false)))
+        whenever(userIdentity.isEligibleFor(Feature.SimplifiedDueDiligence)).thenReturn(Single.just(true))
+        whenever(userIdentity.isVerifiedFor(Feature.SimplifiedDueDiligence)).thenReturn(Single.just(false))
 
-        subject.isSDDEligibleAndNotVerified()
+        subject.isSimplifiedDueDiligenceEligibleAndNotVerified()
             .test()
             .assertValue { it }
     }
