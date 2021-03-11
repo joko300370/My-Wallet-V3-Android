@@ -245,7 +245,7 @@ class LauncherPresenter(
         prefs.selectedFiatCurrency = settings.currency
     }
 
-    fun onEmailVerified() {
+    fun onEmailVerificationFinished() {
         compositeDisposable += userIdentity.isEligibleFor(Feature.SimplifiedDueDiligence).onErrorReturn { false }
             .doOnSuccess {
                 if (it)

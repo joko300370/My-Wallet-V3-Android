@@ -1924,4 +1924,7 @@
     <string name="sb_checkout_pending_order_title">Order in progress</string>
     <string name="sb_checkout_pending_order_blurb">Oops, looks like you’ve already got a Buy order in progress, please wait until it completes before buying again.</string>
     <string name="wallet_outage_message">We are experiencing an outage. Please rest assured your funds are safe. <annotation link="learn_more">Learn more</annotation></string>
+    <string name="increase_your_limits">Increase your limits</string>
+    <string name="increase_your_limits_body">Continue your verification to become Gold level and increase your limits and payment methods.</string>
+    <string name="continue_to_gold">Continue to Gold</string>
 </resources>

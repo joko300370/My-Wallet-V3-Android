@@ -69,6 +69,9 @@ class AnnouncementQueries(
                 userIdentity.isVerifiedFor(Feature.SimplifiedDueDiligence).map { verified -> verified.not() }
         }
 
+    fun isSimplifiedDueDiligenceVerified(): Single<Boolean> =
+        userIdentity.isVerifiedFor(Feature.SimplifiedDueDiligence)
+
     fun hasReceivedStxAirdrop(): Single<Boolean> {
         return nabuToken.fetchNabuToken()
             .flatMap { token -> nabu.getAirdropCampaignStatus(token) }
