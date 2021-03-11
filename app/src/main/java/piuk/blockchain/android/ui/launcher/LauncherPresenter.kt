@@ -41,7 +41,7 @@ class LauncherPresenter(
     private val currencyPrefs: CurrencyPrefs,
     private val analytics: Analytics,
     private val prerequisites: Prerequisites,
-    private val custodialWalletManager: CustodialWalletManager,
+    private val userIdentity: User,
     private val crashLogger: CrashLogger
 ) : BasePresenter<LauncherView>() {
 
@@ -244,7 +244,7 @@ class LauncherPresenter(
         prefs.selectedFiatCurrency = settings.currency
     }
 
-    fun onEmailVerified() {
+    fun onEmailVerificationFinished() {
         compositeDisposable += custodialWalletManager.isSDDEligible().onErrorReturn { false }
             .doOnSuccess {
                 if (it)
