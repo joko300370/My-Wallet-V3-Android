@@ -6,6 +6,7 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.wallet.api.Environment
 import com.blockchain.notifications.analytics.AnalyticsEvents
@@ -101,10 +102,22 @@ class LauncherPresenter(
             // Legacy app has not been prompted for upgrade
             isPinValidated && upgradeNeeded() -> promptUpgrade()
             // App has been PIN validated
-            isPinValidated || accessState.isLoggedIn -> initSettings()
+            isPinValidated || accessState.isLoggedIn -> {
+                logState(isPinValidated, accessState.isLoggedIn)
+                initSettings()
+            }
             // Something odd has happened, re-request PIN
             else -> view.onRequestPin()
         }
+    }
+
+    private fun logState(pinValidated: Boolean, loggedIn: Boolean) {
+        analytics.logEvent(object : AnalyticsEvent {
+            override val event: String
+                get() = "pinValidated: $pinValidated, accessStateLoggedIn: $loggedIn"
+            override val params: Map<String, String>
+                get() = emptyMap()
+        })
     }
 
     private fun upgradeNeeded(): Boolean =
