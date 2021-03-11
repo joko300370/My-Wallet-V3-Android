@@ -48,10 +48,20 @@ class SimpleBuyInteractor(
     private val coincore: Coincore
 ) {
 
-    fun fetchBuyLimitsAndSupportedCryptoCurrencies(targetCurrency: String): Single<Pair<BuySellPairs, TransferLimits>> =
+    // ignore limits when user is in tier 0
+    fun fetchBuyLimitsAndSupportedCryptoCurrencies(
+        targetCurrency: String
+    ): Single<Pair<BuySellPairs, TransferLimits?>> =
         custodialWalletManager.getSupportedBuySellCryptoCurrencies(targetCurrency).zipWith(
-            custodialWalletManager.getProductTransferLimits(targetCurrency, product = Product.SIMPLEBUY)
-        ).trackProgress(appUtil.activityIndicator)
+            tierService.tiers()
+        ).flatMap { (pairs, tier) ->
+            if (tier.isInInitialState()) {
+                Single.just(pairs to null)
+            } else
+                custodialWalletManager.getProductTransferLimits(targetCurrency, product = Product.SIMPLEBUY).map {
+                    pairs to it
+                }
+        }.trackProgress(appUtil.activityIndicator)
 
     fun fetchSupportedFiatCurrencies(): Single<SimpleBuyIntent.SupportedCurrenciesUpdated> =
         custodialWalletManager.getSupportedFiatCurrencies()
@@ -194,10 +204,10 @@ class SimpleBuyInteractor(
         Single<SimpleBuyIntent.PaymentMethodsUpdated> =
         tierService.tiers().zipWith(custodialWalletManager.isSimplifiedDueDiligenceEligible().onErrorReturn { false }
             .doOnSuccess {
-            if (it) {
-                analytics.logEventOnce(SDDAnalytics.SDD_ELIGIBLE)
-            }
-        })
+                if (it) {
+                    analytics.logEventOnce(SDDAnalytics.SDD_ELIGIBLE)
+                }
+            })
             .flatMap { (tier, sddEligible) ->
                 custodialWalletManager.fetchSuggestedPaymentMethod(
                     fiatCurrency = fiatCurrency,
