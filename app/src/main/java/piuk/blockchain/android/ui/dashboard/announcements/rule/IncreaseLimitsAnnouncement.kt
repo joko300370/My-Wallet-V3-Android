@@ -38,7 +38,7 @@ class IncreaseLimitsAnnouncement(
         host.showAnnouncementCard(
             card = StandardAnnouncementCard(
                 name = name,
-                dismissRule = DismissRule.CardPeriodic,
+                dismissRule = DismissRule.CardOneTime,
                 dismissEntry = dismissEntry,
                 titleText = R.string.increase_your_limits,
                 bodyText = R.string.increase_your_limits_body,
@@ -57,6 +57,6 @@ class IncreaseLimitsAnnouncement(
 
     companion object {
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-        private const val DISMISS_KEY = "IncreaseLimitsAnnouncement_DISMISSED"
+        const val DISMISS_KEY = "IncreaseLimitsAnnouncement_DISMISSED"
     }
 }

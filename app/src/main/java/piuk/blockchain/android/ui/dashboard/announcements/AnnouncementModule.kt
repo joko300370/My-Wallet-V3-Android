@@ -146,7 +146,7 @@ val dashboardAnnouncementsModule = module {
                 announcementQueries = get(),
                 simpleBuyPrefs = get()
             )
-        }
+        }.bind(AnnouncementRule::class)
 
         factory {
             BuyBitcoinAnnouncement(

@@ -257,6 +257,7 @@ class SimpleBuyModel(
             ).subscribeBy(
                 onSuccess = {
                     if (it.state == OrderState.FINISHED) {
+                        updatePersistingActionsForCompletedOrders()
                         process(SimpleBuyIntent.PaymentSucceeded)
                     } else if (it.state == OrderState.AWAITING_FUNDS || it.state == OrderState.PENDING_EXECUTION) {
                         process(SimpleBuyIntent.CardPaymentPending)
