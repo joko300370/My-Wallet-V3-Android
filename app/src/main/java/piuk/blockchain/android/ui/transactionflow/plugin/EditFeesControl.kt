@@ -31,6 +31,8 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.AfterTextChangedWatcher
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 
@@ -199,13 +201,13 @@ class EditFeesControl @JvmOverloads constructor(
         model: TransactionModel,
         feeSelection: FeeSelection
     ) = with(binding) {
-            if (feeList.size > 1) {
-                feeOptionSelectSpinner.setupSpinner(selectedOption, model, feeSelection)
-                feeSwitcher.displayedChild = SHOW_DROPDOWN
-            } else {
-                feeSwitcher.displayedChild = SHOW_STATIC
-            }
+        if (feeList.size > 1) {
+            feeOptionSelectSpinner.visible()
+            feeOptionSelectSpinner.setupSpinner(selectedOption, model, feeSelection)
+        } else {
+            feeOptionSelectSpinner.gone()
         }
+    }
 
     private fun AppCompatSpinner.setupSpinner(
         currentLevel: FeeLevel,
@@ -289,8 +291,6 @@ class EditFeesControl @JvmOverloads constructor(
             )
 
     companion object {
-        private const val SHOW_DROPDOWN = 0
-        private const val SHOW_STATIC = 1
         private const val SHOW_STANDARD = 0
         private const val SHOW_CUSTOM = 1
     }

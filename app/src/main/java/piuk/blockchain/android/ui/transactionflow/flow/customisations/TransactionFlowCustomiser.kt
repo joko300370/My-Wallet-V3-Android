@@ -245,6 +245,9 @@ class TransactionFlowCustomiserImpl(
 
     override fun enterAmountMaxNetworkFeeLabel(state: TransactionState): String =
         when (state.action) {
+            AssetAction.InterestDeposit,
+            AssetAction.Sell,
+            AssetAction.Swap,
             AssetAction.Send -> resources.getString(R.string.send_enter_amount_max_fee)
             else -> throw java.lang.IllegalStateException("Max network fee label not configured for ${state.action}")
         }
@@ -574,11 +577,11 @@ class TransactionFlowCustomiserImpl(
         when (state.action) {
             AssetAction.ViewActivity,
             AssetAction.Summary -> throw IllegalStateException()
-            AssetAction.Send -> BalanceAndFeeView(ctx).also { frame.addView(it) }
-            AssetAction.Receive,
+            AssetAction.Send,
             AssetAction.InterestDeposit,
             AssetAction.Sell,
-            AssetAction.Swap -> SmallBalanceView(ctx).also { frame.addView(it) }
+            AssetAction.Swap -> BalanceAndFeeView(ctx).also { frame.addView(it) }
+            AssetAction.Receive -> SmallBalanceView(ctx).also { frame.addView(it) }
             AssetAction.Withdraw,
             AssetAction.FiatDeposit -> AccountInfoBank(ctx).also { frame.addView(it) }
         }
