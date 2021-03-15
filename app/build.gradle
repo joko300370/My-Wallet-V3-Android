@@ -360,4 +360,7 @@ dependencies {
 
     testImplementation Libraries.json
     testImplementation project(':testutils-android')
+
+    debugImplementation Libraries.chuckerDebug
+    releaseImplementation Libraries.chuckerRelease
 }

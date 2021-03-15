@@ -47,6 +47,7 @@ object Versions {
     const val biometrics = "1.1.0-rc01"
 
     // Networking, RxJava
+    const val chucker = "3.4.0"
     const val retrofit = "2.7.0"
     const val okHttp = "4.9.0"
     const val mockWebServer = "v0.1.8"
@@ -191,6 +192,8 @@ object Libraries {
     const val kotlinJson = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.kotlinJson}"
     const val koin = "org.koin:koin-core:${Versions.koin}"
     const val koinAndroid = "org.koin:koin-android:${Versions.koin}"
+    const val chuckerDebug = "com.github.chuckerteam.chucker:library:${Versions.chucker}"
+    const val chuckerRelease = "com.github.chuckerteam.chucker:library-no-op:${Versions.chucker}"
 
     const val koinTest = "org.koin:koin-test:${Versions.koin}"
     const val rxJava = "io.reactivex.rxjava2:rxjava:${Versions.rxJava}"
