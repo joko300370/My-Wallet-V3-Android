@@ -186,7 +186,6 @@ class EditFeesControl @JvmOverloads constructor(
                 val fee = customFee.toString()
                 feeOptionCustom.setText(fee, TextView.BufferType.EDITABLE)
                 feeOptionCustom.setSelection(fee.length)
-                feeOptionCustom.requestFocus()
             } else {
                 feeOptionValue.setText("", TextView.BufferType.EDITABLE)
                 shouldHideFeeOptionValue = true
@@ -253,6 +252,7 @@ class EditFeesControl @JvmOverloads constructor(
             val newFeeLevel = posToFeeLevel(position)
             if (newFeeLevel == FeeLevel.Custom) {
                 showCustomFeeUi(item)
+                binding.feeOptionCustom.requestFocus()
             } else {
                 showStandardUi()
             }
