@@ -142,14 +142,13 @@ open class CustodialTradingAccount(
             ) { hasFunds, hasActionableBalance, isEligibleForSimpleBuy, fiatAccounts ->
 
                 val activity = AssetAction.ViewActivity
-                val receive = AssetAction.Receive.takeIf { !isArchived }
                 val send = AssetAction.Send.takeIf { !isArchived && hasActionableBalance }
                 val swap = AssetAction.Swap.takeIf { !isArchived && hasFunds && isEligibleForSimpleBuy }
                 val sell = AssetAction.Sell.takeIf {
                     !isArchived && hasFunds && isEligibleForSimpleBuy && fiatAccounts.isNotEmpty()
                 }
                 setOfNotNull(
-                    activity, receive, send, swap, sell
+                    activity, send, swap, sell
                 )
             }
 
