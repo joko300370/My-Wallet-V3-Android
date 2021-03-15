@@ -102,22 +102,10 @@ class LauncherPresenter(
             // Legacy app has not been prompted for upgrade
             isPinValidated && upgradeNeeded() -> promptUpgrade()
             // App has been PIN validated
-            isPinValidated || accessState.isLoggedIn -> {
-                logState(isPinValidated, accessState.isLoggedIn)
-                initSettings()
-            }
+            isPinValidated || accessState.isLoggedIn ->  initSettings()
             // Something odd has happened, re-request PIN
             else -> view.onRequestPin()
         }
-    }
-
-    private fun logState(pinValidated: Boolean, loggedIn: Boolean) {
-        analytics.logEvent(object : AnalyticsEvent {
-            override val event: String
-                get() = "pinValidated: $pinValidated, accessStateLoggedIn: $loggedIn"
-            override val params: Map<String, String>
-                get() = emptyMap()
-        })
     }
 
     private fun upgradeNeeded(): Boolean =
