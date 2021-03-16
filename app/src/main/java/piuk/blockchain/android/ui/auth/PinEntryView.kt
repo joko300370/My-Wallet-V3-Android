@@ -60,4 +60,6 @@ interface PinEntryView : View {
     fun setupCommitHashView()
 
     fun askToUseBiometrics()
+
+    fun showApiOutageMessage()
 }

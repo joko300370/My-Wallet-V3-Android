@@ -40,6 +40,8 @@ import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerificationDeepLinkHelper
+import piuk.blockchain.android.identity.UserIdentity
+import piuk.blockchain.android.identity.NabuUserIdentity
 import piuk.blockchain.android.identity.SiftDigitalTrust
 import piuk.blockchain.android.kyc.KycDeepLinkHelper
 import piuk.blockchain.android.remoteconfig.AssetOrderingRemoteConfig
@@ -280,6 +282,13 @@ val applicationModule = module {
                 authDataManager = get()
             )
         }
+
+        factory {
+            NabuUserIdentity(
+                custodialWalletManager = get(),
+                tierService = get()
+            )
+        }.bind(UserIdentity::class)
 
         factory {
             CreateWalletPresenter(
@@ -546,7 +555,7 @@ val applicationModule = module {
                 mobileNoticeRemoteConfig = get(),
                 crashLogger = get(),
                 analytics = get(),
-                config = get(),
+                apiStatus = get(),
                 credentialsWiper = get(),
                 biometricsController = get()
             )
@@ -623,7 +632,7 @@ val applicationModule = module {
                 analytics = get(),
                 crashLogger = get(),
                 prerequisites = get(),
-                custodialWalletManager = get()
+                userIdentity = get()
             )
         }
 

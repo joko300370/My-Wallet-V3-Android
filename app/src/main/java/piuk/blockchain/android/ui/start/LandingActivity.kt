@@ -2,10 +2,15 @@ package piuk.blockchain.android.ui.start
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
 import androidx.appcompat.app.AlertDialog
 import com.blockchain.koin.scopedInject
+import com.blockchain.ui.urllinks.WALLET_STATUS_URL
 import kotlinx.android.synthetic.main.activity_landing.*
+import kotlinx.android.synthetic.main.warning_layout.view.*
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus
@@ -15,11 +20,13 @@ import piuk.blockchain.android.ui.debug.DebugOptionsBottomDialog
 import piuk.blockchain.android.ui.recover.RecoverFundsActivity
 import piuk.blockchain.android.util.copyHashOnLongClick
 import piuk.blockchain.android.ui.customviews.toast
+import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.visible
 
 class LandingActivity : MvpActivity<LandingView, LandingPresenter>(), LandingView {
 
     override val presenter: LandingPresenter by scopedInject()
+    private val stringUtils: StringUtils by inject()
     override val view: LandingView = this
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,6 +85,17 @@ class LandingActivity : MvpActivity<LandingView, LandingPresenter>(), LandingVie
             .setPositiveButton(R.string.dialog_continue) { _, _ -> clearAlert() }
             .create()
         )
+
+    override fun showApiOutageMessage() {
+        layout_warning.visible()
+        val learnMoreMap = mapOf<String, Uri>("learn_more" to Uri.parse(WALLET_STATUS_URL))
+        layout_warning.warning_message.apply {
+            movementMethod = LinkMovementMethod.getInstance()
+            text = stringUtils.getStringWithMappedAnnotations(
+                R.string.wallet_outage_message, learnMoreMap, this@LandingActivity
+            )
+        }
+    }
 
     override fun showDebugMenu() {
         btn_settings.visible()

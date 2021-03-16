@@ -9,6 +9,7 @@ interface SimpleBuyPrefs {
     fun clearCardState()
     fun updateSupportedCards(cardTypes: String)
     fun getSupportedCardTypes(): String?
+    var hasCompletedAtLeastOneBuy: Boolean
 
     var addCardInfoDismissed: Boolean
 }

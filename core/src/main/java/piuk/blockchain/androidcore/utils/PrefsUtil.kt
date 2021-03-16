@@ -180,6 +180,12 @@ class PrefsUtil(
         get() = getValue(KEY_ADD_CARD_INFO, false)
         set(dismissed) = setValue(KEY_ADD_CARD_INFO, dismissed)
 
+    override var hasCompletedAtLeastOneBuy: Boolean
+        get() = getValue(KEY_HAS_COMPLETED_AT_LEAST_ONE_BUY, false)
+        set(value) {
+            setValue(KEY_HAS_COMPLETED_AT_LEAST_ONE_BUY, value)
+        }
+
     override var hasSeenRatingDialog: Boolean
         get() = getValue(HAS_SEEN_RATING, false)
         set(value) = setValue(HAS_SEEN_RATING, value)
@@ -498,6 +504,7 @@ class PrefsUtil(
         private const val KEY_SIMPLE_BUY_STATE = "key_simple_buy_state"
         private const val KEY_CARD_STATE = "key_card_state"
         private const val KEY_ADD_CARD_INFO = "key_add_card_info"
+        private const val KEY_HAS_COMPLETED_AT_LEAST_ONE_BUY = "has_completed_at_least_one_buy"
 
         private const val KEY_SUPPORTED_CARDS_STATE = "key_supported_cards"
 

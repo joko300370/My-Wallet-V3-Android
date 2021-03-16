@@ -257,6 +257,7 @@ class SimpleBuyModel(
             ).subscribeBy(
                 onSuccess = {
                     if (it.state == OrderState.FINISHED) {
+                        updatePersistingCountersForCompletedOrders()
                         process(SimpleBuyIntent.PaymentSucceeded)
                     } else if (it.state == OrderState.AWAITING_FUNDS || it.state == OrderState.PENDING_EXECUTION) {
                         process(SimpleBuyIntent.CardPaymentPending)
@@ -294,7 +295,7 @@ class SimpleBuyModel(
             .subscribeBy(
                 onSuccess = {
                     val orderCreatedSuccessfully = it.state == OrderState.FINISHED
-                    if (orderCreatedSuccessfully) updatePreRatingCompletedActionsCounter()
+                    if (orderCreatedSuccessfully) updatePersistingCountersForCompletedOrders()
                     process(SimpleBuyIntent.OrderCreated(it, shouldShowAppRating(orderCreatedSuccessfully)))
                 },
                 onError = {
@@ -324,8 +325,9 @@ class SimpleBuyModel(
         }
     }
 
-    private fun updatePreRatingCompletedActionsCounter() {
+    private fun updatePersistingCountersForCompletedOrders() {
         ratingPrefs.preRatingActionCompletedTimes = ratingPrefs.preRatingActionCompletedTimes + 1
+        prefs.hasCompletedAtLeastOneBuy = true
     }
 
     private fun shouldShowAppRating(orderCreatedSuccessFully: Boolean): Boolean =

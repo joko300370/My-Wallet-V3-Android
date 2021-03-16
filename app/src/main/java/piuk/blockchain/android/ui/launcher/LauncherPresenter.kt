@@ -3,7 +3,6 @@ package piuk.blockchain.android.ui.launcher
 import android.app.LauncherActivity
 import android.content.Intent
 import com.blockchain.logging.CrashLogger
-import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.CurrencyPrefs
@@ -12,12 +11,15 @@ import com.blockchain.notifications.analytics.AnalyticsEvents
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.exceptions.HDWalletException
 import info.blockchain.wallet.exceptions.InvalidCredentialsException
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.R
+import piuk.blockchain.android.identity.Feature
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.sdd.SDDAnalytics
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
@@ -27,6 +29,7 @@ import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcore.data.metadata.MetadataInitException
 import timber.log.Timber
 
 class LauncherPresenter(
@@ -41,7 +44,7 @@ class LauncherPresenter(
     private val currencyPrefs: CurrencyPrefs,
     private val analytics: Analytics,
     private val prerequisites: Prerequisites,
-    private val custodialWalletManager: CustodialWalletManager,
+    private val userIdentity: UserIdentity,
     private val crashLogger: CrashLogger
 ) : BasePresenter<LauncherView>() {
 
@@ -141,7 +144,7 @@ class LauncherPresenter(
             }
         }
 
-        val metadata = prerequisites.initMetadataAndRelatedPrerequisites()
+        val metadata = Completable.defer { prerequisites.initMetadataAndRelatedPrerequisites() }
         val updateFiatWithDefault = settingsDataManager.updateFiatUnit(currencyPrefs.defaultFiatCurrency)
             .ignoreElements()
 
@@ -183,6 +186,8 @@ class LauncherPresenter(
                                 view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
                                 view.onRequestPin()
                             }
+                        } else if (throwable is MetadataInitException) {
+                            view?.showMetadataNodeFailure()
                         } else {
                             view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
                             view.onRequestPin()
@@ -227,7 +232,6 @@ class LauncherPresenter(
 
     private fun logException(throwable: Throwable) {
         crashLogger.logException(throwable)
-        view?.showMetadataNodeFailure()
     }
 
     private fun shouldCheckForEmailVerification() = accessState.isNewlyCreated && !accessState.isRestored
@@ -244,8 +248,8 @@ class LauncherPresenter(
         prefs.selectedFiatCurrency = settings.currency
     }
 
-    fun onEmailVerified() {
-        compositeDisposable += custodialWalletManager.isSDDEligible().onErrorReturn { false }
+    fun onEmailVerificationFinished() {
+        compositeDisposable += userIdentity.isEligibleFor(Feature.SimplifiedDueDiligence).onErrorReturn { false }
             .doOnSuccess {
                 if (it)
                     analytics.logEventOnce(SDDAnalytics.SDD_ELIGIBLE)

@@ -248,7 +248,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     data class UpdatedBuyLimitsAndSupportedCryptoCurrencies(
         val buySellPairs: BuySellPairs,
         private val selectedCryptoCurrency: CryptoCurrency?,
-        private val transferLimits: TransferLimits
+        private val transferLimits: TransferLimits?
     ) : SimpleBuyIntent() {
 
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState {

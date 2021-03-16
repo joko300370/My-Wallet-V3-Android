@@ -77,8 +77,8 @@ class MetadataInteractor(private val metadataService: MetadataService) {
             }
         }.onErrorResumeNext(Function {
             if (it is HttpException && it.code() == 404) // haven't been created
-                Maybe.empty<String>()
-            else Maybe.error<String>(it)
+                Maybe.empty()
+            else Maybe.error(it)
         })
     }
 

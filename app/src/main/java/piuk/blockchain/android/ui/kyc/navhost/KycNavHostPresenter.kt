@@ -101,6 +101,7 @@ class KycNavHostPresenter(
                 view.campaignType == CampaignType.SimpleBuy ||
                 view.campaignType == CampaignType.Interest ||
                 view.campaignType == CampaignType.FiatFunds ||
+                (view.campaignType == CampaignType.None && !view.showTiersLimitsSplash) ||
                 view.campaignType == CampaignType.Swap -> {
                 compositeDisposable += kycNavigator.findNextStep()
                     .subscribeBy(

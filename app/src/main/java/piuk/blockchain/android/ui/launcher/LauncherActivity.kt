@@ -105,8 +105,8 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
             AlertDialog.Builder(this, R.style.AlertDialogStyle)
                 .setTitle(R.string.app_name)
                 .setMessage(R.string.metadata_load_failure)
-                .setPositiveButton(R.string.retry) { _, _ -> presenter.onViewReady() }
-                .setNegativeButton(R.string.exit) { _, _ -> presenter.clearLoginState() }
+                .setPositiveButton(R.string.retry) { _, _ -> onRequestPin() }
+                .setNegativeButton(R.string.exit) { _, _ -> finish() }
                 .setCancelable(false)
                 .create()
                 .show()
@@ -167,10 +167,10 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
     }
 
     override fun onEmailVerified() {
-        presenter.onEmailVerified()
+        presenter.onEmailVerificationFinished()
     }
 
     override fun onEmailVerificationSkipped() {
-        onStartMainActivity(null, false)
+        presenter.onEmailVerificationFinished()
     }
 }
