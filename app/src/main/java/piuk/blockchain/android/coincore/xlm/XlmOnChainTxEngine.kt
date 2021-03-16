@@ -83,7 +83,7 @@ class XlmOnChainTxEngine(
                 feeSelection = FeeSelection(
                     selectedLevel = FeeLevel.Regular,
                     availableLevels = AVAILABLE_FEE_LEVELS,
-                    asset = CryptoCurrency.XLM
+                    asset = sourceAsset
                 ),
                 selectedFiat = userFiat
             ).setMemo(

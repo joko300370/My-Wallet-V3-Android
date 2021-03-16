@@ -123,7 +123,6 @@ class BalanceAndFeeView @JvmOverloads constructor(
             with(useMax) {
                 visibleIf { !state.amount.isPositive && !customiser.shouldDisableInput(state.errorState) }
                 text = customiser.enterAmountMaxButton(state)
-//                visibleIf { !customiser.shouldDisableInput(state.errorState) && !binding.dropdown.isVisible() }
                 setOnClickListener {
                     analytics.onMaxClicked(state)
                     model.process(TransactionIntent.UseMaxSpendable)

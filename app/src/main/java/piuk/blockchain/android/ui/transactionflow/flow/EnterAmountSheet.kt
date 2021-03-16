@@ -64,15 +64,6 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
     override fun render(newState: TransactionState) {
         Timber.d("!TRANSACTION!> Rendering! EnterAmountSheet")
         cacheState(newState)
-        try {
-            doRender(newState)
-        } catch (t: Throwable) {
-            Timber.e("!TRANSACTION!> Rendering Exception! $t")
-            throw t
-        }
-    }
-
-    private fun doRender(newState: TransactionState) {
         with(binding) {
             amountSheetCtaButton.isEnabled = newState.nextEnabled
 

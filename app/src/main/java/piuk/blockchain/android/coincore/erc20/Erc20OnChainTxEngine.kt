@@ -48,7 +48,7 @@ open class Erc20OnChainTxEngine(
                 feeSelection = FeeSelection(
                     selectedLevel = mapSavedFeeToFeeLevel(fetchDefaultFeeLevel(sourceAsset)),
                     availableLevels = AVAILABLE_FEE_LEVELS,
-                    asset = CryptoCurrency.ETHER
+                    asset = sourceAsset
                 ),
                 selectedFiat = userFiat
             )
@@ -94,7 +94,7 @@ open class Erc20OnChainTxEngine(
             exchange = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
             availableLevels = AVAILABLE_FEE_LEVELS,
             selectedLevel = pendingTx.feeSelection.selectedLevel,
-                asset = CryptoCurrency.ETHER
+                asset = sourceAsset
         )
 
     private fun feeOptions(): Single<FeeOptions> =

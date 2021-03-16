@@ -462,6 +462,7 @@ class TransactionProcessor(
     fun updateFeeLevel(level: FeeLevel, customFeeAmount: Long = -1): Completable {
         Timber.d("!TRANSACTION!> in UpdateFeeLevel")
         val pendingTx = getPendingTx()
+        require(pendingTx.feeSelection.availableLevels.contains(level))
         check(pendingTx.feeSelection.availableLevels.contains(level)) {
             "Fee Level $level not supported by engine ${engine::class.java.name}"
         }

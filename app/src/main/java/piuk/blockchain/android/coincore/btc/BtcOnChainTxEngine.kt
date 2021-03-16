@@ -102,7 +102,7 @@ class BtcOnChainTxEngine(
                 feeSelection = FeeSelection(
                     selectedLevel = mapSavedFeeToFeeLevel(fetchDefaultFeeLevel(sourceAsset)),
                     availableLevels = AVAILABLE_FEE_OPTIONS,
-                    asset = CryptoCurrency.BTC
+                    asset = sourceAsset
                 ),
                 selectedFiat = userFiat
             )
@@ -184,7 +184,7 @@ class BtcOnChainTxEngine(
             totalBalance = balance,
             availableBalance = available.maxSpendable,
             feeForFullAvailable = available.forForMax,
-            feeAmount = CryptoValue.fromMinor(CryptoCurrency.BTC, utxoBundle.absoluteFee),
+            feeAmount = CryptoValue.fromMinor(sourceAsset, utxoBundle.absoluteFee),
             feeSelection = pendingTx.feeSelection.copy(
                 customLevelRates = feeOptions.toLevelRates()
             ),

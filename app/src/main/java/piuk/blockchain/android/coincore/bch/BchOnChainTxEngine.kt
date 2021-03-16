@@ -3,7 +3,6 @@ package piuk.blockchain.android.coincore.bch
 import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
 import info.blockchain.api.data.UnspentOutputs
-import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import info.blockchain.wallet.exceptions.HDWalletException
@@ -77,7 +76,7 @@ class BchOnChainTxEngine(
                 feeSelection = FeeSelection(
                     selectedLevel = FeeLevel.Regular,
                     availableLevels = AVAILABLE_FEE_LEVELS,
-                    asset = CryptoCurrency.BCH
+                    asset = sourceAsset
                 ),
                 selectedFiat = userFiat
             )
