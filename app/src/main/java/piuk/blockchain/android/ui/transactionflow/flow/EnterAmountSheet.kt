@@ -38,6 +38,7 @@ import piuk.blockchain.android.util.gone
 import timber.log.Timber
 import java.lang.IllegalStateException
 import java.math.RoundingMode
+import java.util.concurrent.TimeUnit
 
 class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() {
 
@@ -189,6 +190,7 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
         }
 
         compositeDisposable += binding.amountSheetInput.amount
+            .debounce(AMOUNT_DEBOUNCE_TIME_MS, TimeUnit.MILLISECONDS)
             .subscribe { amount ->
             state.fiatRate?.let { rate ->
                 check(state.pendingTx != null) { "Px is not initialised yet" }
@@ -307,6 +309,10 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
             requestFocus()
             imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
         }
+    }
+
+    companion object {
+        private const val AMOUNT_DEBOUNCE_TIME_MS = 300L
     }
 }
 
