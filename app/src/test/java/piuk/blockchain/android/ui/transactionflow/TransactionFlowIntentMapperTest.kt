@@ -117,7 +117,7 @@ class TransactionFlowIntentMapperTest {
         val passwordRequired = false
 
         val sourceAccount: CryptoAccount = mock()
-        val target: CryptoAccount = mock()
+        val target: NullCryptoAccount = mock()
 
         subject = TransactionFlowIntentMapper(sourceAccount, target, assetAction)
 
@@ -127,6 +127,29 @@ class TransactionFlowIntentMapperTest {
             TransactionIntent.InitialiseWithSourceAccount(
                 assetAction,
                 sourceAccount,
+                passwordRequired
+            ),
+            result
+        )
+    }
+
+    @Test
+    fun `send with defined source and target accounts`() {
+        val assetAction = AssetAction.Send
+        val passwordRequired = false
+
+        val sourceAccount: CryptoAccount = mock()
+        val target: CryptoAccount = mock()
+
+        subject = TransactionFlowIntentMapper(sourceAccount, target, assetAction)
+
+        val result = subject.map(passwordRequired)
+
+        Assert.assertEquals(
+            TransactionIntent.InitialiseWithSourceAndTargetAccount(
+                assetAction,
+                sourceAccount,
+                target,
                 passwordRequired
             ),
             result
@@ -152,7 +175,7 @@ class TransactionFlowIntentMapperTest {
         val passwordRequired = false
 
         val sourceAccount: CryptoAccount = mock()
-        val target: CryptoAccount = mock()
+        val target: NullCryptoAccount = mock()
 
         subject = TransactionFlowIntentMapper(sourceAccount, target, assetAction)
 
@@ -182,7 +205,7 @@ class TransactionFlowIntentMapperTest {
         subject.map(passwordRequired)
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test(expected = IllegalStateException::class)
     fun `fiat deposit with no defined target`() {
         val assetAction = AssetAction.FiatDeposit
         val passwordRequired = false
@@ -238,7 +261,7 @@ class TransactionFlowIntentMapperTest {
         )
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test(expected = IllegalStateException::class)
     fun `fiat withdraw with no defined source`() {
 
         val assetAction = AssetAction.Withdraw

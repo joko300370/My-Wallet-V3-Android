@@ -266,7 +266,7 @@ class TransactionFlowIntentMapper(
         }
 
     private fun handleFiatWithdraw(passwordRequired: Boolean): TransactionIntent {
-        require(sourceAccount.isFiatAccount())
+        check(sourceAccount.isFiatAccount())
         return when {
             target.isDefinedTarget() -> TransactionIntent.InitialiseWithSourceAndPreferredTarget(
                 action,
@@ -282,15 +282,27 @@ class TransactionFlowIntentMapper(
         }
     }
 
-    private fun handleSendAndSell(passwordRequired: Boolean) =
-        when {
-            sourceAccount.isDefinedCryptoAccount() ->
-                TransactionIntent.InitialiseWithSourceAccount(action, sourceAccount, passwordRequired)
-            else -> throw IllegalStateException("Can't start send or sell without a source account")
+    private fun handleSendAndSell(passwordRequired: Boolean): TransactionIntent {
+        check(sourceAccount.isDefinedCryptoAccount()) { "Can't start send or sell without a source account" }
+
+        return if (target.isDefinedTarget()) {
+            TransactionIntent.InitialiseWithSourceAndTargetAccount(
+                action,
+                sourceAccount,
+                target,
+                passwordRequired
+            )
+        } else {
+            TransactionIntent.InitialiseWithSourceAccount(
+                action,
+                sourceAccount,
+                passwordRequired
+            )
         }
+    }
 
     private fun handleFiatDeposit(passwordRequired: Boolean): TransactionIntent {
-        require(target.isDefinedTarget()) { "Can't deposit without a target" }
+        check(target.isDefinedTarget()) { "Can't deposit without a target" }
         return when {
             sourceAccount.isFiatAccount() -> TransactionIntent.InitialiseWithSourceAndTargetAccount(
                 action,
