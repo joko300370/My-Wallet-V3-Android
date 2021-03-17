@@ -189,7 +189,6 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
         }
 
         compositeDisposable += binding.amountSheetInput.amount
-            .debounce(AMOUNT_DEBOUNCE_TIME_MS, TimeUnit.MILLISECONDS)
             .subscribe { amount ->
                 state.fiatRate?.let { rate ->
                     check(state.pendingTx != null) { "Px is not initialised yet" }

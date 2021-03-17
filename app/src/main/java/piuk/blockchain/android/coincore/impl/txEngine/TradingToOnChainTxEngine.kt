@@ -37,7 +37,8 @@ class TradingToOnChainTxEngine(
                 feeForFullAvailable = CryptoValue.zero(sourceAsset),
                 feeAmount = CryptoValue.zero(sourceAsset),
                 feeSelection = FeeSelection(),
-                selectedFiat = userFiat
+                selectedFiat = userFiat,
+                minLimit = CryptoValue.zero(sourceAsset)
             )
         )
 
@@ -89,7 +90,8 @@ class TradingToOnChainTxEngine(
     private fun validateAmounts(pendingTx: PendingTx): Completable =
         sourceAccount.actionableBalance
             .flatMapCompletable { max ->
-                if (max >= pendingTx.amount) {
+                val min = pendingTx.minLimit ?: CryptoValue.zero(sourceAsset)
+                if (pendingTx.amount.isPositive && max >= pendingTx.amount && min <= pendingTx.amount) {
                     Completable.complete()
                 } else {
                     throw TxValidationFailure(
