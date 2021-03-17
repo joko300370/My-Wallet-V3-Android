@@ -113,7 +113,7 @@ abstract class OnChainTxEngineBase(
         cryptoCurrency: CryptoCurrency,
         pendingTx: PendingTx,
         newFeeLevel: FeeLevel,
-        customFeeAmount: Long = -1
+        customFeeAmount: Long
     ): Single<PendingTx> {
         storeDefaultFeeLevel(cryptoCurrency, newFeeLevel)
 

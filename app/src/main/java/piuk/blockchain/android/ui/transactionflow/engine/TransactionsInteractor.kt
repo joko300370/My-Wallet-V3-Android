@@ -99,7 +99,7 @@ class TransactionInteractor(
     fun updateTransactionAmount(amount: Money): Completable =
         transactionProcessor?.updateAmount(amount) ?: throw IllegalStateException("TxProcessor not initialised")
 
-    fun updateTransactionFees(feeLevel: FeeLevel, customFeeAmount: Long): Completable =
+    fun updateTransactionFees(feeLevel: FeeLevel, customFeeAmount: Long?): Completable =
         transactionProcessor?.updateFeeLevel(
             level = feeLevel,
             customFeeAmount = customFeeAmount

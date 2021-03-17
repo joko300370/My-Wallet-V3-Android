@@ -3,6 +3,7 @@ package piuk.blockchain.android.coincore.bch
 import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
 import info.blockchain.api.data.UnspentOutputs
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import info.blockchain.wallet.exceptions.HDWalletException
@@ -61,8 +62,8 @@ class BchOnChainTxEngine(
 
     override fun assertInputsValid() {
         check(txTarget is CryptoAddress)
-        check((txTarget as CryptoAddress).asset == sourceAsset)
-        check(sourceAsset == sourceAsset)
+        check((txTarget as CryptoAddress).asset == CryptoCurrency.BCH)
+        check(sourceAsset == CryptoCurrency.BCH)
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =

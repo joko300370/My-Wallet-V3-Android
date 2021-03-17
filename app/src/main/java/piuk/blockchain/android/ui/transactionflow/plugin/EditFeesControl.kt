@@ -128,15 +128,20 @@ class EditFeesControl @JvmOverloads constructor(
             displayList.add(
                 when (it) {
                     FeeLevel.None -> throw IllegalStateException("Fee level None not supported")
-                    FeeLevel.Regular -> context.getString(R.string.fee_options_label,
+                    FeeLevel.Regular -> context.getString(
+                        R.string.fee_options_label,
                         context.getString(R.string.fee_options_regular),
-                        context.getString(R.string.fee_options_regular_time))
+                        context.getString(R.string.fee_options_regular_time)
+                    )
                     FeeLevel.Priority -> context.getString(
                         R.string.fee_options_label, context.getString(R.string.fee_options_priority),
-                        context.getString(R.string.fee_options_priority_time))
-                    FeeLevel.Custom -> context.getString(R.string.fee_options_label,
+                        context.getString(R.string.fee_options_priority_time)
+                    )
+                    FeeLevel.Custom -> context.getString(
+                        R.string.fee_options_label,
                         context.getString(R.string.fee_options_custom),
-                        context.getString(R.string.fee_options_custom_warning))
+                        context.getString(R.string.fee_options_custom_warning)
+                    )
                 }
             )
         }
@@ -283,12 +288,13 @@ class EditFeesControl @JvmOverloads constructor(
 
     private fun updateFeeOptionValueVisibility() = binding.feeOptionValue.visibleIf { !shouldHideFeeOptionValue }
 
-    private fun sendFeeUpdate(model: TransactionModel, level: FeeLevel, customFee: Long = -1) =
+    private fun sendFeeUpdate(model: TransactionModel, level: FeeLevel, customFeeAmount: Long? = null) =
         model.process(
             TransactionIntent.SetFeeLevel(
                 feeLevel = level,
-                customFeeAmount = customFee)
+                customFeeAmount = customFeeAmount
             )
+        )
 
     companion object {
         private const val SHOW_STANDARD = 0

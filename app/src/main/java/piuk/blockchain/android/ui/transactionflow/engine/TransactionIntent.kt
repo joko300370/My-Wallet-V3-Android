@@ -364,7 +364,7 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
 
     data class SetFeeLevel(
         val feeLevel: FeeLevel,
-        val customFeeAmount: Long = -1
+        val customFeeAmount: Long?
     ) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState

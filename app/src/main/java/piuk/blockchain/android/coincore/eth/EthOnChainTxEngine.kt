@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore.eth
 
 import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import info.blockchain.balance.Money.Companion.max
@@ -39,8 +40,8 @@ open class EthOnChainTxEngine(
 ) {
     override fun assertInputsValid() {
         check(txTarget is CryptoAddress)
-        check((txTarget as CryptoAddress).asset == sourceAsset)
-        check(sourceAsset == sourceAsset)
+        check((txTarget as CryptoAddress).asset == CryptoCurrency.ETHER)
+        check(sourceAsset == CryptoCurrency.ETHER)
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
@@ -62,18 +63,21 @@ open class EthOnChainTxEngine(
 
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(
-            pendingTx.copy(confirmations = listOf(
-                TxConfirmationValue.From(from = sourceAccount.label),
-                TxConfirmationValue.To(to = txTarget.label),
-                makeFeeSelectionOption(pendingTx),
-                TxConfirmationValue.FeedTotal(
-                    amount = pendingTx.amount,
-                    fee = pendingTx.feeAmount,
-                    exchangeFee = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
-                    exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
-                ),
-                TxConfirmationValue.Description()
-            )))
+            pendingTx.copy(
+                confirmations = listOf(
+                    TxConfirmationValue.From(from = sourceAccount.label),
+                    TxConfirmationValue.To(to = txTarget.label),
+                    makeFeeSelectionOption(pendingTx),
+                    TxConfirmationValue.FeedTotal(
+                        amount = pendingTx.amount,
+                        fee = pendingTx.feeAmount,
+                        exchangeFee = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+                        exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
+                    ),
+                    TxConfirmationValue.Description()
+                )
+            )
+        )
 
     private fun absoluteFee(feeLevel: FeeLevel): Single<CryptoValue> =
         feeOptions().map {

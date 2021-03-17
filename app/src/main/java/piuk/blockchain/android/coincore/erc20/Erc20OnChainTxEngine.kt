@@ -48,7 +48,7 @@ open class Erc20OnChainTxEngine(
                 feeSelection = FeeSelection(
                     selectedLevel = mapSavedFeeToFeeLevel(fetchDefaultFeeLevel(sourceAsset)),
                     availableLevels = AVAILABLE_FEE_LEVELS,
-                    asset = sourceAsset
+                    asset = CryptoCurrency.ETHER
                 ),
                 selectedFiat = userFiat
             )

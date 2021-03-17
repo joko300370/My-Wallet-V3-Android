@@ -164,16 +164,16 @@ class TradingToOnChainTxEngineTest {
             .test()
             .assertValue {
                 it.amount == CryptoValue.zero(ASSET) &&
-                it.totalBalance == CryptoValue.zero(ASSET) &&
-                it.availableBalance == CryptoValue.zero(ASSET) &&
-                it.feeForFullAvailable == CryptoValue.zero(ASSET) &&
-                it.feeAmount == CryptoValue.zero(ASSET) &&
-                it.selectedFiat == SELECTED_FIAT &&
-                it.confirmations.isEmpty() &&
-                it.minLimit == null &&
-                it.maxLimit == null &&
-                it.validationState == ValidationState.UNINITIALISED &&
-                it.engineState.isEmpty()
+                    it.totalBalance == CryptoValue.zero(ASSET) &&
+                    it.availableBalance == CryptoValue.zero(ASSET) &&
+                    it.feeForFullAvailable == CryptoValue.zero(ASSET) &&
+                    it.feeAmount == CryptoValue.zero(ASSET) &&
+                    it.selectedFiat == SELECTED_FIAT &&
+                    it.confirmations.isEmpty() &&
+                    it.minLimit == CryptoValue.zero(ASSET) &&
+                    it.maxLimit == null &&
+                    it.validationState == ValidationState.UNINITIALISED &&
+                    it.engineState.isEmpty()
             }
             .assertValue { verifyFeeLevels(it.feeSelection) }
             .assertNoErrors()
@@ -221,9 +221,9 @@ class TradingToOnChainTxEngineTest {
         ).test()
             .assertValue {
                 it.amount == inputAmount &&
-                it.totalBalance == totalBalance &&
-                it.availableBalance == actionableBalance &&
-                it.feeAmount == expectedFee
+                    it.totalBalance == totalBalance &&
+                    it.availableBalance == actionableBalance &&
+                    it.feeAmount == expectedFee
             }
             .assertValue { verifyFeeLevels(it.feeSelection) }
             .assertComplete()
@@ -380,9 +380,9 @@ class TradingToOnChainTxEngineTest {
         ).test()
             .assertValue {
                 it.amount == inputAmount &&
-                it.totalBalance == totalBalance &&
-                it.availableBalance == actionableBalance &&
-                it.feeAmount == zeroPax
+                    it.totalBalance == totalBalance &&
+                    it.availableBalance == actionableBalance &&
+                    it.feeAmount == zeroPax
             }
             .assertValue { verifyFeeLevels(it.feeSelection) }
             .assertComplete()

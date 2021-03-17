@@ -459,15 +459,14 @@ class TransactionProcessor(
 
     // Check that the fee level is supported, then call into the engine to set the fee and validate ballances etc
     // the selected fee level is supported
-    fun updateFeeLevel(level: FeeLevel, customFeeAmount: Long = -1): Completable {
+    fun updateFeeLevel(level: FeeLevel, customFeeAmount: Long?): Completable {
         Timber.d("!TRANSACTION!> in UpdateFeeLevel")
         val pendingTx = getPendingTx()
-        require(pendingTx.feeSelection.availableLevels.contains(level))
-        check(pendingTx.feeSelection.availableLevels.contains(level)) {
+        require(pendingTx.feeSelection.availableLevels.contains(level)) {
             "Fee Level $level not supported by engine ${engine::class.java.name}"
         }
 
-        return engine.doUpdateFeeLevel(pendingTx, level, customFeeAmount)
+        return engine.doUpdateFeeLevel(pendingTx, level, customFeeAmount ?: -1L)
             .flatMap { engine.doValidateAmount(it) }
             .doOnSuccess { updatePendingTx(it) }
             .ignoreElement()
