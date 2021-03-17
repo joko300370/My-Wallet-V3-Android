@@ -37,7 +37,6 @@ import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
 import piuk.blockchain.android.util.gone
 import timber.log.Timber
 import java.math.RoundingMode
-import java.util.concurrent.TimeUnit
 
 class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() {
 
