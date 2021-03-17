@@ -8,6 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.constraintlayout.widget.ConstraintLayout
+import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.ExchangeRate
+import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
@@ -108,7 +111,13 @@ class BalanceAndFeeView @JvmOverloads constructor(
         if (value.isPositive || value.isZero) {
             state.fiatRate?.let { rate ->
                 return when (displayMode) {
-                    TxFlowWidget.DisplayMode.Fiat -> rate.convert(value).toStringWithSymbol()
+                    TxFlowWidget.DisplayMode.Fiat -> {
+                        // This applies to case that fees are in different currency than the source account currency (ERC-20 token)
+                        // in this case we will show the fee in the default currency without make any conversions
+                        if (rate.canConvert(value))
+                            rate.convert(value).toStringWithSymbol()
+                        else value.toStringWithSymbol()
+                    }
                     TxFlowWidget.DisplayMode.Crypto -> value.toStringWithSymbol()
                 }
             }
@@ -176,3 +185,11 @@ class BalanceAndFeeView @JvmOverloads constructor(
         imm.hideSoftInputFromWindow(binding.root.windowToken, 0)
     }
 }
+
+private fun ExchangeRate.canConvert(value: Money): Boolean =
+    when (this) {
+        is ExchangeRate.FiatToCrypto -> value.currencyCode == this.from
+        is ExchangeRate.CryptoToFiat -> (value is CryptoValue && value.currency == this.from)
+        is ExchangeRate.FiatToFiat -> (value is FiatValue && value.currencyCode == this.from)
+        is ExchangeRate.CryptoToCrypto -> (value is CryptoValue && value.currency == this.from)
+    }
