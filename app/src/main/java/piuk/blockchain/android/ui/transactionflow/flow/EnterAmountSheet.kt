@@ -37,6 +37,7 @@ import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
 import piuk.blockchain.android.util.gone
 import timber.log.Timber
 import java.math.RoundingMode
+import java.util.concurrent.TimeUnit
 
 class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() {
 
@@ -188,6 +189,7 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
         }
 
         compositeDisposable += binding.amountSheetInput.amount
+            .debounce(AMOUNT_DEBOUNCE_TIME_MS, TimeUnit.MILLISECONDS)
             .subscribe { amount ->
                 state.fiatRate?.let { rate ->
                     check(state.pendingTx != null) { "Px is not initialised yet" }
