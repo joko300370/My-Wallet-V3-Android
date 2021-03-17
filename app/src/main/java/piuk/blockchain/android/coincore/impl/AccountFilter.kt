@@ -58,7 +58,7 @@ private fun buildNonCustodialGroup(
     accountList: List<SingleAccount>
 ): AccountGroup? {
     val grpAccounts = accountList.filterIsInstance<CryptoNonCustodialAccount>()
-    return if (accountList.isNotEmpty())
+    return if (grpAccounts.isNotEmpty())
         CryptoAccountNonCustodialGroup(
             asset, labels.getDefaultCustodialWalletLabel(asset), grpAccounts
         )
