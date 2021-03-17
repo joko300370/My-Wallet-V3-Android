@@ -46,11 +46,13 @@
         android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintVertical_bias="0"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/amount_sheet_title">
         <LinearLayout
             android:id="@+id/scroll_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical">
             <FrameLayout
                 android:id="@+id/frame_upper_slot"
@@ -81,7 +83,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="32dp"
-                android:layout_marginBottom="@dimen/tiny_margin"
                 android:contentDescription="@string/next"
                 android:text="@string/next" />
         </LinearLayout>

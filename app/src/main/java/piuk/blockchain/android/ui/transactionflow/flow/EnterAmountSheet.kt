@@ -36,7 +36,6 @@ import piuk.blockchain.android.ui.transactionflow.plugin.ExpandableTxFlowWidget
 import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
 import piuk.blockchain.android.util.gone
 import timber.log.Timber
-import java.lang.IllegalStateException
 import java.math.RoundingMode
 import java.util.concurrent.TimeUnit
 
@@ -151,9 +150,18 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
             (lowerSlot as? ExpandableTxFlowWidget)?.let {
                 it.expanded.observeOn(AndroidSchedulers.mainThread()).subscribe { expanded ->
                     upperSlot?.setVisible(!expanded)
+                    configureCtaButton(expanded)
                 }
             }
         }
+    }
+
+    private fun configureCtaButton(expanded: Boolean) {
+        val layoutParams: ViewGroup.MarginLayoutParams =
+            binding.amountSheetCtaButton.layoutParams as ViewGroup.MarginLayoutParams
+        layoutParams.bottomMargin =
+            if (expanded) resources.getDimension(R.dimen.xhuge_margin).toInt() else 0
+        binding.amountSheetCtaButton.layoutParams = layoutParams
     }
 
     private fun DialogTxFlowEnterAmountBinding.initialiseLowerSlotIfNeeded(newState: TransactionState) {
@@ -183,21 +191,21 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
         compositeDisposable += binding.amountSheetInput.amount
             .debounce(AMOUNT_DEBOUNCE_TIME_MS, TimeUnit.MILLISECONDS)
             .subscribe { amount ->
-            state.fiatRate?.let { rate ->
-                check(state.pendingTx != null) { "Px is not initialised yet" }
-                model.process(
-                    TransactionIntent.AmountChanged(
-                        if (!state.allowFiatInput && amount is FiatValue) {
-                            convertFiatToCrypto(amount, rate as ExchangeRate.CryptoToFiat, state).also {
-                                binding.amountSheetInput.fixExchange(it)
+                state.fiatRate?.let { rate ->
+                    check(state.pendingTx != null) { "Px is not initialised yet" }
+                    model.process(
+                        TransactionIntent.AmountChanged(
+                            if (!state.allowFiatInput && amount is FiatValue) {
+                                convertFiatToCrypto(amount, rate as ExchangeRate.CryptoToFiat, state).also {
+                                    binding.amountSheetInput.fixExchange(it)
+                                }
+                            } else {
+                                amount
                             }
-                        } else {
-                            amount
-                        }
+                        )
                     )
-                )
+                }
             }
-        }
 
         compositeDisposable += binding.amountSheetInput
             .onImeAction
