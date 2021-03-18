@@ -1681,7 +1681,7 @@ I tuoi fondi saranno disponibili per il prelievo una volta che il trasferimento 
     <string name="cash_accounts">Conti di cassa</string>
     <string name="cash_accounts_description">Conserva USD, GBP o EUR nel tuo portafogli. Usa il saldo per acquistare cripto. Vendi cripto per contanti in qualsiasi momento.</string>
     <string name="link_a_bank_description">Conserva USD, GBP o EUR nel tuo portafogli. Usa il saldo per acquistare cripto. Vendi cripto per contanti in qualsiasi momento.</string>
-    <string name="earn_interest_description">Metti la tua cripto al lavoro. Guadagna fino al 10\%% mensilmente semplicemente non facendo nulla. Deposita istantaneamente e inizia a guadagnare.</string>
+    <string name="earn_interest_description" formatted="false">Metti la tua cripto al lavoro. Guadagna fino al 10% mensilmente semplicemente non facendo nulla. Deposita istantaneamente e inizia a guadagnare.</string>
     <string name="sb_checkout_daily_limit_title">Limite giornaliero superato</string>
     <string name="sb_checkout_daily_limit_blurb">Ops, sembra che tu abbia esaurito il limite di transazione giornaliero per acquisti e depositi, riprova domani.</string>
     <string name="sb_checkout_weekly_limit_title">Limite settimanale superato</string>

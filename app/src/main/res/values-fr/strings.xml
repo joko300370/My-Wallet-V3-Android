@@ -1676,7 +1676,7 @@ Une fois que c\'est fait, veuillez réessayer.</string>
     <string name="cash_accounts">Comptes de caisse</string>
     <string name="cash_accounts_description">Stockez des USD, GBP ou EUR dans votre portefeuille. Utilisez le solde pour acheter de la crypto. Vendez de la crypto contre de l\'argent à tout moment.</string>
     <string name="link_a_bank_description">Stockez des USD, GBP ou EUR dans votre portefeuille. Utilisez le solde pour acheter de la crypto. Vendez de la crypto contre de l\'argent à tout moment.</string>
-    <string name="earn_interest_description">Faites travailler votre crypto. Gagnez jusqu\'à 10\%% par mois en ne faisant rien. Déposez instantanément et commencez à gagner.</string>
+    <string name="earn_interest_description" formatted="false">Faites travailler votre crypto. Gagnez jusqu\'à 10% par mois en ne faisant rien. Déposez instantanément et commencez à gagner.</string>
     <string name="sb_checkout_daily_limit_title">Plafond journalier dépassé</string>
     <string name="sb_checkout_daily_limit_blurb">Oups, il semble que vous ayez atteint votre plafond journalier de transactions pour les Achats et les Dépôts, veuillez réessayer demain.</string>
     <string name="sb_checkout_weekly_limit_title">Plafond hebdomadaire dépassé</string>
