@@ -1666,7 +1666,7 @@ Bitte schreiben Sie diese 12 Wörter der Reihe nach auf und bewahren Sie sie an 
     <string name="cash_accounts">Geldkonten</string>
     <string name="cash_accounts_description">Speichere USD, GBP oder EUR in deinem Wallet. Verwende das Guthaben, um Krypto zu kaufen. Verkaufe jederzeit Krypto für Bargeld.</string>
     <string name="link_a_bank_description">Speichere USD, GBP oder EUR in deinem Wallet. Verwende das Guthaben, um Krypto zu kaufen. Verkaufe jederzeit Krypto für Bargeld.</string>
-    <string name="earn_interest_description">Lass dein Krypto arbeiten. Verdiene bis zu 10 % monatlich, indem du einfach nichts tust. Sofort einzahlen und anfangen zu verdienen.</string>
+    <string name="earn_interest_description">Lass dein Krypto arbeiten. Verdiene bis zu 10% monatlich, indem du einfach nichts tust. Sofort einzahlen und anfangen zu verdienen.</string>
     <string name="sb_checkout_daily_limit_title">Tägliches Limit aufgebraucht</string>
     <string name="sb_checkout_daily_limit_blurb">Ups, es sieht so aus, als hättest du dein tägliches Transaktionslimit für Käufe und Einzahlungen aufgebraucht, bitte versuche es morgen erneut.</string>
     <string name="sb_checkout_weekly_limit_title">Wöchentliches Limit aufgebraucht</string>
