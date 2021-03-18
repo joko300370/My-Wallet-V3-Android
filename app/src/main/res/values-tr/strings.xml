@@ -1681,7 +1681,7 @@ Banka transferiniz %3$s tarihinde tamamlandıktan sonra para çekme işlemi ger�
     <string name="cash_accounts">Nakit Hesaplar</string>
     <string name="cash_accounts_description">Cüzdanınızda USD, GBP veya EUR saklayın. Kripto satın almak için bakiyeyi kullanın. İstediğiniz zaman nakit karşılığında kripto satın.</string>
     <string name="link_a_bank_description">Cüzdanınızda USD, GBP veya EUR saklayın. Kripto satın almak için bakiyeyi kullanın. İstediğiniz zaman nakit karşılığında kripto satın.</string>
-    <string name="earn_interest_description">Kripto paranızı çalıştırın. Hiçbir şey yapmadan ayda %10\'a kadar kazanç elde edin. Anında para yatırın ve kazanmaya başlayın.</string>
+    <string name="earn_interest_description">Kripto paranızı çalıştırın. Hiçbir şey yapmadan ayda 10\%%\'a kadar kazanç elde edin. Anında para yatırın ve kazanmaya başlayın.</string>
     <string name="sb_checkout_daily_limit_title">Günlük limit aşıldı</string>
     <string name="sb_checkout_daily_limit_blurb">Oops! Satın Alma ve Para Yatırma için günlük işlem limitinizi tüketmiş gözüküyorsunuz, lütfen yarın tekrar deneyin.</string>
     <string name="sb_checkout_weekly_limit_title">Haftalık limit aşıldı</string>

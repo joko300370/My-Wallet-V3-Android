@@ -1657,7 +1657,7 @@ Anote estas 12 palavras por ordem e guarde-as num lugar seguro. Nunca as partilh
     <string name="cash_accounts">Contas de caixa</string>
     <string name="cash_accounts_description">Guarde USD, GBP ou EUR na sua carteira. Utilize o saldo para comprar criptomoedas. Venda criptomoedas por dinheiro a qualquer momento.</string>
     <string name="link_a_bank_description">Guarde USD, GBP ou EUR na sua carteira. Utilize o saldo para comprar criptomoedas. Venda criptomoedas por dinheiro a qualquer momento.</string>
-    <string name="earn_interest_description">Ponha a sua criptomoeda a render. Ganhe até 10% todos os meses sem fazer nada. Deposite instantaneamente e comece a ganhar.</string>
+    <string name="earn_interest_description">Ponha a sua criptomoeda a render. Ganhe até 10\%% todos os meses sem fazer nada. Deposite instantaneamente e comece a ganhar.</string>
     <string name="sb_checkout_daily_limit_title">Limite diário excedido</string>
     <string name="sb_checkout_daily_limit_blurb">Ups, parece que já chegou ao seu limite de transações diário para Compras e Depósitos, tente novamente amanhã.</string>
     <string name="sb_checkout_weekly_limit_title">Limite semanal excedido</string>

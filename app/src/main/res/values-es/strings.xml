@@ -1672,7 +1672,7 @@ Sus fondos estarán disponibles para ser retirados una vez que la transferencia 
     <string name="cash_accounts">Cuentas de caja</string>
     <string name="cash_accounts_description">Guarde USD, GBP o EUR en su monedero. Utilice el saldo para comprar criptomonedas. Venda criptomonedas por dinero en efectivo en cualquier momento.</string>
     <string name="link_a_bank_description">Guarde USD, GBP o EUR en su monedero. Utilice el saldo para comprar criptomonedas. Venda criptomonedas por dinero en efectivo en cualquier momento.</string>
-    <string name="earn_interest_description">Ponga sus criptomonedas a trabajar. Gane hasta un 10% al mes sin hacer nada. Deposite en el momento y empiece a ganar.</string>
+    <string name="earn_interest_description">Ponga sus criptomonedas a trabajar. Gane hasta un 10\%% al mes sin hacer nada. Deposite en el momento y empiece a ganar.</string>
     <string name="sb_checkout_daily_limit_title">Se ha superado el límite diario</string>
     <string name="sb_checkout_daily_limit_blurb">Vaya, parece que ha agotado su límite diario de transacciones para compras y depósitos. Vuelva a intentarlo mañana.</string>
     <string name="sb_checkout_weekly_limit_title">Se ha superado el límite semanal</string>
