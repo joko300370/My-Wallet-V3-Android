@@ -1677,7 +1677,7 @@ Banka transferiniz %3$s tarihinde tamamlandıktan sonra para çekme işlemi ger�
     <string name="want_to_buy_more">Daha fazla satın almak ister misiniz?</string>
     <string name="unlock_gold_level_trading">Gold Seviye Ticaretin kilidini açın</string>
     <string name="verify_your_identity_limits">Kimliğinizi doğrulayın, faiz kazanın ve günde %1$s miktarına kadar ticaret yapın.</string>
-    <string name="apply_and_unlock"><![CDATA[Şimdi Uygula ve Kilidi Aç]]></string>
+    <string name="apply_and_unlock">Şimdi Uygula ve Kilidi Aç></string>
     <string name="cash_accounts">Nakit Hesaplar</string>
     <string name="cash_accounts_description">Cüzdanınızda USD, GBP veya EUR saklayın. Kripto satın almak için bakiyeyi kullanın. İstediğiniz zaman nakit karşılığında kripto satın.</string>
     <string name="link_a_bank_description">Cüzdanınızda USD, GBP veya EUR saklayın. Kripto satın almak için bakiyeyi kullanın. İstediğiniz zaman nakit karşılığında kripto satın.</string>

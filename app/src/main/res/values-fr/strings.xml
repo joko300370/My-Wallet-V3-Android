@@ -1672,7 +1672,7 @@ Une fois que c\'est fait, veuillez réessayer.</string>
     <string name="want_to_buy_more">Vous voulez en acheter plus ?</string>
     <string name="unlock_gold_level_trading">Débloquez le trading de niveau Gold</string>
     <string name="verify_your_identity_limits">Vérifiez votre identité, gagnez des intérêts et échangez jusqu\'à %1$s par an.</string>
-    <string name="apply_and_unlock"><![CDATA[Appliquer & déverrouiller maintenant]]></string>
+    <string name="apply_and_unlock">Appliquer &amp; déverrouiller maintenant></string>
     <string name="cash_accounts">Comptes de caisse</string>
     <string name="cash_accounts_description">Stockez des USD, GBP ou EUR dans votre portefeuille. Utilisez le solde pour acheter de la crypto. Vendez de la crypto contre de l\'argent à tout moment.</string>
     <string name="link_a_bank_description">Stockez des USD, GBP ou EUR dans votre portefeuille. Utilisez le solde pour acheter de la crypto. Vendez de la crypto contre de l\'argent à tout moment.</string>

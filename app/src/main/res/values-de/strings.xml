@@ -1662,7 +1662,7 @@ Bitte schreiben Sie diese 12 Wörter der Reihe nach auf und bewahren Sie sie an 
     <string name="want_to_buy_more">Mehr kaufen?</string>
     <string name="unlock_gold_level_trading">Gold-Level-Handel freischalten</string>
     <string name="verify_your_identity_limits">Überprüfe deine Identität und handle täglich bis zu %1$s.</string>
-    <string name="apply_and_unlock"><![CDATA[Jetzt beantragen und freischalten]]></string>
+    <string name="apply_and_unlock">Jetzt beantragen und freischalten></string>
     <string name="cash_accounts">Geldkonten</string>
     <string name="cash_accounts_description">Speichere USD, GBP oder EUR in deinem Wallet. Verwende das Guthaben, um Krypto zu kaufen. Verkaufe jederzeit Krypto für Bargeld.</string>
     <string name="link_a_bank_description">Speichere USD, GBP oder EUR in deinem Wallet. Verwende das Guthaben, um Krypto zu kaufen. Verkaufe jederzeit Krypto für Bargeld.</string>

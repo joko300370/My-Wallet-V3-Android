@@ -1677,7 +1677,7 @@ I tuoi fondi saranno disponibili per il prelievo una volta che il trasferimento 
     <string name="want_to_buy_more">Vuoi acquistare di più?</string>
     <string name="unlock_gold_level_trading">Sblocca il trading di livello Gold</string>
     <string name="verify_your_identity_limits">Verifica la tua identità, guadagna interessi e fai trading fino a %1$s al giorno.</string>
-    <string name="apply_and_unlock"><![CDATA[Applica e sblocca ora]]></string>
+    <string name="apply_and_unlock">Applica e sblocca ora></string>
     <string name="cash_accounts">Conti di cassa</string>
     <string name="cash_accounts_description">Conserva USD, GBP o EUR nel tuo portafogli. Usa il saldo per acquistare cripto. Vendi cripto per contanti in qualsiasi momento.</string>
     <string name="link_a_bank_description">Conserva USD, GBP o EUR nel tuo portafogli. Usa il saldo per acquistare cripto. Vendi cripto per contanti in qualsiasi momento.</string>

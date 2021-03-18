@@ -1653,7 +1653,7 @@ Anote estas 12 palavras por ordem e guarde-as num lugar seguro. Nunca as partilh
     <string name="want_to_buy_more">Quer comprar mais?</string>
     <string name="unlock_gold_level_trading">Desbloqueie a Negociação de Nível Gold</string>
     <string name="verify_your_identity_limits">Verifique a sua identidade, ganhe juros e negoceie até %1$s por dia.</string>
-    <string name="apply_and_unlock"><![CDATA[Inscreva-se e Desbloqueie Agora]]></string>
+    <string name="apply_and_unlock">Inscreva-se e Desbloqueie Agora></string>
     <string name="cash_accounts">Contas de caixa</string>
     <string name="cash_accounts_description">Guarde USD, GBP ou EUR na sua carteira. Utilize o saldo para comprar criptomoedas. Venda criptomoedas por dinheiro a qualquer momento.</string>
     <string name="link_a_bank_description">Guarde USD, GBP ou EUR na sua carteira. Utilize o saldo para comprar criptomoedas. Venda criptomoedas por dinheiro a qualquer momento.</string>

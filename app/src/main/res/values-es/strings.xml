@@ -1668,7 +1668,7 @@ Sus fondos estarán disponibles para ser retirados una vez que la transferencia 
     <string name="want_to_buy_more">¿Quiere comprar más?</string>
     <string name="unlock_gold_level_trading">Desbloquear el comercio de nivel Gold</string>
     <string name="verify_your_identity_limits">Verifique su identidad, gane intereses y comercie con hasta %1$s al día.</string>
-    <string name="apply_and_unlock"><![CDATA[Solicitar y desbloquear ahora]]></string>
+    <string name="apply_and_unlock">Solicitar y desbloquear ahora</string>
     <string name="cash_accounts">Cuentas de caja</string>
     <string name="cash_accounts_description">Guarde USD, GBP o EUR en su monedero. Utilice el saldo para comprar criptomonedas. Venda criptomonedas por dinero en efectivo en cualquier momento.</string>
     <string name="link_a_bank_description">Guarde USD, GBP o EUR en su monedero. Utilice el saldo para comprar criptomonedas. Venda criptomonedas por dinero en efectivo en cualquier momento.</string>
