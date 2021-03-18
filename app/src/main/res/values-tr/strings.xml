@@ -1670,4 +1670,28 @@ Banka transferiniz %3$s tarihinde tamamlandıktan sonra para çekme işlemi ger�
     <string name="did_not_get_email">E-postayı almadınız mı?</string>
     <string name="send_again">Tekrar gönderin</string>
 
+    <string name="buy_crypto_card_sdd_body">Satın almak istediğiniz kriptoyu seçin, kimliğinizi doğrulayın ve anında satın alın.</string>
+    <string name="bank_wire_transfer_fee">%1$sÜcret</string>
+    <string name="bank_wire_transfer_min_withdrawal">%1$sMin. Çekim</string>
+    <string name="select_a_bank">Banka Seçin</string>
+    <string name="want_to_buy_more">Daha fazla satın almak ister misiniz?</string>
+    <string name="unlock_gold_level_trading">Gold Seviye Ticaretin kilidini açın</string>
+    <string name="verify_your_identity_limits">Kimliğinizi doğrulayın, faiz kazanın ve günde %1$s miktarına kadar ticaret yapın.</string>
+    <string name="apply_and_unlock"><![CDATA[Şimdi Uygula ve Kilidi Aç]]></string>
+    <string name="cash_accounts">Nakit Hesaplar</string>
+    <string name="cash_accounts_description">Cüzdanınızda USD, GBP veya EUR saklayın. Kripto satın almak için bakiyeyi kullanın. İstediğiniz zaman nakit karşılığında kripto satın.</string>
+    <string name="link_a_bank_description">Cüzdanınızda USD, GBP veya EUR saklayın. Kripto satın almak için bakiyeyi kullanın. İstediğiniz zaman nakit karşılığında kripto satın.</string>
+    <string name="earn_interest_description">Kripto paranızı çalıştırın. Hiçbir şey yapmadan ayda %10\'a kadar kazanç elde edin. Anında para yatırın ve kazanmaya başlayın.</string>
+    <string name="sb_checkout_daily_limit_title">Günlük limit aşıldı</string>
+    <string name="sb_checkout_daily_limit_blurb">Oops! Satın Alma ve Para Yatırma için günlük işlem limitinizi tüketmiş gözüküyorsunuz, lütfen yarın tekrar deneyin.</string>
+    <string name="sb_checkout_weekly_limit_title">Haftalık limit aşıldı</string>
+    <string name="sb_checkout_weekly_limit_blurb">Oops! Satın Alma ve Para Yatırma için haftalık işlem limitinizi tüketmiş gözüküyorsunuz, lütfen yarın tekrar deneyin.</string>
+    <string name="sb_checkout_yearly_limit_title">Yıllık limit aşıldı</string>
+    <string name="sb_checkout_yearly_limit_blurb">Oops! Satın Alma ve Para Yatırma için yıllık işlem limitinizi tüketmiş gözüküyorsunuz.</string>
+    <string name="sb_checkout_pending_order_title">Talimat sürüyor</string>
+    <string name="sb_checkout_pending_order_blurb">Oops! Zaten devam etmekte olan bir Satın Alma işleminiz var gözüküyor, tekrar satın almadan önce lütfen devam eden işlemin tamamlanmasını bekleyin.</string>
+    <string name="wallet_outage_message">Bir kesinti yaşıyoruz. Paranız güvende, içiniz rahat olsun. <annotation link="learn_more">Daha fazla bilgi</annotation></string>
+    <string name="increase_your_limits">Limitlerinizi artırın</string>
+    <string name="increase_your_limits_body">Gold seviyesi olmak, limitlerinizi ve ödeme yöntemlerinizi artırmak için doğrulamanıza devam edin.</string>
+    <string name="continue_to_gold">Gold seviyeye devam edin</string>
 </resources>

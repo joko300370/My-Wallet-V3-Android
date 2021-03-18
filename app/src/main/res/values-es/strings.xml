@@ -1662,4 +1662,27 @@ Sus fondos estarán disponibles para ser retirados una vez que la transferencia 
     <string name="check_my_inbox">Comprobar mi bandeja de entrada</string>
     <string name="did_not_get_email">¿No recibió el correo electrónico?</string>
     <string name="send_again">Enviar de nuevo</string>
+    <string name="bank_wire_transfer_fee">Tarifa de %1$s</string>
+    <string name="bank_wire_transfer_min_withdrawal">Retirada mínima de %1$s</string>
+    <string name="select_a_bank">Seleccione un banco</string>
+    <string name="want_to_buy_more">¿Quiere comprar más?</string>
+    <string name="unlock_gold_level_trading">Desbloquear el comercio de nivel Gold</string>
+    <string name="verify_your_identity_limits">Verifique su identidad, gane intereses y comercie con hasta %1$s al día.</string>
+    <string name="apply_and_unlock"><![CDATA[Solicitar y desbloquear ahora]]></string>
+    <string name="cash_accounts">Cuentas de caja</string>
+    <string name="cash_accounts_description">Guarde USD, GBP o EUR en su monedero. Utilice el saldo para comprar criptomonedas. Venda criptomonedas por dinero en efectivo en cualquier momento.</string>
+    <string name="link_a_bank_description">Guarde USD, GBP o EUR en su monedero. Utilice el saldo para comprar criptomonedas. Venda criptomonedas por dinero en efectivo en cualquier momento.</string>
+    <string name="earn_interest_description">Ponga sus criptomonedas a trabajar. Gane hasta un 10 % al mes sin hacer nada. Deposite en el momento y empiece a ganar.</string>
+    <string name="sb_checkout_daily_limit_title">Se ha superado el límite diario</string>
+    <string name="sb_checkout_daily_limit_blurb">Vaya, parece que ha agotado su límite diario de transacciones para compras y depósitos. Vuelva a intentarlo mañana.</string>
+    <string name="sb_checkout_weekly_limit_title">Se ha superado el límite semanal</string>
+    <string name="sb_checkout_weekly_limit_blurb">Vaya, parece que ha agotado su límite de transacciones semanales para compras y depósitos. Vuelva a intentarlo mañana.</string>
+    <string name="sb_checkout_yearly_limit_title">Se ha superado el límite anual</string>
+    <string name="sb_checkout_yearly_limit_blurb">Vaya, parece que ha agotado su límite anual de transacciones para compras y depósitos.</string>
+    <string name="sb_checkout_pending_order_title">Pedido en curso</string>
+    <string name="sb_checkout_pending_order_blurb">Vaya, parece que ya tiene un pedido de compra en curso. Espere hasta que se complete antes de volver a comprar.</string>
+    <string name="wallet_outage_message">Hemos experimentado una interrupción. No se preocupe, sus fondos están seguros. <annotation link="learn_more"> Más información </annotation></string>
+    <string name="increase_your_limits">Aumente sus límites</string>
+    <string name="increase_your_limits_body">Continúe su verificación para alcanzar el nivel Gold y aumente sus límites y métodos de pago</string>
+    <string name="continue_to_gold">Continuar a Gold</string>
 </resources>
