@@ -1,10 +1,10 @@
 package piuk.blockchain.android.coincore.impl.txEngine.swap
 
 import androidx.annotation.VisibleForTesting
-import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.TransferLimits
-import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.CustodialOrder
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.TransferDirection
+import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.nabu.service.TierService
@@ -52,7 +52,7 @@ abstract class SwapTxEngineBase(
     override fun targetExchangeRate(): Observable<ExchangeRate> =
         quotesEngine.pricedQuote.map {
             ExchangeRate.CryptoToCrypto(
-                from = sourceAccount.asset,
+                from = sourceAsset,
                 to = target.asset,
                 rate = it.price.toBigDecimal()
             )
@@ -65,9 +65,9 @@ abstract class SwapTxEngineBase(
         pricedQuote: PricedQuote
     ): PendingTx {
         val exchangeRate = ExchangeRate.CryptoToFiat(
-            sourceAccount.asset,
+            sourceAsset,
             userFiat,
-            exchangeRates.getLastPrice(sourceAccount.asset, userFiat)
+            exchangeRates.getLastPrice(sourceAsset, userFiat)
         )
 
         minApiLimit = exchangeRate.inverse()
@@ -121,7 +121,7 @@ abstract class SwapTxEngineBase(
                         TxConfirmationValue.SwapSourceValue(swappingAssetValue = pendingTx.amount as CryptoValue),
                         TxConfirmationValue.SwapReceiveValue(receiveAmount = CryptoValue.fromMajor(target.asset,
                             pendingTx.amount.toBigDecimal().times(pricedQuote.price.toBigDecimal()))),
-                        TxConfirmationValue.SwapExchangeRate(CryptoValue.fromMajor(sourceAccount.asset, BigDecimal.ONE),
+                        TxConfirmationValue.SwapExchangeRate(CryptoValue.fromMajor(sourceAsset, BigDecimal.ONE),
                             CryptoValue.fromMajor(target.asset, pricedQuote.price.toBigDecimal())),
                         TxConfirmationValue.From(from = sourceAccount.label),
                         TxConfirmationValue.To(to = txTarget.label),
@@ -136,7 +136,7 @@ abstract class SwapTxEngineBase(
                             txFee = TxFee(
                                 fee = pendingTx.fees,
                                 type = TxFee.FeeType.DEPOSIT_FEE,
-                                asset = sourceAccount.asset
+                                asset = sourceAsset
                             )
                         )
                     ),
@@ -171,7 +171,7 @@ abstract class SwapTxEngineBase(
                 )
                 addOrReplaceOption(
                     TxConfirmationValue.SwapExchangeRate(
-                        CryptoValue.fromMajor(sourceAccount.asset, BigDecimal.ONE),
+                        CryptoValue.fromMajor(sourceAsset, BigDecimal.ONE),
                         pricedQuote.price
                     )
                 )
@@ -205,7 +205,7 @@ abstract class SwapTxEngineBase(
 
     private fun minAmountToPayNetworkFees(price: Money, networkFee: Money): Money =
         CryptoValue.fromMajor(
-            sourceAccount.asset,
-            networkFee.toBigDecimal().divide(price.toBigDecimal(), sourceAccount.asset.dp, RoundingMode.HALF_UP)
+            sourceAsset,
+            networkFee.toBigDecimal().divide(price.toBigDecimal(), sourceAsset.dp, RoundingMode.HALF_UP)
         )
 }

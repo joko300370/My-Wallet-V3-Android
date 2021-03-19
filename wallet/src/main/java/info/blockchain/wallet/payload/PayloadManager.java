@@ -45,7 +45,7 @@ import info.blockchain.wallet.multiaddress.TransactionSummary;
 import info.blockchain.wallet.pairing.Pairing;
 import info.blockchain.wallet.payload.data.Account;
 import info.blockchain.wallet.payload.data.HDWallet;
-import info.blockchain.wallet.payload.data.LegacyAddress;
+import info.blockchain.wallet.payload.data.ImportedAddress;
 import info.blockchain.wallet.payload.data.Wallet;
 import info.blockchain.wallet.payload.data.WalletBase;
 import info.blockchain.wallet.payload.data.WalletExtensionsKt;
@@ -58,9 +58,6 @@ import retrofit2.Response;
 
 @SuppressWarnings("ALL")
 public class PayloadManager {
-
-    public static final String MULTI_ADDRESS_ALL = "all";
-    public static final String MULTI_ADDRESS_ALL_LEGACY = "all_legacy";
 
     private static Logger log = LoggerFactory.getLogger(PayloadManager.class);
 
@@ -82,7 +79,8 @@ public class PayloadManager {
             WalletApi walletApi,
             MultiAddressFactory multiAddressFactory,
             BalanceManagerBtc balanceManagerBtc,
-            BalanceManagerBch balanceManagerBch) {
+            BalanceManagerBch balanceManagerBch
+    ) {
         this.walletApi = walletApi;
         // Bitcoin
         this.multiAddressFactory = multiAddressFactory;
@@ -378,9 +376,9 @@ public class PayloadManager {
             }
 
             syncAddresses.addAll(
-                    Tools.filterLegacyAddress(
-                            LegacyAddress.NORMAL_ADDRESS,
-                            walletBaseBody.getWalletBody().getLegacyAddressList()));
+                    Tools.filterImportedAddress(
+                        ImportedAddress.NORMAL_ADDRESS,
+                        walletBaseBody.getWalletBody().getImportedAddressList()));
         }
 
         Call<ResponseBody> call = walletApi.updateWallet(
@@ -404,7 +402,7 @@ public class PayloadManager {
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    // ACCOUNT AND LEGACY HDADDRESS CREATION
+    // ACCOUNT AND IMPORTED HDADDRESS CREATION
     ///////////////////////////////////////////////////////////////////////////
 
     /**
@@ -428,92 +426,92 @@ public class PayloadManager {
     }
 
     /**
-     * Inserts a {@link LegacyAddress} into the user's {@link Wallet} and then syncs the wallet with
-     * the server. Will remove/revert the LegacyAddress if the sync was unsuccessful.
+     * Inserts a {@link ImportedAddress} into the user's {@link Wallet} and then syncs the wallet with
+     * the server. Will remove/revert the ImportedAddress if the sync was unsuccessful.
      *
-     * @param legacyAddress The {@link LegacyAddress} to be added
+     * @param importedAddress The {@link ImportedAddress} to be added
      * @throws Exception Possible if saving the Wallet fails
      */
-    public void addLegacyAddress(LegacyAddress legacyAddress) throws Exception {
-        List<LegacyAddress> currentAddresses = walletBaseBody.getWalletBody().getLegacyAddressList();
-        walletBaseBody.getWalletBody().getLegacyAddressList().add(legacyAddress);
+    public void addImportedAddress(ImportedAddress importedAddress) throws Exception {
+        List<ImportedAddress> currentAddresses = walletBaseBody.getWalletBody().getImportedAddressList();
+        walletBaseBody.getWalletBody().getImportedAddressList().add(importedAddress);
 
         if (!save()) {
             // Revert on sync fail
-            walletBaseBody.getWalletBody().setLegacyAddressList(currentAddresses);
-            throw new Exception("Failed to save added Legacy Address.");
+            walletBaseBody.getWalletBody().setImportedAddressList(currentAddresses);
+            throw new Exception("Failed to save added Imported Address.");
         }
 
         updateAllBalances();
     }
 
     /**
-     * Replaces an old {@link LegacyAddress} with a newer one if found and then syncs the wallet
-     * with the server. Will remove/revert the LegacyAddress if the sync was unsuccessful.
+     * Replaces an old {@link ImportedAddress} with a newer one if found and then syncs the wallet
+     * with the server. Will remove/revert the ImportedAddress if the sync was unsuccessful.
      *
-     * @param legacyAddress The {@link LegacyAddress} to be added
+     * @param importedAddress The {@link ImportedAddress} to be added
      * @throws Exception            Possible if saving the Wallet fails
      * @throws NullPointerException Thrown if the address to be updated is not found
      */
-    public void updateLegacyAddress(LegacyAddress legacyAddress) throws Exception {
+    public void updateImportedAddress(ImportedAddress importedAddress) throws Exception {
         boolean found = false;
 
-        final List<LegacyAddress> legacyAddressList = walletBaseBody.getWalletBody().getLegacyAddressList();
-        for (int i = 0; i < legacyAddressList.size(); i++) {
-            final LegacyAddress address = legacyAddressList.get(i);
-            if (address.getAddress().equals(legacyAddress.getAddress())) {
+        final List<ImportedAddress> importedAddressList = walletBaseBody.getWalletBody().getImportedAddressList();
+        for (int i = 0; i < importedAddressList.size(); i++) {
+            final ImportedAddress address = importedAddressList.get(i);
+            if (address.getAddress().equals(importedAddress.getAddress())) {
                 // Replace object with updated version
-                walletBaseBody.getWalletBody().getLegacyAddressList().set(i, legacyAddress);
+                walletBaseBody.getWalletBody().getImportedAddressList().set(i, importedAddress);
                 found = true;
                 break;
             }
         }
 
         if (!found) {
-            throw new NullPointerException("Legacy address not found");
+            throw new NullPointerException("Imported address not found");
         }
 
         if (!save()) {
             // Revert on sync fail
-            walletBaseBody.getWalletBody().setLegacyAddressList(legacyAddressList);
-            throw new Exception("Failed to save added Legacy Address.");
+            walletBaseBody.getWalletBody().setImportedAddressList(importedAddressList);
+            throw new Exception("Failed to save added imported Address.");
         }
 
         updateAllBalances();
     }
 
     /**
-     * Sets private key to existing matching legacy address. If no match is found the key will be added
+     * Sets private key to existing matching imported address. If no match is found the key will be added
      * to the wallet non the less.
      *
-     * @param key            ECKey for existing legacy address
+     * @param key            ECKey for existing imported address
      * @param secondPassword Double encryption password if applicable.
      */
-    public LegacyAddress setKeyForLegacyAddress(ECKey key, @Nullable String secondPassword) throws Exception {
-        LegacyAddress matchingLegacyAddress;
+    public ImportedAddress setKeyForImportedAddress(ECKey key, @Nullable String secondPassword) throws Exception {
+        ImportedAddress matchingImportedAddress;
         try {
-            matchingLegacyAddress = walletBaseBody.getWalletBody()
-                    .setKeyForLegacyAddress(key, secondPassword);
+            matchingImportedAddress = walletBaseBody.getWalletBody()
+                    .setKeyForImportedAddress(key, secondPassword);
         } catch (NoSuchAddressException e) {
             e.printStackTrace();
             //If no match found, save as new
-            return addLegacyAddressFromKey(key, secondPassword);
+            return addImportedAddressFromKey(key, secondPassword);
         }
 
         boolean success = save();
 
         if (!success) {
             //Revert on save fail
-            matchingLegacyAddress.setPrivateKey(null);
+            matchingImportedAddress.setPrivateKey(null);
         }
 
-        return matchingLegacyAddress;
+        return matchingImportedAddress;
 
     }
 
-    public LegacyAddress addLegacyAddressFromKey(ECKey key, @Nullable String secondPassword) throws Exception {
-        LegacyAddress newlyAdded = walletBaseBody.getWalletBody()
-                .addLegacyAddressFromKey(key, secondPassword);
+    public ImportedAddress addImportedAddressFromKey(ECKey key, @Nullable String secondPassword) throws Exception {
+        ImportedAddress newlyAdded = walletBaseBody.getWalletBody()
+                .addImportedAddressFromKey(key, secondPassword);
 
         boolean success = save();
 
@@ -551,22 +549,23 @@ public class PayloadManager {
         return walletBaseBody.getWalletBody().getHdWallets().get(0).getAccounts().get(accountIdx).getXpub();
     }
 
-    public ECKey getAddressECKey(@Nonnull LegacyAddress legacyAddress, @Nullable String secondPassword)
+    public ECKey getAddressECKey(@Nonnull ImportedAddress importedAddress, @Nullable String secondPassword)
             throws DecryptionException, UnsupportedEncodingException, InvalidCipherTextException {
 
         walletBaseBody.getWalletBody().validateSecondPassword(secondPassword);
 
-        String decryptedPrivateKey = legacyAddress.getPrivateKey();
+        String decryptedPrivateKey = importedAddress.getPrivateKey();
 
         if (secondPassword != null) {
             decryptedPrivateKey = DoubleEncryptionFactory
-                    .decrypt(legacyAddress.getPrivateKey(),
-                            walletBaseBody.getWalletBody().getSharedKey(),
-                            secondPassword,
-                            walletBaseBody.getWalletBody().getOptions().getPbkdf2Iterations());
+                    .decrypt(
+                        importedAddress.getPrivateKey(),
+                        walletBaseBody.getWalletBody().getSharedKey(),
+                        secondPassword,
+                        walletBaseBody.getWalletBody().getOptions().getPbkdf2Iterations());
         }
 
-        return Tools.getECKeyFromKeyAndAddress(decryptedPrivateKey, legacyAddress.getAddress());
+        return Tools.getECKeyFromKeyAndAddress(decryptedPrivateKey, importedAddress.getAddress());
     }
 
     /**
@@ -655,12 +654,12 @@ public class PayloadManager {
     public List<TransactionSummary> getImportedAddressesTransactions(int limit, int offset)
             throws IOException, ApiException {
         List<String> activeXpubs = getPayload().getHdWallets().get(0).getActiveXpubs();
-        List<String> activeLegacy = getPayload().getLegacyAddressStringList(LegacyAddress.NORMAL_ADDRESS);
+        List<String> activeImported = getPayload().getImportedAddressStringList(ImportedAddress.NORMAL_ADDRESS);
 
         ArrayList<String> all = new ArrayList<>(activeXpubs);
-        all.addAll(activeLegacy);
+        all.addAll(activeImported);
 
-        return multiAddressFactory.getAccountTransactions(all, activeLegacy, null, limit, offset, 0);
+        return multiAddressFactory.getAccountTransactions(all, activeImported, null, limit, offset, 0);
     }
 
     public DeterministicKey masterKey() throws HDWalletException {
@@ -687,10 +686,10 @@ public class PayloadManager {
             throws IOException, ApiException {
 
         List<String> activeXpubs = getPayload().getHdWallets().get(0).getActiveXpubs();
-        List<String> activeLegacy = getPayload().getLegacyAddressStringList(LegacyAddress.NORMAL_ADDRESS);
+        List<String> activeImported = getPayload().getImportedAddressStringList(ImportedAddress.NORMAL_ADDRESS);
 
         ArrayList<String> all = new ArrayList<>(activeXpubs);
-        all.addAll(activeLegacy);
+        all.addAll(activeImported);
 
         return multiAddressFactory.getAccountTransactions(all, null, xpub, limit, offset, 0);
     }
@@ -709,8 +708,8 @@ public class PayloadManager {
     /**
      * Converts any Bitcoin address to a label.
      *
-     * @param address Accepts account receive or change chain address, as well as legacy address.
-     * @return Account or legacy address label
+     * @param address Accepts account receive or change chain address, as well as imported address.
+     * @return Account or imported address label
      */
     public String getLabelFromAddress(String address) {
         String label;
@@ -719,7 +718,7 @@ public class PayloadManager {
         if (xpub != null) {
             label = getPayload().getHdWallets().get(HD_WALLET_INDEX).getLabelFromXpub(xpub);
         } else {
-            label = getPayload().getLabelFromLegacyAddress(address);
+            label = getPayload().getLabelFromImportedAddress(address);
         }
 
         if (label == null || label.isEmpty()) {
@@ -898,9 +897,9 @@ public class PayloadManager {
     public void updateAllBalances() throws ServerConnectionException, IOException {
         Wallet wallet = getPayload();
         Set<String> xpubs = WalletExtensionsKt.activeXpubs(wallet);
-        Set<String> allLegacy = WalletExtensionsKt.nonArchivedLegacyAddressStrings(wallet);
+        Set<String> allImported = WalletExtensionsKt.nonArchivedImportedAddressStrings(wallet);
 
-        balanceManagerBtc.updateAllBalances(xpubs, allLegacy);
+        balanceManagerBtc.updateAllBalances(xpubs, allImported);
     }
 
     /**

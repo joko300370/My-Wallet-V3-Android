@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -60,9 +61,8 @@
         app:srcCompat="@drawable/ic_currency_type_swap"
         tools:visibility="visible" />
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <piuk.blockchain.android.ui.customviews.StatusPill
         android:id="@+id/error"
-        style="@style/Text.Error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/size_massive"
@@ -74,12 +74,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/enter_amount"
+        app:status_type="error"
         tools:text="$ 200000 Max"
         tools:visibility="visible" />
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <piuk.blockchain.android.ui.customviews.StatusPill
         android:id="@+id/info"
-        style="@style/Text.Info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/size_massive"
@@ -93,6 +93,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/enter_amount"
+        app:status_type="info"
         tools:text="Tap here to trade more"
         tools:visibility="visible" />
 

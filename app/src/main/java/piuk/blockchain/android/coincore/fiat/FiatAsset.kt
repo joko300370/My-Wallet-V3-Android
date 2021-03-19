@@ -3,8 +3,6 @@ package piuk.blockchain.android.coincore.fiat
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.repositories.AssetBalancesRepository
-import com.blockchain.nabu.models.responses.nabu.KycTierLevel
-import com.blockchain.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -23,7 +21,6 @@ class FiatAsset(
     private val assetBalancesRepository: AssetBalancesRepository,
     private val exchangeRateDataManager: ExchangeRateDataManager,
     private val custodialWalletManager: CustodialWalletManager,
-    private val tierService: TierService,
     private val currencyPrefs: CurrencyPrefs
 ) : Asset {
     override fun init(): Completable = Completable.complete()
@@ -34,17 +31,14 @@ class FiatAsset(
             AssetFilter.All,
             AssetFilter.Custodial -> fetchFiatWallets()
             AssetFilter.NonCustodial,
-            AssetFilter.Interest -> TODO()
+            AssetFilter.Interest -> Maybe.empty() // Only support single accounts
         }
 
     private fun fetchFiatWallets(): Maybe<AccountGroup> =
-        tierService.tiers()
-            .flatMap { tier ->
-                custodialWalletManager.getSupportedFundsFiats(
-                    currencyPrefs.selectedFiatCurrency,
-                    tier.isApprovedFor(KycTierLevel.GOLD)
-                )
-            }.flatMapMaybe { fiatList ->
+        custodialWalletManager.getSupportedFundsFiats(
+            currencyPrefs.selectedFiatCurrency
+        )
+            .flatMapMaybe { fiatList ->
                 if (fiatList.isNotEmpty()) {
                     Maybe.just(
                         FiatAccountGroup(
@@ -53,7 +47,7 @@ class FiatAsset(
                         )
                     )
                 } else {
-                    Maybe.empty<AccountGroup>()
+                    Maybe.empty()
                 }
             }
 

@@ -1,5 +1,6 @@
 package com.blockchain.nabu.datamanagers
 
+import android.annotation.SuppressLint
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.LiveCustodialWalletManager
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
@@ -7,9 +8,9 @@ import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.datamanagers.repositories.interest.Eligibility
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestLimits
 import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
-import com.blockchain.nabu.models.data.Bank
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
+import com.blockchain.nabu.models.data.WithdrawalFeeAndLimit
 import com.blockchain.nabu.models.responses.interest.InterestActivityItemResponse
 import com.blockchain.nabu.models.responses.interest.InterestAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CardPartnerAttributes
@@ -75,7 +76,10 @@ interface CustodialWalletManager {
         amount: String
     ): Single<CustodialQuote>
 
-    fun fetchWithdrawFee(currency: String): Single<FiatValue>
+    fun fetchWithdrawFeeAndMinLimit(
+        currency: String,
+        paymentMethodType: PaymentMethodType
+    ): Single<WithdrawalFeeAndLimit>
 
     fun fetchWithdrawLocksTime(paymentMethodType: PaymentMethodType): Single<BigInteger>
 
@@ -85,7 +89,7 @@ interface CustodialWalletManager {
     ): Single<BuySellOrder>
 
     fun createWithdrawOrder(
-        amount: FiatValue,
+        amount: Money,
         bankId: String
     ): Completable
 
@@ -129,20 +133,24 @@ interface CustodialWalletManager {
 
     fun updateSupportedCardTypes(fiatCurrency: String): Completable
 
-    fun getLinkedBeneficiaries(): Single<List<Beneficiary>>
-
     fun linkToABank(fiatCurrency: String): Single<LinkBankTransfer>
 
     fun updateAccountProviderId(linkingId: String, providerAccountId: String, accountId: String): Completable
 
     fun fetchSuggestedPaymentMethod(
         fiatCurrency: String,
+        fetchSddLimits: Boolean,
         onlyEligible: Boolean
     ): Single<List<PaymentMethod>>
 
     fun getEligiblePaymentMethodTypes(
         fiatCurrency: String
     ): Single<List<EligiblePaymentMethodType>>
+
+    fun getBankTransferLimits(
+        fiatCurrency: String,
+        onlyEligible: Boolean
+    ): Single<PaymentLimits>
 
     fun addNewCard(fiatCurrency: String, billingAddress: BillingAddress): Single<CardToBeActivated>
 
@@ -177,11 +185,15 @@ interface CustodialWalletManager {
 
     fun getInterestEligibilityForAsset(crypto: CryptoCurrency): Single<Eligibility>
 
-    fun getSupportedFundsFiats(fiatCurrency: String, isTier2Approved: Boolean): Single<List<String>>
+    fun getSupportedFundsFiats(fiatCurrency: String = defaultFiatCurrency): Single<List<String>>
 
-    fun canWireTransferToABankWithCurrency(fiatCurrency: String): Single<Boolean>
+    fun canTransactWithBankMethods(fiatCurrency: String): Single<Boolean>
 
     fun getExchangeSendAddressFor(crypto: CryptoCurrency): Maybe<String>
+
+    fun isSimplifiedDueDiligenceEligible(): Single<Boolean>
+
+    fun fetchSimplifiedDueDiligenceUserState(): Single<SimplifiedDueDiligenceUserState>
 
     fun createCustodialOrder(
         direction: TransferDirection,
@@ -199,7 +211,7 @@ interface CustodialWalletManager {
         product: Product
     ): Completable
 
-    fun getSwapLimits(currency: String): Single<TransferLimits>
+    fun getProductTransferLimits(currency: String, product: Product): Single<TransferLimits>
 
     fun getSwapTrades(): Single<List<CustodialOrder>>
 
@@ -217,9 +229,13 @@ interface CustodialWalletManager {
         id: String
     ): Single<LinkedBank>
 
-    fun getLinkedBanks(): Single<List<LinkedBank>>
+    fun getBanks(): Single<List<Bank>>
 
     fun isFiatCurrencySupported(destination: String): Boolean
+
+    fun startBankTransfer(id: String, amount: Money, currency: String): Single<String>
+
+    val defaultFiatCurrency: String
 }
 
 data class InterestActivityItem(
@@ -298,19 +314,27 @@ data class OrderInput(private val symbol: String, private val amount: String? = 
 
 data class OrderOutput(private val symbol: String, private val amount: String? = null)
 
-data class Beneficiary(
-    override val id: String,
-    override val name: String,
-    override val account: String,
-    override val currency: String
-) : Bank {
-    override val accountType: String
-        get() = ""
+data class Bank(
+    val id: String,
+    val name: String,
+    val account: String,
+    val state: BankState,
+    val currency: String,
+    val accountType: String,
+    val paymentMethodType: PaymentMethodType
+) : Serializable {
 
-    override val paymentMethod: PaymentMethodType
-        get() = PaymentMethodType.FUNDS
+    @SuppressLint("DefaultLocale") // Yes, lint is broken
+    fun toHumanReadableAccount(): String {
+        return accountType.toLowerCase(Locale.getDefault()).capitalize(Locale.getDefault())
+    }
+}
 
-    override fun toHumanReadableAccount(): String = ""
+enum class BankState {
+    PENDING,
+    BLOCKED,
+    ACTIVE,
+    UNKNOWN
 }
 
 data class FiatTransaction(
@@ -329,6 +353,7 @@ enum class TransactionType {
 
 enum class TransactionState {
     COMPLETED,
+    PENDING,
     UNKNOWN
 }
 
@@ -420,40 +445,58 @@ sealed class TransactionError : Throwable() {
     object ExecutionFailed : TransactionError()
 }
 
-sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val order: Int) :
-    Serializable {
-    object Undefined : PaymentMethod(UNDEFINED_PAYMENT_ID, null, UNDEFINED_PAYMENT_METHOD_ORDER)
+sealed class PaymentMethod(
+    val id: String,
+    open val limits: PaymentLimits?,
+    val order: Int,
+    open val isEligible: Boolean
+) : Serializable {
 
-    data class UndefinedCard(override val limits: PaymentLimits) :
-        PaymentMethod(UNDEFINED_CARD_PAYMENT_ID, limits, UNDEFINED_CARD_PAYMENT_METHOD_ORDER)
+    data class UndefinedCard(override val limits: PaymentLimits, override val isEligible: Boolean) :
+        PaymentMethod(UNDEFINED_CARD_PAYMENT_ID, limits, UNDEFINED_CARD_PAYMENT_METHOD_ORDER, isEligible),
+        UndefinedPaymentMethod {
+        override val paymentMethodType: PaymentMethodType
+            get() = PaymentMethodType.PAYMENT_CARD
+    }
 
     data class Funds(
         val balance: FiatValue,
         val fiatCurrency: String,
-        override val limits: PaymentLimits
+        override val limits: PaymentLimits,
+        override val isEligible: Boolean
+    ) : PaymentMethod(FUNDS_PAYMENT_ID, limits, FUNDS_PAYMENT_METHOD_ORDER, isEligible)
+
+    data class UndefinedFunds(
+        val fiatCurrency: String,
+        override val limits: PaymentLimits,
+        override val isEligible: Boolean
     ) :
-        PaymentMethod(FUNDS_PAYMENT_ID, limits, FUNDS_PAYMENT_METHOD_ORDER)
+        PaymentMethod(UNDEFINED_FUNDS_PAYMENT_ID, limits, UNDEFINED_FUNDS_PAYMENT_METHOD_ORDER, isEligible),
+        UndefinedPaymentMethod {
+        override val paymentMethodType: PaymentMethodType
+            get() = PaymentMethodType.FUNDS
+    }
 
-    data class UndefinedFunds(val fiatCurrency: String, override val limits: PaymentLimits) :
-        PaymentMethod(UNDEFINED_FUNDS_PAYMENT_ID, limits, UNDEFINED_FUNDS_PAYMENT_METHOD_ORDER)
-
-    data class UndefinedBankTransfer(override val limits: PaymentLimits) :
-        PaymentMethod(UNDEFINED_BANK_TRANSFER_PAYMENT_ID, limits, UNDEFINED_BANK_TRANSFER_METHOD_ORDER)
+    data class UndefinedBankTransfer(override val limits: PaymentLimits, override val isEligible: Boolean) :
+        PaymentMethod(UNDEFINED_BANK_TRANSFER_PAYMENT_ID, limits, UNDEFINED_BANK_TRANSFER_METHOD_ORDER, isEligible),
+        UndefinedPaymentMethod {
+        override val paymentMethodType: PaymentMethodType
+            get() = PaymentMethodType.BANK_TRANSFER
+    }
 
     data class Bank(
         val bankId: String,
         override val limits: PaymentLimits,
         val bankName: String,
         val accountEnding: String,
-        val accountType: String
-    ) : PaymentMethod(bankId, limits, BANK_PAYMENT_METHOD_ORDER), Serializable {
-
-        val accountDottedLastDigits: String
-            get() = "•••• $accountEnding"
+        val accountType: String,
+        override val isEligible: Boolean
+    ) : PaymentMethod(bankId, limits, BANK_PAYMENT_METHOD_ORDER, isEligible), Serializable {
 
         override fun detailedLabel() =
             "$bankName $accountEnding"
 
+        @SuppressLint("DefaultLocale") // Yes, lint is broken
         val uiAccountType: String =
             accountType.toLowerCase(Locale.getDefault()).capitalize(Locale.getDefault())
     }
@@ -466,8 +509,9 @@ sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val 
         val partner: Partner,
         val expireDate: Date,
         val cardType: CardType,
-        val status: CardStatus
-    ) : PaymentMethod(cardId, limits, CARD_PAYMENT_METHOD_ORDER), Serializable {
+        val status: CardStatus,
+        override val isEligible: Boolean
+    ) : PaymentMethod(cardId, limits, CARD_PAYMENT_METHOD_ORDER, isEligible), Serializable {
 
         override fun detailedLabel() =
             "${uiLabel()} ${dottedEndDigits()}"
@@ -499,7 +543,6 @@ sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val 
     open fun detailedLabel(): String = ""
 
     companion object {
-        const val UNDEFINED_PAYMENT_ID = "UNDEFINED_PAYMENT_ID"
         const val UNDEFINED_CARD_PAYMENT_ID = "UNDEFINED_CARD_PAYMENT_ID"
         const val FUNDS_PAYMENT_ID = "FUNDS_PAYMENT_ID"
         const val UNDEFINED_FUNDS_PAYMENT_ID = "UNDEFINED_FUNDS_PAYMENT_ID"
@@ -515,6 +558,10 @@ sealed class PaymentMethod(val id: String, open val limits: PaymentLimits?, val 
     }
 }
 
+interface UndefinedPaymentMethod {
+    val paymentMethodType: PaymentMethodType
+}
+
 data class PaymentLimits(val min: FiatValue, val max: FiatValue) : Serializable {
     constructor(min: Long, max: Long, currency: String) : this(
         FiatValue.fromMinor(currency, min),
@@ -524,7 +571,8 @@ data class PaymentLimits(val min: FiatValue, val max: FiatValue) : Serializable 
 
 enum class Product {
     SIMPLEBUY,
-    SAVINGS
+    SAVINGS,
+    TRADE
 }
 
 data class BillingAddress(
@@ -633,4 +681,9 @@ data class CustodialOrder(
 data class EligiblePaymentMethodType(
     val paymentMethodType: PaymentMethodType,
     val currency: String
+)
+
+data class SimplifiedDueDiligenceUserState(
+    val isVerified: Boolean,
+    val stateFinalised: Boolean
 )

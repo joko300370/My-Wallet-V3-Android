@@ -1,7 +1,6 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import androidx.annotation.VisibleForTesting
-import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.service.TierService
 import io.reactivex.Single
@@ -15,7 +14,6 @@ import piuk.blockchain.android.ui.dashboard.announcements.StandardAnnouncementCa
 
 internal class KycMoreInfoAnnouncement(
     private val tierService: TierService,
-    private val showPopupFeatureFlag: FeatureFlag,
     dismissRecorder: DismissRecorder
 ) : AnnouncementRule(dismissRecorder) {
 
@@ -27,10 +25,7 @@ internal class KycMoreInfoAnnouncement(
             return Single.just(false)
         }
 
-        return Single.merge(
-            didNotStartGoldLevelKyc(),
-            showPopupFeatureFlag.enabled
-        ).all { it }
+        return didNotStartGoldLevelKyc()
     }
 
     private fun didNotStartGoldLevelKyc(): Single<Boolean> =

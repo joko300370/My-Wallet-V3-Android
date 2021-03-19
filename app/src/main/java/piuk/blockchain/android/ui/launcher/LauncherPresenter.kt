@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.launcher
 
-import android.annotation.SuppressLint
 import android.app.LauncherActivity
 import android.content.Intent
 import com.blockchain.logging.CrashLogger
@@ -12,20 +11,25 @@ import com.blockchain.notifications.analytics.AnalyticsEvents
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.exceptions.HDWalletException
 import info.blockchain.wallet.exceptions.InvalidCredentialsException
+import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.R
+import piuk.blockchain.android.identity.Feature
+import piuk.blockchain.android.identity.UserIdentity
+import piuk.blockchain.android.sdd.SDDAnalytics
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcore.data.metadata.MetadataInitException
 import timber.log.Timber
 
 class LauncherPresenter(
@@ -40,6 +44,7 @@ class LauncherPresenter(
     private val currencyPrefs: CurrencyPrefs,
     private val analytics: Analytics,
     private val prerequisites: Prerequisites,
+    private val userIdentity: UserIdentity,
     private val crashLogger: CrashLogger
 ) : BasePresenter<LauncherView>() {
 
@@ -122,7 +127,6 @@ class LauncherPresenter(
      * Init of the [SettingsDataManager] must complete here so that we can access the [Settings]
      * object from memory when the user is logged in.
      */
-    @SuppressLint("CheckResult")
     private fun initSettings() {
 
         val settings = Single.defer {
@@ -140,62 +144,66 @@ class LauncherPresenter(
             }
         }
 
-        val metadata = prerequisites.initMetadataAndRelatedPrerequisites()
+        val metadata = Completable.defer { prerequisites.initMetadataAndRelatedPrerequisites() }
         val updateFiatWithDefault = settingsDataManager.updateFiatUnit(currencyPrefs.defaultFiatCurrency)
             .ignoreElements()
 
         compositeDisposable +=
             settings.zipWith(
                 metadata.toSingleDefault(true)
-            ).flatMap { (_, _) ->
-                if (!shouldCheckForSimpleBuyLaunching())
-                    Single.just(false)
+            ).map { (_, _) ->
+                if (!shouldCheckForEmailVerification())
+                    false
                 else {
-                    Single.just(walletJustCreated())
+                    walletJustCreated()
                 }
-            }.flatMap { simpleBuyShouldLaunched ->
-                if (!simpleBuyShouldLaunched && noCurrencySet())
-                    updateFiatWithDefault.toSingleDefault(simpleBuyShouldLaunched)
+            }.flatMap { emailVerifShouldLaunched ->
+                if (noCurrencySet())
+                    updateFiatWithDefault.toSingleDefault(emailVerifShouldLaunched)
                 else {
-                    Single.just(simpleBuyShouldLaunched)
+                    Single.just(emailVerifShouldLaunched)
                 }
             }
-            .doOnSuccess { accessState.isLoggedIn = true }
-            .doOnSuccess { notificationTokenManager.registerAuthEvent() }
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe { view.updateProgressVisibility(true) }
-            .subscribeBy(
-                onSuccess = { simpleBuyShouldLaunched ->
-                    view.updateProgressVisibility(false)
-                    if (simpleBuyShouldLaunched) {
-                        launchBuySellIntro()
-                    } else {
-                        startMainActivity()
-                    }
-                }, onError = { throwable ->
-                    view.updateProgressVisibility(false)
-                    if (throwable is InvalidCredentialsException || throwable is HDWalletException) {
-                        if (payloadDataManager.isDoubleEncrypted) {
-                            // Wallet double encrypted and needs to be decrypted to set up ether wallet, contacts etc
-                            view?.showSecondPasswordDialog()
+                .doOnSuccess { accessState.isLoggedIn = true }
+                .doOnSuccess { notificationTokenManager.registerAuthEvent() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { view.updateProgressVisibility(true) }
+                .subscribeBy(
+                    onSuccess = { emailVerifShouldLaunched ->
+                        view.updateProgressVisibility(false)
+                        if (emailVerifShouldLaunched) {
+                            launchEmailVerification()
                         } else {
-                        view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
+                            startMainActivity()
+                        }
+                    }, onError = { throwable ->
+                        view.updateProgressVisibility(false)
+                        if (throwable is InvalidCredentialsException || throwable is HDWalletException) {
+                            if (payloadDataManager.isDoubleEncrypted) {
+                                // Wallet double encrypted and needs to be decrypted to set up ether wallet, contacts etc
+                                view?.showSecondPasswordDialog()
+                            } else {
+                                view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
+                                view.onRequestPin()
+                            }
+                        } else if (throwable is MetadataInitException) {
+                            view?.showMetadataNodeFailure()
+                        } else {
+                            view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
                             view.onRequestPin()
                         }
-                    } else {
-                        view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR)
-                        view.onRequestPin()
+                        logException(throwable)
                     }
-                    logException(throwable)
-                }
-            )
-        }
+                )
+    }
 
     private fun isNewAccount(): Boolean = accessState.isNewlyCreated
 
     private fun walletJustCreated() =
-        view?.getPageIntent()?.getBooleanExtra(AppUtil.INTENT_EXTRA_IS_AFTER_WALLET_CREATION,
-            false) == true
+        view?.getPageIntent()?.getBooleanExtra(
+            AppUtil.INTENT_EXTRA_IS_AFTER_WALLET_CREATION,
+            false
+        ) == true
 
     internal fun decryptAndSetupMetadata(secondPassword: String) {
         if (!payloadDataManager.validateSecondPassword(secondPassword)) {
@@ -224,21 +232,33 @@ class LauncherPresenter(
 
     private fun logException(throwable: Throwable) {
         crashLogger.logException(throwable)
-        view?.showMetadataNodeFailure()
     }
 
-    private fun shouldCheckForSimpleBuyLaunching() = accessState.isNewlyCreated && !accessState.isRestored
+    private fun shouldCheckForEmailVerification() = accessState.isNewlyCreated && !accessState.isRestored
 
     private fun startMainActivity() {
         view.onStartMainActivity(deepLinkPersistence.popUriFromSharedPrefs())
     }
 
-    private fun launchBuySellIntro() {
-        view.launchBuySellIntro()
+    private fun launchEmailVerification() {
+        view.launchEmailVerification()
     }
 
     private fun setCurrencyUnits(settings: Settings) {
         prefs.selectedFiatCurrency = settings.currency
+    }
+
+    fun onEmailVerificationFinished() {
+        compositeDisposable += userIdentity.isEligibleFor(Feature.SimplifiedDueDiligence).onErrorReturn { false }
+            .doOnSuccess {
+                if (it)
+                    analytics.logEventOnce(SDDAnalytics.SDD_ELIGIBLE)
+            }
+            .subscribeBy(
+                onSuccess = {
+                    view.onStartMainActivity(null, it)
+                }, onError = {}
+            )
     }
 
     companion object {

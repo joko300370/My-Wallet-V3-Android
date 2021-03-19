@@ -4,6 +4,7 @@ import com.blockchain.nabu.api.nabu.Nabu
 import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.extensions.wrapErrorMessage
+import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentBody
 import com.blockchain.nabu.models.responses.banktransfer.CreateLinkBankRequestBody
 import com.blockchain.nabu.models.responses.banktransfer.UpdateProviderAccountBody
 import com.blockchain.nabu.models.responses.interest.InterestAccountDetailsResponse
@@ -23,6 +24,8 @@ import com.blockchain.nabu.models.responses.nabu.SendToMercuryAddressResponse
 import com.blockchain.nabu.models.responses.nabu.SendWithdrawalAddressesRequest
 import com.blockchain.nabu.models.responses.nabu.SupportedDocuments
 import com.blockchain.nabu.models.responses.nabu.WalletMercuryLink
+import com.blockchain.nabu.models.responses.sdd.SDDEligibilityResponse
+import com.blockchain.nabu.models.responses.sdd.SDDStatusResponse
 import com.blockchain.nabu.models.responses.simplebuy.AddNewCardBodyRequest
 import com.blockchain.nabu.models.responses.simplebuy.BankAccountResponse
 import com.blockchain.nabu.models.responses.simplebuy.CardPartnerAttributes
@@ -237,6 +240,14 @@ class NabuService(retrofit: Retrofit) {
         SendToMercuryAddressRequest(cryptoSymbol)
     ).wrapErrorMessage()
 
+    internal fun isSDDEligible(): Single<SDDEligibilityResponse> =
+        service.isSDDEligible().wrapErrorMessage()
+
+    internal fun isSDDVerified(sessionToken: NabuSessionTokenResponse): Single<SDDStatusResponse> =
+        service.isSDDVerified(
+            sessionToken.authHeader
+        ).wrapErrorMessage()
+
     internal fun fetchQuote(
         sessionToken: NabuSessionTokenResponse,
         quoteRequest: QuoteRequest
@@ -253,12 +264,14 @@ class NabuService(retrofit: Retrofit) {
         createOrderRequest
     ).wrapErrorMessage()
 
-    internal fun getSwapLimits(
+    internal fun fetchProductLimits(
         sessionToken: NabuSessionTokenResponse,
-        currency: String
-    ): Single<SwapLimitsResponse> = service.fetchSwapLimits(
-        sessionToken.authHeader,
-        currency
+        currency: String,
+        product: String
+    ): Single<SwapLimitsResponse> = service.fetchLimits(
+        authorization = sessionToken.authHeader,
+        currency = currency,
+        product = product
     ).onErrorResumeNext {
         if ((it as? HttpException)?.code() == 409) {
             Single.just(
@@ -339,8 +352,8 @@ class NabuService(retrofit: Retrofit) {
         }
     }.wrapErrorMessage()
 
-    internal fun fetchWithdrawFee(sessionToken: NabuSessionTokenResponse) = service.withdrawFee(
-        sessionToken.authHeader
+    internal fun fetchWithdrawFee(sessionToken: NabuSessionTokenResponse, paymentMethod: String) = service.withdrawFee(
+        sessionToken.authHeader, type = paymentMethod
     ).wrapErrorMessage()
 
     internal fun fetchWithdrawLocksRules(sessionToken: NabuSessionTokenResponse, paymentMethod: PaymentMethodType) =
@@ -507,10 +520,12 @@ class NabuService(retrofit: Retrofit) {
     fun paymentMethods(
         sessionToken: NabuSessionTokenResponse,
         currency: String,
-        eligibleOnly: Boolean
+        eligibleOnly: Boolean,
+        tier: Int? = null
     ) = service.getPaymentMethodsForSimpleBuy(
         authorization = sessionToken.authHeader,
         currency = currency,
+        tier = tier,
         eligibleOnly = eligibleOnly
     ).wrapErrorMessage()
 
@@ -623,10 +638,20 @@ class NabuService(retrofit: Retrofit) {
     ) = service.getLinkedBank(authorization = sessionToken.authHeader, id = id)
         .wrapErrorMessage()
 
-    fun getLinkedBanks(
+    fun getBanks(
         sessionToken: NabuSessionTokenResponse
-    ) = service.getLinkedBanks(authorization = sessionToken.authHeader)
+    ) = service.getBanks(authorization = sessionToken.authHeader)
         .wrapErrorMessage()
+
+    fun startAchPayment(
+        sessionToken: NabuSessionTokenResponse,
+        id: String,
+        body: BankTransferPaymentBody
+    ) = service.startBankTransferPayment(
+        authorization = sessionToken.authHeader,
+        id = id,
+        body = body
+    ).wrapErrorMessage()
 
     companion object {
         internal const val CLIENT_TYPE = "APP"

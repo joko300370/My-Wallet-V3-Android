@@ -1,10 +1,11 @@
 package piuk.blockchain.android.ui.transactionflow.engine
 
+import com.blockchain.nabu.models.data.LinkBankTransfer
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
 import piuk.blockchain.android.coincore.AssetAction
-import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.InvoiceTarget
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.NullCryptoAccount
@@ -14,12 +15,14 @@ import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.ui.base.mvi.MviIntent
+import java.util.Stack
 
 sealed class TransactionIntent : MviIntent<TransactionState> {
 
-    class InitialiseWithSourceAccount(
+    // The InitialiseXYZ intents are data classes so the TransactionFlowIntentMapperTest can compare them
+    data class InitialiseWithSourceAccount(
         val action: AssetAction,
-        val fromAccount: CryptoAccount,
+        val fromAccount: BlockchainAccount,
         private val passwordRequired: Boolean
     ) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
@@ -32,7 +35,7 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             )
     }
 
-    class InitialiseWithNoSourceOrTargetAccount(
+    data class InitialiseWithNoSourceOrTargetAccount(
         val action: AssetAction,
         private val passwordRequired: Boolean
     ) : TransactionIntent() {
@@ -40,14 +43,13 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             TransactionState(
                 action = action,
                 passwordRequired = passwordRequired,
-                errorState = TransactionErrorState.NONE,
-                currentStep = TransactionStep.SELECT_SOURCE
-            ).updateBackstack(oldState)
+                errorState = TransactionErrorState.NONE
+            )
     }
 
-    class InitialiseWithSourceAndTargetAccount(
+    data class InitialiseWithSourceAndTargetAccount(
         val action: AssetAction,
-        val fromAccount: CryptoAccount,
+        val fromAccount: BlockchainAccount,
         val target: TransactionTarget,
         private val passwordRequired: Boolean
     ) : TransactionIntent() {
@@ -73,9 +75,9 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             }
     }
 
-    class InitialiseWithSourceAndPreferredTarget(
+    data class InitialiseWithSourceAndPreferredTarget(
         val action: AssetAction,
-        val fromAccount: CryptoAccount,
+        val fromAccount: BlockchainAccount,
         val target: TransactionTarget,
         private val passwordRequired: Boolean
     ) : TransactionIntent() {
@@ -89,6 +91,26 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
                 currentStep = TransactionStep.ENTER_ADDRESS,
                 nextEnabled = true
             ).updateBackstack(oldState)
+    }
+
+    data class InitialiseWithTargetAndNoSource(
+        val action: AssetAction,
+        val target: TransactionTarget,
+        private val passwordRequired: Boolean
+    ) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            TransactionState(
+                action = action,
+                selectedTarget = target,
+                errorState = TransactionErrorState.NONE,
+                passwordRequired = passwordRequired,
+                nextEnabled = true
+            )
+    }
+
+    object ClearBackStack : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(stepsBackStack = Stack())
     }
 
     object ResetFlow : TransactionIntent() {
@@ -142,17 +164,17 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             ).updateBackstack(oldState)
 
         private fun selectStep(passwordRequired: Boolean): TransactionStep =
-            if (passwordRequired) {
-                TransactionStep.ENTER_PASSWORD
-            } else {
-                TransactionStep.ENTER_ADDRESS
+            when {
+                passwordRequired -> TransactionStep.ENTER_PASSWORD
+                else -> TransactionStep.ENTER_ADDRESS
             }
     }
 
-    class AvailableSourceAccountsListUpdated(private val accounts: List<CryptoAccount>) : TransactionIntent() {
+    class AvailableSourceAccountsListUpdated(private val accounts: List<BlockchainAccount>) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState.copy(
-                availableSources = accounts
+                availableSources = accounts,
+                currentStep = TransactionStep.SELECT_SOURCE
             ).updateBackstack(oldState)
     }
 
@@ -227,7 +249,7 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
     }
 
     class FiatRateUpdated(
-        private val fiatRate: ExchangeRate.CryptoToFiat
+        private val fiatRate: ExchangeRate
     ) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState.copy(
@@ -269,7 +291,7 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
     }
 
     class SourceAccountSelected(
-        val sourceAccount: CryptoAccount
+        val sourceAccount: BlockchainAccount
     ) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState.copy(
@@ -282,8 +304,14 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
     ) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState.copy(
-                nextEnabled = false
+                nextEnabled = false,
+                setMax = false
             ).updateBackstack(oldState)
+    }
+
+    object UseMaxSpendable : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(setMax = true)
     }
 
     class ModifyTxOption(
@@ -333,11 +361,50 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             ).updateBackstack(oldState)
     }
 
+    object StartLinkABank : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState = oldState
+    }
+
+    object RefreshSourceAccounts : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState = oldState.copy(
+            linkBankState = BankLinkingState.NotStarted
+        )
+    }
+
+    class LinkBankInfoSuccess(private val bankTransferInfo: LinkBankTransfer) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                linkBankState = BankLinkingState.Success(bankTransferInfo)
+            )
+    }
+
+    class LinkBankFailed(private val e: Throwable) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                linkBankState = BankLinkingState.Error(e)
+            )
+    }
+
     object InvalidateTransaction : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState.copy(
                 pendingTx = null,
                 selectedTarget = NullAddress,
+                nextEnabled = false,
+                fiatRate = null,
+                targetRate = null
+            ).updateBackstack(oldState)
+    }
+
+    object NavigateBackFromEnterAmount : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState = oldState
+    }
+
+    object InvalidateTransactionKeepingTarget : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                pendingTx = null,
+                sendingAccount = NullCryptoAccount(),
                 nextEnabled = false,
                 fiatRate = null,
                 targetRate = null

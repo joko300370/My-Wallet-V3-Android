@@ -5,8 +5,8 @@ import piuk.blockchain.android.R
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.utils.PRNGFixes
 import piuk.blockchain.androidcore.utils.PrngFixer
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.ui.customviews.toast
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.toast
 import timber.log.Timber
 import java.security.Security
 

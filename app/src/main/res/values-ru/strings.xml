@@ -22,7 +22,6 @@
     <string name="action_settings">настройки</string>
     <string name="please_wait">пожалуйста, подождите</string>
     <string name="item_backup">Резервные фонды</string>
-    <string name="item_lockbox">сейф в банке</string>
     <string name="item_the_exchange">обмен</string>
     <string name="item_airdrops">Airdrops</string>
     <string name="toolbar_cmd_home">Дом</string>
@@ -51,7 +50,6 @@
  новый пароль 
 </string>
     <string name="no_private_key">Невозможно создать закрытый ключ.</string>
-    <string name="pin_max_strikes">%1$d неудачных попытки PIN-кода. Пожалуйста, введите пароль.</string>
     <string name="pin_4_strikes_password_accepted">Пароль принят. Пожалуйста, определите новый PIN-код.
 </string>
     <string name="bip38_password_entry">Пожалуйста, введите пароль закрытого ключа</string>
@@ -810,7 +808,7 @@
     <string name="kyc_resubmission_splash_description_3">Требуемые фотографии отсутствуют.</string>
     <string name="kyc_resubmission_splash_description_4">Отправленный вами документ неверен.</string>
     <string name="kyc_resubmission_splash_description_5">Нам не удалось прочитать предоставленные вами изображения из-за качества изображения.</string>
-    <string name="sunriver_splash_title">Подтверждение личности</string>
+    <string name="identity_verification">Подтверждение личности</string>
     <string name="sunriver_status_message">Ваша информация проверяется. Обзор должен завершиться в ближайшее время.</string>
     <string name="buy_sell_splash_title">Купить Продать</string>
     <string name="buy_sell_splash_message">Вы можете покупать и продавать биткойны (BTC) с помощью своей кредитной карты или банковского счета через нашего партнера Coinify.</string>
@@ -945,7 +943,7 @@
     <string name="daily_swap_and_buy_limit">Дневной своп и лимит покупки</string>
     <string name="simple_buy_own_crypto">Собственная криптография за несколько минут</string>
     <string name="simple_buy_verify_your_identity">Подтвердите свою личность и купите крипто</string>
-    <string name="simple_buy_skip">Пропускать</string>
+    <string name="common_skip">Пропускать</string>
     <string name="simple_buy_currency_selection_header">Ваша местная валюта для хранения средств в этой валюте в качестве средств в вашем Криптовалютном Кошельке Blockchain.</string>
     <string name="payment_methods">Способы оплаты</string>
     <string name="payment_method">Способ оплаты</string>
@@ -998,11 +996,6 @@
     <string name="invalid_date">Недействительная дата</string>
     <string name="invalid_card_number">Не верный номер карты</string>
     <string name="full_name">Полное имя</string>
-    <string name="address_line_1">Адресная строка 1</string>
-    <string name="address_line_2">Адресная строка 2</string>
-    <string name="address_city">город</string>
-    <string name="address_zip">ZIP</string>
-    <string name="address_postcode">почтовый индекс</string>
     <string name="billing_address_state">государственный</string>
     <string name="currency_not_supported_title">Ваша валюта не поддерживается</string>
     <string name="activity_no_activity_title">У вас нет активности</string>
@@ -1220,7 +1213,7 @@
     <string name="send_enter_unexpected_error">Произошла непредвиденная ошибка. Пожалуйста, попробуйте еще раз.</string>
     <string name="send_enter_insufficient_gas">У вас недостаточно ETH для обработки этой транзакции.</string>
     <string name="send_select_a_wallet_title">или выберите кошелек</string>
-    <string name="send_internal_transfer_message">В настоящее время вы можете перевести только %1$s из торгового кошелька %1$s в свои кошельки-хранилища. Как только %1$s окажется в вашем кошельке-хранилище, вы можете переводить на внешние адреса.</string>
+    <string name="send_internal_transfer_message">В настоящее время вы можете перевести только %1$s из торгового кошелька %2$s в свои кошельки-хранилища. Как только %1$s окажется в вашем кошельке-хранилище, вы можете переводить на внешние адреса.</string>
     <string name="purchase_funds_note">Ваша итоговая сумма может измениться из-за активности рынка.</string>
     <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Подробнее. </annotation>
@@ -1295,7 +1288,6 @@
     <string name="sell_for_cash">Продать криптовалюту за наличные</string>
     <string name="select_wallet_to_sell">Выберите кошелек для продажи.</string>
     <string name="common_sell">Продать</string>
-    <string name="quote_price">%1$s Цена</string>
     <string name="convert_your_crypto_to_cash">Конвертируйте свою криптовалюту в наличные</string>
     <string name="scan_mismatch_transaction_target">Отсканированный код не является QR-кодом %1$s .</string>
     <string name="scan_failed">QR-код не распознан, попробуйте еще раз.</string>
@@ -1475,7 +1467,7 @@
     <string name="swap_faster_cheaper_better">Быстрее. Дешевле. Лучше. Наш новый опыт конвертации Swap позволяет обменивать криптовалюту за меньшее количество нажатий.</string>
     <string name="common_continue">Продолжить</string>
     <plurals name="transfer_label_plural">
-        <item quantity="one">1 импортированный адрес</item>
+        <item quantity="one">%1$d импортированный адрес</item>
         <item quantity="few">%d импортированных адреса</item>
         <item quantity="many">%d импортированных адресов</item>
         <item quantity="other">%d импортированных адресов</item>
@@ -1531,17 +1523,6 @@
     <string name="sell_intro_empty_title">Нет кошельков для продаж</string>
     <string name="sell_intro_empty_label">Похоже, у вас нет кошельков со средствами, которые вы можете продать, попробуйте сначала пополнить кошельки.</string>
     <string name="yodlee_splash_title_partner">Blockchain.com использует Yodlee для проверки ваших банковских реквизитов и надежной привязки ваших счетов.</string>
-    <string name="lockbox_title">Lockbox</string>
-    <string name="lockbox_landing_get_yours_title">Получите свое устройство Lockbox</string>
-    <string name="lockbox_landing_get_yours_message">Безопасно храните криптовалюту в автономном режиме.</string>
-    <string name="lockbox_landing_get_yours_button">Купить сейчас</string>
-    <string name="lockbox_landing_already_owned_title">Уже есть?</string>
-    <string name="lockbox_landing_already_owned_message">Перейдите на компьютере по адресу blockchain.com и подключите свой Lockbox.</string>
-    <string name="lockbox_landing_learn_more">Хотите узнать больше? Нажмите здесь, чтобы перейти к
-%1$s</string>
-    <string name="lockbox_landing_coming_soon_title">Средства скоро будут доступны</string>
-    <string name="lockbox_landing_coming_soon_message">В данный момент мы не можем отобразить ваш баланс Lockbox. Не беспокойтесь, ваши средства в безопасности. Мы скоро добавим эту функцию. Пока вы ждете, можете проверить свой баланс в интернете.</string>
-    <string name="lockbox_landing_coming_soon_button">Проверить мой баланс</string>
     <string name="trading_order_limit">У вас слишком много трансакций %1$s в ожидании. Когда они будут завершены, вы сможете создать новую.</string>
     <string name="trading_order_not_cancelable">Ой! Этот заказ %1$s нельзя отменить.</string>
     <string name="trading_pending_withdrawal">Ой! У вас уже есть вывод средств в ожидании. Пожалуйста, попробуйте еще раз, как только он будет завершен.</string>
@@ -1564,4 +1545,127 @@
     <string name="trading_ineligible_for_swap">Ой! Эта услуга в настоящее время недоступна. Пожалуйста, обратитесь в службу поддержки.</string>
     <string name="trading_invalid_destination_amount">Ой! Похоже, что это неверная сумма, попробуйте еще раз.</string>
     <string name="executing_transaction_error">Ой! При выполнении ончейн-транзакции %1$s что-то пошло не так.</string>
+    <string name="backup_wallet_title">Восстановление секретного закрытого ключа</string>
+    <string name="pin_max_strikes">%1$d неудачных попытки PIN-кода. Пожалуйста, введите пароль.</string>
+    <string name="recovery_passphrase_1">Фраза для восстановления секретного закрытого ключа</string>
+    <string name="invalid_recovery_phrase_1">Фраза для восстановления секретного закрытого ключа недействительна. Попробуйте еще раз</string>
+    <string name="password_disclaimer">Я понимаю, что Blockchain.com не может восстановить мой пароль по запросу. Если я потеряю доступ к своему кошельку, я должен(-а) использовать свою <annotation link="backup">секретную фразу</annotation> для доступа к средствам.</string>
+    <string name="transfer_funds_description_1">Импортированные адреса не восстанавливаются вашей фразой для восстановления секретного закрытого ключа. Чтобы обезопасить эти средства, мы рекомендуем перевести их на ваш кошелек Blockchain.com, не связанный с хранением.</string>
+    <string name="pairing_code_instructions_alert">Никогда никому не сообщайте QR-код для сопряжения своего мобильного устройства. Любой, кто может просмотреть этот QR-код, может вывести средства.
+Blockchain.com никогда не будет просить просмотреть или прислать QR-код для сопряжения вашего мобильного устройства.</string>
+    <string name="backup_title">Восстановление секретного закрытого ключа</string>
+    <string name="backup_subtitle">Фраза для восстановления секретного закрытого ключа</string>
+    <string name="backup_instructions_1">В сфере криптовалют, когда у вас есть закрытые ключи, вы контролируете средства в своем Кошельке с закрытым ключом. Недостаток заключается в том, что ЛЮБОЙ человек, у которого есть ваши закрытые ключи, может управлять вашим Кошельком с закрытым ключом.</string>
+    <string name="backup_instructions_2">Итак, вы должны:</string>
+    <string name="backup_instructions_3">1. Записать фразу из 12 слов на следующем экране в точном порядке их появления.</string>
+    <string name="backup_instructions_4">2. Хранить ее в надежном месте, в идеале – на надежно хранящемся листе бумаги (другими словами, не в цифровой копии).</string>
+    <string name="backup_instructions_5">3. НИКОГДА никому не сообщать свою резервную фразу.</string>
+    <string name="backup_instructions_warn">Предупреждение: если у кого-то есть ваша резервная фраза, он получит доступ к вашему Кошельку с закрытым ключом и сможет снимать средства.</string>
+    <string name="backup_instructions_alert">Blockchain.com никогда не попросит просмотреть или прислать вашу фразу для восстановления.</string>
+    <string name="backup_button_begin">Просмотр фразы для восстановления</string>
+    <string name="backup_complete_message_1">Вы можете использовать свою фразу для восстановления секретного закрытого ключа, чтобы возобновить доступ к вашим средствам, если Вы потеряете свой пароль. Любой, у кого есть доступ к вашей фразе для восстановления секретного закрытого ключа, может получить доступ к вашим средствам, поэтому помните, что держать ее нужно в безопасном месте и не в электронном виде. </string>
+    <string name="backup_verify_heading_1">Введите следующие слова из вашей фразы для восстановления секретного закрытого ключа, чтобы завершить процесс резервного копирования.</string>
+    <string name="backup_lost_mnemonic_1">Потеряли свою фразу для восстановления секретного закрытого ключа из 12 слов?</string>
+    <string name="fingerprint_login_description">Используйте свои биометрические данные для входа в Кошелек.</string>
+    <string name="fingerprint_register_description">Используйте свои биометрические данные для более быстрого и легкого доступа к кошельку.
+
+Чтобы продолжить, подтвердите отпечаток пальца</string>
+    <string name="biometric_disable_message">Вы уверены, что хотите отключить вход с помощью биометрических данных?</string>
+    <string name="biometrics_key_invalidated_title">Биометрические данные изменены</string>
+    <string name="biometrics_key_invalidated_description">Биометрические данные, хранящиеся на этом устройстве, изменились, либо отключена блокировка клавиатуры. Вместо этого введите свой PIN-код.
+
+Затем вы можете снова настроить вход в систему с помощью биометрических данных в меню \"Настройки\".</string>
+    <string name="biometrics_key_invalidated_settings_description">Биометрические данные, хранящиеся на этом устройстве, изменились, либо отключена блокировка клавиатуры.
+
+Введите биометрические данные повторно и попробуйте еще раз.</string>
+    <string name="fingerprint_fatal_error_desc">Что-то пошло не так при попытке использовать биометрические данные, вместо этого воспользуйтесь своим PIN-кодом.
+
+Затем вы можете снова настроить вход в систему с помощью биометрических данных в меню \"Настройки\".
+Ошибка:%1$s</string>
+    <string name="biometrics_disabled_lockout_title">Ошибка при аутентификации</string>
+    <string name="biometrics_disabled_lockout_desc">Вы предприняли слишком много неудачных попыток при аутентификации. Подождите 30 секунд и попробуйте еще раз.</string>
+    <string name="biometrics_disabled_lockout_perm_desc">Ваши биометрические датчики отключены, заблокируйте устройство и разблокируйте его, используя PIN-код, графический ключ или пароль для повторного их включения.
+
+После этого попробуйте еще раз.</string>
+    <string name="biometrics_action_settings">Перейти в Настройки</string>
+    <string name="biometrics_enrollment_title">Активировать доступ с помощью биометрических данных</string>
+    <string name="biometrics_enrollment_desc">Быстро войдите в свой кошелек вместо того, чтобы использовать PIN-код.</string>
+    <string name="recovery_card_title_1">Фраза для восстановления секретного закрытого ключа</string>
+    <string name="recovery_card_body_1">Вы управляете своими криптовалютами. Запишите свою фразу для восстановления секретного закрытого ключа, чтобы восстановить все средства в случае, если вы потеряете пароль.</string>
+    <string name="backup_before_send_body_1">Ваша фраза для восстановления секретного закрытого ключа позволит вам восстановить доступ к своим криптовалютам, если вы потеряете доступ к своему кошельку.
+
+Запишите эти 12 слов по порядку и храните их в безопасном месте. Никогда не делись ими ни с кем. Ваша фраза для восстановления секретного закрытого ключа необходима для восстановления доступа к вашим криптовалютам, если вы когда-либо утратите его.</string>
+
+    <string name="kyc_address_address_zip_code_hint_1">Почтовый индекс</string>
+    <string name="payment_method_type_account_info">%1$s Учетная запись %2$s</string>
+    <string name="address_line_1">Адресная строка 1</string>
+    <string name="address_line_2">Адресная строка 2</string>
+    <string name="address_city">Город</string>
+    <string name="address_zip">Почтовый индекс</string>
+    <string name="address_postcode">Код города</string>
+    <string name="quote_price">%1$s Цена</string>
+    <string name="pay_with_my_dotted">Оплатить с помощью ...</string>
+    <string name="failed_to_link_bank">Не удалось получить доступ через банковскую ссылку</string>
+    <string name="add_a_bank_account">Добавить банковский счет</string>
+    <string name="wire_transfer">Электронный банковский перевод</string>
+    <string name="link_a_bank_wire_transfer">Соедините банк с вашим Кошельком, отправив любую сумму с помощью электронного банковского перевода. Примечание: Это происходит гораздо медленнее, и с вас могут взиматься высокие банковские сборы.</string>
+    <string name="link_a_bank_bank_transfer">Установите безопасное соединение с банком, чтобы покупать криптовалюту, вносить деньги на депозит и выводить их обратно на свою банковскую карту в любое время</string>
+    <string name="add_credit_or_debit_card_1">Кредитная или дебетовая карта</string>
+    <string name="first_name">Имя</string>
+    <string name="last_name">Фамилия</string>
+    <string name="as_it_shows_in_id">Как указано в вашем удостоверении личности государственного образца или паспорте</string>
+    <string name="date_of_birth">Дата рождения</string>
+    <string name="date_of_birth_instructions">Чтобы купить криптовалюту, вам должно быть 18 лет или больше.</string>
+    <string name="kyc_profile_message_1">Blockchain.com обязан собирать эту информацию в соответствии с законом. Чтобы покупать и продавать криптовалюту, вам должно быть 18 лет или больше.</string>
+    <string name="kyc_address_header_1">Blockchain.com обязан собирать эту информацию в соответствии с законом.</string>
+    <string name="kyc_country_selection_search_hint_1">Выберите свою страну</string>
+    <string name="kyc_country_selection_title_1">Выберите свою страну</string>
+    <string name="preferences_rate_app">Оцените приложение</string>
+    <string name="tx_title_fiat_deposit">Депозит %1$s</string>
+    <string name="bank_account_info_default">Закрытие аккаунта</string>
+    <string name="bank_wire_transfer_fee_default">Комиссия за перевод</string>
+    <string name="payment_wire_transfer">Электронный банковский перевод</string>
+    <string name="payment_wire_transfer_subtitle">3-5 рабочих дней</string>
+    <string name="payment_wire_transfer_blurb">Отправляйте средства прямо со своего банковского счета в Криптовалютный Кошелек Blockchain.com. Могут применяться банковские комиссии.</string>
+    <string name="payment_deposit">Банковский депозит</string>
+    <string name="payment_deposit_subtitle">Доступно мгновенно</string>
+    <string name="payment_deposit_blurb">Надежно подключите банк и отправляйте наличные на свой Криптовалютный Кошелек Blockchain.com в любое время.</string>
+    <string name="routing_number">Routing Number (номер роутинга)</string>
+    <string name="bank_transfer_in_progress_title">%1$s покупка началась</string>
+    <string name="bank_transfer_in_progress_blurb">Сейчас мы завершаем вашу покупку. Ожидайте, что средства будут выведены из вашего банка до %1$s. Проверьте статус вашего ордера в любое время в «Активности».</string>
+    <string name="fiat_funds_detail_pending_withdrawal">У вас уже идет процесс вывода средств, пожалуйста, дождитесь его завершения, прежде чем начинать новый.</string>
+    <string name="withdraw_confirmation_cta_button">Вывести %1$s</string>
+    <string name="withdraw_confirmation_progress_message">Сейчас мы завершаем вывод средств.</string>
+    <string name="withdraw_confirmation_progress_title">Снятие %1$s</string>
+    <string name="withdraw_confirmation_success_title">%1$s снято!</string>
+    <string name="withdraw_confirmation_success_message">Мы отправляем наличные средства. Ожидайте, что деньги придут в ваш банк %1$s. Проверяйте статус вывода средств на экране активности в любое время</string>
+    <string name="withdraw_target_select_title">Вывести в...</string>
+    <string name="withdraw_confirmation_eta">Средства поступят к</string>
+    <string name="deposit_enter_amount_min_swap">Требуется минимальный депозит в размере %1$s</string>
+    <string name="withdraw_enter_amount_min">Требуется минимальный вывод в размере %1$s</string>
+    <string name="send_confirmation_eta">Средства придут</string>
+    <string name="deposit_source_select_title">Связанные банковские счета</string>
+    <string name="deposit_confirmation_cta_button">Депозит %1$s</string>
+    <string name="deposit_enter_amount_limit_title">Суточный лимит</string>
+    <string name="deposit_enter_amount_limit_label">Доступно %1$s</string>
+    <string name="deposit_confirmation_progress_title">Депозит %1$s</string>
+    <string name="deposit_confirmation_progress_message">Сейчас мы завершаем ваш депозит.</string>
+    <string name="deposit_confirmation_success_title">%1$s внесено!</string>
+    <string name="deposit_confirmation_success_message">Пока мы ждем перечисления денег вашим банком, вот вам ранний доступ к %1$s на вашем счете наличных %2$s, чтобы вы могли сразу купить криптовалюту.
+
+Средства будут доступны для вывода после завершения банковского перевода %3$s.</string>
+    <string name="add_a_deposit_method">Выберите метод депозита</string>
+    <string name="security_check">Проверка безопасности</string>
+    <string name="success_email_veriff">Готово! Ваша электронная почта подтверждена.</string>
+    <string name="email_verified">Электронная почта подтверждена</string>
+    <string name="email_verification_part_1">Мы отправили письмо с подтверждением на адрес</string>
+    <string name="email_verification_part_2">. Пожалуйста, нажмите ссылку в письме, чтобы продолжить.</string>
+    <string name="email_verify">Подтвердите ваш электронный адрес</string>
+    <string name="edit_email_address">Редактировать адрес электронной почты</string>
+    <string name="common_save">Сохранить</string>
+    <string name="change_email_instructions">Введите свой адрес электронной почты ниже и нажмите «Сохранить». Мы отправим вам письмо с подтверждением на этот новый адрес.</string>
+    <string name="check_my_inbox">Проверить мой почтовый ящик</string>
+    <string name="did_not_get_email">Не получили письмо?</string>
+    <string name="send_again">Отправить еще раз</string>
+
 </resources>

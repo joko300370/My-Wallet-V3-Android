@@ -12,6 +12,8 @@ import io.reactivex.Single
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
+import piuk.blockchain.android.identity.Feature
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.simplebuy.SimpleBuyState
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.ui.tiers
@@ -23,6 +25,7 @@ class AnnouncementQueriesTest {
     private val settings: SettingsDataManager = mock()
     private val nabu: NabuDataManager = mock()
     private val tierService: TierService = mock()
+    private val userIdentity: UserIdentity = mock()
 
     private val sbSync: SimpleBuySyncFactory = mock()
 
@@ -37,7 +40,8 @@ class AnnouncementQueriesTest {
             settings = settings,
             nabu = nabu,
             tierService = tierService,
-            sbStateFactory = sbSync
+            sbStateFactory = sbSync,
+            userIdentity = userIdentity
         )
     }
 
@@ -48,17 +52,20 @@ class AnnouncementQueriesTest {
             Single.just(
                 KycTiers(
                     listOf(
-                        TierResponse(0,
+                        TierResponse(
+                            0,
                             "",
                             KycTierState.None,
                             sampleLimits
                         ),
-                        TierResponse(0,
+                        TierResponse(
+                            0,
                             "",
                             KycTierState.Verified,
                             sampleLimits
                         ),
-                        TierResponse(0,
+                        TierResponse(
+                            0,
                             "",
                             KycTierState.None,
                             sampleLimits
@@ -234,6 +241,36 @@ class AnnouncementQueriesTest {
             .assertValue { !it }
             .assertValueCount(1)
             .assertComplete()
+    }
+
+    @Test
+    fun `user isSddEligible but verified`() {
+        whenever(userIdentity.isEligibleFor(Feature.SimplifiedDueDiligence)).thenReturn(Single.just(true))
+        whenever(userIdentity.isVerifiedFor(Feature.SimplifiedDueDiligence)).thenReturn(Single.just(true))
+
+        subject.isSimplifiedDueDiligenceEligibleAndNotVerified()
+            .test()
+            .assertValue { !it }
+    }
+
+    @Test
+    fun `user not SddEligible neither verified`() {
+        whenever(userIdentity.isEligibleFor(Feature.SimplifiedDueDiligence)).thenReturn(Single.just(false))
+        whenever(userIdentity.isVerifiedFor(Feature.SimplifiedDueDiligence)).thenReturn(Single.just(false))
+
+        subject.isSimplifiedDueDiligenceEligibleAndNotVerified()
+            .test()
+            .assertValue { !it }
+    }
+
+    @Test
+    fun `user  SddEligible and not verified`() {
+        whenever(userIdentity.isEligibleFor(Feature.SimplifiedDueDiligence)).thenReturn(Single.just(true))
+        whenever(userIdentity.isVerifiedFor(Feature.SimplifiedDueDiligence)).thenReturn(Single.just(false))
+
+        subject.isSimplifiedDueDiligenceEligibleAndNotVerified()
+            .test()
+            .assertValue { it }
     }
 
     companion object {

@@ -1,8 +1,8 @@
 package piuk.blockchain.android.ui.settings
 
 import androidx.annotation.StringRes
+import com.blockchain.nabu.datamanagers.Bank
 import com.blockchain.nabu.datamanagers.PaymentMethod
-import com.blockchain.nabu.models.data.Bank
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import piuk.blockchain.androidcoreui.ui.base.View
@@ -32,7 +32,7 @@ interface SettingsView : View {
     fun setEmailSummary(email: String, isVerified: Boolean)
     fun setEmailUnknown()
 
-    fun setSmsSummary(summary: String, isVerified: Boolean)
+    fun setSmsSummary(smsNumber: String, isVerified: Boolean)
     fun setSmsUnknown()
 
     fun setFiatSummary(summary: String)
@@ -57,7 +57,7 @@ interface SettingsView : View {
 
     fun updateCards(cards: List<PaymentMethod.Card>)
 
-    fun updateLinkableBanks(linkableBanks: Set<LinkableBank>, linkedBanksCount: Int)
+    fun updateLinkableBanks(linkablePaymentMethods: Set<LinkablePaymentMethods>, linkedBanksCount: Int)
 
     fun updateLinkedBanks(banks: Set<Bank>)
 
@@ -88,4 +88,6 @@ interface SettingsView : View {
     fun launchKycFlow()
 
     fun linkBankWithPartner(linkBankTransfer: LinkBankTransfer)
+
+    fun showRateUsPreference()
 }

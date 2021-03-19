@@ -1,9 +1,8 @@
 package piuk.blockchain.android.ui.upgrade
 
 import androidx.annotation.StringRes
-
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.ui.base.View
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 
 internal interface UpgradeWalletView : View {
 

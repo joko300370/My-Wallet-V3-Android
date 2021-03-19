@@ -57,10 +57,10 @@ class KycTierSplashPresenter(
             .doOnError(Timber::e)
             .subscribeBy(
                 onSuccess = {
-                    view!!.navigateTo(it, tier)
+                    view?.navigateTo(it, tier)
                 },
                 onError = {
-                    view!!.showError(R.string.kyc_non_specific_server_error)
+                    view?.showError(R.string.kyc_non_specific_server_error)
                 }
             )
     }

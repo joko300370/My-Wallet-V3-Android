@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.View.FIND_VIEWS_WITH_TEXT
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -57,7 +56,6 @@ import piuk.blockchain.android.ui.interest.InterestDashboardActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.kyc.status.KycStatusActivity
 import piuk.blockchain.android.ui.launcher.LauncherActivity
-import piuk.blockchain.android.ui.lockbox.LockboxLandingActivity
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity
 import piuk.blockchain.android.ui.pairingcode.PairingCodeActivity
 import piuk.blockchain.android.ui.scan.QrExpected
@@ -77,13 +75,11 @@ import piuk.blockchain.android.ui.transfer.TransferFragment
 import piuk.blockchain.android.util.AndroidUtils
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.android.util.getAccount
-import piuk.blockchain.android.withdraw.WithdrawActivity
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import timber.log.Timber
-import java.util.ArrayList
 
 class MainActivity : MvpActivity<MainView, MainPresenter>(),
     HomeNavigator,
@@ -164,9 +160,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
             override fun onDrawerOpened(drawerView: View) {
                 drawerOpen = true
-                if (tour_guide.isActive) {
-                    setTourMenuView()
-                }
                 analytics.logEvent(SideNavEvent.SideMenuOpenEvent)
             }
 
@@ -314,23 +307,9 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         }
     }
 
-    private fun setTourMenuView() {
-        val item = menu.findItem(R.id.nav_backup)
-
-        val out = ArrayList<View>()
-        drawer_layout.findViewsWithText(out, item.title, FIND_VIEWS_WITH_TEXT)
-
-        if (out.isNotEmpty()) {
-            val menuView = out[0]
-            tour_guide.setDeferredTriggerView(menuView, offsetX = -menuView.width / 3)
-        }
-    }
-
     private fun selectDrawerItem(menuItem: MenuItem) {
         analytics.logEvent(SideNavEvent(menuItem.itemId))
         when (menuItem.itemId) {
-            R.id.nav_lockbox -> LockboxLandingActivity.start(this)
-            R.id.nav_backup -> launchBackupFunds()
             R.id.nav_the_exchange -> presenter.onThePitMenuClicked()
             R.id.nav_airdrops -> AirdropCentreActivity.start(this)
             R.id.nav_addresses -> startActivityForResult(Intent(this, AccountActivity::class.java),
@@ -537,10 +516,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
             )
     }
 
-    override fun displayLockboxMenu(lockboxAvailable: Boolean) {
-        menu.findItem(R.id.nav_lockbox).isVisible = lockboxAvailable
-    }
-
     override fun showHomebrewDebugMenu() {
         menu.findItem(R.id.nav_debug_swap).isVisible = true
     }
@@ -593,13 +568,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     override fun gotoActivityFor(account: BlockchainAccount?) =
         startActivitiesFragment(account)
-
-    override fun goToWithdraw(currency: String) {
-        startActivity(WithdrawActivity.newInstance(
-            context = this,
-            currency = currency
-        ))
-    }
 
     override fun resumeSimpleBuyKyc() {
         startActivity(

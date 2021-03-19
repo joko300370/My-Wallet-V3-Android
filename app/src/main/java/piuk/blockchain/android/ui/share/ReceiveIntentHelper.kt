@@ -60,10 +60,10 @@ class ReceiveIntentHelper(private val context: Context) {
                 CryptoCurrency.BCH -> emailIntent.setupIntentForEmailBch(uri)
                 CryptoCurrency.XLM -> emailIntent.setupIntentForEmailXlm(payment = uri.fromStellarUri())
                 CryptoCurrency.PAX -> emailIntent.setupIntentForEmailPax(uri)
-                CryptoCurrency.STX -> TODO("STX is not fully supported yet")
-                CryptoCurrency.ALGO -> TODO("ALGO is not fully supported yet")
                 CryptoCurrency.USDT -> emailIntent.setupIntentForEmailUsdt(uri)
                 CryptoCurrency.DGLD -> emailIntent.setupIntentForEmailDgld(uri)
+                CryptoCurrency.STX,
+                CryptoCurrency.ALGO -> throw NotImplementedError("$cryptoCurrency is not fully supported yet")
             }.exhaustive
 
             val imageIntent = Intent().apply { setupIntentForImage(type, file) }

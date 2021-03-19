@@ -1,5 +1,6 @@
 package piuk.blockchain.android.data.biometrics
 
+import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyPermanentlyInvalidatedException
 import android.security.keystore.KeyProperties
@@ -84,7 +85,9 @@ class CryptographyManagerImpl : CryptographyManager {
     private fun removeKey(keyName: String) {
         val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE)
         keyStore.load(null) // Keystore must be loaded before it can be accessed
-        keyStore.deleteEntry(keyName)
+        if (keyStore.containsAlias(keyName)) {
+            keyStore.deleteEntry(keyName)
+        }
     }
 
     override fun clearData(secretKeyName: String) {
@@ -110,7 +113,9 @@ class CryptographyManagerImpl : CryptographyManager {
         // If Secretkey was previously created for that keyName, then grab and return it.
         val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE)
         keyStore.load(null) // Keystore must be loaded before it can be accessed
-        keyStore.getKey(keyName, null)?.let { return it as SecretKey }
+        if (keyStore.containsAlias(keyName)) {
+            return keyStore.getKey(keyName, null) as SecretKey
+        }
 
         // if you reach here, then a new SecretKey must be generated for that keyName
         val paramsBuilder = KeyGenParameterSpec.Builder(
@@ -122,6 +127,9 @@ class CryptographyManagerImpl : CryptographyManager {
             setEncryptionPaddings(ENCRYPTION_PADDING)
             setKeySize(KEY_SIZE)
             setUserAuthenticationRequired(true)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                paramsBuilder.setInvalidatedByBiometricEnrollment(true)
+            }
         }
 
         val keyGenParams = paramsBuilder.build()

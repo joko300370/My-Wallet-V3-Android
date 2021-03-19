@@ -8,6 +8,7 @@ import com.blockchain.nabu.datamanagers.BuySellOrder
 import com.blockchain.nabu.datamanagers.BuySellPair
 import com.blockchain.nabu.datamanagers.BuySellPairs
 import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.responses.simplebuy.CardPaymentAttributes
@@ -29,6 +30,7 @@ import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.cards.EverypayAuthOptions
 import piuk.blockchain.android.cards.partners.EverypayCardActivator
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import java.util.Date
 
 class SimpleBuyModelTest {
@@ -40,12 +42,16 @@ class SimpleBuyModelTest {
         fiatCurrency = "USD",
         selectedPaymentMethod = SelectedPaymentMethod(
             id = "123-321",
-            paymentMethodType = PaymentMethodType.PAYMENT_CARD
+            paymentMethodType = PaymentMethodType.PAYMENT_CARD,
+            isEligible = true
         ))
     private val gson = Gson()
     private val interactor: SimpleBuyInteractor = mock()
     private val prefs: SimpleBuyPrefs = mock {
         on { simpleBuyState() } `it returns` gson.toJson(defaultState)
+    }
+    private val environmentConfig: EnvironmentConfig = mock {
+        on { isRunningInDebugMode() } `it returns` false
     }
 
     private val ratingPrefs: RatingPrefs = mock {
@@ -71,15 +77,17 @@ class SimpleBuyModelTest {
                 cardActivators = listOf(
                     mock()
                 ),
-                ratingPrefs = ratingPrefs
+                ratingPrefs = ratingPrefs,
+                environmentConfig = environmentConfig,
+                crashLogger = mock()
             )
     }
 
     @Test
     fun `interactor fetched limits and pairs should be applied to state`() {
         whenever(interactor.fetchBuyLimitsAndSupportedCryptoCurrencies("USD"))
-            .thenReturn(Single.just(
-                BuySellPairs(listOf(
+            .thenReturn(
+                Single.just(BuySellPairs(listOf(
                     BuySellPair(pair = "BTC-USD",
                         buyLimits = BuySellLimits(100, 5024558),
                         sellLimits = BuySellLimits(100, 5024558)),
@@ -89,7 +97,7 @@ class SimpleBuyModelTest {
                         sellLimits = BuySellLimits(100, 5024558)),
                     BuySellPair(pair = "BCH-EUR", buyLimits = BuySellLimits(1001, 10000),
                         sellLimits = BuySellLimits(100, 5024558))
-                ))))
+                )) to TransferLimits("USD")))
         val testObserver = model.state.test()
         model.process(SimpleBuyIntent.FetchBuyLimits("USD", CryptoCurrency.BTC))
 
@@ -98,6 +106,7 @@ class SimpleBuyModelTest {
             BuySellPair("BTC-USD", BuySellLimits(min = 100, max = 5024558),
                 sellLimits = BuySellLimits(100, 5024558))),
             fiatCurrency = "USD",
+            transferLimits = TransferLimits("USD"),
             selectedCryptoCurrency = CryptoCurrency.BTC
         ))
     }
@@ -219,7 +228,8 @@ class SimpleBuyModelTest {
                         sellLimits = BuySellLimits(100, 5024558)),
                     BuySellPair(pair = "BCH-EUR", buyLimits = BuySellLimits(1001, 10000),
                         sellLimits = BuySellLimits(100, 5024558))
-                ))))
+                )) to TransferLimits("USD")
+            ))
 
         val testObserver = model.state.test()
         model.process(SimpleBuyIntent.FetchBuyLimits("USD", CryptoCurrency.BTC))
@@ -230,7 +240,8 @@ class SimpleBuyModelTest {
                 BuySellPair(pair = "BTC-USD", buyLimits = BuySellLimits(100, 3000),
                     sellLimits = BuySellLimits(100, 5024558))
             ),
-            selectedCryptoCurrency = CryptoCurrency.BTC
+            selectedCryptoCurrency = CryptoCurrency.BTC,
+            transferLimits = TransferLimits("USD")
         ))
     }
 }

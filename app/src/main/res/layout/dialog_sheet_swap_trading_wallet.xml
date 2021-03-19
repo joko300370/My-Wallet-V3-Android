@@ -45,16 +45,14 @@
         android:layout_marginTop="@dimen/standard_margin"
         app:layout_constraintTop_toBottomOf="@id/swap_trading_subtitle" />
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <piuk.blockchain.android.ui.customviews.StatusPill
         android:id="@+id/swap_trading_fees_badge"
-        style="@style/Text.Semibold.12"
+        app:status_type="upsell"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginTop="@dimen/standard_margin"
-        android:background="@drawable/bkgd_green_100_rounded"
         android:text="@string/swap_low_fees"
-        android:textColor="@color/green_600"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/swap_trading_header_separator" />
 
@@ -88,16 +86,14 @@
         android:layout_marginTop="@dimen/standard_margin"
         app:layout_constraintTop_toBottomOf="@id/swap_trading_fees_subtitle" />
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <piuk.blockchain.android.ui.customviews.StatusPill
         android:id="@+id/swap_trading_fast_badge"
-        style="@style/Text.Semibold.12"
+        app:status_type="upsell"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginTop="@dimen/standard_margin"
-        android:background="@drawable/bkgd_green_100_rounded"
         android:text="@string/swap_faster"
-        android:textColor="@color/green_600"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/swap_trading_benefits_separator" />
 

@@ -20,6 +20,7 @@ data class AgentResponse(val account: String)
 data class PaymentMethodResponse(
     val type: String,
     val eligible: Boolean,
+    val visible: Boolean,
     val limits: Limits,
     val subTypes: List<String>?,
     val currency: String?
@@ -32,7 +33,8 @@ data class PaymentMethodResponse(
     }
 }
 
-data class Limits(val min: Long, val max: Long)
+data class Limits(val min: Long, val max: Long, val daily: DailyLimits?)
+data class DailyLimits(val limit: Long, val available: Long, val used: Long)
 
 data class CardResponse(
     val id: String,

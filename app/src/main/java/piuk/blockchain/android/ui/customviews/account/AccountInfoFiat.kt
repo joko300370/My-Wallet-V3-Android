@@ -16,6 +16,11 @@ import kotlinx.android.synthetic.main.view_account_fiat_overview.view.*
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
+import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
+import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
+import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 
@@ -23,7 +28,7 @@ class AccountInfoFiat @JvmOverloads constructor(
     ctx: Context,
     attr: AttributeSet? = null,
     defStyle: Int = 0
-) : ConstraintLayout(ctx, attr, defStyle), KoinComponent {
+) : ConstraintLayout(ctx, attr, defStyle), KoinComponent, TxFlowWidget {
 
     private val exchangeRates: ExchangeRates by scopedInject()
     private val currencyPrefs: CurrencyPrefs by scopedInject()
@@ -87,5 +92,17 @@ class AccountInfoFiat @JvmOverloads constructor(
 
     fun dispose() {
         compositeDisposable.clear()
+    }
+
+    override fun initControl(
+        model: TransactionModel,
+        customiser: EnterAmountCustomisations,
+        analytics: TxFlowAnalytics
+    ) {
+        // No need to initialise
+    }
+
+    override fun update(state: TransactionState) {
+        updateAccount(state.sendingAccount as FiatAccount, DefaultCellDecorator()) { }
     }
 }

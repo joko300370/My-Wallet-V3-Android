@@ -2,8 +2,8 @@ package com.blockchain.nabu.models.data
 
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.responses.banktransfer.LinkBankAttrsResponse
+import info.blockchain.balance.FiatValue
 import java.io.Serializable
-import java.util.Locale
 
 data class LinkBankTransfer(val id: String, val partner: BankPartner, val attributes: LinkBankAttributes) : Serializable
 
@@ -26,27 +26,24 @@ enum class BankPartner {
 
 interface LinkBankAttributes
 
-class YodleeAttributes(val fastlinkUrl: String, val token: String, val configName: String) : LinkBankAttributes,
+data class YodleeAttributes(val fastlinkUrl: String, val token: String, val configName: String) : LinkBankAttributes,
     Serializable
 
 data class LinkedBank(
-    override val id: String,
-    override val currency: String,
+    val id: String,
+    val currency: String,
     val partner: BankPartner,
-    override val name: String,
+    val name: String,
     val accountNumber: String,
     val state: LinkedBankState,
     val errorStatus: LinkedBankErrorState,
-    override val accountType: String
-) : Bank {
-    override val account: String
+    val accountType: String
+) {
+    val account: String
         get() = accountNumber
 
-    override val paymentMethod: PaymentMethodType
+    val paymentMethod: PaymentMethodType
         get() = PaymentMethodType.BANK_TRANSFER
-
-    override fun toHumanReadableAccount(): String =
-        accountType.toLowerCase(Locale.getDefault()).capitalize(Locale.getDefault())
 }
 
 enum class LinkedBankErrorState {
@@ -64,6 +61,12 @@ enum class LinkedBankState {
     UNKNOWN
 }
 
+data class WithdrawalFeeAndLimit(
+    val minLimit: FiatValue,
+    val fee: FiatValue
+)
+
+/*
 interface Bank : Serializable {
     val currency: String
     val account: String
@@ -72,4 +75,4 @@ interface Bank : Serializable {
     val id: String
     val paymentMethod: PaymentMethodType
     fun toHumanReadableAccount(): String
-}
+}*/

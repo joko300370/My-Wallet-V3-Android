@@ -4,6 +4,7 @@ import com.blockchain.android.testutils.rxInit
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.Product
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.TransferQuote
@@ -197,7 +198,7 @@ class TradingToTradingSwapTxEngineTest {
             exchangeRates
         )
 
-        val asset = subject.asset
+        val asset = subject.sourceAsset
 
         // Assert
         assertEquals(asset, SRC_ASSET)
@@ -250,16 +251,16 @@ class TradingToTradingSwapTxEngineTest {
             .test()
             .assertValue {
                 it.amount == CryptoValue.zero(SRC_ASSET) &&
-                it.totalBalance == totalBalance &&
-                it.availableBalance == totalBalance &&
-                it.fees == CryptoValue.zero(SRC_ASSET) &&
-                it.selectedFiat == SELECTED_FIAT &&
-                it.customFeeAmount == -1L &&
-                it.confirmations.isEmpty() &&
-                it.minLimit == expectedMinLimit &&
-                it.maxLimit == MAX_GOLD_LIMIT_ASSET &&
-                it.validationState == ValidationState.UNINITIALISED &&
-                it.engineState[USER_TIER] != null
+                    it.totalBalance == totalBalance &&
+                    it.availableBalance == totalBalance &&
+                    it.fees == CryptoValue.zero(SRC_ASSET) &&
+                    it.selectedFiat == SELECTED_FIAT &&
+                    it.customFeeAmount == -1L &&
+                    it.confirmations.isEmpty() &&
+                    it.minLimit == expectedMinLimit &&
+                    it.maxLimit == MAX_GOLD_LIMIT_ASSET &&
+                    it.validationState == ValidationState.UNINITIALISED &&
+                    it.engineState[USER_TIER] != null
             }
             .assertValue { verifyFeeLevels(it, FeeLevel.None) }
             .assertNoErrors()
@@ -306,16 +307,16 @@ class TradingToTradingSwapTxEngineTest {
             .test()
             .assertValue {
                 it.amount == CryptoValue.zero(SRC_ASSET) &&
-                it.totalBalance == CryptoValue.zero(SRC_ASSET) &&
-                it.availableBalance == CryptoValue.zero(SRC_ASSET) &&
-                it.fees == CryptoValue.zero(SRC_ASSET) &&
-                it.selectedFiat == SELECTED_FIAT &&
-                it.customFeeAmount == -1L &&
-                it.confirmations.isEmpty() &&
-                it.minLimit == null &&
-                it.maxLimit == null &&
-                it.validationState == ValidationState.PENDING_ORDERS_LIMIT_REACHED &&
-                it.engineState.isEmpty()
+                    it.totalBalance == CryptoValue.zero(SRC_ASSET) &&
+                    it.availableBalance == CryptoValue.zero(SRC_ASSET) &&
+                    it.fees == CryptoValue.zero(SRC_ASSET) &&
+                    it.selectedFiat == SELECTED_FIAT &&
+                    it.customFeeAmount == -1L &&
+                    it.confirmations.isEmpty() &&
+                    it.minLimit == null &&
+                    it.maxLimit == null &&
+                    it.validationState == ValidationState.PENDING_ORDERS_LIMIT_REACHED &&
+                    it.engineState.isEmpty()
             }
             .assertValue { verifyFeeLevels(it, FeeLevel.None) }
             .assertNoErrors()
@@ -376,13 +377,13 @@ class TradingToTradingSwapTxEngineTest {
             .assertComplete()
             .assertNoErrors()
 
-            verify(sourceAccount, atLeastOnce()).asset
-            verify(txTarget, atLeastOnce()).asset
-            verifyQuotesEngineStarted()
+        verify(sourceAccount, atLeastOnce()).asset
+        verify(txTarget, atLeastOnce()).asset
+        verifyQuotesEngineStarted()
 
-            verify(quotesEngine).updateAmount(inputAmount)
+        verify(quotesEngine).updateAmount(inputAmount)
 
-            noMoreInteractions(txTarget)
+        noMoreInteractions(txTarget)
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -533,7 +534,7 @@ class TradingToTradingSwapTxEngineTest {
         subject.doUpdateFeeLevel(
             pendingTx,
             FeeLevel.None,
-                -1
+            -1
         ).test()
             .assertValue {
                 it.amount == inputAmount &&
@@ -563,7 +564,7 @@ class TradingToTradingSwapTxEngineTest {
         val kycTiers: KycTiers = mock()
         whenever(kycTierService.tiers()).thenReturn(Single.just(kycTiers))
 
-        whenever(walletManager.getSwapLimits(SELECTED_FIAT))
+        whenever(walletManager.getProductTransferLimits(SELECTED_FIAT, Product.TRADE))
             .itReturns(
                 Single.just(
                     TransferLimits(
@@ -577,7 +578,7 @@ class TradingToTradingSwapTxEngineTest {
 
     private fun verifyLimitsFetched() {
         verify(kycTierService).tiers()
-        verify(walletManager).getSwapLimits(SELECTED_FIAT)
+        verify(walletManager).getProductTransferLimits(SELECTED_FIAT, Product.TRADE)
     }
 
     private fun verifyQuotesEngineStarted() {

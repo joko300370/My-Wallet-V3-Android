@@ -12,7 +12,7 @@ import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.android.ui.base.MvpActivity
 import piuk.blockchain.android.ui.scan.QrExpected
 import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
-import piuk.blockchain.androidcoreui.ui.customviews.toast
+import piuk.blockchain.android.ui.customviews.toast
 
 class LoginActivity : MvpActivity<LoginView, LoginPresenter>(), LoginView {
 

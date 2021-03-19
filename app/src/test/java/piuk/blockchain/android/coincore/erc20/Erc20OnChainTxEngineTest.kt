@@ -153,7 +153,7 @@ class Erc20OnChainTxEngineTest {
             exchangeRates
         )
 
-        val asset = subject.asset
+        val asset = subject.sourceAsset
 
         // Assert
         assertEquals(asset, ASSET)

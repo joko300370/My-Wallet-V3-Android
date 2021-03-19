@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="piuk.blockchain.android"
     android:installLocation="auto">
@@ -11,8 +12,12 @@
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
     <uses-permission android:name="android.permission.CAMERA" />
     <!-- force the removal of these two permissions, which may be added by 3rd party libs -->
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" tools:node="remove" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.READ_PHONE_STATE"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        tools:node="remove" />
 
     <uses-feature android:name="android.hardware.location.gps" />
 
@@ -30,7 +35,7 @@
         <activity
             android:name=".ui.launcher.LauncherActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:launchMode="singleTop">
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -138,9 +143,6 @@
             android:name=".ui.ssl.SSLVerifyActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.lockbox.LockboxLandingActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"/>
-        <activity
             android:name=".ui.thepit.PitPermissionsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
@@ -155,10 +157,6 @@
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".simplebuy.SimpleBuyActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".withdraw.WithdrawActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:windowSoftInputMode="adjustResize" />
         <activity

@@ -10,7 +10,6 @@ import com.blockchain.sunriver.datamanager.XlmMetaDataInitializer
 import com.blockchain.sunriver.datamanager.default
 import com.blockchain.sunriver.models.XlmTransaction
 import com.blockchain.utils.toHex
-import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import io.reactivex.Maybe
@@ -18,6 +17,11 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.schedulers.Schedulers
 import org.stellar.sdk.KeyPair
+
+data class XlmAccountReference(
+    val label: String,
+    val accountId: String
+)
 
 data class BalanceAndMin(
     val balance: CryptoValue,
@@ -36,9 +40,11 @@ class XlmDataManager internal constructor(
     xlmHorizonUrlFetcher: XlmHorizonUrlFetcher,
     xlmHorizonDefUrl: String
 ) {
-    private val xlmProxyUrl = xlmHorizonUrlFetcher.xlmHorizonUrl(xlmHorizonDefUrl).doOnSuccess {
-        horizonProxy.update(it)
-    }.cache()
+    private val xlmProxyUrl = xlmHorizonUrlFetcher
+        .xlmHorizonUrl(xlmHorizonDefUrl)
+        .doOnSuccess {
+            horizonProxy.update(it)
+        }.cache()
 
     fun sendFunds(
         sendDetails: SendDetails,
@@ -103,21 +109,21 @@ class XlmDataManager internal constructor(
     private val wallet = Single.defer { metaDataInitializer.initWalletMaybePrompt.toSingle() }
     private val maybeWallet = Maybe.defer { metaDataInitializer.initWalletMaybe }
 
-    fun getBalance(accountReference: AccountReference.Xlm): Single<CryptoValue> =
+    fun getBalance(accountReference: XlmAccountReference): Single<CryptoValue> =
         getBalance(accountReference.accountId)
 
     private fun getBalance(address: String): Single<CryptoValue> =
         Single.fromCallable { horizonProxy.getBalance(address) }.ensureUrlUpdated()
             .subscribeOn(Schedulers.io())
 
-    private fun getBalanceAndMin(accountReference: AccountReference.Xlm): Single<BalanceAndMin> =
+    private fun getBalanceAndMin(accountReference: XlmAccountReference): Single<BalanceAndMin> =
         Single.fromCallable { horizonProxy.getBalanceAndMin(accountReference.accountId) }.ensureUrlUpdated()
             .subscribeOn(Schedulers.io())
 
     fun getBalance(): Single<CryptoValue> =
         Maybe.concat(
             maybeDefaultAccount().flatMap { getBalance(it).toMaybe() },
-            Maybe.just(CryptoValue.ZeroXlm)
+            Maybe.just(CryptoValue.zero(CryptoCurrency.XLM))
         ).firstOrError()
 
     /**
@@ -134,7 +140,7 @@ class XlmDataManager internal constructor(
                         (it.balance - it.minimumBalance - fee) as CryptoValue
                     }
                 }.toMaybe(),
-            Maybe.just(CryptoValue.ZeroXlm)
+            Maybe.just(CryptoValue.zero(CryptoCurrency.XLM))
         ).firstOrError()
 
     fun getBalanceAndMin(): Single<BalanceAndMin> =
@@ -142,19 +148,24 @@ class XlmDataManager internal constructor(
             maybeDefaultAccount().flatMap {
                 getBalanceAndMin(it).toMaybe()
             },
-            Maybe.just(BalanceAndMin(CryptoValue.ZeroXlm, CryptoValue.ZeroXlm))
+            Maybe.just(
+                BalanceAndMin(
+                    CryptoValue.zero(CryptoCurrency.XLM),
+                    CryptoValue.zero(CryptoCurrency.XLM)
+                )
+            )
         ).firstOrError()
 
-    fun defaultAccount(): Single<AccountReference.Xlm> =
+    fun defaultAccount(): Single<XlmAccountReference> =
         defaultXlmAccount()
             .map(XlmAccount::toReference)
 
-    fun defaultAccountReference(): Single<AccountReference> = defaultAccount().map { it }
+    fun defaultAccountReference(): Single<XlmAccountReference> = defaultAccount().map { it }
 
-    fun maybeDefaultAccount(): Maybe<AccountReference.Xlm> =
+    fun maybeDefaultAccount(): Maybe<XlmAccountReference> =
         maybeDefaultXlmAccount().map(XlmAccount::toReference)
 
-    fun getTransactionList(accountReference: AccountReference.Xlm): Single<List<XlmTransaction>> =
+    fun getTransactionList(accountReference: XlmAccountReference): Single<List<XlmTransaction>> =
         Single.fromCallable {
             horizonProxy.getTransactionList(accountReference.accountId)
                 .map(accountReference.accountId, horizonProxy)
@@ -214,13 +225,13 @@ internal fun HorizonProxy.SendResult.mapToSendFundsResult(sendDetails: SendDetai
     }
 
 private val SendDetails.fromXlm
-    get() = from as? AccountReference.Xlm
+    get() = from as? XlmAccountReference
         ?: throw XlmSendException("Source account reference is not an Xlm reference")
 
 class XlmSendException(message: String) : RuntimeException(message)
 
 private fun XlmAccount.toReference() =
-    AccountReference.Xlm(label ?: "", publicKey)
+    XlmAccountReference(label ?: "", publicKey)
 
 class SendException(
     result: SendFundsResult
@@ -231,7 +242,7 @@ class SendException(
 }
 
 data class SendDetails(
-    val from: AccountReference,
+    val from: XlmAccountReference,
     val value: CryptoValue,
     val toAddress: String,
     val toLabel: String = "",
@@ -239,7 +250,7 @@ data class SendDetails(
     val memo: Memo? = null
 ) {
     constructor(
-        from: AccountReference,
+        from: XlmAccountReference,
         value: CryptoValue,
         toAddress: String,
         fee: CryptoValue,
@@ -286,7 +297,7 @@ data class SendConfirmationDetails(
     val sendDetails: SendDetails,
     val fees: CryptoValue
 ) {
-    val from: AccountReference = sendDetails.from
+    val from: XlmAccountReference = sendDetails.from
     val to: String = sendDetails.toAddress
     val amount: CryptoValue = sendDetails.value
 }

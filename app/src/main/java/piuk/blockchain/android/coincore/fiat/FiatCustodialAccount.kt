@@ -1,6 +1,8 @@
 package piuk.blockchain.android.coincore.fiat
 
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.TransactionState
+import com.blockchain.nabu.datamanagers.TransactionType
 import com.blockchain.nabu.datamanagers.repositories.AssetBalancesRepository
 import com.blockchain.nabu.models.responses.interest.DisabledReason
 import info.blockchain.balance.ExchangeRates
@@ -8,6 +10,7 @@ import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import info.blockchain.balance.total
 import io.reactivex.Single
+import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
@@ -79,18 +82,26 @@ internal class FiatCustodialAccount(
                 }
             }
 
-    override val actions: Single<AvailableActions> =
-        custodialWalletManager.canWireTransferToABankWithCurrency(fiatCurrency).map {
-            if (it) {
-                setOf(
-                    AssetAction.ViewActivity,
-                    AssetAction.Deposit,
-                    AssetAction.Withdraw
-                )
-            } else {
-                setOf(AssetAction.ViewActivity)
-            }
+    override fun canWithdrawFunds(): Single<Boolean> =
+        custodialWalletManager.getTransactions(fiatCurrency).map {
+            it.filter { tx -> tx.type == TransactionType.WITHDRAWAL && tx.state == TransactionState.PENDING }
+        }.map {
+            it.isEmpty()
         }
+
+    override val actions: Single<AvailableActions> =
+        custodialWalletManager.canTransactWithBankMethods(fiatCurrency).zipWith(actionableBalance.map { it.isPositive })
+            .map { (canTransactWithBanks, hasActionableBalance) ->
+                if (canTransactWithBanks) {
+                    setOfNotNull(
+                        AssetAction.ViewActivity,
+                        AssetAction.FiatDeposit,
+                        if (hasActionableBalance) AssetAction.Withdraw else null
+                    )
+                } else {
+                    setOf(AssetAction.ViewActivity)
+                }
+            }
 
     override val isFunded: Boolean
         get() = hasFunds.get()
@@ -121,6 +132,9 @@ class FiatAccountGroup(
 ) : AccountGroup {
     // Produce the sum of all balances of all accounts
     override val accountBalance: Single<Money>
+        get() = Single.error(NotImplementedError("No unified balance for All Fiat accounts"))
+
+    override val actionableBalance: Single<Money>
         get() = Single.error(NotImplementedError("No unified balance for All Fiat accounts"))
 
     override val pendingBalance: Single<Money>
@@ -171,6 +185,9 @@ class FiatAccountGroup(
                     .total()
             }
         }
+
+    override val receiveAddress: Single<ReceiveAddress>
+        get() = Single.error(NotImplementedError("No receive addresses for All Fiat accounts"))
 
     override fun includes(account: BlockchainAccount): Boolean =
         accounts.contains(account)

@@ -19,8 +19,8 @@ import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.ui.customviews.toast
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
 import piuk.blockchain.android.util.gone
@@ -52,7 +52,8 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
             CampaignType.SimpleBuy,
             CampaignType.Resubmission,
             CampaignType.FiatFunds,
-            CampaignType.Interest -> R.string.sunriver_splash_title
+            CampaignType.None,
+            CampaignType.Interest -> R.string.identity_verification
         }
         setupToolbar(toolBar, title)
 
@@ -102,6 +103,7 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
         displayNotificationButton()
         val message = when (campaignType) {
             CampaignType.Swap,
+            CampaignType.None,
             CampaignType.Resubmission -> R.string.kyc_status_message_in_progress
             CampaignType.Blockstack,
             CampaignType.SimpleBuy,

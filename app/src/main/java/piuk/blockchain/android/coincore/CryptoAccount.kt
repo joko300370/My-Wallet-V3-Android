@@ -15,6 +15,9 @@ interface BlockchainAccount {
 
     val accountBalance: Single<Money> // Total balance, including uncleared and locked
 
+    // Available balance, not including uncleared and locked, that may be used for transactions
+    val actionableBalance: Single<Money>
+
     val pendingBalance: Single<Money>
 
     val activity: Single<ActivitySummaryList>
@@ -30,14 +33,14 @@ interface BlockchainAccount {
     val disabledReason: Single<DisabledReason>
 
     fun fiatBalance(fiatCurrency: String, exchangeRates: ExchangeRates): Single<Money>
+
+    val receiveAddress: Single<ReceiveAddress>
+
+    fun requireSecondPassword(): Single<Boolean> = Single.just(false)
 }
 
 interface SingleAccount : BlockchainAccount, TransactionTarget {
-    val receiveAddress: Single<ReceiveAddress>
     val isDefault: Boolean
-
-    // Available balance, not including uncleared and locked, that may be used for transactions
-    val actionableBalance: Single<Money>
 
     // Is this account currently able to operate as a transaction source
     val sourceState: Single<TxSourceState>
@@ -55,6 +58,7 @@ enum class TxSourceState {
 interface InterestAccount
 interface TradingAccount
 interface NonCustodialAccount
+interface BankAccount
 
 typealias SingleAccountList = List<SingleAccount>
 
@@ -67,8 +71,6 @@ interface CryptoAccount : SingleAccount {
     override val pendingBalance: Single<Money>
         get() = Single.just(CryptoValue.zero(asset))
 
-    fun requireSecondPassword(): Single<Boolean>
-
     fun matches(other: CryptoAccount): Boolean
 }
 
@@ -76,6 +78,8 @@ interface FiatAccount : SingleAccount {
     val fiatCurrency: String
     override val pendingBalance: Single<Money>
         get() = Single.just(FiatValue.zero(fiatCurrency))
+
+    fun canWithdrawFunds(): Single<Boolean>
 }
 
 interface AccountGroup : BlockchainAccount {
@@ -179,6 +183,8 @@ object NullFiatAccount : FiatAccount {
 
     override val disabledReason: Single<DisabledReason>
         get() = Single.just(DisabledReason.NONE)
+
+    override fun canWithdrawFunds(): Single<Boolean> = Single.just(false)
 
     override fun fiatBalance(
         fiatCurrency: String,

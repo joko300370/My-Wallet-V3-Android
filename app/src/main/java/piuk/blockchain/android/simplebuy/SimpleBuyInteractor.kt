@@ -11,6 +11,8 @@ import com.blockchain.nabu.datamanagers.OrderInput
 import com.blockchain.nabu.datamanagers.OrderOutput
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.Product
+import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.datamanagers.repositories.WithdrawLocksRepository
@@ -21,6 +23,7 @@ import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.nabu.models.responses.simplebuy.CardPartnerAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
 import com.blockchain.nabu.service.TierService
+import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.ui.trackProgress
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
@@ -30,6 +33,8 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.cards.CardIntent
 import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.networking.PollService
+import piuk.blockchain.android.sdd.SDDAnalytics
 import piuk.blockchain.android.util.AppUtil
 import java.util.concurrent.TimeUnit
 
@@ -38,14 +43,25 @@ class SimpleBuyInteractor(
     private val custodialWalletManager: CustodialWalletManager,
     private val withdrawLocksRepository: WithdrawLocksRepository,
     private val appUtil: AppUtil,
+    private val analytics: Analytics,
     private val eligibilityProvider: EligibilityProvider,
     private val coincore: Coincore
 ) {
 
-    fun fetchBuyLimitsAndSupportedCryptoCurrencies(targetCurrency: String):
-        Single<BuySellPairs> =
-        custodialWalletManager.getSupportedBuySellCryptoCurrencies(targetCurrency)
-            .trackProgress(appUtil.activityIndicator)
+    // ignore limits when user is in tier 0
+    fun fetchBuyLimitsAndSupportedCryptoCurrencies(
+        targetCurrency: String
+    ): Single<Pair<BuySellPairs, TransferLimits?>> =
+        custodialWalletManager.getSupportedBuySellCryptoCurrencies(targetCurrency).zipWith(
+            tierService.tiers()
+        ).flatMap { (pairs, tier) ->
+            if (tier.isInInitialState()) {
+                Single.just(pairs to null)
+            } else
+                custodialWalletManager.getProductTransferLimits(targetCurrency, product = Product.SIMPLEBUY).map {
+                    pairs to it
+                }
+        }.trackProgress(appUtil.activityIndicator)
 
     fun fetchSupportedFiatCurrencies(): Single<SimpleBuyIntent.SupportedCurrenciesUpdated> =
         custodialWalletManager.getSupportedFiatCurrencies()
@@ -136,11 +152,13 @@ class SimpleBuyInteractor(
             accountId = accountId
         )
 
-    fun pollForLinkedBankState(id: String): Single<LinkedBank> = custodialWalletManager.getLinkedBank(id)
-        .repeatWhen { it.delay(5, TimeUnit.SECONDS).zipWith(Flowable.range(0, 12)) }
-        .takeUntil {
-            it.state != LinkedBankState.PENDING
-        }.lastOrError()
+    fun pollForLinkedBankState(id: String): Single<LinkedBank> = PollService(
+        custodialWalletManager.getLinkedBank(id)
+    ) {
+        it.state != LinkedBankState.PENDING
+    }.start(timerInSec = 5, retries = 12).map {
+        it.value
+    }
 
     fun checkTierLevel(): Single<SimpleBuyIntent.KycStateUpdated> {
 
@@ -182,29 +200,32 @@ class SimpleBuyInteractor(
             SimpleBuyIntent.ExchangeRateUpdated(it.price() as FiatValue)
         }
 
-    fun fetchPaymentMethods(fiatCurrency: String, preselectedId: String?):
+    fun eligiblePaymentMethods(fiatCurrency: String, preselectedId: String?):
         Single<SimpleBuyIntent.PaymentMethodsUpdated> =
-        tierService.tiers().flatMap { tier ->
-            custodialWalletManager.fetchSuggestedPaymentMethod(
-                fiatCurrency,
-                tier.isInitialisedFor(KycTierLevel.GOLD)
-            ).map { paymentMethods ->
-                SimpleBuyIntent.PaymentMethodsUpdated(
-                    availablePaymentMethods = paymentMethods,
-                    canAddCard = tier.isApprovedFor(KycTierLevel.GOLD),
-                    canLinkFunds = tier.isApprovedFor(KycTierLevel.GOLD),
-                    canLinkBank = tier.isApprovedFor(KycTierLevel.GOLD),
-                    preselectedId = if (tier.isApprovedFor(
-                            KycTierLevel.GOLD
-                        ) || preselectedId != null
-                    ) {
-                        preselectedId
-                    } else {
-                        PaymentMethod.UNDEFINED_PAYMENT_ID
-                    }
-                )
+        tierService.tiers().zipWith(custodialWalletManager.isSimplifiedDueDiligenceEligible().onErrorReturn { false }
+            .doOnSuccess {
+                if (it) {
+                    analytics.logEventOnce(SDDAnalytics.SDD_ELIGIBLE)
+                }
+            })
+            .flatMap { (tier, sddEligible) ->
+                custodialWalletManager.fetchSuggestedPaymentMethod(
+                    fiatCurrency = fiatCurrency,
+                    fetchSddLimits = sddEligible && tier.isInInitialState(),
+                    onlyEligible = tier.isInitialisedFor(KycTierLevel.GOLD)
+                ).map { paymentMethods ->
+                    SimpleBuyIntent.PaymentMethodsUpdated(
+                        availablePaymentMethods = paymentMethods,
+                        canLinkBank = paymentMethods.filterIsInstance<PaymentMethod.UndefinedBankTransfer>()
+                            .firstOrNull()?.isEligible ?: false,
+                        canAddCard = paymentMethods.filterIsInstance<PaymentMethod.UndefinedCard>()
+                            .firstOrNull()?.isEligible ?: false,
+                        canLinkFunds = paymentMethods.filterIsInstance<PaymentMethod.UndefinedFunds>()
+                            .firstOrNull()?.isEligible ?: false,
+                        preselectedId = preselectedId
+                    )
+                }
             }
-        }
 
     // attributes are null in case of bank
     fun confirmOrder(
@@ -223,25 +244,22 @@ class SimpleBuyInteractor(
             }.lastOrError()
 
     fun pollForCardStatus(cardId: String): Single<CardIntent.CardUpdated> =
-        custodialWalletManager.getCardDetails(cardId)
-            .repeatWhen { it.delay(5, TimeUnit.SECONDS).zipWith(Flowable.range(0, 24)) }
-            .takeUntil {
-                it.status == CardStatus.BLOCKED ||
-                    it.status == CardStatus.EXPIRED ||
-                    it.status == CardStatus.ACTIVE
-            }
-            .map {
-                CardIntent.CardUpdated(it)
-            }
-            .lastOrError()
-
-    fun fetchPaymentMethods(fiatCurrency: String): Single<List<PaymentMethod>> =
-        tierService.tiers().flatMap {
-            custodialWalletManager.fetchSuggestedPaymentMethod(
-                fiatCurrency,
-                it.isInitialisedFor(KycTierLevel.GOLD)
-            )
+        PollService(
+            custodialWalletManager.getCardDetails(cardId)
+        ) {
+            it.status == CardStatus.BLOCKED ||
+                it.status == CardStatus.EXPIRED ||
+                it.status == CardStatus.ACTIVE
         }
+            .start()
+            .map {
+                CardIntent.CardUpdated(it.value)
+            }
+
+    fun eligiblePaymentMethodsTypes(fiatCurrency: String): Single<List<EligiblePaymentMethodType>> =
+        custodialWalletManager.getEligiblePaymentMethodTypes(
+            fiatCurrency = fiatCurrency
+        )
 
     fun fetchOrder(orderId: String) = custodialWalletManager.getBuyOrder(orderId)
 

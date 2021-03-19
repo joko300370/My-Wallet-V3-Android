@@ -131,7 +131,7 @@ class KycCountrySelectionPresenterTest {
                 )
             )
         val countryDisplayModel = CountryDisplayModel(
-            name = "United States",
+            name = "California",
             countryCode = "US",
             isState = true,
             state = "US-AL"
@@ -140,7 +140,7 @@ class KycCountrySelectionPresenterTest {
         subject.onRegionSelected(countryDisplayModel)
         // Assert
         verify(nabuDataManager).getStatesList("US", Scope.None)
-        verify(view).continueFlow(countryCode, "US-AL")
+        verify(view).continueFlow(countryCode, "US-AL", "California")
     }
 
     @Test
@@ -160,7 +160,7 @@ class KycCountrySelectionPresenterTest {
         subject.onRegionSelected(countryDisplayModel)
         // Assert
         verify(nabuDataManager).getCountriesList(Scope.None)
-        verify(view).continueFlow(countryCode, null)
+        verify(view).continueFlow(countryCode, null, null)
     }
 
     @Test

@@ -239,6 +239,8 @@
     kotlinx.serialization.KSerializer serializer(...);
 }
 
+-keep public class com.mukesh.countrypicker.** { *; }
+
 # Change here com.yourcompany.yourpackage
 #-keep,includedescriptorclasses class com.yourcompany.yourpackage.**$$serializer { *; } # <-- change package name to your app's
 #-keepclassmembers class com.yourcompany.yourpackage.** { # <-- change package name to your app's

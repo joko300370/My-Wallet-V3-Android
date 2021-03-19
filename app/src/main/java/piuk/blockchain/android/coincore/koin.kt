@@ -1,7 +1,7 @@
 package piuk.blockchain.android.coincore
 
-import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.koin.dgldFeatureFlag
+import com.blockchain.koin.payloadScopeQualifier
 import info.blockchain.balance.CryptoCurrency
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -13,6 +13,7 @@ import piuk.blockchain.android.coincore.erc20.pax.PaxAsset
 import piuk.blockchain.android.coincore.erc20.usdt.UsdtAsset
 import piuk.blockchain.android.coincore.eth.EthAsset
 import piuk.blockchain.android.coincore.fiat.FiatAsset
+import piuk.blockchain.android.coincore.fiat.LinkedBanksFactory
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.coincore.impl.TxProcessorFactory
 import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
@@ -167,7 +168,6 @@ val coincoreModule = module {
                 assetBalancesRepository = get(),
                 exchangeRateDataManager = get(),
                 custodialWalletManager = get(),
-                tierService = get(),
                 currencyPrefs = get()
             )
         }
@@ -270,6 +270,12 @@ val coincoreModule = module {
 
         factory {
             TransferQuotesEngine(quotesProvider = get())
+        }
+
+        factory {
+            LinkedBanksFactory(
+                custodialWalletManager = get()
+            )
         }
     }
 }

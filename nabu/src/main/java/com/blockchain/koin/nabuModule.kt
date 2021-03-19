@@ -101,15 +101,17 @@ val nabuModule = module {
                 authenticator = get(),
                 simpleBuyPrefs = get(),
                 paymentAccountMapperMappers = mapOf(
-                    "EUR" to get(eur), "GBP" to get(gbp)
+                    "EUR" to get(eur), "GBP" to get(gbp), "USD" to get(usd)
                 ),
+                achDepositWithdrawFeatureFlag = get(achDepositWithdrawFeatureFlag),
+                sddFeatureFlag = get(sddFeatureFlag),
                 kycFeatureEligibility = get(),
                 assetBalancesRepository = get(),
                 interestRepository = get(),
                 custodialRepository = get(),
-                extraAttributesProvider = get(),
                 bankLinkingEnabledProvider = get(),
-                transactionErrorMapper = get()
+                transactionErrorMapper = get(),
+                currencyPrefs = get()
             )
         }.bind(CustodialWalletManager::class)
 
@@ -216,7 +218,8 @@ val nabuModule = module {
         }.bind(CreateNabuToken::class)
 
         factory { NabuDataUserProviderNabuDataManagerAdapter(get(), get()) }.bind(
-            NabuDataUserProvider::class)
+            NabuDataUserProvider::class
+        )
 
         factory { NabuUserSyncUpdateUserWalletInfoWithJWT(get(), get()) }.bind(NabuUserSync::class)
 
@@ -226,7 +229,8 @@ val nabuModule = module {
 
         scoped {
             NabuUserRepository(
-                nabuDataUserProvider = get())
+                nabuDataUserProvider = get()
+            )
         }
 
         scoped {

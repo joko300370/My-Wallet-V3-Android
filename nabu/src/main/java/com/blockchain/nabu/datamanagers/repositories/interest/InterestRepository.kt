@@ -44,6 +44,7 @@ class InterestRepository(
     fun getEligibilityForAsset(ccy: CryptoCurrency): Single<Eligibility> =
         eligibilityCache.getCachedSingle().map { eligibilityList ->
             eligibilityList.find { it.cryptoCurrency == ccy }?.eligibility
+                ?: Eligibility.notEligible()
         }
 
     companion object {

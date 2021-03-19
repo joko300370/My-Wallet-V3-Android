@@ -115,8 +115,8 @@ class SimpleBuySyncFactory(
                 list.sortedByDescending { it.expires }
                     .firstOrNull {
                         it.state == OrderState.AWAITING_FUNDS ||
-                                it.state == OrderState.PENDING_EXECUTION ||
-                                it.state == OrderState.PENDING_CONFIRMATION
+                            it.state == OrderState.PENDING_EXECUTION ||
+                            it.state == OrderState.PENDING_CONFIRMATION
                     }?.toSimpleBuyStateMaybe() ?: Maybe.empty()
             }
     }
@@ -128,8 +128,8 @@ class SimpleBuySyncFactory(
                     list.sortedByDescending { it.expires }
                         .firstOrNull {
                             it.state == OrderState.AWAITING_FUNDS ||
-                                    it.state == OrderState.PENDING_EXECUTION ||
-                                    it.state == OrderState.PENDING_CONFIRMATION
+                                it.state == OrderState.PENDING_EXECUTION ||
+                                it.state == OrderState.PENDING_CONFIRMATION
                         }?.toSimpleBuyStateMaybe() ?: Maybe.just(localState)
                 }
         } else {
@@ -139,33 +139,37 @@ class SimpleBuySyncFactory(
 
     private fun BuySellOrder.isDefinedCardPayment() =
         paymentMethodType == PaymentMethodType.PAYMENT_CARD &&
-                paymentMethodId != PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
+            paymentMethodId != PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
 
     private fun BuySellOrder.isDefinedBankTransferPayment() =
         paymentMethodType == PaymentMethodType.BANK_TRANSFER &&
-                paymentMethodId != PaymentMethod.UNDEFINED_BANK_TRANSFER_PAYMENT_ID
+            paymentMethodId != PaymentMethod.UNDEFINED_BANK_TRANSFER_PAYMENT_ID
 
     private fun BuySellOrder.toSimpleBuyStateMaybe(): Maybe<SimpleBuyState> = when {
         isDefinedCardPayment() -> {
             custodialWallet.getCardDetails(paymentMethodId).flatMapMaybe {
-                Maybe.just(this.toSimpleBuyState().copy(
-                    selectedPaymentMethod = SelectedPaymentMethod(
-                        it.cardId,
-                        it.partner,
-                        it.detailedLabel(),
-                        PaymentMethodType.PAYMENT_CARD
+                Maybe.just(
+                    this.toSimpleBuyState().copy(
+                        selectedPaymentMethod = SelectedPaymentMethod(
+                            it.cardId,
+                            it.partner,
+                            it.detailedLabel(),
+                            PaymentMethodType.PAYMENT_CARD,
+                            true
+                        )
                     )
-                )
                 )
             }
         }
         isDefinedBankTransferPayment() -> {
             custodialWallet.getLinkedBank(paymentMethodId).flatMapMaybe {
-                Maybe.just(toSimpleBuyState().copy(
-                    selectedPaymentMethod = SelectedPaymentMethod(
-                        it.id, null, it.name, PaymentMethodType.BANK_TRANSFER
+                Maybe.just(
+                    toSimpleBuyState().copy(
+                        selectedPaymentMethod = SelectedPaymentMethod(
+                            it.id, null, it.name, PaymentMethodType.BANK_TRANSFER, true
+                        )
                     )
-                ))
+                )
             }
         }
         else -> {
@@ -227,7 +231,8 @@ fun BuySellOrder.toSimpleBuyState(): SimpleBuyState =
         orderExchangePrice = price,
         selectedPaymentMethod = SelectedPaymentMethod(
             id = paymentMethodId,
-            paymentMethodType = paymentMethodType
+            paymentMethodType = paymentMethodType,
+            isEligible = true
         ),
         expirationDate = expires,
         currentScreen = configureCurrentScreen(state)

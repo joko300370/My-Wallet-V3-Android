@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.dashboard
 
+import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -11,8 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
+import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.notifications.analytics.AnalyticsEvents
-import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import com.blockchain.preferences.CurrencyPrefs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import info.blockchain.balance.CryptoCurrency
@@ -33,11 +34,12 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import piuk.blockchain.android.simplebuy.SimpleBuyCancelOrderBottomSheet
 import piuk.blockchain.android.ui.airdrops.AirdropStatusSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.customviews.KycBenefitsBottomSheet
-import piuk.blockchain.android.ui.customviews.VerifyIdentityBenefit
+import piuk.blockchain.android.ui.customviews.VerifyIdentityNumericBenefitItem
 import piuk.blockchain.android.ui.dashboard.adapter.DashboardDelegateAdapter
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
@@ -46,18 +48,21 @@ import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsFlow
 import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsDetailSheet
 import piuk.blockchain.android.ui.dashboard.sheets.ForceBackupForSendSheet
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
+import piuk.blockchain.android.ui.dashboard.sheets.LinkBankMethodChooserBottomSheet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.interest.InterestSummarySheet
+import piuk.blockchain.android.ui.linkbank.LinkBankActivity
 import piuk.blockchain.android.ui.sell.BuySellFragment
+import piuk.blockchain.android.ui.settings.BankLinkingHost
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.transfer.receive.activity.ReceiveActivity
+import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.launchUrlInBrowser
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.android.util.inflate
 import timber.log.Timber
 
 class EmptyDashboardItem : DashboardItem
@@ -70,7 +75,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     KycBenefitsBottomSheet.Host,
     DialogFlow.FlowHost,
     AssetDetailsFlow.AssetDetailsHost,
-    InterestSummarySheet.Host {
+    InterestSummarySheet.Host,
+    BankLinkingHost {
 
     override val model: DashboardModel by scopedInject()
     private val announcements: AnnouncementList by scopedInject()
@@ -126,8 +132,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             // TODO clear display list
         }
 
-        if (this.state?.showDashboardSheet != newState.showDashboardSheet) {
-            showPromoSheet(newState)
+        if (this.state?.dashboardNavigationAction != newState.dashboardNavigationAction) {
+            handleStateNavigation(newState)
         }
 
         // Update/show dialog flow
@@ -192,33 +198,62 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
     }
 
-    private fun showPromoSheet(state: DashboardState) {
+    private fun handleStateNavigation(state: DashboardState) {
+        when {
+            state.dashboardNavigationAction?.isBottomSheet() == true -> {
+                handleBottomSheet(state)
+                model.process(ResetDashboardNavigation)
+            }
+            state.dashboardNavigationAction is LinkBankNavigationAction -> {
+                startBankLinking(state.dashboardNavigationAction.linkBankTransfer)
+            }
+        }
+    }
+
+    private fun startBankLinking(linkBankTransfer: LinkBankTransfer) {
+        startActivityForResult(
+            LinkBankActivity.newInstance(
+                linkBankTransfer,
+                requireContext()
+            ),
+            LinkBankActivity.LINK_BANK_REQUEST_CODE
+        )
+    }
+
+    private fun handleBottomSheet(state: DashboardState) {
         showBottomSheet(
-            when (state.showDashboardSheet) {
-                DashboardSheet.STX_AIRDROP_COMPLETE -> AirdropStatusSheet.newInstance(
-                    blockstackCampaignName)
-                DashboardSheet.BACKUP_BEFORE_SEND -> ForceBackupForSendSheet.newInstance(state.backupSheetDetails!!)
-                DashboardSheet.SIMPLE_BUY_CANCEL_ORDER -> {
+            when (state.dashboardNavigationAction) {
+                DashboardNavigationAction.StxAirdropComplete -> AirdropStatusSheet.newInstance(
+                    blockstackCampaignName
+                )
+                DashboardNavigationAction.BackUpBeforeSend -> ForceBackupForSendSheet.newInstance(
+                    state.backupSheetDetails!!
+                )
+                DashboardNavigationAction.SimpleBuyCancelOrder -> {
                     analytics.logEvent(SimpleBuyAnalytics.BANK_DETAILS_CANCEL_PROMPT)
                     SimpleBuyCancelOrderBottomSheet.newInstance(true)
                 }
-                DashboardSheet.FIAT_FUNDS_DETAILS -> FiatFundsDetailSheet.newInstance(
+                DashboardNavigationAction.FiatFundsDetails -> FiatFundsDetailSheet.newInstance(
                     state.selectedFiatAccount
                         ?: return
                 )
-                DashboardSheet.LINK_OR_DEPOSIT -> {
+                DashboardNavigationAction.LinkOrDeposit -> {
                     state.selectedFiatAccount?.let {
                         LinkBankAccountDetailsBottomSheet.newInstance(it)
                     } ?: LinkBankAccountDetailsBottomSheet.newInstance()
                 }
-                DashboardSheet.FIAT_FUNDS_NO_KYC -> showFiatFundsKyc()
-                DashboardSheet.INTEREST_SUMMARY -> InterestSummarySheet.newInstance(
+                DashboardNavigationAction.PaymentMethods -> {
+                    state.linkablePaymentMethodsForAction?.let {
+                        LinkBankMethodChooserBottomSheet.newInstance(it)
+                    }
+                }
+                DashboardNavigationAction.FiatFundsNoKyc -> showFiatFundsKyc()
+                DashboardNavigationAction.InterestSummary -> InterestSummarySheet.newInstance(
                     state.selectedCryptoAccount!!,
                     state.selectedAsset!!
                 )
-                null -> null
-            }
-        )
+                else -> null
+            })
     }
 
     private fun showFiatFundsKyc(): BottomSheetDialogFragment {
@@ -233,15 +268,18 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                 title = getString(R.string.fiat_funds_no_kyc_announcement_title),
                 description = getString(R.string.fiat_funds_no_kyc_announcement_description),
                 listOfBenefits = listOf(
-                    VerifyIdentityBenefit(
+                    VerifyIdentityNumericBenefitItem(
                         getString(R.string.fiat_funds_no_kyc_step_1_title),
-                        getString(R.string.fiat_funds_no_kyc_step_1_description)),
-                    VerifyIdentityBenefit(
+                        getString(R.string.fiat_funds_no_kyc_step_1_description)
+                    ),
+                    VerifyIdentityNumericBenefitItem(
                         getString(R.string.fiat_funds_no_kyc_step_2_title),
-                        getString(R.string.fiat_funds_no_kyc_step_2_description)),
-                    VerifyIdentityBenefit(
+                        getString(R.string.fiat_funds_no_kyc_step_2_description)
+                    ),
+                    VerifyIdentityNumericBenefitItem(
                         getString(R.string.fiat_funds_no_kyc_step_3_title),
-                        getString(R.string.fiat_funds_no_kyc_step_3_description))
+                        getString(R.string.fiat_funds_no_kyc_step_3_description)
+                    )
                 ),
                 icon = currencyIcon
             )
@@ -360,7 +398,24 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                     model.process(CheckBackupStatus(it.account, it.action))
                 }
             }
+            LinkBankActivity.LINK_BANK_REQUEST_CODE -> {
+                if (resultCode == RESULT_OK) {
+                    state?.selectedFiatAccount?.let { fiatAccount ->
+                        (state?.dashboardNavigationAction as? DashboardNavigationAction.LinkBankWithPartner)?.let {
+                            model.process(
+                                LaunchBankTransferFlow(
+                                    fiatAccount,
+                                    it.assetAction,
+                                    true
+                                )
+                            )
+                        }
+                    }
+                }
+            }
         }
+
+        model.process(ResetDashboardNavigation)
     }
 
     private fun onAssetClicked(cryptoCurrency: CryptoCurrency) {
@@ -403,7 +458,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         override fun startTransferCrypto() = navigator().launchTransfer()
 
         override fun startStxReceivedDetail() =
-            model.process(ShowDashboardSheet(DashboardSheet.STX_AIRDROP_COMPLETE))
+            model.process(ShowDashboardSheet(DashboardNavigationAction.StxAirdropComplete))
 
         override fun finishSimpleBuySignup() {
             navigator().resumeSimpleBuyKyc()
@@ -422,7 +477,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
 
         override fun showFiatFundsKyc() {
-            model.process(ShowDashboardSheet(DashboardSheet.FIAT_FUNDS_NO_KYC))
+            model.process(ShowDashboardSheet(DashboardNavigationAction.FiatFundsNoKyc))
         }
 
         override fun showBankLinking() =
@@ -432,12 +487,32 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             requireContext().launchUrlInBrowser(url)
     }
 
-    override fun depositFiat(account: FiatAccount) {
-        model.process(ShowBankLinkingSheet(account))
+    override fun onBankWireTransferSelected(currency: String) {
+        state?.selectedFiatAccount?.let {
+            model.process(ShowBankLinkingSheet(it))
+        }
+    }
+
+    override fun startDepositFlow(fiatAccount: FiatAccount) {
+        model.process(LaunchBankTransferFlow(fiatAccount, AssetAction.FiatDeposit, false))
+    }
+
+    override fun onLinkBankSelected(paymentMethodForAction: LinkablePaymentMethodsForAction) {
+        state?.selectedFiatAccount?.let {
+            if (paymentMethodForAction is LinkablePaymentMethodsForAction.LinkablePaymentMethodsForDeposit) {
+                model.process(LaunchBankTransferFlow(it, AssetAction.FiatDeposit, true))
+            } else if (paymentMethodForAction is LinkablePaymentMethodsForAction.LinkablePaymentMethodsForWithdraw) {
+                model.process(LaunchBankTransferFlow(it, AssetAction.Withdraw, true))
+            }
+        }
+    }
+
+    override fun startBankTransferWithdrawal(fiatAccount: FiatAccount) {
+        model.process(LaunchBankTransferFlow(fiatAccount, AssetAction.Withdraw, false))
     }
 
     override fun showFundsKyc() {
-        model.process(ShowDashboardSheet(DashboardSheet.FIAT_FUNDS_NO_KYC))
+        model.process(ShowDashboardSheet(DashboardNavigationAction.FiatFundsNoKyc))
     }
 
     override fun verificationCtaClicked() {
@@ -473,21 +548,17 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     override fun gotoActivityFor(account: BlockchainAccount) =
         navigator().gotoActivityFor(account)
 
-    override fun withdrawFiat(currency: String) {
-        navigator().goToWithdraw(currency)
-    }
-
     override fun goToDeposit(
         fromAccount: SingleAccount,
         toAccount: SingleAccount,
         action: AssetAction
     ) {
-        model.process(LaunchDepositFlow(toAccount, fromAccount, action))
+        model.process(LaunchInterestDepositFlow(toAccount, fromAccount, action))
     }
 
     override fun goToSummary(account: SingleAccount, asset: CryptoCurrency) {
         model.process(UpdateSelectedCryptoAccount(account, asset))
-        model.process(ShowDashboardSheet(DashboardSheet.INTEREST_SUMMARY))
+        model.process(ShowDashboardSheet(DashboardNavigationAction.InterestSummary))
     }
 
     override fun goToSellFrom(account: CryptoAccount) {

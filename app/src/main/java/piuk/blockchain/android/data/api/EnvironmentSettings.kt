@@ -1,6 +1,5 @@
 package piuk.blockchain.android.data.api
 
-import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.Environment
 import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.params.BitcoinCashMainNetParams
@@ -13,19 +12,6 @@ import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 
 class EnvironmentSettings : EnvironmentConfig {
 
-    override fun websocketUrl(currency: CryptoCurrency) =
-        when (currency) {
-            CryptoCurrency.BTC -> BuildConfig.BITCOIN_WEBSOCKET_URL
-            CryptoCurrency.ETHER -> BuildConfig.ETHEREUM_WEBSOCKET_URL
-            CryptoCurrency.BCH -> BuildConfig.BITCOIN_CASH_WEBSOCKET_URL
-            CryptoCurrency.XLM -> BuildConfig.BITCOIN_CASH_WEBSOCKET_URL
-            CryptoCurrency.PAX -> TODO("PAX is not yet supported - AND-2003")
-            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
-            CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
-            CryptoCurrency.USDT -> TODO("STUB: USDT NOT IMPLEMENTED")
-            CryptoCurrency.DGLD -> TODO("STUB: DGLD NOT IMPLEMENTED")
-        }
-
     override fun isRunningInDebugMode(): Boolean = BuildConfig.DEBUG
 
     override val environment: Environment = Environment.fromString(BuildConfig.ENVIRONMENT)
@@ -34,6 +20,7 @@ class EnvironmentSettings : EnvironmentConfig {
 
     override val apiUrl: String = BuildConfig.API_URL
     override val everypayHostUrl: String = BuildConfig.EVERYPAY_HOST_URL
+    override val statusUrl: String = BuildConfig.STATUS_API_URL
 
     override val bitpayUrl: String = BITPAY_LIVE_BASE
 

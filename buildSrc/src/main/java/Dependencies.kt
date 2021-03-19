@@ -6,12 +6,13 @@ object Versions {
     const val minSdk = 23
     const val targetSdk = 30
     const val compileSdk = 30
-    const val versionCode = 607
-    const val versionName = "8.4.5"
-    const val buildTools = "28.0.3"
+
+    const val versionCode = 625
+    const val versionName = "8.5.3"
+    const val buildTools = "29.0.2"
 
     // Build tools and languages
-    const val androidPlugin = "3.4.1"
+    const val androidPlugin = "4.1.2"
     const val kotlin = "1.4.21"
     const val googleServicesPlugin = "4.3.3"
     const val coveralls = "2.8.2"
@@ -46,6 +47,7 @@ object Versions {
     const val biometrics = "1.1.0-rc01"
 
     // Networking, RxJava
+    const val chucker = "3.4.0"
     const val retrofit = "2.7.0"
     const val okHttp = "4.9.0"
     const val mockWebServer = "v0.1.8"
@@ -82,13 +84,12 @@ object Versions {
     const val charts = "3.1.0"
     const val circleIndicator = "1.2.2"
     const val bottomNav = "2.2.0"
-    const val countryPicker = "1.1.7"
+    const val countryPicker = "2.0.4"
 
     // zxing 3.4.0 crashes with:
     //      "java.lang.NoSuchMethodError. No interface method sort(Ljava/util/Comparator;)V in class Ljava/util/List;"
     // List.sort() is not available on Android SDK < 24 so DO NOT UPGRADE until project target min is 24
     const val zxing = "3.3.0"
-    const val wheelPicker = "1.1.2"
     const val materialDatePicker = "3.6.4"
     const val sparkline = "1.2.0"
 
@@ -118,7 +119,7 @@ object Versions {
     const val robolectric = "4.3"
     const val json = "20140107"
     const val espresso = "3.2.0"
-    const val jacoco = "0.8.1"
+    const val jacoco = "0.8.6"
     const val androidxTesting = "1.1.1"
 }
 
@@ -191,6 +192,8 @@ object Libraries {
     const val kotlinJson = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.kotlinJson}"
     const val koin = "org.koin:koin-core:${Versions.koin}"
     const val koinAndroid = "org.koin:koin-android:${Versions.koin}"
+    const val chuckerDebug = "com.github.chuckerteam.chucker:library:${Versions.chucker}"
+    const val chuckerRelease = "com.github.chuckerteam.chucker:library-no-op:${Versions.chucker}"
 
     const val koinTest = "org.koin:koin-test:${Versions.koin}"
     const val rxJava = "io.reactivex.rxjava2:rxjava:${Versions.rxJava}"
@@ -225,7 +228,6 @@ object Libraries {
     const val bottomNav = "com.aurelhubert:ahbottomnavigation:${Versions.bottomNav}"
     const val countryPicker = "com.github.mukeshsolanki:country-picker-android:${Versions.countryPicker}"
     const val zxing = "com.google.zxing:core:${Versions.zxing}"
-    const val wheelPicker = "cn.aigestudio.wheelpicker:WheelPicker:${Versions.wheelPicker}"
     const val materialDatePicker = "com.wdullaer:materialdatetimepicker:${Versions.materialDatePicker}"
     const val sparkline = "com.robinhood.spark:spark:${Versions.sparkline}"
 

@@ -14,13 +14,11 @@ import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.createwallet.CreateWalletActivity
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.ViewUtils
 import java.util.Locale
 
-internal class RecoverFundsActivity :
-    BaseMvpActivity<RecoverFundsView, RecoverFundsPresenter>(),
-    RecoverFundsView {
+internal class RecoverFundsActivity : BaseMvpActivity<RecoverFundsView, RecoverFundsPresenter>(), RecoverFundsView {
 
     private val presenter: RecoverFundsPresenter by scopedInject()
 

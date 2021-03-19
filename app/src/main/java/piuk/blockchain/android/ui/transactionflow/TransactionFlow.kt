@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.transactionflow
 
 import androidx.annotation.CallSuper
 import androidx.annotation.UiThread
+import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.reactivex.Scheduler
@@ -11,8 +12,11 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.koin.core.KoinComponent
 import org.koin.core.inject
+import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
@@ -77,7 +81,7 @@ abstract class DialogFlow : SlidingModalBottomDialog.Host {
 }
 
 class TransactionFlow(
-    private val sourceAccount: CryptoAccount = NullCryptoAccount(),
+    private val sourceAccount: BlockchainAccount = NullCryptoAccount(),
     private val target: TransactionTarget = NullCryptoAccount(),
     private val action: AssetAction,
     private val uiScheduler: Scheduler = AndroidSchedulers.mainThread()
@@ -101,44 +105,30 @@ class TransactionFlow(
             // Trigger intent to set initial state: source account & password required
             disposables += state.subscribeBy(
                 onNext = { handleStateChange(it) },
-                onError = { Timber.e("Transaction state is broken: $it") }
+                onError = {
+                    if (BuildConfig.DEBUG) {
+                        throw it
+                    }
+                    Timber.e("Transaction state is broken: $it")
+                }
             )
         }
 
         // Persist the flow
         activeTransactionFlow.setFlow(this)
 
+        val intentMapper = TransactionFlowIntentMapper(
+            sourceAccount = sourceAccount,
+            target = target,
+            action = action
+        )
+
         disposables += sourceAccount.requireSecondPassword()
+            .map { intentMapper.map(it) }
             .observeOn(uiScheduler)
             .subscribeBy(
-                onSuccess = { passwordRequired ->
-                    when {
-                        target !is NullCryptoAccount && sourceAccount !is NullCryptoAccount -> {
-                            if (action == AssetAction.Swap) {
-                                model.process(
-                                    TransactionIntent.InitialiseWithSourceAndPreferredTarget(
-                                        action, sourceAccount, target, passwordRequired
-                                    )
-                                )
-                            } else {
-                                model.process(
-                                    TransactionIntent.InitialiseWithSourceAndTargetAccount(
-                                        action, sourceAccount, target, passwordRequired
-                                    )
-                                )
-                            }
-                        }
-                        sourceAccount !is NullCryptoAccount -> {
-                            model.process(
-                                TransactionIntent.InitialiseWithSourceAccount(action, sourceAccount, passwordRequired)
-                            )
-                        }
-                        else -> {
-                            model.process(
-                                TransactionIntent.InitialiseWithNoSourceOrTargetAccount(action, passwordRequired)
-                            )
-                        }
-                    }
+                onSuccess = { transactionIntent ->
+                    model.process(transactionIntent)
                 },
                 onError = {
                     Timber.e("Unable to configure transaction flow, aborting. e == $it")
@@ -208,4 +198,132 @@ class TransactionFlow(
     override fun onSheetClosed() {
         finishFlow()
     }
+}
+
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+class TransactionFlowIntentMapper(
+    private val sourceAccount: BlockchainAccount,
+    private val target: TransactionTarget,
+    private val action: AssetAction
+) {
+
+    fun map(passwordRequired: Boolean) =
+        when (action) {
+            AssetAction.FiatDeposit -> {
+                handleFiatDeposit(passwordRequired)
+            }
+            AssetAction.Sell,
+            AssetAction.Send -> {
+                handleSendAndSell(passwordRequired)
+            }
+            AssetAction.Withdraw -> {
+                handleFiatWithdraw(passwordRequired)
+            }
+            AssetAction.Swap -> {
+                handleSwap(passwordRequired)
+            }
+            AssetAction.InterestDeposit -> {
+                handleInterestDeposit(passwordRequired)
+            }
+            AssetAction.Receive,
+            AssetAction.ViewActivity,
+            AssetAction.Summary -> throw IllegalStateException(
+                "Flows for Receive, ViewActivity and Summary not supported"
+            )
+        }
+
+    private fun handleInterestDeposit(passwordRequired: Boolean) =
+        when {
+            sourceAccount.isDefinedCryptoAccount() &&
+                target.isDefinedTarget() -> TransactionIntent.InitialiseWithSourceAndTargetAccount(
+                action,
+                sourceAccount,
+                target,
+                passwordRequired
+            )
+            else -> throw IllegalStateException(
+                "Calling interest deposit without source and target is not supported"
+            )
+        }
+
+    private fun handleSwap(passwordRequired: Boolean) =
+        when {
+            !sourceAccount.isDefinedCryptoAccount() -> TransactionIntent.InitialiseWithNoSourceOrTargetAccount(
+                action,
+                passwordRequired
+            )
+            !target.isDefinedTarget() -> TransactionIntent.InitialiseWithSourceAccount(
+                action,
+                sourceAccount,
+                passwordRequired
+            )
+            else -> TransactionIntent.InitialiseWithSourceAndPreferredTarget(
+                action,
+                sourceAccount,
+                target,
+                passwordRequired
+            )
+        }
+
+    private fun handleFiatWithdraw(passwordRequired: Boolean): TransactionIntent {
+        check(sourceAccount.isFiatAccount())
+        return when {
+            target.isDefinedTarget() -> TransactionIntent.InitialiseWithSourceAndPreferredTarget(
+                action,
+                sourceAccount,
+                target,
+                passwordRequired
+            )
+            else -> TransactionIntent.InitialiseWithSourceAccount(
+                action,
+                sourceAccount,
+                passwordRequired
+            )
+        }
+    }
+
+    private fun handleSendAndSell(passwordRequired: Boolean): TransactionIntent {
+        check(sourceAccount.isDefinedCryptoAccount()) { "Can't start send or sell without a source account" }
+
+        return if (target.isDefinedTarget()) {
+            TransactionIntent.InitialiseWithSourceAndTargetAccount(
+                action,
+                sourceAccount,
+                target,
+                passwordRequired
+            )
+        } else {
+            TransactionIntent.InitialiseWithSourceAccount(
+                action,
+                sourceAccount,
+                passwordRequired
+            )
+        }
+    }
+
+    private fun handleFiatDeposit(passwordRequired: Boolean): TransactionIntent {
+        check(target.isDefinedTarget()) { "Can't deposit without a target" }
+        return when {
+            sourceAccount.isFiatAccount() -> TransactionIntent.InitialiseWithSourceAndTargetAccount(
+                action,
+                sourceAccount,
+                target,
+                passwordRequired
+            )
+            else -> TransactionIntent.InitialiseWithTargetAndNoSource(
+                action,
+                target,
+                passwordRequired
+            )
+        }
+    }
+
+    private fun BlockchainAccount.isDefinedCryptoAccount() =
+        this is CryptoAccount && this !is NullCryptoAccount
+
+    private fun BlockchainAccount.isFiatAccount() =
+        this is FiatAccount
+
+    private fun TransactionTarget.isDefinedTarget() =
+        this !is NullCryptoAccount
 }

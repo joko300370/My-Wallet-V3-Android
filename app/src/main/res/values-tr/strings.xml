@@ -22,7 +22,6 @@
     <string name="action_settings">Ayarlar</string>
     <string name="please_wait">Lütfen bekle</string>
     <string name="item_backup">Yedek fonlar</string>
-    <string name="item_lockbox">Lockbox</string>
     <string name="item_the_exchange">Değiş tokuş</string>
     <string name="item_airdrops">Airdrops</string>
     <string name="toolbar_cmd_home">Ev</string>
@@ -51,7 +50,6 @@
  Yeni Şifre 
 </string>
     <string name="no_private_key">Özel anahtar üretilemiyor.</string>
-    <string name="pin_max_strikes">%1$d başarısız PIN denemesi. Lütfen şifre girin.</string>
     <string name="pin_4_strikes_password_accepted">Şifre kabul edildi. Lütfen yeni PIN tanımlayın.
 </string>
     <string name="bip38_password_entry">Lütfen özel anahtar şifresini girin</string>
@@ -808,7 +806,7 @@
     <string name="kyc_resubmission_splash_description_3">Gerekli fotoğraflar eksik.</string>
     <string name="kyc_resubmission_splash_description_4">Gönderdiğiniz belge yanlış.</string>
     <string name="kyc_resubmission_splash_description_5">Görüntü kalitesi nedeniyle gönderdiğiniz resimleri okuyamadık.</string>
-    <string name="sunriver_splash_title">kimlik doğrulama</string>
+    <string name="identity_verification">kimlik doğrulama</string>
     <string name="sunriver_status_message">Bilgileriniz inceleniyor. İnceleme kısa süre içinde tamamlanmalıdır.</string>
     <string name="buy_sell_splash_title">Al sat</string>
     <string name="buy_sell_splash_message">Ortağımız Coinify aracılığıyla kredi kartınızı veya banka hesabınızı kullanarak bitcoin (BTC) satın alabilir ve satabilirsiniz.</string>
@@ -941,7 +939,6 @@
     <string name="daily_swap_and_buy_limit">Günlük Takas ve Satın Alma Limiti</string>
     <string name="simple_buy_own_crypto">Birkaç Dakika İçinde Kendi Kripto Param</string>
     <string name="simple_buy_verify_your_identity">Kimliğinizi doğrulayın ve kripto satın alın</string>
-    <string name="simple_buy_skip">Atla</string>
     <string name="simple_buy_currency_selection_header">Blockchain Cüzdanınızda para olarak bu para biriminde para saklamak için yerel para biriminiz.</string>
     <string name="payment_methods">Ödeme metodları</string>
     <string name="payment_method">Ödeme şekli</string>
@@ -994,11 +991,6 @@
     <string name="invalid_date">Geçersiz tarih</string>
     <string name="invalid_card_number">Geçersiz kart numarası</string>
     <string name="full_name">Ad Soyad</string>
-    <string name="address_line_1">Adres satırı 1</string>
-    <string name="address_line_2">Adres Satırı 2</string>
-    <string name="address_city">Kent</string>
-    <string name="address_zip">Posta</string>
-    <string name="address_postcode">posta kodu</string>
     <string name="billing_address_state">Durum</string>
     <string name="currency_not_supported_title">Para Birimi Desteklenmiyor</string>
     <string name="activity_no_activity_title">Etkinliğiniz Yok</string>
@@ -1217,7 +1209,7 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
     <string name="send_enter_unexpected_error">Beklenmedik bir hata oldu. Lütfen daha sonra tekrar deneyin.</string>
     <string name="send_enter_insufficient_gas">Bu işlemi gerçekleştirmek içinsize ait yeterli ETH bulunmuyor.</string>
     <string name="send_select_a_wallet_title">veya Bir Cüzdan Seçin</string>
-    <string name="send_internal_transfer_message">Şu anda, %1$s Ticari Cüzdanınızdan Kasa Cüzdanlarınıza yalnızca %1$s tutarında bir aktarım yapabilirsiniz. %1$s Kasa Cüzdanınıza geldiğinde harici adreslere aktarabilirsiniz.</string>
+    <string name="send_internal_transfer_message">Şu anda, %1$s Ticari Cüzdanınızdan Kasa Cüzdanlarınıza yalnızca %2$s tutarında bir aktarım yapabilirsiniz. %1$s Kasa Cüzdanınıza geldiğinde harici adreslere aktarabilirsiniz.</string>
     <string name="purchase_funds_note">Nihai tutar, piyasa hareketliliğinden dolayı değişebilir.</string>
     <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Daha fazla bilgi edinin. </annotation>
@@ -1526,17 +1518,6 @@ Not: Önümüzdeki %1$s gün boyunca Bu tutarı cüzdanınızdan gönderemeyecek
     <string name="sell_intro_empty_title">Satış Yapılabilecek Cüzdan Yok</string>
     <string name="sell_intro_empty_label">Görünüşe göre satış yapabileceğiniz bir bakiyeye sahip Cüzdanınız yok, önce bazı Cüzdanlara para yatırmayı deneyin.</string>
     <string name="yodlee_splash_title_partner">Blockchain.com, banka kimlik bilgilerinizi doğrulamak ve hesaplarınızı güvenli bir şekilde bağlamak için Yodlee kullanır.</string>
-    <string name="lockbox_title">Lockbox</string>
-    <string name="lockbox_landing_get_yours_title">Lockbox cihazınızı Alın</string>
-    <string name="lockbox_landing_get_yours_message">Kripto para biriminizi çevrimdışı güvenle saklayın.</string>
-    <string name="lockbox_landing_get_yours_button">Şimdi satın al</string>
-    <string name="lockbox_landing_already_owned_title">Zaten bir tane var mı?</string>
-    <string name="lockbox_landing_already_owned_message">Bilgisayarınızdan blockchain.com\'da oturum açın ve lockbox cihazınızı bağlayın.</string>
-    <string name="lockbox_landing_learn_more">Daha fazla bilgi edinmek ister misiniz? Ziyaret etmek için buraya dokunun
-%1$s</string>
-    <string name="lockbox_landing_coming_soon_title">Bakiyeler Çok Yakında</string>
-    <string name="lockbox_landing_coming_soon_message">Şu anda Lockbox hesabınızı görüntüleyemiyoruz. Endişelenmeyin, paranız güvende. Bu özelliği yakında ekleyeceğiz. Beklerken, bakiyenizi web üzerinde kontrol edebilirsiniz.</string>
-    <string name="lockbox_landing_coming_soon_button">Bakiyemi kontrol et</string>
     <string name="trading_order_limit">Bekleyen çok fazla %1$s işleminiz var. Bunlar tamamlandıktan sonra yeni bir tane oluşturabilirsiniz.</string>
     <string name="trading_order_not_cancelable">Hata! Bu %1$s siparişi iptal edilemez.</string>
     <string name="trading_pending_withdrawal">Hata! Halihazırda bekleyen bir para çekme işleminiz var, lütfen tamamlandığında tekrar deneyin.</string>
@@ -1559,4 +1540,134 @@ Not: Önümüzdeki %1$s gün boyunca Bu tutarı cüzdanınızdan gönderemeyecek
     <string name="trading_ineligible_for_swap">Hata! Hizmet şu anda kullanılamıyor. Lütfen deste ekibi ile iletişime geçin.</string>
     <string name="trading_invalid_destination_amount">Hata! Görünüşe bu geçerli bir tutar değil, lütfen daha sonra tekrar deneyin.</string>
     <string name="executing_transaction_error">Hata! %1$s zincir üzeri işlem yürütülürken bir sorun oluştu.</string>
+    <string name="backup_wallet_title">Gizli Özel Anahtar Kurtarma</string>
+    <string name="pin_max_strikes">%1$d başarısız PIN denemesi. Lütfen şifrenizi girin.</string>
+    <string name="recovery_passphrase_1">Gizli Özel Anahtar Kurtarma İfadesi</string>
+    <string name="invalid_recovery_phrase_1">Geçersiz Gizli Özel Anahtar Kurtarma İfadesi. Lütfen tekrar deneyin</string>
+    <string name="password_disclaimer">Blockchain.com\'un parolamı benim için kurtaramayacağını anlıyorum. Cüzdanıma erişimi kaybedersem, parama erişmek için <annotation link="backup"> Gizli İfademi </annotation> kullanmalıyım.</string>
+    <string name="transfer_funds_description_1">İçe aktarılan adresler Gizli Özel Anahtar Yedekleme İfadeniz tarafından yedeklenmez. Bu fonları güvence altına almak için
+ bu bakiyeleri yedeklemenize eklemek için aktarmanızı öneririz.
+    </string>
+    <string name="pairing_code_instructions_alert">Mobil eşleştirme QR kodunuzu asla kimseyle paylaşmayın. Bu QR kodunu görüntüleyebilen herkes para çekebilir.
+ Blockchain.com asla mobil eşleştirme QR kodunuzu görüntülemeyi veya almayı istemez.</string>
+    <string name="backup_title">Gizli Özel Anahtar Kurtarma</string>
+    <string name="backup_subtitle">Gizli Özel Anahtar Kurtarma İfadesi</string>
+    <string name="backup_instructions_1">Kriptoda, özel anahtarlar sizdeyse, Özel Anahtar Cüzdanınızdaki fonların kontrolü de sizdedir. Dezavantajı ise HER KİM anahtarlarınıza erişebilirse, Özel Anahtar Cüzdanınızı da kontrol edebilmesidir.</string>
+    <string name="backup_instructions_2">Yani şunları yapmalısınız:</string>
+    <string name="backup_instructions_3">1. Bir sonraki ekranda 12 kelimelik ifadeyi tam olarak göründüğü sırada yazın.</string>
+    <string name="backup_instructions_4">2. Emniyetli bir şekilde saklanan bir kağıt parçası üzerinde güvenli bir şekilde kaydedin (dijital kopya değil fiziki kopya).</string>
+    <string name="backup_instructions_5">3. Yedekleme ifadenizi ASLA kimseyle paylaşmayın.</string>
+    <string name="backup_instructions_warn">Uyarı: Biri yedekleme ifadenize sahipse, Özel Anahtar Cüzdanınıza erişebilir ve para çekebilir.</string>
+    <string name="backup_instructions_alert">Blockchain.com asla kurtarma ifadenizi görüntülemeyi veya almayı istemez.</string>
+    <string name="backup_button_begin">Kurtarma İfadesini Görüntüle</string>
+    <string name="backup_complete_message_1">Gizli Özel Anahtar Yedekleme İfadenizi, aşağıdaki durumlarda paranızı geri yüklemek için kullanabilirsiniz
+ şifrenizi kaybedersiniz. Gizli Özel Anahtar Yedekleme İfadenize erişimi olan herkes paranıza erişebilir.
+ güvenli bir yerde çevrimdışı tutmayı unutmayın.
+</string>
+    <string name="backup_verify_heading_1">Gizli Özel Anahtar Kurtarma İfadenizden şu kelimeleri girin:
+ Yedekleme işlemini tamamlayın.
+</string>
+    <string name="backup_lost_mnemonic_1">12 kelimelik Gizli Özel Anahtar Kurtarma İfadenizi mi kaybettiniz?</string>
+    <string name="fingerprint_login_description">Cüzdan\'a giriş yapmak için biyometrik bilgilerinizi kullanın</string>
+    <string name="fingerprint_register_description">Cüzdanınıza daha hızlı ve kolay bir erişim için biyometrik blgilerinizi kullanın.
+
+Devam etmek için parmak izini onaylayın</string>
+    <string name="biometric_disable_message">Biyometrik girişi devre dışı bırakmak istediğinizden emin misiniz?</string>
+    <string name="biometrics_key_invalidated_title">Biyometrik bilgiler değiştirildi</string>
+    <string name="biometrics_key_invalidated_description">Bu cihazda depolanan biyometrik bilgiler değişmiş veya tuş kilidi devre dışı bırakılmış. Lütfen bunun yerine PIN kodunuzu kullanın.
+
+ Daha sonra Biyometrik Oturum Açmayı Ayarlar\'dan tekrar kurabilirsiniz.</string>
+    <string name="biometrics_key_invalidated_settings_description">Bu cihazda depolanan biyometrik bilgiler değişmiş veya tuş kilidi devre dışı bırakılmış. Lütfen bunun yerine PIN kodunuzu kullanın.
+
+Lütfen biyometrik bilgilerinizi tekrar ekleyin.</string>
+    <string name="fingerprint_fatal_error_desc">Biyometrik bilgileri kullanmaya çalışırken bir hata meydana geldi, lütfen PIN kodunuzu kullanın.
+
+ Daha sonra Biyometrik Oturum Açmayı Ayarlar\'dan tekrar kurabilirsiniz.
+ Hata: %1$s</string>
+    <string name="biometrics_disabled_lockout_title">Kimlik doğrulama hatası</string>
+    <string name="biometrics_disabled_lockout_desc">Çok fazla başarısız kimlik doğrulama girişiminde bulundunuz, lütfen 30 saniye bekleyin ve tekrar deneyin</string>
+    <string name="biometrics_disabled_lockout_perm_desc">Biyometrik sensörleriniz devre dışı bırakıldı, lütfen cihazınızı kilitleyin ve yeniden etkinleştirmek için PIN\'inizi, Modelinizi veya Parolanızı kullanarak kilidini açın.
+
+ Bu işlemi tamamladıktan sonra lütfen tekrar deneyin.</string>
+    <string name="biometrics_action_settings">Ayarlara Git</string>
+    <string name="biometrics_enrollment_title">Biyometrik Bilgileri Etkinleştir</string>
+    <string name="biometrics_enrollment_desc">PIN\'inizi kullanmak yerine cüzdanınıza hızlıca giriş yapın.</string>
+    <string name="recovery_card_title_1">Gizli Özel Anahtar Kurtarma İfadesi</string>
+    <string name="recovery_card_body_1">Kripto paranızı siz kontrol edin. Parolanızı kaybetmeniz durumunda tüm paranızı geri yüklemek için Gizli Özel Anahtar Kurtarma İfadenizi not edin.</string>
+    <string name="backup_before_send_body_1">Gizli Özel Anahtar Kurtarma İfadeniz, cüzdanınıza erişiminizi kaybederseniz kripto parayı kurtarmanıza izin verecektir.
+
+Lütfen bu 12 kelimeyi sırayla yazın ve güvenli bir yerde saklayın. Asla kimseyle paylaşmayın. Gizli Özel Anahtar Kurtarma İfadeniz, sisteme giremediğinizde kripto parayı kurtarmanızı sağlar.</string>
+
+    <string name="kyc_address_address_zip_code_hint_1">Posta kodu</string>
+    <string name="payment_method_type_account_info">%1$s Hesabı %2$s</string>
+    <string name="address_line_1">Adres satırı 1</string>
+    <string name="address_line_2">Adres Satırı 2</string>
+    <string name="address_city">Şehir</string>
+    <string name="address_zip">Posta Kodu</string>
+    <string name="address_postcode">Posta Kodu</string>
+    <string name="quote_price">%1$s Fiyatı</string>
+    <string name="pay_with_my_dotted">Şununla öde:</string>
+    <string name="failed_to_link_bank">Banka Bağlantısı Başarısız Oldu</string>
+    <string name="add_a_bank_account">Banka Hesabı Ekle</string>
+    <string name="wire_transfer">Havale</string>
+    <string name="link_a_bank_wire_transfer">Banka havalesi yoluyla herhangi bir tutar göndererek Cüzdanınıza banka bağlayın. Not: Bu yöntem çok daha yavaştır, ayrıca yüksek banka ücretleri geçerli olabilir.</string>
+    <string name="link_a_bank_bank_transfer">Kripto satın almak, para yatırmak ve istediğiniz zaman bankanıza aktarmak için bankanızı güvenli bir şekilde hesabınıza bağlayın.</string>
+    <string name="add_credit_or_debit_card_1">Kredi veya Banka Kartı</string>
+    <string name="first_name">Adı</string>
+    <string name="last_name">Soyadı</string>
+    <string name="as_it_shows_in_id">Resmi kimliğinizde veya Pasaportunuzda gösterildiği gibi</string>
+    <string name="date_of_birth">Doğum Tarihi</string>
+    <string name="date_of_birth_instructions">Kripto Satın Alabilmek için 18 yaşında veya daha büyük olmalısınız.</string>
+    <string name="kyc_profile_message_1">Blockchain.com kanunen bu bilgileri toplamak zorundadır. Kripto alım satımı yapabilmek için 18 veya daha üstü bir yaşta olmalısınız.</string>
+    <string name="kyc_address_header_1">Blockchain.com kanunen bu bilgileri toplamak zorundadır.</string>
+    <string name="kyc_country_selection_search_hint_1">Ülkenizi Seçin</string>
+    <string name="kyc_country_selection_title_1">Ülkenizi Seçin</string>
+    <string name="preferences_rate_app">Uygulamayı derecelendirin</string>
+    <string name="tx_title_fiat_deposit">%1$s yatırın</string>
+    <string name="common_skip">Atla</string>
+    <string name="bank_account_info_default">Hrsap Sonu</string>
+    <string name="bank_wire_transfer_fee_default">Ücretsiz Havale Gönderin</string>
+    <string name="payment_wire_transfer">Havale</string>
+    <string name="payment_wire_transfer_subtitle">3-5 İş Günü</string>
+    <string name="payment_wire_transfer_blurb">Doğrudan banka hesabınızdan Blockchain.com Cüzdanınıza para gönderin. Banka ücretleri geçerli olabilir.</string>
+    <string name="payment_deposit">Mevduat hesabı</string>
+    <string name="payment_deposit_subtitle">Anında Kullanılabilir</string>
+    <string name="payment_deposit_blurb">İstediğiniz zaman Blockchain.com Cüzdanınızdan nakit gönderebilmek için güvenli bir şekilde bir banka bağlantısı kurun.</string>
+    <string name="routing_number">Banka Hesap No</string>
+    <string name="bank_transfer_in_progress_title">%1$s Satın Alma Başlatıldı</string>
+    <string name="bank_transfer_in_progress_blurb">Şimdi satın alma işleminizi tamamlıyoruz. banka hesabınızdan %1$s tutarında para çekilebilir. Aktivite sekmesinde emrinizin durumunu istediğiniz zaman görüntüleyebilirsiniz.</string>
+    <string name="fiat_funds_detail_pending_withdrawal">Halihazırda bir Para Çekme işlemi devam ediyor, yenisini başlatmadan önce lütfen devam etmekte olan işlemin sonuçlanmasını bekleyin.</string>
+    <string name="withdraw_confirmation_cta_button">%1$s çek</string>
+    <string name="withdraw_confirmation_progress_message">Şimdi para çekme işleminizi tamamlıyoruz.</string>
+    <string name="withdraw_confirmation_progress_title">%1$s çekiliyor</string>
+    <string name="withdraw_confirmation_success_title">%1$s çekildi!</string>
+    <string name="withdraw_confirmation_success_message">Parayı şu anda göndermekteyiz. Paranın banka hesabınıza %1$s tarihinde geçmesi beklenmektedir. İstediğiniz zaman Para Çekme işleminizin durumunu Aktivite ekranından kontrol edebilirsiniz.</string>
+    <string name="withdraw_target_select_title">Şu hesaba para çek:</string>
+    <string name="withdraw_confirmation_eta">Paranın hesaba geçiş tarihi:</string>
+    <string name="deposit_enter_amount_min_swap">En az %1$s tutarında para yatırmanız gerekli</string>
+    <string name="withdraw_enter_amount_min">En az %1$s tutarında para çekmeniz gerekli</string>
+    <string name="send_confirmation_eta">Paranın hesaba geçiş tarihi:</string>
+    <string name="deposit_source_select_title">Bağlantılı Bankalar</string>
+    <string name="deposit_confirmation_cta_button">%1$s yatırın</string>
+    <string name="deposit_enter_amount_limit_title">Günlük Limit</string>
+    <string name="deposit_enter_amount_limit_label">%1$s Kullanılabilir</string>
+    <string name="deposit_confirmation_progress_title">%1$s yatırılıyor</string>
+    <string name="deposit_confirmation_progress_message">Para yatırma işleminizi şimdi tamamlıyoruz.</string>
+    <string name="deposit_confirmation_success_title">%1$s Yatırıldı!</string>
+    <string name="deposit_confirmation_success_message">Bankanızın parayı göndermesini beklerken hemen kripto para satın alabilmeniz için %2$s Nakit Hesabınızdan %1$s tutara erken erişim sağlayabilirsiniz.
+Banka transferiniz %3$s tarihinde tamamlandıktan sonra para çekme işlemi gerçekleştirebileceksiniz.</string>
+    <string name="add_a_deposit_method">Para Yatırma Yöntemi Seçin</string>
+    <string name="security_check">Güvenlik Denetimi</string>
+    <string name="success_email_veriff">Başarılı! E-posta adresiniz doğrulandı.</string>
+    <string name="email_verified">E-posta Doğrulandı</string>
+    <string name="email_verification_part_1">Şu adrese bir doğrulama e-postası göndereceğiz:</string>
+    <string name="email_verification_part_2">. Devam etmek için lütfen e-postada bulunan bağlantıya tıklayın.</string>
+    <string name="email_verify">Eposta adresinizi doğrulayın</string>
+    <string name="edit_email_address">E-posta Adresini Düzenle</string>
+    <string name="common_save">Kaydet</string>
+    <string name="change_email_instructions">Aşağıya e-posta adresinizi girin ve Kaydet\'i tıklayın. Bu yeni adrese bir doğrulama e-postası göndereceğiz.</string>
+    <string name="check_my_inbox">Gelen Kutumu Kontrol Et</string>
+    <string name="did_not_get_email">E-postayı almadınız mı?</string>
+    <string name="send_again">Tekrar gönderin</string>
+
 </resources>

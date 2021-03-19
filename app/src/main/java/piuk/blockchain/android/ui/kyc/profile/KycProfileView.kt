@@ -12,7 +12,9 @@ interface KycProfileView : View {
 
     val countryCode: String
 
-    val state: String?
+    val stateCode: String?
+
+    val stateName: String?
 
     var dateOfBirth: Calendar?
 

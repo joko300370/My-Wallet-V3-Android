@@ -3,9 +3,9 @@ package piuk.blockchain.android.ui.auth
 import android.content.Intent
 import android.widget.ImageView
 import androidx.annotation.StringRes
-import piuk.blockchain.android.util.ViewUtils
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.ui.base.View
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.android.util.ViewUtils
 
 interface PinEntryView : View {
 
@@ -60,4 +60,6 @@ interface PinEntryView : View {
     fun setupCommitHashView()
 
     fun askToUseBiometrics()
+
+    fun showApiOutageMessage()
 }

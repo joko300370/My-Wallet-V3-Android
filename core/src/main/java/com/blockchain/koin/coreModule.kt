@@ -56,9 +56,7 @@ import piuk.blockchain.androidcore.data.settings.PhoneNumberUpdater
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.data.settings.SettingsEmailAndSyncUpdater
 import piuk.blockchain.androidcore.data.settings.SettingsPhoneNumberUpdater
-import piuk.blockchain.androidcore.data.settings.SettingsPhoneVerificationQuery
 import piuk.blockchain.androidcore.data.settings.SettingsService
-import piuk.blockchain.androidcore.data.settings.applyFlag
 import piuk.blockchain.androidcore.data.settings.datastore.SettingsDataStore
 import piuk.blockchain.androidcore.data.settings.datastore.SettingsMemoryStore
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
@@ -158,8 +156,6 @@ val coreModule = module {
 
         factory { SendDataManager(get(), get(), get()) }
 
-        factory { SettingsPhoneVerificationQuery(get()).applyFlag(get(smsVerifFeatureFlag)) }
-
         factory { SettingsPhoneNumberUpdater(get()) }.bind(PhoneNumberUpdater::class)
 
         factory { SettingsEmailAndSyncUpdater(get(), get()) }.bind(EmailSyncUpdater::class)
@@ -195,6 +191,7 @@ val coreModule = module {
 
     single {
         PrefsUtil(
+            ctx = get(),
             store = get(),
             backupStore = CloudBackupAgent.backupPrefs(ctx = get()),
             idGenerator = get(),

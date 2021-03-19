@@ -18,7 +18,6 @@
     <string name="action_settings">die Einstellungen</string>
     <string name="please_wait">Warten Sie mal</string>
     <string name="item_backup">Backup-Fonds</string>
-    <string name="item_lockbox">Schließfach</string>
     <string name="item_the_exchange">Austausch</string>
     <string name="item_airdrops">Lufttropfen</string>
     <string name="toolbar_cmd_home">Zuhause</string>
@@ -47,7 +46,6 @@
  Neues Kennwort
 </string>
     <string name="no_private_key">Privater Schlüssel kann nicht erstellt werden.</string>
-    <string name="pin_max_strikes">%1$d fehlgeschlagene PIN-Versuche. Bitte geben Sie Ihr Passwort ein.</string>
     <string name="pin_4_strikes_password_accepted">Passwort akzeptiert. Bitte definieren Sie eine neue PIN.
 </string>
     <string name="bip38_password_entry">Bitte geben Sie das Passwort für den privaten Schlüssel ein</string>
@@ -804,7 +802,7 @@
     <string name="kyc_resubmission_splash_description_3">Die erforderlichen Fotos fehlen.</string>
     <string name="kyc_resubmission_splash_description_4">Das von Ihnen eingereichte Dokument ist falsch.</string>
     <string name="kyc_resubmission_splash_description_5">Wir konnten die von Ihnen eingereichten Bilder aufgrund der Bildqualität nicht lesen.</string>
-    <string name="sunriver_splash_title">Identitätsprüfung</string>
+    <string name="identity_verification">Identitätsprüfung</string>
     <string name="sunriver_status_message">Ihre Informationen werden überprüft. Die Überprüfung sollte in Kürze abgeschlossen sein.</string>
     <string name="buy_sell_splash_title">Kaufen Verkaufen</string>
     <string name="buy_sell_splash_message">Sie können Bitcoin (BTC) mit Ihrer Kreditkarte oder Ihrem Bankkonto über unseren Partner Coinify kaufen und verkaufen.</string>
@@ -941,7 +939,7 @@
     <string name="daily_swap_and_buy_limit">Tägliches Swap- und Kauflimit</string>
     <string name="simple_buy_own_crypto">Eigene Krypto in wenigen Minuten</string>
     <string name="simple_buy_verify_your_identity">Überprüfen Sie Ihre Identität und kaufen Sie Krypto</string>
-    <string name="simple_buy_skip">Überspringen</string>
+    <string name="common_skip">Überspringen</string>
     <string name="simple_buy_currency_selection_header">Ihre lokale Währung, um Geld in dieser Währung als Geld in Ihrer Blockchain-Brieftasche zu speichern.</string>
     <string name="payment_methods">Zahlungsmethoden</string>
     <string name="payment_method">Bezahlverfahren</string>
@@ -994,11 +992,6 @@
     <string name="invalid_date">Ungültiges Datum</string>
     <string name="invalid_card_number">Ungültige Kartennummer</string>
     <string name="full_name">Vollständiger Name</string>
-    <string name="address_line_1">Anschrift Zeile 1</string>
-    <string name="address_line_2">Adresszeile 2</string>
-    <string name="address_city">Stadt</string>
-    <string name="address_zip">POSTLEITZAHL</string>
-    <string name="address_postcode">Postleitzahl</string>
     <string name="billing_address_state">Zustand</string>
     <string name="currency_not_supported_title">Ihre Währung wird nicht unterstützt</string>
     <string name="activity_no_activity_title">Sie haben keine Aktivität</string>
@@ -1289,7 +1282,6 @@
     <string name="sell_for_cash">Verkaufe Crypto gegen Bargeld</string>
     <string name="select_wallet_to_sell">Wählen Sie eine Brieftasche aus, aus der Sie verkaufen möchten.</string>
     <string name="common_sell">Verkaufen</string>
-    <string name="quote_price">%1$s Preis</string>
     <string name="convert_your_crypto_to_cash">Wandeln Sie Ihre Krypto in Bargeld um</string>
     <string name="scan_mismatch_transaction_target">Der gescannte Code ist kein %1$s QR-Code.</string>
     <string name="scan_failed">QR-Code nicht erkannt, bitte erneut versuchen.</string>
@@ -1520,17 +1512,6 @@ Beachten Sie: Sie werden diese Gelder von Ihrer Wallet in den nächsten %1$s Tag
     <string name="sell_intro_empty_title">Keine Wallets, aus denen verkauft werden kann</string>
     <string name="sell_intro_empty_label">Scheinbar haben Sie keine Wallets mit einem Guthaben, das Sie verkaufen können. Versuchen Sie zuerst einige Brieftaschen zu finanzieren.</string>
     <string name="yodlee_splash_title_partner">Blockchain.com verwendet Yodlee, um Ihre Bankdaten zu überprüfen und Ihre Konten sicher zu verknüpfen.</string>
-    <string name="lockbox_title">Lockbox</string>
-    <string name="lockbox_landing_get_yours_title">Erhalten Sie Ihre Lockbox</string>
-    <string name="lockbox_landing_get_yours_message">Speichern Sie Ihre Kryptowährung sicher offline.</string>
-    <string name="lockbox_landing_get_yours_button">Jetzt kaufen</string>
-    <string name="lockbox_landing_already_owned_title">Haben Sie bereits eine?</string>
-    <string name="lockbox_landing_already_owned_message">Melden Sie sich von Ihrem Computer aus bei blockchain.com an und verbinden Sie sich mit Ihrer Lockbox.</string>
-    <string name="lockbox_landing_learn_more">Möchten Sie mehr erfahren? Tippen Sie für einen Besuch hier
-%1$s</string>
-    <string name="lockbox_landing_coming_soon_title">Guthaben in Kürze</string>
-    <string name="lockbox_landing_coming_soon_message">Derzeit können wir Ihr Lockbox-Guthaben nicht anzeigen. Machen Sie sich keine Sorgen, Ihre Geldmittel sind sicher. Wir werden diese Funktion bald hinzufügen. Während Sie warten, können Sie Ihr Guthaben im Internet überprüfen.</string>
-    <string name="lockbox_landing_coming_soon_button">Mein Guthaben überprüfen</string>
     <string name="trading_order_limit">Sie haben zu viele ausstehende %1$s-Transaktionen. Sobald diese abgeschlossen sind, können Sie eine neue erstellen.</string>
     <string name="trading_order_not_cancelable">Hoppla! Dieser %1$s-Auftrag ist nicht stornierbar.</string>
     <string name="trading_pending_withdrawal">Hoppla! Sie haben bereits eine ausstehende Abhebung, bitte versuchen Sie es erneut, wenn diese abgeschlossen ist.</string>
@@ -1553,4 +1534,125 @@ Beachten Sie: Sie werden diese Gelder von Ihrer Wallet in den nächsten %1$s Tag
     <string name="trading_ineligible_for_swap">Hoppla! Dieser Dienst ist derzeit nicht verfügbar. Bitte wenden Sie sich an den Support.</string>
     <string name="trading_invalid_destination_amount">Hoppla! Scheinbar ist das kein gültiger Betrag, bitte versuchen Sie es erneut.</string>
     <string name="executing_transaction_error">Hoppla! Etwas ist bei der Durchführung der %1$s On-Chain-Transaktion schiefgelaufen.</string>
+    <string name="backup_wallet_title">Wiederherstellung des privaten Geheimschlüssels</string>
+    <string name="pin_max_strikes">%1$d fehlgeschlagene PIN-Versuche. Bitte geben Sie Ihr Passwort ein.</string>
+    <string name="recovery_passphrase_1">Geheimschlüssel-Wiederherstellungssatz</string>
+    <string name="invalid_recovery_phrase_1">Ungültiger Geheimschlüssel-Wiederherstellungssatz. Bitte versuchen Sie es erneut</string>
+    <string name="password_disclaimer">Ich verstehe, dass Blockchain.com mein Passwort nicht für mich wiederherstellen kann. Wenn ich den Zugriff auf meine Wallet verliere, muss ich meinen <annotation link="backup">Geheimsatz</annotation> verwenden, um auf mein Guthaben zuzugreifen.</string>
+    <string name="transfer_funds_description_1">Die importierten Adressen werden nicht von Ihrem Geheimschlüssel-Wiederherstellungssatz gesichert. Um diese Guthaben zu sichern, empfehlen
+       wir die Übertragung dieser Kontostände auf Ihre nicht depotführende Blockchain.com-Wallet.
+    </string>
+    <string name="pairing_code_instructions_alert">Teilen Sie Ihren mobilen Pairing-QR-Code niemandem mit. Jeder, der diesen QR-Code einsehen kann, kann Guthaben abheben. Blockchain.com wird Sie niemals auffordern, Ihren QR-Code für das Pairing von Mobiltelefonen anzuzeigen oder zu erhalten.</string>
+    <string name="backup_title">Wiederherstellung des privaten Geheimschlüssels</string>
+    <string name="backup_subtitle">Geheimschlüssel-Wiederherstellungssatz</string>
+    <string name="backup_instructions_1">Wenn Sie bei Krypto die privaten Schlüssel besitzen, haben Sie die Kontrolle über das Guthaben in Ihrer privaten Schlüssel-Wallet. Der Nachteil ist, dass JEDER, der Ihre privaten Schlüssel besitzt, Ihre private Schlüssel-Wallet steuern kann.</string>
+    <string name="backup_instructions_2">Sie müssen also:</string>
+    <string name="backup_instructions_3">1. Notieren Sie den 12-Wörter-Satz auf dem nächsten Bildschirm in der genauen Reihenfolge, in der er angezeigt wird.</string>
+    <string name="backup_instructions_4">2. Bewahren Sie ihn sicher auf, idealerweise auf einem sicher aufbewahrten Blatt Papier (d. h. nicht auf einer digitalen Kopie).</string>
+    <string name="backup_instructions_5">3. Teilen Sie Ihren Wiederherstellungssatz NIEMALS jemandem mit.</string>
+    <string name="backup_instructions_warn">Warnung: Wenn jemand Ihren Wiederherstellungssatz hat, hat er Zugriff auf Ihre private Schlüssel-Wallet und kann Guthaben abheben.</string>
+    <string name="backup_instructions_alert">Blockchain.com wird Sie niemals darum bitten, Ihren Wiederherstellungssatz anzuzeigen oder zu erhalten.</string>
+    <string name="backup_button_begin">Wiederherstellungssatz anzeigen</string>
+    <string name="backup_complete_message_1">Sie können Ihren Geheimschlüssel-Wiederherstellungssatz verwenden, um Ihr Guthaben wiederherzustellen, wenn Sie Ihr Passwort verlieren. Jeder mit Zugriff auf Ihren Geheimschlüssel-Wiederherstellungssatz kann auf Ihr Guthaben zugreifen, also denken Sie daran, es irgendwo offline sicher aufzubewahren.</string>
+    <string name="backup_verify_heading_1">Geben Sie die folgenden Worte aus Ihrem Geheimschlüssel-Wiederherstellungssatz ein, um den Wiederherstellungsprozess abzuschließen.</string>
+    <string name="backup_lost_mnemonic_1">Haben Sie Ihren 12-stelliges Geheimschlüssel-Wiederherstellungssatz verloren?</string>
+    <string name="fingerprint_login_description">Verwenden Sie Ihre Biometrie, um sich in Ihrer Wallet anzumelden.</string>
+    <string name="fingerprint_register_description">Verwenden Sie Ihre Biometrie für schnelleren, leichteren Zugriff auf Ihre Wallet.
+
+Bestätigen Sie, dass Sie es sind, um fortzufahren</string>
+    <string name="biometric_disable_message">Sind Sie sicher, dass Sie die Biometrie-Anmeldung deaktivieren möchten?</string>
+    <string name="biometrics_key_invalidated_title">Biometrie geändert</string>
+    <string name="biometrics_key_invalidated_description">Entweder hat sich die in diesem Gerät gespeicherte Biometrie geändert oder der Schlüsselschutz wurde deaktiviert.
+
+Sie können die Biometrie-Anmeldung in Ihren Einstellungen erneut einrichten.</string>
+    <string name="biometrics_key_invalidated_settings_description">Entweder hat sich die in diesem Gerät gespeicherte Biometrie geändert oder der Schlüsselschutz wurde deaktiviert.
+
+Bitte fügen Sie Ihre Biometrie nochmals hinzu und versuchen Sie es erneut.</string>
+    <string name="fingerprint_fatal_error_desc">Beim Versuch Biometrie zu verwenden ist etwas schiefgelaufen. Bitte verwenden Sie stattdessen Ihre PIN.
+
+Sie können die Biometrieanmeldung dann wieder in den Einstellungen einrichten.
+Fehler: %1$s</string>
+    <string name="biometrics_disabled_lockout_title">Authentifizierungsfehler</string>
+    <string name="biometrics_disabled_lockout_desc">Sie haben zu viele fehlgeschlagene Versuche zur Anmeldung unternommen. Bitte warten Sie 30 Sekunden und versuchen Sie es erneut.</string>
+    <string name="biometrics_disabled_lockout_perm_desc">Ihre Biometrie-Sensoren sind deaktiviert. Bitte sperren und entsperren Sie Ihr Gerät mit Ihrer PIN, Ihrem Muster oder Ihrem Passwort, um sie wieder zu aktivieren.
+
+Sobald dies erledigt ist, versuchen Sie es bitte erneut.</string>
+    <string name="biometrics_action_settings">Zu Einstellungen gehen</string>
+    <string name="biometrics_enrollment_title">Biometrie aktivieren</string>
+    <string name="biometrics_enrollment_desc">Melden Sie sich schnell in Ihrer Wallet an, anstatt Ihre PIN zu verwenden.</string>
+    <string name="recovery_card_title_1">Geheimschlüssel-Wiederherstellungssatz</string>
+    <string name="recovery_card_body_1">Sie kontrollieren Ihre Krypto. Notieren Sie sich Ihren Geheimschlüssel-Wiederherstellungssatz, um Ihr gesamtes Guthaben wiederherzustellen, falls Sie Ihr Passwort verlieren.</string>
+    <string name="backup_before_send_body_1">Mit Ihrem Geheimschlüssel-Wiederherstellungssatz können Sie Ihre Krypto wiederherstellen, wenn Sie den Zugriff auf Ihre Wallet verlieren.
+
+Bitte schreiben Sie diese 12 Wörter der Reihe nach auf und bewahren Sie sie an einem sicheren Ort auf. Teile diese niemandem mit. Ihr Geheimschlüssel-Wiederherstellungssatz ist der Schlüssel zur Wiederherstellung Ihrer Krypto, falls Sie jemals ausgesperrt werden.</string>
+    <string name="kyc_address_address_zip_code_hint_1">Postleitzahl</string>
+    <string name="payment_method_type_account_info">%1$s Konto %2$s</string>
+    <string name="address_line_1">Adresszeile 1</string>
+    <string name="address_line_2">Adresszeile 2</string>
+    <string name="address_city">Ort</string>
+    <string name="address_zip">PLZ</string>
+    <string name="address_postcode">Postleitzahl</string>
+    <string name="quote_price">%1$s Preis</string>
+    <string name="pay_with_my_dotted">Bezahlen mit meinem …</string>
+    <string name="failed_to_link_bank">Bankverknüpfung fehlgeschlagen</string>
+    <string name="add_a_bank_account">Fügen Sie ein Bankkonto hinzu</string>
+    <string name="wire_transfer">Banküberweisung</string>
+    <string name="link_a_bank_wire_transfer">Verknüpfen Sie eine Bank mit Ihrer Wallet, indem Sie irgendeinen Betrag mittels Banküberweisung senden. Hinweis: Das ist viel langsamer und es können hohe Bankgebühren anfallen.</string>
+    <string name="link_a_bank_bank_transfer">Verknüpfen Sie sicher eine Bank, um jederzeit Krypto zu kaufen sowie Bargeld einzuzahlen und abzuheben.</string>
+    <string name="add_credit_or_debit_card_1">Kredit- oder Debitkarte</string>
+    <string name="first_name">Vorname</string>
+    <string name="last_name">Nachname</string>
+    <string name="as_it_shows_in_id">Wie auf Ihrem amtlichen Ausweis oder Reisepass angegeben</string>
+    <string name="date_of_birth">Geburtsdatum</string>
+    <string name="date_of_birth_instructions">Sie müssen mindestens 18 Jahre alt sein, um Krypto kaufen zu können.</string>
+    <string name="kyc_profile_message_1">Blockchain.com ist gesetzlich verpflichtet, diese Informationen zu sammeln. Sie müssen mindestens 18 Jahre alt sein, um Krypto kaufen und verkaufen zu können.</string>
+    <string name="kyc_address_header_1">Blockchain.com ist gesetzlich verpflichtet, diese Informationen zu sammeln.</string>
+    <string name="kyc_country_selection_search_hint_1">Wählen Sie Ihr Land aus</string>
+    <string name="kyc_country_selection_title_1">Wählen Sie Ihr Land aus</string>
+    <string name="preferences_rate_app">Bewerten Sie die App</string>
+    <string name="tx_title_fiat_deposit">%1$s einzahlen</string>
+    <string name="bank_account_info_default">Kontoende</string>
+    <string name="bank_wire_transfer_fee_default">Überweisungsgebühr</string>
+    <string name="payment_wire_transfer">Banküberweisung</string>
+    <string name="payment_wire_transfer_subtitle">3 – 5 Werktage</string>
+    <string name="payment_wire_transfer_blurb">Senden Sie Geld direkt von Ihrer Bank an Ihr Blockchain.com-Wallet. Es können Bankgebühren anfallen.</string>
+    <string name="payment_deposit">Einzahlung</string>
+    <string name="payment_deposit_subtitle">Sofort verfügbar</string>
+    <string name="payment_deposit_blurb">Verknüpfen Sie sicher ein Bankkonto und senden Sie jederzeit Bargeld an Ihr Blockchain.com-Wallet.</string>
+    <string name="routing_number">Bankleitzahl</string>
+    <string name="bank_transfer_in_progress_title">%1$s Kauf gestartet</string>
+    <string name="bank_transfer_in_progress_blurb">Wir schließen Ihren Kauf jetzt ab. Ihre Abhebung wird seitens Ihrer Bank voraussichtlich bis zum %1$s erfolgen. Sie können den Status Ihrer Abhebung jederzeit auf Ihrem Aktivitätsbildschirm nachverfolgen.</string>
+    <string name="fiat_funds_detail_pending_withdrawal">Sie haben bereits eine offene Abhebung, bitte warten Sie, bis diese abgeschlossen ist, bevor Sie eine neue Abhebung beantragen.</string>
+    <string name="withdraw_confirmation_cta_button">%1$s abheben</string>
+    <string name="withdraw_confirmation_progress_message">Wir schließen Ihre Abhebung jetzt ab.</string>
+    <string name="withdraw_confirmation_progress_title">%1$s abheben</string>
+    <string name="withdraw_confirmation_success_title">%1$s Abhebung erfolgt!</string>
+    <string name="withdraw_confirmation_success_message">Wir versenden das Geld jetzt. Das Geld wir voraussichtlich am %1$s bei Ihrer Bank eintreffen. Sie können den Status Ihrer Abhebung jederzeit auf Ihrem Aktivitätsbildschirm nachverfolgen.</string>
+    <string name="withdraw_target_select_title">Auszahlen auf…</string>
+    <string name="withdraw_confirmation_eta">Gelder kommen an bis</string>
+    <string name="deposit_enter_amount_min_swap">Mindesteinzahlung von %1$s erforderlich</string>
+    <string name="withdraw_enter_amount_min">Mindestabhebung von %1$s erforderlich</string>
+    <string name="send_confirmation_eta">Gelder kommen an</string>
+    <string name="deposit_source_select_title">Verknüpfte Banken</string>
+    <string name="deposit_confirmation_cta_button">Einzahlung %1$s</string>
+    <string name="deposit_enter_amount_limit_title">Tägliches Limit</string>
+    <string name="deposit_enter_amount_limit_label">%1$s Verfügbar</string>
+    <string name="deposit_confirmation_progress_title">Einzahlung von %1$s</string>
+    <string name="deposit_confirmation_progress_message">Wir schließen Ihre Einzahlung jetzt ab.</string>
+    <string name="deposit_confirmation_success_title">%1$s Einzahlung erfolgt!</string>
+    <string name="deposit_confirmation_success_message">Während wir darauf warten, dass Ihre Bank das Geld sendet, erhalten Sie hier frühzeitig Zugriff auf %1$s auf Ihrem %2$s Geldkonto, sodass Sie sofort Krypto kaufen können. Sie können eine Abhebung vornehmen, sobald die Banküberweisung am %3$s durchgeführt wurde.</string>
+    <string name="add_a_deposit_method">Wählen Sie eine Einzahlungsmethode</string>
+    <string name="security_check">Sicherheitsprüfung</string>
+    <string name="success_email_veriff">Geschafft! Ihre E-Mail wurde bestätigt.</string>
+    <string name="email_verified">E-Mail-Adresse wurde bestätigt</string>
+    <string name="email_verification_part_1">Wir haben zur Bestätigung eine E-Mail versandt an</string>
+    <string name="email_verification_part_2">. Bitte tippen Sie auf den Link in der E-Mail, um fortzufahren.</string>
+    <string name="email_verify">E-Mail-Adresse bestätigen</string>
+    <string name="edit_email_address">E-Mail-Adresse bearbeiten</string>
+    <string name="common_save">Speichern</string>
+    <string name="change_email_instructions">Geben Sie unten Ihre E-Mail-Adresse ein und klicken Sie auf Speichern. Wir senden Ihnen eine Bestätigungs-E-Mail an diese neue Adresse.</string>
+    <string name="check_my_inbox">Überprüfen Sie Ihren Posteingang</string>
+    <string name="did_not_get_email">Haben Sie die E-Mail nicht erhalten?</string>
+    <string name="send_again">Erneut senden</string>
+
 </resources>

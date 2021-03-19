@@ -53,14 +53,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/huge_margin"
-        android:text="@string/backup_complete_message" />
+        android:text="@string/backup_complete_message_1" />
 
     <TextView
         style="@style/Text.Standard.Centered.12"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/huge_margin"
-        android:text="@string/backup_lost_mnemonic"/>
+        android:text="@string/backup_lost_mnemonic_1"/>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_backup_done"

@@ -8,29 +8,24 @@ import com.blockchain.nabu.models.responses.nabu.UserState
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
 import com.blockchain.nabu.NabuToken
 import com.blockchain.nabu.models.responses.tokenresponse.NabuOfflineTokenResponse
-import com.blockchain.remoteconfig.FeatureFlag
+import com.blockchain.sunriver.XlmAccountReference
 import com.blockchain.sunriver.XlmDataManager
-import info.blockchain.balance.AccountReference
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.schedulers.Schedulers
 
 class SunriverCampaignRegistration(
-    private val featureFlag: FeatureFlag,
     private val nabuDataManager: NabuDataManager,
     private val nabuToken: NabuToken,
     private val kycStatusHelper: KycStatusHelper,
     private val xlmDataManager: XlmDataManager
 ) : CampaignRegistration {
 
-    private fun defaultAccount(): Single<AccountReference.Xlm> = xlmDataManager.defaultAccount()
+    private fun defaultAccount(): Single<XlmAccountReference> = xlmDataManager.defaultAccount()
 
     fun getCampaignCardType(): Single<SunriverCardType> =
-        featureFlag.enabled
-            .flatMap { enabled -> if (enabled) getCardsForUserState() else Single.just(
-                SunriverCardType.None
-            ) }
+        getCardsForUserState()
 
     private fun getCardsForUserState(): Single<SunriverCardType> =
         Singles.zip(
@@ -63,7 +58,7 @@ class SunriverCampaignRegistration(
 
     private fun doRegisterCampaign(
         token: NabuOfflineTokenResponse,
-        xlmAccount: AccountReference.Xlm,
+        xlmAccount: XlmAccountReference,
         campaignData: CampaignData
     ): Completable =
         nabuDataManager.registerCampaign(

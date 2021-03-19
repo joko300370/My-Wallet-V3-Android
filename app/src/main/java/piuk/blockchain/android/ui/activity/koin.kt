@@ -17,7 +17,9 @@ val activitiesModule = module {
             ActivitiesModel(
                 initialState = ActivitiesState(),
                 mainScheduler = AndroidSchedulers.mainThread(),
-                interactor = get()
+                interactor = get(),
+                environmentConfig = get(),
+                crashLogger = get()
             )
         }
 
@@ -35,7 +37,9 @@ val activitiesModule = module {
             ActivityDetailsModel(
                 initialState = ActivityDetailState(),
                 mainScheduler = AndroidSchedulers.mainThread(),
-                interactor = get()
+                interactor = get(),
+                environmentConfig = get(),
+                crashLogger = get()
             )
         }
 

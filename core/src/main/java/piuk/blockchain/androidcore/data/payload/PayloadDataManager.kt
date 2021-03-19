@@ -9,7 +9,7 @@ import info.blockchain.wallet.exceptions.HDWalletException
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.payload.data.Account
-import info.blockchain.wallet.payload.data.LegacyAddress
+import info.blockchain.wallet.payload.data.ImportedAddress
 import info.blockchain.wallet.payload.data.Wallet
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import info.blockchain.wallet.stx.STXAccount
@@ -57,14 +57,14 @@ class PayloadDataManager(
     val accountCount: Int
         get() = wallet?.hdWallets?.get(0)?.accounts?.size ?: 0
 
-    var legacyAddresses: List<LegacyAddress>
-        get() = wallet?.legacyAddressList?.filter { !it.isWatchOnly() } ?: emptyList()
+    var importedAddresses: List<ImportedAddress>
+        get() = wallet?.importedAddressList?.filter { !it.isWatchOnly() } ?: emptyList()
         set(addresses) {
-            wallet!!.legacyAddressList = addresses
+            wallet!!.importedAddressList = addresses
         }
 
-    val legacyAddressStringList: List<String>
-        get() = wallet?.legacyAddressStringList ?: emptyList()
+    val importedAddressStringList: List<String>
+        get() = wallet?.importedAddressStringList ?: emptyList()
 
     val wallet: Wallet?
         get() = payloadManager.payload
@@ -320,7 +320,7 @@ class PayloadDataManager(
     /**
      * Converts any address to a label.
      *
-     * @param address Accepts account receive or change chain address, as well as legacy address.
+     * @param address Accepts account receive or change chain address, as well as imported address.
      * @return Either the label associated with the address, or the original address
      */
     fun addressToLabel(address: String): String = payloadManager.getLabelFromAddress(address)
@@ -407,16 +407,16 @@ class PayloadDataManager(
             .observeOn(AndroidSchedulers.mainThread())
 
     /**
-     * Returns an [ECKey] for a given [LegacyAddress], optionally with a second password
+     * Returns an [ECKey] for a given [ImportedAddress], optionally with a second password
      * should the private key be encrypted.
      *
-     * @param legacyAddress The [LegacyAddress] to generate an Elliptic Curve Key for
+     * @param importedAddress The [ImportedAddress] to generate an Elliptic Curve Key for
      * @param secondPassword An optional second password, necessary if the private key is ebcrypted
      * @return An Elliptic Curve Key object [ECKey]
-     * @see LegacyAddress.isPrivateKeyEncrypted
+     * @see ImportedAddress.isPrivateKeyEncrypted
      */
-    fun getAddressECKey(legacyAddress: LegacyAddress, secondPassword: String?): ECKey? =
-        payloadManager.getAddressECKey(legacyAddress, secondPassword)
+    fun getAddressECKey(importedAddress: ImportedAddress, secondPassword: String?): ECKey? =
+        payloadManager.getAddressECKey(importedAddress, secondPassword)
 
     /**
      * Derives new [Account] from the master seed
@@ -431,26 +431,26 @@ class PayloadDataManager(
         }.applySchedulers()
 
     /**
-     * Add a private key for a [LegacyAddress]
+     * Add a private key for a [ImportedAddress]
      *
      * @param key An [ECKey]
      * @param secondPassword An optional double encryption password
      * @return An [Observable] representing a successful save
      */
-    fun addLegacyAddressFromKey(key: ECKey, secondPassword: String?): Single<LegacyAddress> =
-        rxPinning.call<LegacyAddress> {
-            payloadService.setKeyForLegacyAddress(key, secondPassword)
+    fun addImportedAddressFromKey(key: ECKey, secondPassword: String?): Single<ImportedAddress> =
+        rxPinning.call<ImportedAddress> {
+            payloadService.setKeyForImportedAddress(key, secondPassword)
         }.applySchedulers()
         .singleOrError()
 
     /**
-     * Allows you to propagate changes to a [LegacyAddress] through the [Wallet]
+     * Allows you to propagate changes to a [ImportedAddress] through the [Wallet]
      *
-     * @param legacyAddress The updated address
+     * @param importedAddress The updated address
      * @return A [Completable] object representing a successful save
      */
-    fun updateLegacyAddress(legacyAddress: LegacyAddress): Completable =
-        rxPinning.call { payloadService.updateLegacyAddress(legacyAddress) }
+    fun updateImportedAddress(importedAddress: ImportedAddress): Completable =
+        rxPinning.call { payloadService.updateImportedAddress(importedAddress) }
             .applySchedulers()
 
     /**
@@ -631,4 +631,4 @@ class PayloadDataManager(
     }
 }
 
-private fun LegacyAddress.isWatchOnly() = privateKey == null
+private fun ImportedAddress.isWatchOnly() = privateKey == null

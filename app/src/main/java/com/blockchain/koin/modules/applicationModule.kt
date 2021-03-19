@@ -1,19 +1,14 @@
 package com.blockchain.koin.modules
 
 import android.content.Context
-import com.blockchain.accounts.AccountList
-import com.blockchain.koin.bch
-import com.blockchain.koin.btc
-import com.blockchain.koin.eth
 import com.blockchain.koin.eur
 import com.blockchain.koin.explorerRetrofit
 import com.blockchain.koin.gbp
 import com.blockchain.koin.interestAccountFeatureFlag
 import com.blockchain.koin.moshiExplorerRetrofit
-import com.blockchain.koin.pax
 import com.blockchain.koin.payloadScope
 import com.blockchain.koin.payloadScopeQualifier
-import com.blockchain.koin.usdt
+import com.blockchain.koin.usd
 import com.blockchain.logging.DigitalTrust
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentAccountMapper
 import com.blockchain.network.websocket.Options
@@ -30,11 +25,6 @@ import org.bitcoinj.params.BitcoinMainNetParams
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import piuk.blockchain.android.BuildConfig
-import piuk.blockchain.android.accounts.BchAccountListAdapter
-import piuk.blockchain.android.accounts.BtcAccountListAdapter
-import piuk.blockchain.android.accounts.EthAccountListAdapter
-import piuk.blockchain.android.accounts.PaxAccountListAdapter
-import piuk.blockchain.android.accounts.UsdtAccountListAdapter
 import piuk.blockchain.android.cards.CardModel
 import piuk.blockchain.android.cards.partners.EverypayCardActivator
 import piuk.blockchain.android.coincore.AssetOrdering
@@ -50,6 +40,8 @@ import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerificationDeepLinkHelper
+import piuk.blockchain.android.identity.UserIdentity
+import piuk.blockchain.android.identity.NabuUserIdentity
 import piuk.blockchain.android.identity.SiftDigitalTrust
 import piuk.blockchain.android.kyc.KycDeepLinkHelper
 import piuk.blockchain.android.remoteconfig.AssetOrderingRemoteConfig
@@ -63,6 +55,7 @@ import piuk.blockchain.android.simplebuy.SimpleBuyInteractor
 import piuk.blockchain.android.simplebuy.SimpleBuyModel
 import piuk.blockchain.android.simplebuy.SimpleBuyState
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
+import piuk.blockchain.android.simplebuy.USDPaymentAccountMapper
 import piuk.blockchain.android.sunriver.SunriverDeepLinkHelper
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.thepit.PitLinkingImpl
@@ -90,11 +83,12 @@ import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsModel
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsState
 import piuk.blockchain.android.ui.home.CredentialsWiper
 import piuk.blockchain.android.ui.home.MainPresenter
+import piuk.blockchain.android.ui.kyc.email.entry.EmailVeriffModel
+import piuk.blockchain.android.ui.kyc.email.entry.EmailVerifyInteractor
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
 import piuk.blockchain.android.ui.launcher.DeepLinkPersistence
 import piuk.blockchain.android.ui.launcher.LauncherPresenter
 import piuk.blockchain.android.ui.launcher.Prerequisites
-import piuk.blockchain.android.ui.lockbox.LockboxLandingPresenter
 import piuk.blockchain.android.ui.onboarding.OnboardingPresenter
 import piuk.blockchain.android.ui.pairingcode.PairingCodePresenter
 import piuk.blockchain.android.ui.recover.RecoverFundsPresenter
@@ -120,9 +114,6 @@ import piuk.blockchain.android.util.ResourceDefaultLabels
 import piuk.blockchain.android.util.RootUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.lifecycle.LifecycleInterestedComponent
-import piuk.blockchain.android.withdraw.mvi.WithdrawInteractor
-import piuk.blockchain.android.withdraw.mvi.WithdrawModel
-import piuk.blockchain.android.withdraw.mvi.WithdrawStatePersistence
 import piuk.blockchain.androidcore.data.api.ConnectionApi
 import piuk.blockchain.androidcore.data.auth.metadata.WalletCredentialsMetadataUpdater
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
@@ -222,7 +213,6 @@ val applicationModule = module {
                 qrProcessor = get(),
                 environmentSettings = get(),
                 kycStatusHelper = get(),
-                lockboxDataManager = get(),
                 deepLinkProcessor = get(),
                 sunriverCampaignRegistration = get(),
                 xlmDataManager = get(),
@@ -241,6 +231,10 @@ val applicationModule = module {
 
         factory(eur) {
             EURPaymentAccountMapper(stringUtils = get())
+        }.bind(PaymentAccountMapper::class)
+
+        factory(usd) {
+            USDPaymentAccountMapper(stringUtils = get())
         }.bind(PaymentAccountMapper::class)
 
         scoped {
@@ -284,11 +278,17 @@ val applicationModule = module {
         factory {
             PairingCodePresenter(
                 qrCodeDataManager = get(),
-                stringUtils = get(),
                 payloadDataManager = get(),
                 authDataManager = get()
             )
         }
+
+        factory {
+            NabuUserIdentity(
+                custodialWalletManager = get(),
+                tierService = get()
+            )
+        }.bind(UserIdentity::class)
 
         factory {
             CreateWalletPresenter(
@@ -394,7 +394,9 @@ val applicationModule = module {
             DashboardModel(
                 initialState = DashboardState(),
                 mainScheduler = AndroidSchedulers.mainThread(),
-                interactor = get()
+                interactor = get(),
+                environmentConfig = get(),
+                crashLogger = get()
             )
         }
 
@@ -408,7 +410,8 @@ val applicationModule = module {
                 simpleBuyPrefs = get(),
                 analytics = get(),
                 crashLogger = get(),
-                assetOrdering = get()
+                assetOrdering = get(),
+                linkedBanksFactory = get()
             )
         }
 
@@ -416,7 +419,9 @@ val applicationModule = module {
             AssetDetailsModel(
                 initialState = AssetDetailsState(),
                 mainScheduler = AndroidSchedulers.mainThread(),
-                interactor = get()
+                interactor = get(),
+                environmentConfig = get(),
+                crashLogger = get()
             )
         }
 
@@ -435,6 +440,7 @@ val applicationModule = module {
                 custodialWalletManager = get(),
                 appUtil = get(),
                 coincore = get(),
+                analytics = get(),
                 eligibilityProvider = get()
             )
         }
@@ -449,26 +455,9 @@ val applicationModule = module {
                 gson = get(),
                 cardActivators = listOf(
                     EverypayCardActivator(get(), get())
-                )
-            )
-        }
-
-        scoped {
-            WithdrawStatePersistence()
-        }
-
-        factory {
-            WithdrawInteractor(
-                assetBalancesRepository = get(),
-                custodialWalletManager = get()
-            )
-        }
-
-        factory {
-            WithdrawModel(
-                withdrawStatePersistence = get(),
-                mainScheduler = AndroidSchedulers.mainThread(),
-                withdrawInteractor = get()
+                ),
+                environmentConfig = get(),
+                crashLogger = get()
             )
         }
 
@@ -481,7 +470,9 @@ val applicationModule = module {
                     EverypayCardActivator(get(), get())
                 ),
                 gson = get(),
-                prefs = get()
+                prefs = get(),
+                environmentConfig = get(),
+                crashLogger = get()
             )
         }
 
@@ -545,14 +536,8 @@ val applicationModule = module {
                 kycStatusHelper = get(),
                 pitLinking = get(),
                 analytics = get(),
-                biometricsController = get()
-            )
-        }
-
-        factory {
-            LockboxLandingPresenter(
-                lockboxDataManager = get(),
-                walletOptionsDataManager = get()
+                biometricsController = get(),
+                ratingPrefs = get()
             )
         }
 
@@ -570,7 +555,7 @@ val applicationModule = module {
                 mobileNoticeRemoteConfig = get(),
                 crashLogger = get(),
                 analytics = get(),
-                config = get(),
+                apiStatus = get(),
                 credentialsWiper = get(),
                 biometricsController = get()
             )
@@ -646,7 +631,8 @@ val applicationModule = module {
                 currencyPrefs = get(),
                 analytics = get(),
                 crashLogger = get(),
-                prerequisites = get()
+                prerequisites = get(),
+                userIdentity = get()
             )
         }
 
@@ -677,24 +663,32 @@ val applicationModule = module {
             )
         }
 
-        factory(btc) { BtcAccountListAdapter(get()) }.bind(AccountList::class)
-        factory(bch) { BchAccountListAdapter(get()) }.bind(AccountList::class)
-        factory(eth) { EthAccountListAdapter(get()) }.bind(AccountList::class)
-        factory(pax) { PaxAccountListAdapter(get(), get()) }.bind(AccountList::class)
-        factory(usdt) { UsdtAccountListAdapter(get(), get()) }.bind(AccountList::class)
-
         factory {
             BiometricsController(
                 applicationContext = get(),
                 prefs = get(),
                 accessState = get(),
-                cryptographyManager = get()
+                cryptographyManager = get(),
+                crashLogger = get()
             )
         }.bind(BiometricAuth::class)
 
         factory {
             CryptographyManagerImpl()
         }.bind(CryptographyManager::class)
+
+        factory {
+            EmailVeriffModel(
+                interactor = get(),
+                observeScheduler = AndroidSchedulers.mainThread(),
+                environmentConfig = get(),
+                crashLogger = get()
+            )
+        }
+
+        factory {
+            EmailVerifyInteractor(get())
+        }
     }
 
     factory {

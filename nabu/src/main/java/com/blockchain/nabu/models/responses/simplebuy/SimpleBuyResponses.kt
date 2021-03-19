@@ -46,7 +46,8 @@ data class BankAgentResponse(
     val country: String?,
     val name: String?,
     val recipient: String?,
-    val routingNumber: String?
+    val routingNumber: String?,
+    val swiftCode: String?
 )
 
 data class SimpleBuyBalanceResponse(
@@ -115,12 +116,13 @@ data class TransferFundsResponse(
 }
 
 data class FeesResponse(
-    val fees: List<CurrencyFeeResponse>
+    val fees: List<CurrencyFeeResponse>,
+    val minAmounts: List<CurrencyFeeResponse>
 )
 
 data class CurrencyFeeResponse(
     val symbol: String,
-    val value: BigDecimal
+    val minorValue: String
 )
 
 data class CustodialWalletOrder(

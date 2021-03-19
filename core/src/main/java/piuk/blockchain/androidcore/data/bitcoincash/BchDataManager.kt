@@ -282,12 +282,12 @@ class BchDataManager(
             ?: emptyList()
 
     private fun getActiveXpubsAndImportedAddresses(): List<String> =
-        getActiveXpubs() + getLegacyAddressStringList()
+        getActiveXpubs() + getImportedAddressStringList()
 
-    fun getLegacyAddressStringList(): List<String> = payloadDataManager.legacyAddressStringList
+    fun getImportedAddressStringList(): List<String> = payloadDataManager.importedAddressStringList
 
     fun updateAllBalances(): Completable {
-        val legacyAddresses = payloadDataManager.legacyAddresses
+        val importedAddresses = payloadDataManager.importedAddresses
             .filterNot { it.isArchived }
             .map { it.address }
             .toSet()
@@ -295,7 +295,7 @@ class BchDataManager(
         val xpubs = getActiveXpubs().toSet()
 
         return rxPinning.call {
-            bchDataStore.bchWallet!!.updateAllBalances(xpubs, legacyAddresses)
+            bchDataStore.bchWallet!!.updateAllBalances(xpubs, importedAddresses)
         }
     }
 
@@ -328,14 +328,6 @@ class BchDataManager(
             Observable.fromCallable { fetchWalletTransactions(limit, offset) }
         }.applySchedulers()
 
-    /**
-     * Returns all non-archived accounts
-     * @return Generic account data that contains label and xpub/address
-     */
-    fun getActiveAccounts(): List<GenericMetadataAccount> {
-        return getAccountMetadataList().filterNot { it.isArchived }
-    }
-
     fun getAccountMetadataList(): List<GenericMetadataAccount> =
         bchDataStore.bchMetadata?.accounts ?: emptyList()
 
@@ -346,9 +338,6 @@ class BchDataManager(
     fun setDefaultAccountPosition(position: Int) {
         bchDataStore.bchMetadata!!.defaultAcccountIdx = position
     }
-
-    fun getDefaultGenericMetadataAccount(): GenericMetadataAccount? =
-        getAccountMetadataList().elementAtOrNull(getDefaultAccountPosition())
 
     /**
      * Allows you to generate a BCH receive address at an arbitrary number of positions on the chain
@@ -449,8 +438,8 @@ class BchDataManager(
     /**
      * Converts any Bitcoin Cash address to a label.
      *
-     * @param address Accepts account receive or change chain address, as well as legacy address.
-     * @return Account or legacy address label
+     * @param address Accepts account receive or change chain address, as well as imported address.
+     * @return Account or imported address label
      */
     fun getLabelFromBchAddress(address: String): String? {
         val xpub = bchDataStore.bchWallet?.getXpubFromAddress(address)
@@ -469,7 +458,6 @@ class BchDataManager(
         offset: Int
     ): MutableList<TransactionSummary> =
         bchDataStore.bchWallet!!.getTransactions(
-            null, // legacy list
             getActiveXpubsAndImportedAddresses(),
             address,
             limit,
@@ -479,7 +467,6 @@ class BchDataManager(
     @WebRequest
     private fun fetchWalletTransactions(limit: Int, offset: Int): MutableList<TransactionSummary> =
         bchDataStore.bchWallet!!.getTransactions(
-            null, // legacy list
             getActiveXpubsAndImportedAddresses(),
             null,
             limit,

@@ -1,24 +1,29 @@
 package piuk.blockchain.android.ui.pairingcode
 
-import android.annotation.SuppressLint
 import android.graphics.Bitmap
+import androidx.annotation.StringRes
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.plusAssign
 import okhttp3.ResponseBody
 import piuk.blockchain.android.R
 import piuk.blockchain.android.scan.QrCodeDataManager
-import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.androidcoreui.ui.base.View
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import piuk.blockchain.androidcoreui.utils.logging.pairingEvent
 import piuk.blockchain.androidcoreui.utils.logging.PairingMethod
 
+interface PairingCodeView : View {
+    fun onQrLoaded(bitmap: Bitmap)
+    fun showError(@StringRes message: Int)
+    fun showProgressSpinner()
+    fun hideProgressSpinner()
+}
+
 class PairingCodePresenter(
     private val qrCodeDataManager: QrCodeDataManager,
-    stringUtils: StringUtils,
     private val payloadDataManager: PayloadDataManager,
     private val authDataManager: AuthDataManager
 ) : BasePresenter<PairingCodeView>() {
@@ -27,10 +32,6 @@ class PairingCodePresenter(
         // No op
     }
 
-    internal val firstStep =
-        String.format(stringUtils.getString(R.string.pairing_code_instruction_1), WEB_WALLET_URL)
-
-    @SuppressLint("CheckResult")
     internal fun generatePairingQr() {
         compositeDisposable += pairingEncryptionPasswordObservable
             .doOnSubscribe { view.showProgressSpinner() }
@@ -41,7 +42,7 @@ class PairingCodePresenter(
                     view.onQrLoaded(bitmap)
                     Logging.logEvent(pairingEvent(PairingMethod.REVERSE))
                 },
-                { view.showToast(R.string.unexpected_error, ToastCustom.TYPE_ERROR) })
+                { view.showError(R.string.unexpected_error) })
     }
 
     private val pairingEncryptionPasswordObservable: Observable<ResponseBody>
@@ -62,9 +63,5 @@ class PairingCodePresenter(
             encryptionPhrase,
             600
         )
-    }
-
-    companion object {
-        private const val WEB_WALLET_URL = "login.blockchain.com"
     }
 }

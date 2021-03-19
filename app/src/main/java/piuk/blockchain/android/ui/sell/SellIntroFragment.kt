@@ -37,7 +37,7 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.customviews.ButtonOptions
 import piuk.blockchain.android.ui.customviews.IntroHeaderView
-import piuk.blockchain.android.ui.customviews.VerifyIdentityBenefit
+import piuk.blockchain.android.ui.customviews.VerifyIdentityNumericBenefitItem
 import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.home.HomeNavigator
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
@@ -134,14 +134,14 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
 
         kyc_benefits.initWithBenefits(
             benefits = listOf(
-                VerifyIdentityBenefit(
+                VerifyIdentityNumericBenefitItem(
                     getString(R.string.invalid_id),
                     getString(R.string.invalid_id_description)
-                ), VerifyIdentityBenefit(
+                ), VerifyIdentityNumericBenefitItem(
                     getString(R.string.information_missmatch),
                     getString(R.string.information_missmatch_description)
                 ),
-                VerifyIdentityBenefit(
+                VerifyIdentityNumericBenefitItem(
                     getString(R.string.blocked_by_local_laws),
                     getString(R.string.sell_intro_kyc_subtitle_3)
                 )
@@ -164,14 +164,14 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
 
         kyc_benefits.initWithBenefits(
             benefits = listOf(
-                VerifyIdentityBenefit(
+                VerifyIdentityNumericBenefitItem(
                     getString(R.string.sell_intro_kyc_title_1),
                     getString(R.string.sell_intro_kyc_subtitle_1)
-                ), VerifyIdentityBenefit(
+                ), VerifyIdentityNumericBenefitItem(
                     getString(R.string.sell_intro_kyc_title_2),
                     getString(R.string.sell_intro_kyc_subtitle_2)
                 ),
-                VerifyIdentityBenefit(
+                VerifyIdentityNumericBenefitItem(
                     getString(R.string.sell_intro_kyc_title_3),
                     getString(R.string.sell_intro_kyc_subtitle_3)
                 )
@@ -262,7 +262,7 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
 
     private fun supportedCryptoCurrencies(): Single<List<CryptoCurrency>> {
         val availableFiats =
-            custodialWalletManager.getSupportedFundsFiats(currencyPrefs.selectedFiatCurrency, true)
+            custodialWalletManager.getSupportedFundsFiats(currencyPrefs.selectedFiatCurrency)
         return custodialWalletManager.getSupportedBuySellCryptoCurrencies()
             .zipWith(availableFiats) { supportedPairs, fiats ->
                 supportedPairs.pairs.filter { fiats.contains(it.fiatCurrency) }

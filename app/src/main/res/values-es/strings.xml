@@ -22,7 +22,6 @@
     <string name="action_settings">Configuraciones</string>
     <string name="please_wait">Espera por favor</string>
     <string name="item_backup">Fondos de respaldo</string>
-    <string name="item_lockbox">Caja de seguridad</string>
     <string name="item_the_exchange">Intercambiar</string>
     <string name="item_airdrops">Gotas de aire</string>
     <string name="toolbar_cmd_home">Inicio</string>
@@ -51,7 +50,6 @@
  nueva contraseña 
 </string>
     <string name="no_private_key">No se puede producir la clave privada.</string>
-    <string name="pin_max_strikes">%1$d intentos fallidos de PIN. Por favor proporcione la contraseña.</string>
     <string name="pin_4_strikes_password_accepted">Contraseña aceptada Por favor, defina un nuevo PIN.
 </string>
     <string name="bip38_password_entry">Por favor, introduzca la contraseña de clave privada</string>
@@ -808,7 +806,7 @@ Euros/Dolares</string>
     <string name="kyc_resubmission_splash_description_3">Faltan las fotos requeridas.</string>
     <string name="kyc_resubmission_splash_description_4">El documento que envió es incorrecto.</string>
     <string name="kyc_resubmission_splash_description_5">No pudimos leer las imágenes que envió debido a la calidad de la imagen.</string>
-    <string name="sunriver_splash_title">Verificación de identidad</string>
+    <string name="identity_verification">Verificación de identidad</string>
     <string name="sunriver_status_message">Su información está siendo revisada. La revisión debería completarse en breve.</string>
     <string name="buy_sell_splash_title">Compra y Venda</string>
     <string name="buy_sell_splash_message">Puede comprar y vender bitcoin (BTC) con su tarjeta de crédito o cuenta bancaria a través de nuestro socio Coinify.</string>
@@ -943,7 +941,7 @@ Euros/Dolares</string>
     <string name="daily_swap_and_buy_limit">Límite diario de intercambio y compra</string>
     <string name="simple_buy_own_crypto">Cripto propio en pocos minutos</string>
     <string name="simple_buy_verify_your_identity">Verifique su identidad y compre Criptomonedas</string>
-    <string name="simple_buy_skip">Omitir</string>
+    <string name="common_skip">Omitir</string>
     <string name="simple_buy_currency_selection_header">Su moneda local para almacenar fondos en esa moneda como fondos en su billetera Blockchain.</string>
     <string name="payment_methods">Métodos de pago</string>
     <string name="payment_method">Método de pago</string>
@@ -996,11 +994,6 @@ Euros/Dolares</string>
     <string name="invalid_date">Fecha invalida</string>
     <string name="invalid_card_number">El número de tarjeta no es válido</string>
     <string name="full_name">Nombre completo</string>
-    <string name="address_line_1">Dirección Línea 1</string>
-    <string name="address_line_2">Dirección Línea 2</string>
-    <string name="address_city">Ciudad</string>
-    <string name="address_zip">CÓDIGO POSTAL</string>
-    <string name="address_postcode">Código postal</string>
     <string name="billing_address_state">Estado</string>
     <string name="currency_not_supported_title">Su moneda no es compatible</string>
     <string name="activity_no_activity_title">No tienes actividad</string>
@@ -1214,7 +1207,7 @@ Esto le permitirá restaurar su Wallet si perdiera este dispositivo.</string>
     <string name="send_enter_unexpected_error">Ha ocurrido un error inesperado. Inténtelo de nuevo.</string>
     <string name="send_enter_insufficient_gas">No tiene suficiente ETH para efectuar esta transacción.</string>
     <string name="send_select_a_wallet_title">o seleccione una Wallet.</string>
-    <string name="send_internal_transfer_message">En este momento, solo podrá realizar transferencias %1$s desde su %1$s Trade Wallet a su Vault Wallet. En el momento en que %1$s esté en su Vault Wallet, podrá transferirlo a direcciones externas.</string>
+    <string name="send_internal_transfer_message">En este momento, solo podrá realizar transferencias de %1$s desde su %2$s Cartera Comercial a su Cartera de %2$s. En el momento en que el %1$s esté en su Cartera de %2$s, podrá transferirlo a direcciones externas.</string>
     <string name="purchase_funds_note">Su cantidad definitiva podrá cambiar debido a la actividad del mercado.</string>
     <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Obtenga más información. </annotation>
@@ -1289,7 +1282,6 @@ Esto le permitirá restaurar su Wallet si perdiera este dispositivo.</string>
     <string name="sell_for_cash">Vender criptomonedas por efectivo</string>
     <string name="select_wallet_to_sell">Seleccione una billetera desde la que vender.</string>
     <string name="common_sell">Vender</string>
-    <string name="quote_price">%1$s Precio</string>
     <string name="convert_your_crypto_to_cash">Convierta su cripto en efectivo</string>
     <string name="scan_mismatch_transaction_target">El código escaneado no es un código QR %1$s .</string>
     <string name="scan_failed">No se reconoce el código QR. Vuelve a intentarlo.</string>
@@ -1521,17 +1513,6 @@ Nota: No podrá enviar ni retirar estos fondos de su monedero durante los próxi
     <string name="sell_intro_empty_title">No hay monederos desde los que poder vender</string>
     <string name="sell_intro_empty_label">Parece que no tiene monederos con un saldo que pueda vender. Intente financiar antes algunos monederos.</string>
     <string name="yodlee_splash_title_partner">Blockchain.com utiliza Yodlee para verificar sus credenciales bancarias y vincular de forma segura sus cuentas.</string>
-    <string name="lockbox_title">Lockbox</string>
-    <string name="lockbox_landing_get_yours_title">Consiga un Lockbox</string>
-    <string name="lockbox_landing_get_yours_message">Almacene de forma segura sus criptomonedas sin conexión.</string>
-    <string name="lockbox_landing_get_yours_button">Comprar ahora</string>
-    <string name="lockbox_landing_already_owned_title">¿Ya tiene uno?</string>
-    <string name="lockbox_landing_already_owned_message">Desde su ordenador, inicie sesión en Blockchain y conecte su Lockbox.</string>
-    <string name="lockbox_landing_learn_more">¿Quiere saber más? Toque aquí para visitar
-%1$s</string>
-    <string name="lockbox_landing_coming_soon_title">Saldos próximamente</string>
-    <string name="lockbox_landing_coming_soon_message">No podemos mostrar su saldo de Lockbox en este momento. No se preocupe, sus fondos están a salvo. Pronto añadiremos esta función. Mientras espera, puede comprobar su saldo en la web.</string>
-    <string name="lockbox_landing_coming_soon_button">Comprobar mi saldo</string>
     <string name="trading_order_limit">Tiene demasiadas transacciones pendientes %1$s. Una vez que se completen, puede crear una nueva.</string>
     <string name="trading_order_not_cancelable">¡Vaya! Este pedido %1$s no se puede cancelar.</string>
     <string name="trading_pending_withdrawal">¡Vaya! Ya tiene un retiro pendiente. Inténtelo de nuevo una vez que se complete.</string>
@@ -1554,4 +1535,131 @@ Nota: No podrá enviar ni retirar estos fondos de su monedero durante los próxi
     <string name="trading_ineligible_for_swap">¡Vaya! Este servicio no está disponible en este momento. Póngase en contacto con el soporte técnico.</string>
     <string name="trading_invalid_destination_amount">¡Vaya! Parece que no es un importe válido, Inténtelo de nuevo.</string>
     <string name="executing_transaction_error">¡Vaya! Algo salió mal al ejecutar la transacción en cadena %1$s.</string>
+    <string name="backup_wallet_title">Recuperación de clave privada secreta</string>
+    <string name="pin_max_strikes">%1$d intentos de PIN fallidos. Introduzca la contraseña.</string>
+    <string name="recovery_passphrase_1">Frase secreta de recuperación de la clave privada</string>
+    <string name="invalid_recovery_phrase_1">Frase secreta de recuperación de la clave privada no válida. Inténtelo de nuevo</string>
+    <string name="password_disclaimer">Entiendo que Blockchain.com no puede recuperar mi contraseña por mí. Si pierdo el acceso a mi billetera, debo utilizar mi <annotation link="backup">frase secreta</annotation> para acceder a mis fondos.</string>
+    <string name="transfer_funds_description_1">Las direcciones importadas no están respaldadas por su frase secreta de recuperación de la clave privada. Para asegurar estos fondos,
+        recomendamos transferir estos saldos a su billetera sin custodia de Blockchain.com.
+    </string>
+    <string name="pairing_code_instructions_alert">Nunca comparta su código QR de emparejamiento móvil con nadie. Cualquiera que pueda ver este código QR puede retirar fondos. Blockchain.com nunca le pedirá ver o recibir su código QR de emparejamiento móvil.</string>
+    <string name="backup_title">Recuperación de clave privada secreta</string>
+    <string name="backup_subtitle">Frase secreta de recuperación de la clave privada</string>
+    <string name="backup_instructions_1">En el ámbito de las criptomonedas, cuando tiene las claves privadas, tiene el control de los fondos en su billetera de clave privada. Por lo tanto, QUIEN tenga sus claves privadas puede controlar su billetera de claves privadas.</string>
+    <string name="backup_instructions_2">Por tanto, debe:</string>
+    <string name="backup_instructions_3">1. Escriba la frase de 12 palabras que aparece en la siguiente pantalla en el orden exacto en que aparece.</string>
+    <string name="backup_instructions_4">2. Guárdela en un lugar seguro, idealmente en una hoja de papel que vaya a guardar de manera segura (es decir, no en una copia digital).</string>
+    <string name="backup_instructions_5">3. NUNCA comparta su frase de recuperación con nadie.</string>
+    <string name="backup_instructions_warn">Advertencia: si alguien tiene su frase de respaldo, tendrá acceso a su billetera de clave privada y podrá retirar fondos.</string>
+    <string name="backup_instructions_alert">Blockchain.com nunca le pedirá ver o recibir su frase de recuperación.</string>
+    <string name="backup_button_begin">Ver frase de recuperación</string>
+    <string name="backup_complete_message_1">Puede utilizar su frase secreta de recuperación de la clave privada para recuperar sus fondos si
+        pierde su contraseña. Cualquiera que tenga acceso a su frase secreta de recuperación de la clave privada puede acceder a sus fondos, así que
+        recuerde mantenerla fuera de línea en algún lugar seguro.
+    </string>
+    <string name="backup_verify_heading_1">Introduzca las siguientes palabras de su frase secreta de recuperación de la clave privada para
+        completar el proceso de recuperación.
+    </string>
+    <string name="backup_lost_mnemonic_1">¿Ha perdido su frase secreta de recuperación de la clave privada de 12 palabras?</string>
+    <string name="fingerprint_login_description">Utilice sus datos biométricos para iniciar sesión en su billetera</string>
+    <string name="fingerprint_register_description">Utilice sus datos biométricos para acceder a su cartera de forma más rápida y sencilla.
+
+Confirme que es usted para continuar</string>
+    <string name="biometric_disable_message">¿Está seguro de que desea desactivar el inicio de sesión biométrico?</string>
+    <string name="biometrics_key_invalidated_title">Los datos biométricos han cambiado</string>
+    <string name="biometrics_key_invalidated_description">O los datos biométricos almacenados en este dispositivo han cambiado o el bloqueo del teclado se ha desactivado. Utilice su PIN en su lugar.
+
+A continuación, puede volver a configurar el inicio de sesión biométrico desde Configuración.</string>
+    <string name="biometrics_key_invalidated_settings_description">O los datos biométricos almacenados en este dispositivo han cambiado o el bloqueo del teclado se ha desactivado.
+
+Vuelva a añadir sus datos biométricos e inténtelo de nuevo.</string>
+    <string name="fingerprint_fatal_error_desc">Se ha producido un error al intentar utilizar la biometría. Utilice su PIN en su lugar.
+
+A continuación, puede volver a configurar el inicio de sesión biométrico desde Configuración.
+Error: %1$s</string>
+    <string name="biometrics_disabled_lockout_title">Fallo de autentificacion</string>
+    <string name="biometrics_disabled_lockout_desc">Ha habido demasiados intentos fallidos de autenticación. Espere 30 segundos e inténtelo de nuevo.</string>
+    <string name="biometrics_disabled_lockout_perm_desc">Sus sensores biométricos están desactivados. Bloquee su dispositivo y desbloquéelo con su PIN, patrón o contraseña para volver a activarlos.
+
+Una vez hecho esto, inténtelo de nuevo.</string>
+    <string name="biometrics_action_settings">Ir a Configuración</string>
+    <string name="biometrics_enrollment_title">Activar la biometría</string>
+    <string name="biometrics_enrollment_desc">Inicie sesión rápidamente en su billetera en lugar de utilizar su PIN.</string>
+    <string name="recovery_card_title_1">Frase secreta de recuperación de la clave privada</string>
+    <string name="recovery_card_body_1">Usted controla sus criptomonedas. Escriba su frase secreta de recuperación de la clave privada para recuperar todos sus fondos en caso de que pierda su contraseña.</string>
+    <string name="backup_before_send_body_1">Su frase secreta de recuperación de la clave privada le permitirá recuperar sus criptomonedas si pierde el acceso a su billetera.
+
+Escriba estas 12 palabras en orden y guárdelas en un lugar seguro. Nunca lo compartas con nadie. Su frase secreta de recuperación de la clave privada es la clave para recuperar sus criptomonedas si alguna vez queda bloqueado.</string>
+    <string name="kyc_address_address_zip_code_hint_1">Código postal</string>
+    <string name="payment_method_type_account_info">%1$s Cuenta %2$s</string>
+    <string name="address_line_1">Línea de dirección 1</string>
+    <string name="address_line_2">Línea de dirección 2</string>
+    <string name="address_city">Ciudad</string>
+    <string name="address_zip">CÓDIGO POSTAL</string>
+    <string name="address_postcode">Código postal</string>
+    <string name="quote_price">%1$s Precio</string>
+    <string name="pay_with_my_dotted">Pagar con mi…</string>
+    <string name="failed_to_link_bank">Error al vincular banco</string>
+    <string name="add_a_bank_account">Añadir cuenta bancaria</string>
+    <string name="wire_transfer">Transferencia bancaria</string>
+    <string name="link_a_bank_wire_transfer">Vincule un banco a su billetera enviando cualquier cantidad mediante transferencia bancaria. Tenga en cuenta que este proceso es mucho más lento y pueden aplicarse altas comisiones bancarias.</string>
+    <string name="link_a_bank_bank_transfer">Vincule de forma segura un banco para comprar criptomonedas, depositar dinero en efectivo y retirar dinero a su banco en cualquier momento.</string>
+    <string name="add_credit_or_debit_card_1">Tarjeta de crédito o débito</string>
+    <string name="first_name">Nombre</string>
+    <string name="last_name">Apellidos</string>
+    <string name="as_it_shows_in_id">Como se muestra en su identificación o pasaporte emitido por el gobierno</string>
+    <string name="date_of_birth">Fecha de nacimiento</string>
+    <string name="date_of_birth_instructions">Debe tener 18 años o más para comprar criptomonedas.</string>
+    <string name="kyc_profile_message_1">Blockchain.com está obligado por ley a recopilar esta información. Debe tener 18 años o más para comprar y vender criptomonedas.</string>
+    <string name="kyc_address_header_1">Blockchain.com está obligado por ley a recopilar esta información.</string>
+    <string name="kyc_country_selection_search_hint_1">Seleccione su país</string>
+    <string name="kyc_country_selection_title_1">Seleccione su país</string>
+
+    <string name="preferences_rate_app">Calificar la aplicación</string>
+    <string name="tx_title_fiat_deposit">Depósito %1$s</string>
+    <string name="bank_account_info_default">Finalización de la cuenta</string>
+    <string name="bank_wire_transfer_fee_default">Tarifa bancaria</string>
+    <string name="payment_wire_transfer">Transferencia bancaria</string>
+    <string name="payment_wire_transfer_subtitle">3 – 5 días laborables</string>
+    <string name="payment_wire_transfer_blurb">Envíe fondos directamente desde su cuenta bancaria a su billetera Blockchain.com. Pueden aplicarse comisiones bancarias.</string>
+    <string name="payment_deposit">Depósito bancario</string>
+    <string name="payment_deposit_subtitle">Disponible al instante</string>
+    <string name="payment_deposit_blurb">Vincule de forma segura un banco y envíe dinero en efectivo a su billetera blockchain.com en cualquier momento.</string>
+    <string name="routing_number">Número de ruta</string>
+    <string name="bank_transfer_in_progress_title">%1$s Compra iniciada</string>
+    <string name="bank_transfer_in_progress_blurb">Estamos completando su compra en este momento. Espere a que los fondos sean retirados de su banco el %1$s. Compruebe el estado de su pedido en cualquier momento en Actividad.</string>
+    <string name="fiat_funds_detail_pending_withdrawal">Ya tiene una retirada en curso, espere hasta que se complete antes de iniciar una nueva.</string>
+    <string name="withdraw_confirmation_cta_button">Retirar %1$s</string>
+    <string name="withdraw_confirmation_progress_message">Estamos completando su retirada ahora.</string>
+    <string name="withdraw_confirmation_progress_title">Retirando %1$s</string>
+    <string name="withdraw_confirmation_success_title">Se ha retirado %1$s</string>
+    <string name="withdraw_confirmation_success_message">Estamos enviando el dinero en efectivo en este momento. El dinero debería llegar a su banco el %1$s. Compruebe el estado de su retirada en cualquier momento desde su pantalla de actividad</string>
+    <string name="withdraw_target_select_title">Retirar a…</string>
+    <string name="withdraw_confirmation_eta">Los fondos llegarán antes del</string>
+    <string name="deposit_enter_amount_min_swap">Se requiere un depósito mínimo de %1$s</string>
+    <string name="withdraw_enter_amount_min">Se requiere una retirada mínima de %1$s</string>
+    <string name="send_confirmation_eta">Los fondos llegarán</string>
+    <string name="deposit_source_select_title">Bancos vinculados</string>
+    <string name="deposit_confirmation_cta_button">Depósito %1$s</string>
+    <string name="deposit_enter_amount_limit_title">Límite diario</string>
+    <string name="deposit_enter_amount_limit_label">%1$s disponible</string>
+    <string name="deposit_confirmation_progress_title">Depositando %1$s</string>
+    <string name="deposit_confirmation_progress_message">Estamos completando su depósito ahora mismo.</string>
+    <string name="deposit_confirmation_success_title">Se ha depositado %1$s</string>
+    <string name="deposit_confirmation_success_message">Mientras esperamos a que su banco envíe el dinero, aquí tiene un acceso anticipado a %1$s en su cuenta de efectivo %2$s para que pueda comprar criptomonedas de inmediato.
+Sus fondos estarán disponibles para ser retirados una vez que la transferencia bancaria se haya completado el %3$s.</string>
+    <string name="add_a_deposit_method">Seleccione un método de depósito</string>
+    <string name="security_check">Control de seguridad</string>
+    <string name="success_email_veriff">Su correo electrónico se ha confirmado correctamente.</string>
+    <string name="email_verified">Correo electrónico verificado</string>
+    <string name="email_verification_part_1">Hemos enviado un correo electrónico de verificación a </string>
+    <string name="email_verification_part_2">. Pulse el enlace del correo electrónico para continuar.</string>
+    <string name="email_verify">Verifique su correo electrónico</string>
+    <string name="edit_email_address">Editar la dirección de correo electrónico</string>
+    <string name="common_save">Guardar</string>
+    <string name="change_email_instructions">Introduzca su dirección de correo electrónico y haga clic en Guardar. Le enviaremos un correo electrónico de verificación a esta nueva dirección.</string>
+    <string name="check_my_inbox">Comprobar mi bandeja de entrada</string>
+    <string name="did_not_get_email">¿No recibió el correo electrónico?</string>
+    <string name="send_again">Enviar de nuevo</string>
 </resources>

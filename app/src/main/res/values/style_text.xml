@@ -217,6 +217,10 @@
         <item name="fontFamily">@font/inter_bold</item>
     </style>
 
+    <style name="Text.Bold.14">
+        <item name="android:textSize">14sp</item>
+    </style>
+
     <style name="Text.Bold.Centered">
         <item name="android:gravity">center</item>
     </style>

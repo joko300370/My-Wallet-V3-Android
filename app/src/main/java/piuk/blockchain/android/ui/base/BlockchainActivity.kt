@@ -8,6 +8,7 @@ import androidx.annotation.CallSuper
 import androidx.annotation.StringRes
 import androidx.annotation.UiThread
 import androidx.appcompat.app.AlertDialog
+import androidx.viewbinding.ViewBinding
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.SecurityPrefs
 import com.blockchain.ui.ActivityIndicator
@@ -85,13 +86,15 @@ abstract class BlockchainActivity : ToolBarActivity() {
         }
         appUtil.activityIndicator = activityIndicator
 
-        compositeDisposable += activityIndicator.loading.observeOn(AndroidSchedulers.mainThread()).subscribeBy {
-            if (it == true) {
-                showLoading()
-            } else {
-                hideLoading()
+        compositeDisposable += activityIndicator.loading
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy {
+                if (it == true) {
+                    showLoading()
+                } else {
+                    hideLoading()
+                }
             }
-        }
     }
 
     protected open fun showLoading() {}
@@ -187,7 +190,7 @@ abstract class BlockchainActivity : ToolBarActivity() {
         val dlg = supportFragmentManager.findFragmentByTag(BOTTOM_DIALOG)
 
         dlg?.let {
-            (it as? SlidingModalBottomDialog)?.dismiss()
+            (it as? SlidingModalBottomDialog<ViewBinding>)?.dismiss()
                 ?: throw IllegalStateException("Fragment is not a $BOTTOM_DIALOG")
         }
     }

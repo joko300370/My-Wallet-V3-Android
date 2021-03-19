@@ -516,5 +516,6 @@ private fun LinkedBank.toPaymentMethod() =
         limits = PaymentLimits(0, 0, currency),
         bankName = name,
         accountEnding = accountNumber,
-        accountType = accountType
+        accountType = accountType,
+        isEligible = true
     )

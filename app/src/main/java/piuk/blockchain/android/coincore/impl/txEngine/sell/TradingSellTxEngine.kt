@@ -38,10 +38,10 @@ class TradingSellTxEngine(
             .zipWith(sourceAccount.accountBalance).flatMap { (quote, balance) ->
                 Single.just(
                     PendingTx(
-                        amount = CryptoValue.zero(asset),
+                        amount = CryptoValue.zero(sourceAsset),
                         totalBalance = balance,
                         availableBalance = balance,
-                        fees = CryptoValue.zero(asset),
+                        fees = CryptoValue.zero(sourceAsset),
                         selectedFiat = userFiat,
                         feeLevel = FeeLevel.None,
                         availableFeeLevels = AVAILABLE_FEE_LEVELS
@@ -51,10 +51,10 @@ class TradingSellTxEngine(
                 }
             }.handlePendingOrdersError(
                 PendingTx(
-                    amount = CryptoValue.zero(asset),
-                    totalBalance = CryptoValue.zero(asset),
-                    availableBalance = CryptoValue.zero(asset),
-                    fees = CryptoValue.zero(asset),
+                    amount = CryptoValue.zero(sourceAsset),
+                    totalBalance = CryptoValue.zero(sourceAsset),
+                    availableBalance = CryptoValue.zero(sourceAsset),
+                    fees = CryptoValue.zero(sourceAsset),
                     selectedFiat = userFiat,
                     feeLevel = FeeLevel.None
                 )

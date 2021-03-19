@@ -172,7 +172,7 @@ class BchOnChainTxEngineTest {
             exchangeRates
         )
 
-        val asset = subject.asset
+        val asset = subject.sourceAsset
 
         // Assert
         assertEquals(asset, ASSET)
