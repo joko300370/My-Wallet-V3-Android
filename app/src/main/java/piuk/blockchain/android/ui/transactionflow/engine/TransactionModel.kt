@@ -98,6 +98,7 @@ data class TransactionState(
     val executionStatus: TxExecutionStatus = TxExecutionStatus.NotStarted,
     val stepsBackStack: Stack<TransactionStep> = Stack(),
     val availableTargets: List<TransactionTarget> = emptyList(),
+    val displayMode: DisplayMode = DisplayMode.Crypto,
     val availableSources: List<BlockchainAccount> = emptyList(),
     val linkBankState: BankLinkingState = BankLinkingState.NotStarted
 ) : MviState {
@@ -202,6 +203,7 @@ class TransactionModel(
             is TransactionIntent.AmountChanged -> processAmountChanged(intent.amount)
             is TransactionIntent.ModifyTxOption -> processModifyTxOptionRequest(intent.confirmation)
             is TransactionIntent.PendingTxUpdated -> null
+            is TransactionIntent.DisplayModeChanged -> null
             is TransactionIntent.UpdateTransactionComplete -> null
             is TransactionIntent.ReturnToPreviousStep -> null
             is TransactionIntent.ShowTargetSelection -> null
@@ -482,4 +484,8 @@ fun <T> Observable<T>.doOnFirst(onAction: (T) -> Unit): Observable<T> {
             firstCall = false
         }
     }
+}
+
+enum class DisplayMode {
+    Fiat, Crypto
 }

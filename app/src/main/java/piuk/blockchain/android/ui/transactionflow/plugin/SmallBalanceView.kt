@@ -28,8 +28,6 @@ class SmallBalanceView @JvmOverloads constructor(
     private val binding: ViewTxFlowSmallBalanceBinding =
         ViewTxFlowSmallBalanceBinding.inflate(LayoutInflater.from(context), this, true)
 
-    override var displayMode: TxFlowWidget.DisplayMode = TxFlowWidget.DisplayMode.Crypto
-
     override fun initControl(
         model: TransactionModel,
         customiser: EnterAmountCustomisations,

@@ -28,6 +28,7 @@ import piuk.blockchain.android.ui.customviews.FiatCryptoInputView
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
 import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
+import piuk.blockchain.android.ui.transactionflow.engine.DisplayMode
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
@@ -229,14 +230,14 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
         compositeDisposable += binding.amountSheetInput.onInputToggle
             .subscribe {
                 analyticsHooks.onCryptoToggle(it, state)
-                lowerSlot?.displayMode = it.toDisplayMode()
+                model.process(TransactionIntent.DisplayModeChanged(it.toDisplayMode()))
             }
     }
 
     private fun CurrencyType.toDisplayMode() =
         when {
-            isCrypto() -> TxFlowWidget.DisplayMode.Crypto
-            isFiat() -> TxFlowWidget.DisplayMode.Fiat
+            isCrypto() -> DisplayMode.Crypto
+            isFiat() -> DisplayMode.Fiat
             else -> throw IllegalStateException("Unknown CurrencyType")
         }
 

@@ -108,6 +108,4 @@ class AccountInfoFiat @JvmOverloads constructor(
     override fun setVisible(isVisible: Boolean) {
         binding.root.visibleIf { isVisible }
     }
-
-    override var displayMode: TxFlowWidget.DisplayMode = TxFlowWidget.DisplayMode.Fiat
 }

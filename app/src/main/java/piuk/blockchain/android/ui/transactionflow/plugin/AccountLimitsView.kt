@@ -71,6 +71,4 @@ class AccountLimitsView @JvmOverloads constructor(
             amountSheetLimit.text = customiser.enterAmountLimitsViewInfo(state)
         }
     }
-
-    override var displayMode: TxFlowWidget.DisplayMode = TxFlowWidget.DisplayMode.Fiat
 }

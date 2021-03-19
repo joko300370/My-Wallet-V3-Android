@@ -8,12 +8,6 @@ import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmoun
 
 interface TxFlowWidget {
 
-    enum class DisplayMode {
-        Fiat, Crypto
-    }
-
-    var displayMode: DisplayMode
-
     fun initControl(
         model: TransactionModel,
         customiser: EnterAmountCustomisations,

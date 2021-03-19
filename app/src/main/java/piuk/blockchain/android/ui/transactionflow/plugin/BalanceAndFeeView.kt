@@ -17,6 +17,7 @@ import io.reactivex.subjects.PublishSubject
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.databinding.ViewTxFlowFeeAndBalanceBinding
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
+import piuk.blockchain.android.ui.transactionflow.engine.DisplayMode
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
@@ -39,6 +40,7 @@ class BalanceAndFeeView @JvmOverloads constructor(
     private val imm: InputMethodManager by lazy {
         context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     }
+    private var state: TransactionState? = null
 
     private val binding: ViewTxFlowFeeAndBalanceBinding =
         ViewTxFlowFeeAndBalanceBinding.inflate(LayoutInflater.from(context), this, true)
@@ -47,8 +49,6 @@ class BalanceAndFeeView @JvmOverloads constructor(
 
     override val expanded: Observable<Boolean>
         get() = expandableSubject
-
-    override var displayMode: TxFlowWidget.DisplayMode = TxFlowWidget.DisplayMode.Crypto
 
     override fun initControl(
         model: TransactionModel,
@@ -104,21 +104,22 @@ class BalanceAndFeeView @JvmOverloads constructor(
         state.pendingTx?.feeForFullAvailable?.let {
             binding.feeForFullAvailableValue.text = makeAmountString(it, state)
         }
+        this.state = state
     }
 
     @SuppressLint("SetTextI18n")
     private fun makeAmountString(value: Money, state: TransactionState): String {
         if (value.isPositive || value.isZero) {
             state.fiatRate?.let { rate ->
-                return when (displayMode) {
-                    TxFlowWidget.DisplayMode.Fiat -> {
+                return when (state.displayMode) {
+                    DisplayMode.Fiat -> {
                         // This applies to case that fees are in different currency than the source account currency (ERC-20 token)
                         // in this case we will show the fee in the default currency without make any conversions
                         if (rate.canConvert(value))
                             rate.convert(value).toStringWithSymbol()
                         else value.toStringWithSymbol()
                     }
-                    TxFlowWidget.DisplayMode.Crypto -> value.toStringWithSymbol()
+                    DisplayMode.Crypto -> value.toStringWithSymbol()
                 }
             }
         }
