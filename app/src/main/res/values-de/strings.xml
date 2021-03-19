@@ -1655,4 +1655,29 @@ Bitte schreiben Sie diese 12 Wörter der Reihe nach auf und bewahren Sie sie an 
     <string name="did_not_get_email">Haben Sie die E-Mail nicht erhalten?</string>
     <string name="send_again">Erneut senden</string>
 
+    <string name="buy_crypto_card_sdd_body">Wähle die Krypto aus, die du kaufen möchtest, überprüfe deine Identität und kaufe sofort.</string>
+    <string name="bank_wire_transfer_fee">%1$s Gebühr</string>
+    <string name="bank_wire_transfer_min_withdrawal">%1$s Mindestauszahlung</string>
+    <string name="select_a_bank">Wähle eine Bank</string>
+    <string name="want_to_buy_more">Mehr kaufen?</string>
+    <string name="unlock_gold_level_trading">Gold-Level-Handel freischalten</string>
+    <string name="verify_your_identity_limits">Überprüfe deine Identität und handle täglich bis zu %1$s.</string>
+    <string name="apply_and_unlock">Jetzt beantragen und freischalten></string>
+    <string name="cash_accounts">Geldkonten</string>
+    <string name="cash_accounts_description">Speichere USD, GBP oder EUR in deinem Wallet. Verwende das Guthaben, um Krypto zu kaufen. Verkaufe jederzeit Krypto für Bargeld.</string>
+    <string name="link_a_bank_description">Speichere USD, GBP oder EUR in deinem Wallet. Verwende das Guthaben, um Krypto zu kaufen. Verkaufe jederzeit Krypto für Bargeld.</string>
+    <string name="earn_interest_description" formatted="false">Lass dein Krypto arbeiten. Verdiene bis zu 10% monatlich, indem du einfach nichts tust. Sofort einzahlen und anfangen zu verdienen.</string>
+    <string name="sb_checkout_daily_limit_title">Tägliches Limit aufgebraucht</string>
+    <string name="sb_checkout_daily_limit_blurb">Ups, es sieht so aus, als hättest du dein tägliches Transaktionslimit für Käufe und Einzahlungen aufgebraucht, bitte versuche es morgen erneut.</string>
+    <string name="sb_checkout_weekly_limit_title">Wöchentliches Limit aufgebraucht</string>
+    <string name="sb_checkout_weekly_limit_blurb">Ups, es sieht so aus, als hättest du dein wöchentliches Transaktionslimit für Käufe und Einzahlungen aufgebraucht, bitte versuche es morgen erneut.</string>
+    <string name="sb_checkout_yearly_limit_title">Jährliches Limit aufgebraucht</string>
+    <string name="sb_checkout_yearly_limit_blurb">Ups, es sieht so aus, als hättest du dein jährliches Transaktionslimit für Käufe und Einzahlungen aufgebraucht.</string>
+    <string name="sb_checkout_pending_order_title">Kauf in Bearbeitung</string>
+    <string name="sb_checkout_pending_order_blurb">Ups, es sieht so aus, als hättest du einen Kauf in Bearbeitung. Bitte warte, bis dieser vervollständigt ist, bevor du einen neuen Kauf startest.</string>
+    <string name="wallet_outage_message">Wir haben derzeit einen Ausfall. Bitte sei versichert, dass deine Gelder sicher sind. <annotation link="learn_more">Mehr erfahren</annotation></string>
+    <string name="increase_your_limits">Erhöhe deine Limits</string>
+    <string name="increase_your_limits_body">Setze deine Überprüfung fort, um Gold zu erreichen, und erhöhe deine Limits und Zahlungsmethoden</string>
+    <string name="continue_to_gold">Weiter zu Gold</string>
+
 </resources>

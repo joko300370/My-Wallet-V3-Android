@@ -1909,11 +1909,11 @@
     <string name="want_to_buy_more">Want to buy more?</string>
     <string name="unlock_gold_level_trading">Unlock Gold Level Trading</string>
     <string name="verify_your_identity_limits">Verify your identity, earn interest and trade up to %1$s a day.</string>
-    <string name="apply_and_unlock"><![CDATA[Apply & Unlock Now]]></string>
+    <string name="apply_and_unlock">Apply &amp; Unlock Now></string>
     <string name="cash_accounts">Cash Accounts</string>
     <string name="cash_accounts_description">Store USD, GBP or EUR in your wallet. Use the balance to buy crypto. Sell crypto for cash at anytime.</string>
     <string name="link_a_bank_description">Store USD, GBP or EUR in your wallet. Use the balance to buy crypto. Sell crypto for cash at anytime.</string>
-    <string name="earn_interest_description">Put your crypto to work. Earn up to 10% monthly by simply doing nothing. Instanly deposit and start earning.</string>
+    <string name="earn_interest_description" formatted="false">Put your crypto to work. Earn up to 10% monthly by simply doing nothing. Instantly deposit and start earning.</string>
 
     <string name="sb_checkout_daily_limit_title">Daily limit exceeded</string>
     <string name="sb_checkout_daily_limit_blurb">Oops, looks like you’ve used up your daily transaction limit for Buys and Deposits, please try again tomorrow.</string>
