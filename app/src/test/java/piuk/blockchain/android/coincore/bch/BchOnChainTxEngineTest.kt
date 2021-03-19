@@ -33,6 +33,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import kotlin.test.assertEquals
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.ValidationState
@@ -122,8 +123,8 @@ class BchOnChainTxEngineTest {
         subject.assertInputsValid()
 
         // Assert
-        verify(txTarget).asset
-        verify(sourceAccount).asset
+        verify(txTarget, atLeastOnce()).asset
+        verify(sourceAccount, atLeastOnce()).asset
 
         noMoreInteractions(sourceAccount, txTarget)
     }
@@ -205,20 +206,20 @@ class BchOnChainTxEngineTest {
                 it.amount == CryptoValue.zero(ASSET) &&
                     it.totalBalance == CryptoValue.zero(ASSET) &&
                     it.availableBalance == CryptoValue.zero(ASSET) &&
-                    it.fees == CryptoValue.zero(ASSET) &&
+                    it.feeAmount == CryptoValue.zero(ASSET) &&
                     it.selectedFiat == SELECTED_FIAT &&
-                    it.customFeeAmount == -1L &&
                     it.confirmations.isEmpty() &&
                     it.minLimit == null &&
                     it.maxLimit == null &&
                     it.validationState == ValidationState.UNINITIALISED &&
                     it.engineState.isEmpty()
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Regular) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
             .assertNoErrors()
             .assertComplete()
 
         verify(currencyPrefs).selectedFiatCurrency
+        verify(sourceAccount, atLeastOnce()).asset
 
         noMoreInteractions(sourceAccount, txTarget)
     }
@@ -255,7 +256,12 @@ class BchOnChainTxEngineTest {
                 unspentOutputs,
                 feePerKb
             )
-        ).thenReturn(totalSweepable as CryptoValue)
+        ).thenReturn(
+            SendDataManager.MaxAvailable(
+                totalSweepable as CryptoValue,
+                totalFee
+            )
+        )
 
         val utxoBundle: SpendableUnspentOutputs = mock {
             on { absoluteFee } itReturns totalFee.toBigInteger()
@@ -277,10 +283,14 @@ class BchOnChainTxEngineTest {
             amount = CryptoValue.zero(ASSET),
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
-            fees = CryptoValue.zero(ASSET),
+            feeForFullAvailable = CryptoValue.zero(ASSET),
+            feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = CryptoCurrency.BCH
+            )
         )
 
         // Act
@@ -292,9 +302,10 @@ class BchOnChainTxEngineTest {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == totalSweepable &&
-                it.fees == totalFee
+                it.feeForFullAvailable == totalFee &&
+                it.feeAmount == totalFee
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Regular) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
             .assertComplete()
             .assertNoErrors()
 
@@ -340,10 +351,13 @@ class BchOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = totalSweepable,
-            fees = totalFee,
+            feeForFullAvailable = totalFee,
+            feeAmount = totalFee,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -383,10 +397,13 @@ class BchOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = totalSweepable,
-            fees = totalFee,
+            feeForFullAvailable = totalFee,
+            feeAmount = totalFee,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -426,10 +443,13 @@ class BchOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = totalSweepable,
-            fees = totalFee,
+            feeForFullAvailable = totalFee,
+            feeAmount = totalFee,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -469,10 +489,14 @@ class BchOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = totalSweepable,
-            fees = totalFee,
+            feeForFullAvailable = totalFee,
+            feeAmount = totalFee,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = CryptoCurrency.BCH
+            )
         )
 
         // Act
@@ -485,9 +509,9 @@ class BchOnChainTxEngineTest {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == totalSweepable &&
-                it.fees == totalFee
+                it.feeAmount == totalFee
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Regular) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
             .assertComplete()
             .assertNoErrors()
 
@@ -502,10 +526,12 @@ class BchOnChainTxEngineTest {
             on { xpubAddress } itReturns SOURCE_XPUB
         }
 
-    private fun verifyFeeLevels(pendingTx: PendingTx, expectedLevel: FeeLevel) =
-        pendingTx.feeLevel == expectedLevel &&
-            pendingTx.availableFeeLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
-            pendingTx.availableFeeLevels.contains(pendingTx.feeLevel)
+    private fun verifyFeeLevels(feeSelection: FeeSelection, expectedLevel: FeeLevel) =
+        feeSelection.selectedLevel == expectedLevel &&
+            feeSelection.availableLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
+            feeSelection.availableLevels.contains(feeSelection.selectedLevel) &&
+            feeSelection.customAmount == -1L &&
+            feeSelection.asset == CryptoCurrency.BCH
 
     private fun noMoreInteractions(sourceAccount: BlockchainAccount, txTarget: TransactionTarget) {
         verifyNoMoreInteractions(txTarget)

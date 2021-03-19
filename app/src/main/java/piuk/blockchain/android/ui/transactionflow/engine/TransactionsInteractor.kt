@@ -21,6 +21,7 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.PendingTx
@@ -97,6 +98,12 @@ class TransactionInteractor(
 
     fun updateTransactionAmount(amount: Money): Completable =
         transactionProcessor?.updateAmount(amount) ?: throw IllegalStateException("TxProcessor not initialised")
+
+    fun updateTransactionFees(feeLevel: FeeLevel, customFeeAmount: Long?): Completable =
+        transactionProcessor?.updateFeeLevel(
+            level = feeLevel,
+            customFeeAmount = customFeeAmount
+        ) ?: throw IllegalStateException("TxProcessor not initialised")
 
     fun getTargetAccounts(sourceAccount: BlockchainAccount, action: AssetAction): Single<SingleAccountList> =
         when (action) {

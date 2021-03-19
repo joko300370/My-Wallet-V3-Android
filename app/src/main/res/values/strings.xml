@@ -1567,9 +1567,13 @@
     <string name="sell_enter_amount_max">Sell Max</string>
     <string name="sell_enter_amount_min_error">%1$s Min</string>
     <string name="sell_enter_amount_max_error">%1$s Max</string>
+    <string name="sell_enter_amount_error_insufficient_funds_for_fees">Not enough %1$s in your wallet to sell with current network fees.</string>
     <string name="send_enter_amount_deposit_max">Transfer Max</string>
     <string name="send_enter_amount_min_deposit">Minimum transfer of %1$s required</string>
     <string name="send_enter_amount_min_send">Minimum send of %1$s required</string>
+    <string name="send_enter_amount_network_fees">Network Fees</string>
+    <string name="send_enter_amount_total">Total</string>
+    <string name="send_enter_amount_max_fee">Max Network Fee</string>
     <string name="swap_enter_amount_min_swap">Minimum swap of %1$s required</string>
     <string name="deposit_enter_amount_min_swap">Minimum deposit of %1$s required</string>
     <string name="withdraw_enter_amount_min">Minimum withdrawal of %1$s required</string>
@@ -1581,6 +1585,7 @@
     <string name="send_confirmation_tx_fee">Transaction Fee</string>
     <string name="send_confirmation_eta">Funds Will Arrive</string>
     <string name="send_confirmation_insufficient_fee">Not enough funds for priority fee, please adjust your sending amount.</string>
+    <string name="send_confirmation_insufficient_funds_for_fee">Not enough funds for current fee level.</string>
     <string name="send_confirmation_add_note_hint">Add a note</string>
     <string name="send_confirmation_cta_button">Send %1$s</string>
     <string name="swap_confirmation_cta_button">Swap %1$s for %2$s</string>
@@ -1618,6 +1623,7 @@
     <string name="send_progress_complete_title">%1$s Sent</string>
     <string name="sell_progress_complete_title">%1$s Sold</string>
     <string name="swap_progress_complete_title">Swap Complete</string>
+    <string name="interest_enter_amount_error_insufficient_funds_for_fees">Not enough %1$s in your wallet to transfer with current network fees.</string>
     <string name="send_progress_complete_subtitle">Your %1$s has been successfully sent.</string>
     <string name="send_progress_error_title">Oops! Something Went Wrong. Please try again.</string>
     <string name="send_progress_error_subtitle">Don’t worry. Your money is safe. Please try again or contact our Support Team for help.</string>
@@ -1627,6 +1633,7 @@
     <string name="send_error_not_valid_asset_address">Not a valid %1s address</string>
     <string name="send_error_address_is_eth_contract">Address is not a user address</string>
     <string name="send_enter_amount_error_insufficient_funds">Not enough %1$s in your wallet.</string>
+    <string name="send_enter_amount_error_insufficient_funds_for_fees">Not enough %1$s in your wallet to send with current network fees.</string>
     <string name="send_enter_amount_error_invalid_amount">Send 0.00000001 %1$s or more.</string>
     <string name="send_enter_invalid_password">Password is incorrect.</string>
     <string name="send_enter_unexpected_error">An unexpected error has occurred. Please try again.</string>
@@ -1643,6 +1650,7 @@
     <string name="swap_enter_amount_max">Swap Max</string>
     <string name="swap_enter_amount_silver_limit">Tap here to upgrade your profile and swap this amount.</string>
     <string name="swap_enter_amount_over_limit">You can swap up to %1$s today.</string>
+    <string name="swap_enter_amount_error_insufficient_funds_for_fees">Not enough %1$s in your wallet to swap with current network fees.</string>
     <string name="swap_select_target_subtitle">Confirm the wallet you want to Swap from and choose the wallet you want to Receive into.</string>
     <string name="swap_select_target_title">New Swap</string>
     <string name="tx_confirmation_network_fee">%1$s Network Fee</string>

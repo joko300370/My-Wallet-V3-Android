@@ -4,52 +4,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="@dimen/standard_margin"
-    android:layout_marginEnd="@dimen/standard_margin"
-    android:paddingTop="@dimen/very_small_margin"
-    android:paddingBottom="@dimen/very_small_margin">
+    android:layout_height="wrap_content" >
 
-    <ViewSwitcher
-        android:id="@+id/fee_switcher"
+    <androidx.appcompat.widget.AppCompatSpinner
+        android:id="@+id/fee_option_select_spinner"
+        style="@style/Text.Semibold.12"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:measureAllChildren="false"
+        android:background="@drawable/spinner_arrow_bkgd"
+        android:overlapAnchor="true"
+        android:spinnerMode="dropdown"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/fee_label"
-                style="@style/Text.Light.14"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/send_confirmation_fee"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <androidx.appcompat.widget.AppCompatSpinner
-                android:id="@+id/fee_option_select_spinner"
-                style="@style/Text.Light.14"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/spinner_arrow_bkgd"
-                android:overlapAnchor="true"
-                android:spinnerMode="dropdown"
-                app:layout_constraintTop_toBottomOf="@id/fee_option_label" />
-        </LinearLayout>
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/fee_option_label"
-            style="@style/Text.Light.14"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/send_confirmation_tx_fee"
-            app:layout_constraintTop_toTopOf="parent" />
-    </ViewSwitcher>
 
     <ViewSwitcher
         android:id="@+id/fee_type_switcher"
@@ -57,7 +24,7 @@
         android:layout_height="wrap_content"
         android:measureAllChildren="false"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/fee_switcher">
+        app:layout_constraintTop_toBottomOf="@id/fee_option_select_spinner">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/fee_option_value"
@@ -67,6 +34,7 @@
             android:layout_marginTop="4dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/fee_switcher"
+            android:visibility="gone"
             tools:text="0.0001BTC" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -110,9 +78,9 @@
         style="@style/Text.Semibold.12"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/fee_type_switcher"
+        app:layout_constraintBottom_toBottomOf="parent"
         tools:text="Learn more about network fees" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

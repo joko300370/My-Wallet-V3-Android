@@ -14,6 +14,7 @@ sealed class TxFlowLogError(msg: String, cause: Throwable) : Exception(msg, caus
     class AddressFail(e: Throwable) : TxFlowLogError("VALIDATE ADDRESS FAILED", e)
     class TargetFail(e: Throwable) : TxFlowLogError("SELECT TARGET FAIL", e)
     class BalanceFail(e: Throwable) : TxFlowLogError("BALANCE FAIL", e)
+    class FeesFail(e: Throwable) : TxFlowLogError("FEES FAILED", e)
     class ExecuteFail(e: Throwable) : TxFlowLogError("EXECUTE FAIL", e)
     class ValidateFail(e: Throwable) : TxFlowLogError("VALIDATE ALL FAILED", e)
 }

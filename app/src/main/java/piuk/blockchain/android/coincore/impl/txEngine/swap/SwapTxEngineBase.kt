@@ -134,7 +134,7 @@ abstract class SwapTxEngineBase(
                         ),
                         TxConfirmationValue.NetworkFee(
                             txFee = TxFee(
-                                fee = pendingTx.fees,
+                                fee = pendingTx.feeAmount,
                                 type = TxFee.FeeType.DEPOSIT_FEE,
                                 asset = sourceAsset
                             )

@@ -23,6 +23,7 @@ import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.invisible
 import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 
 class AccountInfoBank @JvmOverloads constructor(
@@ -43,7 +44,6 @@ class AccountInfoBank @JvmOverloads constructor(
         account: LinkedBankAccount,
         onAccountClicked: (LinkedBankAccount) -> Unit
     ) {
-
         with(binding) {
             bankName.text = account.label
             bankLogo.setImageResource(R.drawable.ic_bank_transfer)
@@ -146,5 +146,9 @@ class AccountInfoBank @JvmOverloads constructor(
                 // do nothing
             }
         }
+    }
+
+    override fun setVisible(isVisible: Boolean) {
+        binding.root.visibleIf { isVisible }
     }
 }

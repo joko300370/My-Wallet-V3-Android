@@ -15,6 +15,7 @@ import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxResult
@@ -116,16 +117,16 @@ class FiatDepositTxEngineTest {
                 it.amount == zeroFiat &&
                     it.totalBalance == zeroFiat &&
                     it.availableBalance == zeroFiat &&
-                    it.fees == zeroFiat &&
+                    it.feeForFullAvailable == zeroFiat &&
+                    it.feeAmount == zeroFiat &&
                     it.selectedFiat == SELECTED_FIAT &&
-                    it.customFeeAmount == -1L &&
                     it.confirmations.isEmpty() &&
                     it.minLimit == limits.min &&
                     it.maxLimit == limits.max &&
                     it.validationState == ValidationState.UNINITIALISED &&
                     it.engineState.isEmpty()
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
+            .assertValue { verifyFeeLevels(it.feeSelection) }
             .assertNoErrors()
             .assertComplete()
     }
@@ -148,10 +149,10 @@ class FiatDepositTxEngineTest {
             amount = zeroFiat,
             totalBalance = zeroFiat,
             availableBalance = zeroFiat,
-            fees = zeroFiat,
+            feeForFullAvailable = zeroFiat,
+            feeAmount = zeroFiat,
             selectedFiat = TGT_ASSET,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = setOf(FeeLevel.None)
+            feeSelection = FeeSelection()
         )
 
         val inputAmount = FiatValue.fromMinor(TGT_ASSET, 1000L)
@@ -166,9 +167,9 @@ class FiatDepositTxEngineTest {
                 it.amount == inputAmount &&
                     it.totalBalance == zeroFiat &&
                     it.availableBalance == zeroFiat &&
-                    it.fees == zeroFiat
+                    it.feeAmount == zeroFiat
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
+            .assertValue { verifyFeeLevels(it.feeSelection) }
     }
 
     @Test
@@ -189,11 +190,11 @@ class FiatDepositTxEngineTest {
             amount = zeroFiat,
             validationState = ValidationState.UNINITIALISED,
             totalBalance = zeroFiat,
+            feeForFullAvailable = zeroFiat,
             availableBalance = zeroFiat,
-            fees = zeroFiat,
+            feeAmount = zeroFiat,
             selectedFiat = TGT_ASSET,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = setOf(FeeLevel.None)
+            feeSelection = FeeSelection()
         )
 
         subject.doValidateAmount(
@@ -205,9 +206,9 @@ class FiatDepositTxEngineTest {
                 it.amount == zeroFiat &&
                     it.totalBalance == zeroFiat &&
                     it.availableBalance == zeroFiat &&
-                    it.fees == zeroFiat
+                    it.feeAmount == zeroFiat
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
+            .assertValue { verifyFeeLevels(it.feeSelection) }
     }
 
     @Test
@@ -229,10 +230,10 @@ class FiatDepositTxEngineTest {
             amount = amount,
             totalBalance = zeroFiat,
             availableBalance = zeroFiat,
-            fees = zeroFiat,
+            feeForFullAvailable = zeroFiat,
+            feeAmount = zeroFiat,
             selectedFiat = TGT_ASSET,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = setOf(FeeLevel.None),
+            feeSelection = FeeSelection(),
             minLimit = null,
             maxLimit = null
         )
@@ -269,10 +270,10 @@ class FiatDepositTxEngineTest {
             amount = amount,
             totalBalance = zeroFiat,
             availableBalance = zeroFiat,
-            fees = zeroFiat,
+            feeForFullAvailable = zeroFiat,
+            feeAmount = zeroFiat,
             selectedFiat = TGT_ASSET,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = setOf(FeeLevel.None),
+            feeSelection = FeeSelection(),
             minLimit = minLimit,
             maxLimit = maxLimit
         )
@@ -309,10 +310,10 @@ class FiatDepositTxEngineTest {
             amount = amount,
             totalBalance = zeroFiat,
             availableBalance = zeroFiat,
-            fees = zeroFiat,
+            feeForFullAvailable = zeroFiat,
+            feeAmount = zeroFiat,
             selectedFiat = TGT_ASSET,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = setOf(FeeLevel.None),
+            feeSelection = FeeSelection(),
             minLimit = minLimit,
             maxLimit = maxLimit
         )
@@ -349,10 +350,10 @@ class FiatDepositTxEngineTest {
             amount = amount,
             totalBalance = zeroFiat,
             availableBalance = zeroFiat,
-            fees = zeroFiat,
+            feeForFullAvailable = zeroFiat,
+            feeAmount = zeroFiat,
             selectedFiat = TGT_ASSET,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = setOf(FeeLevel.None),
+            feeSelection = FeeSelection(),
             minLimit = minLimit,
             maxLimit = maxLimit
         )
@@ -394,10 +395,10 @@ class FiatDepositTxEngineTest {
             amount = amount,
             totalBalance = zeroFiat,
             availableBalance = zeroFiat,
-            fees = zeroFiat,
+            feeForFullAvailable = zeroFiat,
+            feeAmount = zeroFiat,
             selectedFiat = TGT_ASSET,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = setOf(FeeLevel.None),
+            feeSelection = FeeSelection(),
             minLimit = minLimit,
             maxLimit = maxLimit
         )
@@ -444,10 +445,10 @@ class FiatDepositTxEngineTest {
             amount = amount,
             totalBalance = zeroFiat,
             availableBalance = zeroFiat,
-            fees = zeroFiat,
+            feeForFullAvailable = zeroFiat,
+            feeAmount = zeroFiat,
             selectedFiat = TGT_ASSET,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = setOf(FeeLevel.None),
+            feeSelection = FeeSelection(),
             minLimit = minLimit,
             maxLimit = maxLimit
         )
@@ -467,10 +468,12 @@ class FiatDepositTxEngineTest {
         verify(walletManager).startBankTransfer(bankAccountAddress.address, amount, TGT_ASSET)
     }
 
-    private fun verifyFeeLevels(pendingTx: PendingTx, expectedLevel: FeeLevel) =
-        pendingTx.feeLevel == expectedLevel &&
-            pendingTx.availableFeeLevels == setOf(FeeLevel.None) &&
-            pendingTx.availableFeeLevels.contains(pendingTx.feeLevel)
+    private fun verifyFeeLevels(feeSelection: FeeSelection) =
+        feeSelection.selectedLevel == FeeLevel.None &&
+            feeSelection.availableLevels == setOf(FeeLevel.None) &&
+            feeSelection.availableLevels.contains(feeSelection.selectedLevel) &&
+            feeSelection.customAmount == -1L &&
+            feeSelection.asset == null
 
     companion object {
         private const val SELECTED_FIAT = "USD"

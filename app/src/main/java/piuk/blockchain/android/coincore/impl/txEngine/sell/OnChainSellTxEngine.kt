@@ -7,6 +7,7 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxResult
@@ -49,7 +50,9 @@ class OnChainSellTxEngine(
                     }
             }.map { px ->
                 px.copy(
-                    feeLevel = defaultFeeLevel(px),
+                    feeSelection = px.feeSelection.copy(
+                        selectedLevel = defaultFeeLevel(px)
+                    ),
                     selectedFiat = userFiat
                 )
             }.handlePendingOrdersError(
@@ -57,18 +60,18 @@ class OnChainSellTxEngine(
                     amount = CryptoValue.zero(sourceAsset),
                     totalBalance = CryptoValue.zero(sourceAsset),
                     availableBalance = CryptoValue.zero(sourceAsset),
-                    fees = CryptoValue.zero(sourceAsset),
+                    feeForFullAvailable = CryptoValue.zero(sourceAsset),
+                    feeAmount = CryptoValue.zero(sourceAsset),
                     selectedFiat = userFiat,
-                    feeLevel = FeeLevel.Regular,
-                    availableFeeLevels = setOf(FeeLevel.Regular)
+                    feeSelection = FeeSelection()
                 )
             )
 
     private fun defaultFeeLevel(pendingTx: PendingTx): FeeLevel =
-        if (pendingTx.availableFeeLevels.contains(FeeLevel.Priority))
+        if (pendingTx.feeSelection.availableLevels.contains(FeeLevel.Priority))
             FeeLevel.Priority
         else
-            pendingTx.feeLevel
+            pendingTx.feeSelection.selectedLevel
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         engine.doValidateAmount(pendingTx)

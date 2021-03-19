@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore
 
 import androidx.annotation.CallSuper
 import androidx.annotation.VisibleForTesting
+import com.blockchain.annotations.CommonCode
 import com.blockchain.extensions.replace
 import com.blockchain.koin.payloadScope
 import com.blockchain.nabu.datamanagers.TransactionError
@@ -62,15 +63,28 @@ data class TxFee(
     }
 }
 
+data class FeeLevelRates(
+    val regularFee: Long,
+    val priorityFee: Long
+)
+
+data class FeeSelection(
+    val selectedLevel: FeeLevel = FeeLevel.None,
+    val customAmount: Long = -1L,
+    val availableLevels: Set<FeeLevel> = setOf(FeeLevel.None),
+    val customLevelRates: FeeLevelRates? = null,
+    val feeState: FeeState? = null,
+    val asset: CryptoCurrency? = null
+)
+
 data class PendingTx(
     val amount: Money,
     val totalBalance: Money,
     val availableBalance: Money,
-    val fees: Money,
+    val feeForFullAvailable: Money,
+    val feeAmount: Money,
+    val feeSelection: FeeSelection,
     val selectedFiat: String,
-    val feeLevel: FeeLevel = FeeLevel.None,
-    val customFeeAmount: Long = -1L,
-    val availableFeeLevels: Set<FeeLevel> = setOf(FeeLevel.None),
     val confirmations: List<TxConfirmationValue> = emptyList(),
     val minLimit: Money? = null,
     val maxLimit: Money? = null,
@@ -155,20 +169,16 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
 
     object EstimatedWithdrawalCompletion : TxConfirmationValue(TxConfirmation.READ_ONLY)
 
+    @CommonCode("This structure is repeated in non-confirmation FEeSelection. They should be merged")
     data class FeeSelection(
         val feeDetails: FeeState? = null,
         val exchange: Money? = null,
         val selectedLevel: FeeLevel,
         val customFeeAmount: Long = -1L,
         val availableLevels: Set<FeeLevel> = emptySet(),
-        val feeInfo: FeeInfo? = null,
+        val feeInfo: FeeLevelRates? = null,
         val asset: CryptoCurrency
-    ) : TxConfirmationValue(TxConfirmation.FEE_SELECTION) {
-        data class FeeInfo(
-            val regularFee: Long,
-            val priorityFee: Long
-        )
-    }
+    ) : TxConfirmationValue(TxConfirmation.FEE_SELECTION)
 
     data class BitPayCountdown(
         val timeRemainingSecs: Long
@@ -449,14 +459,14 @@ class TransactionProcessor(
 
     // Check that the fee level is supported, then call into the engine to set the fee and validate ballances etc
     // the selected fee level is supported
-    fun updateFeeLevel(level: FeeLevel, customFeeAmount: Long = -1): Completable {
+    fun updateFeeLevel(level: FeeLevel, customFeeAmount: Long?): Completable {
         Timber.d("!TRANSACTION!> in UpdateFeeLevel")
         val pendingTx = getPendingTx()
-        check(pendingTx.availableFeeLevels.contains(level)) {
+        require(pendingTx.feeSelection.availableLevels.contains(level)) {
             "Fee Level $level not supported by engine ${engine::class.java.name}"
         }
 
-        return engine.doUpdateFeeLevel(pendingTx, level, customFeeAmount)
+        return engine.doUpdateFeeLevel(pendingTx, level, customFeeAmount ?: -1L)
             .flatMap { engine.doValidateAmount(it) }
             .doOnSuccess { updatePendingTx(it) }
             .ignoreElement()

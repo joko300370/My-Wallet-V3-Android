@@ -28,6 +28,7 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionErrorState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TxExecutionStatus
 import piuk.blockchain.android.ui.transactionflow.plugin.AccountLimitsView
+import piuk.blockchain.android.ui.transactionflow.plugin.BalanceAndFeeView
 import piuk.blockchain.android.ui.transactionflow.plugin.FromAndToView
 import piuk.blockchain.android.ui.transactionflow.plugin.SmallBalanceView
 import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
@@ -242,6 +243,15 @@ class TransactionFlowCustomiserImpl(
             else -> throw java.lang.IllegalStateException("Limits info view not configured for ${state.action}")
         }
 
+    override fun enterAmountMaxNetworkFeeLabel(state: TransactionState): String =
+        when (state.action) {
+            AssetAction.InterestDeposit,
+            AssetAction.Sell,
+            AssetAction.Swap,
+            AssetAction.Send -> resources.getString(R.string.send_enter_amount_max_fee)
+            else -> throw java.lang.IllegalStateException("Max network fee label not configured for ${state.action}")
+        }
+
     override fun confirmTitle(state: TransactionState): String {
         val amount = state.pendingTx?.amount?.toStringWithSymbol() ?: ""
 
@@ -418,8 +428,8 @@ class TransactionFlowCustomiserImpl(
 
     override fun selectTargetAccountTitle(state: TransactionState): String {
         return when (state.action) {
-            AssetAction.Swap -> resources.getString(R.string.receive)
-            AssetAction.Send -> resources.getString(R.string.send)
+            AssetAction.Swap,
+            AssetAction.Send -> resources.getString(R.string.common_receive)
             AssetAction.Sell -> resources.getString(R.string.sell)
             AssetAction.FiatDeposit -> resources.getString(R.string.common_deposit)
             AssetAction.Withdraw -> resources.getString(R.string.withdraw_target_select_title)
@@ -533,6 +543,32 @@ class TransactionFlowCustomiserImpl(
         }
     }
 
+    override fun issueFeesTooHighMessage(state: TransactionState): String? {
+        return when (state.action) {
+            AssetAction.Send ->
+                resources.getString(
+                    R.string.send_enter_amount_error_insufficient_funds_for_fees,
+                    state.sendingAsset.displayTicker
+                )
+            AssetAction.Swap ->
+                resources.getString(
+                    R.string.swap_enter_amount_error_insufficient_funds_for_fees,
+                    state.sendingAsset.displayTicker
+                )
+            AssetAction.Sell ->
+                resources.getString(
+                    R.string.sell_enter_amount_error_insufficient_funds_for_fees,
+                    state.sendingAsset.displayTicker
+                )
+            AssetAction.InterestDeposit ->
+                resources.getString(
+                    R.string.interest_enter_amount_error_insufficient_funds_for_fees,
+                    state.sendingAsset.displayTicker
+                )
+            else -> null
+        }
+    }
+
     override fun installEnterAmountLowerSlotView(
         ctx: Context,
         frame: FrameLayout,
@@ -542,10 +578,10 @@ class TransactionFlowCustomiserImpl(
             AssetAction.ViewActivity,
             AssetAction.Summary -> throw IllegalStateException()
             AssetAction.Send,
-            AssetAction.Receive,
             AssetAction.InterestDeposit,
             AssetAction.Sell,
-            AssetAction.Swap -> SmallBalanceView(ctx).also { frame.addView(it) }
+            AssetAction.Swap -> BalanceAndFeeView(ctx).also { frame.addView(it) }
+            AssetAction.Receive -> SmallBalanceView(ctx).also { frame.addView(it) }
             AssetAction.Withdraw,
             AssetAction.FiatDeposit -> AccountInfoBank(ctx).also { frame.addView(it) }
         }

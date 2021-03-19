@@ -5,6 +5,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.InvoiceTarget
 import piuk.blockchain.android.coincore.NullAddress
@@ -331,6 +332,15 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             ).updateBackstack(oldState)
     }
 
+    class DisplayModeChanged(
+        private val displayMode: DisplayMode
+    ) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                displayMode = displayMode
+            )
+    }
+
     // Fired when the cta of the enter amount sheet is clicked. This just moved to the
     // confirm sheet, with CTA disabled pending a validation check.
     object PrepareTransaction : TransactionIntent() {
@@ -359,6 +369,14 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
                 currentStep = TransactionStep.IN_PROGRESS,
                 executionStatus = TxExecutionStatus.Error(error)
             ).updateBackstack(oldState)
+    }
+
+    data class SetFeeLevel(
+        val feeLevel: FeeLevel,
+        val customFeeAmount: Long?
+    ) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState
     }
 
     object StartLinkABank : TransactionIntent() {

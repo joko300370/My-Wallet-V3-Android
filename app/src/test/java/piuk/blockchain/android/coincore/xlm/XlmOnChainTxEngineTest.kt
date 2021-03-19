@@ -30,6 +30,7 @@ import kotlin.test.assertEquals
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmationValue
@@ -195,9 +196,8 @@ class XlmOnChainTxEngineTest {
                 it.amount == CryptoValue.zero(ASSET) &&
                 it.totalBalance == CryptoValue.zero(ASSET) &&
                 it.availableBalance == CryptoValue.zero(ASSET) &&
-                it.fees == CryptoValue.zero(ASSET) &&
+                it.feeAmount == CryptoValue.zero(ASSET) &&
                 it.selectedFiat == SELECTED_FIAT &&
-                it.customFeeAmount == -1L &&
                 it.confirmations.isEmpty() &&
                 it.minLimit == null &&
                 it.maxLimit == null &&
@@ -211,7 +211,7 @@ class XlmOnChainTxEngineTest {
                     memo.editable
                 } ?: false
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Regular) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
             .assertNoErrors()
             .assertComplete()
 
@@ -251,9 +251,8 @@ class XlmOnChainTxEngineTest {
                 it.amount == CryptoValue.zero(ASSET) &&
                     it.totalBalance == CryptoValue.zero(ASSET) &&
                     it.availableBalance == CryptoValue.zero(ASSET) &&
-                    it.fees == CryptoValue.zero(ASSET) &&
+                    it.feeAmount == CryptoValue.zero(ASSET) &&
                     it.selectedFiat == SELECTED_FIAT &&
-                    it.customFeeAmount == -1L &&
                     it.confirmations.isEmpty() &&
                     it.minLimit == null &&
                     it.maxLimit == null &&
@@ -267,7 +266,7 @@ class XlmOnChainTxEngineTest {
                             memo.editable
                     } ?: false
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Regular) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
             .assertNoErrors()
             .assertComplete()
 
@@ -302,15 +301,20 @@ class XlmOnChainTxEngineTest {
             amount = CryptoValue.zero(ASSET),
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
-            fees = CryptoValue.zero(ASSET),
+            feeForFullAvailable = CryptoValue.zero(ASSET),
+            feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = CryptoCurrency.XLM
+            )
         )
 
         val inputAmount = 2.lumens()
         val expectedFee = FEE_REGULAR
         val expectedAvailable = actionableBalance - expectedFee
+        val expectedFullFee = FEE_REGULAR
 
         // Act
         subject.doUpdateAmount(
@@ -323,9 +327,10 @@ class XlmOnChainTxEngineTest {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == expectedAvailable &&
-                it.fees == expectedFee
+                it.feeForFullAvailable == expectedFullFee &&
+                it.feeAmount == expectedFee
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Regular) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
 
         verify(sourceAccount).accountBalance
         verify(sourceAccount).actionableBalance
@@ -358,10 +363,13 @@ class XlmOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = availableBalance,
-            fees = expectedFee,
+            feeForFullAvailable = expectedFee,
+            feeAmount = expectedFee,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -396,10 +404,13 @@ class XlmOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = availableBalance,
-            fees = expectedFee,
+            feeForFullAvailable = expectedFee,
+            feeAmount = expectedFee,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -434,10 +445,13 @@ class XlmOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = availableBalance,
-            fees = expectedFee,
+            feeForFullAvailable = expectedFee,
+            feeAmount = expectedFee,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
         )
 
         // Act
@@ -473,10 +487,14 @@ class XlmOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = expectedAvailable,
-            fees = expectedFee,
+            feeForFullAvailable = expectedFee,
+            feeAmount = expectedFee,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.Regular,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = CryptoCurrency.XLM
+            )
         )
 
         // Act
@@ -492,9 +510,9 @@ class XlmOnChainTxEngineTest {
                 it.amount == inputAmount &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == expectedAvailable &&
-                it.fees == expectedFee
+                it.feeAmount == expectedFee
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Regular) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
 
         noMoreInteractions(sourceAccount, txTarget)
     }
@@ -506,10 +524,14 @@ class XlmOnChainTxEngineTest {
             on { actionableBalance } itReturns Single.just(availableBalance)
         }
 
-    private fun verifyFeeLevels(pendingTx: PendingTx, expectedLevel: FeeLevel) =
-        pendingTx.feeLevel == expectedLevel &&
-            pendingTx.availableFeeLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
-            pendingTx.availableFeeLevels.contains(pendingTx.feeLevel)
+    private fun verifyFeeLevels(
+        feeSelection: FeeSelection,
+        expectedLevel: FeeLevel
+    ) = feeSelection.selectedLevel == expectedLevel &&
+        feeSelection.availableLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
+        feeSelection.availableLevels.contains(feeSelection.selectedLevel) &&
+        feeSelection.asset == FEE_ASSET &&
+        feeSelection.customAmount == -1L
 
     private fun noMoreInteractions(sourceAccount: BlockchainAccount, txTarget: TransactionTarget) {
         verifyNoMoreInteractions(txTarget)
@@ -525,6 +547,7 @@ class XlmOnChainTxEngineTest {
     companion object {
         private val ASSET = CryptoCurrency.XLM
         private val WRONG_ASSET = CryptoCurrency.BTC
+        private val FEE_ASSET = CryptoCurrency.XLM
         private const val TARGET_ADDRESS = "VALID_NON_EXCHANGE_XLM_ADDRESS"
         private const val TARGET_EXCHANGE_ADDRESS = "VALID_EXCHANGE_XLM_ADDRESS"
         private const val MEMO_TEXT = "ADDRESS_PART_FOR_MEMO"

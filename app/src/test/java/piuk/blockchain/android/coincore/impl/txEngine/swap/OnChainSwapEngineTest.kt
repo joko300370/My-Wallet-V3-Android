@@ -40,6 +40,7 @@ import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
@@ -306,16 +307,15 @@ class OnChainSwapEngineTest {
                 it.amount == CryptoValue.zero(SRC_ASSET) &&
                     it.totalBalance == totalBalance &&
                     it.availableBalance == availableBalance &&
-                    it.fees == CryptoValue.zero(SRC_ASSET) &&
+                    it.feeAmount == CryptoValue.zero(SRC_ASSET) &&
                     it.selectedFiat == SELECTED_FIAT &&
-                    it.customFeeAmount == -1L &&
                     it.confirmations.isEmpty() &&
                     it.minLimit == expectedMinLimit &&
                     it.maxLimit == MAX_GOLD_LIMIT_ASSET &&
                     it.validationState == ValidationState.UNINITIALISED &&
                     it.engineState[USER_TIER] != null
             }
-            .assertValue { verifyFeeLevels(it, expectedFeeLevel, expectedFeeOptions) }
+            .assertValue { verifyFeeLevels(it.feeSelection, expectedFeeLevel, expectedFeeOptions) }
             .assertNoErrors()
             .assertComplete()
 
@@ -377,16 +377,15 @@ class OnChainSwapEngineTest {
                 it.amount == CryptoValue.zero(SRC_ASSET) &&
                     it.totalBalance == totalBalance &&
                     it.availableBalance == availableBalance &&
-                    it.fees == CryptoValue.zero(SRC_ASSET) &&
+                    it.feeAmount == CryptoValue.zero(SRC_ASSET) &&
                     it.selectedFiat == SELECTED_FIAT &&
-                    it.customFeeAmount == -1L &&
                     it.confirmations.isEmpty() &&
                     it.minLimit == expectedMinLimit &&
                     it.maxLimit == MAX_GOLD_LIMIT_ASSET &&
                     it.validationState == ValidationState.UNINITIALISED &&
                     it.engineState[USER_TIER] != null
             }
-            .assertValue { verifyFeeLevels(it, expectedFeeLevel, expectedFeeOptions) }
+            .assertValue { verifyFeeLevels(it.feeSelection, expectedFeeLevel, expectedFeeOptions) }
             .assertNoErrors()
             .assertComplete()
 
@@ -433,18 +432,19 @@ class OnChainSwapEngineTest {
             .test()
             .assertValue {
                 it.amount == CryptoValue.zero(SRC_ASSET) &&
-                    it.totalBalance == CryptoValue.zero(SRC_ASSET) &&
-                    it.availableBalance == CryptoValue.zero(SRC_ASSET) &&
-                    it.fees == CryptoValue.zero(SRC_ASSET) &&
-                    it.selectedFiat == SELECTED_FIAT &&
-                    it.customFeeAmount == -1L &&
-                    it.confirmations.isEmpty() &&
-                    it.minLimit == null &&
-                    it.maxLimit == null &&
-                    it.validationState == ValidationState.PENDING_ORDERS_LIMIT_REACHED &&
-                    it.engineState.isEmpty()
+                it.totalBalance == CryptoValue.zero(SRC_ASSET) &&
+                it.availableBalance == CryptoValue.zero(SRC_ASSET) &&
+                it.feeAmount == CryptoValue.zero(SRC_ASSET) &&
+                it.selectedFiat == SELECTED_FIAT &&
+                it.confirmations.isEmpty() &&
+                it.minLimit == null &&
+                it.maxLimit == null &&
+                it.validationState == ValidationState.PENDING_ORDERS_LIMIT_REACHED &&
+                it.engineState.isEmpty()
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.Regular, setOf(FeeLevel.Regular)) }
+            .assertValue {
+                verifyFeeLevels(it.feeSelection, FeeLevel.None, setOf(FeeLevel.None), null)
+            }
             .assertNoErrors()
             .assertComplete()
 
@@ -482,10 +482,14 @@ class OnChainSwapEngineTest {
             amount = CryptoValue.zero(SRC_ASSET),
             totalBalance = CryptoValue.zero(SRC_ASSET),
             availableBalance = CryptoValue.zero(SRC_ASSET),
-            fees = CryptoValue.zero(SRC_ASSET),
+            feeForFullAvailable = CryptoValue.zero(SRC_ASSET),
+            feeAmount = CryptoValue.zero(SRC_ASSET),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = expectedFeeLevel,
-            availableFeeLevels = expectedFeeLevelOptions
+            feeSelection = FeeSelection(
+                selectedLevel = expectedFeeLevel,
+                availableLevels = expectedFeeLevelOptions,
+                asset = FEE_ASSET
+            )
         )
 
         whenever(onChainEngine.doUpdateAmount(inputAmount, pendingTx))
@@ -495,7 +499,7 @@ class OnChainSwapEngineTest {
                         amount = inputAmount,
                         totalBalance = totalBalance,
                         availableBalance = availableBalance,
-                        fees = expectedFee
+                        feeAmount = expectedFee
                     )
                 )
             )
@@ -509,11 +513,11 @@ class OnChainSwapEngineTest {
             .assertNoErrors()
             .assertValue {
                 it.amount == inputAmount &&
-                    it.totalBalance == totalBalance &&
-                    it.availableBalance == availableBalance &&
-                    it.fees == expectedFee
+                it.totalBalance == totalBalance &&
+                it.availableBalance == availableBalance &&
+                it.feeAmount == expectedFee
             }
-            .assertValue { verifyFeeLevels(it, expectedFeeLevel, expectedFeeLevelOptions) }
+            .assertValue { verifyFeeLevels(it.feeSelection, expectedFeeLevel, expectedFeeLevelOptions) }
 
         verify(sourceAccount, atLeastOnce()).asset
         verify(txTarget, atLeastOnce()).asset
@@ -529,7 +533,7 @@ class OnChainSwapEngineTest {
         // Arrange
         val totalBalance: Money = 21.bitcoin()
         val availableBalance: Money = 20.bitcoin()
-
+        val fullFee = totalBalance - availableBalance
         val sourceAccount = mockSourceAccount(totalBalance, availableBalance)
         val txTarget = mockTransactionTarget()
 
@@ -549,10 +553,14 @@ class OnChainSwapEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = availableBalance,
-            fees = initialFee,
+            feeForFullAvailable = fullFee,
+            feeAmount = initialFee,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = initialFeeLevel,
-            availableFeeLevels = initialFeeLevelOptions
+            feeSelection = FeeSelection(
+                selectedLevel = initialFeeLevel,
+                availableLevels = initialFeeLevelOptions,
+                asset = FEE_ASSET
+            )
         )
 
         whenever(
@@ -564,7 +572,7 @@ class OnChainSwapEngineTest {
         ).thenReturn(
             Single.just(
                 pendingTx.copy(
-                    feeLevel = FeeLevel.Regular
+                    feeSelection = pendingTx.feeSelection.copy(selectedLevel = FeeLevel.Regular)
                 )
             )
         )
@@ -577,7 +585,7 @@ class OnChainSwapEngineTest {
         ).test()
             .assertComplete()
             .assertNoErrors()
-            .assertValue { verifyFeeLevels(it, FeeLevel.Regular, initialFeeLevelOptions) }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular, initialFeeLevelOptions) }
 
         verify(sourceAccount, atLeastOnce()).asset
         verify(txTarget, atLeastOnce()).asset
@@ -610,10 +618,14 @@ class OnChainSwapEngineTest {
             amount = CryptoValue.zero(SRC_ASSET),
             totalBalance = totalBalance,
             availableBalance = availableBalance,
-            fees = CryptoValue.zero(SRC_ASSET),
+            feeForFullAvailable = totalBalance - availableBalance,
+            feeAmount = CryptoValue.zero(SRC_ASSET),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = initialFeeLevel,
-            availableFeeLevels = availableFeeOptions
+            feeSelection = FeeSelection(
+                selectedLevel = initialFeeLevel,
+                availableLevels = availableFeeOptions,
+                asset = FEE_ASSET
+            )
         )
         whenever(onChainEngine.doInitialiseTx()).thenReturn(Single.just(initialisedPendingTx))
     }
@@ -656,12 +668,15 @@ class OnChainSwapEngineTest {
     }
 
     private fun verifyFeeLevels(
-        pendingTx: PendingTx,
+        feeSelection: FeeSelection,
         expectedLevel: FeeLevel,
-        expectedFeeOptions: Set<FeeLevel>
-    ) = pendingTx.feeLevel == expectedLevel &&
-        pendingTx.availableFeeLevels == expectedFeeOptions &&
-        pendingTx.availableFeeLevels.contains(pendingTx.feeLevel)
+        expectedFeeOptions: Set<FeeLevel>,
+        feeAsset: CryptoCurrency? = FEE_ASSET
+    ) = feeSelection.selectedLevel == expectedLevel &&
+        feeSelection.availableLevels == expectedFeeOptions &&
+        feeSelection.availableLevels.contains(feeSelection.selectedLevel) &&
+        feeSelection.asset == feeAsset &&
+        feeSelection.customAmount == -1L
 
     private fun noMoreInteractions(sourceAccount: CryptoAccount, txTarget: TransactionTarget) {
         verifyNoMoreInteractions(txTarget)
@@ -679,6 +694,7 @@ class OnChainSwapEngineTest {
         private const val SELECTED_FIAT = "INR"
         private val SRC_ASSET = CryptoCurrency.BTC
         private val TGT_ASSET = CryptoCurrency.XLM
+        private val FEE_ASSET = CryptoCurrency.BTC
         private val EXCHANGE_RATE = 2.toBigDecimal() // 1 btc == 2 INR
 
         private const val SAMPLE_DEPOSIT_ADDRESS = "initial quote deposit address"

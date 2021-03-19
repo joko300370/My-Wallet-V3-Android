@@ -12,10 +12,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.view_account_fiat_overview.view.*
 import org.koin.core.KoinComponent
-import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.databinding.ViewAccountFiatOverviewBinding
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
@@ -23,6 +22,7 @@ import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmoun
 import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.visibleIf
 
 class AccountInfoFiat @JvmOverloads constructor(
     ctx: Context,
@@ -34,10 +34,8 @@ class AccountInfoFiat @JvmOverloads constructor(
     private val currencyPrefs: CurrencyPrefs by scopedInject()
     private val compositeDisposable = CompositeDisposable()
 
-    init {
-        LayoutInflater.from(context)
-            .inflate(R.layout.view_account_fiat_overview, this, true)
-    }
+    val binding: ViewAccountFiatOverviewBinding =
+        ViewAccountFiatOverviewBinding.inflate(LayoutInflater.from(context), this, true)
 
     fun updateAccount(account: FiatAccount, cellDecorator: CellDecorator, onAccountClicked: (FiatAccount) -> Unit) {
         compositeDisposable.clear()
@@ -49,45 +47,46 @@ class AccountInfoFiat @JvmOverloads constructor(
         cellDecorator: CellDecorator,
         onAccountClicked: (FiatAccount) -> Unit
     ) {
+        with(binding) {
+            val userFiat = currencyPrefs.selectedFiatCurrency
 
-        val userFiat = currencyPrefs.selectedFiatCurrency
+            walletName.text = account.label
+            icon.setIcon(account.fiatCurrency)
+            assetSubtitle.text = account.fiatCurrency
 
-        wallet_name.text = account.label
-        icon.setIcon(account.fiatCurrency)
-        asset_subtitle.text = account.fiatCurrency
-
-        compositeDisposable += account.accountBalance
-            .flatMap { balanceInAccountCurrency ->
-                if (userFiat == account.fiatCurrency)
-                    Single.just(balanceInAccountCurrency to balanceInAccountCurrency)
-                else account.fiatBalance(userFiat, exchangeRates).map { balanceInSelectedCurrency ->
-                    balanceInAccountCurrency to balanceInSelectedCurrency
+            compositeDisposable += account.accountBalance
+                .flatMap { balanceInAccountCurrency ->
+                    if (userFiat == account.fiatCurrency)
+                        Single.just(balanceInAccountCurrency to balanceInAccountCurrency)
+                    else account.fiatBalance(userFiat, exchangeRates).map { balanceInSelectedCurrency ->
+                        balanceInAccountCurrency to balanceInSelectedCurrency
+                    }
                 }
-            }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy { (balanceInAccountCurrency, balanceInWalletCurrency) ->
-                if (userFiat == account.fiatCurrency) {
-                    wallet_balance_exchange_fiat.gone()
-                    wallet_balance_fiat.text = balanceInAccountCurrency.toStringWithSymbol()
-                } else {
-                    wallet_balance_exchange_fiat.visible()
-                    wallet_balance_fiat.text = balanceInWalletCurrency.toStringWithSymbol()
-                    wallet_balance_exchange_fiat.text = balanceInAccountCurrency.toStringWithSymbol()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy { (balanceInAccountCurrency, balanceInWalletCurrency) ->
+                    if (userFiat == account.fiatCurrency) {
+                        walletBalanceExchangeFiat.gone()
+                        walletBalanceFiat.text = balanceInAccountCurrency.toStringWithSymbol()
+                    } else {
+                        walletBalanceExchangeFiat.visible()
+                        walletBalanceFiat.text = balanceInWalletCurrency.toStringWithSymbol()
+                        walletBalanceExchangeFiat.text = balanceInAccountCurrency.toStringWithSymbol()
+                    }
                 }
-            }
 
-        setOnClickListener { }
-        compositeDisposable += cellDecorator.isEnabled()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { isEnabled ->
-                if (isEnabled) {
-                    setOnClickListener { onAccountClicked(account) }
-                    container.alpha = 1f
-                } else {
-                    container.alpha = .6f
-                    setOnClickListener { }
+            setOnClickListener { }
+            compositeDisposable += cellDecorator.isEnabled()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { isEnabled ->
+                    if (isEnabled) {
+                        setOnClickListener { onAccountClicked(account) }
+                        container.alpha = 1f
+                    } else {
+                        container.alpha = .6f
+                        setOnClickListener { }
+                    }
                 }
-            }
+        }
     }
 
     fun dispose() {
@@ -104,5 +103,9 @@ class AccountInfoFiat @JvmOverloads constructor(
 
     override fun update(state: TransactionState) {
         updateAccount(state.sendingAccount as FiatAccount, DefaultCellDecorator()) { }
+    }
+
+    override fun setVisible(isVisible: Boolean) {
+        binding.root.visibleIf { isVisible }
     }
 }

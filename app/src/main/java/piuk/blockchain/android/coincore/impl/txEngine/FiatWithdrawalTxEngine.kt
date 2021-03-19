@@ -7,6 +7,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmationValue
@@ -41,16 +42,17 @@ class FiatWithdrawalTxEngine(
             sourceAccount.accountBalance,
             (txTarget as LinkedBankAccount).getWithdrawalFeeAndMinLimit(),
             { actionableBalance, accountBalance, limitAndFee ->
+                val zeroFiat = FiatValue.zero((sourceAccount as FiatAccount).fiatCurrency)
                 PendingTx(
-                    amount = FiatValue.zero((sourceAccount as FiatAccount).fiatCurrency),
+                    amount = zeroFiat,
                     maxLimit = actionableBalance,
                     minLimit = limitAndFee.minLimit,
                     availableBalance = actionableBalance,
+                    feeForFullAvailable = zeroFiat,
                     totalBalance = accountBalance,
-                    fees = limitAndFee.fee,
+                    feeAmount = limitAndFee.fee,
                     selectedFiat = userFiat,
-                    feeLevel = FeeLevel.None,
-                    availableFeeLevels = setOf(FeeLevel.None)
+                    feeSelection = FeeSelection()
                 )
             }
         )
@@ -73,7 +75,7 @@ class FiatWithdrawalTxEngine(
                     TxConfirmationValue.From(sourceAccount.label),
                     TxConfirmationValue.To(txTarget.label),
                     TxConfirmationValue.FiatTxFee(
-                        fee = pendingTx.fees
+                        fee = pendingTx.feeAmount
                     ),
                     TxConfirmationValue.EstimatedWithdrawalCompletion,
                     TxConfirmationValue.Total(
@@ -92,7 +94,7 @@ class FiatWithdrawalTxEngine(
         )
 
     override fun doUpdateFeeLevel(pendingTx: PendingTx, level: FeeLevel, customFeeAmount: Long): Single<PendingTx> {
-        require(pendingTx.availableFeeLevels.contains(level))
+        require(pendingTx.feeSelection.availableLevels.contains(level))
         return Single.just(pendingTx)
     }
 
