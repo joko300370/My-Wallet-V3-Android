@@ -40,7 +40,6 @@ class BalanceAndFeeView @JvmOverloads constructor(
     private val imm: InputMethodManager by lazy {
         context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     }
-    private var state: TransactionState? = null
 
     private val binding: ViewTxFlowFeeAndBalanceBinding =
         ViewTxFlowFeeAndBalanceBinding.inflate(LayoutInflater.from(context), this, true)
