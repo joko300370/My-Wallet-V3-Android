@@ -210,8 +210,6 @@ class AccountInfoCrypto @JvmOverloads constructor(
     override fun setVisible(isVisible: Boolean) {
         binding.root.visibleIf { isVisible }
     }
-
-    override var displayMode: TxFlowWidget.DisplayMode = TxFlowWidget.DisplayMode.Fiat
 }
 
 private fun <T> Single<T>.startWithValueIfCondition(

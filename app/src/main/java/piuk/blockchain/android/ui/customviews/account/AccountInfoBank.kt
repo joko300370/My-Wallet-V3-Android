@@ -71,8 +71,6 @@ class AccountInfoBank @JvmOverloads constructor(
         }
     }
 
-    override var displayMode: TxFlowWidget.DisplayMode = TxFlowWidget.DisplayMode.Fiat
-
     private fun getFeeOrShowDefault(account: LinkedBankAccount) {
         compositeDisposable += account.getWithdrawalFeeAndMinLimit()
             .observeOn(AndroidSchedulers.mainThread())

@@ -82,6 +82,4 @@ class FromAndToView @JvmOverloads constructor(
             amountSheetTo.text = customiser.enterAmountTargetLabel(state)
         }
     }
-
-    override var displayMode: TxFlowWidget.DisplayMode = TxFlowWidget.DisplayMode.Fiat
 }

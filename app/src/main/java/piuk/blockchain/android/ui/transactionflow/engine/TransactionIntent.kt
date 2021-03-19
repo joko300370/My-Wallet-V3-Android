@@ -332,6 +332,15 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             ).updateBackstack(oldState)
     }
 
+    class DisplayModeChanged(
+        private val displayMode: DisplayMode
+    ) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                displayMode = displayMode
+            )
+    }
+
     // Fired when the cta of the enter amount sheet is clicked. This just moved to the
     // confirm sheet, with CTA disabled pending a validation check.
     object PrepareTransaction : TransactionIntent() {
