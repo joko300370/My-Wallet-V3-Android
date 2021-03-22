@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -71,13 +72,22 @@
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginTop="@dimen/small_margin"
         android:layout_marginEnd="@dimen/standard_margin"
-        android:layout_marginBottom="@dimen/standard_margin"
-        app:layout_constraintBottom_toTopOf="@id/link_bank_btn"
+        android:layout_marginBottom="@dimen/tiny_margin"
+        android:ellipsize="end"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toTopOf="@id/link_bank_buttons_guide"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/link_bank_title"
         app:layout_constraintVertical_bias="0"
         tools:text="Oops! Something Went Wrong." />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/link_bank_buttons_guide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.8" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/link_bank_btn"
@@ -88,6 +98,8 @@
         android:text="@string/common_continue"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/link_bank_cancel"
+        app:layout_constraintTop_toBottomOf="@id/link_bank_buttons_guide"
+        app:layout_constraintVertical_chainStyle="packed"
         tools:visibility="visible" />
 
     <androidx.appcompat.widget.AppCompatButton
@@ -98,5 +110,7 @@
         android:text="@string/yodlee_linking_cancel"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/link_bank_btn"
+        app:layout_constraintVertical_chainStyle="packed"
         tools:visibility="visible" />
 </androidx.constraintlayout.widget.ConstraintLayout>
