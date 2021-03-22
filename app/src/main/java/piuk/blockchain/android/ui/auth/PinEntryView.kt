@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.auth
 import android.content.Intent
 import android.widget.ImageView
 import androidx.annotation.StringRes
+import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.ui.base.View
 import piuk.blockchain.android.util.ViewUtils
