@@ -1,14 +1,12 @@
-package piuk.blockchain.android.coincore.erc20.dgld
+package piuk.blockchain.android.coincore.erc20.aave
 
 import com.blockchain.logging.CrashLogger
-import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.preferences.WalletStatus
-import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.preferences.WalletStatus
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
-import io.reactivex.Completable
 import piuk.blockchain.android.coincore.erc20.Erc20TokensBase
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.thepit.PitLinking
@@ -18,9 +16,8 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import java.util.concurrent.atomic.AtomicBoolean
 
-internal class DgldAsset(
+internal class AaveAsset(
     payloadManager: PayloadDataManager,
     ethDataManager: EthDataManager,
     feeDataManager: FeeDataManager,
@@ -29,15 +26,14 @@ internal class DgldAsset(
     historicRates: ExchangeRateService,
     currencyPrefs: CurrencyPrefs,
     labels: DefaultLabels,
-    pitLinking: PitLinking,
     crashLogger: CrashLogger,
+    pitLinking: PitLinking,
     environmentConfig: EnvironmentConfig,
-    eligibilityProvider: EligibilityProvider,
-    offlineAccounts: OfflineAccountUpdater,
     walletPreferences: WalletStatus,
-    private val wDgldFeatureFlag: FeatureFlag
+    offlineAccounts: OfflineAccountUpdater,
+    eligibilityProvider: EligibilityProvider
 ) : Erc20TokensBase(
-    CryptoCurrency.DGLD,
+    CryptoCurrency.AAVE,
     payloadManager,
     ethDataManager,
     feeDataManager,
@@ -52,17 +48,4 @@ internal class DgldAsset(
     environmentConfig,
     eligibilityProvider,
     offlineAccounts
-) {
-    private val isDgldFeatureFlagEnabled = AtomicBoolean(false)
-
-    override fun initToken(): Completable {
-        return wDgldFeatureFlag.enabled.doOnSuccess {
-            isDgldFeatureFlagEnabled.set(it)
-        }.flatMapCompletable {
-            super.initToken()
-        }
-    }
-
-    override val isEnabled: Boolean
-        get() = isDgldFeatureFlagEnabled.get()
-}
+)

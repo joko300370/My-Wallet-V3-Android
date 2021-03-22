@@ -6,6 +6,7 @@ enum class CryptoCurrency(
     val dp: Int,           // max decimal places; ie the quanta of this asset
     val userDp: Int,       // user decimal places
     val requiredConfirmations: Int,
+    val startDateForPrice: Long, // token price start times in epoch-seconds
     private val featureFlags: Long
 ) {
     /**
@@ -18,6 +19,7 @@ enum class CryptoCurrency(
         dp = 8,
         userDp = 8,
         requiredConfirmations = 3,
+        startDateForPrice = 1282089600L, // 2010-08-18 00:00:00 UTC
         featureFlags =
         CryptoCurrency.PRICE_CHARTING or
                 CryptoCurrency.MULTI_WALLET or
@@ -29,6 +31,7 @@ enum class CryptoCurrency(
         dp = 18,
         userDp = 8,
         requiredConfirmations = 12,
+        startDateForPrice = 1438992000L, // 2015-08-08 00:00:00 UTC
         featureFlags =
         CryptoCurrency.PRICE_CHARTING or
                 CryptoCurrency.OFFLINE_RECEIVE_ADDRESS
@@ -39,6 +42,7 @@ enum class CryptoCurrency(
         dp = 8,
         userDp = 8,
         requiredConfirmations = 3,
+        startDateForPrice = 1500854400L, // 2017-07-24 00:00:00 UTC
         featureFlags =
         CryptoCurrency.PRICE_CHARTING or
                 CryptoCurrency.MULTI_WALLET or
@@ -51,6 +55,7 @@ enum class CryptoCurrency(
         dp = 7,
         userDp = 7,
         requiredConfirmations = 1,
+        startDateForPrice = 1409875200L, // 2014-09-04 00:00:00 UTC
         featureFlags =
         CryptoCurrency.PRICE_CHARTING or
                 CryptoCurrency.OFFLINE_RECEIVE_ADDRESS
@@ -61,6 +66,7 @@ enum class CryptoCurrency(
         dp = 6,
         userDp = 6,
         requiredConfirmations = 12,
+        startDateForPrice = 1560985200L, // 2019-06-20 00:00:00 UTC
         featureFlags = CryptoCurrency.PRICE_CHARTING or CryptoCurrency.CUSTODIAL_ONLY
     ),
     DGLD(
@@ -69,6 +75,7 @@ enum class CryptoCurrency(
         dp = 8,
         userDp = 8,
         requiredConfirmations = 12, // Same as ETHER
+        startDateForPrice = 1576108800L, // 2019-12-12 00:00:00 UTC
         featureFlags = CryptoCurrency.PRICE_CHARTING or CryptoCurrency.IS_ERC20
     ),
     PAX(
@@ -77,6 +84,7 @@ enum class CryptoCurrency(
         dp = 18,
         userDp = 8,
         requiredConfirmations = 12, // Same as ETHER
+        startDateForPrice = 1438992000L, // Same as ETHER
         featureFlags = CryptoCurrency.IS_ERC20 or
                 CryptoCurrency.OFFLINE_RECEIVE_ADDRESS
     ),
@@ -86,6 +94,7 @@ enum class CryptoCurrency(
         dp = 6,
         userDp = 6,
         requiredConfirmations = 12, // Same as ETHER
+        startDateForPrice = 1438992000L, // Same as ETHER
         featureFlags = CryptoCurrency.IS_ERC20
     ),
     STX(
@@ -94,8 +103,18 @@ enum class CryptoCurrency(
         dp = 7,
         userDp = 7,
         requiredConfirmations = 12,
+        startDateForPrice = 0,
         featureFlags =
         CryptoCurrency.STUB_ASSET
+    ),
+    AAVE(
+        networkTicker = "AAVE",
+        displayTicker = "AAVE",
+        dp = 18,
+        userDp = 8,
+        requiredConfirmations = 12, // Same as ETHER
+        startDateForPrice = 1615831200L, // 2021-03-15 00:00:00 UTC
+        featureFlags = CryptoCurrency.PRICE_CHARTING or CryptoCurrency.IS_ERC20
     );
 
     fun hasFeature(feature: Long): Boolean = (0L != (featureFlags and feature))

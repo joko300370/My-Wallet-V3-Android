@@ -73,6 +73,7 @@
     <color name="color_algo_logo">@color/algo</color>
     <color name="color_usdt_logo">@color/usdt</color>
     <color name="color_dgld_logo">@color/dgld</color>
+    <color name="color_aave_logo">@color/aave</color>
 
     <!-- Non-Spendable colours -->
     <color name="non_spendable_button_background">@color/grey_100</color>

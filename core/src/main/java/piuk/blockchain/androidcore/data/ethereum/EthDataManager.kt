@@ -452,6 +452,7 @@ class EthDataManager(
             CryptoCurrency.PAX -> getEthWallet()!!.getErc20TokenData(Erc20TokenData.PAX_CONTRACT_NAME)
             CryptoCurrency.USDT -> getEthWallet()!!.getErc20TokenData(Erc20TokenData.USDT_CONTRACT_NAME)
             CryptoCurrency.DGLD -> getEthWallet()!!.getErc20TokenData(Erc20TokenData.DGLD_CONTRACT_NAME)
+            CryptoCurrency.AAVE -> getEthWallet()!!.getErc20TokenData(Erc20TokenData.AAVE_CONTRACT_NAME)
             else -> throw IllegalArgumentException("Not an ERC20 token")
         }
     }

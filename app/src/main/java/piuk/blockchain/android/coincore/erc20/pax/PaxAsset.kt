@@ -5,7 +5,6 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligibilityProvider
-import com.blockchain.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.coincore.erc20.Erc20TokensBase
@@ -29,7 +28,6 @@ internal class PaxAsset(
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
-    tiersService: TierService,
     environmentConfig: EnvironmentConfig,
     walletPreferences: WalletStatus,
     offlineAccounts: OfflineAccountUpdater,
@@ -47,7 +45,6 @@ internal class PaxAsset(
     labels,
     pitLinking,
     crashLogger,
-    tiersService,
     environmentConfig,
     eligibilityProvider,
     offlineAccounts

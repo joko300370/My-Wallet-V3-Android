@@ -20,12 +20,15 @@ private class CoincoreInitFailure(msg: String, e: Throwable) : Exception(msg, e)
 class Coincore internal constructor(
     // TODO: Build an interface on PayloadDataManager/PayloadManager for 'global' crypto calls; second password etc?
     private val payloadManager: PayloadDataManager,
-    private val assetMap: Map<CryptoCurrency, CryptoAsset>,
+    private val assetLoader: AssetLoader,
     private val txProcessorFactory: TxProcessorFactory,
     private val defaultLabels: DefaultLabels,
     private val fiatAsset: Asset,
     private val crashLogger: CrashLogger
 ) {
+
+    private val assetMap: Map<CryptoCurrency, CryptoAsset>
+        get() = assetLoader.assetMap
 
     operator fun get(ccy: CryptoCurrency): CryptoAsset =
         assetMap[ccy] ?: throw IllegalArgumentException(

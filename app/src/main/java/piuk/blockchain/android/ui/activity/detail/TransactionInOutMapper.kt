@@ -29,16 +29,13 @@ class TransactionInOutMapper(
     fun transformInputAndOutputs(
         item: NonCustodialActivitySummaryItem
     ): Single<TransactionInOutDetails> =
-        when (item.cryptoCurrency) {
-            CryptoCurrency.BTC -> handleBtcToAndFrom(item)
-            CryptoCurrency.BCH -> handleBchToAndFrom(item)
-            CryptoCurrency.XLM -> handleXlmToAndFrom(item)
-            CryptoCurrency.ETHER,
-            CryptoCurrency.PAX,
-            CryptoCurrency.USDT,
-            CryptoCurrency.DGLD -> handleEthAndErc20ToAndFrom(item)
-            CryptoCurrency.STX,
-            CryptoCurrency.ALGO -> throw IllegalArgumentException("${item.cryptoCurrency} is not currently supported")
+        when {
+            item.cryptoCurrency == CryptoCurrency.BTC -> handleBtcToAndFrom(item)
+            item.cryptoCurrency == CryptoCurrency.BCH -> handleBchToAndFrom(item)
+            item.cryptoCurrency == CryptoCurrency.XLM -> handleXlmToAndFrom(item)
+            item.cryptoCurrency == CryptoCurrency.ETHER ||
+            item.cryptoCurrency.hasFeature(CryptoCurrency.IS_ERC20) -> handleEthAndErc20ToAndFrom(item)
+            else -> throw IllegalArgumentException("${item.cryptoCurrency} is not currently supported")
         }
 
     private fun handleXlmToAndFrom(activitySummaryItem: NonCustodialActivitySummaryItem) =
