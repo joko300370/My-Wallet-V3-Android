@@ -258,7 +258,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
         fiatCurrency: String
     ): String =
         when (selectedPaymentMethod.paymentMethodType) {
-            PaymentMethodType.FUNDS -> getString(R.string.currency_funds_wallet, fiatCurrency)
+            PaymentMethodType.FUNDS -> getString(R.string.fiat_currency_funds_wallet_name, fiatCurrency)
             else -> selectedPaymentMethod.label ?: ""
         }
 

@@ -73,10 +73,11 @@ internal class BchAsset(
             .doOnError { Timber.e("Unable to init BCH, because: $it") }
             .onErrorComplete()
 
-    override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> =
-        Single.fromCallable {
+    override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> {
+        var updateDefaultAccountLabel = Completable.complete()
             with(bchDataManager) {
-                mutableListOf<CryptoAccount>().apply {
+                val accounts = mutableListOf<CryptoAccount>()
+                accounts.apply {
                     getAccountMetadataList().forEachIndexed { i, account ->
                         val bchAccount = BchCryptoWalletAccount.createBchAccount(
                             payloadManager = payloadManager,
@@ -92,11 +93,17 @@ internal class BchAsset(
                             refreshTrigger = this@BchAsset
                         )
                         if (bchAccount.isDefault) {
+                            updateDefaultAccountLabel = if (bchAccount.label != labels.getDefaultNonCustodialWalletLabel(asset))
+                                bchAccount.updateLabel(
+                                    labels.getDefaultNonCustodialWalletLabel(asset)
+                                ) else Completable.complete()
+
                             updateOfflineCache(bchAccount)
                         }
                         add(bchAccount)
                     }
                 }
+                return updateDefaultAccountLabel.toSingle { accounts }
             }
         }
 

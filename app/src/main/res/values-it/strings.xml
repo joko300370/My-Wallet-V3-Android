@@ -921,11 +921,6 @@
     <string name="iban">IBAN</string>
     <string name="estonia">Estonia</string>
     <string name="lets_setup_wallet">Prepariamo il tuo portafoglio. Puoi acquistare rapidamente criptovalute ora o farlo in seguito.</string>
-    <string name="btc_default_wallet_name">Il mio portafoglio Bitcoin</string>
-    <string name="bch_default_account_label">Portafoglio My Bitcoin Cash</string>
-    <string name="eth_default_account_label">Il mio portafoglio Ether</string>
-    <string name="xlm_default_account_label">Il mio portafoglio stellare</string>
-    <string name="pax_default_account_label_1">Il mio portafoglio digitale USD</string>
     <string name="exchange_default_account_label">Il mio Exchange %1$s Indirizzo</string>
     <string name="linked_cards">Carte collegate</string>
     <string name="tx_title_send">Invia %1s</string>
@@ -964,7 +959,6 @@
     <string name="buy_now">Acquista ora</string>
     <string name="default_label_all_wallets">Tutti i portafogli</string>
     <string name="approximately_symbol">~ %1$s</string>
-    <string name="custodial_wallet_default_label">%1s Portafoglio di trading</string>
     <string name="select_account_sheet_title">Seleziona un portafoglio</string>
     <string name="activity_state_initialised">inizializzato</string>
     <string name="activity_state_uninitialised">Non inizializzato</string>
@@ -1121,7 +1115,6 @@
     <string name="transfer_second_pswd_title">2a password</string>
     <string name="transfer_second_pswd_desc">Inserisci la tua seconda password, sarai quindi in grado di continuare a inviare.</string>
     <string name="transfer_second_pswd_hint">2a password</string>
-    <string name="currency_wallet">Il mio portafoglio %1s</string>
     <string name="dashboard_asset_item_label_title">Notare che.</string>
     <string name="algorand_asset_label">La funzionalità per ritirare ALGO dal tuo portafoglio di trading non è al momento disponibile, ma sarà presto disponibile.</string>
     <string name="send_state_no_funds">Senza fondi</string>
@@ -1224,7 +1217,7 @@
     <string name="purchase_card_note_2">La tua crittografia sarà disponibile per essere ritirata all\'interno</string>
     <string name="select_send_sheet_title">Invia da</string>
     <string name="select_send_source_title">Invia da</string>
-    <string name="currency_funds_wallet">Il mio portafoglio %1s</string>
+    <string name="fiat_currency_funds_wallet_name">Il mio portafoglio %1s</string>
     <string name="us_dollars">Dollari americani</string>
     <string name="fiat_funds_detail_withdraw_details">Cashout sulla tua banca</string>
     <string name="withdraw_currency">Preleva %1$s</string>

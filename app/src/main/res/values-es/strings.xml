@@ -919,11 +919,6 @@ Euros/Dolares</string>
     <string name="iban">IBAN</string>
     <string name="estonia">Estonia</string>
     <string name="lets_setup_wallet">Vamos a configurar su billetera. Puede comprar rápidamente crypto ahora o hacer esto más tarde.</string>
-    <string name="btc_default_wallet_name">Mi billetera Bitcoin</string>
-    <string name="bch_default_account_label">My Bitcoin Cash Wallet</string>
-    <string name="eth_default_account_label">My Ether Wallet</string>
-    <string name="xlm_default_account_label">Mi billetera estelar</string>
-    <string name="pax_default_account_label_1">Mi billetera digital USD</string>
     <string name="exchange_default_account_label">Mi intercambio %1$s Dirección</string>
     <string name="linked_cards">Tarjetas vinculadas</string>
     <string name="tx_title_send">Enviar %1s</string>
@@ -962,7 +957,6 @@ Euros/Dolares</string>
     <string name="buy_now">Compra ahora</string>
     <string name="default_label_all_wallets">Todas las billeteras</string>
     <string name="approximately_symbol">~ %1$s</string>
-    <string name="custodial_wallet_default_label">Cartera comercial %1s</string>
     <string name="select_account_sheet_title">Selecciona una billetera</string>
     <string name="activity_state_initialised">Inicializado</string>
     <string name="activity_state_uninitialised">Sin inicializar</string>
@@ -1116,7 +1110,6 @@ Inténtelo de nuevo más tarde.</string>
     <string name="transfer_second_pswd_title">2.ª contraseña</string>
     <string name="transfer_second_pswd_desc">Introduzca su segunda contraseña, luego podrá continuar enviando.</string>
     <string name="transfer_second_pswd_hint">2.ª contraseña</string>
-    <string name="currency_wallet">Mi monedero %1s</string>
     <string name="dashboard_asset_item_label_title">Tenga en cuenta:</string>
     <string name="algorand_asset_label">La función para retirar ALGO de su monedero comercial no está disponible en este momento, pero lo estará pronto.</string>
     <string name="send_state_no_funds">Sin fondos</string>
@@ -1218,7 +1211,7 @@ Esto le permitirá restaurar su Wallet si perdiera este dispositivo.</string>
     <string name="purchase_card_note_2">Su cripto estará disponible para ser retirado dentro de</string>
     <string name="select_send_sheet_title">Enviado desde</string>
     <string name="select_send_source_title">Enviado desde</string>
-    <string name="currency_funds_wallet">Mi billetera %1s</string>
+    <string name="fiat_currency_funds_wallet_name">Mi billetera %1s</string>
     <string name="us_dollars">Dólares estadounidenses</string>
     <string name="fiat_funds_detail_withdraw_details">Retiro a su banco</string>
     <string name="withdraw_currency">Retirar %1$s</string>
