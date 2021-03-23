@@ -132,6 +132,14 @@ public class EthereumWallet {
         return walletData.getAccounts().get(ACCOUNT_INDEX);
     }
 
+    public void renameAccount(String newLabel){
+        EthereumAccount account = getAccount();
+        account.setLabel(newLabel);
+        ArrayList<EthereumAccount> accounts = new ArrayList<>();
+        accounts.add(account);
+        walletData.setAccounts(accounts);
+    }
+
     public HashMap<String, String> getTxNotes() {
         return walletData.getTxNotes();
     }

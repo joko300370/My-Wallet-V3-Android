@@ -6,6 +6,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import info.blockchain.wallet.ethereum.EthereumAccount
+import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.ReceiveAddress
@@ -20,8 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 internal class EthCryptoWalletAccount(
     payloadManager: PayloadDataManager,
-    override val label: String,
-    internal val address: String,
+    private val jsonAccount: EthereumAccount,
     private val ethDataManager: EthDataManager,
     private val fees: FeeDataManager,
     private val walletPreferences: WalletStatus,
@@ -39,14 +39,18 @@ internal class EthCryptoWalletAccount(
         custodialWalletManager: CustodialWalletManager
     ) : this(
         payloadManager,
-        jsonAccount.label,
-        jsonAccount.address,
+        jsonAccount,
         ethDataManager,
         fees,
         walletPreferences,
         exchangeRates,
         custodialWalletManager
     )
+
+    internal val address: String
+        get() = jsonAccount.address
+    override val label: String
+        get() = jsonAccount.label
 
     private val hasFunds = AtomicBoolean(false)
 
@@ -72,6 +76,14 @@ internal class EthCryptoWalletAccount(
                 label = label
             )
         )
+
+    override fun updateLabel(newLabel: String): Completable {
+        require(newLabel.isNotEmpty())
+        val revertLabel = label
+        jsonAccount.label = newLabel
+        return ethDataManager.updateAccountLabel(newLabel)
+            .doOnError { jsonAccount.label = revertLabel }
+    }
 
     override val activity: Single<ActivitySummaryList>
         get() = ethDataManager.getLatestBlockNumber()

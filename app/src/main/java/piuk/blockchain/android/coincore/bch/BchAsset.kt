@@ -70,40 +70,32 @@ internal class BchAsset(
             .doOnError { Timber.e("Unable to init BCH, because: $it") }
             .onErrorComplete()
 
-    override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> {
-        var updateDefaultAccountLabel = Completable.complete()
-        with(bchDataManager) {
-            val accounts = mutableListOf<CryptoAccount>()
-            accounts.apply {
-                getAccountMetadataList().forEachIndexed { i, account ->
-                    val bchAccount = BchCryptoWalletAccount.createBchAccount(
-                        payloadManager = payloadManager,
-                        jsonAccount = account,
-                        bchManager = bchDataManager,
-                        addressIndex = i,
-                        exchangeRates = exchangeRates,
-                        networkParams = environmentSettings.bitcoinCashNetworkParameters,
-                        feeDataManager = feeDataManager,
-                        sendDataManager = sendDataManager,
-                        walletPreferences = walletPreferences,
-                        custodialWalletManager = custodialManager,
-                        refreshTrigger = this@BchAsset
-                    )
-                    if (bchAccount.isDefault) {
-                        updateDefaultAccountLabel =
-                            if (bchAccount.label == labels.getOldDefaultNonCustodialWalletLabel(asset))
-                                bchAccount.updateLabel(
-                                    labels.getDefaultNonCustodialWalletLabel(asset)
-                                ) else Completable.complete()
-
-                        updateOfflineCache(bchAccount)
+    override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList>  =
+        Single.fromCallable {
+            with(bchDataManager) {
+                mutableListOf<CryptoAccount>().apply {
+                    getAccountMetadataList().forEachIndexed { i, account ->
+                        val bchAccount = BchCryptoWalletAccount.createBchAccount(
+                            payloadManager = payloadManager,
+                            jsonAccount = account,
+                            bchManager = bchDataManager,
+                            addressIndex = i,
+                            exchangeRates = exchangeRates,
+                            networkParams = environmentSettings.bitcoinCashNetworkParameters,
+                            feeDataManager = feeDataManager,
+                            sendDataManager = sendDataManager,
+                            walletPreferences = walletPreferences,
+                            custodialWalletManager = custodialManager,
+                            refreshTrigger = this@BchAsset
+                        )
+                        if (bchAccount.isDefault) {
+                            updateOfflineCache(bchAccount)
+                        }
+                        add(bchAccount)
                     }
-                    add(bchAccount)
                 }
             }
-            return updateDefaultAccountLabel.toSingle { accounts }
         }
-    }
 
     private fun updateOfflineCache(account: BchCryptoWalletAccount) {
         require(account.isDefault)

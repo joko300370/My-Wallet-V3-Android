@@ -104,6 +104,13 @@ class EthDataManager(
             .onErrorReturn { BigInteger.ZERO }
             .subscribeOn(Schedulers.io())
 
+    fun updateAccountLabel(label: String): Completable {
+        require(label.isNotEmpty())
+        check(ethDataStore.ethWallet != null)
+        ethDataStore.ethWallet?.renameAccount(label)
+        return save()
+    }
+
     fun getErc20Balance(cryptoCurrency: CryptoCurrency): Single<CryptoValue> {
         require(cryptoCurrency.hasFeature(IS_ERC20))
 

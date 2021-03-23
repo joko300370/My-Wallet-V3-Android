@@ -8,6 +8,7 @@ import com.blockchain.sunriver.XlmAccountReference
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
+import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.ReceiveAddress
@@ -21,8 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 internal class XlmCryptoWalletAccount(
     payloadManager: PayloadDataManager,
-    override val label: String = "",
-    internal val address: String,
+    private var xlmAccountReference: XlmAccountReference,
     private val xlmManager: XlmDataManager,
     override val exchangeRates: ExchangeRateDataManager,
     private val xlmFeesFetcher: XlmFeesFetcher,
@@ -32,6 +32,12 @@ internal class XlmCryptoWalletAccount(
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.XLM, custodialWalletManager) {
 
     override val isDefault: Boolean = true // Only one account ever, so always default
+
+    override val label: String
+        get() = xlmAccountReference.label
+
+    internal val address: String
+        get() = xlmAccountReference.accountId
 
     private val hasFunds = AtomicBoolean(false)
 
@@ -68,6 +74,15 @@ internal class XlmCryptoWalletAccount(
                 appendTradeActivity(custodialWalletManager, asset, it)
             }.doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 
+    override fun updateLabel(newLabel: String): Completable {
+        require(newLabel.isNotEmpty())
+        if (newLabel == label) return Completable.complete()
+        val revertLabel = label
+        xlmAccountReference = xlmAccountReference.copy(label = newLabel)
+        return xlmManager.updateAccountLabel(newLabel)
+            .doOnError { xlmAccountReference = xlmAccountReference.copy(label = revertLabel) }
+    }
+
     override fun createTxEngine(): TxEngine =
         XlmOnChainTxEngine(
             xlmDataManager = xlmManager,
@@ -76,25 +91,4 @@ internal class XlmCryptoWalletAccount(
             requireSecondPassword = payloadDataManager.isDoubleEncrypted,
             walletPreferences = walletPreferences
         )
-
-    constructor(
-        payloadManager: PayloadDataManager,
-        account: XlmAccountReference,
-        xlmManager: XlmDataManager,
-        exchangeRates: ExchangeRateDataManager,
-        xlmFeesFetcher: XlmFeesFetcher,
-        walletOptionsDataManager: WalletOptionsDataManager,
-        walletPreferences: WalletStatus,
-        custodialWalletManager: CustodialWalletManager
-    ) : this(
-        payloadManager = payloadManager,
-        label = account.label,
-        address = account.accountId,
-        xlmManager = xlmManager,
-        exchangeRates = exchangeRates,
-        xlmFeesFetcher = xlmFeesFetcher,
-        walletOptionsDataManager = walletOptionsDataManager,
-        walletPreferences = walletPreferences,
-        custodialWalletManager = custodialWalletManager
-    )
 }

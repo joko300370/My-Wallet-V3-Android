@@ -8,6 +8,7 @@ import com.blockchain.wallet.DefaultLabels
 import com.blockchain.wallet.Seed
 import com.blockchain.wallet.SeedAccess
 import info.blockchain.balance.CryptoCurrency
+import io.reactivex.Completable
 import io.reactivex.Maybe
 
 internal class XlmMetaDataInitializer(
@@ -40,7 +41,6 @@ internal class XlmMetaDataInitializer(
         repository.loadMetadata(XlmMetaData.MetaDataType, XlmMetaData::class.java)
             .ignoreBadMetadata()
             .compareForLog()
-            .updateLabelIfNeeded()
     }.maybeCache()
 
     private fun createAndSave(): Maybe<XlmMetaData> = newXlmMetaData().saveSideEffect()
@@ -107,31 +107,18 @@ internal class XlmMetaDataInitializer(
             )
         }
 
-    private fun Maybe<XlmMetaData>.updateLabelIfNeeded(): Maybe<XlmMetaData> =
-        flatMap {
-            if (it.accounts?.get(0)?.label == defaultLabels.getOldDefaultNonCustodialWalletLabel(CryptoCurrency.XLM)) {
-                Maybe.just(
-                    it.withUpdatedDefaultAccountLabel(
-                        defaultLabels.getDefaultNonCustodialWalletLabel(CryptoCurrency.XLM)
-                    )
-                ).saveSideEffect()
-            } else {
-                Maybe.just(it)
-            }
-        }
-}
-
-private fun XlmMetaData.withUpdatedDefaultAccountLabel(label: String): XlmMetaData =
-    this.copy(
-        accounts = this.accounts?.mapIndexed { index, xlmAccount ->
-            if (index == 0) {
-                xlmAccount.copy(
-                    label = label
+    fun updateAccountLabel(newLabel: String): Completable = load.map { metadata ->
+        val account = metadata.accounts?.get(0) ?: throw IllegalStateException("Account not initialised")
+        metadata.copy(
+            accounts = listOf(
+                account.copy(
+                    label = newLabel
                 )
-            } else
-                xlmAccount
-        }
-    )
+            )
+        )
+    }.saveSideEffect()
+        .ignoreElement()
+}
 
 private fun Maybe<XlmMetaData>.ignoreBadMetadata(): Maybe<XlmMetaData> =
     filter { !(it.accounts?.isEmpty() ?: true) }

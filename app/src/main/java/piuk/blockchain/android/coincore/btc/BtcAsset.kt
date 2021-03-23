@@ -75,29 +75,24 @@ internal class BtcAsset(
     override fun initToken(): Completable =
         Completable.complete()
 
-    override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> {
-        var updateDefaultAccountLabel = Completable.complete()
-        with(payloadManager) {
-            val result = mutableListOf<CryptoAccount>()
-            accounts.forEachIndexed { i, account ->
-                val btcAccount = btcAccountFromPayloadAccount(i, account)
-                if (btcAccount.isDefault) {
-                    updateOfflineCache(btcAccount)
-                    updateDefaultAccountLabel =
-                        if (btcAccount.label == labels.getOldDefaultNonCustodialWalletLabel(asset))
-                            btcAccount.updateLabel(
-                                labels.getDefaultNonCustodialWalletLabel(asset)
-                            ) else Completable.complete()
+    override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> =
+        Single.fromCallable {
+            with(payloadManager) {
+                val result = mutableListOf<CryptoAccount>()
+                accounts.forEachIndexed { i, account ->
+                    val btcAccount = btcAccountFromPayloadAccount(i, account)
+                    if (btcAccount.isDefault) {
+                        updateOfflineCache(btcAccount)
+                    }
+                    result.add(btcAccount)
                 }
-                result.add(btcAccount)
-            }
 
-            importedAddresses.forEach { account ->
-                result.add(btcAccountFromImportedAccount(account))
+                importedAddresses.forEach { account ->
+                    result.add(btcAccountFromImportedAccount(account))
+                }
+                result
             }
-            return updateDefaultAccountLabel.toSingle { result }
         }
-    }
 
     private fun updateOfflineCache(account: BtcCryptoWalletAccount) {
         require(account.isDefault)
