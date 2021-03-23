@@ -1,19 +1,22 @@
 package piuk.blockchain.android.coincore
 
 import com.blockchain.koin.dgldFeatureFlag
+import com.blockchain.koin.payloadScope
 import com.blockchain.koin.payloadScopeQualifier
-import info.blockchain.balance.CryptoCurrency
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import piuk.blockchain.android.coincore.alg.AlgoAsset
 import piuk.blockchain.android.coincore.bch.BchAsset
 import piuk.blockchain.android.coincore.btc.BtcAsset
+import piuk.blockchain.android.coincore.erc20.aave.AaveAsset
 import piuk.blockchain.android.coincore.erc20.dgld.DgldAsset
 import piuk.blockchain.android.coincore.erc20.pax.PaxAsset
 import piuk.blockchain.android.coincore.erc20.usdt.UsdtAsset
+import piuk.blockchain.android.coincore.erc20.yfi.YfiAsset
 import piuk.blockchain.android.coincore.eth.EthAsset
 import piuk.blockchain.android.coincore.fiat.FiatAsset
 import piuk.blockchain.android.coincore.fiat.LinkedBanksFactory
+import piuk.blockchain.android.coincore.impl.AssetResourcesImpl
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.coincore.impl.TxProcessorFactory
 import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
@@ -35,12 +38,11 @@ val coincoreModule = module {
                 crashLogger = get(),
                 pitLinking = get(),
                 labels = get(),
-                tiersService = get(),
                 environmentConfig = get(),
                 eligibilityProvider = get(),
                 offlineAccounts = get()
             )
-        }
+        }.bind(CryptoAsset::class)
 
         scoped {
             BtcAsset(
@@ -55,13 +57,12 @@ val coincoreModule = module {
                 pitLinking = get(),
                 crashLogger = get(),
                 labels = get(),
-                tiersService = get(),
                 walletPreferences = get(),
                 eligibilityProvider = get(),
                 offlineAccounts = get(),
                 coinsWebsocket = get()
             )
-        }
+        }.bind(CryptoAsset::class)
 
         scoped {
             BchAsset(
@@ -77,12 +78,11 @@ val coincoreModule = module {
                 sendDataManager = get(),
                 pitLinking = get(),
                 labels = get(),
-                tiersService = get(),
                 walletPreferences = get(),
                 offlineAccounts = get(),
                 eligibilityProvider = get()
             )
-        }
+        }.bind(CryptoAsset::class)
 
         scoped {
             XlmAsset(
@@ -97,13 +97,12 @@ val coincoreModule = module {
                 pitLinking = get(),
                 crashLogger = get(),
                 labels = get(),
-                tiersService = get(),
                 environmentConfig = get(),
                 walletPreferences = get(),
                 offlineAccounts = get(),
                 eligibilityProvider = get()
             )
-        }
+        }.bind(CryptoAsset::class)
 
         scoped {
             EthAsset(
@@ -118,12 +117,11 @@ val coincoreModule = module {
                 custodialManager = get(),
                 pitLinking = get(),
                 labels = get(),
-                tiersService = get(),
                 offlineAccounts = get(),
                 environmentConfig = get(),
                 eligibilityProvider = get()
             )
-        }
+        }.bind(CryptoAsset::class)
 
         scoped {
             PaxAsset(
@@ -137,13 +135,12 @@ val coincoreModule = module {
                 pitLinking = get(),
                 crashLogger = get(),
                 labels = get(),
-                tiersService = get(),
                 offlineAccounts = get(),
                 environmentConfig = get(),
                 walletPreferences = get(),
                 eligibilityProvider = get()
             )
-        }
+        }.bind(CryptoAsset::class)
 
         scoped {
             AlgoAsset(
@@ -155,12 +152,11 @@ val coincoreModule = module {
                 pitLinking = get(),
                 crashLogger = get(),
                 labels = get(),
-                tiersService = get(),
                 environmentConfig = get(),
                 eligibilityProvider = get(),
                 offlineAccounts = get()
             )
-        }
+        }.bind(CryptoAsset::class)
 
         scoped {
             FiatAsset(
@@ -184,13 +180,12 @@ val coincoreModule = module {
                 crashLogger = get(),
                 labels = get(),
                 pitLinking = get(),
-                tierService = get(),
                 offlineAccounts = get(),
                 environmentConfig = get(),
                 walletPreferences = get(),
                 eligibilityProvider = get()
             )
-        }
+        }.bind(CryptoAsset::class)
 
         scoped {
             DgldAsset(
@@ -208,31 +203,71 @@ val coincoreModule = module {
                 walletPreferences = get(),
                 eligibilityProvider = get(),
                 offlineAccounts = get(),
-                tiersService = get(),
                 wDgldFeatureFlag = get(dgldFeatureFlag)
             )
-        }
+        }.bind(CryptoAsset::class)
+
+        scoped {
+            AaveAsset(
+                payloadManager = get(),
+                ethDataManager = get(),
+                feeDataManager = get(),
+                exchangeRates = get(),
+                historicRates = get(),
+                currencyPrefs = get(),
+                custodialManager = get(),
+                crashLogger = get(),
+                labels = get(),
+                pitLinking = get(),
+                offlineAccounts = get(),
+                environmentConfig = get(),
+                walletPreferences = get(),
+                eligibilityProvider = get()
+            )
+        }.bind(CryptoAsset::class)
+
+        scoped {
+            YfiAsset(
+                payloadManager = get(),
+                ethDataManager = get(),
+                feeDataManager = get(),
+                exchangeRates = get(),
+                historicRates = get(),
+                currencyPrefs = get(),
+                custodialManager = get(),
+                crashLogger = get(),
+                labels = get(),
+                pitLinking = get(),
+                offlineAccounts = get(),
+                environmentConfig = get(),
+                walletPreferences = get(),
+                eligibilityProvider = get()
+            )
+        }.bind(CryptoAsset::class)
 
         scoped {
             Coincore(
                 payloadManager = get(),
                 fiatAsset = get<FiatAsset>(),
-                assetMap = mapOf(
-                    CryptoCurrency.BTC to get<BtcAsset>(),
-                    CryptoCurrency.BCH to get<BchAsset>(),
-                    CryptoCurrency.ETHER to get<EthAsset>(),
-                    CryptoCurrency.XLM to get<XlmAsset>(),
-                    CryptoCurrency.PAX to get<PaxAsset>(),
-                    CryptoCurrency.STX to get<StxAsset>(),
-                    CryptoCurrency.ALGO to get<AlgoAsset>(),
-                    CryptoCurrency.USDT to get<UsdtAsset>(),
-                    CryptoCurrency.DGLD to get<DgldAsset>()
-                ),
+                assetLoader = get(),
                 txProcessorFactory = get(),
                 defaultLabels = get(),
                 crashLogger = get()
             )
         }
+
+        scoped {
+            val cryptoAssets: List<CryptoAsset> = payloadScope.getAll()
+            CryptoAssetLoader(
+                cryptoAssets = cryptoAssets
+            )
+        }.bind(AssetLoader::class)
+
+        scoped {
+            AssetResourcesImpl(
+                resources = get()
+            )
+        }.bind(AssetResources::class)
 
         scoped {
             TxProcessorFactory(

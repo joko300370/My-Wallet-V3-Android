@@ -9,43 +9,40 @@ import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import java.math.BigInteger
 
 fun FeeDataManager.getFeeOptions(cryptoCurrency: CryptoCurrency): Single<out NetworkFees> =
-    when (cryptoCurrency) {
-        CryptoCurrency.BTC -> btcFeeOptions.map {
+    when {
+        cryptoCurrency == CryptoCurrency.BTC -> btcFeeOptions.map {
             BitcoinLikeFees(
                 it.regularFee,
                 it.priorityFee
             )
         }
-        CryptoCurrency.BCH -> bchFeeOptions.map {
+        cryptoCurrency == CryptoCurrency.BCH -> bchFeeOptions.map {
             BitcoinLikeFees(
                 it.regularFee,
                 it.priorityFee
             )
         }
-        CryptoCurrency.ETHER -> ethFeeOptions.map {
+        cryptoCurrency == CryptoCurrency.ETHER -> ethFeeOptions.map {
             EthereumFees(
                 it.regularFee,
                 it.priorityFee,
                 it.gasLimit
             )
         }
-        CryptoCurrency.XLM -> xlmFeeOptions.map {
+        cryptoCurrency == CryptoCurrency.XLM -> xlmFeeOptions.map {
             XlmFees(
                 CryptoValue.fromMinor(CryptoCurrency.XLM, it.regularFee.toBigInteger()),
                 CryptoValue.fromMinor(CryptoCurrency.XLM, it.priorityFee.toBigInteger())
             )
         }
-        CryptoCurrency.PAX,
-        CryptoCurrency.USDT,
-        CryptoCurrency.DGLD -> ethFeeOptions.map {
+        cryptoCurrency.hasFeature(CryptoCurrency.IS_ERC20) -> ethFeeOptions.map {
             EthereumFees(
                 it.regularFee,
                 it.priorityFee,
                 it.gasLimitContract
             )
         }
-        CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
-        CryptoCurrency.ALGO -> TODO("STUB: ALGO NOT IMPLEMENTED")
+        else -> TODO("STUB: ${cryptoCurrency.displayTicker} NOT IMPLEMENTED")
     }.singleOrError()
 
 sealed class NetworkFees

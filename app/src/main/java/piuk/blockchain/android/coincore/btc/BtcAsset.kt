@@ -5,7 +5,6 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligibilityProvider
-import com.blockchain.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -52,7 +51,6 @@ internal class BtcAsset(
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
-    tiersService: TierService,
     environmentConfig: EnvironmentConfig,
     private val walletPreferences: WalletStatus,
     offlineAccounts: OfflineAccountUpdater,
@@ -66,7 +64,6 @@ internal class BtcAsset(
     custodialManager,
     pitLinking,
     crashLogger,
-    tiersService,
     environmentConfig,
     eligibilityProvider,
     offlineAccounts

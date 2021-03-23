@@ -6,7 +6,6 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligibilityProvider
-import com.blockchain.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.util.FormatsUtil
@@ -43,7 +42,6 @@ internal class EthAsset(
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
-    tiersService: TierService,
     environmentConfig: EnvironmentConfig,
     eligibilityProvider: EligibilityProvider,
     offlineAccounts: OfflineAccountUpdater
@@ -56,7 +54,6 @@ internal class EthAsset(
     custodialManager,
     pitLinking,
     crashLogger,
-    tiersService,
     environmentConfig,
     eligibilityProvider,
     offlineAccounts
@@ -66,7 +63,9 @@ internal class EthAsset(
         CryptoCurrency.ETHER to labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.ETHER),
         CryptoCurrency.PAX to labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.PAX),
         CryptoCurrency.USDT to labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.USDT),
-        CryptoCurrency.DGLD to labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.DGLD)
+        CryptoCurrency.DGLD to labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.DGLD),
+        CryptoCurrency.AAVE to labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.AAVE),
+        CryptoCurrency.YFI to labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.YFI)
     )
 
     override val asset: CryptoCurrency

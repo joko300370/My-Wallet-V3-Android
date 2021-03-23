@@ -4,7 +4,6 @@ import androidx.annotation.VisibleForTesting
 import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligibilityProvider
-import com.blockchain.nabu.service.TierService
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
@@ -48,7 +47,6 @@ internal abstract class CryptoAssetBase(
     protected val custodialManager: CustodialWalletManager,
     private val pitLinking: PitLinking,
     protected val crashLogger: CrashLogger,
-    private val tiersService: TierService,
     protected val environmentConfig: EnvironmentConfig,
     private val eligibilityProvider: EligibilityProvider,
     protected val offlineAccounts: OfflineAccountUpdater

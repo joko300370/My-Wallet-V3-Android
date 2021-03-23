@@ -629,6 +629,8 @@ class CoinsWebSocketStrategy(
             entity == Entity.TokenAccount && isErc20ParamType(CryptoCurrency.PAX) -> CryptoCurrency.PAX
             entity == Entity.TokenAccount && isErc20ParamType(CryptoCurrency.USDT) -> CryptoCurrency.USDT
             entity == Entity.TokenAccount && isErc20ParamType(CryptoCurrency.DGLD) -> CryptoCurrency.DGLD
+            entity == Entity.TokenAccount && isErc20ParamType(CryptoCurrency.AAVE) -> CryptoCurrency.AAVE
+            entity == Entity.TokenAccount && isErc20ParamType(CryptoCurrency.YFI) -> CryptoCurrency.YFI
             else -> {
                 throw IllegalStateException("This should never trigger, did we add a new ERC20 token?")
             }
@@ -641,7 +643,9 @@ class CoinsWebSocketStrategy(
     private fun EthResponse.isErc20Token(): Boolean =
         isErc20TransactionType(CryptoCurrency.PAX) ||
             isErc20TransactionType(CryptoCurrency.USDT) ||
-            isErc20TransactionType(CryptoCurrency.DGLD)
+            isErc20TransactionType(CryptoCurrency.DGLD) ||
+            isErc20TransactionType(CryptoCurrency.AAVE) ||
+            isErc20TransactionType(CryptoCurrency.YFI)
 
     private fun EthResponse.isErc20TransactionType(cryptoCurrency: CryptoCurrency) =
         transaction?.to.equals(ethDataManager.getErc20TokenData(cryptoCurrency).contractAddress, true)

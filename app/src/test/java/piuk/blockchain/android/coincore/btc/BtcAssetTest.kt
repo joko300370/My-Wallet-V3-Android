@@ -6,7 +6,6 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligibilityProvider
-import com.blockchain.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -53,7 +52,6 @@ class BtcAssetTest {
     private val labels: DefaultLabels = mock()
     private val pitLinking: PitLinking = mock()
     private val crashLogger: CrashLogger = mock()
-    private val tiersService: TierService = mock()
     private val btcParams: NetworkParameters = mock()
     private val environmentConfig: EnvironmentConfig = mock {
         on { bitcoinNetworkParameters } itReturns btcParams
@@ -74,7 +72,6 @@ class BtcAssetTest {
         labels = labels,
         pitLinking = pitLinking,
         crashLogger = crashLogger,
-        tiersService = tiersService,
         environmentConfig = environmentConfig,
         offlineAccounts = offlineCache,
         walletPreferences = walletPreferences,

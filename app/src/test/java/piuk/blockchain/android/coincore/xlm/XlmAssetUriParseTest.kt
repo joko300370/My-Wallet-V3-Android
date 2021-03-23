@@ -8,7 +8,6 @@ import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.XlmFeesFetcher
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligibilityProvider
-import com.blockchain.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import org.amshove.kluent.mock
 import org.junit.Rule
@@ -41,7 +40,6 @@ class XlmAssetUriParseTest {
     private val labels: DefaultLabels = mock()
     private val pitLinking: PitLinking = mock()
     private val crashLogger: CrashLogger = mock()
-    private val tiersService: TierService = mock()
     private val environmentConfig: EnvironmentConfig = mock()
     private val walletPreferences: WalletStatus = mock()
     private val eligibilityProvider: EligibilityProvider = mock()
@@ -59,7 +57,6 @@ class XlmAssetUriParseTest {
         labels = labels,
         pitLinking = pitLinking,
         crashLogger = crashLogger,
-        tiersService = tiersService,
         environmentConfig = environmentConfig,
         walletPreferences = walletPreferences,
         offlineAccounts = offlineCache,

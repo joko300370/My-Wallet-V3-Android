@@ -206,6 +206,26 @@ public class EthereumWallet {
             wasUpdated = true;
         }
 
+        if (!map.containsKey(Erc20TokenData.AAVE_CONTRACT_NAME) ||
+            !map.get(Erc20TokenData.AAVE_CONTRACT_NAME).hasLabelAndAddressStored()
+        ) {
+            map.put(
+                Erc20TokenData.AAVE_CONTRACT_NAME,
+                Erc20TokenData.Companion.createAaveTokenData(labelsMap.get(CryptoCurrency.AAVE))
+            );
+            wasUpdated = true;
+        }
+
+        if (!map.containsKey(Erc20TokenData.YFI_CONTRACT_NAME) ||
+            !map.get(Erc20TokenData.YFI_CONTRACT_NAME).hasLabelAndAddressStored()
+        ) {
+            map.put(
+                Erc20TokenData.YFI_CONTRACT_NAME,
+                Erc20TokenData.Companion.createYfiTokenData(labelsMap.get(CryptoCurrency.YFI))
+            );
+            wasUpdated = true;
+        }
+
         return wasUpdated;
     }
 }
