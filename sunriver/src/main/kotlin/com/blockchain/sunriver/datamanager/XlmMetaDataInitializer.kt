@@ -116,8 +116,7 @@ internal class XlmMetaDataInitializer(
                 )
             )
         )
-    }.saveSideEffect()
-        .ignoreElement()
+    }.saveSideEffect().ignoreElement()
 }
 
 private fun Maybe<XlmMetaData>.ignoreBadMetadata(): Maybe<XlmMetaData> =

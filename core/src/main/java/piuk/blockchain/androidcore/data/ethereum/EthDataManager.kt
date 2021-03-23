@@ -434,14 +434,6 @@ class EthDataManager(
                     }
                 }
 
-                val defEthLabel = labelsMap[CryptoCurrency.ETHER]
-                if (defEthLabel != null && ethWallet.account.label != defEthLabel) {
-                    ethWallet.account.apply {
-                        label = defEthLabel
-                        needsSave = true
-                    }
-                }
-
                 if (ethWallet.updateErc20Tokens(labelsMap.filter { it.key.hasFeature(IS_ERC20) })) {
                     needsSave = true
                 }
