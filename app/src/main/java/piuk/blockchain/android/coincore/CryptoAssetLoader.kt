@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore
 
 import info.blockchain.balance.CryptoCurrency
+import kotlin.math.max
 
 class CryptoAssetLoader(private val cryptoAssets: List<CryptoAsset>) : AssetLoader {
     override val assetMap: Map<CryptoCurrency, CryptoAsset>
@@ -13,7 +14,7 @@ class CryptoAssetLoader(private val cryptoAssets: List<CryptoAsset>) : AssetLoad
         indexOfFirstErc20.takeIf { it != -1 }?.let {
             return this.toMutableList().apply {
                 remove(ethItem)
-                add(indexOfFirstErc20, ethItem)
+                add(max(indexOfFirstErc20 - 1, 0), ethItem)
                 toList()
             }
         } ?: return this
