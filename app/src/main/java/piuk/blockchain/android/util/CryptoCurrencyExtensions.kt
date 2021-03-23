@@ -28,6 +28,7 @@ fun CryptoCurrency.colorRes(): Int =
         CryptoCurrency.USDT -> R.color.color_usdt_logo
         CryptoCurrency.DGLD -> R.color.color_dgld_logo
         CryptoCurrency.AAVE -> R.color.color_aave_logo
+        CryptoCurrency.YFI -> R.color.color_yfi_logo
     }
 
 @ColorInt
@@ -44,6 +45,7 @@ fun CryptoCurrency.chartLineColour(context: Context) =
             CryptoCurrency.USDT -> R.color.color_usdt_logo
             CryptoCurrency.DGLD -> R.color.dgld_chart
             CryptoCurrency.AAVE -> R.color.aave
+            CryptoCurrency.YFI -> R.color.yfi
         })
 
 @DrawableRes
@@ -59,6 +61,7 @@ fun CryptoCurrency.drawableResFilled(): Int =
         CryptoCurrency.USDT -> R.drawable.vector_usdt_colored
         CryptoCurrency.DGLD -> R.drawable.vector_dgld_colored
         CryptoCurrency.AAVE -> R.drawable.vector_aave_colored
+        CryptoCurrency.YFI -> R.drawable.vector_yfi_colored
     }
 
 @DrawableRes
@@ -73,6 +76,7 @@ fun CryptoCurrency.coinIconWhite(): Int =
         CryptoCurrency.USDT -> R.drawable.vector_usdt_white
         CryptoCurrency.DGLD -> R.drawable.vector_dgld_white
         CryptoCurrency.AAVE,
+        CryptoCurrency.YFI,
         CryptoCurrency.STX -> throw NotImplementedError("$displayTicker Not implemented")
     }
 
@@ -89,6 +93,7 @@ fun CryptoCurrency.maskedAsset(): Int =
         CryptoCurrency.USDT -> R.drawable.ic_usdt_circled_mask
         CryptoCurrency.DGLD -> R.drawable.ic_dgld_circled_mask
         CryptoCurrency.AAVE -> R.drawable.ic_aave_circled_mask
+        CryptoCurrency.YFI -> R.drawable.ic_yfi_circled_mask
     }
 
 fun ImageView.setImageDrawable(@DrawableRes res: Int) {
@@ -112,6 +117,7 @@ fun CryptoCurrency.errorIcon(): Int =
         CryptoCurrency.USDT -> R.drawable.vector_usdt_error
         CryptoCurrency.DGLD -> R.drawable.vector_dgld_error
         CryptoCurrency.AAVE -> R.drawable.vector_aave_error
+        CryptoCurrency.YFI -> R.drawable.vector_yfi_error
     }
 
 @StringRes
@@ -127,6 +133,7 @@ fun CryptoCurrency.assetName() =
         CryptoCurrency.USDT -> R.string.usdt
         CryptoCurrency.DGLD -> R.string.dgld
         CryptoCurrency.AAVE -> R.string.aave
+        CryptoCurrency.YFI -> R.string.yfi
     }
 
 @ColorRes
@@ -141,6 +148,7 @@ fun CryptoCurrency.assetTint() =
         CryptoCurrency.USDT -> R.color.usdt_bkgd
         CryptoCurrency.DGLD -> R.color.dgld_bkgd
         CryptoCurrency.AAVE -> R.color.aave_bkgd
+        CryptoCurrency.YFI -> R.color.yfi_bkgd
         else -> {
             android.R.color.transparent // STX left, do nothing
         }
@@ -158,6 +166,7 @@ fun CryptoCurrency.assetFilter() =
         CryptoCurrency.USDT -> R.color.usdt
         CryptoCurrency.DGLD -> R.color.black
         CryptoCurrency.AAVE -> R.color.aave
+        CryptoCurrency.YFI -> R.color.yfi
         else -> {
             android.R.color.transparent // STX left, do nothing
         }
@@ -173,7 +182,8 @@ fun CryptoCurrency.makeBlockExplorerUrl(
     CryptoCurrency.PAX,
     CryptoCurrency.USDT,
     CryptoCurrency.DGLD,
-    CryptoCurrency.AAVE -> "https://www.blockchain.com/eth/tx/"
+    CryptoCurrency.AAVE,
+    CryptoCurrency.YFI -> "https://www.blockchain.com/eth/tx/"
     CryptoCurrency.ALGO -> "https://algoexplorer.io/tx/"
     CryptoCurrency.STX -> throw NotImplementedError("STX Not implemented")
 } + transactionHash
@@ -187,7 +197,8 @@ fun CryptoCurrency.getDecimalPlaces(): Int =
         CryptoCurrency.ALGO,
         CryptoCurrency.USDT,
         CryptoCurrency.DGLD,
-        CryptoCurrency.AAVE -> 2
+        CryptoCurrency.AAVE,
+        CryptoCurrency.YFI -> 2
         CryptoCurrency.XLM -> 4
         CryptoCurrency.STX -> throw NotImplementedError("STX Not implemented")
     }
@@ -216,6 +227,7 @@ internal class ResourceDefaultLabels(
                 CryptoCurrency.USDT -> R.string.usdt_default_account_label
                 CryptoCurrency.DGLD -> R.string.dgld_default_account_label
                 CryptoCurrency.AAVE -> R.string.aave_default_account_label
+                CryptoCurrency.YFI -> R.string.yfi_default_account_label
             }
         )
 

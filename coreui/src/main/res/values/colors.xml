@@ -74,6 +74,7 @@
     <color name="color_usdt_logo">@color/usdt</color>
     <color name="color_dgld_logo">@color/dgld</color>
     <color name="color_aave_logo">@color/aave</color>
+    <color name="color_yfi_logo">@color/yfi</color>
 
     <!-- Non-Spendable colours -->
     <color name="non_spendable_button_background">@color/grey_100</color>

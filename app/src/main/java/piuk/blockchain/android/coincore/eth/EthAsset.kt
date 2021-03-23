@@ -64,7 +64,8 @@ internal class EthAsset(
         CryptoCurrency.PAX to labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.PAX),
         CryptoCurrency.USDT to labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.USDT),
         CryptoCurrency.DGLD to labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.DGLD),
-        CryptoCurrency.AAVE to labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.AAVE)
+        CryptoCurrency.AAVE to labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.AAVE),
+        CryptoCurrency.YFI to labels.getDefaultNonCustodialWalletLabel(CryptoCurrency.YFI)
     )
 
     override val asset: CryptoCurrency

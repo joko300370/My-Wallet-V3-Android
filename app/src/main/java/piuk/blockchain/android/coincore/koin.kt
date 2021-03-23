@@ -12,6 +12,7 @@ import piuk.blockchain.android.coincore.erc20.aave.AaveAsset
 import piuk.blockchain.android.coincore.erc20.dgld.DgldAsset
 import piuk.blockchain.android.coincore.erc20.pax.PaxAsset
 import piuk.blockchain.android.coincore.erc20.usdt.UsdtAsset
+import piuk.blockchain.android.coincore.erc20.yfi.YfiAsset
 import piuk.blockchain.android.coincore.eth.EthAsset
 import piuk.blockchain.android.coincore.fiat.FiatAsset
 import piuk.blockchain.android.coincore.fiat.LinkedBanksFactory
@@ -208,6 +209,25 @@ val coincoreModule = module {
 
         scoped {
             AaveAsset(
+                payloadManager = get(),
+                ethDataManager = get(),
+                feeDataManager = get(),
+                exchangeRates = get(),
+                historicRates = get(),
+                currencyPrefs = get(),
+                custodialManager = get(),
+                crashLogger = get(),
+                labels = get(),
+                pitLinking = get(),
+                offlineAccounts = get(),
+                environmentConfig = get(),
+                walletPreferences = get(),
+                eligibilityProvider = get()
+            )
+        }.bind(CryptoAsset::class)
+
+        scoped {
+            YfiAsset(
                 payloadManager = get(),
                 ethDataManager = get(),
                 feeDataManager = get(),

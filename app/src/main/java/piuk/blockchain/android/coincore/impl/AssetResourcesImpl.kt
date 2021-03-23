@@ -18,5 +18,6 @@ internal class AssetResourcesImpl(val resources: Resources) : AssetResources {
             CryptoCurrency.USDT -> resources.getString(R.string.usdt)
             CryptoCurrency.STX -> resources.getString(R.string.stacks_1)
             CryptoCurrency.AAVE -> resources.getString(R.string.aave)
+            CryptoCurrency.YFI -> resources.getString(R.string.yfi)
         }
 }

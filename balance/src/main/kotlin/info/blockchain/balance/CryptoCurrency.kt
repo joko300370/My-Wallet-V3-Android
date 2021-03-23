@@ -115,6 +115,15 @@ enum class CryptoCurrency(
         requiredConfirmations = 12, // Same as ETHER
         startDateForPrice = 1615831200L, // 2021-03-15 00:00:00 UTC
         featureFlags = CryptoCurrency.PRICE_CHARTING or CryptoCurrency.IS_ERC20
+    ),
+    YFI(
+        networkTicker = "YFI",
+        displayTicker = "YFI",
+        dp = 18,
+        userDp = 8,
+        requiredConfirmations = 12, // Same as ETHER
+        startDateForPrice = 1615831200L, // Same as AAVE
+        featureFlags = CryptoCurrency.PRICE_CHARTING or CryptoCurrency.IS_ERC20
     );
 
     fun hasFeature(feature: Long): Boolean = (0L != (featureFlags and feature))
