@@ -921,7 +921,6 @@
     <string name="iban">IBAN</string>
     <string name="estonia">Estonie</string>
     <string name="lets_setup_wallet">Préparons votre portefeuille. Vous pouvez acheter rapidement la crypto maintenant ou le faire plus tard.</string>
-    <string name="exchange_default_account_label">Mon adresse Exchange %1$s</string>
     <string name="linked_cards">Cartes liées</string>
     <string name="tx_title_send">Envoyer %1s</string>
     <string name="tx_title_receive">Recevez %1s</string>
@@ -1006,7 +1005,6 @@
     <string name="common_spaced_strings">%1$s %2$s</string>
     <string name="server_unreachable_exit">Impossible de se connecter au serveur, veuillez réessayer plus tard.</string>
     <string name="dashboard_asset_balance_interest">Gagnez %1$.1f %% APY</string>
-    <string name="default_label_interest_wallet">Portefeuille d\'intérêt</string>
     <string name="activity_details_created">Date</string>
     <string name="activity_details_completed">Terminé</string>
     <string name="activity_details_fee">Frais</string>
@@ -1217,7 +1215,6 @@ Veuillez réessayer plus tard.</string>
     <string name="purchase_card_note_2">Votre crypto sera disponible pour être retiré dans</string>
     <string name="select_send_sheet_title">Envoyé de</string>
     <string name="select_send_source_title">Envoyé de</string>
-    <string name="fiat_currency_funds_wallet_name">Mon portefeuille %1s</string>
     <string name="us_dollars">Dollars américains</string>
     <string name="fiat_funds_detail_withdraw_details">Cashout à votre banque</string>
     <string name="withdraw_currency">Retirer %1$s</string>

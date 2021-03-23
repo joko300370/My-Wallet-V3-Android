@@ -917,7 +917,6 @@
     <string name="iban">IBAN</string>
     <string name="estonia">Estland</string>
     <string name="lets_setup_wallet">Lassen Sie uns Ihre Brieftasche einrichten. Sie können Krypto jetzt schnell kaufen oder dies später tun.</string>
-    <string name="exchange_default_account_label">Meine Exchange %1$s Adresse</string>
     <string name="linked_cards">Verknüpfte Karten</string>
     <string name="tx_title_send">%1s senden</string>
     <string name="tx_title_receive">Erhalte %1s</string>
@@ -1002,7 +1001,6 @@
     <string name="common_spaced_strings">%1$s %2$s</string>
     <string name="server_unreachable_exit">Es kann keine Verbindung zum Server hergestellt werden. Versuchen Sie es später erneut.</string>
     <string name="dashboard_asset_balance_interest">Verdiene %1$.1f %% APY</string>
-    <string name="default_label_interest_wallet">Zinsgeldbörse</string>
     <string name="activity_details_created">Datum</string>
     <string name="activity_details_completed">Abgeschlossen</string>
     <string name="activity_details_fee">Gebühr</string>
@@ -1211,7 +1209,6 @@
     <string name="purchase_card_note_2">Ihre Krypto kann innerhalb von abgerufen werden</string>
     <string name="select_send_sheet_title">Senden von</string>
     <string name="select_send_source_title">Senden von</string>
-    <string name="fiat_currency_funds_wallet_name">Meine %1s Brieftasche</string>
     <string name="us_dollars">US Dollar</string>
     <string name="fiat_funds_detail_withdraw_details">Auszahlung an Ihre Bank</string>
     <string name="withdraw_currency">%1$s abheben</string>

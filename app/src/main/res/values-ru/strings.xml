@@ -921,7 +921,6 @@
     <string name="iban">IBAN</string>
     <string name="estonia">Эстония</string>
     <string name="lets_setup_wallet">Давайте настроим ваш кошелек. Вы можете быстро купить крипто сейчас или сделать это позже.</string>
-    <string name="exchange_default_account_label">Мой обменный %1$s адрес</string>
     <string name="linked_cards">Связанные карты</string>
     <string name="tx_title_send">Отправить %1s</string>
     <string name="tx_title_receive">Получать %1s</string>
@@ -1006,7 +1005,6 @@
     <string name="common_spaced_strings">%1$s %2$s</string>
     <string name="server_unreachable_exit">Невозможно подключиться к серверу, повторите попытку позже.</string>
     <string name="dashboard_asset_balance_interest">Зарабатывай %1$.1f %% APY</string>
-    <string name="default_label_interest_wallet">Интерес кошелек</string>
     <string name="activity_details_created">Свидание</string>
     <string name="activity_details_completed">Завершенный</string>
     <string name="activity_details_fee">плата</string>
@@ -1217,7 +1215,6 @@
     <string name="purchase_card_note_2">Ваша криптовалюта будет доступна для вывода в течение</string>
     <string name="select_send_sheet_title">Отправлено из</string>
     <string name="select_send_source_title">Отправлено из</string>
-    <string name="fiat_currency_funds_wallet_name">Мой %1s кошелек</string>
     <string name="us_dollars">Доллары США</string>
     <string name="fiat_funds_detail_withdraw_details">Вывод в ваш банк</string>
     <string name="withdraw_currency">Вывести %1$s</string>

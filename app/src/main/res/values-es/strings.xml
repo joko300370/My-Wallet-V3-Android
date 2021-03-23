@@ -919,7 +919,6 @@ Euros/Dolares</string>
     <string name="iban">IBAN</string>
     <string name="estonia">Estonia</string>
     <string name="lets_setup_wallet">Vamos a configurar su billetera. Puede comprar rápidamente crypto ahora o hacer esto más tarde.</string>
-    <string name="exchange_default_account_label">Mi intercambio %1$s Dirección</string>
     <string name="linked_cards">Tarjetas vinculadas</string>
     <string name="tx_title_send">Enviar %1s</string>
     <string name="tx_title_receive">Recibe %1s</string>
@@ -1004,7 +1003,6 @@ Euros/Dolares</string>
     <string name="common_spaced_strings">%1$s %2$s</string>
     <string name="server_unreachable_exit">No se puede conectar al servidor, intente más tarde.</string>
     <string name="dashboard_asset_balance_interest">Gane %1$.1f %% APY</string>
-    <string name="default_label_interest_wallet">Billetera de intereses</string>
     <string name="activity_details_created">Fecha</string>
     <string name="activity_details_completed">Terminado</string>
     <string name="activity_details_fee">Cuota</string>
@@ -1211,7 +1209,6 @@ Esto le permitirá restaurar su Wallet si perdiera este dispositivo.</string>
     <string name="purchase_card_note_2">Su cripto estará disponible para ser retirado dentro de</string>
     <string name="select_send_sheet_title">Enviado desde</string>
     <string name="select_send_source_title">Enviado desde</string>
-    <string name="fiat_currency_funds_wallet_name">Mi billetera %1s</string>
     <string name="us_dollars">Dólares estadounidenses</string>
     <string name="fiat_funds_detail_withdraw_details">Retiro a su banco</string>
     <string name="withdraw_currency">Retirar %1$s</string>

@@ -139,10 +139,11 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
             is BuyPurchaseAmount -> infoType.fundedFiat.toStringWithSymbol()
             is TransactionId -> infoType.txId
             is BuyCryptoWallet -> parent.context.getString(
-                R.string.custodial_wallet_default_label_1,
-                parent.context.getString(infoType.crypto.assetName())
+                R.string.custodial_wallet_default_label_1
             )
-            is SellCryptoWallet -> parent.context.getString(R.string.fiat_currency_funds_wallet_name, infoType.currency)
+            is SellCryptoWallet -> parent.context.getString(
+                R.string.fiat_currency_funds_wallet_name_1, infoType.currency
+            )
             is SellPurchaseAmount -> infoType.value.toStringWithSymbol()
             is BuyPaymentMethod -> {
                 when {

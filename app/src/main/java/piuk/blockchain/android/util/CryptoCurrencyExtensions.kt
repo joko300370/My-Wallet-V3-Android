@@ -229,8 +229,7 @@ internal class ResourceDefaultLabels(
         )
 
     override fun getDefaultCustodialWalletLabel(cryptoCurrency: CryptoCurrency): String {
-        val asset = resources.getString(cryptoCurrency.assetName())
-        return resources.getString(R.string.custodial_wallet_default_label_1, asset)
+        return resources.getString(R.string.custodial_wallet_default_label_1)
     }
 
     override fun getAssetMasterWalletLabel(cryptoCurrency: CryptoCurrency): String =
@@ -240,13 +239,13 @@ internal class ResourceDefaultLabels(
         resources.getString(R.string.default_label_all_wallets)
 
     override fun getDefaultInterestWalletLabel(cryptoCurrency: CryptoCurrency): String =
-        resources.getString(R.string.default_label_interest_wallet)
+        resources.getString(R.string.default_label_interest_wallet_1)
 
     override fun getDefaultExchangeWalletLabel(cryptoCurrency: CryptoCurrency): String =
-        resources.getString(R.string.exchange_default_account_label, cryptoCurrency.displayTicker)
+        resources.getString(R.string.exchange_default_account_label_1, cryptoCurrency.displayTicker)
 
     override fun getDefaultCustodialFiatWalletLabel(fiatCurrency: String): String =
-        resources.getString(R.string.fiat_currency_funds_wallet_name, fiatCurrency)
+        resources.getString(R.string.fiat_currency_funds_wallet_name_1, fiatCurrency)
 }
 
 class AssetResourceFactory(

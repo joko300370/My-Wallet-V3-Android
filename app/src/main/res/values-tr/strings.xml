@@ -917,7 +917,6 @@
     <string name="iban">IBAN</string>
     <string name="estonia">Estonya</string>
     <string name="lets_setup_wallet">Cüzdanınızı ayarlayalım. Şimdi hızlı bir şekilde kripto satın alabilir veya daha sonra yapabilirsiniz.</string>
-    <string name="exchange_default_account_label">Değişim %1$s Adresi</string>
     <string name="linked_cards">Bağlantılı Kartlar</string>
     <string name="tx_title_send">%1s gönder</string>
     <string name="tx_title_receive">teslim almak %1s</string>
@@ -1001,7 +1000,6 @@
     <string name="common_spaced_strings">%1$s %2$s</string>
     <string name="server_unreachable_exit">Sunucuya bağlanılamıyor, lütfen daha sonra tekrar deneyin.</string>
     <string name="dashboard_asset_balance_interest">%% %1$.1f %% APY kazanın</string>
-    <string name="default_label_interest_wallet">Faiz Cüzdanı</string>
     <string name="activity_details_created">tarih</string>
     <string name="activity_details_completed">Tamamlandı</string>
     <string name="activity_details_fee">ücret</string>
@@ -1213,7 +1211,6 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
     <string name="purchase_card_note_2">Kripto paranız içinde çekilmeye hazır olacak</string>
     <string name="select_send_sheet_title">Gönderen</string>
     <string name="select_send_source_title">Gönderen</string>
-    <string name="fiat_currency_funds_wallet_name">%1s Cüzdanım</string>
     <string name="us_dollars">Amerikan doları</string>
     <string name="fiat_funds_detail_withdraw_details">Bankanıza Para Çekme</string>
     <string name="withdraw_currency">%1$s çek</string>

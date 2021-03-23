@@ -921,7 +921,6 @@
     <string name="iban">IBAN</string>
     <string name="estonia">Estônia</string>
     <string name="lets_setup_wallet">Vamos configurar sua carteira. Você pode comprar rapidamente criptografia agora ou fazer isso mais tarde.</string>
-    <string name="exchange_default_account_label">Meu endereço %1$s Exchange</string>
     <string name="linked_cards">Cartões vinculados</string>
     <string name="tx_title_send">Enviar %1s</string>
     <string name="tx_title_receive">Receba %1s</string>
@@ -1006,7 +1005,6 @@
     <string name="common_spaced_strings">%1$s %2$s</string>
     <string name="server_unreachable_exit">Não foi possível conectar ao servidor, tente novamente mais tarde.</string>
     <string name="dashboard_asset_balance_interest">Ganhe %1$.1f %% %1$.1f</string>
-    <string name="default_label_interest_wallet">Carteira de juros</string>
     <string name="activity_details_created">Encontro</string>
     <string name="activity_details_completed">Concluído</string>
     <string name="activity_details_fee">Taxa</string>
@@ -1216,7 +1214,6 @@ se disponível. Isso permite que restaure a sua carteira e perder este dispositi
     <string name="purchase_card_note_2">Sua criptografia estará disponível para ser retirada em</string>
     <string name="select_send_sheet_title">Enviar de</string>
     <string name="select_send_source_title">Enviar de</string>
-    <string name="fiat_currency_funds_wallet_name">Minha carteira %1s</string>
     <string name="us_dollars">Dólares americanos</string>
     <string name="fiat_funds_detail_withdraw_details">Saque para o seu banco</string>
     <string name="withdraw_currency">Retirar %1$s</string>
