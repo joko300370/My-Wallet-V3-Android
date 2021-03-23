@@ -70,7 +70,7 @@ internal class BchAsset(
             .doOnError { Timber.e("Unable to init BCH, because: $it") }
             .onErrorComplete()
 
-    override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList>  =
+    override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> =
         Single.fromCallable {
             with(bchDataManager) {
                 mutableListOf<CryptoAccount>().apply {

@@ -64,7 +64,15 @@ internal abstract class CryptoAssetBase(
     private fun updateLabelsIfNeeded(list: SingleAccountList): Completable =
         Completable.concat(
             list.map {
-                (it as? CryptoNonCustodialAccount)?.updateLabelIfNeeded()?.onErrorComplete() ?: Completable.complete()
+                val cryptoNonCustodialAccount = it as? CryptoNonCustodialAccount
+                if (cryptoNonCustodialAccount?.labelNeedsUpdate() == true)
+                    cryptoNonCustodialAccount.updateLabel(labels.getDefaultNonCustodialWalletLabel(asset))
+                        .doOnError { error ->
+                            crashLogger.logException(error)
+                        }
+                        .onErrorComplete()
+                else
+                    Completable.complete()
             }
         )
 
@@ -93,10 +101,8 @@ internal abstract class CryptoAssetBase(
             crashLogger.logException(it, errorMsg)
         }
 
-    private fun CryptoNonCustodialAccount.updateLabelIfNeeded(): Completable =
-        if (label == labels.getOldDefaultNonCustodialWalletLabel(asset)) {
-            updateLabel(labels.getDefaultNonCustodialWalletLabel(asset))
-        } else Completable.complete()
+    private fun CryptoNonCustodialAccount.labelNeedsUpdate(): Boolean =
+        label == labels.getOldDefaultNonCustodialWalletLabel(asset)
 
     // Called when the set of account in use bu this asset changes. Update the offline
     // cache and the BE notification addresses here

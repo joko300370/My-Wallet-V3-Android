@@ -1,6 +1,5 @@
 package piuk.blockchain.android.coincore.impl
 
-import androidx.annotation.CallSuper
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
