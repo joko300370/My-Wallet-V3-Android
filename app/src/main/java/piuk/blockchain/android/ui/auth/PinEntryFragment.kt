@@ -33,7 +33,6 @@ import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.play.core.tasks.Task
-import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -62,7 +61,6 @@ import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.ViewUtils
-import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.copyHashOnLongClick
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible

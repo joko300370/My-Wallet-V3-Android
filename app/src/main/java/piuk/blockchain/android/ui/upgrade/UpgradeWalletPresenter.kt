@@ -6,16 +6,14 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.util.PasswordUtil
 import io.reactivex.rxkotlin.plusAssign
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.launcher.LauncherActivity
+import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.data.access.AccessState
-import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.assetName
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import piuk.blockchain.androidcoreui.utils.logging.walletUpgradeEvent
 

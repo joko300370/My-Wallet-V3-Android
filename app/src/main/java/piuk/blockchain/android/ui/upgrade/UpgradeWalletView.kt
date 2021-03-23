@@ -1,7 +1,6 @@
 package piuk.blockchain.android.ui.upgrade
 
 import androidx.annotation.StringRes
-import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.ui.base.View
 

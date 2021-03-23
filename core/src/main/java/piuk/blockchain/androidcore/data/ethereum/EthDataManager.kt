@@ -1,7 +1,6 @@
 package piuk.blockchain.androidcore.data.ethereum
 
 import com.blockchain.logging.LastTxUpdater
-import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoCurrency.Companion.IS_ERC20
 import info.blockchain.balance.CryptoValue

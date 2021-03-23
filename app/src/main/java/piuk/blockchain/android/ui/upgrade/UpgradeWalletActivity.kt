@@ -19,12 +19,10 @@ import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.blockchain.koin.scopedInject
 import com.blockchain.ui.password.SecondPasswordHandler
-import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.ActivityUpgradeWalletBinding
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
-import piuk.blockchain.android.util.assetName
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 
 internal class UpgradeWalletActivity : BaseMvpActivity<UpgradeWalletView, UpgradeWalletPresenter>(),

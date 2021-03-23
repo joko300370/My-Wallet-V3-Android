@@ -31,7 +31,6 @@ import piuk.blockchain.android.ui.activity.detail.TransactionId
 import piuk.blockchain.android.ui.activity.detail.Value
 import piuk.blockchain.android.ui.activity.detail.XlmMemo
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.toFormattedString
 

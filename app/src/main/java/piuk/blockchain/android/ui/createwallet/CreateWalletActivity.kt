@@ -29,7 +29,6 @@ import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.ViewUtils
-import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.getTextString
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import piuk.blockchain.androidcore.utils.helperfunctions.consume

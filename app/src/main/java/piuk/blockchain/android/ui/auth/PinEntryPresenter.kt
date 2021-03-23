@@ -30,8 +30,6 @@ import piuk.blockchain.android.data.biometrics.BiometricsController
 import piuk.blockchain.android.ui.home.CredentialsWiper
 import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.ResourceDefaultLabels
-import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.auth.AuthDataManager
