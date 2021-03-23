@@ -12,10 +12,7 @@ import piuk.blockchain.android.R
 class ResourceDefaultLabelsTest {
 
     private val resources: Resources = mock {
-        on { getString(R.string.btc_default_wallet_name) } `it returns` "A - BTC"
-        on { getString(R.string.eth_default_account_label) } `it returns` "B - ETH"
-        on { getString(R.string.bch_default_account_label) } `it returns` "C - BCH"
-        on { getString(R.string.xlm_default_account_label) } `it returns` "D - XLM"
+        on { getString(R.string.default_crypto_non_custodial_wallet_label) } `it returns` "Private Key"
     }
 
     private val defaultLabels: DefaultLabels =
@@ -23,21 +20,21 @@ class ResourceDefaultLabelsTest {
 
     @Test
     fun `btc default label`() {
-        defaultLabels.getDefaultNonCustodialWalletLabel(CryptoCurrency.BTC) `should equal` "A - BTC"
+        defaultLabels.getDefaultNonCustodialWalletLabel(CryptoCurrency.BTC) `should equal` "Private Key"
     }
 
     @Test
     fun `ether default label`() {
-        defaultLabels.getDefaultNonCustodialWalletLabel(CryptoCurrency.ETHER) `should equal` "B - ETH"
+        defaultLabels.getDefaultNonCustodialWalletLabel(CryptoCurrency.ETHER) `should equal` "Private Key"
     }
 
     @Test
     fun `bch default label`() {
-        defaultLabels.getDefaultNonCustodialWalletLabel(CryptoCurrency.BCH) `should equal` "C - BCH"
+        defaultLabels.getDefaultNonCustodialWalletLabel(CryptoCurrency.BCH) `should equal` "Private Key"
     }
 
     @Test
     fun `xlm default label`() {
-        defaultLabels.getDefaultNonCustodialWalletLabel(CryptoCurrency.XLM) `should equal` "D - XLM"
+        defaultLabels.getDefaultNonCustodialWalletLabel(CryptoCurrency.XLM) `should equal` "Private Key"
     }
 }

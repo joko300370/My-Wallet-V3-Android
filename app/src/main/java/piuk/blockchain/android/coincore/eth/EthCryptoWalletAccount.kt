@@ -29,24 +29,6 @@ internal class EthCryptoWalletAccount(
     private val custodialWalletManager: CustodialWalletManager
 ) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ETHER, custodialWalletManager) {
 
-    constructor(
-        payloadManager: PayloadDataManager,
-        ethDataManager: EthDataManager,
-        fees: FeeDataManager,
-        jsonAccount: EthereumAccount,
-        walletPreferences: WalletStatus,
-        exchangeRates: ExchangeRateDataManager,
-        custodialWalletManager: CustodialWalletManager
-    ) : this(
-        payloadManager,
-        jsonAccount,
-        ethDataManager,
-        fees,
-        walletPreferences,
-        exchangeRates,
-        custodialWalletManager
-    )
-
     internal val address: String
         get() = jsonAccount.address
     override val label: String
@@ -92,7 +74,6 @@ internal class EthCryptoWalletAccount(
                     .map { list ->
                         list.map { transaction ->
                             val isEr20FeeTransaction = isErc20FeeTransaction(transaction.to)
-
                             EthActivitySummaryItem(
                                 ethDataManager,
                                 transaction,
