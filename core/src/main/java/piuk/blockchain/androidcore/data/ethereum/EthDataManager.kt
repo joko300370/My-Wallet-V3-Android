@@ -104,6 +104,13 @@ class EthDataManager(
             .onErrorReturn { BigInteger.ZERO }
             .subscribeOn(Schedulers.io())
 
+    fun updateAccountLabel(label: String): Completable {
+        require(label.isNotEmpty())
+        check(ethDataStore.ethWallet != null)
+        ethDataStore.ethWallet?.renameAccount(label)
+        return save()
+    }
+
     fun getErc20Balance(cryptoCurrency: CryptoCurrency): Single<CryptoValue> {
         require(cryptoCurrency.hasFeature(IS_ERC20))
 
@@ -419,8 +426,7 @@ class EthDataManager(
                 if (ethWallet?.account == null || !ethWallet.account.isCorrect) {
                     try {
                         val masterKey = payloadDataManager.masterKey
-                        ethWallet =
-                            EthereumWallet(masterKey, labelsMap)
+                        ethWallet = EthereumWallet(masterKey, labelsMap)
                         needsSave = true
                     } catch (e: HDWalletException) {
                         // Wallet private key unavailable. First decrypt with second password.

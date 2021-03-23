@@ -78,13 +78,13 @@ internal class EthAsset(
         Single.just(ethDataManager.getEthWallet() ?: throw Exception("No ether wallet found"))
             .map {
                 EthCryptoWalletAccount(
-                    payloadManager,
-                    ethDataManager,
-                    feeDataManager,
-                    it.account,
-                    walletPrefs,
-                    exchangeRates,
-                    custodialManager
+                    payloadManager = payloadManager,
+                    ethDataManager = ethDataManager,
+                    fees = feeDataManager,
+                    jsonAccount = it.account,
+                    walletPreferences = walletPrefs,
+                    exchangeRates = exchangeRates,
+                    custodialWalletManager = custodialManager
                 )
             }.doOnSuccess {
                 updateOfflineCache(it)

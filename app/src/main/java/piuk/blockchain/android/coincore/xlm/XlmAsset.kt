@@ -71,7 +71,7 @@ internal class XlmAsset(
             .map {
                 XlmCryptoWalletAccount(
                     payloadManager = payloadManager,
-                    account = it,
+                    xlmAccountReference = it,
                     xlmManager = xlmDataManager,
                     exchangeRates = exchangeRates,
                     xlmFeesFetcher = xlmFeesFetcher,

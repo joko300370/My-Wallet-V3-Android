@@ -15,7 +15,9 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.ui.urllinks.URL_BACKUP_INFO
 import com.blockchain.ui.urllinks.URL_PRIVACY_POLICY
 import com.blockchain.ui.urllinks.URL_TOS_POLICY
+import com.blockchain.wallet.DefaultLabels
 import com.jakewharton.rxbinding2.widget.RxTextView
+import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.activity_create_wallet.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import kotlinx.android.synthetic.main.view_password_strength.view.*
@@ -38,6 +40,7 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
     View.OnFocusChangeListener {
 
     private val stringUtils: StringUtils by inject()
+    private val defaultLabels: DefaultLabels by inject()
     private val createWalletPresenter: CreateWalletPresenter by scopedInject()
     private var progressDialog: MaterialProgressDialog? = null
     private var applyConstraintSet: ConstraintSet = ConstraintSet()
@@ -231,7 +234,7 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
         }
     }
 
-    override fun getDefaultAccountName(): String = getString(R.string.btc_default_wallet_name)
+    override fun getDefaultAccountName(): String = defaultLabels.getDefaultNonCustodialWalletLabel(CryptoCurrency.BTC)
 
     override fun enforceFlagSecure() = true
 

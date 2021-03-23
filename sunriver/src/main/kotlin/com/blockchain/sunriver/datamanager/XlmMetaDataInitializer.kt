@@ -8,6 +8,7 @@ import com.blockchain.wallet.DefaultLabels
 import com.blockchain.wallet.Seed
 import com.blockchain.wallet.SeedAccess
 import info.blockchain.balance.CryptoCurrency
+import io.reactivex.Completable
 import io.reactivex.Maybe
 
 internal class XlmMetaDataInitializer(
@@ -105,6 +106,17 @@ internal class XlmMetaDataInitializer(
                 transactionNotes = emptyMap()
             )
         }
+
+    fun updateAccountLabel(newLabel: String): Completable = load.map { metadata ->
+        val account = metadata.accounts?.get(0) ?: throw IllegalStateException("Account not initialised")
+        metadata.copy(
+            accounts = listOf(
+                account.copy(
+                    label = newLabel
+                )
+            )
+        )
+    }.saveSideEffect().ignoreElement()
 }
 
 private fun Maybe<XlmMetaData>.ignoreBadMetadata(): Maybe<XlmMetaData> =

@@ -921,12 +921,6 @@
     <string name="iban">IBAN</string>
     <string name="estonia">Estônia</string>
     <string name="lets_setup_wallet">Vamos configurar sua carteira. Você pode comprar rapidamente criptografia agora ou fazer isso mais tarde.</string>
-    <string name="btc_default_wallet_name">My Bitcoin Wallet</string>
-    <string name="bch_default_account_label">Carteira My Bitcoin Cash</string>
-    <string name="eth_default_account_label">My Ether Wallet</string>
-    <string name="xlm_default_account_label">My Stellar Wallet</string>
-    <string name="pax_default_account_label_1">Carteira digital My USD</string>
-    <string name="exchange_default_account_label">Meu endereço %1$s Exchange</string>
     <string name="linked_cards">Cartões vinculados</string>
     <string name="tx_title_send">Enviar %1s</string>
     <string name="tx_title_receive">Receba %1s</string>
@@ -964,7 +958,6 @@
     <string name="buy_now">Compre Agora</string>
     <string name="default_label_all_wallets">Todas as carteiras</string>
     <string name="approximately_symbol">~ %1$s</string>
-    <string name="custodial_wallet_default_label">Carteira de negociação %1s</string>
     <string name="select_account_sheet_title">Selecione uma carteira</string>
     <string name="activity_state_initialised">Inicializado</string>
     <string name="activity_state_uninitialised">Não inicializado</string>
@@ -1012,7 +1005,6 @@
     <string name="common_spaced_strings">%1$s %2$s</string>
     <string name="server_unreachable_exit">Não foi possível conectar ao servidor, tente novamente mais tarde.</string>
     <string name="dashboard_asset_balance_interest">Ganhe %1$.1f %% %1$.1f</string>
-    <string name="default_label_interest_wallet">Carteira de juros</string>
     <string name="activity_details_created">Encontro</string>
     <string name="activity_details_completed">Concluído</string>
     <string name="activity_details_fee">Taxa</string>
@@ -1121,7 +1113,6 @@
     <string name="transfer_second_pswd_title">2.ª palavra-passe</string>
     <string name="transfer_second_pswd_desc">Introduza a sua 2.ª palavra-passe e, em seguida, poderá continuar a enviar.</string>
     <string name="transfer_second_pswd_hint">2.ª palavra-passe</string>
-    <string name="currency_wallet">A minha Wallet %1s</string>
     <string name="dashboard_asset_item_label_title">Tenha em atenção</string>
     <string name="algorand_asset_label">A funcionalidade de levantar ALGO da sua carteira de negociação não está disponível neste momento, mas estará em breve.</string>
     <string name="send_state_no_funds">Sem fundos</string>
@@ -1223,7 +1214,6 @@ se disponível. Isso permite que restaure a sua carteira e perder este dispositi
     <string name="purchase_card_note_2">Sua criptografia estará disponível para ser retirada em</string>
     <string name="select_send_sheet_title">Enviar de</string>
     <string name="select_send_source_title">Enviar de</string>
-    <string name="currency_funds_wallet">Minha carteira %1s</string>
     <string name="us_dollars">Dólares americanos</string>
     <string name="fiat_funds_detail_withdraw_details">Saque para o seu banco</string>
     <string name="withdraw_currency">Retirar %1$s</string>

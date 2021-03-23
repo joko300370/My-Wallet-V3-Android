@@ -57,7 +57,24 @@ internal abstract class CryptoAssetBase(
     }
 
     protected val accounts: Single<SingleAccountList>
-        get() = activeAccounts.fetchAccountList(::loadAccounts)
+        get() = activeAccounts.fetchAccountList(::loadAccounts).flatMap {
+            updateLabelsIfNeeded(it).toSingle { it }
+        }
+
+    private fun updateLabelsIfNeeded(list: SingleAccountList): Completable =
+        Completable.concat(
+            list.map {
+                val cryptoNonCustodialAccount = it as? CryptoNonCustodialAccount
+                if (cryptoNonCustodialAccount?.labelNeedsUpdate() == true)
+                    cryptoNonCustodialAccount.updateLabel(labels.getDefaultNonCustodialWalletLabel(asset))
+                        .doOnError { error ->
+                            crashLogger.logException(error)
+                        }
+                        .onErrorComplete()
+                else
+                    Completable.complete()
+            }
+        )
 
     override val isEnabled: Boolean
         get() = !asset.hasFeature(CryptoCurrency.STUB_ASSET)
@@ -83,6 +100,9 @@ internal abstract class CryptoAssetBase(
             Timber.e("$errorMsg: $it")
             crashLogger.logException(it, errorMsg)
         }
+
+    private fun CryptoNonCustodialAccount.labelNeedsUpdate(): Boolean =
+        label == labels.getOldDefaultNonCustodialWalletLabel(asset)
 
     // Called when the set of account in use bu this asset changes. Update the offline
     // cache and the BE notification addresses here

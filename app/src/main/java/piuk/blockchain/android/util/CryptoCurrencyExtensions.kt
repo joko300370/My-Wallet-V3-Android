@@ -33,7 +33,8 @@ fun CryptoCurrency.colorRes(): Int =
 
 @ColorInt
 fun CryptoCurrency.chartLineColour(context: Context) =
-    ContextCompat.getColor(context,
+    ContextCompat.getColor(
+        context,
         when (this) {
             CryptoCurrency.BTC -> R.color.color_bitcoin_logo
             CryptoCurrency.ETHER -> R.color.color_ether_logo
@@ -205,8 +206,10 @@ fun CryptoCurrency.getDecimalPlaces(): Int =
 
 fun ImageView.setAssetIconColours(cryptoCurrency: CryptoCurrency, context: Context) {
     setBackgroundResource(R.drawable.bkgd_tx_circle)
-    ViewCompat.setBackgroundTintList(this,
-        ColorStateList.valueOf(ContextCompat.getColor(context, cryptoCurrency.assetTint())))
+    ViewCompat.setBackgroundTintList(
+        this,
+        ColorStateList.valueOf(ContextCompat.getColor(context, cryptoCurrency.assetTint()))
+    )
     setColorFilter(ContextCompat.getColor(context, cryptoCurrency.assetFilter()))
 }
 
@@ -216,24 +219,17 @@ internal class ResourceDefaultLabels(
 
     override fun getDefaultNonCustodialWalletLabel(cryptoCurrency: CryptoCurrency): String =
         resources.getString(
-            when (cryptoCurrency) {
-                CryptoCurrency.BTC -> R.string.btc_default_wallet_name
-                CryptoCurrency.ETHER -> R.string.eth_default_account_label
-                CryptoCurrency.BCH -> R.string.bch_default_account_label
-                CryptoCurrency.XLM -> R.string.xlm_default_account_label
-                CryptoCurrency.PAX -> R.string.pax_default_account_label_1
-                CryptoCurrency.STX -> throw NotImplementedError("STX Not implemented")
-                CryptoCurrency.ALGO -> R.string.algo_default_account_label
-                CryptoCurrency.USDT -> R.string.usdt_default_account_label
-                CryptoCurrency.DGLD -> R.string.dgld_default_account_label
-                CryptoCurrency.AAVE -> R.string.aave_default_account_label
-                CryptoCurrency.YFI -> R.string.yfi_default_account_label
-            }
+            R.string.default_crypto_non_custodial_wallet_label
+        )
+
+    override fun getOldDefaultNonCustodialWalletLabel(cryptoCurrency: CryptoCurrency): String =
+        resources.getString(
+            R.string.old_default_non_custodial_wallet_label,
+            resources.getString(cryptoCurrency.assetName())
         )
 
     override fun getDefaultCustodialWalletLabel(cryptoCurrency: CryptoCurrency): String {
-        val asset = resources.getString(cryptoCurrency.assetName())
-        return resources.getString(R.string.custodial_wallet_default_label, asset)
+        return resources.getString(R.string.custodial_wallet_default_label_1)
     }
 
     override fun getAssetMasterWalletLabel(cryptoCurrency: CryptoCurrency): String =
@@ -243,13 +239,13 @@ internal class ResourceDefaultLabels(
         resources.getString(R.string.default_label_all_wallets)
 
     override fun getDefaultInterestWalletLabel(cryptoCurrency: CryptoCurrency): String =
-        resources.getString(R.string.default_label_interest_wallet)
+        resources.getString(R.string.default_label_interest_wallet_1)
 
     override fun getDefaultExchangeWalletLabel(cryptoCurrency: CryptoCurrency): String =
-        resources.getString(R.string.exchange_default_account_label, cryptoCurrency.displayTicker)
+        resources.getString(R.string.exchange_default_account_label_1, cryptoCurrency.displayTicker)
 
     override fun getDefaultCustodialFiatWalletLabel(fiatCurrency: String): String =
-        resources.getString(R.string.currency_wallet, fiatCurrency)
+        resources.getString(R.string.fiat_currency_funds_wallet_name_1, fiatCurrency)
 }
 
 class AssetResourceFactory(
