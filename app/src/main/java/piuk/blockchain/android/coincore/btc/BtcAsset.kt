@@ -86,10 +86,11 @@ internal class BtcAsset(
                 val btcAccount = btcAccountFromPayloadAccount(i, account)
                 if (btcAccount.isDefault) {
                     updateOfflineCache(btcAccount)
-                    updateDefaultAccountLabel = if (btcAccount.label != labels.getDefaultNonCustodialWalletLabel(asset))
-                        btcAccount.updateLabel(
-                            labels.getDefaultNonCustodialWalletLabel(asset)
-                        ) else Completable.complete()
+                    updateDefaultAccountLabel =
+                        if (btcAccount.label == labels.getOldDefaultNonCustodialWalletLabel(asset))
+                            btcAccount.updateLabel(
+                                labels.getDefaultNonCustodialWalletLabel(asset)
+                            ) else Completable.complete()
                 }
                 result.add(btcAccount)
             }

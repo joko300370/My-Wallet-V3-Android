@@ -198,7 +198,13 @@ internal class ResourceDefaultLabels(
 
     override fun getDefaultNonCustodialWalletLabel(cryptoCurrency: CryptoCurrency): String =
         resources.getString(
-            R.string.default_crypto_non_custodial_wallet_name
+            R.string.default_crypto_non_custodial_wallet_label
+        )
+
+    override fun getOldDefaultNonCustodialWalletLabel(cryptoCurrency: CryptoCurrency): String =
+        resources.getString(
+            R.string.old_default_non_custodial_wallet_label,
+            resources.getString(cryptoCurrency.assetName())
         )
 
     override fun getDefaultCustodialWalletLabel(cryptoCurrency: CryptoCurrency): String {

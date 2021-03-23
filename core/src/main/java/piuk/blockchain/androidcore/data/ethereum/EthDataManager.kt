@@ -1,6 +1,7 @@
 package piuk.blockchain.androidcore.data.ethereum
 
 import com.blockchain.logging.LastTxUpdater
+import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoCurrency.Companion.IS_ERC20
 import info.blockchain.balance.CryptoValue
@@ -419,12 +420,19 @@ class EthDataManager(
                 if (ethWallet?.account == null || !ethWallet.account.isCorrect) {
                     try {
                         val masterKey = payloadDataManager.masterKey
-                        ethWallet =
-                            EthereumWallet(masterKey, labelsMap)
+                        ethWallet = EthereumWallet(masterKey, labelsMap)
                         needsSave = true
                     } catch (e: HDWalletException) {
                         // Wallet private key unavailable. First decrypt with second password.
                         throw InvalidCredentialsException(e.message)
+                    }
+                }
+
+                val defEthLabel = labelsMap[CryptoCurrency.ETHER]
+                if (defEthLabel != null && ethWallet.account.label != defEthLabel) {
+                    ethWallet.account.apply {
+                        label = defEthLabel
+                        needsSave = true
                     }
                 }
 

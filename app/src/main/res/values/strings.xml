@@ -1351,7 +1351,8 @@
     <string name="buy_now_1">Buy %1s</string>
     <string name="simple_buy_transfer_details_error">Something went wrong while loading the transfer details.\n\nPlease try again later.</string>
 
-    <string name="default_crypto_non_custodial_wallet_name">Private Key Wallet</string>
+    <string name="default_crypto_non_custodial_wallet_label">Private Key Wallet</string>
+    <string name="old_default_non_custodial_wallet_label">My %1s Wallet</string>
     <string name="default_label_all_wallets">All Wallets</string>
     <string name="default_label_interest_wallet">Interest Wallet</string>
     <string name="exchange_default_account_label">My Exchange %1$s Address</string>
