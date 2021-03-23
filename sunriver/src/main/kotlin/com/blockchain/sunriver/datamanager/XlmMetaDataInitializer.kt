@@ -40,6 +40,7 @@ internal class XlmMetaDataInitializer(
         repository.loadMetadata(XlmMetaData.MetaDataType, XlmMetaData::class.java)
             .ignoreBadMetadata()
             .compareForLog()
+            .updateLabelIfNeeded()
     }.maybeCache()
 
     private fun createAndSave(): Maybe<XlmMetaData> = newXlmMetaData().saveSideEffect()
@@ -105,7 +106,17 @@ internal class XlmMetaDataInitializer(
                 transactionNotes = emptyMap()
             )
         }
+
+    private fun Maybe<XlmMetaData>.updateLabelIfNeeded() : Maybe<XlmMetaData> =
+        flatMap {
+            if(it.accounts[0].label == defaultLabels.getOldDefaultNonCustodialWalletLabel(CryptoCurrency.XLM))
+                it.accounts[0].copy(
+                    label = defaultLabels.getDefaultNonCustodialWalletLabel(CryptoCurrency.XLM)
+                )
+        }
 }
+
+
 
 private fun Maybe<XlmMetaData>.ignoreBadMetadata(): Maybe<XlmMetaData> =
     filter { !(it.accounts?.isEmpty() ?: true) }
