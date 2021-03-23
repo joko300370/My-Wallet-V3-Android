@@ -107,16 +107,31 @@ internal class XlmMetaDataInitializer(
             )
         }
 
-    private fun Maybe<XlmMetaData>.updateLabelIfNeeded() : Maybe<XlmMetaData> =
+    private fun Maybe<XlmMetaData>.updateLabelIfNeeded(): Maybe<XlmMetaData> =
         flatMap {
-            if(it.accounts[0].label == defaultLabels.getOldDefaultNonCustodialWalletLabel(CryptoCurrency.XLM))
-                it.accounts[0].copy(
-                    label = defaultLabels.getDefaultNonCustodialWalletLabel(CryptoCurrency.XLM)
-                )
+            if (it.accounts?.get(0)?.label == defaultLabels.getOldDefaultNonCustodialWalletLabel(CryptoCurrency.XLM)) {
+                Maybe.just(
+                    it.withUpdatedDefaultAccountLabel(
+                        defaultLabels.getDefaultNonCustodialWalletLabel(CryptoCurrency.XLM)
+                    )
+                ).saveSideEffect()
+            } else {
+                Maybe.just(it)
+            }
         }
 }
 
-
+private fun XlmMetaData.withUpdatedDefaultAccountLabel(label: String): XlmMetaData =
+    this.copy(
+        accounts = this.accounts?.mapIndexed { index, xlmAccount ->
+            if (index == 0) {
+                xlmAccount.copy(
+                    label = label
+                )
+            } else
+                xlmAccount
+        }
+    )
 
 private fun Maybe<XlmMetaData>.ignoreBadMetadata(): Maybe<XlmMetaData> =
     filter { !(it.accounts?.isEmpty() ?: true) }
