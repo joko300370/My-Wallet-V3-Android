@@ -18,14 +18,11 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.TradingAccount
-import piuk.blockchain.android.coincore.impl.CryptoAccountCustodialGroup
-import piuk.blockchain.android.coincore.impl.CryptoAccountNonCustodialGroup
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.databinding.ViewAccountCryptoOverviewBinding
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
@@ -33,11 +30,10 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
 import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
-import piuk.blockchain.android.util.assetFilter
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.android.util.setAssetIconColours
+import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
