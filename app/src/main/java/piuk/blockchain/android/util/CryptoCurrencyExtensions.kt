@@ -242,7 +242,7 @@ internal class ResourceDefaultLabels(
         resources.getString(R.string.default_label_interest_wallet_1)
 
     override fun getDefaultExchangeWalletLabel(cryptoCurrency: CryptoCurrency): String =
-        resources.getString(R.string.exchange_default_account_label_1, cryptoCurrency.displayTicker)
+        resources.getString(R.string.exchange_default_account_label_1)
 
     override fun getDefaultCustodialFiatWalletLabel(fiatCurrency: String): String =
         resources.getString(R.string.fiat_currency_funds_wallet_name_1, fiatCurrency)
