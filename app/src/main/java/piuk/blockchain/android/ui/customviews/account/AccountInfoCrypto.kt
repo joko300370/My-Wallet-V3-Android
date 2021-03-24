@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.customviews.account
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
@@ -17,14 +18,11 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.TradingAccount
-import piuk.blockchain.android.coincore.impl.CryptoAccountCustodialGroup
-import piuk.blockchain.android.coincore.impl.CryptoAccountNonCustodialGroup
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.databinding.ViewAccountCryptoOverviewBinding
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
@@ -33,12 +31,12 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
 import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
 import piuk.blockchain.android.util.assetName
-import piuk.blockchain.android.util.setCoinIcon
+import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.setAssetIconColours
+import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
-import java.lang.IllegalArgumentException
 
 class AccountInfoCrypto @JvmOverloads constructor(
     ctx: Context,
@@ -78,9 +76,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
         (account as? InterestAccount)?.let { setInterestAccountDetails(account, accountsAreTheSame) }
 
         with(binding) {
-            assetAccountIcon.visible()
-            assetAccountIcon.setImageResource(account.typeIndicator())
-            assetAccountIcon.setAssetIconColours(account.asset, container.context)
+            assetAccountIcon.updateAccountIndicator(account)
         }
         displayedAccount = account
     }
@@ -210,15 +206,22 @@ class AccountInfoCrypto @JvmOverloads constructor(
     }
 }
 
-private fun BlockchainAccount.typeIndicator(): Int =
-    when (this) {
-        is CryptoAccountNonCustodialGroup,
+private fun AppCompatImageView.updateAccountIndicator(account: CryptoAccount) {
+    val indicator = when (account) {
         is CryptoNonCustodialAccount -> R.drawable.ic_non_custodial_account_indicator
         is InterestAccount -> R.drawable.ic_interest_account_indicator
-        is CryptoAccountCustodialGroup,
         is TradingAccount -> R.drawable.ic_custodial_account_indicator
-        else -> throw IllegalArgumentException("No indicator asset is supported for account $this")
+        else -> null
     }
+
+    indicator?.let {
+        setImageResource(indicator)
+        visible()
+        setAssetIconColours(account.asset, context)
+    } ?: kotlin.run {
+        gone()
+    }
+}
 
 private fun <T> Single<T>.startWithValueIfCondition(
     value: T?,
