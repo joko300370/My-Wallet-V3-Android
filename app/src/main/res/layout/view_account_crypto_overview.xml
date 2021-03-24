@@ -71,10 +71,13 @@
         android:id="@+id/asset_account_icon"
         android:layout_width="16dp"
         android:layout_height="16dp"
-        android:layout_marginStart="23dp"
-        android:layout_marginTop="21dp"
-        app:layout_constraintStart_toStartOf="@id/icon"
-        app:layout_constraintTop_toTopOf="@id/icon"
-        app:srcCompat="@drawable/ic_account_badge_custodial" />
+        android:background="@drawable/circle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintCircle="@+id/icon"
+        app:layout_constraintCircleAngle="135"
+        android:padding="1dp"
+        app:layout_constraintCircleRadius="20dp"
+        app:srcCompat="@drawable/ic_non_custodial_account_indicator" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
