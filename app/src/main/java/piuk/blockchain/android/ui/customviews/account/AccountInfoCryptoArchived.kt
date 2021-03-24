@@ -42,7 +42,7 @@ class AccountInfoCryptoArchived @JvmOverloads constructor(
         icon.visible()
 
         if (account is TradingAccount) {
-            asset_account_icon.setImageResource(R.drawable.ic_account_badge_custodial)
+            asset_account_icon.setImageResource(R.drawable.ic_custodial_account_indicator)
             asset_account_icon.visible()
         } else {
             asset_account_icon.gone()

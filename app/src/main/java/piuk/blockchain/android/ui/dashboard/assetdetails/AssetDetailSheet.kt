@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import piuk.blockchain.android.simplebuy.CustodialBalanceClicked
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.wallet.DefaultLabels
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
@@ -53,6 +54,7 @@ import java.util.Locale
 class AssetDetailSheet : MviBottomSheet<AssetDetailsModel,
     AssetDetailsIntent, AssetDetailsState, DialogSheetDashboardAssetDetailsBinding>() {
     private val currencyPrefs: CurrencyPrefs by inject()
+    private val labels: DefaultLabels by inject()
     private val locale = Locale.getDefault()
 
     private val cryptoCurrency: CryptoCurrency by lazy {
@@ -70,7 +72,8 @@ class AssetDetailSheet : MviBottomSheet<AssetDetailsModel,
         AssetDetailAdapter(
             ::onAccountSelected,
             cryptoCurrency.hasFeature(CryptoCurrency.CUSTODIAL_ONLY),
-            token
+            token,
+            labels
         ) {
             PendingBalanceAccountDecorator(it.account)
         }

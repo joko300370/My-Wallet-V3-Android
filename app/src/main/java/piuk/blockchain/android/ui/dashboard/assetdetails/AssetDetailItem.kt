@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.dashboard.assetdetails
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.Money
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -19,12 +20,13 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.customviews.account.addViewToBottomWithConstraints
-import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.android.util.context
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.visible
+import java.lang.IllegalArgumentException
 import kotlin.properties.Delegates
 
 data class AssetDetailItem(
@@ -36,7 +38,7 @@ data class AssetDetailItem(
     val interestRate: Double
 )
 
-class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class AssetDetailViewHolder(itemView: View, private val labels: DefaultLabels) : RecyclerView.ViewHolder(itemView) {
 
     fun bind(
         item: AssetDetailItem,
@@ -48,19 +50,20 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
             val asset = getAsset(item.account, item.balance.currencyCode)
 
             icon.setCoinIcon(asset)
-            wallet_name.text = resources.getString(asset.assetName())
-
             asset_subtitle.text = when (item.assetFilter) {
-                AssetFilter.All -> resources.getString(R.string.dashboard_asset_balance_total)
-                AssetFilter.NonCustodial -> resources.getString(
-                    R.string.dashboard_asset_balance_wallet
-                )
-                AssetFilter.Custodial -> resources.getString(
-                    R.string.dashboard_asset_balance_custodial
-                )
+                AssetFilter.NonCustodial,
+                AssetFilter.Custodial -> labels.getAssetMasterWalletLabel(asset)
                 AssetFilter.Interest -> resources.getString(
                     R.string.dashboard_asset_balance_interest, item.interestRate
                 )
+                else -> throw IllegalArgumentException("Not supported filter")
+            }
+
+            wallet_name.text = when (item.assetFilter) {
+                AssetFilter.NonCustodial -> labels.getDefaultNonCustodialWalletLabel(asset)
+                AssetFilter.Custodial -> labels.getDefaultCustodialWalletLabel(asset)
+                AssetFilter.Interest -> labels.getDefaultInterestWalletLabel(asset)
+                else -> throw IllegalArgumentException("Not supported filter")
             }
 
             rootView.setOnClickListener {
@@ -68,21 +71,27 @@ class AssetDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
             }
 
             when (item.assetFilter) {
-                AssetFilter.NonCustodial -> asset_account_icon.gone()
+                AssetFilter.NonCustodial -> {
+                    asset_account_icon.visible()
+                    asset_account_icon.setImageResource(
+                        R.drawable.ic_non_custodial_account_indicator
+                    )
+                }
                 AssetFilter.Interest -> {
                     asset_account_icon.visible()
                     asset_account_icon.setImageResource(
-                        R.drawable.ic_account_badge_interest
+                        R.drawable.ic_interest_account_indicator
                     )
                 }
                 AssetFilter.Custodial -> {
                     asset_account_icon.visible()
                     asset_account_icon.setImageResource(
-                        R.drawable.ic_account_badge_custodial
+                        R.drawable.ic_custodial_account_indicator
                     )
                 }
                 AssetFilter.All -> asset_account_icon.gone()
             }
+            asset_account_icon.setAssetIconColours(asset, context)
 
             wallet_balance_fiat.text = item.balance.toStringWithSymbol()
             wallet_balance_crypto.text = item.fiatBalance.toStringWithSymbol()
@@ -123,6 +132,7 @@ internal class AssetDetailAdapter(
     private val onAccountSelected: (BlockchainAccount, AssetFilter) -> Unit,
     private val showBanner: Boolean,
     private val token: CryptoAsset,
+    private val labels: DefaultLabels,
     private val assetDetailsDecorator: AssetDetailsDecorator
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val compositeDisposable = CompositeDisposable()
@@ -140,7 +150,7 @@ internal class AssetDetailAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         if (viewType == TYPE_CRYPTO) {
-            AssetDetailViewHolder(parent.inflate(R.layout.view_account_crypto_overview))
+            AssetDetailViewHolder(parent.inflate(R.layout.view_account_crypto_overview), labels)
         } else {
             LabelViewHolder(parent.inflate(R.layout.dialog_dashboard_asset_label_item))
         }

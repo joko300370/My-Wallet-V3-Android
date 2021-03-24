@@ -52,6 +52,6 @@
         android:layout_marginTop="21dp"
         app:layout_constraintStart_toStartOf="@id/icon"
         app:layout_constraintTop_toTopOf="@id/icon"
-        app:srcCompat="@drawable/ic_account_badge_custodial" />
+        app:srcCompat="@drawable/ic_custodial_account_indicator" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

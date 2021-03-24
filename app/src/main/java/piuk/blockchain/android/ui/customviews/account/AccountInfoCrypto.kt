@@ -17,12 +17,15 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.InterestAccount
-import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.TradingAccount
+import piuk.blockchain.android.coincore.impl.CryptoAccountCustodialGroup
+import piuk.blockchain.android.coincore.impl.CryptoAccountNonCustodialGroup
+import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.databinding.ViewAccountCryptoOverviewBinding
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
@@ -31,10 +34,11 @@ import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmoun
 import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
 import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.setCoinIcon
-import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
+import java.lang.IllegalArgumentException
 
 class AccountInfoCrypto @JvmOverloads constructor(
     ctx: Context,
@@ -71,16 +75,12 @@ class AccountInfoCrypto @JvmOverloads constructor(
         val accountsAreTheSame = displayedAccount.isTheSameWith(account)
         updateAccountDetails(account, accountsAreTheSame, onAccountClicked, cellDecorator)
 
+        (account as? InterestAccount)?.let { setInterestAccountDetails(account, accountsAreTheSame) }
+
         with(binding) {
-            when (account) {
-                is InterestAccount -> setInterestAccountDetails(account, accountsAreTheSame)
-                is TradingAccount -> {
-                    assetAccountIcon.visible()
-                    assetAccountIcon.setImageResource(R.drawable.ic_account_badge_custodial)
-                }
-                is NonCustodialAccount -> assetAccountIcon.gone()
-                else -> assetAccountIcon.gone()
-            }
+            assetAccountIcon.visible()
+            assetAccountIcon.setImageResource(account.typeIndicator())
+            assetAccountIcon.setAssetIconColours(account.asset, container.context)
         }
         displayedAccount = account
     }
@@ -90,8 +90,6 @@ class AccountInfoCrypto @JvmOverloads constructor(
         accountsAreTheSame: Boolean
     ) {
         with(binding) {
-            assetAccountIcon.setImageResource(R.drawable.ic_account_badge_interest)
-
             compositeDisposable += coincore[account.asset].interestRate().observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe { assetSubtitle.text = resources.getString(R.string.empty) }
                 .doOnSuccess {
@@ -211,6 +209,16 @@ class AccountInfoCrypto @JvmOverloads constructor(
         binding.root.visibleIf { isVisible }
     }
 }
+
+private fun BlockchainAccount.typeIndicator(): Int =
+    when (this) {
+        is CryptoAccountNonCustodialGroup,
+        is CryptoNonCustodialAccount -> R.drawable.ic_non_custodial_account_indicator
+        is InterestAccount -> R.drawable.ic_interest_account_indicator
+        is CryptoAccountCustodialGroup,
+        is TradingAccount -> R.drawable.ic_custodial_account_indicator
+        else -> throw IllegalArgumentException("No indicator asset is supported for account $this")
+    }
 
 private fun <T> Single<T>.startWithValueIfCondition(
     value: T?,
