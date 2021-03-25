@@ -43,7 +43,7 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
     override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogSheetActivityDetailsBinding =
         DialogSheetActivityDetailsBinding.inflate(inflater, container, false)
 
-    override val model: ActivityDetailsModel by inject()
+    override val model: ActivityDetailsModel by scopedInject()
 
     private val listAdapter: ActivityDetailsDelegateAdapter by lazy {
         ActivityDetailsDelegateAdapter(
