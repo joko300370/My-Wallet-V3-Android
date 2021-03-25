@@ -66,8 +66,7 @@ private class CustodialInterestActivityItemViewHolder(
             if (tx.status.isPending().not()) {
                 icon.setAssetIconColours(
                     tintColor = assetResources.assetTint(tx.cryptoCurrency),
-                    filterColor = assetResources.assetFilter(tx.cryptoCurrency),
-                    context = context
+                    filterColor = assetResources.assetFilter(tx.cryptoCurrency)
                 )
             } else {
                 icon.background = null

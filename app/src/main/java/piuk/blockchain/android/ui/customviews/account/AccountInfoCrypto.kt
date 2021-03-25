@@ -3,7 +3,6 @@ package piuk.blockchain.android.ui.customviews.account
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import androidx.appcompat.widget.AppCompatImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
@@ -18,13 +17,12 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AccountIcon
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.NullCryptoAccount
-import piuk.blockchain.android.coincore.TradingAccount
-import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.databinding.ViewAccountCryptoOverviewBinding
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
@@ -76,10 +74,26 @@ class AccountInfoCrypto @JvmOverloads constructor(
 
         (account as? InterestAccount)?.let { setInterestAccountDetails(account, accountsAreTheSame) }
 
-        with(binding) {
-            assetAccountIcon.updateAccountIndicator(account, assetResources)
-        }
+        updateAccountIcon(account)
+
         displayedAccount = account
+    }
+
+    private fun updateAccountIcon(account: CryptoAccount) {
+        with(binding) {
+            val accountIcon = AccountIcon(account, assetResources)
+            icon.setImageDrawable(accountIcon.icon)
+            accountIcon.indicator?.let {
+                assetAccountIcon.apply {
+                    visible()
+                    setAssetIconColours(
+                        tintColor = assetResources.assetTint(account.asset),
+                        filterColor = assetResources.assetFilter(account.asset)
+                    )
+                    setImageResource(it)
+                }
+            } ?: kotlin.run { assetAccountIcon.gone() }
+        }
     }
 
     private fun setInterestAccountDetails(
@@ -117,8 +131,6 @@ class AccountInfoCrypto @JvmOverloads constructor(
         with(binding) {
             val crypto = account.asset
             walletName.text = account.label
-            icon.setImageDrawable(assetResources.drawableResFilled(crypto))
-            icon.visible()
 
             assetSubtitle.setText(assetResources.assetNameRes(crypto))
 
@@ -204,27 +216,6 @@ class AccountInfoCrypto @JvmOverloads constructor(
 
     override fun setVisible(isVisible: Boolean) {
         binding.root.visibleIf { isVisible }
-    }
-}
-
-private fun AppCompatImageView.updateAccountIndicator(account: CryptoAccount, assetResources: AssetResources) {
-    val indicator = when (account) {
-        is CryptoNonCustodialAccount -> R.drawable.ic_non_custodial_account_indicator
-        is InterestAccount -> R.drawable.ic_interest_account_indicator
-        is TradingAccount -> R.drawable.ic_custodial_account_indicator
-        else -> null
-    }
-
-    indicator?.let {
-        setImageResource(indicator)
-        visible()
-        setAssetIconColours(
-            tintColor = assetResources.assetTint(account.asset),
-            filterColor = assetResources.assetFilter(account.asset),
-            context = context
-        )
-    } ?: kotlin.run {
-        gone()
     }
 }
 

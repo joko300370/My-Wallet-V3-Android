@@ -95,8 +95,7 @@ class AssetDetailViewHolder(itemView: View, private val labels: DefaultLabels) :
             }
             asset_account_icon.setAssetIconColours(
                 tintColor = assetResources.assetTint(asset),
-                filterColor = assetResources.assetFilter(asset),
-                context = context
+                filterColor = assetResources.assetFilter(asset)
             )
 
             wallet_balance_fiat.text = item.balance.toStringWithSymbol()

@@ -41,7 +41,8 @@ internal class AssetResourcesImpl(val resources: Resources) : AssetResources {
         }
 
     override fun chartLineColour(cryptoCurrency: CryptoCurrency, context: Context): Int =
-        ContextCompat.getColor(context,
+        ContextCompat.getColor(
+            context,
             when (cryptoCurrency) {
                 CryptoCurrency.BTC -> R.color.color_bitcoin_logo
                 CryptoCurrency.ETHER -> R.color.color_ether_logo
@@ -55,7 +56,8 @@ internal class AssetResourcesImpl(val resources: Resources) : AssetResources {
                 CryptoCurrency.AAVE -> R.color.aave
                 CryptoCurrency.YFI -> R.color.yfi
                 CryptoCurrency.DOT -> R.color.dot
-            })
+            }
+        )
 
     override fun drawableResFilled(cryptoCurrency: CryptoCurrency): Int =
         when (cryptoCurrency) {
@@ -206,5 +208,12 @@ internal class AssetResourcesImpl(val resources: Resources) : AssetResources {
             CryptoCurrency.DOT -> 2
             CryptoCurrency.XLM -> 4
             CryptoCurrency.STX -> throw NotImplementedError("STX Not implemented")
+        }
+
+    override fun fiatCurrencyIcon(currency: String): Int =
+        when (currency) {
+            "EUR" -> R.drawable.ic_funds_euro
+            "GBP" -> R.drawable.ic_funds_gbp
+            else -> R.drawable.ic_funds_usd
         }
 }

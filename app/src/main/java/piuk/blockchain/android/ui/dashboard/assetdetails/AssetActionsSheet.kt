@@ -278,8 +278,7 @@ private class AssetActionAdapter(
                 item_action_icon.setImageResource(item.icon)
                 item_action_icon.setAssetIconColours(
                     tintColor = assetResources.assetTint(item.asset),
-                    filterColor = assetResources.assetFilter(item.asset),
-                    context = view.context
+                    filterColor = assetResources.assetFilter(item.asset)
                 )
                 item_action_title.text = item.title
                 item_action_label.text = item.description

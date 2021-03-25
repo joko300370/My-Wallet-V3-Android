@@ -48,8 +48,7 @@ class PendingSwapsAdapter(
                 val asset = (custodialOrder.inputMoney as CryptoValue).currency
                 icon.setAssetIconColours(
                     tintColor = assetResources.assetTint(asset),
-                    filterColor = assetResources.assetFilter(asset),
-                    context = context
+                    filterColor = assetResources.assetFilter(asset)
                 )
             }
         }

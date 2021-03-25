@@ -66,8 +66,7 @@ private class NonCustodialActivityItemViewHolder(
                 icon.setTransactionTypeIcon(tx.transactionType, tx.isFeeTransaction)
                 icon.setAssetIconColours(
                     tintColor = assetResources.assetTint(tx.cryptoCurrency),
-                    filterColor = assetResources.assetFilter(tx.cryptoCurrency),
-                    context = context
+                    filterColor = assetResources.assetFilter(tx.cryptoCurrency)
                 )
             } else {
                 icon.setIsConfirming()

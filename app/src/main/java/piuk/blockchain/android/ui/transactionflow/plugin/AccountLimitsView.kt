@@ -62,8 +62,7 @@ class AccountLimitsView @JvmOverloads constructor(
             if (customiser.enterAmountActionIconCustomisation(state)) {
                 amountSheetLimitsDirection.setAssetIconColours(
                     tintColor = assetResources.assetTint(state.sendingAsset),
-                    filterColor = assetResources.assetFilter(state.sendingAsset),
-                    context = this@AccountLimitsView.context
+                    filterColor = assetResources.assetFilter(state.sendingAsset)
                 )
             }
         }

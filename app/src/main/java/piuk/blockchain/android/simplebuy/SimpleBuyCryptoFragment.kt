@@ -196,8 +196,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             )
             binding.buyIcon.setAssetIconColours(
                 tintColor = assetResources.assetTint(it),
-                filterColor = assetResources.assetFilter(it),
-                context = activity
+                filterColor = assetResources.assetFilter(it)
             )
         }
         newState.selectedCryptoCurrency?.let {
