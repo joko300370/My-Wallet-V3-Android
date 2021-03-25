@@ -7,16 +7,14 @@ import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.android.coincore.impl.CryptoAccountCustodialGroup
 import piuk.blockchain.android.coincore.impl.CryptoAccountNonCustodialGroup
 import piuk.blockchain.android.coincore.impl.CryptoExchangeAccount
-import piuk.blockchain.android.coincore.impl.CryptoInterestAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 
 class AccountIcon(private val account: BlockchainAccount, private val assetResources: AssetResources) {
     val icon: Int
         @DrawableRes get() = when (account) {
             is CryptoAccount -> assetResources.drawableResFilled(account.asset)
-            is CryptoInterestAccount -> assetResources.drawableResFilled(account.asset)
-            is AccountGroup -> accountGroupIcon(account)
             is FiatAccount -> assetResources.fiatCurrencyIcon(account.fiatCurrency)
+            is AccountGroup -> accountGroupIcon(account)
             else -> throw IllegalStateException("$account is not supported")
         }
 
