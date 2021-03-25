@@ -1,6 +1,5 @@
 package piuk.blockchain.android.util
 
-import android.content.Context
 import android.content.res.ColorStateList
 import android.widget.ImageView
 import androidx.annotation.ColorRes
@@ -14,7 +13,7 @@ fun ImageView.setImageDrawable(@DrawableRes res: Int) {
     setImageDrawable(AppCompatResources.getDrawable(context, res))
 }
 
-fun ImageView.setAssetIconColours(@ColorRes tintColor: Int, @ColorRes filterColor: Int, context: Context) {
+fun ImageView.setAssetIconColours(@ColorRes tintColor: Int, @ColorRes filterColor: Int) {
     setBackgroundResource(R.drawable.bkgd_tx_circle)
     ViewCompat.setBackgroundTintList(this,
         ColorStateList.valueOf(ContextCompat.getColor(context, tintColor)))

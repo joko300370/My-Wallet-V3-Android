@@ -72,8 +72,7 @@ class FromAndToView @JvmOverloads constructor(
             if (customiser.enterAmountActionIconCustomisation(state)) {
                 amountSheetAssetDirection.setAssetIconColours(
                     tintColor = assetResources.assetTint(state.sendingAsset),
-                    filterColor = assetResources.assetFilter(state.sendingAsset),
-                    context = this@FromAndToView.context
+                    filterColor = assetResources.assetFilter(state.sendingAsset)
                 )
             }
         }

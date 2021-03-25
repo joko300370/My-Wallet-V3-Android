@@ -28,6 +28,9 @@ interface AssetResources {
     @DrawableRes
     fun errorIcon(cryptoCurrency: CryptoCurrency): Int
 
+    @DrawableRes
+    fun fiatCurrencyIcon(currency: String): Int
+
     @StringRes
     fun assetNameRes(cryptoCurrency: CryptoCurrency): Int
 

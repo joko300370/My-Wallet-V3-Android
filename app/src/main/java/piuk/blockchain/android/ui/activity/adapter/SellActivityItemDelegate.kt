@@ -67,8 +67,7 @@ private class SellActivityItemViewHolder(
                     icon.setImageResource(R.drawable.ic_tx_sell)
                     icon.setAssetIconColours(
                         tintColor = assetResources.assetTint(it.source),
-                        filterColor = assetResources.assetFilter(it.source),
-                        context = context
+                        filterColor = assetResources.assetFilter(it.source)
                     )
                 }
                 setOnClickListener { onAccountClicked(tx.currencyPair.source, tx.txId, CryptoActivityType.SELL) }

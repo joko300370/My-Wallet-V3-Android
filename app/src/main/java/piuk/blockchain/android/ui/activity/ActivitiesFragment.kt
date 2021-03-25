@@ -5,9 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.annotation.UiThread
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.annotations.CommonCode
@@ -23,12 +21,11 @@ import kotlinx.android.synthetic.main.fragment_activities.*
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AccountIcon
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.FiatAccount
-import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.ui.activity.adapter.ActivitiesDelegateAdapter
 import piuk.blockchain.android.ui.activity.detail.CryptoActivityDetailsBottomSheet
 import piuk.blockchain.android.ui.activity.detail.FiatActivityDetailsBottomSheet
@@ -37,15 +34,15 @@ import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.util.getAccount
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.putAccount
+import piuk.blockchain.android.util.setAssetIconColours
+import piuk.blockchain.android.util.visible
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.goneIf
-import piuk.blockchain.android.util.inflate
-import piuk.blockchain.android.util.visible
 import timber.log.Timber
 
 class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesIntent, ActivitiesState>(),
@@ -107,14 +104,18 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
                 ActivitiesSheet.CRYPTO_ACTIVITY_DETAILS -> {
                     newState.selectedCryptoCurrency?.let {
                         showBottomSheet(
-                            CryptoActivityDetailsBottomSheet.newInstance(it, newState.selectedTxId,
-                                newState.activityType))
+                            CryptoActivityDetailsBottomSheet.newInstance(
+                                it, newState.selectedTxId,
+                                newState.activityType
+                            )
+                        )
                     }
                 }
                 ActivitiesSheet.FIAT_ACTIVITY_DETAILS -> {
                     newState.selectedFiatCurrency?.let {
                         showBottomSheet(
-                            FiatActivityDetailsBottomSheet.newInstance(it, newState.selectedTxId))
+                            FiatActivityDetailsBottomSheet.newInstance(it, newState.selectedTxId)
+                        )
                     }
                 }
             }
@@ -157,9 +158,24 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
 
         val account = newState.account
 
-        account_icon.setAccountIcon(account)
+        val accountIcon = AccountIcon(account, assetResources)
+        account_icon.setImageResource(accountIcon.icon)
 
-        account_spend_locked.goneIf { account.isCustodial().not() }
+        accountIcon.indicator?.let {
+            check(account is CryptoAccount) {
+                "Indicators are supported only for CryptoAccounts"
+            }
+            val currency = account.asset
+            account_indicator.apply {
+                visible()
+                setImageResource(it)
+                setAssetIconColours(
+                    tintColor = assetResources.assetTint(currency),
+                    filterColor = assetResources.assetFilter(currency)
+                )
+            }
+        } ?: account_indicator.gone()
+
         account_name.text = account.label
         fiat_balance.text = ""
 
@@ -168,28 +184,15 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
             .subscribeBy(
                 onSuccess = {
                     fiat_balance.text =
-                        getString(R.string.common_spaced_strings, it.toStringWithSymbol(),
-                            it.currencyCode)
+                        getString(
+                            R.string.common_spaced_strings, it.toStringWithSymbol(),
+                            it.currencyCode
+                        )
                 },
                 onError = {
                     Timber.e("Unable to get balance for ${account.label}")
                 }
             )
-    }
-
-    private fun ImageView.setAccountIcon(account: BlockchainAccount) {
-        when (account) {
-            is CryptoAccount -> setImageDrawable(
-                AppCompatResources.getDrawable(
-                    context,
-                    assetResources.drawableResFilled(account.asset)
-                )
-            )
-            is FiatAccount -> setImageResource(account.icon())
-            else -> setImageDrawable(
-                AppCompatResources.getDrawable(context, R.drawable.ic_all_wallets_white)
-            )
-        }
     }
 
     private fun renderTransactionList(newState: ActivitiesState) {
@@ -320,12 +323,6 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
             }
         }
     }
-}
-
-private fun FiatAccount.icon(): Int = when (fiatCurrency) {
-    "EUR" -> R.drawable.ic_funds_euro
-    "GBP" -> R.drawable.ic_funds_gbp
-    else -> R.drawable.ic_funds_usd
 }
 
 /**
