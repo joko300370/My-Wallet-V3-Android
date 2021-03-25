@@ -22,6 +22,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_interest_dashboard.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetFilter
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.SingleAccount
@@ -48,10 +49,11 @@ class InterestDashboardFragment : Fragment() {
     private val custodialWalletManager: CustodialWalletManager by scopedInject()
     private val kycTierService: TierService by scopedInject()
     private val coincore: Coincore by scopedInject()
+    private val assetResources: AssetResources by scopedInject()
 
     private val listAdapter: InterestDashboardAdapter by lazy {
         InterestDashboardAdapter(
-            coincore = coincore,
+            assetResources = assetResources,
             disposables = disposables,
             custodialWalletManager = custodialWalletManager,
             verificationClicked = ::startKyc,

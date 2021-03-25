@@ -1543,6 +1543,7 @@
 
     <string name="dashboard_asset_item_label_title">Please note.</string>
     <string name="algorand_asset_label">Functionality to withdraw ALGO from your trading wallet is currently unavailable, but coming soon.</string>
+    <string name="polkadot_asset_label">Functionality to withdraw DOT from your trading wallet is currently unavailable, but coming soon.</string>
 
     <!-- Transaction flows -->
     <string name="send_enter_amount_from">From: %1$s</string>

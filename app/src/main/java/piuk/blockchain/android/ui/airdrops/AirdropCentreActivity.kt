@@ -13,10 +13,11 @@ import kotlinx.android.synthetic.main.item_airdrop_header.view.*
 import kotlinx.android.synthetic.main.item_airdrop_status.view.*
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.ui.base.MvpActivity
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
-import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.setImageDrawable
 import piuk.blockchain.android.util.setOnClickListenerDebounced
 import java.text.DateFormat
 import kotlin.math.max
@@ -25,6 +26,8 @@ import piuk.blockchain.android.ui.airdrops.AirdropStatusSheet as AirdropStatusSh
 class AirdropCentreActivity : MvpActivity<AirdropCentreView, AirdropCentrePresenter>(),
     AirdropCentreView,
     SlidingModalBottomDialog.Host {
+
+    private val assetResources: AssetResources by scopedInject()
 
     override val presenter: AirdropCentrePresenter by scopedInject()
     override val view: AirdropCentreView = this
@@ -48,7 +51,7 @@ class AirdropCentreActivity : MvpActivity<AirdropCentreView, AirdropCentrePresen
         itemList.add(i, ListItem.HeaderItem("Ended"))
         itemList.add(0, ListItem.HeaderItem("Active"))
 
-        airdrop_list.adapter = Adapter(itemList) { airdropName -> onItemClicked(airdropName) }
+        airdrop_list.adapter = Adapter(itemList, assetResources) { airdropName -> onItemClicked(airdropName) }
     }
 
     private fun onItemClicked(airdropName: String) {
@@ -86,9 +89,9 @@ class HeadingViewHolder(itemView: View) : AirdropViewHolder<ListItem.HeaderItem>
 
 class StatusViewHolder(itemView: View) : AirdropViewHolder<ListItem.AirdropItem>(itemView) {
 
-    fun bind(item: ListItem.AirdropItem, onClick: (String) -> Unit) {
+    fun bind(item: ListItem.AirdropItem, assetResources: AssetResources, onClick: (String) -> Unit) {
         with(itemView) {
-            icon.setCoinIcon(item.airdrop.currency)
+            icon.setImageDrawable(assetResources.drawableResFilled(item.airdrop.currency))
             currency.text = item.airdrop.currency.displayTicker
             val formatted = DateFormat.getDateInstance(DateFormat.SHORT).format(item.airdrop.date)
             setOnClickListenerDebounced { onClick(item.airdrop.name) }
@@ -106,6 +109,7 @@ class StatusViewHolder(itemView: View) : AirdropViewHolder<ListItem.AirdropItem>
 
 private class Adapter(
     private val itemList: List<ListItem>,
+    private val assetResources: AssetResources,
     private val onClick: (String) -> Unit
 ) : RecyclerView.Adapter<AirdropViewHolder<ListItem>>() {
 
@@ -127,7 +131,7 @@ private class Adapter(
     override fun onBindViewHolder(holder: AirdropViewHolder<ListItem>, position: Int) {
         when (val o = itemList[position]) {
             is ListItem.HeaderItem -> (holder as HeadingViewHolder).bind(o)
-            is ListItem.AirdropItem -> (holder as StatusViewHolder).bind(o, onClick)
+            is ListItem.AirdropItem -> (holder as StatusViewHolder).bind(o, assetResources, onClick)
         }
     }
 }

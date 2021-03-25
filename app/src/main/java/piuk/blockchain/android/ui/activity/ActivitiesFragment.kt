@@ -24,6 +24,7 @@ import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.ActivitySummaryItem
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
@@ -37,7 +38,6 @@ import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.util.getAccount
 import piuk.blockchain.android.util.putAccount
-import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
@@ -56,6 +56,7 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
     private val theAdapter: ActivitiesDelegateAdapter by lazy {
         ActivitiesDelegateAdapter(
             prefs = get(),
+            assetResources = assetResources,
             onCryptoItemClicked = { cc, tx, type ->
                 onCryptoActivityClicked(cc, tx, type)
             },
@@ -71,6 +72,7 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
     private val rxBus: RxBus by inject()
     private val currencyPrefs: CurrencyPrefs by inject()
     private val exchangeRates: ExchangeRateDataManager by scopedInject()
+    private val assetResources: AssetResources by scopedInject()
 
     private val actionEvent by unsafeLazy {
         rxBus.register(ActionEvent::class.java)
@@ -177,10 +179,16 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
 
     private fun ImageView.setAccountIcon(account: BlockchainAccount) {
         when (account) {
-            is CryptoAccount -> setCoinIcon(account.asset)
+            is CryptoAccount -> setImageDrawable(
+                AppCompatResources.getDrawable(
+                    context,
+                    assetResources.drawableResFilled(account.asset)
+                )
+            )
             is FiatAccount -> setImageResource(account.icon())
             else -> setImageDrawable(
-                AppCompatResources.getDrawable(context, R.drawable.ic_all_wallets_white))
+                AppCompatResources.getDrawable(context, R.drawable.ic_all_wallets_white)
+            )
         }
     }
 

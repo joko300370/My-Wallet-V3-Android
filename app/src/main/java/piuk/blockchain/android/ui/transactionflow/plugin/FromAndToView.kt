@@ -4,6 +4,9 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
+import org.koin.core.KoinComponent
+import org.koin.core.inject
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.databinding.ViewTxFlowFromAndToBinding
@@ -13,7 +16,7 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.setAssetIconColours
-import piuk.blockchain.android.util.setCoinIcon
+import piuk.blockchain.android.util.setImageDrawable
 import piuk.blockchain.android.util.visibleIf
 
 class FromAndToView @JvmOverloads constructor(
@@ -21,11 +24,12 @@ class FromAndToView @JvmOverloads constructor(
     attr: AttributeSet? = null,
     defStyle: Int = 0
 ) : ConstraintLayout(ctx, attr, defStyle),
-    TxFlowWidget {
+    TxFlowWidget, KoinComponent {
 
     private lateinit var model: TransactionModel
     private lateinit var customiser: EnterAmountCustomisations
     private lateinit var analytics: TxFlowAnalytics
+    private val assetResources: AssetResources by inject()
 
     private val binding: ViewTxFlowFromAndToBinding =
         ViewTxFlowFromAndToBinding.inflate(LayoutInflater.from(context), this, true)
@@ -58,7 +62,7 @@ class FromAndToView @JvmOverloads constructor(
 
             if (customiser.showTargetIcon(state)) {
                 (state.selectedTarget as? CryptoAccount)?.let {
-                    amountSheetTargetIcon.setCoinIcon(it.asset)
+                    amountSheetTargetIcon.setImageDrawable(assetResources.drawableResFilled(it.asset))
                 }
             } else {
                 amountSheetTargetIcon.gone()
@@ -66,7 +70,11 @@ class FromAndToView @JvmOverloads constructor(
 
             amountSheetAssetDirection.setImageResource(customiser.enterAmountActionIcon(state))
             if (customiser.enterAmountActionIconCustomisation(state)) {
-                amountSheetAssetDirection.setAssetIconColours(state.sendingAsset, this@FromAndToView.context)
+                amountSheetAssetDirection.setAssetIconColours(
+                    tintColor = assetResources.assetTint(state.sendingAsset),
+                    filterColor = assetResources.assetFilter(state.sendingAsset),
+                    context = this@FromAndToView.context
+                )
             }
         }
 

@@ -91,6 +91,13 @@ class FeeOptions constructor(
             )
         }
 
+        private fun defaultForDot(): FeeOptions {
+            return FeeOptions(
+                regularFee = 4, // TODO what is the right amount here?
+                priorityFee = 4
+            )
+        }
+
         /**
          * @param currency the currency
          * @return the default FeeOptions given a currency
@@ -103,6 +110,7 @@ class FeeOptions constructor(
                 currency == CryptoCurrency.BCH -> defaultForBch()
                 currency == CryptoCurrency.XLM -> defaultForXlm()
                 currency == CryptoCurrency.ALGO -> defaultForAlg()
+                currency == CryptoCurrency.DOT -> defaultForDot()
                 else -> throw NotImplementedError("STUB: ${currency.displayTicker} NOT IMPLEMENTED")
             }
         }

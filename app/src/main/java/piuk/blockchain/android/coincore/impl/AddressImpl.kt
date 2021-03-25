@@ -7,6 +7,7 @@ import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.alg.AlgoAddress
 import piuk.blockchain.android.coincore.bch.BchAddress
 import piuk.blockchain.android.coincore.btc.BtcAddress
+import piuk.blockchain.android.coincore.dot.PolkadotAddress
 import piuk.blockchain.android.coincore.erc20.Erc20Address
 import piuk.blockchain.android.coincore.eth.EthAddress
 import piuk.blockchain.android.coincore.xlm.XlmAddress
@@ -60,6 +61,12 @@ internal fun makeExternalAssetAddress(
         asset == CryptoCurrency.ALGO -> {
             AlgoAddress(
                 address = address
+            )
+        }
+        asset == CryptoCurrency.DOT -> {
+            PolkadotAddress(
+                address = address,
+                label = label
             )
         }
         else -> throw IllegalArgumentException("External Address not not supported for asset: $asset")

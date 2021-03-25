@@ -25,6 +25,7 @@ class ExchangeRateDataStore(
     private var dgldTickerData: Map<String, PriceDatum>? = null
     private var aaveTickerData: Map<String, PriceDatum>? = null
     private var yfiTickerData: Map<String, PriceDatum>? = null
+    private var dotTickerData: Map<String, PriceDatum>? = null
 
     fun updateExchangeRates(): Completable = Single.merge(
         listOf(
@@ -47,7 +48,9 @@ class ExchangeRateDataStore(
             exchangeRateService.getExchangeRateMap(CryptoCurrency.AAVE)
                 .doOnSuccess { aaveTickerData = it.toMap() },
             exchangeRateService.getExchangeRateMap(CryptoCurrency.YFI)
-                .doOnSuccess { yfiTickerData = it.toMap() }
+                .doOnSuccess { yfiTickerData = it.toMap() },
+            exchangeRateService.getExchangeRateMap(CryptoCurrency.DOT)
+                .doOnSuccess { dotTickerData = it.toMap() }
         )
     ).ignoreElements()
 
@@ -100,6 +103,7 @@ class ExchangeRateDataStore(
             CryptoCurrency.DGLD -> dgldTickerData
             CryptoCurrency.AAVE -> aaveTickerData
             CryptoCurrency.YFI -> yfiTickerData
+            CryptoCurrency.DOT -> dotTickerData
         }
 
     fun getHistoricPrice(

@@ -200,7 +200,7 @@ internal abstract class CryptoAssetBase(
                 listOf(
                     CryptoExchangeAccount(
                         asset = asset,
-                        label = labels.getDefaultExchangeWalletLabel(asset),
+                        label = labels.getDefaultExchangeWalletLabel(),
                         address = address,
                         exchangeRates = exchangeRates,
                         environmentConfig = environmentConfig

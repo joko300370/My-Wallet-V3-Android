@@ -14,6 +14,7 @@ import io.reactivex.subjects.SingleSubject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AddressFactory
 import piuk.blockchain.android.coincore.AssetFilter
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -26,7 +27,6 @@ import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.android.data.api.bitpay.PATH_BITPAY_INVOICE
 import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
-import piuk.blockchain.android.util.assetName
 import java.security.KeyPair
 
 sealed class ScanResult(
@@ -84,11 +84,15 @@ class QrScanResultProcessor(
                 Single.error(QrScanError(QrScanError.ErrorCode.BitPayScanFailed, it.message ?: "Unknown reason"))
             }
 
-    fun disambiguateScan(activity: Activity, targets: Collection<CryptoTarget>): Single<CryptoTarget> {
+    fun disambiguateScan(
+        activity: Activity,
+        targets: Collection<CryptoTarget>,
+        assetResources: AssetResources
+    ): Single<CryptoTarget> {
         // TEMP while refactoring - replace with bottom sheet.
         val optionsList = ArrayList(targets)
         val selectList = optionsList.map {
-            activity.resources.getString(it.asset.assetName())
+            activity.resources.getString(assetResources.assetNameRes(it.asset))
         }.toTypedArray()
 
         val subject = SingleSubject.create<CryptoTarget>()

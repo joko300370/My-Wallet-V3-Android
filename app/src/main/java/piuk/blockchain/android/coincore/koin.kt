@@ -8,6 +8,7 @@ import org.koin.dsl.module
 import piuk.blockchain.android.coincore.alg.AlgoAsset
 import piuk.blockchain.android.coincore.bch.BchAsset
 import piuk.blockchain.android.coincore.btc.BtcAsset
+import piuk.blockchain.android.coincore.dot.PolkadotAsset
 import piuk.blockchain.android.coincore.erc20.aave.AaveAsset
 import piuk.blockchain.android.coincore.erc20.dgld.DgldAsset
 import piuk.blockchain.android.coincore.erc20.pax.PaxAsset
@@ -241,6 +242,22 @@ val coincoreModule = module {
                 offlineAccounts = get(),
                 environmentConfig = get(),
                 walletPreferences = get(),
+                eligibilityProvider = get()
+            )
+        }.bind(CryptoAsset::class)
+
+        scoped {
+            PolkadotAsset(
+                payloadManager = get(),
+                exchangeRates = get(),
+                historicRates = get(),
+                currencyPrefs = get(),
+                custodialManager = get(),
+                crashLogger = get(),
+                labels = get(),
+                pitLinking = get(),
+                offlineAccounts = get(),
+                environmentConfig = get(),
                 eligibilityProvider = get()
             )
         }.bind(CryptoAsset::class)

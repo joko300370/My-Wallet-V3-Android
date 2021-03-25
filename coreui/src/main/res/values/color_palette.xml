@@ -89,6 +89,7 @@
     <color name="dgld_bkgd">#26FFE738</color>
     <color name="aave_bkgd">#262EBAC6</color>
     <color name="yfi_bkgd">#260074FA</color>
+    <color name="dot_bkgd">#26E6007A</color>
 
     <color name="btc">#FF9B22</color>
     <color name="bch">#8DC351</color>
@@ -103,6 +104,7 @@
     <color name="dgld_chart">#000000</color>
     <color name="aave">#2EBAC6</color>
     <color name="yfi">#0074FA</color>
+    <color name="dot">#E6007A</color>
 </resources>
 
 

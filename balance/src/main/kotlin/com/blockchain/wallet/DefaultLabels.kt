@@ -10,6 +10,6 @@ interface DefaultLabels {
     fun getOldDefaultNonCustodialWalletLabel(cryptoCurrency: CryptoCurrency): String
     fun getDefaultCustodialWalletLabel(cryptoCurrency: CryptoCurrency): String
     fun getDefaultInterestWalletLabel(cryptoCurrency: CryptoCurrency): String
-    fun getDefaultExchangeWalletLabel(cryptoCurrency: CryptoCurrency): String
+    fun getDefaultExchangeWalletLabel(): String
     fun getDefaultCustodialFiatWalletLabel(fiatCurrency: String): String
 }

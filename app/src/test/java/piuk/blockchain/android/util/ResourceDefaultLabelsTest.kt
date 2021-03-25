@@ -8,6 +8,7 @@ import org.amshove.kluent.`it returns`
 import org.amshove.kluent.`should equal`
 import org.junit.Test
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetResources
 
 class ResourceDefaultLabelsTest {
 
@@ -15,8 +16,10 @@ class ResourceDefaultLabelsTest {
         on { getString(R.string.default_crypto_non_custodial_wallet_label) } `it returns` "Private Key"
     }
 
+    private val assetResources: AssetResources = mock()
+
     private val defaultLabels: DefaultLabels =
-        ResourceDefaultLabels(resources)
+        ResourceDefaultLabels(resources, assetResources)
 
     @Test
     fun `btc default label`() {

@@ -28,6 +28,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.buy_intro_fragment.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.customviews.IntroHeaderView
@@ -46,6 +47,7 @@ class BuyIntroFragment : Fragment() {
     private val coinCore: Coincore by scopedInject()
     private val appUtil: AppUtil by inject()
     private val simpleBuyPrefs: SimpleBuyPrefs by scopedInject()
+    private val assetResources: AssetResources by scopedInject()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -121,21 +123,26 @@ class BuyIntroFragment : Fragment() {
         )
 
         rv_cryptos.layoutManager = LinearLayoutManager(activity)
-        rv_cryptos.adapter = BuyCryptoCurrenciesAdapter(buyPairs.pairs.map { pair ->
-            BuyCryptoItem(
-                cryptoCurrency = pair.cryptoCurrency,
-                price = pricesHistory.first { it.cryptoCurrency == pair.cryptoCurrency }.currentExchangeRate.price(),
-                percentageDelta = pricesHistory.first { it.cryptoCurrency == pair.cryptoCurrency }.percentageDelta
-            ) {
-                simpleBuyPrefs.clearState()
-                startActivity(SimpleBuyActivity.newInstance(
-                    activity as Context,
-                    pair.cryptoCurrency,
-                    launchFromNavigationBar = true,
-                    launchKycResume = false
-                ))
-            }
-        })
+        rv_cryptos.adapter = BuyCryptoCurrenciesAdapter(
+            buyPairs.pairs.map { pair ->
+                BuyCryptoItem(
+                    cryptoCurrency = pair.cryptoCurrency,
+                    price = pricesHistory.first { it.cryptoCurrency == pair.cryptoCurrency }
+                        .currentExchangeRate
+                        .price(),
+                    percentageDelta = pricesHistory.first { it.cryptoCurrency == pair.cryptoCurrency }.percentageDelta
+                ) {
+                    simpleBuyPrefs.clearState()
+                    startActivity(SimpleBuyActivity.newInstance(
+                        activity as Context,
+                        pair.cryptoCurrency,
+                        launchFromNavigationBar = true,
+                        launchKycResume = false
+                    ))
+                }
+            },
+            assetResources
+        )
     }
 
     private fun renderErrorState() {

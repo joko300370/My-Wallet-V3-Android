@@ -7,13 +7,16 @@ import com.blockchain.nabu.datamanagers.CustodialOrder
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import kotlinx.android.synthetic.main.swap_pending_item_layout.view.*
+import kotlinx.android.synthetic.main.swap_pending_item_layout.view.icon
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.util.toFormattedDate
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.inflate
 
 class PendingSwapsAdapter(
     private val orders: List<CustodialOrder>,
+    private val assetResources: AssetResources,
     private val toFiat: (Money) -> Money
 ) :
     RecyclerView.Adapter<PendingSwapsAdapter.PendingSwapViewHolder>() {
@@ -26,11 +29,15 @@ class PendingSwapsAdapter(
         )
 
     override fun onBindViewHolder(holder: PendingSwapViewHolder, position: Int) {
-        holder.bind(orders[position], toFiat)
+        holder.bind(orders[position], assetResources, toFiat)
     }
 
     class PendingSwapViewHolder(private val parent: View) : RecyclerView.ViewHolder(parent) {
-        fun bind(custodialOrder: CustodialOrder, toFiat: (Money) -> Money) {
+        fun bind(
+            custodialOrder: CustodialOrder,
+            assetResources: AssetResources,
+            toFiat: (Money) -> Money
+        ) {
             with(parent) {
                 title.text = resources.getString(
                     R.string.swap_direction, (custodialOrder.inputMoney as CryptoValue).currency.displayTicker,
@@ -38,7 +45,12 @@ class PendingSwapsAdapter(
                 subtitle.text = custodialOrder.createdAt.toFormattedDate()
                 fiatvalue.text = toFiat(custodialOrder.inputMoney).toStringWithSymbol()
                 cryptovalue.text = custodialOrder.inputMoney.toStringWithSymbol()
-                icon.setAssetIconColours((custodialOrder.inputMoney as CryptoValue).currency, context)
+                val asset = (custodialOrder.inputMoney as CryptoValue).currency
+                icon.setAssetIconColours(
+                    tintColor = assetResources.assetTint(asset),
+                    filterColor = assetResources.assetFilter(asset),
+                    context = context
+                )
             }
         }
     }

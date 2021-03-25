@@ -23,9 +23,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.data.coinswebsocket.service.MessagesSocketHandler
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
-import piuk.blockchain.android.util.AssetResourceFactory
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
@@ -103,7 +103,7 @@ class CoinsWebSocketStrategyTest {
         on { getValue(PersistentPrefs.KEY_WALLET_GUID, "") } `it returns` "1234"
     }
 
-    private val assetResources: AssetResourceFactory = mock() {
+    private val assetResources: AssetResources = mock {
         on { assetName(CryptoCurrency.USDT) } itReturns "Tether"
         on { assetName(CryptoCurrency.PAX) } itReturns "USD Digital"
         on { assetName(CryptoCurrency.DGLD) } itReturns "Wrapped-DGLD"

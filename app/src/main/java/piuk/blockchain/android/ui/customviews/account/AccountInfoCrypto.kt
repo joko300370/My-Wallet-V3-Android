@@ -18,6 +18,7 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.InterestAccount
@@ -30,10 +31,9 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
 import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
-import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.setAssetIconColours
-import piuk.blockchain.android.util.setCoinIcon
+import piuk.blockchain.android.util.setImageDrawable
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
@@ -47,6 +47,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
     private val exchangeRates: ExchangeRates by scopedInject()
     private val currencyPrefs: CurrencyPrefs by scopedInject()
     private val coincore: Coincore by scopedInject()
+    private val assetResources: AssetResources by scopedInject()
     private val compositeDisposable = CompositeDisposable()
     private var accountBalance: Money? = null
     private var isEnabled: Boolean? = null
@@ -76,7 +77,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
         (account as? InterestAccount)?.let { setInterestAccountDetails(account, accountsAreTheSame) }
 
         with(binding) {
-            assetAccountIcon.updateAccountIndicator(account)
+            assetAccountIcon.updateAccountIndicator(account, assetResources)
         }
         displayedAccount = account
     }
@@ -116,10 +117,10 @@ class AccountInfoCrypto @JvmOverloads constructor(
         with(binding) {
             val crypto = account.asset
             walletName.text = account.label
-            icon.setCoinIcon(crypto)
+            icon.setImageDrawable(assetResources.drawableResFilled(crypto))
             icon.visible()
 
-            assetSubtitle.setText(crypto.assetName())
+            assetSubtitle.setText(assetResources.assetNameRes(crypto))
 
             compositeDisposable += account.accountBalance
                 .doOnSuccess {
@@ -206,7 +207,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
     }
 }
 
-private fun AppCompatImageView.updateAccountIndicator(account: CryptoAccount) {
+private fun AppCompatImageView.updateAccountIndicator(account: CryptoAccount, assetResources: AssetResources) {
     val indicator = when (account) {
         is CryptoNonCustodialAccount -> R.drawable.ic_non_custodial_account_indicator
         is InterestAccount -> R.drawable.ic_interest_account_indicator
@@ -217,7 +218,11 @@ private fun AppCompatImageView.updateAccountIndicator(account: CryptoAccount) {
     indicator?.let {
         setImageResource(indicator)
         visible()
-        setAssetIconColours(account.asset, context)
+        setAssetIconColours(
+            tintColor = assetResources.assetTint(account.asset),
+            filterColor = assetResources.assetFilter(account.asset),
+            context = context
+        )
     } ?: kotlin.run {
         gone()
     }

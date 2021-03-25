@@ -18,11 +18,10 @@ import kotlinx.android.synthetic.main.view_trending_pairs.view.*
 import kotlinx.android.synthetic.main.view_trending_pairs.view.trending_title
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetFilter
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.dashboard.assetdetails.selectFirstAccount
-import piuk.blockchain.android.util.assetName
-import piuk.blockchain.android.util.drawableResFilled
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.visible
@@ -40,8 +39,12 @@ class TrendingPairsView(context: Context, attrs: AttributeSet) : ConstraintLayou
         )
     }
 
-    fun initialise(pairs: List<TrendingPair>, onSwapPairClicked: (TrendingPair) -> Unit) {
-        setupPairs(pairs, onSwapPairClicked)
+    fun initialise(
+        pairs: List<TrendingPair>,
+        onSwapPairClicked: (TrendingPair) -> Unit,
+        assetResources: AssetResources
+    ) {
+        setupPairs(pairs, onSwapPairClicked, assetResources)
     }
 
     private fun setupView(context: Context, attrs: AttributeSet) {
@@ -53,7 +56,11 @@ class TrendingPairsView(context: Context, attrs: AttributeSet) : ConstraintLayou
         attributes.recycle()
     }
 
-    private fun setupPairs(pairs: List<TrendingPair>, onSwapPairClicked: (TrendingPair) -> Unit) {
+    private fun setupPairs(
+        pairs: List<TrendingPair>,
+        onSwapPairClicked: (TrendingPair) -> Unit,
+        assetResources: AssetResources
+    ) {
         if (pairs.isEmpty()) {
             trending_empty.visible()
             trending_list.gone()
@@ -66,7 +73,8 @@ class TrendingPairsView(context: Context, attrs: AttributeSet) : ConstraintLayou
                     itemClicked = {
                         onSwapPairClicked(it)
                     },
-                    items = pairs
+                    items = pairs,
+                    assetResources = assetResources
                 )
                 visible()
             }
@@ -124,14 +132,15 @@ class SwapTrendingPairsProvider(
 private class TrendingPairsAdapter(
     val type: TrendingPairsView.TrendingType,
     val itemClicked: (TrendingPair) -> Unit,
-    private val items: List<TrendingPair>
+    private val items: List<TrendingPair>,
+    private val assetResources: AssetResources
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         TrendingPairViewHolder(parent.inflate(R.layout.item_trending_pair_row, false), itemClicked)
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as TrendingPairViewHolder).bind(type, items[position])
+        (holder as TrendingPairViewHolder).bind(type, items[position], assetResources)
     }
 
     override fun getItemCount(): Int = items.size
@@ -142,10 +151,10 @@ private class TrendingPairsAdapter(
         override val containerView: View?
             get() = itemView
 
-        fun bind(type: TrendingPairsView.TrendingType, item: TrendingPair) {
+        fun bind(type: TrendingPairsView.TrendingType, item: TrendingPair, assetResources: AssetResources) {
             itemView.apply {
-                trending_icon_in.setImageResource(item.sourceAccount.asset.drawableResFilled())
-                trending_icon_out.setImageResource(item.destinationAccount.asset.drawableResFilled())
+                trending_icon_in.setImageResource(assetResources.drawableResFilled(item.sourceAccount.asset))
+                trending_icon_out.setImageResource(assetResources.drawableResFilled(item.destinationAccount.asset))
                 if (item.enabled) {
                     trending_root.setOnClickListener {
                         itemClicked(item)
@@ -159,9 +168,9 @@ private class TrendingPairsAdapter(
                 when (type) {
                     TrendingPairsView.TrendingType.SWAP -> {
                         trending_title.text = context.getString(R.string.trending_swap,
-                            context.getString(item.sourceAccount.asset.assetName()))
+                            context.getString(assetResources.assetNameRes(item.sourceAccount.asset)))
                         trending_subtitle.text = context.getString(R.string.trending_receive,
-                            context.getString(item.destinationAccount.asset.assetName()))
+                            context.getString(assetResources.assetNameRes(item.destinationAccount.asset)))
                         trending_icon_type.setImageDrawable(
                             ContextCompat.getDrawable(context, R.drawable.ic_swap_light_blue))
                     }
