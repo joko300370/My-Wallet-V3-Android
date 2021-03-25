@@ -17,7 +17,6 @@ import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.databinding.DialogSheetActivityDetailsBinding
@@ -43,7 +42,7 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
     override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogSheetActivityDetailsBinding =
         DialogSheetActivityDetailsBinding.inflate(inflater, container, false)
 
-    override val model: ActivityDetailsModel by inject()
+    override val model: ActivityDetailsModel by scopedInject()
 
     private val listAdapter: ActivityDetailsDelegateAdapter by lazy {
         ActivityDetailsDelegateAdapter(
