@@ -21,7 +21,6 @@ import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.verifyZeroInteractions
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.balance.AccountReference
 import info.blockchain.balance.CryptoValue
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -59,14 +58,14 @@ class XlmDataManagerTest {
     @Test
     fun `getBalance with reference - there should be no interactions before subscribe`() {
         verifyNoInteractionsBeforeSubscribe {
-            getBalance(AccountReference.Xlm("", "ANY"))
+            getBalance(XlmAccountReference("", "ANY"))
         }
     }
 
     @Test
     fun `balanceOf with reference - there should be no interactions before subscribe`() {
         verifyNoInteractionsBeforeSubscribe {
-            getBalance(AccountReference.Xlm("", "ANY"))
+            getBalance(XlmAccountReference("", "ANY"))
         }
     }
 
@@ -75,7 +74,7 @@ class XlmDataManagerTest {
         givenXlmDataManager(
             givenBalances("ANY" to 123.lumens())
         )
-            .getBalance(AccountReference.Xlm("", "ANY"))
+            .getBalance(XlmAccountReference("", "ANY"))
             .testSingle() `should equal` 123.lumens()
     }
 
@@ -84,7 +83,7 @@ class XlmDataManagerTest {
         givenXlmDataManager(
             givenBalances("ANY" to 456.lumens())
         )
-            .getBalance(AccountReference.Xlm("", "ANY"))
+            .getBalance(XlmAccountReference("", "ANY"))
             .testSingle() `should equal` 456.lumens()
     }
 
@@ -291,8 +290,8 @@ class XlmDataManagerTest {
                 )
             )
         )
-        val accountReference: AccountReference = dataManager.defaultAccountReference().testSingle()
-        val accountReferenceXlm: AccountReference.Xlm = dataManager.defaultAccount().testSingle()
+        val accountReference: XlmAccountReference = dataManager.defaultAccountReference().testSingle()
+        val accountReferenceXlm: XlmAccountReference = dataManager.defaultAccount().testSingle()
         accountReference `should equal` accountReferenceXlm
     }
 
@@ -384,10 +383,10 @@ class XlmDataManagerTest {
             )
         )
         xlmDataManager
-            .getBalance(AccountReference.Xlm("", "ADDRESS1"))
+            .getBalance(XlmAccountReference("", "ADDRESS1"))
             .testSingle() `should equal` 10.lumens()
         xlmDataManager
-            .getBalance(AccountReference.Xlm("", "ADDRESS2"))
+            .getBalance(XlmAccountReference("", "ADDRESS2"))
             .testSingle() `should equal` 20.lumens()
     }
 }
@@ -409,7 +408,7 @@ class XlmDataManagerTransactionListTest {
     @Test
     fun `getTransactionList with reference - there should be no interactions before subscribe`() {
         verifyNoInteractionsBeforeSubscribe {
-            getTransactionList(AccountReference.Xlm("", "ANY"))
+            getTransactionList(XlmAccountReference("", "ANY"))
         }
     }
 
@@ -443,7 +442,7 @@ class XlmDataManagerTransactionListTest {
                 "GC24LNYWXIYYB6OGCMAZZ5RX6WPI2F74ZV7HNBV4ADALLXJRT7ZTLHP2" to getResponseList())
         )
             .getTransactionList(
-                AccountReference.Xlm("", "GC24LNYWXIYYB6OGCMAZZ5RX6WPI2F74ZV7HNBV4ADALLXJRT7ZTLHP2"))
+                XlmAccountReference("", "GC24LNYWXIYYB6OGCMAZZ5RX6WPI2F74ZV7HNBV4ADALLXJRT7ZTLHP2"))
             .testSingle() `should equal` getXlmList()
     }
 
@@ -506,7 +505,7 @@ class XlmDataManagerSendTransactionTest {
         verifyNoInteractionsBeforeSubscribe {
             dryRunSendFunds(
                 SendDetails(
-                    AccountReference.Xlm("", "ANY"),
+                    XlmAccountReference("", "ANY"),
                     100.lumens(),
                     "ANY",
                     1.stroops()
@@ -520,7 +519,7 @@ class XlmDataManagerSendTransactionTest {
         verifyNoInteractionsBeforeSubscribe {
             sendFunds(
                 SendDetails(
-                    AccountReference.Xlm("", "ANY"),
+                    XlmAccountReference("", "ANY"),
                     100.lumens(),
                     "ANY",
                     1.stroops()
@@ -580,7 +579,7 @@ class XlmDataManagerSendTransactionTest {
             lastTxUpdater = lastTxUpdater
         ).sendFunds(
             SendDetails(
-                AccountReference.Xlm("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
+                XlmAccountReference("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
                 199.456.lumens(),
                 "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3",
                 256.stroops()
@@ -610,7 +609,7 @@ class XlmDataManagerSendTransactionTest {
             )
         }
         val sendDetails = SendDetails(
-            AccountReference.Xlm("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
+            XlmAccountReference("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
             199.456.lumens(),
             "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3",
             1.stroops()
@@ -703,7 +702,7 @@ class XlmDataManagerSendTransactionTest {
             lastTxUpdater = lastTxUpdater
         ).sendFunds(
             SendDetails(
-                AccountReference.Xlm("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
+                XlmAccountReference("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
                 199.456.lumens(),
                 "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3",
                 256.stroops(),
@@ -772,7 +771,7 @@ class XlmDataManagerSendTransactionTest {
             lastTxUpdater = lastTxUpdater
         ).sendFunds(
             SendDetails(
-                AccountReference.Xlm("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
+                XlmAccountReference("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
                 199.456.lumens(),
                 "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3",
                 256.stroops(),
@@ -799,7 +798,7 @@ class XlmDataManagerSendTransactionTest {
             )
         }
         val sendDetails = SendDetails(
-            AccountReference.Xlm("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
+            XlmAccountReference("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
             199.456.lumens(),
             "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3",
             1.stroops()
@@ -849,7 +848,7 @@ class XlmDataManagerSendTransactionTest {
             )
         }
         val sendDetails = SendDetails(
-            AccountReference.Xlm("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
+            XlmAccountReference("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
             199.456.lumens(),
             "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED4",
             1.stroops()
@@ -914,7 +913,7 @@ class XlmDataManagerSendTransactionTest {
             )
         }
         val sendDetails = SendDetails(
-            AccountReference.Xlm("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
+            XlmAccountReference("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
             1.23.lumens(),
             "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3",
             256.stroops()
@@ -991,7 +990,7 @@ class XlmDataManagerSendTransactionTest {
             )
         }
         val sendDetails = SendDetails(
-            AccountReference.Xlm("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
+            XlmAccountReference("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
             1.23.lumens(),
             "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3",
             500.stroops()
@@ -1054,7 +1053,7 @@ class XlmDataManagerSendTransactionTest {
             )
         ).sendFunds(
             SendDetails(
-                AccountReference.Xlm("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
+                XlmAccountReference("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
                 1.23.lumens(),
                 "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED4",
                 1.stroops()
@@ -1067,26 +1066,6 @@ class XlmDataManagerSendTransactionTest {
                 success `should be` false
             }
         horizonProxy.verifyJustTheOneSendAttemptAndUpdate()
-    }
-
-    @Test
-    fun `when the from address reference is not an Xlm one - throw`() {
-        val horizonProxy = mock<HorizonProxy>()
-        givenXlmDataManager(
-            horizonProxy
-        ).sendFunds(
-            SendDetails(
-                AccountReference.Ethereum("", "0xAddress"),
-                1.23.lumens(),
-                "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3",
-                1.stroops()
-            )
-        )
-            .test()
-            .assertFailureAndMessage(XlmSendException::class.java,
-                "Source account reference is not an Xlm reference")
-            .assertNotComplete()
-        verifyZeroInteractions(horizonProxy)
     }
 }
 
@@ -1131,7 +1110,7 @@ class XlmDataManagerSendWithMemoTest {
 
         dataManager.sendFunds(
             SendDetails(
-                AccountReference.Xlm("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
+                XlmAccountReference("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
                 1.23.lumens(),
                 "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3",
                 1.stroops(),
@@ -1178,7 +1157,7 @@ class XlmDataManagerSendWithMemoTest {
             memoMapper
         ).dryRunSendFunds(
             SendDetails(
-                AccountReference.Xlm("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
+                XlmAccountReference("", "GB5INYM5XFJHAIQYXUQMGMQEM5KWBM4OYVLTWQI5JSQBRQKFYH3M3XWR"),
                 1.23.lumens(),
                 "GDKDDBJNREDV4ITL65Z3PNKAGWYJQL7FZJSV4P2UWGLRXI6AWT36UED3",
                 1.stroops(),

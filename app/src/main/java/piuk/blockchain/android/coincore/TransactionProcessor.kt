@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore
 
 import androidx.annotation.CallSuper
 import androidx.annotation.VisibleForTesting
+import com.blockchain.annotations.CommonCode
 import com.blockchain.extensions.replace
 import com.blockchain.koin.payloadScope
 import com.blockchain.nabu.datamanagers.TransactionError
@@ -62,15 +63,28 @@ data class TxFee(
     }
 }
 
+data class FeeLevelRates(
+    val regularFee: Long,
+    val priorityFee: Long
+)
+
+data class FeeSelection(
+    val selectedLevel: FeeLevel = FeeLevel.None,
+    val customAmount: Long = -1L,
+    val availableLevels: Set<FeeLevel> = setOf(FeeLevel.None),
+    val customLevelRates: FeeLevelRates? = null,
+    val feeState: FeeState? = null,
+    val asset: CryptoCurrency? = null
+)
+
 data class PendingTx(
     val amount: Money,
     val totalBalance: Money,
     val availableBalance: Money,
-    val fees: Money,
+    val feeForFullAvailable: Money,
+    val feeAmount: Money,
+    val feeSelection: FeeSelection,
     val selectedFiat: String,
-    val feeLevel: FeeLevel = FeeLevel.None,
-    val customFeeAmount: Long = -1L,
-    val availableFeeLevels: Set<FeeLevel> = setOf(FeeLevel.None),
     val confirmations: List<TxConfirmationValue> = emptyList(),
     val minLimit: Money? = null,
     val maxLimit: Money? = null,
@@ -149,20 +163,22 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
 
     data class Total(val total: Money, val exchange: Money? = null) : TxConfirmationValue(TxConfirmation.READ_ONLY)
 
+    data class FiatTxFee(val fee: Money) : TxConfirmationValue(TxConfirmation.READ_ONLY)
+
+    object EstimatedDepositCompletion : TxConfirmationValue(TxConfirmation.READ_ONLY)
+
+    object EstimatedWithdrawalCompletion : TxConfirmationValue(TxConfirmation.READ_ONLY)
+
+    @CommonCode("This structure is repeated in non-confirmation FEeSelection. They should be merged")
     data class FeeSelection(
         val feeDetails: FeeState? = null,
         val exchange: Money? = null,
         val selectedLevel: FeeLevel,
         val customFeeAmount: Long = -1L,
         val availableLevels: Set<FeeLevel> = emptySet(),
-        val feeInfo: FeeInfo? = null,
+        val feeInfo: FeeLevelRates? = null,
         val asset: CryptoCurrency
-    ) : TxConfirmationValue(TxConfirmation.FEE_SELECTION) {
-        data class FeeInfo(
-            val regularFee: Long,
-            val priorityFee: Long
-        )
-    }
+    ) : TxConfirmationValue(TxConfirmation.FEE_SELECTION)
 
     data class BitPayCountdown(
         val timeRemainingSecs: Long
@@ -209,12 +225,12 @@ abstract class TxEngine : KoinComponent {
         fun refreshConfirmations(revalidate: Boolean = false): Completable
     }
 
-    private lateinit var _sourceAccount: CryptoAccount
+    private lateinit var _sourceAccount: BlockchainAccount
     private lateinit var _txTarget: TransactionTarget
     private lateinit var _exchangeRates: ExchangeRateDataManager
     private lateinit var _refresh: RefreshTrigger
 
-    protected val sourceAccount: CryptoAccount
+    protected val sourceAccount: BlockchainAccount
         get() = _sourceAccount
 
     protected val txTarget: TransactionTarget
@@ -229,7 +245,7 @@ abstract class TxEngine : KoinComponent {
 
     @CallSuper
     open fun start(
-        sourceAccount: CryptoAccount,
+        sourceAccount: BlockchainAccount,
         txTarget: TransactionTarget,
         exchangeRates: ExchangeRateDataManager,
         refreshTrigger: RefreshTrigger = object : RefreshTrigger {
@@ -259,8 +275,11 @@ abstract class TxEngine : KoinComponent {
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
-    val asset: CryptoCurrency
-        get() = sourceAccount.asset
+    // workaround for using engine without cryptocurrency source
+    val sourceAsset: CryptoCurrency
+        get() = (sourceAccount as? CryptoAccount)?.asset ?: throw IllegalStateException(
+            "Trying to use cryptocurrency with non-crypto source"
+        )
 
     open val requireSecondPassword: Boolean = false
 
@@ -270,16 +289,40 @@ abstract class TxEngine : KoinComponent {
     // Return a stream of the exchange rate between the source asset and the user's selected
     // fiat currency. This should always return at least once, but can safely either complete
     // or keep sending updated rates, depending on what is useful for Transaction context
-    open fun userExchangeRate(): Observable<ExchangeRate> =
-        Observable.just(
-            exchangeRates.getLastPrice(sourceAccount.asset, userFiat)
-        ).map { rate ->
-            ExchangeRate.CryptoToFiat(
-                sourceAccount.asset,
-                userFiat,
-                rate
-            )
+    open fun userExchangeRate(): Observable<ExchangeRate> {
+        check(sourceAccount is CryptoAccount || sourceAccount is FiatAccount) {
+            "Attempting to use exchange rate for non crypto or fiat sources"
         }
+
+        return when (sourceAccount) {
+            is CryptoAccount -> {
+                Observable.just(
+                    exchangeRates.getLastPrice((sourceAccount as CryptoAccount).asset, userFiat)
+                ).map { rate ->
+                    ExchangeRate.CryptoToFiat(
+                        (sourceAccount as CryptoAccount).asset,
+                        userFiat,
+                        rate
+                    )
+                }
+            }
+            is FiatAccount -> {
+                Observable.just(
+                    exchangeRates.getLastPriceOfFiat((sourceAccount as FiatAccount).fiatCurrency, userFiat)
+                ).map {
+                    ExchangeRate.FiatToFiat(
+                        (sourceAccount as FiatAccount).fiatCurrency,
+                        userFiat,
+                        it
+                    )
+                }
+            }
+            else -> {
+                Timber.e("Attempting to use exchange rate for non crypto or fiat sources")
+                Observable.empty()
+            }
+        }
+    }
 
     abstract fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx>
 
@@ -331,7 +374,7 @@ abstract class TxEngine : KoinComponent {
 }
 
 class TransactionProcessor(
-    sourceAccount: CryptoAccount,
+    sourceAccount: BlockchainAccount,
     txTarget: TransactionTarget,
     exchangeRates: ExchangeRateDataManager,
     private val engine: TxEngine
@@ -416,14 +459,14 @@ class TransactionProcessor(
 
     // Check that the fee level is supported, then call into the engine to set the fee and validate ballances etc
     // the selected fee level is supported
-    fun updateFeeLevel(level: FeeLevel, customFeeAmount: Long = -1): Completable {
+    fun updateFeeLevel(level: FeeLevel, customFeeAmount: Long?): Completable {
         Timber.d("!TRANSACTION!> in UpdateFeeLevel")
         val pendingTx = getPendingTx()
-        check(pendingTx.availableFeeLevels.contains(level)) {
+        require(pendingTx.feeSelection.availableLevels.contains(level)) {
             "Fee Level $level not supported by engine ${engine::class.java.name}"
         }
 
-        return engine.doUpdateFeeLevel(pendingTx, level, customFeeAmount)
+        return engine.doUpdateFeeLevel(pendingTx, level, customFeeAmount ?: -1L)
             .flatMap { engine.doValidateAmount(it) }
             .doOnSuccess { updatePendingTx(it) }
             .ignoreElement()

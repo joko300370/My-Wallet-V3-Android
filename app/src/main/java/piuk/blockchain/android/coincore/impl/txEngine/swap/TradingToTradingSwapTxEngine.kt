@@ -7,6 +7,7 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
@@ -26,7 +27,7 @@ class TradingToTradingSwapTxEngine(
     override fun assertInputsValid() {
         check(txTarget is CustodialTradingAccount)
         check(sourceAccount is CustodialTradingAccount)
-        check((txTarget as CustodialTradingAccount).asset != sourceAccount.asset)
+        check((txTarget as CustodialTradingAccount).asset != sourceAsset)
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
@@ -35,12 +36,12 @@ class TradingToTradingSwapTxEngine(
                 availableBalance.flatMap { balance ->
                     Single.just(
                         PendingTx(
-                            amount = CryptoValue.zero(sourceAccount.asset),
+                            amount = CryptoValue.zero(sourceAsset),
                             totalBalance = balance,
                             availableBalance = balance,
-                            fees = CryptoValue.zero(sourceAccount.asset),
-                            feeLevel = FeeLevel.None,
-                            availableFeeLevels = AVAILABLE_FEE_LEVELS,
+                            feeForFullAvailable = CryptoValue.zero(sourceAsset),
+                            feeAmount = CryptoValue.zero(sourceAsset),
+                            feeSelection = FeeSelection(),
                             selectedFiat = userFiat
                         )
                     ).flatMap {
@@ -49,11 +50,12 @@ class TradingToTradingSwapTxEngine(
                 }
             }.handlePendingOrdersError(
                 PendingTx(
-                    amount = CryptoValue.zero(sourceAccount.asset),
-                    totalBalance = CryptoValue.zero(sourceAccount.asset),
-                    availableBalance = CryptoValue.zero(sourceAccount.asset),
-                    fees = CryptoValue.zero(sourceAccount.asset),
-                    feeLevel = FeeLevel.None,
+                    amount = CryptoValue.zero(sourceAsset),
+                    totalBalance = CryptoValue.zero(sourceAsset),
+                    availableBalance = CryptoValue.zero(sourceAsset),
+                    feeForFullAvailable = CryptoValue.zero(sourceAsset),
+                    feeAmount = CryptoValue.zero(sourceAsset),
+                    feeSelection = FeeSelection(),
                     selectedFiat = userFiat
                 )
             )
@@ -82,7 +84,7 @@ class TradingToTradingSwapTxEngine(
         level: FeeLevel,
         customFeeAmount: Long
     ): Single<PendingTx> {
-        require(pendingTx.availableFeeLevels.contains(level))
+        require(pendingTx.feeSelection.availableLevels.contains(level))
         // This engine only supports FeeLevel.None, so
         return Single.just(pendingTx)
     }

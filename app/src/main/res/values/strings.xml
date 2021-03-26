@@ -42,13 +42,12 @@
         <item quantity="other">%d imported addresses</item>
     </plurals>
     <string name="upgrade_wallet">Upgrade</string>
-    <string name="backup_wallet">Backup funds</string>
+    <string name="backup_wallet_title">Secret Private Key Recovery</string>
     <string name="action_settings">Settings</string>
 
     <!-- nav menu -->
     <string name="please_wait">Please wait</string>
     <string name="item_backup">Backup funds</string>
-    <string name="item_lockbox">Lockbox</string>
     <string name="item_the_exchange">Exchange</string>
     <string name="item_airdrops">Airdrops</string>
     <string name="item_debug_homebrew" translatable="false">Debug Homebrew</string>
@@ -70,6 +69,7 @@
     <string name="options_id">Wallet ID</string>
 
     <string name="preferences_about_title">About Us</string>
+    <string name="preferences_rate_app">Rate the App</string>
 
     <string name="logout_wallet">Log Out</string>
     <string name="ask_you_sure_logout">Are you sure you want to log out from this wallet?</string>
@@ -146,8 +146,8 @@
     <string name="recover_funds_instructions">Enter your 12 backup words with spaces to recover your
         funds &amp; transactions
     </string>
-    <string name="recovery_passphrase">Backup phrase</string>
-    <string name="invalid_recovery_phrase">Invalid backup phrase. Please try again</string>
+    <string name="recovery_passphrase_1">Secret Private Key Recovery Phrase</string>
+    <string name="invalid_recovery_phrase_1">Invalid Secret Private Key Recovery Phrase. Please try again</string>
     <string name="creating_wallet">Creating wallet</string>
 
     <string name="restore_failed">Restoring wallet failed. Please try again</string>
@@ -382,7 +382,7 @@
     <!-- FUNDS TRANSFER -->
     <string name="transfer">Transfer</string>
     <string name="transfer_funds_title">Transfer From Imported Address?</string>
-    <string name="transfer_funds_description">Imported addresses are not backed up by your Backup Phrase. To secure these funds, we
+    <string name="transfer_funds_description_1">Imported addresses are not backed up by your Secret Private Key Recovery Phrase. To secure these funds, we
         recommend transferring these balances to your Blockchain.com non-custodial Wallet.
     </string>
 
@@ -493,8 +493,7 @@
     <string name="pairing_code_instruction_3">Using your computer’s camera, scan the QR code below.</string>
     <string name="pairing_code_show_qr">Show QR code</string>
     <string name="pairing_code_hide_qr">Hide QR code</string>
-    <string name="pairing_code_warning_1">Keep this code hidden until you’re ready.</string>
-    <string name="pairing_code_warning_2">Keep this code safe!\nDo not share with others.</string>
+    <string name="pairing_code_instructions_alert">Never share your mobile pairing QR code with anyone. Anyone who can view this QR code can withdraw funds. Blockchain.com will never ask to view or receive your mobile pairing QR code.</string>
     <string name="email_request_subject_btc">Bitcoin payment request</string>
 
     <!-- SHARE RECEIVE ADDRESS -->
@@ -562,33 +561,38 @@
     <string name="tx_title_transfer">Transfer %1s</string>
     <string name="tx_title_fee">Fee %1s</string>
     <string name="tx_title_interest">%1$s Interest Earned</string>
+    <string name="tx_title_fiat_deposit">Deposit %1$s</string>
 
     <!-- TRANSACTION DETAILS -->
     <string name="transaction_detail_coinbase">No Inputs (Newly Generated Coins)</string>
 
     <!-- SECURITY CENTRE -->
     <string name="security_centre_email_check">Check email</string>
-    <string name="backup_header">Backup Phrase</string>
 
     <!-- BACKUP -->
-    <string name="backup_explanation">For your security, Blockchain does not keep any passwords on
-        file. The following 12 word Backup Phrase will give you access to your funds in case you
-        lose your password. Be sure to write it on a piece of paper and to keep it somewhere safe
-        and secure.
-    </string>
-    <string name="backup_button_start">Start backup</string>
+    <string name="backup_title">Secret Private Key Recovery</string>
+    <string name="backup_subtitle">Secret Private Key Recovery Phrase</string>
+    <string name="backup_instructions_1">In crypto, when you hold the private keys, you\'re in control of the funds in your Private Key Wallet. The downside is that WHOEVER holds your private keys can control your Private Key Wallet.</string>
+    <string name="backup_instructions_2">So you must:</string>
+    <string name="backup_instructions_3">1. Write down the 12 word phrase on the next screen in the exact order it appears</string>
+    <string name="backup_instructions_4">2. Keep it safe, ideally on a securely stored piece of paper (in other words, not a digital copy).</string>
+    <string name="backup_instructions_5">3. NEVER share your backup phrase with anyone.</string>
+    <string name="backup_instructions_warn">Warning: If someone has your backup phrase they will have access to your Private Key Wallet and can withdraw funds.</string>
+    <string name="backup_instructions_alert">Blockchain.com will never ask to view or receive your recovery phrase.</string>
+    <string name="backup_button_begin">View Recovery Phrase</string>
+
     <string name="backup_write_down_words">It is important to make sure you write down your words
         exactly as they appear here and in this order.
     </string>
     <string name="backup_header_complete">Backup Complete</string>
-    <string name="backup_complete_message">You can use your Backup Phrase to restore your funds if
-        you lose your password. Anyone with access to your Backup Phrase can access your funds so
+    <string name="backup_complete_message_1">You can use your Secret Private Key Recovery Phrase to restore your funds if
+        you lose your password. Anyone with access to your Secret Private Key Recovery Phrase can access your funds so
         remember to keep it offline somewhere safe and secure.
     </string>
     <string name="backup_again">Backup again</string>
     <string name="backup_confirmed">Backup confirmed</string>
     <string name="backup_last">Last backup: %1$s</string>
-    <string name="backup_verify_heading">Enter the following words from your Backup Phrase to
+    <string name="backup_verify_heading_1">Enter the following words from your Secret Private Key Recovery Phrase to
         complete the backup process.
     </string>
     <string name="backup_next_word">NEXT WORD</string>
@@ -597,7 +601,7 @@
     <string name="backup_of">of</string>
     <string name="backup_word_mismatch">Word Mismatch</string>
     <string name="backup_done">DONE</string>
-    <string name="backup_lost_mnemonic">Lost your 12 word backup phrase?</string>
+    <string name="backup_lost_mnemonic_1">Lost your 12 word Secret Private Key Recovery Phrase?</string>
 
     <!-- BIOMETRICS -->
     <string name="fingerprint_description">Confirm fingerprint to continue</string>
@@ -854,6 +858,7 @@
 
     <string name="buy_crypto_card_title">Buy Crypto</string>
     <string name="buy_crypto_card_body">We can help you buy in just a few simple steps.</string>
+    <string name="buy_crypto_card_sdd_body">Select the crypto you want to buy, verify your identity and buy instantly.</string>
     <string name="buy_crypto_card_cta">Buy Crypto Now</string>
 
     <!-- Transfer Bitcoin announcement -->
@@ -862,8 +867,8 @@
     <string name="transfer_btc_card_cta">Get Started</string>
 
     <!-- Wallet Recovery announcement -->
-    <string name="recovery_card_title">Wallet Recovery Phrase</string>
-    <string name="recovery_card_body">You control your crypto. Write down your recovery phrase to restore all your funds in case you lose your password.</string>
+    <string name="recovery_card_title_1">Secret Private Key Recovery Phrase</string>
+    <string name="recovery_card_body_1">You control your crypto. Write down your Secret Private Key Recovery Phrase to restore all your funds in case you lose your password.</string>
     <string name="recovery_card_cta">Backup Phrase</string>
 
     <!-- Simple buy finish signup -->
@@ -931,7 +936,7 @@
 
     <!-- force backup before send sheet -->
     <string name="backup_before_send_title">Backup Your Wallet</string>
-    <string name="backup_before_send_body">Your backup phrase will allow you to recover your crypto if you lose access to your wallet. \n\nPlease write down these 12 words in order and keep them somewhere safe. Never share it with anyone. Your backup phrase is the key to recovering your crypto if you ever get locked out.</string>
+    <string name="backup_before_send_body_1">Your Secret Private Key Recovery Phrase will allow you to recover your crypto if you lose access to your wallet. \n\nPlease write down these 12 words in order and keep them somewhere safe. Never share it with anyone. Your Secret Private Key Recovery Phrase is the key to recovering your crypto if you ever get locked out.</string>
     <string name="backup_before_send_cta">Backup Now</string>
     <string name="backup_before_send_later_cta">Continue without Backup</string>
     <plurals name="backup_before_send_later_label">
@@ -1137,7 +1142,7 @@
     <string name="kyc_resubmission_splash_description_3">The required photos are missing.</string>
     <string name="kyc_resubmission_splash_description_4">The document you submitted is incorrect.</string>
     <string name="kyc_resubmission_splash_description_5">We were unable to read the images you submitted due to image quality.</string>
-    <string name="sunriver_splash_title">Identity Verification</string>
+    <string name="identity_verification">Identity Verification</string>
     <string name="sunriver_status_message">Your information is being reviewed. The review should complete shortly.</string>
 
     <!-- Sunriver Airdrop -->
@@ -1258,7 +1263,7 @@
     <string name="simple_buy_intro_main_button_action">Buy Crypto Now</string>
     <string name="simple_buy_deposit_my_crypto">Tour the Wallet</string>
     <string name="simple_buy_skip_text">Explore your new Blockchain Wallet.</string>
-    <string name="simple_buy_skip">Skip</string>
+    <string name="common_skip">Skip</string>
     <string name="simple_buy_currency_selection_header">Your local currency to store funds in that currency as funds in your Blockchain Wallet.</string>
     <string name="simple_buy_get_started">Get Started</string>
     <string name="simple_buy_what_you_want_to_buy">What would you like to buy?</string>
@@ -1276,8 +1281,18 @@
     <string name="minimum_buy">%1$s Minimum</string>
     <string name="buy_min">Buy Min</string>
     <string name="buy_max">Buy Max</string>
+    <string name="bank_account_info_default">Account Ending</string>
+    <string name="bank_wire_transfer_fee_default">Wire Fee</string>
+    <string name="bank_wire_transfer_fee">%1$s Fee</string>
+    <string name="bank_wire_transfer_min_withdrawal">%1$s Min Withdraw</string>
     <string name="bank_wire_transfer">Bank Wire Transfer</string>
     <string name="bank_transfer">Bank Transfer</string>
+    <string name="payment_wire_transfer">Wire Transfer</string>
+    <string name="payment_wire_transfer_subtitle">3 – 5 Business Days</string>
+    <string name="payment_wire_transfer_blurb">Send funds directly from your bank account to your Blockchain.com Wallet. Bank fees may apply.</string>
+    <string name="payment_deposit">Bank Deposit</string>
+    <string name="payment_deposit_subtitle">Instantly Available</string>
+    <string name="payment_deposit_blurb">Securely link a bank and send cash to your Blockchain.com Wallet at anytime.</string>
     <string name="credit_or_debit_card">Credit or Debit Card</string>
     <string name="instantly_buy_crypto_with_card">Instantly buy crypto with any Visa or Mastercard.</string>
     <string name="send_funds_directly_from_your_bank">Send funds directly from your bank to your Blockchain Wallet. Once we receive the manual transfer, use that cash to buy crypto.</string>
@@ -1327,6 +1342,7 @@
     <string name="recipient_name">Recipient</string>
     <string name="sort_code">Sort Code</string>
     <string name="bank_name">Bank Name</string>
+    <string name="routing_number">Routing Number</string>
     <string name="bank_country">Bank Country</string>
     <string name="iban">IBAN</string>
     <string name="estonia">Estonia</string>
@@ -1383,6 +1399,8 @@
     <string name="card_buying">Buying %1s</string>
     <string name="card_in_progress">%1s Buy In Progress</string>
     <string name="we_will_notify_order_complete">We’ll notify you when your order is complete.</string>
+    <string name="bank_transfer_in_progress_title">%1$s Buy Started</string>
+    <string name="bank_transfer_in_progress_blurb">We are completing your purchase now. Expect the funds to be withdrawn from your bank by %1$s. Check the status of your order at anytime in Activity.</string>
     <string name="completing_card_buy">We’re completing your purchase now.</string>
     <string name="card_purchased">%1s Purchased</string>
     <string name="card_purchased_available_now">Your %1s is now available in your Wallet.</string>
@@ -1491,10 +1509,18 @@
     <!-- Fiat Funds -->
     <string name="fiat_funds_detail_withdraw_title">Withdraw</string>
     <string name="fiat_funds_detail_deposit_details">Add Cash from Your Bank</string>
-    <string name="fiat_funds_detail_withdraw_details">Cashout to Your Bank</string>
+    <string name="fiat_funds_detail_withdraw_details">Cash Out to Your Bank</string>
+    <string name="fiat_funds_detail_pending_withdrawal">You already have a Withdrawal in progress, please wait until that completes before starting a new one.</string>
     <string name="withdraw_currency">Withdraw %1$s</string>
     <string name="withdraw_title">Withdraw</string>
     <string name="withdraw_to">Withdraw to</string>
+    <string name="withdraw_confirmation_cta_button">Withdraw %1$s</string>
+    <string name="withdraw_confirmation_progress_message">We’re completing your withdrawal now.</string>
+    <string name="withdraw_confirmation_progress_title">Withdrawing %1$s</string>
+    <string name="withdraw_confirmation_success_title">%1$s Withdrawn!</string>
+    <string name="withdraw_confirmation_success_message">We are sending the cash now. Expect the cash to hit your bank on %1$s. Check the status of your Withdrawal at anytime from your Activity Screen</string>
+    <string name="withdraw_target_select_title">Withdraw to…</string>
+    <string name="withdraw_confirmation_eta">Funds Will Arrive by</string>
     <string name="add_a_bank">Add a Bank</string>
     <string name="fiat_funds_detail_activity_title">Activity</string>
     <string name="fiat_funds_detail_activity_details">View All Transactions</string>
@@ -1526,13 +1552,13 @@
     <string name="withdrawal_amount">%1$s Withdrawal</string>
     <string name="withdrawing_amount">Withdrawing %1$s</string>
     <string name="withdrawing_amount_message">We’re completing your withdrawal now.</string>
-    <string name="withdrawal_success_message">Succeess! We’re are withdrawing the cash from your %1$s Wallet now. The funds should be in your bank in 1&#8211;3 business days.</string>
+    <string name="withdrawal_success_message">Success! We’re are withdrawing the cash from your %1$s Wallet now. The funds should be in your bank in 1&#8211;3 business days.</string>
     <string name="currency_wallet">My %1s Wallet</string>
 
     <string name="dashboard_asset_item_label_title">Please note.</string>
     <string name="algorand_asset_label">Functionality to withdraw ALGO from your trading wallet is currently unavailable, but coming soon.</string>
 
-    <!-- new send -->
+    <!-- Transaction flows -->
     <string name="send_enter_amount_from">From: %1$s</string>
     <string name="send_enter_amount_to">To: %1$s</string>
     <string name="send_enter_amount_title">Send %1$s</string>
@@ -1541,21 +1567,37 @@
     <string name="sell_enter_amount_max">Sell Max</string>
     <string name="sell_enter_amount_min_error">%1$s Min</string>
     <string name="sell_enter_amount_max_error">%1$s Max</string>
+    <string name="sell_enter_amount_error_insufficient_funds_for_fees">Not enough %1$s in your wallet to sell with current network fees.</string>
     <string name="send_enter_amount_deposit_max">Transfer Max</string>
     <string name="send_enter_amount_min_deposit">Minimum transfer of %1$s required</string>
     <string name="send_enter_amount_min_send">Minimum send of %1$s required</string>
+    <string name="send_enter_amount_network_fees">Network Fees</string>
+    <string name="send_enter_amount_total">Total</string>
+    <string name="send_enter_amount_max_fee">Max Network Fee</string>
     <string name="swap_enter_amount_min_swap">Minimum swap of %1$s required</string>
+    <string name="deposit_enter_amount_min_swap">Minimum deposit of %1$s required</string>
+    <string name="withdraw_enter_amount_min">Minimum withdrawal of %1$s required</string>
     <string name="send_error_tx_in_flight">A transaction is already in progress</string>
     <string name="send_error_tx_option_invalid">An error has occurred</string>
     <string name="too_many_pending_orders_error_message">Your %1$s Wallet has too many swaps in-progress. Please select a different wallet.</string>
     <string name="send_confirmation_title">Send %1$s</string>
     <string name="send_confirmation_fee">Fee - Regular</string>
     <string name="send_confirmation_tx_fee">Transaction Fee</string>
+    <string name="send_confirmation_eta">Funds Will Arrive</string>
     <string name="send_confirmation_insufficient_fee">Not enough funds for priority fee, please adjust your sending amount.</string>
+    <string name="send_confirmation_insufficient_funds_for_fee">Not enough funds for current fee level.</string>
     <string name="send_confirmation_add_note_hint">Add a note</string>
     <string name="send_confirmation_cta_button">Send %1$s</string>
     <string name="swap_confirmation_cta_button">Swap %1$s for %2$s</string>
     <string name="swap_confirmation_disclaimer">The amounts you send and receive may change slightly due to market activity. Once an order starts, we are unable to stop it.</string>
+    <string name="deposit_source_select_title">Linked Banks</string>
+    <string name="deposit_confirmation_cta_button">Deposit %1$s</string>
+    <string name="deposit_enter_amount_limit_title">Daily Limit</string>
+    <string name="deposit_enter_amount_limit_label">%1$s Available</string>
+    <string name="deposit_confirmation_progress_title">Depositing %1$s</string>
+    <string name="deposit_confirmation_progress_message">We’re completing your deposit now.</string>
+    <string name="deposit_confirmation_success_title">%1$s Deposited!</string>
+    <string name="deposit_confirmation_success_message">While we wait for your bank to send the cash, here’s early access to %1$s in your %2$s Cash Account so you can buy crypto right away.\n\nYour funds will be available to withdraw once the bank transfer is complete on %3$s.</string>
     <string name="sell_confirmation_cta_button">Sell %1$s</string>
     <string name="sell_confirmation_progress_title">Selling %1$s</string>
     <string name="sell_confirmation_progress_message">We’re completing your sell now.</string>
@@ -1581,6 +1623,7 @@
     <string name="send_progress_complete_title">%1$s Sent</string>
     <string name="sell_progress_complete_title">%1$s Sold</string>
     <string name="swap_progress_complete_title">Swap Complete</string>
+    <string name="interest_enter_amount_error_insufficient_funds_for_fees">Not enough %1$s in your wallet to transfer with current network fees.</string>
     <string name="send_progress_complete_subtitle">Your %1$s has been successfully sent.</string>
     <string name="send_progress_error_title">Oops! Something Went Wrong. Please try again.</string>
     <string name="send_progress_error_subtitle">Don’t worry. Your money is safe. Please try again or contact our Support Team for help.</string>
@@ -1590,6 +1633,7 @@
     <string name="send_error_not_valid_asset_address">Not a valid %1s address</string>
     <string name="send_error_address_is_eth_contract">Address is not a user address</string>
     <string name="send_enter_amount_error_insufficient_funds">Not enough %1$s in your wallet.</string>
+    <string name="send_enter_amount_error_insufficient_funds_for_fees">Not enough %1$s in your wallet to send with current network fees.</string>
     <string name="send_enter_amount_error_invalid_amount">Send 0.00000001 %1$s or more.</string>
     <string name="send_enter_invalid_password">Password is incorrect.</string>
     <string name="send_enter_unexpected_error">An unexpected error has occurred. Please try again.</string>
@@ -1606,6 +1650,7 @@
     <string name="swap_enter_amount_max">Swap Max</string>
     <string name="swap_enter_amount_silver_limit">Tap here to upgrade your profile and swap this amount.</string>
     <string name="swap_enter_amount_over_limit">You can swap up to %1$s today.</string>
+    <string name="swap_enter_amount_error_insufficient_funds_for_fees">Not enough %1$s in your wallet to swap with current network fees.</string>
     <string name="swap_select_target_subtitle">Confirm the wallet you want to Swap from and choose the wallet you want to Receive into.</string>
     <string name="swap_select_target_title">New Swap</string>
     <string name="tx_confirmation_network_fee">%1$s Network Fee</string>
@@ -1731,6 +1776,7 @@
     <string name="trending_empty">Fund your Trading Wallets to see Trending Swaps with lower fees.</string>
     <string name="trending_receive">Receive %1$s</string>
     <string name="select_a_wallet">Select a Wallet</string>
+    <string name="select_a_bank">Select a Bank</string>
 
     <!-- Transaction Flow confirmation screen -->
     <string name="confirm_status_msg_insufficient_funds">You have insufficient funds in this account to process this transaction</string>
@@ -1784,7 +1830,7 @@
     <string name="swap_faster_cheaper_better">Faster. Cheaper. Better. Our new Swap experience lets you exchange crypto in fewer taps.</string>
     <string name="link_a_bank">Link a Bank</string>
     <string name="instantly_buy_crypto_with_link_a_bank">Link your bank and instantly buy crypto at anytime.</string>
-    <string name="add_payment_method">+Add New</string>
+    <string name="add_payment_method">+ Add New</string>
     <string name="pay_with_my_dotted">Pay with my…</string>
 
     <!-- Yodlee splash -->
@@ -1817,18 +1863,8 @@
     <string name="dotted_suffixed_string" translatable="false">•••• %1s</string>
     <string name="failed_to_link_bank">Bank Link Failed</string>
 
-    <!-- lockbox -->
-    <string name="lockbox_title">Lockbox</string>
-    <string name="lockbox_landing_get_yours_title">Get Your Lockbox</string>
-    <string name="lockbox_landing_get_yours_message">Safely store your cryptocurrency offline.</string>
-    <string name="lockbox_landing_get_yours_button">Buy now</string>
-    <string name="lockbox_landing_already_owned_title">Already own one?</string>
-    <string name="lockbox_landing_already_owned_message">From your computer, log into blockchain.com and connect your lockbox.</string>
-    <string name="lockbox_landing_learn_more">Want to learn more? Tap here to visit\n%1$s</string>
-    <string name="lockbox_landing_coming_soon_title">Balances Coming Soon</string>
-    <string name="lockbox_landing_coming_soon_message">We are unable to display your Lockbox balance at this time. Don’t worry, your funds are safe. We’ll be adding this feature soon. While you wait, you can check your balance on the web.</string>
-    <string name="lockbox_landing_coming_soon_button">Check my balance</string>
     <string name="add_a_bank_account">Add a Bank Account</string>
+    <string name="add_a_deposit_method">Select a Deposit Method</string>
     <string name="wire_transfer">Wire Transfer</string>
     <string name="link_a_bank_wire_transfer">Link a bank to your Wallet by sending any amount via wire transfer. Note: This is much slower and high bank fees may apply.</string>
     <string name="link_a_bank_bank_transfer">Securely link a bank to buy crypto, deposit cash and withdraw back to your bank at anytime.</string>
@@ -1866,4 +1902,37 @@
     <string name="kyc_address_header_1">Blockchain.com is required by law to collect this information.</string>
     <string name="kyc_country_selection_search_hint_1">Select Your Country</string>
     <string name="kyc_country_selection_title_1">Select Your Country</string>
+    <string name="security_check">Security Check</string>
+    <string name="success_email_veriff">Success! Your email has been confirmed.</string>
+    <string name="email_verified">Email Verified</string>
+    <string name="email_verification_part_1">We sent a verification email to&#160;</string>
+    <string name="email_verification_part_2">. Please tap the link in the email to continue.</string>
+    <string name="email_verify">Verify Your Email</string>
+    <string name="edit_email_address">Edit Email Address</string>
+    <string name="common_save">Save</string>
+    <string name="change_email_instructions">Enter your email address below and click Save. We’ll send you a verification email to this new address.</string>
+    <string name="check_my_inbox">Check My Inbox</string>
+    <string name="did_not_get_email">Didn\'t get the email?</string>
+    <string name="send_again">Send Again</string>
+    <string name="want_to_buy_more">Want to buy more?</string>
+    <string name="unlock_gold_level_trading">Unlock Gold Level Trading</string>
+    <string name="verify_your_identity_limits">Verify your identity, earn interest and trade up to %1$s a day.</string>
+    <string name="apply_and_unlock">Apply &amp; Unlock Now></string>
+    <string name="cash_accounts">Cash Accounts</string>
+    <string name="cash_accounts_description">Store USD, GBP or EUR in your wallet. Use the balance to buy crypto. Sell crypto for cash at anytime.</string>
+    <string name="link_a_bank_description">Store USD, GBP or EUR in your wallet. Use the balance to buy crypto. Sell crypto for cash at anytime.</string>
+    <string name="earn_interest_description" formatted="false">Put your crypto to work. Earn up to 10% monthly by simply doing nothing. Instantly deposit and start earning.</string>
+
+    <string name="sb_checkout_daily_limit_title">Daily limit exceeded</string>
+    <string name="sb_checkout_daily_limit_blurb">Oops, looks like you’ve used up your daily transaction limit for Buys and Deposits, please try again tomorrow.</string>
+    <string name="sb_checkout_weekly_limit_title">Weekly limit exceeded</string>
+    <string name="sb_checkout_weekly_limit_blurb">Oops, looks like you’ve used up your weekly transaction limit for Buys and Deposits, please try again tomorrow.</string>
+    <string name="sb_checkout_yearly_limit_title">Yearly limit exceeded</string>
+    <string name="sb_checkout_yearly_limit_blurb">Oops, looks like you’ve used up your yearly transaction limit for Buys and Deposits.</string>
+    <string name="sb_checkout_pending_order_title">Order in progress</string>
+    <string name="sb_checkout_pending_order_blurb">Oops, looks like you’ve already got a Buy order in progress, please wait until it completes before buying again.</string>
+    <string name="wallet_outage_message">We are experiencing an outage. Please rest assured your funds are safe. <annotation link="learn_more">Learn more</annotation></string>
+    <string name="increase_your_limits">Increase your limits</string>
+    <string name="increase_your_limits_body">Continue your verification to become Gold level and increase your limits and payment methods.</string>
+    <string name="continue_to_gold">Continue to Gold</string>
 </resources>

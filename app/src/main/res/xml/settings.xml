@@ -72,6 +72,10 @@
             android:key="fingerprint"
             android:title="@string/enable_fingerprint"
             app:iconSpaceReserved="false" />
+        <piuk.blockchain.android.ui.settings.preferences.CustomPreference
+            android:key="backup"
+            android:title="@string/backup_subtitle"
+            app:iconSpaceReserved="false" />
         <piuk.blockchain.android.ui.settings.preferences.CustomSwitchPreference
             android:key="2fa"
             android:summary="@string/two_fa_summary"
@@ -117,8 +121,15 @@
         app:iconSpaceReserved="false">
         <piuk.blockchain.android.ui.settings.preferences.CustomPreference
             android:key="about"
+            android:selectable="false"
             android:title="@string/preferences_about_title"
             app:iconSpaceReserved="false" />
+        <piuk.blockchain.android.ui.settings.preferences.CustomPreference
+            android:key="rate_app"
+            android:selectable="true"
+            android:title="@string/preferences_rate_app"
+            app:iconSpaceReserved="false"
+            app:isPreferenceVisible="false" />
         <piuk.blockchain.android.ui.settings.preferences.CustomPreference
             android:key="tos"
             android:title="@string/options_tos"

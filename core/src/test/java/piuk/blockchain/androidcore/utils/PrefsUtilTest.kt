@@ -1,5 +1,6 @@
 package piuk.blockchain.androidcore.utils
 
+import android.content.Context
 import android.content.SharedPreferences
 import com.blockchain.logging.CrashLogger
 import com.nhaarman.mockito_kotlin.any
@@ -15,6 +16,7 @@ import org.junit.Test
 
 class PrefsUtilTest {
 
+    private val ctx: Context = mock()
     private val store: SharedPreferences = mock()
     private val backupStore: SharedPreferences = mock()
     private val editor: SharedPreferences.Editor = mock()
@@ -22,7 +24,7 @@ class PrefsUtilTest {
     private val uuidGenerator: UUIDGenerator = mock()
     private val crashLogger: CrashLogger = mock()
 
-    private val subject: PrefsUtil = PrefsUtil(store, backupStore, idGenerator, uuidGenerator, crashLogger)
+    private val subject: PrefsUtil = PrefsUtil(ctx, store, backupStore, idGenerator, uuidGenerator, crashLogger)
 
     @Before
     fun setUpSharedPrefs() {

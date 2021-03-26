@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.blockchain.koin.scopedInject
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
 import piuk.blockchain.android.ui.kyc.navigate
 import piuk.blockchain.android.ui.kyc.reentry.KycNavigator
@@ -14,7 +15,6 @@ import com.blockchain.ui.extensions.throttledClicks
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
 import piuk.blockchain.android.util.inflate
@@ -27,7 +27,7 @@ class KycResubmissionSplashFragment : Fragment() {
         this
     )
 
-    private val kycNavigator: KycNavigator by inject()
+    private val kycNavigator: KycNavigator by scopedInject()
 
     override fun onCreateView(
         inflater: LayoutInflater,

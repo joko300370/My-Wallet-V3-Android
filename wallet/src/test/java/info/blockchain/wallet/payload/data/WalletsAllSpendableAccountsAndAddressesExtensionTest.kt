@@ -5,8 +5,8 @@ import org.junit.Test
 
 class WalletsAllSpendableAccountsAndAddressesExtensionTest {
 
-    private fun legacyAddressWithPrivateKey(address: String) =
-        LegacyAddress().also {
+    private fun importedAddressWithPrivateKey(address: String) =
+        ImportedAddress().also {
             it.privateKey = "PRIVATE_KEY"
             it.address = address
         }
@@ -19,30 +19,30 @@ class WalletsAllSpendableAccountsAndAddressesExtensionTest {
     @Test
     fun `one spendable`() {
         Wallet().apply {
-            legacyAddressList.add(legacyAddressWithPrivateKey("Address1"))
+            importedAddressList.add(importedAddressWithPrivateKey("Address1"))
         }.allSpendableAccountsAndAddresses() `should equal` setOf("Address1")
     }
 
     @Test
     fun `one archived`() {
         Wallet().apply {
-            legacyAddressList.add(legacyAddressWithPrivateKey("Address1").apply { archive() })
+            importedAddressList.add(importedAddressWithPrivateKey("Address1").apply { archive() })
         }.allSpendableAccountsAndAddresses() `should equal` emptySet()
     }
 
     @Test
     fun `two spendable`() {
         Wallet().apply {
-            legacyAddressList.add(legacyAddressWithPrivateKey("Address1"))
-            legacyAddressList.add(legacyAddressWithPrivateKey("Address2"))
+            importedAddressList.add(importedAddressWithPrivateKey("Address1"))
+            importedAddressList.add(importedAddressWithPrivateKey("Address2"))
         }.allSpendableAccountsAndAddresses() `should equal` setOf("Address1", "Address2")
     }
 
     @Test
     fun `repeated address`() {
         Wallet().apply {
-            legacyAddressList.add(legacyAddressWithPrivateKey("Address1"))
-            legacyAddressList.add(legacyAddressWithPrivateKey("Address1"))
+            importedAddressList.add(importedAddressWithPrivateKey("Address1"))
+            importedAddressList.add(importedAddressWithPrivateKey("Address1"))
         }.allSpendableAccountsAndAddresses() `should equal` setOf("Address1")
     }
 
@@ -71,9 +71,9 @@ class WalletsAllSpendableAccountsAndAddressesExtensionTest {
     fun `two xpubs, two spendable address and two non-spendable`() {
         Wallet().apply {
             hdWallets = listOf(hdWallet("XPub1", "XPub2"))
-            legacyAddressList.add(legacyAddressWithPrivateKey("Address1"))
-            legacyAddressList.add(legacyAddressWithPrivateKey("Address2"))
-            legacyAddressList.add(legacyAddressWithPrivateKey("Address4").apply { archive() })
+            importedAddressList.add(importedAddressWithPrivateKey("Address1"))
+            importedAddressList.add(importedAddressWithPrivateKey("Address2"))
+            importedAddressList.add(importedAddressWithPrivateKey("Address4").apply { archive() })
         }.allSpendableAccountsAndAddresses() `should equal` setOf("XPub1", "XPub2", "Address1", "Address2")
     }
 

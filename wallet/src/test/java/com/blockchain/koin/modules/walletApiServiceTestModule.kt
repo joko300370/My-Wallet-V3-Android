@@ -4,7 +4,6 @@ import com.blockchain.koin.bigInteger
 import com.blockchain.network.EnvironmentUrls
 import com.blockchain.network.modules.MoshiBuilderInterceptorList
 import com.blockchain.network.modules.OkHttpInterceptors
-import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.ApiCode
 import io.fabric8.mockwebserver.DefaultMockServer
 import okhttp3.OkHttpClient
@@ -41,10 +40,8 @@ fun walletApiServiceTestModule(server: DefaultMockServer) = module {
 
             override val everypayHostUrl: String
                 get() = throw NotImplementedError()
-
-            override fun websocketUrl(currency: CryptoCurrency): String {
-                throw NotImplementedError()
-            }
-        } as EnvironmentUrls
-    }
+            override val statusUrl: String
+                get() = throw NotImplementedError()
+        }
+    }.bind(EnvironmentUrls::class)
 }

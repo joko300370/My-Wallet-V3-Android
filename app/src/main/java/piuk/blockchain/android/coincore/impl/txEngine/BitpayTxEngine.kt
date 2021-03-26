@@ -8,7 +8,7 @@ import info.blockchain.balance.Money
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
-import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.PendingTx
@@ -59,7 +59,7 @@ class BitpayTxEngine(
     override fun assertInputsValid() {
         // Only support non-custodial BTC bitpay at this time
         check(sourceAccount is CryptoNonCustodialAccount)
-        check(asset == CryptoCurrency.BTC)
+        check(sourceAsset == CryptoCurrency.BTC)
         check(txTarget is BitPayInvoiceTarget)
         require(assetEngine is BitPayClientEngine)
         assetEngine.assertInputsValid()
@@ -74,7 +74,7 @@ class BitpayTxEngine(
     }
 
     override fun start(
-        sourceAccount: CryptoAccount,
+        sourceAccount: BlockchainAccount,
         txTarget: TransactionTarget,
         exchangeRates: ExchangeRateDataManager,
         refreshTrigger: RefreshTrigger
@@ -88,8 +88,10 @@ class BitpayTxEngine(
             .map { tx ->
                 tx.copy(
                     amount = bitpayInvoice.amount,
-                    feeLevel = FeeLevel.Priority,
-                    availableFeeLevels = AVAILABLE_FEE_LEVELS
+                    feeSelection = tx.feeSelection.copy(
+                        selectedLevel = FeeLevel.Priority,
+                        availableLevels = AVAILABLE_FEE_LEVELS
+                    )
                 )
             }
 
@@ -152,11 +154,11 @@ class BitpayTxEngine(
     // underlying asset engine.
     private fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
         TxConfirmationValue.FeeSelection(
-            feeDetails = FeeState.FeeDetails(pendingTx.fees),
-            exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
-            selectedLevel = pendingTx.feeLevel,
+            feeDetails = FeeState.FeeDetails(pendingTx.feeAmount),
+            exchange = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+            selectedLevel = pendingTx.feeSelection.selectedLevel,
             availableLevels = setOf(FeeLevel.Priority),
-            asset = asset
+            asset = sourceAsset
         )
 
     // Don't set the amount here, it is fixed so we can do it in the confirmation building step
@@ -168,7 +170,7 @@ class BitpayTxEngine(
         level: FeeLevel,
         customFeeAmount: Long
     ): Single<PendingTx> {
-        require(pendingTx.availableFeeLevels.contains(level))
+        require(pendingTx.feeSelection.availableLevels.contains(level))
         return Single.just(pendingTx)
     }
 

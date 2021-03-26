@@ -11,12 +11,6 @@
             android:visible="true" />
 
         <item
-            android:id="@+id/nav_backup"
-            android:icon="@drawable/ic_nav_backup"
-            android:title="@string/item_backup"
-            app:contentDescription="@string/item_backup" />
-
-        <item
             android:id="@+id/nav_addresses"
             android:icon="@drawable/ic_nav_wallet"
             android:title="@string/drawer_addresses"
@@ -33,13 +27,6 @@
             android:icon="@drawable/ic_nav_airdrops"
             android:title="@string/item_airdrops"
             app:contentDescription="@string/item_airdrops" />
-
-        <item
-            android:id="@+id/nav_lockbox"
-            android:icon="@drawable/ic_nav_hardware"
-            android:title="@string/item_lockbox"
-            android:visible="false"
-            app:contentDescription="@string/item_lockbox" />
 
     </group>
 

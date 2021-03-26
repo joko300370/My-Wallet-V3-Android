@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import androidx.annotation.StringRes
 import com.blockchain.extensions.exhaustive
-import com.blockchain.lockbox.LockboxDataManager
 import com.blockchain.logging.CrashLogger
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
@@ -60,7 +59,6 @@ interface MainView : MvpView, HomeNavigator {
     fun clearAllDynamicShortcuts()
     fun showHomebrewDebugMenu()
     fun enableSwapButton(isEnabled: Boolean)
-    fun displayLockboxMenu(lockboxAvailable: Boolean)
     fun showTestnetWarning()
     fun launchPendingVerificationScreen(campaignType: CampaignType)
     fun shouldIgnoreDeepLinking(): Boolean
@@ -78,7 +76,6 @@ class MainPresenter internal constructor(
     private val qrProcessor: QrScanResultProcessor,
     private val environmentSettings: EnvironmentConfig,
     private val kycStatusHelper: KycStatusHelper,
-    private val lockboxDataManager: LockboxDataManager,
     private val deepLinkProcessor: DeepLinkProcessor,
     private val sunriverCampaignRegistration: SunriverCampaignRegistration,
     private val xlmDataManager: XlmDataManager,
@@ -110,18 +107,12 @@ class MainPresenter internal constructor(
             view?.kickToLauncherPage()
         } else {
             logEvents()
-            checkLockboxAvailability()
             lightSimpleBuySync()
             doPushNotifications()
         }
     }
 
     override fun onViewDetached() {}
-
-    private fun checkLockboxAvailability() {
-        compositeDisposable += lockboxDataManager.isLockboxAvailable()
-            .subscribe { enabled, _ -> view?.displayLockboxMenu(enabled) }
-    }
 
     /**
      * Initial setup of push notifications. We don't subscribe to addresses for notifications when
@@ -185,7 +176,7 @@ class MainPresenter internal constructor(
             )
     }
 
-    fun handlePossibleDeepLink(url: String) {
+    private fun handlePossibleDeepLink(url: String) {
         try {
             val link = Uri.parse(url).getQueryParameter("link") ?: return
             compositeDisposable += deepLinkProcessor.getLink(link)
@@ -233,13 +224,13 @@ class MainPresenter internal constructor(
     private fun handleKycDeepLink(linkState: LinkState.KycDeepLink) {
         when (linkState.link) {
             is KycLinkState.Resubmit -> view?.launchKyc(CampaignType.Resubmission)
-            is KycLinkState.EmailVerified -> view?.launchKyc(CampaignType.Swap)
+            is KycLinkState.EmailVerified -> view?.launchKyc(CampaignType.None)
             is KycLinkState.General -> {
                 val data = linkState.link.campaignData
                 if (data != null) {
                     registerForCampaign(data)
                 } else {
-                    view?.launchKyc(CampaignType.Swap)
+                    view?.launchKyc(CampaignType.None)
                 }
             }
             else -> {
@@ -347,7 +338,7 @@ class MainPresenter internal constructor(
                         is ScanResult.TxTarget -> {
                             view?.startTransactionFlowWithTarget(it.targets)
                         }
-                        is ScanResult.ImportedWallet -> TODO()
+                        is ScanResult.ImportedWallet -> { } // TODO: as part of Auth
                     }.exhaustive
                 },
                 onError = {

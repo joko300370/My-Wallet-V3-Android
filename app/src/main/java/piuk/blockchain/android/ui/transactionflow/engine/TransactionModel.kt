@@ -1,5 +1,7 @@
 package piuk.blockchain.android.ui.transactionflow.engine
 
+import com.blockchain.logging.CrashLogger
+import com.blockchain.nabu.models.data.LinkBankTransfer
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
@@ -10,17 +12,20 @@ import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
-import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
+import piuk.blockchain.android.coincore.fiat.LinkedBankAccount
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import timber.log.Timber
 import java.util.Stack
 
@@ -55,6 +60,12 @@ enum class TransactionErrorState {
     UNKNOWN_ERROR
 }
 
+sealed class BankLinkingState {
+    object NotStarted : BankLinkingState()
+    class Success(val bankTransferInfo: LinkBankTransfer) : BankLinkingState()
+    class Error(val e: Throwable) : BankLinkingState()
+}
+
 sealed class TxExecutionStatus {
     object NotStarted : TxExecutionStatus()
     object InProgress : TxExecutionStatus()
@@ -62,32 +73,47 @@ sealed class TxExecutionStatus {
     data class Error(val exception: Throwable) : TxExecutionStatus()
 }
 
+fun BlockchainAccount.getZeroAmountForAccount() =
+    when (this) {
+        is CryptoAccount -> CryptoValue.zero(this.asset)
+        is LinkedBankAccount -> FiatValue.zero(this.currency)
+        is FiatAccount -> FiatValue.zero(this.fiatCurrency)
+        else -> throw IllegalStateException("Account is not a crypto, bank or fiat account")
+    }
+
 data class TransactionState(
     val action: AssetAction = AssetAction.Send,
     val currentStep: TransactionStep = TransactionStep.ZERO,
-    val sendingAccount: CryptoAccount = NullCryptoAccount(),
+    val sendingAccount: BlockchainAccount = NullCryptoAccount(),
     val selectedTarget: TransactionTarget = NullAddress,
-    val fiatRate: ExchangeRate.CryptoToFiat? = null,
+    val fiatRate: ExchangeRate? = null,
     val targetRate: ExchangeRate? = null,
     val passwordRequired: Boolean = false,
     val secondPassword: String = "",
     val nextEnabled: Boolean = false,
+    val setMax: Boolean = false,
     val errorState: TransactionErrorState = TransactionErrorState.NONE,
     val pendingTx: PendingTx? = null,
     val allowFiatInput: Boolean = false,
     val executionStatus: TxExecutionStatus = TxExecutionStatus.NotStarted,
     val stepsBackStack: Stack<TransactionStep> = Stack(),
     val availableTargets: List<TransactionTarget> = emptyList(),
-    val availableSources: List<CryptoAccount> = emptyList()
+    val displayMode: DisplayMode = DisplayMode.Crypto,
+    val availableSources: List<BlockchainAccount> = emptyList(),
+    val linkBankState: BankLinkingState = BankLinkingState.NotStarted
 ) : MviState {
 
-    val asset: CryptoCurrency = sendingAccount.asset
+    // workaround for using engine without cryptocurrency source
+    val sendingAsset: CryptoCurrency
+        get() = (sendingAccount as? CryptoAccount)?.asset ?: throw IllegalStateException(
+            "Trying to use cryptocurrency with non-crypto source"
+        )
 
     val amount: Money
-        get() = pendingTx?.amount ?: CryptoValue.zero(asset) // TODO: Better default required
+        get() = pendingTx?.amount ?: sendingAccount.getZeroAmountForAccount()
 
     val availableBalance: Money
-        get() = pendingTx?.availableBalance ?: CryptoValue.zero(sendingAccount.asset) // TODO: Better default required
+        get() = pendingTx?.availableBalance ?: sendingAccount.getZeroAmountForAccount()
 
     val canGoBack: Boolean
         get() = stepsBackStack.isNotEmpty()
@@ -99,9 +125,11 @@ data class TransactionState(
         get() {
             return pendingTx?.let {
                 val available = availableToAmountCurrency(it.availableBalance, amount)
-                Money.min(available,
-                    it.maxLimit ?: available)
-            } ?: CryptoValue.zero(asset)
+                Money.min(
+                    available,
+                    it.maxLimit ?: available
+                )
+            } ?: sendingAccount.getZeroAmountForAccount()
         }
 
     private fun availableToAmountCurrency(available: Money, amount: Money): Money =
@@ -116,25 +144,34 @@ class TransactionModel(
     initialState: TransactionState,
     mainScheduler: Scheduler,
     private val interactor: TransactionInteractor,
-    private val errorLogger: TxFlowErrorReporting
+    private val errorLogger: TxFlowErrorReporting,
+    environmentConfig: EnvironmentConfig,
+    crashLogger: CrashLogger
 ) : MviModel<TransactionState, TransactionIntent>(
     initialState,
-    mainScheduler
+    mainScheduler,
+    environmentConfig,
+    crashLogger
 ) {
     override fun performAction(previousState: TransactionState, intent: TransactionIntent): Disposable? {
-        Timber.v("!TRANSACTION!> Send Model: performAction: ${intent.javaClass.simpleName}")
+        Timber.v("!TRANSACTION!> Transaction Model: performAction: ${intent.javaClass.simpleName}")
 
         return when (intent) {
-            is TransactionIntent.InitialiseWithSourceAccount -> processAccountsListUpdate(intent.fromAccount,
+            is TransactionIntent.InitialiseWithSourceAccount -> processAccountsListUpdate(
+                previousState,
+                intent.fromAccount,
                 intent.action
             )
             is TransactionIntent.InitialiseWithNoSourceOrTargetAccount -> processSourceAccountsListUpdate(intent.action)
+            is TransactionIntent.InitialiseWithTargetAndNoSource -> processSourceAccountsListUpdate(intent.action)
             is TransactionIntent.ValidatePassword -> processPasswordValidation(intent.password)
             is TransactionIntent.UpdatePasswordIsValidated -> null
             is TransactionIntent.UpdatePasswordNotValidated -> null
             is TransactionIntent.PrepareTransaction -> null
             is TransactionIntent.AvailableSourceAccountsListUpdated -> null
-            is TransactionIntent.SourceAccountSelected -> processAccountsListUpdate(intent.sourceAccount,
+            is TransactionIntent.SourceAccountSelected -> processAccountsListUpdate(
+                previousState,
+                intent.sourceAccount,
                 previousState.action
             )
             is TransactionIntent.ExecuteTransaction -> processExecuteTransaction(previousState.secondPassword)
@@ -145,7 +182,7 @@ class TransactionModel(
             is TransactionIntent.InitialiseWithSourceAndTargetAccount -> {
                 processTargetSelectionConfirmed(
                     sourceAccount = intent.fromAccount,
-                    amount = CryptoValue.zero(intent.fromAccount.asset),
+                    amount = intent.fromAccount.getZeroAmountForAccount(),
                     transactionTarget = intent.target,
                     action = intent.action
                 )
@@ -159,13 +196,14 @@ class TransactionModel(
                 )
             is TransactionIntent.TargetSelectionUpdated -> null
             is TransactionIntent.InitialiseWithSourceAndPreferredTarget ->
-                processAccountsListUpdate(intent.fromAccount, intent.action)
+                processAccountsListUpdate(previousState, intent.fromAccount, intent.action)
             is TransactionIntent.PendingTransactionStarted -> null
             is TransactionIntent.TargetAccountSelected -> null
             is TransactionIntent.FatalTransactionError -> null
             is TransactionIntent.AmountChanged -> processAmountChanged(intent.amount)
             is TransactionIntent.ModifyTxOption -> processModifyTxOptionRequest(intent.confirmation)
             is TransactionIntent.PendingTxUpdated -> null
+            is TransactionIntent.DisplayModeChanged -> null
             is TransactionIntent.UpdateTransactionComplete -> null
             is TransactionIntent.ReturnToPreviousStep -> null
             is TransactionIntent.ShowTargetSelection -> null
@@ -177,23 +215,60 @@ class TransactionModel(
             is TransactionIntent.EnteredAddressReset -> null
             is TransactionIntent.AvailableAccountsListUpdated -> null
             is TransactionIntent.ShowMoreAccounts -> null
+            is TransactionIntent.UseMaxSpendable -> null
+            is TransactionIntent.SetFeeLevel -> processSetFeeLevel(intent)
             is TransactionIntent.InvalidateTransaction -> processInvalidateTransaction()
+            is TransactionIntent.InvalidateTransactionKeepingTarget -> processInvalidationAndNavigate(previousState)
+            is TransactionIntent.ClearBackStack -> null
             is TransactionIntent.ResetFlow -> {
                 interactor.reset()
                 null
             }
+            is TransactionIntent.StartLinkABank -> processLinkABank(previousState)
+            is TransactionIntent.LinkBankInfoSuccess -> null
+            is TransactionIntent.LinkBankFailed -> null
+            is TransactionIntent.RefreshSourceAccounts -> processSourceAccountsListUpdate(previousState.action)
+            is TransactionIntent.NavigateBackFromEnterAmount -> processTransactionInvalidation(previousState.action)
         }
     }
 
-    private fun processAccountsListUpdate(fromAccount: CryptoAccount, action: AssetAction): Disposable =
-        interactor.getTargetAccounts(fromAccount, action).subscribeBy(
-            onSuccess = {
-                process(
-                    TransactionIntent.AvailableAccountsListUpdated(it)
-                )
-            },
-            onError = { }
+    private fun processTransactionInvalidation(assetAction: AssetAction): Disposable? {
+        process(
+            when (assetAction) {
+                AssetAction.FiatDeposit -> TransactionIntent.InvalidateTransactionKeepingTarget
+                else -> TransactionIntent.InvalidateTransaction
+            }
         )
+        return null
+    }
+
+    private fun processLinkABank(previousState: TransactionState): Disposable =
+        interactor.linkABank((previousState.selectedTarget as FiatAccount).fiatCurrency)
+            .subscribeBy(
+                onSuccess = { bankTransfer ->
+                    process(TransactionIntent.LinkBankInfoSuccess(bankTransfer))
+                },
+                onError = {
+                    process(TransactionIntent.LinkBankFailed(it))
+                }
+            )
+
+    private fun processAccountsListUpdate(
+        previousState: TransactionState,
+        fromAccount: BlockchainAccount,
+        action: AssetAction
+    ): Disposable? =
+        if (previousState.selectedTarget is NullAddress) {
+            interactor.getTargetAccounts(fromAccount, action).subscribeBy(
+                onSuccess = {
+                    process(TransactionIntent.AvailableAccountsListUpdated(it))
+                },
+                onError = { }
+            )
+        } else {
+            process(TransactionIntent.TargetSelected)
+            null
+        }
 
     private fun processSourceAccountsListUpdate(action: AssetAction): Disposable =
         interactor.getAvailableSourceAccounts(action).subscribeBy(
@@ -206,8 +281,8 @@ class TransactionModel(
         )
 
     override fun onScanLoopError(t: Throwable) {
-        Timber.e("!TRANSACTION!> Transaction Model: loop error -> $t")
-        errorLogger.log(TxFlowLogError.LoopFail(t))
+        super.onScanLoopError(TxFlowLogError.LoopFail(t))
+        throw t
     }
 
     override fun onStateUpdate(s: TransactionState) {
@@ -219,6 +294,23 @@ class TransactionModel(
             .subscribeBy(
                 onComplete = {
                     process(TransactionIntent.ReturnToPreviousStep)
+                },
+                onError = { t ->
+                    errorLogger.log(TxFlowLogError.ResetFail(t))
+                    process(TransactionIntent.FatalTransactionError(t))
+                }
+            )
+
+    private fun processInvalidationAndNavigate(state: TransactionState): Disposable =
+        interactor.invalidateTransaction()
+            .subscribeBy(
+                onComplete = {
+                    process(
+                        TransactionIntent.InitialiseWithTargetAndNoSource(
+                            state.action, state.selectedTarget, state.passwordRequired
+                        )
+                    )
+                    process(TransactionIntent.ClearBackStack)
                 },
                 onError = { t ->
                     errorLogger.log(TxFlowLogError.ResetFail(t))
@@ -264,7 +356,7 @@ class TransactionModel(
     // bitpay or BTC Url address we can set things like note, amount, fee schedule
     // and hook up the correct processor to execute the transaction.
     private fun processTargetSelectionConfirmed(
-        sourceAccount: SingleAccount,
+        sourceAccount: BlockchainAccount,
         amount: Money,
         transactionTarget: TransactionTarget,
         action: AssetAction
@@ -300,6 +392,16 @@ class TransactionModel(
                 onError = {
                     Timber.e("!TRANSACTION!> Unable to get update available balance")
                     errorLogger.log(TxFlowLogError.BalanceFail(it))
+                    process(TransactionIntent.FatalTransactionError(it))
+                }
+            )
+
+    private fun processSetFeeLevel(intent: TransactionIntent.SetFeeLevel): Disposable =
+        interactor.updateTransactionFees(intent.feeLevel, intent.customFeeAmount)
+            .subscribeBy(
+                onError = {
+                    Timber.e("!TRANSACTION!> Unable to set TX fee level")
+                    errorLogger.log(TxFlowLogError.FeesFail(it))
                     process(TransactionIntent.FatalTransactionError(it))
                 }
             )
@@ -382,4 +484,8 @@ fun <T> Observable<T>.doOnFirst(onAction: (T) -> Unit): Observable<T> {
             firstCall = false
         }
     }
+}
+
+enum class DisplayMode {
+    Fiat, Crypto
 }

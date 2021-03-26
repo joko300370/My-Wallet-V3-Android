@@ -33,17 +33,16 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.ui.base.MvpFragment
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.ui.share.ReceiveIntentHelper
 import piuk.blockchain.android.ui.share.ShareReceiveIntentAdapter
-import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.EditTextFormatUtil
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.extensions.toSafeLong
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.ui.customviews.toast
 import piuk.blockchain.android.util.disableSoftKeyboard
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.inflate
@@ -68,7 +67,6 @@ class ReceiveFragment : MvpFragment<ReceiveView, ReceivePresenter>(),
     override val presenter: ReceivePresenter by scopedInject()
     override val view: ReceiveView = this
 
-    private val appUtil: AppUtil by inject()
     private val rxBus: RxBus by inject()
     private val prefs: CurrencyPrefs by scopedInject()
 
@@ -224,6 +222,7 @@ class ReceiveFragment : MvpFragment<ReceiveView, ReceivePresenter>(),
             image_qr.invisible()
             textview_receiving_address.invisible()
             progressbar.visible()
+            cta_button.isEnabled = false
         }
     }
 
@@ -233,6 +232,7 @@ class ReceiveFragment : MvpFragment<ReceiveView, ReceivePresenter>(),
             image_qr.visible()
             textview_receiving_address.visible()
             image_qr.setImageBitmap(bitmap)
+            cta_button.isEnabled = true
         }
     }
 

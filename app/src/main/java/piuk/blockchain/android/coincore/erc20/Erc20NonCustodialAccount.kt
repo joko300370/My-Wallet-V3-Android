@@ -32,7 +32,7 @@ class Erc20NonCustodialAccount(
     override val exchangeRates: ExchangeRateDataManager,
     private val walletPreferences: WalletStatus,
     private val custodialWalletManager: CustodialWalletManager
-) : CryptoNonCustodialAccount(payloadManager, asset) {
+) : CryptoNonCustodialAccount(payloadManager, asset, custodialWalletManager) {
 
     private val hasFunds = AtomicBoolean(false)
 
@@ -57,15 +57,15 @@ class Erc20NonCustodialAccount(
     override val activity: Single<ActivitySummaryList>
         get() {
             val feedTransactions = ethDataManager.fetchErc20DataModel(asset)
-                    .flatMap { ethDataManager.getErc20Transactions(asset) }
-                    .mapList {
-                        val feeObservable = ethDataManager
-                            .getTransaction(it.transactionHash)
-                            .map { transaction ->
-                                transaction.gasUsed * transaction.gasPrice
-                            }
-                        FeedErc20Transfer(it, feeObservable)
-                    }
+                .flatMap { ethDataManager.getErc20Transactions(asset) }
+                .mapList {
+                    val feeObservable = ethDataManager
+                        .getTransaction(it.transactionHash)
+                        .map { transaction ->
+                            transaction.gasUsed * transaction.gasPrice
+                        }
+                    FeedErc20Transfer(it, feeObservable)
+                }
 
             return Singles.zip(
                 feedTransactions,

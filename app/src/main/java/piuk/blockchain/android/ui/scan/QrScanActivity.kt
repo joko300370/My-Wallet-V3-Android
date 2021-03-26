@@ -54,8 +54,9 @@ import piuk.blockchain.android.ui.scan.camera.CameraManager
 import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.android.util.windowRect
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.ui.customviews.toast
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.toast
+import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 import java.io.IOException
 import java.util.EnumSet

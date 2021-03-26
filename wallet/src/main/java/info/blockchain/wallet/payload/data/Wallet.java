@@ -82,7 +82,7 @@ public class Wallet {
     private List<HDWallet> hdWallets;
 
     @JsonProperty("keys")
-    private List<LegacyAddress> keys;
+    private List<ImportedAddress> keys;
 
     @JsonProperty("address_book")
     private List<AddressBook> addressBook;
@@ -154,7 +154,7 @@ public class Wallet {
         return hdWallets;
     }
 
-    public List<LegacyAddress> getLegacyAddressList() {
+    public List<ImportedAddress> getImportedAddressList() {
         return keys;
     }
 
@@ -206,7 +206,7 @@ public class Wallet {
         this.hdWallets = hdWallets;
     }
 
-    public void setLegacyAddressList(List<LegacyAddress> keys) {
+    public void setImportedAddressList(List<ImportedAddress> keys) {
         this.keys = keys;
     }
 
@@ -264,10 +264,10 @@ public class Wallet {
     public boolean isEncryptionConsistent() {
         ArrayList<String> keyList = new ArrayList<>();
 
-        if (getLegacyAddressList() != null) {
-            List<LegacyAddress> legacyAddresses = getLegacyAddressList();
-            for (LegacyAddress legacyAddress : legacyAddresses) {
-                keyList.add(legacyAddress.getPrivateKey());
+        if (getImportedAddressList() != null) {
+            List<ImportedAddress> importedAddresses = getImportedAddressList();
+            for (ImportedAddress importedAddress : importedAddresses) {
+                keyList.add(importedAddress.getPrivateKey());
             }
         }
 
@@ -356,7 +356,7 @@ public class Wallet {
     }
 
     @VisibleForTesting
-    public LegacyAddress addLegacyAddress(LegacyAddress address, @Nullable String secondPassword)
+    public ImportedAddress addImportedAddress(ImportedAddress address, @Nullable String secondPassword)
             throws Exception {
 
         validateSecondPassword(secondPassword);
@@ -379,9 +379,9 @@ public class Wallet {
         return address;
     }
 
-    public LegacyAddress addLegacyAddressFromKey(ECKey key, @Nullable String secondPassword)
+    public ImportedAddress addImportedAddressFromKey(ECKey key, @Nullable String secondPassword)
             throws Exception {
-        return addLegacyAddress(LegacyAddress.fromECKey(key), secondPassword);
+        return addImportedAddress(ImportedAddress.fromECKey(key), secondPassword);
     }
 
     public void decryptHDWallet(NetworkParameters networkParameters, int hdWalletIndex, String secondPassword)
@@ -425,19 +425,19 @@ public class Wallet {
         return account;
     }
 
-    public LegacyAddress setKeyForLegacyAddress(ECKey key, @Nullable String secondPassword)
+    public ImportedAddress setKeyForImportedAddress(ECKey key, @Nullable String secondPassword)
         throws DecryptionException, UnsupportedEncodingException, EncryptionException,
         NoSuchAddressException {
 
         validateSecondPassword(secondPassword);
 
-        List<LegacyAddress> addressList = getLegacyAddressList();
+        List<ImportedAddress> addressList = getImportedAddressList();
 
         String address = key.toAddress(PersistentUrls.getInstance().getBitcoinParams()).toString();
 
-        LegacyAddress matchingAddressBody = null;
+        ImportedAddress matchingAddressBody = null;
 
-        for(LegacyAddress addressBody : addressList) {
+        for(ImportedAddress addressBody : addressList) {
             if(addressBody.getAddress().equals(address)) {
                 matchingAddressBody = addressBody;
             }
@@ -465,41 +465,39 @@ public class Wallet {
     }
 
     /**
-     * @deprecated Use the kotlin extension: {@link WalletExtensionsKt#nonArchivedLegacyAddressStrings}
+     * @deprecated Use the kotlin extension: {@link WalletExtensionsKt#nonArchivedImportedAddressStrings}
      */
     @Deprecated
-    public List<String> getLegacyAddressStringList() {
+    public List<String> getImportedAddressStringList() {
 
         List<String> addrs = new ArrayList<>(keys.size());
-        for (LegacyAddress legacyAddress : keys) {
-            if (!LegacyAddressExtensionsKt.isArchived(legacyAddress)) {
-                addrs.add(legacyAddress.getAddress());
+        for (ImportedAddress importedAddress : keys) {
+            if (!ImportedAddressExtensionsKt.isArchived(importedAddress)) {
+                addrs.add(importedAddress.getAddress());
             }
         }
 
         return addrs;
     }
 
-    public List<String> getLegacyAddressStringList(long tag) {
+    public List<String> getImportedAddressStringList(long tag) {
 
         List<String> addrs = new ArrayList<>(keys.size());
-        for (LegacyAddress legacyAddress : keys) {
-            if (legacyAddress.getTag() == tag) {
-                addrs.add(legacyAddress.getAddress());
+        for (ImportedAddress importedAddress : keys) {
+            if (importedAddress.getTag() == tag) {
+                addrs.add(importedAddress.getAddress());
             }
         }
 
         return addrs;
     }
 
-    public boolean containsLegacyAddress(String addr) {
-
-        for (LegacyAddress legacyAddress : keys) {
-            if (legacyAddress.getAddress().equals(addr)) {
+    public boolean containsImportedAddress(String addr) {
+        for (ImportedAddress importedAddress : keys) {
+            if (importedAddress.getAddress().equals(addr)) {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -540,13 +538,13 @@ public class Wallet {
      * @param address
      * @return
      */
-    public String getLabelFromLegacyAddress(String address) {
+    public String getLabelFromImportedAddress(String address) {
 
-        List<LegacyAddress> addresses = getLegacyAddressList();
+        List<ImportedAddress> addresses = getImportedAddressList();
 
-        for(LegacyAddress legacyAddress : addresses) {
-            if(legacyAddress.getAddress().equals(address)) {
-                String label = legacyAddress.getLabel();
+        for(ImportedAddress importedAddress : addresses) {
+            if(importedAddress.getAddress().equals(address)) {
+                String label = importedAddress.getLabel();
                 if(label == null || label.isEmpty()){
                     return address;
                 } else {

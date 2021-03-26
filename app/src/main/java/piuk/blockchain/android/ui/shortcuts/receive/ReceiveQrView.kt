@@ -3,9 +3,8 @@ package piuk.blockchain.android.ui.shortcuts.receive
 import android.content.Intent
 import android.graphics.Bitmap
 import androidx.annotation.StringRes
-
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.ui.base.View
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 
 internal interface ReceiveQrView : View {
 

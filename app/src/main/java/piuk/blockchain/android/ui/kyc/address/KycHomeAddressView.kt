@@ -20,8 +20,6 @@ interface KycHomeAddressView : View {
 
     fun showProgressDialog()
 
-    fun continueToMobileVerification(countryCode: String)
-
     fun finishPage()
 
     fun continueToVeriffSplash(countryCode: String)
@@ -29,6 +27,7 @@ interface KycHomeAddressView : View {
     fun continueToTier2MoreInfoNeeded(countryCode: String)
 
     fun tier1Complete()
+    fun onSddVerified()
 
     fun restoreUiState(
         line1: String,

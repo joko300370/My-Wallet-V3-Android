@@ -17,7 +17,7 @@ class HideAssetDetailsTest {
                 CryptoCurrency.ETHER to initialEthState,
                 CryptoCurrency.XLM to initialXlmState
             ),
-            showDashboardSheet = null,
+            dashboardNavigationAction = null,
             announcement = testAnnouncementCard_1
         )
 
@@ -34,14 +34,14 @@ class HideAssetDetailsTest {
                 CryptoCurrency.ETHER to initialEthState,
                 CryptoCurrency.XLM to initialXlmState
             ),
-            showDashboardSheet = null,
+            dashboardNavigationAction = null,
             announcement = testAnnouncementCard_1
         )
 
         val result = subject.reduce(initialState)
 
         assertEquals(result.assets, initialState.assets)
-        assertNull(result.showDashboardSheet)
+        assertNull(result.dashboardNavigationAction)
         assertEquals(result.announcement, initialState.announcement)
     }
 
@@ -54,14 +54,14 @@ class HideAssetDetailsTest {
                 CryptoCurrency.ETHER to initialEthState,
                 CryptoCurrency.XLM to initialXlmState
             ),
-            showDashboardSheet = DashboardSheet.STX_AIRDROP_COMPLETE,
+            dashboardNavigationAction = DashboardNavigationAction.StxAirdropComplete,
             announcement = testAnnouncementCard_1
         )
 
         val result = subject.reduce(initialState)
 
         assertEquals(result.assets, initialState.assets)
-        assertNull(result.showDashboardSheet)
+        assertNull(result.dashboardNavigationAction)
         assertEquals(result.announcement, initialState.announcement)
     }
 }

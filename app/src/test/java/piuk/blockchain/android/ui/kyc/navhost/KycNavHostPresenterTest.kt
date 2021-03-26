@@ -53,7 +53,7 @@ class KycNavHostPresenterTest {
             nabuDataManager,
             sunriverCampaign,
             reentryDecision,
-            ReentryDecisionKycNavigator(mock(), mock(), mock()),
+            ReentryDecisionKycNavigator(nabuToken, nabuDataManager, reentryDecision),
             tierUpdater
         )
         subject.initView(view)

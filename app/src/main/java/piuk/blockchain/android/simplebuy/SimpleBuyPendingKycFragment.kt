@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.PaymentMethod
-import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import kotlinx.android.synthetic.main.fragment_simple_buy_kyc_pending.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.cards.CardDetailsActivity
@@ -40,9 +39,9 @@ class SimpleBuyPendingKycFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent,
         kyc_progress.visibleIf { newState.kycVerificationState == KycState.PENDING }
         kyc_icon.visibleIf {
             newState.kycVerificationState == KycState.FAILED ||
-                    newState.kycVerificationState == KycState.IN_REVIEW ||
-                    newState.kycVerificationState == KycState.UNDECIDED ||
-                    newState.kycVerificationState == KycState.VERIFIED_BUT_NOT_ELIGIBLE
+                newState.kycVerificationState == KycState.IN_REVIEW ||
+                newState.kycVerificationState == KycState.UNDECIDED ||
+                newState.kycVerificationState == KycState.VERIFIED_BUT_NOT_ELIGIBLE
         }
 
         verif_text.text = when (newState.kycVerificationState) {
@@ -64,8 +63,8 @@ class SimpleBuyPendingKycFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent,
 
         continue_to_wallet.visibleIf {
             newState.kycVerificationState == KycState.FAILED ||
-                    newState.kycVerificationState == KycState.UNDECIDED ||
-                    newState.kycVerificationState == KycState.VERIFIED_BUT_NOT_ELIGIBLE
+                newState.kycVerificationState == KycState.UNDECIDED ||
+                newState.kycVerificationState == KycState.VERIFIED_BUT_NOT_ELIGIBLE
         }
 
         kyc_icon.setImageResource(
@@ -145,16 +144,19 @@ class SimpleBuyPendingKycFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent,
         if (requestCode == CardDetailsActivity.ADD_CARD_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
                 val card = (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as?
-                        PaymentMethod.Card) ?: return
+                    PaymentMethod.Card) ?: return
                 val cardId = card.cardId
                 val cardLabel = card.uiLabel()
                 val cardPartner = card.partner
 
-                model.process(SimpleBuyIntent.UpdateSelectedPaymentMethod(cardId,
-                    cardLabel,
-                    cardPartner,
-                    PaymentMethodType.PAYMENT_CARD
-                ))
+                model.process(
+                    SimpleBuyIntent.UpdateSelectedPaymentCard(
+                        id = cardId,
+                        label = cardLabel,
+                        partner = cardPartner,
+                        isEligible = true
+                    )
+                )
                 navigator().goToCheckOutScreen()
             } else {
                 model.process(SimpleBuyIntent.ClearState)

@@ -45,9 +45,9 @@ abstract class SellTxEngineBase(
         pricedQuote: PricedQuote
     ): PendingTx {
         val exchangeRate = ExchangeRate.CryptoToFiat(
-            sourceAccount.asset,
+            sourceAsset,
             userFiat,
-            exchangeRates.getLastPrice(sourceAccount.asset, userFiat)
+            exchangeRates.getLastPrice(sourceAsset, userFiat)
         )
 
         return pendingTx.copy(
@@ -88,20 +88,20 @@ abstract class SellTxEngineBase(
             .firstOrError()
             .map { pricedQuote ->
                 val latestQuoteExchangeRate = ExchangeRate.CryptoToFiat(
-                    from = asset,
+                    from = sourceAsset,
                     to = userFiat,
                     _rate = pricedQuote.price.toBigDecimal()
                 )
                 pendingTx.copy(
                     confirmations = listOf(
-                        TxConfirmationValue.ExchangePriceConfirmation(pricedQuote.price, asset),
+                        TxConfirmationValue.ExchangePriceConfirmation(pricedQuote.price, sourceAsset),
                         TxConfirmationValue.From(sourceAccount.label),
                         TxConfirmationValue.To(txTarget.label),
                         TxConfirmationValue.NetworkFee(
                             txFee = TxFee(
-                                fee = pendingTx.fees,
+                                fee = pendingTx.feeAmount,
                                 type = TxFee.FeeType.DEPOSIT_FEE,
-                                asset = sourceAccount.asset
+                                asset = sourceAsset
                             )
                         ),
                         TxConfirmationValue.Total(
@@ -117,7 +117,7 @@ abstract class SellTxEngineBase(
             .firstOrError()
             .map { pricedQuote ->
                 val latestQuoteExchangeRate = ExchangeRate.CryptoToFiat(
-                    from = sourceAccount.asset,
+                    from = sourceAsset,
                     to = userFiat,
                     _rate = pricedQuote.price.toBigDecimal()
                 )
@@ -125,7 +125,7 @@ abstract class SellTxEngineBase(
                     addOrReplaceOption(
                         TxConfirmationValue.ExchangePriceConfirmation(
                             pricedQuote.price,
-                            sourceAccount.asset
+                            sourceAsset
                         )
                     )
                     addOrReplaceOption(
@@ -160,7 +160,7 @@ abstract class SellTxEngineBase(
     override fun userExchangeRate(): Observable<ExchangeRate> =
         quotesEngine.pricedQuote.map {
             ExchangeRate.CryptoToFiat(
-                from = sourceAccount.asset,
+                from = sourceAsset,
                 to = userFiat,
                 _rate = it.price.toBigDecimal()
             )

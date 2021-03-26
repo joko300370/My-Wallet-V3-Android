@@ -1,19 +1,19 @@
 package piuk.blockchain.android.ui.settings
 
 import android.annotation.SuppressLint
+import com.blockchain.nabu.datamanagers.Bank
+import com.blockchain.nabu.datamanagers.BankState
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
-import com.blockchain.nabu.models.data.Bank
-import com.blockchain.nabu.models.data.LinkedBankState
-import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.models.responses.nabu.NabuApiException
 import com.blockchain.nabu.models.responses.nabu.NabuErrorStatusCodes
 import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
+import com.blockchain.preferences.RatingPrefs
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.settings.SettingsManager
@@ -26,6 +26,7 @@ import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.biometrics.BiometricsController
+import piuk.blockchain.android.simplebuy.SimpleBuyModel
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.thepit.PitLinkingState
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
@@ -56,7 +57,8 @@ class SettingsPresenter(
     private val kycStatusHelper: KycStatusHelper,
     private val pitLinking: PitLinking,
     private val analytics: Analytics,
-    private val biometricsController: BiometricsController
+    private val biometricsController: BiometricsController,
+    private val ratingPrefs: RatingPrefs
 ) : BasePresenter<SettingsView>() {
 
     private val fiatUnit: String
@@ -92,41 +94,49 @@ class SettingsPresenter(
     }
 
     private fun updateCards() {
-        compositeDisposable += kycStatusHelper.getSettingsKycStateTier()
-            .map { kycTiers -> kycTiers.isApprovedFor(KycTierLevel.GOLD) }
-            .doOnSuccess { isGold ->
-                view?.cardsEnabled(isGold)
+        compositeDisposable +=
+            custodialWalletManager.getEligiblePaymentMethodTypes(fiatUnit).map { eligiblePaymentMethods ->
+                eligiblePaymentMethods.firstOrNull { it.paymentMethodType == PaymentMethodType.PAYMENT_CARD } != null
             }
-            .flatMap { isGold ->
-                if (isGold) {
-                    custodialWalletManager.updateSupportedCardTypes(fiatUnit)
-                        .thenSingle {
-                            custodialWalletManager.fetchUnawareLimitsCards(
-                                listOf(CardStatus.ACTIVE, CardStatus.EXPIRED)
-                            )
-                        }
-                } else {
-                    Single.just(emptyList())
+                .doOnSuccess { isCardEligible ->
+                    view?.cardsEnabled(isCardEligible)
                 }
-            }
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe {
-                view?.cardsEnabled(false)
-                onCardsUpdated(emptyList())
-            }
-            .subscribeBy(
-                onSuccess = { cards ->
-                    onCardsUpdated(cards)
-                },
-                onError = {
-                    Timber.i(it)
+                .flatMap { isCardEligible ->
+                    if (isCardEligible) {
+                        custodialWalletManager.updateSupportedCardTypes(fiatUnit)
+                            .thenSingle {
+                                custodialWalletManager.fetchUnawareLimitsCards(
+                                    listOf(CardStatus.ACTIVE, CardStatus.EXPIRED)
+                                )
+                            }
+                    } else {
+                        Single.just(emptyList())
+                    }
                 }
-            )
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe {
+                    view?.cardsEnabled(false)
+                    onCardsUpdated(emptyList())
+                }
+                .subscribeBy(
+                    onSuccess = { cards ->
+                        onCardsUpdated(cards)
+                    },
+                    onError = {
+                        Timber.i(it)
+                    }
+                )
+    }
+
+    fun checkShouldDisplayRateUs() {
+        if (ratingPrefs.preRatingActionCompletedTimes >= SimpleBuyModel.COMPLETED_ORDERS_BEFORE_SHOWING_APP_RATING) {
+            view?.showRateUsPreference()
+        }
     }
 
     fun updateBanks() {
         compositeDisposable +=
-            linkableBanks(fiatUnit).zipWith(linkedBanks().onErrorReturn { emptySet() })
+            eligibleBankPaymentMethods(fiatUnit).zipWith(linkedBanks().onErrorReturn { emptySet() })
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe {
                     view?.banksEnabled(false)
@@ -157,16 +167,15 @@ class SettingsPresenter(
         }
     }
 
-    private fun linkableBanks(fiat: String): Single<Set<LinkableBank>> =
+    private fun eligibleBankPaymentMethods(fiat: String): Single<Set<LinkablePaymentMethods>> =
         custodialWalletManager.getEligiblePaymentMethodTypes(fiat).map { methods ->
             val bankPaymentMethods = methods.filter {
                 it.paymentMethodType == PaymentMethodType.BANK_TRANSFER ||
-                    // Bank linking through wire transfer has not been implemented for USD
-                    (it.paymentMethodType == PaymentMethodType.FUNDS && it.currency != "USD")
+                    it.paymentMethodType == PaymentMethodType.BANK_ACCOUNT
             }
 
             bankPaymentMethods.map { method ->
-                LinkableBank(
+                LinkablePaymentMethods(
                     method.currency,
                     bankPaymentMethods.filter { it.currency == method.currency }.map { it.paymentMethodType }.distinct()
                 )
@@ -174,13 +183,9 @@ class SettingsPresenter(
         }
 
     private fun linkedBanks(): Single<Set<Bank>> =
-        custodialWalletManager.getLinkedBeneficiaries()
-            .zipWith(custodialWalletManager.getLinkedBanks().map { linkedBanks ->
-                linkedBanks.filter { it.state == LinkedBankState.ACTIVE }
-            })
-            .map { (beneficiaries, linkedBanks) ->
-                beneficiaries.toSet() + linkedBanks
-            }
+        custodialWalletManager.getBanks().map { banks -> banks.filter { it.state == BankState.ACTIVE } }.map { banks ->
+            banks.toSet()
+        }
 
     fun onKycStatusClicked() {
         view?.launchKycFlow()
@@ -258,6 +263,19 @@ class SettingsPresenter(
                 throw IllegalStateException("PIN code not found in AccessState")
             }
         }
+    }
+
+    fun updateKyc() {
+        compositeDisposable += kycStatusHelper.getSettingsKycStateTier()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { tiers ->
+                    view?.setKycState(tiers)
+                },
+                onError = {
+                    view?.showError(R.string.settings_error_updating)
+                }
+            )
     }
 
     private fun String?.isInvalid(): Boolean =
@@ -595,7 +613,7 @@ class SettingsPresenter(
     }
 }
 
-data class LinkableBank(
+data class LinkablePaymentMethods(
     val currency: String,
     val linkMethods: List<PaymentMethodType>
 ) : Serializable

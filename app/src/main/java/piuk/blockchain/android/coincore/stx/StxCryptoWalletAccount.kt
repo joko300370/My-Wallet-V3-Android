@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.stx
 
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.Money
 import io.reactivex.Single
@@ -12,10 +13,11 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
 class StxCryptoWalletAccount(
     payloadManager: PayloadDataManager,
+    custodialWalletManager: CustodialWalletManager,
     override val label: String,
     private val address: String,
     override val exchangeRates: ExchangeRateDataManager
-) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.STX) {
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.STX, custodialWalletManager) {
 
     override val isFunded: Boolean
         get() = false
@@ -23,18 +25,18 @@ class StxCryptoWalletAccount(
     override val isDefault: Boolean = true // Only one account ever, so always default
 
     override val accountBalance: Single<Money>
-        get() = TODO("not implemented")
+        get() = throw NotImplementedError("STX Not Implemented")
 
     override val actionableBalance: Single<Money>
         get() = accountBalance
 
     override val receiveAddress: Single<ReceiveAddress>
-        get() = TODO("not implemented")
+        get() = throw NotImplementedError("STX Not Implemented")
 
     override val activity: Single<ActivitySummaryList>
         get() = Single.just(emptyList())
 
     override fun createTxEngine(): TxEngine {
-        TODO("Not yet implemented")
+        throw NotImplementedError("STX Not Implemented")
     }
 }

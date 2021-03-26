@@ -1,6 +1,8 @@
 package piuk.blockchain.android.ui.dashboard
 
 import androidx.annotation.VisibleForTesting
+import com.blockchain.logging.CrashLogger
+import com.blockchain.nabu.models.data.LinkBankTransfer
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
@@ -20,9 +22,12 @@ import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.android.ui.dashboard.sheets.BackupDetails
+import piuk.blockchain.android.ui.settings.LinkablePaymentMethods
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
+import java.io.Serializable
 
 class AssetMap(private val map: Map<CryptoCurrency, CryptoAssetState>) :
     Map<CryptoCurrency, CryptoAssetState> by map {
@@ -93,26 +98,38 @@ data class FiatAssetState(
         }
 }
 
-enum class DashboardSheet {
-    STX_AIRDROP_COMPLETE,
-    BACKUP_BEFORE_SEND,
-    SIMPLE_BUY_CANCEL_ORDER,
-    FIAT_FUNDS_DETAILS,
-    LINK_OR_DEPOSIT,
-    FIAT_FUNDS_NO_KYC,
-    INTEREST_SUMMARY
+sealed class DashboardNavigationAction {
+    object StxAirdropComplete : DashboardNavigationAction()
+    object BackUpBeforeSend : DashboardNavigationAction()
+    object SimpleBuyCancelOrder : DashboardNavigationAction()
+    object FiatFundsDetails : DashboardNavigationAction()
+    object LinkOrDeposit : DashboardNavigationAction()
+    object FiatFundsNoKyc : DashboardNavigationAction()
+    object InterestSummary : DashboardNavigationAction()
+    object PaymentMethods : DashboardNavigationAction()
+    class LinkBankWithPartner(override val linkBankTransfer: LinkBankTransfer, override val assetAction: AssetAction) :
+        DashboardNavigationAction(), LinkBankNavigationAction
+
+    fun isBottomSheet() =
+        this !is LinkBankNavigationAction
+}
+
+interface LinkBankNavigationAction {
+    val linkBankTransfer: LinkBankTransfer
+    val assetAction: AssetAction
 }
 
 data class DashboardState(
     val assets: AssetMap = AssetMap(emptyMap()),
-    val showDashboardSheet: DashboardSheet? = null,
+    val dashboardNavigationAction: DashboardNavigationAction? = null,
     val activeFlow: DialogFlow? = null,
     val announcement: AnnouncementCard? = null,
     val fiatAssets: FiatAssetState? = null,
     val selectedFiatAccount: FiatAccount? = null,
     val selectedCryptoAccount: SingleAccount? = null,
     val selectedAsset: CryptoCurrency? = null,
-    val backupSheetDetails: BackupDetails? = null
+    val backupSheetDetails: BackupDetails? = null,
+    val linkablePaymentMethodsForAction: LinkablePaymentMethodsForAction? = null
 ) : MviState, BalanceState, KoinComponent {
 
     // If ALL the assets are refreshing, then report true. Else false
@@ -195,13 +212,33 @@ data class CryptoAssetState(
     fun reset(): CryptoAssetState = CryptoAssetState(currency)
 }
 
+sealed class LinkablePaymentMethodsForAction(
+    open val linkablePaymentMethods: LinkablePaymentMethods
+) : Serializable {
+    data class LinkablePaymentMethodsForSettings(
+        override val linkablePaymentMethods: LinkablePaymentMethods
+    ) : LinkablePaymentMethodsForAction(linkablePaymentMethods)
+
+    data class LinkablePaymentMethodsForDeposit(
+        override val linkablePaymentMethods: LinkablePaymentMethods
+    ) : LinkablePaymentMethodsForAction(linkablePaymentMethods)
+
+    data class LinkablePaymentMethodsForWithdraw(
+        override val linkablePaymentMethods: LinkablePaymentMethods
+    ) : LinkablePaymentMethodsForAction(linkablePaymentMethods)
+}
+
 class DashboardModel(
     initialState: DashboardState,
     mainScheduler: Scheduler,
-    private val interactor: DashboardInteractor
+    private val interactor: DashboardInteractor,
+    environmentConfig: EnvironmentConfig,
+    crashLogger: CrashLogger
 ) : MviModel<DashboardState, DashboardIntent>(
     initialState,
-    mainScheduler
+    mainScheduler,
+    environmentConfig,
+    crashLogger
 ) {
     override fun performAction(
         previousState: DashboardState,
@@ -233,7 +270,9 @@ class DashboardModel(
             is CheckBackupStatus -> checkBackupStatus(intent.account, intent.action)
             is CancelSimpleBuyOrder -> interactor.cancelSimpleBuyOrder(intent.orderId)
             is LaunchAssetDetailsFlow -> interactor.getAssetDetailsFlow(this, intent.cryptoCurrency)
-            is LaunchDepositFlow -> interactor.getDepositFlow(this, intent.fromAccount, intent.toAccount, intent.action)
+            is LaunchInterestDepositFlow ->
+                interactor.getInterestDepositFlow(this, intent.fromAccount, intent.toAccount, intent.action)
+            is LaunchBankTransferFlow -> processBankTransferFlow(intent)
             is LaunchSendFlow -> interactor.getSendFlow(this, intent.fromAccount, intent.action)
             is FiatBalanceUpdate,
             is BalanceUpdateError,
@@ -247,9 +286,35 @@ class DashboardModel(
             is ClearBottomSheet,
             is UpdateSelectedCryptoAccount,
             is ShowBackupSheet,
-            is UpdateDashboardCurrencies -> null
+            is UpdateDashboardCurrencies,
+            is LaunchBankLinkFlow,
+            is ResetDashboardNavigation,
+            is ShowLinkablePaymentMethodsSheet -> null
         }
     }
+
+    private fun processBankTransferFlow(intent: LaunchBankTransferFlow) =
+        when (intent.action) {
+            AssetAction.FiatDeposit -> {
+                interactor.getBankDepositFlow(
+                    this,
+                    intent.account,
+                    intent.action,
+                    intent.shouldLaunchBankLinkTransfer
+                )
+            }
+            AssetAction.Withdraw -> {
+                interactor.getBankWithdrawalFlow(
+                    this,
+                    intent.account,
+                    intent.action,
+                    intent.shouldLaunchBankLinkTransfer
+                )
+            }
+            else -> {
+                null
+            }
+        }
 
     private fun checkBackupStatus(account: SingleAccount, action: AssetAction): Disposable =
         interactor.hasUserBackedUp()
@@ -262,10 +327,6 @@ class DashboardModel(
                     }
                 }, onError = { Timber.e(it) }
             )
-
-    override fun onScanLoopError(t: Throwable) {
-        Timber.e("***> Scan loop failed: $t")
-    }
 
     override fun distinctIntentFilter(
         previousIntent: DashboardIntent,

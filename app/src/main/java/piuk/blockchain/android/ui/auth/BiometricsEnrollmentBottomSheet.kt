@@ -1,11 +1,11 @@
 package piuk.blockchain.android.ui.auth
 
-import android.view.View
-import kotlinx.android.synthetic.main.dialog_sheet_enroll_biometrics.view.*
-import piuk.blockchain.android.R
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import piuk.blockchain.android.databinding.DialogSheetEnrollBiometricsBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 
-class BiometricsEnrollmentBottomSheet : SlidingModalBottomDialog() {
+class BiometricsEnrollmentBottomSheet : SlidingModalBottomDialog<DialogSheetEnrollBiometricsBinding>() {
     interface Host : SlidingModalBottomDialog.Host {
         fun enrollBiometrics()
         fun cancel()
@@ -17,15 +17,15 @@ class BiometricsEnrollmentBottomSheet : SlidingModalBottomDialog() {
         )
     }
 
-    override val layoutResource: Int
-        get() = R.layout.dialog_sheet_enroll_biometrics
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogSheetEnrollBiometricsBinding =
+        DialogSheetEnrollBiometricsBinding.inflate(inflater, container, false)
 
-    override fun initControls(view: View) {
-        view.biometric_enable.setOnClickListener {
+    override fun initControls(binding: DialogSheetEnrollBiometricsBinding) {
+        binding.biometricEnable.setOnClickListener {
             host.enrollBiometrics()
         }
 
-        view.biometric_cancel.setOnClickListener {
+        binding.biometricCancel.setOnClickListener {
             dismiss()
             host.cancel()
         }

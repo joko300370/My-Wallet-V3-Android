@@ -6,9 +6,9 @@ import androidx.annotation.StringRes
 import androidx.annotation.UiThread
 import androidx.annotation.VisibleForTesting
 import com.blockchain.logging.CrashLogger
+import com.blockchain.nabu.datamanagers.ApiStatus
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
-import com.blockchain.remoteconfig.RemoteConfig
 import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.api.data.UpdateType
 import info.blockchain.wallet.exceptions.AccountLockedException
@@ -18,10 +18,12 @@ import info.blockchain.wallet.exceptions.InvalidCredentialsException
 import info.blockchain.wallet.exceptions.ServerConnectionException
 import info.blockchain.wallet.exceptions.UnsupportedVersionException
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.spongycastle.crypto.InvalidCipherTextException
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.data.biometrics.BiometricsController
 import piuk.blockchain.android.ui.home.CredentialsWiper
 import piuk.blockchain.android.ui.launcher.LauncherActivity
@@ -36,7 +38,6 @@ import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.PrngFixer
 import piuk.blockchain.androidcore.utils.annotations.Thunk
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.net.SocketTimeoutException
@@ -54,7 +55,7 @@ class PinEntryPresenter(
     private val prngFixer: PrngFixer,
     private val mobileNoticeRemoteConfig: MobileNoticeRemoteConfig,
     private val crashLogger: CrashLogger,
-    private val config: RemoteConfig,
+    private val apiStatus: ApiStatus,
     private val credentialsWiper: CredentialsWiper,
     private val biometricsController: BiometricsController
 ) : BasePresenter<PinEntryView>() {
@@ -100,6 +101,18 @@ class PinEntryPresenter(
         checkFingerprintStatus()
         doTestnetCheck()
         setupCommitHash()
+        checkApiStatus()
+    }
+
+    private fun checkApiStatus() {
+        compositeDisposable += apiStatus.isHealthy()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(onSuccess = { isHealthy ->
+                if (isHealthy.not())
+                    view?.showApiOutageMessage()
+            }, onError = {
+                Timber.e(it)
+            })
     }
 
     private fun setupCommitHash() {

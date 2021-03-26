@@ -29,8 +29,8 @@ class ConfirmTransactionDelegateAdapter(
             addAdapterDelegate(LargeTransactionWarningItemDelegate(model))
             addAdapterDelegate(InvoiceCountdownTimerDelegate())
             addAdapterDelegate(ConfirmInfoItemValidationStatusDelegate())
-            addAdapterDelegate(ConfirmInfoItemFeeOptionDelegate(model, analytics, activityContext, stringUtils))
-            addAdapterDelegate(ConfirmNetworkFeeItemDelegate(activityContext, stringUtils))
+            addAdapterDelegate(ConfirmInfoItemFeeOptionDelegate(model, analytics, stringUtils))
+            addAdapterDelegate(ConfirmNetworkFeeItemDelegate(stringUtils))
         }
     }
 }

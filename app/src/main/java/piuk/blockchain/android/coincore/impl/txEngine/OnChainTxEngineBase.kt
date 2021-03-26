@@ -7,8 +7,8 @@ import info.blockchain.wallet.api.data.FeeOptions
 import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAddress
-import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxEngine
@@ -23,7 +23,7 @@ abstract class OnChainTxEngineBase(
         val tgt = txTarget
         check(tgt is CryptoAddress)
         check(tgt.address.isNotEmpty())
-        check(sourceAccount.asset == tgt.asset)
+        check(sourceAsset == tgt.asset)
     }
 
     override fun doPostExecute(txResult: TxResult): Completable =
@@ -46,17 +46,17 @@ abstract class OnChainTxEngineBase(
         walletPreferences.getFeeTypeForAsset(cryptoCurrency)
 
     protected fun getFeeState(pTx: PendingTx, feeOptions: FeeOptions? = null) =
-        if (pTx.feeLevel == FeeLevel.Custom) {
+        if (pTx.feeSelection.selectedLevel == FeeLevel.Custom) {
             when {
-                pTx.customFeeAmount == -1L -> FeeState.ValidCustomFee
-                pTx.customFeeAmount < MINIMUM_CUSTOM_FEE -> {
+                pTx.feeSelection.customAmount == -1L -> FeeState.ValidCustomFee
+                pTx.feeSelection.customAmount < MINIMUM_CUSTOM_FEE -> {
                     FeeState.FeeUnderMinLimit
                 }
-                pTx.customFeeAmount >= MINIMUM_CUSTOM_FEE &&
-                    pTx.customFeeAmount <= feeOptions?.limits?.min ?: 0L -> {
+                pTx.feeSelection.customAmount >= MINIMUM_CUSTOM_FEE &&
+                    pTx.feeSelection.customAmount <= feeOptions?.limits?.min ?: 0L -> {
                     FeeState.FeeUnderRecommended
                 }
-                pTx.customFeeAmount >= feeOptions?.limits?.max ?: 0L -> {
+                pTx.feeSelection.customAmount >= feeOptions?.limits?.max ?: 0L -> {
                     FeeState.FeeOverRecommended
                 }
                 else -> FeeState.ValidCustomFee
@@ -65,7 +65,7 @@ abstract class OnChainTxEngineBase(
             if (pTx.availableBalance < pTx.amount) {
                 FeeState.FeeTooHigh
             } else {
-                FeeState.FeeDetails(pTx.fees)
+                FeeState.FeeDetails(pTx.feeAmount)
             }
         }
 
@@ -74,11 +74,11 @@ abstract class OnChainTxEngineBase(
         level: FeeLevel,
         customFeeAmount: Long
     ): Single<PendingTx> {
-        require(pendingTx.availableFeeLevels.contains(level))
+        require(pendingTx.feeSelection.availableLevels.contains(level))
 
         return if (pendingTx.hasFeeLevelChanged(level, customFeeAmount)) {
             updateFeeSelection(
-                asset,
+                sourceAsset,
                 pendingTx,
                 level,
                 customFeeAmount
@@ -93,7 +93,7 @@ abstract class OnChainTxEngineBase(
         if (newConfirmation is TxConfirmationValue.FeeSelection) {
             if (pendingTx.hasFeeLevelChanged(newConfirmation.selectedLevel, newConfirmation.customFeeAmount)) {
                 updateFeeSelection(
-                    asset,
+                    sourceAsset,
                     pendingTx,
                     newConfirmation.selectedLevel,
                     newConfirmation.customFeeAmount
@@ -113,21 +113,25 @@ abstract class OnChainTxEngineBase(
         cryptoCurrency: CryptoCurrency,
         pendingTx: PendingTx,
         newFeeLevel: FeeLevel,
-        customFeeAmount: Long = -1
+        customFeeAmount: Long
     ): Single<PendingTx> {
         storeDefaultFeeLevel(cryptoCurrency, newFeeLevel)
 
         return doUpdateAmount(
             amount = pendingTx.amount,
             pendingTx = pendingTx.copy(
-                feeLevel = newFeeLevel,
-                customFeeAmount = customFeeAmount
+                feeSelection = pendingTx.feeSelection.copy(
+                    selectedLevel = newFeeLevel,
+                    customAmount = customFeeAmount
+                )
             )
         )
     }
 
     private fun PendingTx.hasFeeLevelChanged(newLevel: FeeLevel, newAmount: Long) =
-        feeLevel != newLevel || (feeLevel == FeeLevel.Custom && newAmount != customFeeAmount)
+        with(feeSelection) {
+            selectedLevel != newLevel || (selectedLevel == FeeLevel.Custom && newAmount != customAmount)
+        }
 
     companion object {
         const val MINIMUM_CUSTOM_FEE = 1L

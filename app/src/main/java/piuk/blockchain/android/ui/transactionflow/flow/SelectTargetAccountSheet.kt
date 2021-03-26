@@ -1,55 +1,53 @@
 package piuk.blockchain.android.ui.transactionflow.flow
 
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import io.reactivex.Single
-import kotlinx.android.synthetic.main.dialog_sheet_account_selector.view.*
 import org.koin.android.ext.android.inject
-import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.databinding.DialogSheetAccountSelectorBinding
 import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.TargetSelectionCustomisations
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 
-class SelectTargetAccountSheet : TransactionFlowSheet() {
+class SelectTargetAccountSheet : TransactionFlowSheet<DialogSheetAccountSelectorBinding>() {
 
-    private val customiser: TransactionFlowCustomiser by inject()
+    private val customiser: TargetSelectionCustomisations by inject()
 
     override fun render(newState: TransactionState) {
-        with(dialogView) {
-            account_list.initialise(
+        with(binding) {
+            accountList.initialise(
                 source = Single.just(newState.availableTargets.map { it as SingleAccount }),
                 status = ::statusDecorator
             )
-            account_list_title.text = customiser.selectTargetAccountTitle(newState)
-            account_list_subtitle.text = customiser.selectTargetAccountDescription(newState)
-            account_list_subtitle.visible()
-            account_list_back.visibleIf { newState.canGoBack }
+            accountListTitle.text = customiser.selectTargetAccountTitle(newState)
+            accountListSubtitle.text = customiser.selectTargetAccountDescription(newState)
+            accountListSubtitle.visible()
+            accountListBack.visibleIf { newState.canGoBack }
         }
     }
 
     private fun statusDecorator(account: BlockchainAccount): CellDecorator =
         customiser.selectTargetStatusDecorator(state, account)
 
-    override val layoutResource: Int
-        get() = R.layout.dialog_sheet_account_selector
-
-    override fun initControls(view: View) {
-        view.apply {
-            account_list.onAccountSelected = ::doOnAccountSelected
-            account_list.onListLoaded = ::doOnListLoaded
-            account_list.onLoadError = ::doOnLoadError
-            account_list_back.setOnClickListener {
+    override fun initControls(binding: DialogSheetAccountSelectorBinding) {
+        binding.apply {
+            accountList.onAccountSelected = ::doOnAccountSelected
+            accountList.onListLoaded = ::doOnListLoaded
+            accountList.onLoadError = ::doOnLoadError
+            accountListBack.setOnClickListener {
                 model.process(TransactionIntent.ReturnToPreviousStep)
             }
         }
     }
 
     private fun doOnListLoaded(isEmpty: Boolean) {
-        dialogView.progress.gone()
+        binding.progress.gone()
     }
 
     private fun doOnAccountSelected(account: BlockchainAccount) {
@@ -58,7 +56,10 @@ class SelectTargetAccountSheet : TransactionFlowSheet() {
     }
 
     private fun doOnLoadError(it: Throwable) {
-        dialogView.account_list_empty.visible()
-        dialogView.progress.gone()
+        binding.accountListEmpty.visible()
+        binding.progress.gone()
     }
+
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogSheetAccountSelectorBinding =
+        DialogSheetAccountSelectorBinding.inflate(inflater, container, false)
 }

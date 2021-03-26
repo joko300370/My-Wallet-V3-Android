@@ -111,7 +111,7 @@ class AssetDetailsFlow(
                     this,
                     filterNonCustodialAccounts(localState.hostAction),
                     when (localState.hostAction) {
-                        AssetAction.Deposit -> R.string.select_deposit_source_title
+                        AssetAction.InterestDeposit -> R.string.select_deposit_source_title
                         AssetAction.Send -> R.string.select_send_sheet_title
                         else -> R.string.select_account_sheet_title
                     }
@@ -130,7 +130,7 @@ class AssetDetailsFlow(
                 account.actions.map { actions ->
                     if (
                         actions.contains(action) ||
-                        (action == AssetAction.Deposit && account.isFunded)
+                        (action == AssetAction.InterestDeposit && account.isFunded)
                     ) {
                         account
                     } else NullCryptoAccount()
@@ -189,7 +189,7 @@ class AssetDetailsFlow(
             AssetAction.Summary -> getInterestAccountAndNavigate(
                 newState.selectedAccount.selectFirstAccount(), newState.hostAction
             )
-            AssetAction.Deposit -> {
+            AssetAction.InterestDeposit -> {
                 selectAccountOrPerformAction(
                     state = newState,
                     singleAccountAction = {
@@ -254,7 +254,7 @@ class AssetDetailsFlow(
     override fun onAccountSelected(account: BlockchainAccount) {
         val singleAccount = account as SingleAccount
         when (localState.hostAction) {
-            AssetAction.Deposit -> getInterestAccountAndNavigate(singleAccount, AssetAction.Deposit)
+            AssetAction.InterestDeposit -> getInterestAccountAndNavigate(singleAccount, AssetAction.InterestDeposit)
             AssetAction.Send -> launchNewSend(singleAccount)
             AssetAction.Sell -> launchSell(singleAccount)
             AssetAction.ViewActivity -> launchActivity(singleAccount)
@@ -280,7 +280,7 @@ class AssetDetailsFlow(
                     model.process(TransactionInFlight)
                 } else {
                     ca.accountGroup(AssetFilter.Interest).subscribeBy { ag ->
-                        if (assetAction == AssetAction.Deposit) {
+                        if (assetAction == AssetAction.InterestDeposit) {
                             assetFlowHost.goToDeposit(
                                 account,
                                 ag.accounts.first(),

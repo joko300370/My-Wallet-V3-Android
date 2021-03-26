@@ -36,6 +36,7 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
     YodleeWebClient.YodleeWebClientInterface {
 
     private val analytics: Analytics by inject()
+    private var isViewLoaded: Boolean = false
 
     private val attributes: YodleeAttributes by lazy {
         arguments?.getSerializable(ATTRIBUTES) as YodleeAttributes
@@ -88,7 +89,11 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
 
     override fun onResume() {
         super.onResume()
-        loadYodlee()
+        // this is here to prevent password autofill from triggering a reload,
+        // as onResume gets called after clicking the floating widget
+        if (!isViewLoaded) {
+            loadYodlee()
+        }
     }
 
     private fun loadYodlee() {
@@ -101,6 +106,7 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
             yodlee_retry.gone()
             yodlee_webview.postUrl(attributes.fastlinkUrl, yodleeQuery.toByteArray())
         }
+        isViewLoaded = true
     }
 
     override fun flowSuccess(providerAccountId: String, accountId: String) {

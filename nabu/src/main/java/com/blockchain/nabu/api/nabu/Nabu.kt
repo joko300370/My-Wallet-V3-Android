@@ -1,5 +1,8 @@
 package com.blockchain.nabu.api.nabu
 
+import com.blockchain.nabu.models.responses.banktransfer.BankInfoResponse
+import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentBody
+import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentResponse
 import com.blockchain.nabu.models.responses.banktransfer.CreateLinkBankRequestBody
 import com.blockchain.nabu.models.responses.banktransfer.CreateLinkBankResponse
 import com.blockchain.nabu.models.responses.banktransfer.LinkedBankTransferResponse
@@ -32,6 +35,8 @@ import com.blockchain.nabu.models.responses.nabu.SupportedDocumentsResponse
 import com.blockchain.nabu.models.responses.nabu.TierUpdateJson
 import com.blockchain.nabu.models.responses.nabu.VeriffToken
 import com.blockchain.nabu.models.responses.nabu.WalletMercuryLink
+import com.blockchain.nabu.models.responses.sdd.SDDEligibilityResponse
+import com.blockchain.nabu.models.responses.sdd.SDDStatusResponse
 import com.blockchain.nabu.models.responses.simplebuy.ActivateCardResponse
 import com.blockchain.nabu.models.responses.simplebuy.AddNewCardBodyRequest
 import com.blockchain.nabu.models.responses.simplebuy.AddNewCardResponse
@@ -212,6 +217,12 @@ internal interface Nabu {
         @Body currency: SendToMercuryAddressRequest
     ): Single<SendToMercuryAddressResponse>
 
+    @GET(SDD_ELIGIBLE)
+    fun isSDDEligible(): Single<SDDEligibilityResponse>
+
+    @GET(SDD_VERIFIED)
+    fun isSDDVerified(@Header("authorization") authorization: String): Single<SDDStatusResponse>
+
     @GET(NABU_SIMPLE_BUY_PAIRS)
     fun getSupportedSimpleBuyPairs(
         @Query("fiatCurrency") fiatCurrency: String? = null
@@ -262,7 +273,8 @@ internal interface Nabu {
     @GET(NABU_SIMPLE_BUY_WITHDRAW_ORDER_FEE)
     fun withdrawFee(
         @Header("authorization") authorization: String,
-        @Query("product") product: String = "SIMPLEBUY"
+        @Query("product") product: String = "SIMPLEBUY",
+        @Query("paymentMethod") type: String
     ): Single<FeesResponse>
 
     @Headers("blockchain-origin: simplebuy")
@@ -363,6 +375,7 @@ internal interface Nabu {
     fun getPaymentMethodsForSimpleBuy(
         @Header("authorization") authorization: String,
         @Query("currency") currency: String,
+        @Query("tier") tier: Int?,
         @Query("eligibleOnly") eligibleOnly: Boolean
     ): Single<List<PaymentMethodResponse>>
 
@@ -447,10 +460,11 @@ internal interface Nabu {
         @Body order: CreateOrderRequest
     ): Single<CustodialOrderResponse>
 
-    @GET(NABU_SWAP_LIMITS)
-    fun fetchSwapLimits(
+    @GET(NABU_LIMITS)
+    fun fetchLimits(
         @Header("authorization") authorization: String,
         @Query("currency") currency: String,
+        @Query("product") product: String,
         @Query("minor") useMinor: Boolean = true
     ): Single<SwapLimitsResponse>
 
@@ -479,8 +493,15 @@ internal interface Nabu {
         @Body body: UpdateProviderAccountBody
     ): Completable
 
-    @GET(NABU_LINK_BANK)
-    fun getLinkedBanks(
+    @GET(NABU_BANK_INFO)
+    fun getBanks(
         @Header("authorization") authorization: String
-    ): Single<List<LinkedBankTransferResponse>>
+    ): Single<List<BankInfoResponse>>
+
+    @POST("$NABU_BANK_TRANSFER/{id}/payment")
+    fun startBankTransferPayment(
+        @Header("authorization") authorization: String,
+        @Path("id") id: String,
+        @Body body: BankTransferPaymentBody
+    ): Single<BankTransferPaymentResponse>
 }

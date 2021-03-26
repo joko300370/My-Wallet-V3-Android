@@ -72,7 +72,8 @@ internal class StxAsset(
             payloadManager,
             label = "STX Account",
             address = stxAccount.bitcoinSerializedBase58Address,
-            exchangeRates = exchangeRates
+            exchangeRates = exchangeRates,
+            custodialWalletManager = custodialManager
         )
     }
 

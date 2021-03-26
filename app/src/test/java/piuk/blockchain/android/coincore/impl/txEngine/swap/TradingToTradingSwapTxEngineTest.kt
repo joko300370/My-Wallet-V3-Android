@@ -4,6 +4,7 @@ import com.blockchain.android.testutils.rxInit
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.Product
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.TransferQuote
@@ -32,6 +33,7 @@ import org.junit.Test
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.ValidationState
@@ -197,7 +199,7 @@ class TradingToTradingSwapTxEngineTest {
             exchangeRates
         )
 
-        val asset = subject.asset
+        val asset = subject.sourceAsset
 
         // Assert
         assertEquals(asset, SRC_ASSET)
@@ -252,16 +254,15 @@ class TradingToTradingSwapTxEngineTest {
                 it.amount == CryptoValue.zero(SRC_ASSET) &&
                 it.totalBalance == totalBalance &&
                 it.availableBalance == totalBalance &&
-                it.fees == CryptoValue.zero(SRC_ASSET) &&
+                it.feeAmount == CryptoValue.zero(SRC_ASSET) &&
                 it.selectedFiat == SELECTED_FIAT &&
-                it.customFeeAmount == -1L &&
                 it.confirmations.isEmpty() &&
                 it.minLimit == expectedMinLimit &&
                 it.maxLimit == MAX_GOLD_LIMIT_ASSET &&
                 it.validationState == ValidationState.UNINITIALISED &&
                 it.engineState[USER_TIER] != null
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
+            .assertValue { verifyFeeLevels(it.feeSelection) }
             .assertNoErrors()
             .assertComplete()
 
@@ -308,16 +309,16 @@ class TradingToTradingSwapTxEngineTest {
                 it.amount == CryptoValue.zero(SRC_ASSET) &&
                 it.totalBalance == CryptoValue.zero(SRC_ASSET) &&
                 it.availableBalance == CryptoValue.zero(SRC_ASSET) &&
-                it.fees == CryptoValue.zero(SRC_ASSET) &&
+                it.feeForFullAvailable == CryptoValue.zero(SRC_ASSET) &&
+                it.feeAmount == CryptoValue.zero(SRC_ASSET) &&
                 it.selectedFiat == SELECTED_FIAT &&
-                it.customFeeAmount == -1L &&
                 it.confirmations.isEmpty() &&
                 it.minLimit == null &&
                 it.maxLimit == null &&
                 it.validationState == ValidationState.PENDING_ORDERS_LIMIT_REACHED &&
                 it.engineState.isEmpty()
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
+            .assertValue { verifyFeeLevels(it.feeSelection) }
             .assertNoErrors()
             .assertComplete()
 
@@ -352,10 +353,10 @@ class TradingToTradingSwapTxEngineTest {
             amount = CryptoValue.zero(SRC_ASSET),
             totalBalance = CryptoValue.zero(SRC_ASSET),
             availableBalance = CryptoValue.zero(SRC_ASSET),
-            fees = CryptoValue.zero(SRC_ASSET),
+            feeForFullAvailable = CryptoValue.zero(SRC_ASSET),
+            feeAmount = CryptoValue.zero(SRC_ASSET),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection()
         )
 
         val inputAmount = 2.bitcoin()
@@ -370,19 +371,19 @@ class TradingToTradingSwapTxEngineTest {
                 it.amount == inputAmount &&
                     it.totalBalance == totalBalance &&
                     it.availableBalance == totalBalance &&
-                    it.fees == expectedFee
+                    it.feeAmount == expectedFee
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
+            .assertValue { verifyFeeLevels(it.feeSelection) }
             .assertComplete()
             .assertNoErrors()
 
-            verify(sourceAccount, atLeastOnce()).asset
-            verify(txTarget, atLeastOnce()).asset
-            verifyQuotesEngineStarted()
+        verify(sourceAccount, atLeastOnce()).asset
+        verify(txTarget, atLeastOnce()).asset
+        verifyQuotesEngineStarted()
 
-            verify(quotesEngine).updateAmount(inputAmount)
+        verify(quotesEngine).updateAmount(inputAmount)
 
-            noMoreInteractions(txTarget)
+        noMoreInteractions(txTarget)
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -391,7 +392,7 @@ class TradingToTradingSwapTxEngineTest {
         val totalBalance: Money = 21.bitcoin()
         val availableBalance: Money = 20.bitcoin()
         val inputAmount = 2.bitcoin()
-        val initialFees = 0.bitcoin()
+        val zeroBtc = 0.bitcoin()
 
         val sourceAccount = fundedSourceAccount(totalBalance, availableBalance)
 
@@ -409,10 +410,10 @@ class TradingToTradingSwapTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = totalBalance,
-            fees = initialFees,
+            feeForFullAvailable = zeroBtc,
+            feeAmount = zeroBtc,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection()
         )
 
         // Act
@@ -429,7 +430,7 @@ class TradingToTradingSwapTxEngineTest {
         val totalBalance: Money = 21.bitcoin()
         val availableBalance: Money = 20.bitcoin()
         val inputAmount = 2.bitcoin()
-        val initialFees = 0.bitcoin()
+        val zeroBtc = 0.bitcoin()
 
         val sourceAccount = fundedSourceAccount(totalBalance, availableBalance)
 
@@ -447,10 +448,10 @@ class TradingToTradingSwapTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = totalBalance,
-            fees = initialFees,
+            feeForFullAvailable = zeroBtc,
+            feeAmount = zeroBtc,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection()
         )
 
         // Act
@@ -467,7 +468,7 @@ class TradingToTradingSwapTxEngineTest {
         val totalBalance: Money = 21.bitcoin()
         val availableBalance: Money = 20.bitcoin()
         val inputAmount = 2.bitcoin()
-        val initialFees = 0.bitcoin()
+        val zeroBtc = 0.bitcoin()
 
         val sourceAccount = fundedSourceAccount(totalBalance, availableBalance)
 
@@ -485,10 +486,10 @@ class TradingToTradingSwapTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = totalBalance,
-            fees = initialFees,
+            feeForFullAvailable = zeroBtc,
+            feeAmount = zeroBtc,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection()
         )
 
         // Act
@@ -505,7 +506,7 @@ class TradingToTradingSwapTxEngineTest {
         val totalBalance: Money = 21.bitcoin()
         val availableBalance: Money = 20.bitcoin()
         val inputAmount = 2.bitcoin()
-        val initialFees = 0.bitcoin()
+        val zeroBtc = 0.bitcoin()
 
         val sourceAccount = fundedSourceAccount(totalBalance, availableBalance)
 
@@ -523,25 +524,25 @@ class TradingToTradingSwapTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = totalBalance,
-            fees = initialFees,
+            feeForFullAvailable = zeroBtc,
+            feeAmount = zeroBtc,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection()
         )
 
         // Act
         subject.doUpdateFeeLevel(
             pendingTx,
             FeeLevel.None,
-                -1
+            -1
         ).test()
             .assertValue {
                 it.amount == inputAmount &&
                     it.totalBalance == totalBalance &&
                     it.availableBalance == totalBalance &&
-                    it.fees == initialFees
+                    it.feeAmount == zeroBtc
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
+            .assertValue { verifyFeeLevels(it.feeSelection) }
             .assertComplete()
             .assertNoErrors()
 
@@ -563,7 +564,7 @@ class TradingToTradingSwapTxEngineTest {
         val kycTiers: KycTiers = mock()
         whenever(kycTierService.tiers()).thenReturn(Single.just(kycTiers))
 
-        whenever(walletManager.getSwapLimits(SELECTED_FIAT))
+        whenever(walletManager.getProductTransferLimits(SELECTED_FIAT, Product.TRADE))
             .itReturns(
                 Single.just(
                     TransferLimits(
@@ -577,7 +578,7 @@ class TradingToTradingSwapTxEngineTest {
 
     private fun verifyLimitsFetched() {
         verify(kycTierService).tiers()
-        verify(walletManager).getSwapLimits(SELECTED_FIAT)
+        verify(walletManager).getProductTransferLimits(SELECTED_FIAT, Product.TRADE)
     }
 
     private fun verifyQuotesEngineStarted() {
@@ -587,10 +588,13 @@ class TradingToTradingSwapTxEngineTest {
         )
     }
 
-    private fun verifyFeeLevels(pendingTx: PendingTx, expectedLevel: FeeLevel) =
-        pendingTx.feeLevel == expectedLevel &&
-            pendingTx.availableFeeLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
-            pendingTx.availableFeeLevels.contains(pendingTx.feeLevel)
+    private fun verifyFeeLevels(
+        feeSelection: FeeSelection
+    ) = feeSelection.selectedLevel == FeeLevel.None &&
+        feeSelection.availableLevels == setOf(FeeLevel.None) &&
+        feeSelection.availableLevels.contains(feeSelection.selectedLevel) &&
+        feeSelection.asset == null &&
+        feeSelection.customAmount == -1L
 
     private fun noMoreInteractions(txTarget: TransactionTarget) {
         verifyNoMoreInteractions(txTarget)
@@ -621,7 +625,5 @@ class TradingToTradingSwapTxEngineTest {
         private val MIN_GOLD_LIMIT_ASSET = CryptoValue.fromMajor(SRC_ASSET, 50.toBigDecimal())
         private val MAX_GOLD_ORDER_ASSET = CryptoValue.fromMajor(SRC_ASSET, 250.toBigDecimal())
         private val MAX_GOLD_LIMIT_ASSET = CryptoValue.fromMajor(SRC_ASSET, 1000.toBigDecimal())
-
-        private val EXPECTED_AVAILABLE_FEE_LEVELS = setOf(FeeLevel.None)
     }
 }

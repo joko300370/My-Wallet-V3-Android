@@ -13,6 +13,7 @@ import org.web3j.crypto.RawTransaction
 import org.web3j.utils.Convert
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
@@ -39,12 +40,16 @@ open class Erc20OnChainTxEngine(
     override fun doInitialiseTx(): Single<PendingTx> =
         Single.just(
             PendingTx(
-                amount = CryptoValue.zero(asset),
-                totalBalance = CryptoValue.zero(asset),
-                availableBalance = CryptoValue.zero(asset),
-                fees = CryptoValue.zero(CryptoCurrency.ETHER),
-                feeLevel = mapSavedFeeToFeeLevel(fetchDefaultFeeLevel(asset)),
-                availableFeeLevels = AVAILABLE_FEE_LEVELS,
+                amount = CryptoValue.zero(sourceAsset),
+                totalBalance = CryptoValue.zero(sourceAsset),
+                availableBalance = CryptoValue.zero(sourceAsset),
+                feeForFullAvailable = CryptoValue.zero(CryptoCurrency.ETHER),
+                feeAmount = CryptoValue.zero(CryptoCurrency.ETHER),
+                feeSelection = FeeSelection(
+                    selectedLevel = mapSavedFeeToFeeLevel(fetchDefaultFeeLevel(sourceAsset)),
+                    availableLevels = AVAILABLE_FEE_LEVELS,
+                    asset = CryptoCurrency.ETHER
+                ),
                 selectedFiat = userFiat
             )
         )
@@ -57,8 +62,8 @@ open class Erc20OnChainTxEngine(
                 makeFeeSelectionOption(pendingTx),
                 TxConfirmationValue.FeedTotal(
                     amount = pendingTx.amount,
-                    fee = pendingTx.fees,
-                    exchangeFee = pendingTx.fees.toFiat(exchangeRates, userFiat),
+                    fee = pendingTx.feeAmount,
+                    exchangeFee = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
                     exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
                 ),
                 TxConfirmationValue.Description()
@@ -86,10 +91,10 @@ open class Erc20OnChainTxEngine(
     override fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
         TxConfirmationValue.FeeSelection(
             feeDetails = getFeeState(pendingTx),
-            exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
+            exchange = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
             availableLevels = AVAILABLE_FEE_LEVELS,
-            selectedLevel = pendingTx.feeLevel,
-            asset = CryptoCurrency.ETHER
+            selectedLevel = pendingTx.feeSelection.selectedLevel,
+                asset = sourceAsset
         )
 
     private fun feeOptions(): Single<FeeOptions> =
@@ -97,17 +102,18 @@ open class Erc20OnChainTxEngine(
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
         require(amount is CryptoValue)
-        require(amount.currency == asset)
+        require(amount.currency == sourceAsset)
         return Singles.zip(
             sourceAccount.accountBalance.map { it as CryptoValue },
             sourceAccount.actionableBalance.map { it as CryptoValue },
-            absoluteFee(pendingTx.feeLevel)
+            absoluteFee(pendingTx.feeSelection.selectedLevel)
         ) { total, available, fee ->
             pendingTx.copy(
                 amount = amount,
                 totalBalance = total,
                 availableBalance = available,
-                fees = fee
+                feeForFullAvailable = fee,
+                feeAmount = fee
             )
         }
     }
@@ -152,7 +158,7 @@ open class Erc20OnChainTxEngine(
 
     private fun validateAmounts(pendingTx: PendingTx): Completable =
         Completable.fromCallable {
-            if (pendingTx.amount <= CryptoValue.zero(asset)) {
+            if (pendingTx.amount <= CryptoValue.zero(sourceAsset)) {
                 throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
             }
         }
@@ -170,7 +176,7 @@ open class Erc20OnChainTxEngine(
     private fun validateSufficientGas(pendingTx: PendingTx): Completable =
         Singles.zip(
             getEthAccountBalance(),
-            absoluteFee(pendingTx.feeLevel)
+            absoluteFee(pendingTx.feeSelection.selectedLevel)
         ) { balance, fee ->
             if (fee > balance) {
                 throw TxValidationFailure(ValidationState.INSUFFICIENT_GAS)
@@ -198,7 +204,7 @@ open class Erc20OnChainTxEngine(
             .flatMap { ethDataManager.setLastTxHashNowSingle(it) }
             .flatMap { hash ->
                 pendingTx.getOption<TxConfirmationValue.Description>(TxConfirmation.DESCRIPTION)?.let { notes ->
-                    ethDataManager.updateErc20TransactionNotes(hash, notes.text, asset)
+                    ethDataManager.updateErc20TransactionNotes(hash, notes.text, sourceAsset)
                 }?.toSingle {
                     hash
                 } ?: Single.just(hash)
@@ -218,8 +224,8 @@ open class Erc20OnChainTxEngine(
             ethDataManager.createErc20Transaction(
                 nonce = nonce,
                 to = tgt.address,
-                contractAddress = ethDataManager.erc20ContractAddress(asset),
-                gasPriceWei = fees.gasPrice(pendingTx.feeLevel),
+                contractAddress = ethDataManager.erc20ContractAddress(sourceAsset),
+                gasPriceWei = fees.gasPrice(pendingTx.feeSelection.selectedLevel),
                 gasLimitGwei = fees.gasLimitGwei,
                 amount = pendingTx.amount.toBigInteger()
             )

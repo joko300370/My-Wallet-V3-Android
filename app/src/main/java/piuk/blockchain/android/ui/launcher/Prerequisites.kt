@@ -9,6 +9,7 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.ui.home.models.MetadataEvent
 import piuk.blockchain.androidcore.data.auth.metadata.WalletCredentialsMetadataUpdater
+import piuk.blockchain.androidcore.data.metadata.MetadataInitException
 import piuk.blockchain.androidcore.data.metadata.MetadataManager
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
@@ -25,7 +26,9 @@ class Prerequisites(
 ) {
 
     fun initMetadataAndRelatedPrerequisites(): Completable =
-        metadataManager.attemptMetadataSetup().logOnError(METADATA_ERROR_MESSAGE)
+        metadataManager.attemptMetadataSetup().logOnError(METADATA_ERROR_MESSAGE).onErrorResumeNext {
+            Completable.error(MetadataInitException(it))
+        }
             .then { simpleBuySync.performSync().logAndCompleteOnError(SIMPLE_BUY_SYNC) }
             .then { coincore.init() } // Coincore signals the crash logger internally
             .then { walletCredentialsUpdater.checkAndUpdate().logAndCompleteOnError(WALLET_CREDENTIALS) }

@@ -11,7 +11,8 @@ val startupUiModule = module {
             LandingPresenter(
                 environmentSettings = get(),
                 prefs = get(),
-                rootUtil = get()
+                rootUtil = get(),
+                apiStatus = get()
             )
         }
 

@@ -10,6 +10,7 @@ import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
 
 class AllWalletsAccount(
@@ -20,6 +21,9 @@ class AllWalletsAccount(
     override val label: String = labels.getAllWalletLabel()
 
     override val accountBalance: Single<Money>
+        get() = Single.error(NotImplementedError("No unified balance for All Wallets meta account"))
+
+    override val actionableBalance: Single<Money>
         get() = Single.error(NotImplementedError("No unified balance for All Wallets meta account"))
 
     override val pendingBalance: Single<Money>
@@ -42,6 +46,9 @@ class AllWalletsAccount(
             .flatMapSingle { it.fiatBalance(fiatCurrency, exchangeRates) }
             .reduce { a, v -> a + v }
             .toSingle(FiatValue.zero(fiatCurrency))
+
+    override val receiveAddress: Single<ReceiveAddress>
+        get() = Single.error(NotImplementedError("No receive address for All Wallets meta account"))
 
     override fun includes(account: BlockchainAccount): Boolean = true
 

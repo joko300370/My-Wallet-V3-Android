@@ -45,6 +45,18 @@
         app:layout_constraintTop_toBottomOf="@+id/text_title"
         style="@style/Text.Standard.Centered.16"/>
 
+    <include
+        android:id="@+id/layout_warning"
+        layout="@layout/warning_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/standard_margin"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/btn_create"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible" />
+
     <Button
         android:id="@+id/btn_create"
         style="@style/CtaButton.Blue"

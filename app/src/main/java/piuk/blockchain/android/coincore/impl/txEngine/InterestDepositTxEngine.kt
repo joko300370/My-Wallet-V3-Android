@@ -4,7 +4,7 @@ import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
-import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.ReceiveAddress
@@ -37,7 +37,7 @@ class InterestDepositTxEngine(
     }
 
     override fun start(
-        sourceAccount: CryptoAccount,
+        sourceAccount: BlockchainAccount,
         txTarget: TransactionTarget,
         exchangeRates: ExchangeRateDataManager,
         refreshTrigger: RefreshTrigger
@@ -49,13 +49,15 @@ class InterestDepositTxEngine(
     override fun doInitialiseTx(): Single<PendingTx> =
         onChainEngine.doInitialiseTx()
             .flatMap { pendingTx ->
-                walletManager.getInterestLimits(asset)
+                walletManager.getInterestLimits(sourceAsset)
                     .toSingle()
                     .map {
                         pendingTx.copy(
                             minLimit = it.minDepositAmount,
-                            feeLevel = FeeLevel.Priority,
-                            availableFeeLevels = AVAILABLE_FEE_LEVELS
+                            feeSelection = pendingTx.feeSelection.copy(
+                                selectedLevel = FeeLevel.Regular,
+                                availableLevels = AVAILABLE_FEE_LEVELS
+                            )
                         )
                     }
                 }
@@ -68,7 +70,7 @@ class InterestDepositTxEngine(
         level: FeeLevel,
         customFeeAmount: Long
     ): Single<PendingTx> {
-        require(pendingTx.availableFeeLevels.contains(level))
+        require(pendingTx.feeSelection.availableLevels.contains(level))
         return Single.just(pendingTx)
     }
 
@@ -95,9 +97,9 @@ class InterestDepositTxEngine(
             .addOrReplaceOption(
                 TxConfirmationValue.NetworkFee(
                     txFee = TxFee(
-                        pendingTx.fees,
+                        pendingTx.feeAmount,
                         TxFee.FeeType.DEPOSIT_FEE,
-                        sourceAccount.asset
+                        sourceAsset
                     )
                 )
             )
@@ -175,6 +177,6 @@ class InterestDepositTxEngine(
     override fun doPostExecute(txResult: TxResult): Completable = txTarget.onTxCompleted(txResult)
 
     companion object {
-        private val AVAILABLE_FEE_LEVELS = setOf(FeeLevel.Priority)
+        private val AVAILABLE_FEE_LEVELS = setOf(FeeLevel.Regular)
     }
 }

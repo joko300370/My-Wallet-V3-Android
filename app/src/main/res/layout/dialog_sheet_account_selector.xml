@@ -80,23 +80,38 @@
         app:layout_goneMarginBottom="@dimen/standard_margin"
         tools:visibility="visible" />
 
-    <ProgressBar
-        android:id="@+id/progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/standard_margin"
-        app:layout_constraintBottom_toTopOf="@+id/account_list"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/account_list_separator"
-        app:layout_goneMarginBottom="@dimen/standard_margin" />
-
     <piuk.blockchain.android.ui.customviews.account.AccountList
         android:id="@+id/account_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/add_method"
         app:layout_constraintTop_toBottomOf="@id/account_list_separator" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/add_method"
+        style="@style/CtaButton.White"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:layout_marginBottom="@dimen/standard_margin"
+        android:text="@string/add_payment_method"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/account_list"
+        tools:visibility="visible" />
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/standard_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/account_list_separator"
+        app:layout_goneMarginBottom="@dimen/standard_margin" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -17,8 +17,10 @@ import piuk.blockchain.android.ui.kyc.complete.ApplicationCompleteFragment
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.ui.customviews.toast
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.toast
+import piuk.blockchain.android.ui.kyc.email.entry.EmailEntryHost
+import piuk.blockchain.android.ui.kyc.email.entry.KycEmailEntryFragmentDirections
 import piuk.blockchain.android.util.invisibleIf
 import kotlinx.android.synthetic.main.activity_kyc_nav_host.frame_layout_fragment_wrapper as fragmentWrapper
 import kotlinx.android.synthetic.main.activity_kyc_nav_host.nav_host as navHostFragment
@@ -26,12 +28,12 @@ import kotlinx.android.synthetic.main.activity_kyc_nav_host.progress_bar_loading
 import kotlinx.android.synthetic.main.activity_kyc_nav_host.toolbar_kyc as toolBar
 
 interface StartKyc {
-    fun startKycActivity(context: Any)
+    fun startKycActivity(context: Any, campaignType: CampaignType)
 }
 
 internal class KycStarter : StartKyc {
-    override fun startKycActivity(context: Any) {
-        KycNavHostActivity.start(context as Context, CampaignType.Swap, true)
+    override fun startKycActivity(context: Any, campaignType: CampaignType) {
+        KycNavHostActivity.start(context as Context, campaignType, true)
     }
 }
 
@@ -54,15 +56,7 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_kyc_nav_host)
-        val title = when (campaignType) {
-            CampaignType.Swap -> R.string.kyc_splash_title
-            CampaignType.Sunriver,
-            CampaignType.SimpleBuy,
-            CampaignType.Blockstack,
-            CampaignType.Resubmission,
-            CampaignType.FiatFunds,
-            CampaignType.Interest -> R.string.sunriver_splash_title
-        }
+        val title = R.string.identity_verification
         setupToolbar(toolBar, title)
 
         navController.setGraph(R.navigation.kyc_nav, intent.extras)
@@ -103,6 +97,20 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
     }
 
+    override fun onEmailEntryFragmentShown() {
+        toolBar.title = getString(R.string.kyc_email_title)
+    }
+
+    override fun onEmailVerified() {
+        navigate(
+            KycEmailEntryFragmentDirections.actionAfterValidation()
+        )
+    }
+
+    override fun onEmailVerificationSkipped() {
+        throw IllegalStateException("Email must be verified")
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         supportFragmentManager.fragments.forEach { fragment ->
@@ -134,8 +142,8 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
     private fun flowShouldBeClosedAfterBackAction() =
         // If on final page, close host Activity on navigate up
         currentFragment is ApplicationCompleteFragment ||
-                // If not coming from settings, we want the 1st launched screen to be the 1st screen in the stack
-                (navInitialDestination != null && navInitialDestination?.id == navController.currentDestination?.id)
+            // If not coming from settings, we want the 1st launched screen to be the 1st screen in the stack
+            (navInitialDestination != null && navInitialDestination?.id == navController.currentDestination?.id)
 
     override fun createPresenter(): KycNavHostPresenter = presenter
 
@@ -145,8 +153,9 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
 
     companion object {
 
-//        const val RESULT_KYC_STX_COMPLETE = 5
-
+        //        const val RESULT_KYC_STX_COMPLETE = 5
+        const val RESULT_KYC_FOR_SDD_COMPLETE = 35432
+        const val RESULT_KYC_FOR_TIER_COMPLETE = 8954234
         private const val EXTRA_CAMPAIGN_TYPE = "piuk.blockchain.android.EXTRA_CAMPAIGN_TYPE"
         const val EXTRA_SHOW_TIERS_LIMITS_SPLASH = "piuk.blockchain.android.EXTRA_SHOW_TIERS_LIMITS_SPLASH"
 
@@ -169,8 +178,13 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
         }
 
         @JvmStatic
-        fun startForResult(fragment: Fragment, campaignType: CampaignType, requestCode: Int) {
-            intentArgs(fragment.requireContext(), campaignType)
+        fun startForResult(
+            fragment: Fragment,
+            campaignType: CampaignType,
+            requestCode: Int,
+            showTiersLimitsSplash: Boolean = false
+        ) {
+            intentArgs(fragment.requireContext(), campaignType, showTiersLimitsSplash)
                 .run { fragment.startActivityForResult(this, requestCode) }
         }
 
@@ -185,10 +199,13 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
                     putExtra(EXTRA_CAMPAIGN_TYPE, campaignType)
                     putExtra(EXTRA_SHOW_TIERS_LIMITS_SPLASH, showTiersLimitsSplash)
                 }
+
+        fun kycStatusUpdated(resultCode: Int) =
+            resultCode == RESULT_KYC_FOR_SDD_COMPLETE || resultCode == RESULT_KYC_FOR_TIER_COMPLETE
     }
 }
 
-interface KycProgressListener {
+interface KycProgressListener : EmailEntryHost {
 
     val campaignType: CampaignType
 

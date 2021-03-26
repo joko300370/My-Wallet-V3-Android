@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.transactionflow.flow.adapter
 
-import android.app.Activity
 import android.content.Context
 import android.graphics.Typeface
 import android.net.Uri
@@ -26,7 +25,6 @@ import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.visible
 
 class ConfirmNetworkFeeItemDelegate<in T>(
-    private val activityContext: Activity,
     private val stringUtils: StringUtils
 ) : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
@@ -34,7 +32,7 @@ class ConfirmNetworkFeeItemDelegate<in T>(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        NetworkFeeItemViewHolder(parent.inflate(R.layout.item_send_confirm_network_fee), activityContext, stringUtils)
+        NetworkFeeItemViewHolder(parent.inflate(R.layout.item_send_confirm_network_fee), stringUtils)
 
     override fun onBindViewHolder(
         items: List<T>,
@@ -47,7 +45,6 @@ class ConfirmNetworkFeeItemDelegate<in T>(
 
 private class NetworkFeeItemViewHolder(
     val parent: View,
-    val activityContext: Activity,
     val stringUtils: StringUtils
 ) : RecyclerView.ViewHolder(parent), LayoutContainer {
 
@@ -87,7 +84,7 @@ private class NetworkFeeItemViewHolder(
         val linkedText = stringUtils.getStringWithMappedAnnotations(
             R.string.tx_confirmation_free_fee_learn_more_3,
             linksMap,
-            activityContext
+            itemView.context
         )
         val sb = SpannableStringBuilder()
             .append(introText)
@@ -110,7 +107,7 @@ private class NetworkFeeItemViewHolder(
         val linkedText = stringUtils.getStringWithMappedAnnotations(
             R.string.tx_confirmation_fee_learn_more_3,
             linksMap,
-            activityContext
+            itemView.context
         )
 
         val sb = SpannableStringBuilder()

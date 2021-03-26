@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.dashboard.announcements
 
-import com.blockchain.koin.coinifyUsersToKyc
 import com.blockchain.koin.dgldFeatureFlag
 import com.blockchain.koin.payloadScope
 import com.blockchain.koin.payloadScopeQualifier
@@ -13,6 +12,7 @@ import piuk.blockchain.android.ui.dashboard.announcements.rule.BuyBitcoinAnnounc
 import piuk.blockchain.android.ui.dashboard.announcements.rule.CloudBackupAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.FiatFundsKycAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.FiatFundsNoKycAnnouncement
+import piuk.blockchain.android.ui.dashboard.announcements.rule.IncreaseLimitsAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.InterestAvailableAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.IntroTourAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycForAirdropsAnnouncement
@@ -59,7 +59,8 @@ val dashboardAnnouncementsModule = module {
                 settings = get(),
                 nabu = get(),
                 tierService = get(),
-                sbStateFactory = get()
+                sbStateFactory = get(),
+                userIdentity = get()
             )
         }
 
@@ -82,7 +83,6 @@ val dashboardAnnouncementsModule = module {
         factory {
             KycMoreInfoAnnouncement(
                 tierService = get(),
-                showPopupFeatureFlag = get(coinifyUsersToKyc),
                 dismissRecorder = get()
             )
         }.bind(AnnouncementRule::class)
@@ -141,8 +141,17 @@ val dashboardAnnouncementsModule = module {
         }.bind(AnnouncementRule::class)
 
         factory {
+            IncreaseLimitsAnnouncement(
+                dismissRecorder = get(),
+                announcementQueries = get(),
+                simpleBuyPrefs = get()
+            )
+        }.bind(AnnouncementRule::class)
+
+        factory {
             BuyBitcoinAnnouncement(
-                dismissRecorder = get()
+                dismissRecorder = get(),
+                announcementQueries = get()
             )
         }.bind(AnnouncementRule::class)
 

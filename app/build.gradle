@@ -111,6 +111,7 @@ android {
             buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['prodEthWebsocket']
             buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['prodBchWebsocket']
             buildConfigString "XLM_WEBSOCKET_URL", buildProperties.secrets['prodXlmWebsocket']
+            buildConfigString "STATUS_API_URL", buildProperties.secrets['prodApiStatus']
             buildConfigString "NABU_WEBSOCKET_URL", buildProperties.secrets['prodNabuWebsocket']
             buildConfigString "HORIZON_URL", buildProperties.secrets['prodHorizonUrl']
             buildConfigString "PIT_LINKING_URL", buildProperties.secrets['prodPitDoLink']
@@ -140,6 +141,7 @@ android {
             buildConfigString "HORIZON_URL", buildProperties.secrets['devHorizonUrl']
             buildConfigString "PIT_LINKING_URL", buildProperties.secrets['devPitDoLink']
             buildConfigString "PIT_LAUNCHING_URL", buildProperties.secrets['devPitLaunch']
+            buildConfigString "STATUS_API_URL", buildProperties.secrets['devApiStatus']
             buildConfigString "COINS_WEBSOCKET_URL", buildProperties.secrets['devCoinsWebsocket']
             buildConfigField "String", "ENVIRONMENT", '"env_dev"'
             buildConfigField "String", "COMMIT_HASH", "\"${getGitCommitHash()}\""
@@ -162,6 +164,7 @@ android {
             buildConfigString "API_URL", buildProperties.secrets['stagingApiServer']
             buildConfigString "EVERYPAY_HOST_URL", buildProperties.secrets['stagingEverypayHost']
             buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['stagingBtcWebsocket']
+            buildConfigString "STATUS_API_URL", buildProperties.secrets['stagingApiStatus']
             buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['stagingEthWebsocket']
             buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['stagingBchWebsocket']
             buildConfigString "XLM_WEBSOCKET_URL", buildProperties.secrets['stagingXlmWebsocket']
@@ -189,13 +192,10 @@ android {
             buildConfigString "EXPLORER_URL", buildProperties.secrets['testnetExplorer']
             buildConfigString "API_URL", buildProperties.secrets['testnetApiServer']
             buildConfigString "EVERYPAY_HOST_URL", buildProperties.secrets['stagingEverypayHost']
-            buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['testnetBtcWebsocket']
-            buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['testnetEthWebsocket']
-            buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['testnetBchWebsocket']
-            buildConfigString "XLM_WEBSOCKET_URL", buildProperties.secrets['testnetXlmWebsocket']
             buildConfigString "NABU_WEBSOCKET_URL", buildProperties.secrets['testnetNabuWebsocket']
             buildConfigString "HORIZON_URL", buildProperties.secrets['testnetHorizonUrl']
             buildConfigString "PIT_LINKING_URL", buildProperties.secrets['testnetPitDoLink']
+            buildConfigString "STATUS_API_URL", buildProperties.secrets['testnetApiStatus']
             buildConfigString "PIT_LAUNCHING_URL", buildProperties.secrets['testnetPitLaunch']
             buildConfigString "COINS_WEBSOCKET_URL", buildProperties.secrets['testnetCoinsWebsocket']
             buildConfigString "SIFT_ACCOUNT_ID", buildProperties.secrets['stagingSiftAccount']
@@ -205,10 +205,12 @@ android {
             versionNameSuffix '-testnet'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     lintOptions {
         checkReleaseBuilds true
         fatal 'StopShip'
@@ -217,6 +219,7 @@ android {
         abortOnError true
         baseline file("lint-baseline.xml")
     }
+
     packagingOptions {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/LICENSE.txt'
@@ -234,7 +237,11 @@ android {
         exclude 'org.bitcoin.test.checkpoints.txt'
         exclude 'org.bitcoin.production.checkpoints.txt'
     }
-    dataBinding.enabled true
+
+    buildFeatures {
+        dataBinding true
+        viewBinding true
+    }
 
     testOptions {
         // Fix for Robolectric bug when using AAPT2
@@ -353,4 +360,7 @@ dependencies {
 
     testImplementation Libraries.json
     testImplementation project(':testutils-android')
+
+    debugImplementation Libraries.chuckerDebug
+    releaseImplementation Libraries.chuckerRelease
 }

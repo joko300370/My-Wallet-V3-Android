@@ -31,8 +31,8 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.ui.customviews.toast
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.getTextString
@@ -65,10 +65,15 @@ class KycProfileFragment : BaseFragment<KycProfileView, KycProfilePresenter>(), 
         ).countryCode
     }
 
-    override val state: String?
+    override val stateCode: String?
         get() = KycProfileFragmentArgs.fromBundle(
             arguments ?: Bundle()
         ).stateCode.takeIf { it.isNotEmpty() }
+
+    override val stateName: String?
+        get() = KycProfileFragmentArgs.fromBundle(
+            arguments ?: Bundle()
+        ).stateName.takeIf { it.isNotEmpty() }
 
     override var dateOfBirth: Calendar? = null
     private var progressDialog: MaterialProgressDialog? = null

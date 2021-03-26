@@ -44,7 +44,6 @@ interface HomeNavigator {
     fun launchSimpleBuySell(viewType: BuySellFragment.BuySellViewType = BuySellFragment.BuySellViewType.TYPE_BUY)
 
     fun gotoActivityFor(account: BlockchainAccount?)
-    fun goToWithdraw(currency: String)
     fun goToTransfer()
 
     fun resumeSimpleBuyKyc()

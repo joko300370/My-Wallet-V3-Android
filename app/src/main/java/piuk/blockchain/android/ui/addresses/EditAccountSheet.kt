@@ -2,7 +2,9 @@ package piuk.blockchain.android.ui.addresses
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.annotation.UiThread
 import com.blockchain.koin.scopedInject
@@ -14,7 +16,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.dialog_account_edit.view.*
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.util.getAccount
@@ -24,15 +25,16 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.bch.BchCryptoWalletAccount
 import piuk.blockchain.android.coincore.btc.BtcCryptoWalletAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
+import piuk.blockchain.android.databinding.DialogAccountEditBinding
 import piuk.blockchain.android.scan.QRCodeEncoder
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.ui.customviews.toast
+import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import timber.log.Timber
 
-class AccountEditSheet : SlidingModalBottomDialog() {
+class AccountEditSheet : SlidingModalBottomDialog<DialogAccountEditBinding>() {
 
     interface Host : SlidingModalBottomDialog.Host {
         fun onStartTransferFunds(account: CryptoNonCustodialAccount)
@@ -40,19 +42,20 @@ class AccountEditSheet : SlidingModalBottomDialog() {
 
     override val host: Host by lazy {
         super.host as? Host
-        ?: throw IllegalStateException("Host fragment is not a AccountEditSheet.Host")
+            ?: throw IllegalStateException("Host fragment is not a AccountEditSheet.Host")
     }
-
-    override val layoutResource: Int = R.layout.dialog_account_edit
 
     val account: CryptoAccount?
         get() = arguments?.getAccount(PARAM_ACCOUNT) as? CryptoAccount
 
-    override fun initControls(view: View) {
+    override fun initControls(binding: DialogAccountEditBinding) {
         (account as? CryptoNonCustodialAccount)?.let {
             configureUi(it)
         } ?: dismiss()
     }
+
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogAccountEditBinding =
+        DialogAccountEditBinding.inflate(inflater, container, false)
 
     private fun configureUi(account: CryptoNonCustodialAccount) {
         configureTransfer(account)
@@ -64,7 +67,7 @@ class AccountEditSheet : SlidingModalBottomDialog() {
 
     @SuppressLint("CheckResult")
     private fun configureTransfer(account: CryptoNonCustodialAccount) {
-        with(dialogView.transfer_container) {
+        with(binding.transferContainer) {
             gone()
             isClickable = false
             setOnClickListener { }
@@ -86,7 +89,7 @@ class AccountEditSheet : SlidingModalBottomDialog() {
                             Timber.e("Failed getting balance for imported account: $it")
                         }
                     )
-                }
+            }
         }
     }
 
@@ -96,7 +99,7 @@ class AccountEditSheet : SlidingModalBottomDialog() {
     }
 
     private fun configureAccountLabel(account: CryptoNonCustodialAccount) {
-        with(dialogView.account_name) {
+        with(binding.accountName) {
             text = account.label
             if (account.isArchived) {
                 alpha =
@@ -154,7 +157,7 @@ class AccountEditSheet : SlidingModalBottomDialog() {
     }
 
     private fun configureMakeDefault(account: CryptoNonCustodialAccount) {
-        with(dialogView.default_container) {
+        with(binding.defaultContainer) {
             when {
                 account.isDefault -> gone()
                 account.isArchived -> {
@@ -183,7 +186,7 @@ class AccountEditSheet : SlidingModalBottomDialog() {
             .subscribeBy(
                 onComplete = {
                     analytics.logEvent(WalletAnalytics.ChangeDefault)
-//                    updateReceiveAddressShortcuts()
+                    //                    updateReceiveAddressShortcuts()
                 },
                 onError = {
                     showError(R.string.remote_save_failed)
@@ -192,30 +195,30 @@ class AccountEditSheet : SlidingModalBottomDialog() {
     }
 
     private fun configureShowXpub(account: CryptoNonCustodialAccount) {
-        with(dialogView.xpub_container) {
+        with(binding) {
             if (account.isInternalAccount) {
-                tv_xpub.setText(R.string.extended_public_key)
-                tv_xpub_description.visible()
+                tvXpub.setText(R.string.extended_public_key)
+                tvXpubDescription.visible()
 
                 if (account.asset == CryptoCurrency.BCH) {
-                    tv_xpub_description.setText(R.string.extended_public_key_description_bch_only)
+                    tvXpubDescription.setText(R.string.extended_public_key_description_bch_only)
                 } else {
-                    tv_xpub_description.setText(R.string.extended_public_key_description)
+                    tvXpubDescription.setText(R.string.extended_public_key_description)
                 }
             } else {
-                tv_xpub.setText(R.string.address)
-                tv_xpub_description.gone()
+                tvXpub.setText(R.string.address)
+                tvXpubDescription.gone()
             }
 
             if (account.isArchived) {
-                alpha =
+                xpubContainer.alpha =
                     DISABLED_ALPHA
-                isClickable = false
-                setOnClickListener { }
+                xpubContainer.isClickable = false
+                xpubContainer.setOnClickListener { }
             } else {
-                alpha = ENABLED_ALPHA
-                isClickable = true
-                setOnClickListener { handleShowXpub(account) }
+                xpubContainer.alpha = ENABLED_ALPHA
+                xpubContainer.isClickable = true
+                xpubContainer.setOnClickListener { handleShowXpub(account) }
             }
         }
     }
@@ -265,7 +268,8 @@ class AccountEditSheet : SlidingModalBottomDialog() {
 
     private fun generateQrCode(qrString: String) =
         try {
-            QRCodeEncoder(qrString,
+            QRCodeEncoder(
+                qrString,
                 QR_CODE_DIMENSION
             ).encodeAsBitmap()
         } catch (e: WriterException) {
@@ -275,9 +279,10 @@ class AccountEditSheet : SlidingModalBottomDialog() {
 
     private fun configureArchive(account: CryptoNonCustodialAccount) {
         if (account.isArchived) {
-            with(dialogView.archive_container) {
-                tv_archive_header.setText(R.string.unarchive)
-                tv_archive_description.setText(R.string.archived_description)
+
+            binding.tvArchiveHeader.setText(R.string.unarchive)
+            binding.tvArchiveDescription.setText(R.string.archived_description)
+            with(binding.archiveContainer) {
                 alpha = ENABLED_ALPHA
                 visibility = View.VISIBLE
                 isClickable = true
@@ -285,9 +290,9 @@ class AccountEditSheet : SlidingModalBottomDialog() {
             }
         } else {
             if (account.isDefault) {
-                with(dialogView.archive_container) {
-                    tv_archive_header.setText(R.string.archive)
-                    tv_archive_description.setText(R.string.default_account_description)
+                binding.tvArchiveHeader.setText(R.string.archive)
+                binding.tvArchiveDescription.setText(R.string.default_account_description)
+                with(binding.archiveContainer) {
                     alpha =
                         DISABLED_ALPHA
                     visibility = View.VISIBLE
@@ -295,9 +300,10 @@ class AccountEditSheet : SlidingModalBottomDialog() {
                     setOnClickListener { /* not clickable */ }
                 }
             } else {
-                with(dialogView.archive_container) {
-                    tv_archive_header.setText(R.string.archive)
-                    tv_archive_description.setText(R.string.not_archived_description)
+
+                binding.tvArchiveHeader.setText(R.string.archive)
+                binding.tvArchiveDescription.setText(R.string.not_archived_description)
+                with(binding.archiveContainer) {
                     alpha =
                         ENABLED_ALPHA
                     visibility = View.VISIBLE
@@ -324,17 +330,17 @@ class AccountEditSheet : SlidingModalBottomDialog() {
         } else {
             account.archive()
         }.observeOn(AndroidSchedulers.mainThread())
-        .showProgress()
-        .updateUi(account)
-        .subscribeBy(
-            onError = { showError(R.string.remote_save_failed) },
-            onComplete = {
-                if (!account.isArchived)
-                    analytics.logEvent(WalletAnalytics.UnArchiveWallet)
-                else
-                    analytics.logEvent(WalletAnalytics.ArchiveWallet)
-            }
-        )
+            .showProgress()
+            .updateUi(account)
+            .subscribeBy(
+                onError = { showError(R.string.remote_save_failed) },
+                onComplete = {
+                    if (!account.isArchived)
+                        analytics.logEvent(WalletAnalytics.UnArchiveWallet)
+                    else
+                        analytics.logEvent(WalletAnalytics.ArchiveWallet)
+                }
+            )
     }
 
     companion object {
@@ -381,5 +387,5 @@ class AccountEditSheet : SlidingModalBottomDialog() {
 
 private val CryptoNonCustodialAccount.isInternalAccount: Boolean
     get() = (this as? BtcCryptoWalletAccount)?.isHDAccount
-            ?: (this as? BchCryptoWalletAccount)?.let { true }
-            ?: throw java.lang.IllegalStateException("Unexpected asset type")
+        ?: (this as? BchCryptoWalletAccount)?.let { true }
+        ?: throw java.lang.IllegalStateException("Unexpected asset type")

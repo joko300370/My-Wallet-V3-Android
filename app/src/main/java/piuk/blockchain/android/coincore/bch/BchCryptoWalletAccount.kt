@@ -40,7 +40,7 @@ internal class BchCryptoWalletAccount private constructor(
     private val walletPreferences: WalletStatus,
     private val custodialWalletManager: CustodialWalletManager,
     private val refreshTrigger: AccountRefreshTrigger
-) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BCH) {
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BCH, custodialWalletManager) {
 
     private val hasFunds = AtomicBoolean(false)
 
@@ -84,15 +84,15 @@ internal class BchCryptoWalletAccount private constructor(
             transactionFetchCount,
             transactionFetchOffset
         ).onErrorReturn { emptyList() }
-        .mapList {
-            BchActivitySummaryItem(
-                it,
-                exchangeRates,
-                account = this
-            )
-        }.flatMap {
-            appendTradeActivity(custodialWalletManager, asset, it)
-        }.doOnSuccess { setHasTransactions(it.isNotEmpty()) }
+            .mapList {
+                BchActivitySummaryItem(
+                    it,
+                    exchangeRates,
+                    account = this
+                )
+            }.flatMap {
+                appendTradeActivity(custodialWalletManager, asset, it)
+            }.doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 
     override fun createTxEngine(): TxEngine =
         BchOnChainTxEngine(

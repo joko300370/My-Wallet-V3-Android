@@ -1,7 +1,7 @@
 package info.blockchain.wallet.payload.data;
 
 import info.blockchain.api.data.UnspentOutputs;
-import info.blockchain.wallet.LegacyAddressHelper;
+import info.blockchain.wallet.ImportedAddressHelper;
 import info.blockchain.wallet.WalletApiMockedResponseTest;
 import info.blockchain.wallet.crypto.AESUtil;
 import info.blockchain.wallet.exceptions.DecryptionException;
@@ -86,7 +86,7 @@ public final class WalletTest extends WalletApiMockedResponseTest {
         assertNotNull(wallet.getHdWallets());
 
         //Keys parsing tested in KeysBodyTest
-        assertNotNull(wallet.getLegacyAddressList());
+        assertNotNull(wallet.getImportedAddressList());
 
         //AddressBook parsing tested in AddressBookTest
         assertNotNull(wallet.getAddressBook());
@@ -105,7 +105,7 @@ public final class WalletTest extends WalletApiMockedResponseTest {
         assertNotNull(wallet.getOptions());
 
         //Keys parsing tested in KeysBodyTest
-        assertNotNull(wallet.getLegacyAddressList());
+        assertNotNull(wallet.getImportedAddressList());
     }
 
     @Test
@@ -126,7 +126,7 @@ public final class WalletTest extends WalletApiMockedResponseTest {
         assertEquals(10, wallet.getOptions().getPbkdf2Iterations());
 
         //Keys parsing tested in KeysBodyTest
-        assertNotNull(wallet.getLegacyAddressList());
+        assertNotNull(wallet.getImportedAddressList());
     }
 
     @Test
@@ -217,12 +217,12 @@ public final class WalletTest extends WalletApiMockedResponseTest {
 
         Wallet wallet = givenWalletFromResouce("wallet_body_6.txt");
 
-        assertEquals(0, wallet.getLegacyAddressList().size());
+        assertEquals(0, wallet.getImportedAddressList().size());
         mockInterceptor.setResponseString("cb600366ef7a94b991aa04557fc1d9c272ba00df6b1d9791d71c66efa0ae7fe9");
-        wallet.addLegacyAddress(LegacyAddressHelper.getLegacyAddress(), null);
-        assertEquals(1, wallet.getLegacyAddressList().size());
+        wallet.addImportedAddress(ImportedAddressHelper.getImportedAddress(), null);
+        assertEquals(1, wallet.getImportedAddressList().size());
 
-        LegacyAddress address = wallet.getLegacyAddressList().get(wallet.getLegacyAddressList().size() - 1);
+        ImportedAddress address = wallet.getImportedAddressList().get(wallet.getImportedAddressList().size() - 1);
 
         assertNotNull(address.getPrivateKey());
         assertNotNull(address.getAddress());
@@ -236,12 +236,12 @@ public final class WalletTest extends WalletApiMockedResponseTest {
 
         Wallet wallet = givenWalletFromResouce("wallet_body_1.txt");
 
-        assertEquals(19, wallet.getLegacyAddressList().size());
+        assertEquals(19, wallet.getImportedAddressList().size());
         mockInterceptor.setResponseString("cb600366ef7a94b991aa04557fc1d9c272ba00df6b1d9791d71c66efa0ae7fe9");
-        wallet.addLegacyAddress(LegacyAddressHelper.getLegacyAddress(), "hello");
-        assertEquals(20, wallet.getLegacyAddressList().size());
+        wallet.addImportedAddress(ImportedAddressHelper.getImportedAddress(), "hello");
+        assertEquals(20, wallet.getImportedAddressList().size());
 
-        LegacyAddress address = wallet.getLegacyAddressList().get(wallet.getLegacyAddressList().size() - 1);
+        ImportedAddress address = wallet.getImportedAddressList().get(wallet.getImportedAddressList().size() - 1);
 
         assertNotNull(address.getPrivateKey());
         assertNotNull(address.getAddress());
@@ -257,13 +257,13 @@ public final class WalletTest extends WalletApiMockedResponseTest {
         Wallet wallet = givenWalletFromResouce("wallet_body_6.txt");
 
         mockInterceptor.setResponseString("cb600366ef7a94b991aa04557fc1d9c272ba00df6b1d9791d71c66efa0ae7fe9");
-        wallet.addLegacyAddress(LegacyAddressHelper.getLegacyAddress(), null);
+        wallet.addImportedAddress(ImportedAddressHelper.getImportedAddress(), null);
 
-        LegacyAddress address = wallet.getLegacyAddressList().get(wallet.getLegacyAddressList().size() - 1);
+        ImportedAddress address = wallet.getImportedAddressList().get(wallet.getImportedAddressList().size() - 1);
 
         ECKey ecKey = DeterministicKey.fromPrivate(Base58.decode(address.getPrivateKey()));
 
-        wallet.setKeyForLegacyAddress(ecKey, null);
+        wallet.setKeyForImportedAddress(ecKey, null);
     }
 
     @Test(expected = NoSuchAddressException.class)
@@ -273,13 +273,13 @@ public final class WalletTest extends WalletApiMockedResponseTest {
         Wallet wallet = givenWalletFromResouce("wallet_body_6.txt");
 
         mockInterceptor.setResponseString("cb600366ef7a94b991aa04557fc1d9c272ba00df6b1d9791d71c66efa0ae7fe9");
-        wallet.addLegacyAddress(LegacyAddressHelper.getLegacyAddress(), null);
+        wallet.addImportedAddress(ImportedAddressHelper.getImportedAddress(), null);
 
-        LegacyAddress address = wallet.getLegacyAddressList().get(wallet.getLegacyAddressList().size() - 1);
+        ImportedAddress address = wallet.getImportedAddressList().get(wallet.getImportedAddressList().size() - 1);
 
         //Try to set address key with ECKey not found in available addresses.
         ECKey ecKey = new ECKey();
-        wallet.setKeyForLegacyAddress(ecKey, null);
+        wallet.setKeyForImportedAddress(ecKey, null);
     }
 
     @Test
@@ -289,9 +289,9 @@ public final class WalletTest extends WalletApiMockedResponseTest {
         Wallet wallet = givenWalletFromResouce("wallet_body_1.txt");
 
         mockInterceptor.setResponseString("cb600366ef7a94b991aa04557fc1d9c272ba00df6b1d9791d71c66efa0ae7fe9");
-        wallet.addLegacyAddress(LegacyAddressHelper.getLegacyAddress(), "hello");
+        wallet.addImportedAddress(ImportedAddressHelper.getImportedAddress(), "hello");
 
-        LegacyAddress address = wallet.getLegacyAddressList().get(wallet.getLegacyAddressList().size() - 1);
+        ImportedAddress address = wallet.getImportedAddressList().get(wallet.getImportedAddressList().size() - 1);
 
         final String decryptedOriginalPrivateKey = AESUtil
                 .decrypt(address.getPrivateKey(), wallet.getSharedKey() + "hello",
@@ -304,10 +304,10 @@ public final class WalletTest extends WalletApiMockedResponseTest {
         ECKey ecKey = DeterministicKey.fromPrivate(Base58.decode(decryptedOriginalPrivateKey));
 
         //Set private key
-        wallet.setKeyForLegacyAddress(ecKey, "hello");
+        wallet.setKeyForImportedAddress(ecKey, "hello");
 
         //Get new set key
-        address = wallet.getLegacyAddressList().get(wallet.getLegacyAddressList().size() - 1);
+        address = wallet.getImportedAddressList().get(wallet.getImportedAddressList().size() - 1);
         String decryptedSetPrivateKey = AESUtil
                 .decrypt(address.getPrivateKey(), wallet.getSharedKey() + "hello",
                         wallet.getOptions().getPbkdf2Iterations());
@@ -323,9 +323,9 @@ public final class WalletTest extends WalletApiMockedResponseTest {
         Wallet wallet = givenWalletFromResouce("wallet_body_1.txt");
 
         mockInterceptor.setResponseString("cb600366ef7a94b991aa04557fc1d9c272ba00df6b1d9791d71c66efa0ae7fe9");
-        wallet.addLegacyAddress(LegacyAddressHelper.getLegacyAddress(), "hello");
+        wallet.addImportedAddress(ImportedAddressHelper.getImportedAddress(), "hello");
 
-        LegacyAddress address = wallet.getLegacyAddressList().get(wallet.getLegacyAddressList().size() - 1);
+        ImportedAddress address = wallet.getImportedAddressList().get(wallet.getImportedAddressList().size() - 1);
 
         final String decryptedOriginalPrivateKey = AESUtil
                 .decrypt(address.getPrivateKey(), wallet.getSharedKey() + "hello",
@@ -338,7 +338,7 @@ public final class WalletTest extends WalletApiMockedResponseTest {
         ECKey ecKey = DeterministicKey.fromPrivate(Base58.decode(decryptedOriginalPrivateKey));
 
         //Set private key
-        wallet.setKeyForLegacyAddress(ecKey, "bogus");
+        wallet.setKeyForImportedAddress(ecKey, "bogus");
     }
 
     @Test

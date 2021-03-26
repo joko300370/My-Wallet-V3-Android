@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="StatusPill">
+        <attr name="status_type" format="flags">
+            <flag name="upsell" value="0" />
+            <flag name="warning" value="1" />
+            <flag name="info" value="2" />
+            <flag name="error" value="3" />
+            <flag name="label" value="4" />
+        </attr>
+    </declare-styleable>
+</resources>

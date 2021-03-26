@@ -17,6 +17,7 @@ import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.NetworkParameters
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxResult
@@ -62,25 +63,29 @@ class BchOnChainTxEngine(
     override fun assertInputsValid() {
         check(txTarget is CryptoAddress)
         check((txTarget as CryptoAddress).asset == CryptoCurrency.BCH)
-        check(asset == CryptoCurrency.BCH)
+        check(sourceAsset == CryptoCurrency.BCH)
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
         Single.just(
             PendingTx(
-                amount = CryptoValue.zero(CryptoCurrency.BCH),
-                totalBalance = CryptoValue.zero(CryptoCurrency.BCH),
-                availableBalance = CryptoValue.zero(CryptoCurrency.BCH),
-                fees = CryptoValue.zero(CryptoCurrency.BCH),
-                feeLevel = FeeLevel.Regular,
-                availableFeeLevels = AVAILABLE_FEE_LEVELS,
+                amount = CryptoValue.zero(sourceAsset),
+                totalBalance = CryptoValue.zero(sourceAsset),
+                availableBalance = CryptoValue.zero(sourceAsset),
+                feeForFullAvailable = CryptoValue.zero(sourceAsset),
+                feeAmount = CryptoValue.zero(sourceAsset),
+                feeSelection = FeeSelection(
+                    selectedLevel = FeeLevel.Regular,
+                    availableLevels = AVAILABLE_FEE_LEVELS,
+                    asset = sourceAsset
+                ),
                 selectedFiat = userFiat
             )
         )
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
         require(amount is CryptoValue)
-        require(amount.currency == CryptoCurrency.BCH)
+        require(amount.currency == sourceAsset)
 
         return Singles.zip(
             sourceAccount.accountBalance.map { it as CryptoValue },
@@ -96,7 +101,7 @@ class BchOnChainTxEngine(
     }
 
     private fun getUnspentApiResponse(address: String): Single<UnspentOutputs> =
-        if (bchDataManager.getAddressBalance(address) > CryptoValue.zero(asset)) {
+        if (bchDataManager.getAddressBalance(address) > CryptoValue.zero(sourceAsset)) {
             sendDataManager.getUnspentBchOutputs(address)
                 // If we get here, we should have balance and valid UTXOs. IF we don't, then, um... we'd best fail hard
                 .map { utxo ->
@@ -118,8 +123,8 @@ class BchOnChainTxEngine(
         feePerKb: CryptoValue,
         coins: UnspentOutputs
     ): PendingTx {
-        val maxAvailable = sendDataManager.getMaximumAvailable(
-            cryptoCurrency = CryptoCurrency.BCH,
+        val available = sendDataManager.getMaximumAvailable(
+            cryptoCurrency = sourceAsset,
             unspentCoins = coins,
             feePerKb = feePerKb
         )
@@ -133,8 +138,9 @@ class BchOnChainTxEngine(
         return pendingTx.copy(
             amount = amount,
             totalBalance = balance,
-            availableBalance = maxAvailable,
-            fees = CryptoValue.fromMinor(CryptoCurrency.BCH, unspentOutputs.absoluteFee),
+            availableBalance = available.maxSpendable,
+            feeForFullAvailable = available.forForMax,
+            feeAmount = CryptoValue.fromMinor(sourceAsset, unspentOutputs.absoluteFee),
             engineState = pendingTx.engineState.copyAndPut(STATE_UTXO, unspentOutputs)
         )
     }
@@ -142,14 +148,14 @@ class BchOnChainTxEngine(
     private fun getDynamicFeePerKb(pendingTx: PendingTx): Single<CryptoValue> =
         feeManager.bchFeeOptions
             .map { feeOptions ->
-                check(pendingTx.feeLevel == FeeLevel.Regular) {
-                    "Fee level ${pendingTx.feeLevel} is not supported by BCH"
+                check(pendingTx.feeSelection.selectedLevel == FeeLevel.Regular) {
+                    "Fee level ${pendingTx.feeSelection.selectedLevel} is not supported by BCH"
                 }
                 feeToCrypto(feeOptions.regularFee)
             }.singleOrError()
 
     private fun feeToCrypto(feePerKb: Long): CryptoValue =
-        CryptoValue.fromMinor(CryptoCurrency.BCH, (feePerKb * 1000).toBigInteger())
+        CryptoValue.fromMinor(sourceAsset, (feePerKb * 1000).toBigInteger())
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         validateAmounts(pendingTx)
@@ -183,8 +189,8 @@ class BchOnChainTxEngine(
                     makeFeeSelectionOption(pendingTx),
                     TxConfirmationValue.FeedTotal(
                         amount = pendingTx.amount,
-                        fee = pendingTx.fees,
-                        exchangeFee = pendingTx.fees.toFiat(exchangeRates, userFiat),
+                        fee = pendingTx.feeAmount,
+                        exchangeFee = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
                         exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
                     )
                 )
@@ -194,10 +200,10 @@ class BchOnChainTxEngine(
     override fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
         TxConfirmationValue.FeeSelection(
             feeDetails = getFeeState(pendingTx),
-            exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
-            selectedLevel = pendingTx.feeLevel,
+            exchange = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+            selectedLevel = pendingTx.feeSelection.selectedLevel,
             availableLevels = AVAILABLE_FEE_LEVELS,
-            asset = sourceAccount.asset
+            asset = sourceAsset
         )
 
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =
@@ -225,7 +231,7 @@ class BchOnChainTxEngine(
                 keys,
                 getFullBitcoinCashAddressFormat(bchTarget.address),
                 changeAddress,
-                pendingTx.fees.toBigInteger(),
+                pendingTx.feeAmount.toBigInteger(),
                 pendingTx.amount.toBigInteger()
             ).singleOrError()
         }.doOnSuccess {
@@ -301,4 +307,4 @@ class BchOnChainTxEngine(
 }
 
 private val PendingTx.totalSent: Money
-    get() = amount + fees
+    get() = amount + feeAmount

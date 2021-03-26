@@ -1,16 +1,16 @@
 package piuk.blockchain.android.ui.customviews.account
 
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.annotation.StringRes
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.activityShown
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.dialog_sheet_account_selector.*
-import kotlinx.android.synthetic.main.dialog_sheet_account_selector.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.databinding.DialogSheetAccountSelectorBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
@@ -18,7 +18,7 @@ import piuk.blockchain.android.util.visibleIf
 
 class AccountSelectSheet(
     override val host: Host
-) : SlidingModalBottomDialog() {
+) : SlidingModalBottomDialog<DialogSheetAccountSelectorBinding>() {
 
     interface SelectionHost : Host {
         fun onAccountSelected(account: BlockchainAccount)
@@ -28,8 +28,8 @@ class AccountSelectSheet(
         fun onAccountSelectorBack()
     }
 
-    override val layoutResource: Int
-        get() = R.layout.dialog_sheet_account_selector
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogSheetAccountSelectorBinding =
+        DialogSheetAccountSelectorBinding.inflate(inflater, container, false)
 
     private val coincore: Coincore by scopedInject()
     private val disposables = CompositeDisposable()
@@ -50,42 +50,43 @@ class AccountSelectSheet(
     }
 
     private fun doOnListLoaded(isEmpty: Boolean) {
-        dialogView.account_list_empty.visibleIf { isEmpty }
-        dialogView.progress.gone()
+        binding.accountListEmpty.visibleIf { isEmpty }
+        binding.progress.gone()
     }
 
     private fun doOnLoadError(it: Throwable) {
-        dialogView.progress.gone()
+        binding.progress.gone()
         dismiss()
     }
 
     private fun doOnListLoading() {
-        dialogView.progress.visible()
+        binding.progress.visible()
     }
 
-    override fun initControls(view: View) {
-        with(view) {
-            account_list.onAccountSelected = ::doOnAccountSelected
-            account_list.onListLoaded = ::doOnListLoaded
-            account_list.onLoadError = ::doOnLoadError
-            account_list.onListLoading = ::doOnListLoading
-            account_list_title.text = getString(sheetTitle)
-            account_list_subtitle.text = getString(sheetSubtitle)
-            account_list_subtitle.visibleIf { getString(sheetSubtitle).isNotEmpty() }
-
+    override fun initControls(binding: DialogSheetAccountSelectorBinding) {
+        with(binding) {
+            accountList.apply {
+                onAccountSelected = ::doOnAccountSelected
+                onListLoaded = ::doOnListLoaded
+                onLoadError = ::doOnLoadError
+                onListLoading = ::doOnListLoading
+            }
+            accountListTitle.text = getString(sheetTitle)
+            accountListSubtitle.text = getString(sheetSubtitle)
+            accountListSubtitle.visibleIf { getString(sheetSubtitle).isNotEmpty() }
+            }
             if (host is SelectAndBackHost) {
-                showBackArrow(view)
+                showBackArrow()
             } else {
-                view.account_list_back.gone()
+                binding.accountListBack.gone()
             }
 
-            account_list.initialise(accountList, statusDecorator)
+            binding.accountList.initialise(accountList, statusDecorator)
         }
-    }
 
-    private fun showBackArrow(view: View) {
-        view.account_list_back.visible()
-        view.account_list_back.setOnClickListener {
+    private fun showBackArrow() {
+        binding.accountListBack.visible()
+        binding.accountListBack.setOnClickListener {
             (host as SelectAndBackHost).onAccountSelectorBack()
         }
     }
