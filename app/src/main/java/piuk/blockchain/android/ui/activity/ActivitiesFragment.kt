@@ -170,7 +170,7 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
                 visible()
                 setImageResource(it)
                 setAssetIconColours(
-                    tintColor = assetResources.assetTint(currency),
+                    tintColor = R.color.white,
                     filterColor = assetResources.assetFilter(currency)
                 )
             }

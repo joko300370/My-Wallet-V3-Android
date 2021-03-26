@@ -94,7 +94,7 @@ class AssetDetailViewHolder(itemView: View, private val labels: DefaultLabels) :
                 AssetFilter.All -> asset_account_icon.gone()
             }
             asset_account_icon.setAssetIconColours(
-                tintColor = assetResources.assetTint(asset),
+                tintColor = R.color.white,
                 filterColor = assetResources.assetFilter(asset)
             )
 

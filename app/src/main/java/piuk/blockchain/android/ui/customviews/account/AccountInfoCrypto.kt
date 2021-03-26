@@ -87,7 +87,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
                 assetAccountIcon.apply {
                     visible()
                     setAssetIconColours(
-                        tintColor = assetResources.assetTint(account.asset),
+                        tintColor = R.color.white,
                         filterColor = assetResources.assetFilter(account.asset)
                     )
                     setImageResource(it)
