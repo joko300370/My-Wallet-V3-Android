@@ -9,19 +9,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import kotlinx.android.synthetic.main.item_announcement_standard.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.isVisible
 import piuk.blockchain.android.util.visible
 import android.graphics.drawable.GradientDrawable
+import android.view.LayoutInflater
 import com.blockchain.notifications.analytics.Analytics
-import kotlinx.android.synthetic.main.item_announcement_mini.view.*
-import kotlinx.android.synthetic.main.item_announcement_standard.view.icon
-import kotlinx.android.synthetic.main.item_announcement_standard.view.msg_body
-import kotlinx.android.synthetic.main.item_announcement_standard.view.msg_title
+import piuk.blockchain.android.databinding.ItemAnnouncementMiniBinding
+import piuk.blockchain.android.databinding.ItemAnnouncementStandardBinding
 
 class StdAnnouncementDelegate<in T>(private val analytics: Analytics) :
     AdapterDelegate<T> {
@@ -58,6 +55,10 @@ class StdAnnouncementDelegate<in T>(private val analytics: Analytics) :
 
             if (announcement.iconImage != 0) {
                 icon.setImageDrawable(ContextCompat.getDrawable(itemView.context, announcement.iconImage))
+                if (announcement.shouldWrapIconWidth) {
+                    // This is only used to display the vector_aave_yfi_dot_announcement icon in the correct size
+                    icon.layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT
+                }
                 icon.visible()
             } else {
                 icon.gone()
@@ -107,22 +108,23 @@ class StdAnnouncementDelegate<in T>(private val analytics: Analytics) :
         return item is StandardAnnouncementCard
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        AnnouncementViewHolder(
-            parent.inflate(R.layout.item_announcement_standard)
-        )
+    override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
 
-    private class AnnouncementViewHolder internal constructor(
-        itemView: View
-    ) : RecyclerView.ViewHolder(itemView) {
+        val binding = ItemAnnouncementStandardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return AnnouncementViewHolder(binding)
+    }
 
-        internal val container: View = itemView.card_container
-        internal val icon: ImageView = itemView.icon
-        internal val title: TextView = itemView.msg_title
-        internal val body: TextView = itemView.msg_body
-        internal val closeBtn: ImageView = itemView.btn_close
-        internal val ctaBtn: TextView = itemView.btn_cta1
-        internal val dismissBtn: TextView = itemView.btn_dismiss
+    private class AnnouncementViewHolder constructor(
+        binding: ItemAnnouncementStandardBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        val container: View = binding.cardContainer
+        val icon: ImageView = binding.icon
+        val title: TextView = binding.msgTitle
+        val body: TextView = binding.msgBody
+        val closeBtn: ImageView = binding.btnClose
+        val ctaBtn: TextView = binding.btnCta1
+        val dismissBtn: TextView = binding.btnDismiss
 
         fun paintButtons(@ColorRes btnColour: Int) {
             val colour = ContextCompat.getColor(ctaBtn.context, btnColour)
@@ -149,10 +151,10 @@ class MiniAnnouncementDelegate<in T>(private val analytics: Analytics) :
         return item is MiniAnnouncementCard
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        AnnouncementViewHolder(
-            parent.inflate(R.layout.item_announcement_mini)
-        )
+    override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
+        val binding = ItemAnnouncementMiniBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return AnnouncementViewHolder(binding)
+    }
 
     override fun onBindViewHolder(
         items: List<T>,
@@ -199,13 +201,13 @@ class MiniAnnouncementDelegate<in T>(private val analytics: Analytics) :
         analytics.logEvent(AnnouncementAnalyticsEvent.CardShown(announcement.name))
     }
 
-    private class AnnouncementViewHolder internal constructor(
-        itemView: View
-    ) : RecyclerView.ViewHolder(itemView) {
-        internal val icon: ImageView = itemView.icon
-        internal val title: TextView = itemView.msg_title
-        internal val body: TextView = itemView.msg_body
-        internal val cardContainer: View = itemView.mini_card_container
-        internal val actionIcon: ImageView = itemView.action_icon
+    private class AnnouncementViewHolder constructor(
+        binding: ItemAnnouncementMiniBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
+        val icon: ImageView = binding.icon
+        val title: TextView = binding.msgTitle
+        val body: TextView = binding.msgBody
+        val cardContainer: View = binding.miniCardContainer
+        val actionIcon: ImageView = binding.actionIcon
     }
 }

@@ -6,6 +6,7 @@ import com.blockchain.koin.payloadScopeQualifier
 import io.reactivex.android.schedulers.AndroidSchedulers
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import piuk.blockchain.android.ui.dashboard.announcements.rule.AaveYfiDotAvailableAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.BackupPhraseAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.BitpayAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.BuyBitcoinAnnouncement
@@ -15,11 +16,9 @@ import piuk.blockchain.android.ui.dashboard.announcements.rule.FiatFundsNoKycAnn
 import piuk.blockchain.android.ui.dashboard.announcements.rule.IncreaseLimitsAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.InterestAvailableAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.IntroTourAnnouncement
-import piuk.blockchain.android.ui.dashboard.announcements.rule.KycForAirdropsAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycIncompleteAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycMoreInfoAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycResubmissionAnnouncement
-import piuk.blockchain.android.ui.dashboard.announcements.rule.PitAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.RegisterFingerprintsAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.RegisteredForAirdropMiniAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SellIntroAnnouncement
@@ -84,14 +83,6 @@ val dashboardAnnouncementsModule = module {
             KycMoreInfoAnnouncement(
                 tierService = get(),
                 dismissRecorder = get()
-            )
-        }.bind(AnnouncementRule::class)
-
-        factory {
-            PitAnnouncement(
-                pitLink = get(),
-                dismissRecorder = get(),
-                analytics = get()
             )
         }.bind(AnnouncementRule::class)
 
@@ -170,13 +161,6 @@ val dashboardAnnouncementsModule = module {
         }.bind(AnnouncementRule::class)
 
         factory {
-            KycForAirdropsAnnouncement(
-                dismissRecorder = get(),
-                queries = get()
-            )
-        }.bind(AnnouncementRule::class)
-
-        factory {
             RegisteredForAirdropMiniAnnouncement(
                 dismissRecorder = get(),
                 queries = get()
@@ -246,6 +230,12 @@ val dashboardAnnouncementsModule = module {
             WDGLDAvailableAnnouncement(
                 dismissRecorder = get(),
                 dgldFeatureFlag = get(dgldFeatureFlag)
+            )
+        }.bind(AnnouncementRule::class)
+
+        factory {
+            AaveYfiDotAvailableAnnouncement(
+                dismissRecorder = get()
             )
         }.bind(AnnouncementRule::class)
     }

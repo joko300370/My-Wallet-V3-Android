@@ -784,11 +784,6 @@
     <string name="min_with_value">%1$s Min</string>
     <string name="max_with_value">%1$s Max</string>
 
-    <!-- Exchange announcement -->
-    <string name="the_exchange_announcement_title">Introducing the Exchange</string>
-    <string name="the_exchange_announcement_body">It’s time to Level Up to a better crypto exchange. Buy, sell, and trade more digital assets in the Blockchain.com Exchange.</string>
-    <string name="the_exchange_announcement_cta_text">Checkout the Exchange</string>
-
     <!-- The Pit linking -->
     <string name="the_exchange_slogan_kyc_promo">There’s a new way to trade. Link your Wallet for instant access.</string>
 
@@ -884,11 +879,6 @@
     <string name="register_fingerprint_card_body">Enable fingerprint to quickly log into your wallet instead of using your PIN.</string>
     <string name="register_fingerprint_card_cta">Enable Now</string>
 
-    <!-- Kyc for Airdrops announcement -->
-    <string name="kyc_airdrop_card_title">Want Free Crypto?</string>
-    <string name="kyc_airdrop_card_body">Verify your identity to participate in our Airdrop program and receive free crypto from future Airdrops.</string>
-    <string name="kyc_airdrop_card_cta">Start Verification</string>
-
     <!-- Sell announcement -->
     <string name="sell_announcement_title">Sell Your Crypto for Cash</string>
     <string name="sell_announcement_description">Sell directly from your Trading Wallets to your Cash Wallet.</string>
@@ -903,6 +893,11 @@
     <string name="wdgld_available_card_title">Trade wDGLD Now</string>
     <string name="wdgld_available_card_body">Wrapped Digital Gold (wDGLD) is an ERC-20 tokenized version of DGLD, combining a gold-backed token with the power and flexibility of Ethereum.</string>
     <string name="wdgld_available_card_cta">Trade wDGLD now</string>
+
+    <!-- AAVE/YFI/DOT announcement -->
+    <string name="aave_yfi_dot_available_card_title">Aave, YFI and DOT now available!</string>
+    <string name="aave_yfi_dot_available_card_body">Aave, YFI and Polkadot tokens are now available to Buy, Sell, Swap and Send in your Wallet.</string>
+    <string name="aave_yfi_dot_available_card_cta">Buy Now</string>
 
     <!-- Airdrop Status bottom sheet -->
     <string name="airdrop_received_sheet_heading">Airdrop</string>
