@@ -1,8 +1,11 @@
 package piuk.blockchain.android.coincore
 
+import com.blockchain.koin.aaveFeatureFlag
 import com.blockchain.koin.dgldFeatureFlag
+import com.blockchain.koin.dotFeatureFlag
 import com.blockchain.koin.payloadScope
 import com.blockchain.koin.payloadScopeQualifier
+import com.blockchain.koin.yfiFeatureFlag
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import piuk.blockchain.android.coincore.alg.AlgoAsset
@@ -223,7 +226,8 @@ val coincoreModule = module {
                 offlineAccounts = get(),
                 environmentConfig = get(),
                 walletPreferences = get(),
-                eligibilityProvider = get()
+                eligibilityProvider = get(),
+                aaveFeatureFlag = get(aaveFeatureFlag)
             )
         }.bind(CryptoAsset::class)
 
@@ -242,7 +246,8 @@ val coincoreModule = module {
                 offlineAccounts = get(),
                 environmentConfig = get(),
                 walletPreferences = get(),
-                eligibilityProvider = get()
+                eligibilityProvider = get(),
+                yfiFeatureFlag = get(yfiFeatureFlag)
             )
         }.bind(CryptoAsset::class)
 
@@ -258,7 +263,8 @@ val coincoreModule = module {
                 pitLinking = get(),
                 offlineAccounts = get(),
                 environmentConfig = get(),
-                eligibilityProvider = get()
+                eligibilityProvider = get(),
+                dotFeatureFlag = get(dotFeatureFlag)
             )
         }.bind(CryptoAsset::class)
 

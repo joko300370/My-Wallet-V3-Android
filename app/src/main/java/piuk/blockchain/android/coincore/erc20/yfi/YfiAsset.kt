@@ -5,8 +5,10 @@ import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligibilityProvider
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
+import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
+import io.reactivex.Completable
 import piuk.blockchain.android.coincore.erc20.Erc20TokensBase
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.thepit.PitLinking
@@ -16,6 +18,7 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import java.util.concurrent.atomic.AtomicBoolean
 
 internal class YfiAsset(
     payloadManager: PayloadDataManager,
@@ -31,7 +34,8 @@ internal class YfiAsset(
     environmentConfig: EnvironmentConfig,
     walletPreferences: WalletStatus,
     offlineAccounts: OfflineAccountUpdater,
-    eligibilityProvider: EligibilityProvider
+    eligibilityProvider: EligibilityProvider,
+    private val yfiFeatureFlag: FeatureFlag
 ) : Erc20TokensBase(
     CryptoCurrency.YFI,
     payloadManager,
@@ -48,4 +52,17 @@ internal class YfiAsset(
     environmentConfig,
     eligibilityProvider,
     offlineAccounts
-)
+) {
+    private val isYfiFeatureFlagEnabled = AtomicBoolean(false)
+
+    override fun initToken(): Completable {
+        return yfiFeatureFlag.enabled.doOnSuccess {
+            isYfiFeatureFlagEnabled.set(it)
+        }.flatMapCompletable {
+            super.initToken()
+        }
+    }
+
+    override val isEnabled: Boolean
+        get() = isYfiFeatureFlagEnabled.get()
+}

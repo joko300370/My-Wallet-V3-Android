@@ -4,6 +4,7 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligibilityProvider
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
@@ -19,6 +20,7 @@ import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import java.util.concurrent.atomic.AtomicBoolean
 
 internal class PolkadotAsset(
     payloadManager: PayloadDataManager,
@@ -31,7 +33,8 @@ internal class PolkadotAsset(
     crashLogger: CrashLogger,
     environmentConfig: EnvironmentConfig,
     private val eligibilityProvider: EligibilityProvider,
-    offlineAccounts: OfflineAccountUpdater
+    offlineAccounts: OfflineAccountUpdater,
+    private val dotFeatureFlag: FeatureFlag
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -49,8 +52,18 @@ internal class PolkadotAsset(
     override val asset: CryptoCurrency
         get() = CryptoCurrency.DOT
 
-    override fun initToken(): Completable =
-        Completable.complete()
+    private val isDotFeatureFlagEnabled = AtomicBoolean(false)
+
+    override val isEnabled: Boolean
+        get() = isDotFeatureFlagEnabled.get()
+
+    override fun initToken(): Completable {
+        return dotFeatureFlag.enabled.doOnSuccess {
+            isDotFeatureFlagEnabled.set(it)
+        }.flatMapCompletable {
+            Completable.complete()
+        }
+    }
 
     override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> =
         Single.just(emptyList())
