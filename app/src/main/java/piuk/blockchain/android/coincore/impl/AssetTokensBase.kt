@@ -66,7 +66,12 @@ internal abstract class CryptoAssetBase(
             list.map {
                 val cryptoNonCustodialAccount = it as? CryptoNonCustodialAccount
                 if (cryptoNonCustodialAccount?.labelNeedsUpdate() == true)
-                    cryptoNonCustodialAccount.updateLabel(labels.getDefaultNonCustodialWalletLabel(asset))
+                    cryptoNonCustodialAccount.updateLabel(
+                        cryptoNonCustodialAccount.label.replace(
+                            labels.getOldDefaultNonCustodialWalletLabel(asset),
+                            labels.getDefaultNonCustodialWalletLabel(asset)
+                        )
+                    )
                         .doOnError { error ->
                             crashLogger.logException(error)
                         }
@@ -101,8 +106,10 @@ internal abstract class CryptoAssetBase(
             crashLogger.logException(it, errorMsg)
         }
 
-    private fun CryptoNonCustodialAccount.labelNeedsUpdate(): Boolean =
-        label == labels.getOldDefaultNonCustodialWalletLabel(asset)
+    private fun CryptoNonCustodialAccount.labelNeedsUpdate(): Boolean {
+        val regex = """${labels.getOldDefaultNonCustodialWalletLabel(asset)}(\s?)([\d]*)""".toRegex()
+        return label.matches(regex)
+    }
 
     // Called when the set of account in use bu this asset changes. Update the offline
     // cache and the BE notification addresses here
