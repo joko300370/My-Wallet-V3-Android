@@ -19,13 +19,16 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.rxkotlin.zipWith
 import kotlinx.android.synthetic.main.fragment_interest_dashboard.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.visible
@@ -42,7 +45,8 @@ class InterestDashboardFragment : Fragment() {
 
     val host: InterestDashboardHost by lazy {
         activity as? InterestDashboardHost ?: throw IllegalStateException(
-            "Host fragment is not a InterestDashboardFragment.InterestDashboardHost")
+            "Host fragment is not a InterestDashboardFragment.InterestDashboardHost"
+        )
     }
 
     private val disposables = CompositeDisposable()
@@ -147,14 +151,18 @@ class InterestDashboardFragment : Fragment() {
             if (hasBalance) {
                 host.showInterestSummarySheet(interestAccount, cryptoCurrency)
             } else {
-                disposables += coincore[cryptoCurrency].accountGroup(AssetFilter.NonCustodial)
-                    .subscribe { ncg ->
-                        if (ncg.accounts.size > 1) {
-                            host.startAccountSelection(Single.just(ncg.accounts), interestAccount)
+                disposables += coincore[cryptoCurrency].accountGroup(AssetFilter.All)
+                    .map { group ->
+                        group.accounts.filter { account -> account is TradingAccount || account is NonCustodialAccount }
+                    }
+                    .subscribe { accounts ->
+                        /*if (accounts.size > 1) {
+                            host.startAccountSelection(Single.just(accounts), interestAccount)
                         } else {
-                            val defaultNonCustodial = ncg.accounts.first { acc -> acc.isDefault }
+                            val defaultNonCustodial = accounts.first { acc -> acc.isDefault }
                             host.startDepositFlow(defaultNonCustodial, interestAccount)
-                        }
+                        }*/
+                        host.startAccountSelection(Single.just(accounts), interestAccount)
                     }
             }
         }

@@ -32,6 +32,7 @@ import com.blockchain.nabu.models.responses.simplebuy.CardPartnerAttributes
 import com.blockchain.nabu.models.responses.simplebuy.ConfirmOrderRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
 import com.blockchain.nabu.models.responses.simplebuy.DepositRequestBody
+import com.blockchain.nabu.models.responses.simplebuy.ProductTransferRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyCurrency
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyEligibility
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyPairsResp
@@ -650,6 +651,14 @@ class NabuService(retrofit: Retrofit) {
     ) = service.startBankTransferPayment(
         authorization = sessionToken.authHeader,
         id = id,
+        body = body
+    ).wrapErrorMessage()
+
+    fun executeTransfer(
+        sessionToken: NabuSessionTokenResponse,
+        body: ProductTransferRequestBody
+    ) = service.executeTransfer(
+        authorization = sessionToken.authHeader,
         body = body
     ).wrapErrorMessage()
 

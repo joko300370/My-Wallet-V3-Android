@@ -48,6 +48,7 @@ import com.blockchain.nabu.models.responses.simplebuy.ConfirmOrderRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
 import com.blockchain.nabu.models.responses.simplebuy.DepositRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.FeesResponse
+import com.blockchain.nabu.models.responses.simplebuy.ProductTransferRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyAllBalancesResponse
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyBalanceResponse
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyCurrency
@@ -504,4 +505,10 @@ internal interface Nabu {
         @Path("id") id: String,
         @Body body: BankTransferPaymentBody
     ): Single<BankTransferPaymentResponse>
+
+    @POST(NABU_TRANSFER)
+    fun executeTransfer(
+        @Header("authorization") authorization: String,
+        @Body body: ProductTransferRequestBody
+    ): Completable
 }

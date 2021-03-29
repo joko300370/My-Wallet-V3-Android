@@ -39,9 +39,10 @@ import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.btc.BtcCryptoWalletAccount
 import piuk.blockchain.android.coincore.impl.CryptoInterestAccount
 import piuk.blockchain.android.coincore.impl.injectMocks
+import piuk.blockchain.android.coincore.impl.txEngine.interest.InterestDepositOnChainTxEngine
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
-class InterestDepositTxEngineTest {
+class InterestDepositOnChainTxEngineTest {
 
     @get:Rule
     val initSchedulers = rxInit {
@@ -59,7 +60,7 @@ class InterestDepositTxEngineTest {
 
     private val onChainEngine: OnChainTxEngineBase = mock()
 
-    private val subject = InterestDepositTxEngine(
+    private val subject = InterestDepositOnChainTxEngine(
         walletManager = walletManager,
         onChainEngine = onChainEngine
     )

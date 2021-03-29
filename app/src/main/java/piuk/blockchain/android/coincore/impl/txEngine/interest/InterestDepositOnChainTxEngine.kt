@@ -1,4 +1,4 @@
-package piuk.blockchain.android.coincore.impl.txEngine
+package piuk.blockchain.android.coincore.impl.txEngine.interest
 
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.Money
@@ -16,9 +16,10 @@ import piuk.blockchain.android.coincore.TxFee
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
+import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
-class InterestDepositTxEngine(
+class InterestDepositOnChainTxEngine(
     private val walletManager: CustodialWalletManager,
     private val onChainEngine: OnChainTxEngineBase
 ) : TxEngine() {

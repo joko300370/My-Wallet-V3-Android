@@ -50,3 +50,41 @@ val featureFlagsModule = module {
         get<RemoteConfig>().featureFlag("sdd_enabled")
     }
 }
+
+/*
+val localFeatureFlag = module {
+    LFeatureFlag.values().forEach { ff ->
+        factory(ff.qualifier()) {
+            PrefsLocalFeatureFlag(get(), false)
+        }.bind(FlaggedFeature::class)
+    }
+}
+
+class PrefsLocalFeatureFlag(private val persistance: LocalFeatureFlagPersistence,private val name:LFeatureFlag, private val defValue: Boolean) :
+    LocalFeatureFlag {
+    override fun isEnabled(): Boolean {
+        return persistance.enabled(defValue,name.toString())
+    }
+}
+
+interface LocalFeatureFlagPersistence {
+    fun enabled(defValue: Boolean, name: String): Boolean
+    fun update(defValue: Boolean, name: String): Boolean
+    fun (defValue: Boolean, name: String): Boolean
+}
+
+interface FlaggedFeature {
+    fun isEnabled(): Boolean
+}
+
+class PrefsFeatureFlagPers(private val prefs: PersistentPrefs) : LocalFeatureFlagPersistence {
+
+    override fun enabled(defValue: Boolean, name: String): Boolean = prefs.getValue(name, defValue)
+    override fun update(defValue: Boolean, name: String): Boolean = prefs.getValue(name, defValue)
+}
+
+enum class LFeatureFlag() {
+    OPEN_BANKING(false), ACH(false), SEGWIT(false);
+
+    fun qualifier(): StringQualifier = StringQualifier(this.toString())
+}*/

@@ -31,9 +31,9 @@ data class SimpleBuyQuoteResponse(
     val time: Date,
     val rate: Long,
     val rateWithoutFee: Long,
-/* the  fee value is more of a feeRate (ie it is the fee per 1 unit of crypto) to get the actual
- "fee" you'll need to multiply by amount of crypto
- */
+    /* the  fee value is more of a feeRate (ie it is the fee per 1 unit of crypto) to get the actual
+     "fee" you'll need to multiply by amount of crypto
+     */
     val fee: Long
 )
 
@@ -185,6 +185,13 @@ data class AddNewCardBodyRequest(private val currency: String, private val addre
 data class AddNewCardResponse(
     val id: String,
     val partner: Partner
+)
+
+class ProductTransferRequestBody(
+    val currency: String,
+    val amount: String,
+    val origin: String,
+    val destination: String,
 )
 
 data class ActivateCardResponse(
