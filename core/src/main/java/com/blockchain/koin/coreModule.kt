@@ -11,6 +11,7 @@ import com.blockchain.payload.PayloadDecrypt
 import com.blockchain.preferences.AuthPrefs
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.DashboardPrefs
+import com.blockchain.preferences.InternalFeatureFlagPrefs
 import com.blockchain.preferences.NotificationPrefs
 import com.blockchain.preferences.OfflineCachePrefs
 import com.blockchain.preferences.RatingPrefs
@@ -210,6 +211,7 @@ val coreModule = module {
         .bind(EncryptedPrefs::class)
         .bind(OfflineCachePrefs::class)
         .bind(AuthPrefs::class)
+        .bind(InternalFeatureFlagPrefs::class)
 
     factory { PaymentService(get(), get(), get()) }
 
