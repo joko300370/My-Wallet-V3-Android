@@ -1004,7 +1004,7 @@ class LiveCustodialWalletManager(
                     amount = amount.toBigInteger().toString(),
                     currency = amount.currencyCode,
                     origin = origin.name,
-                    destination = origin.name,
+                    destination = destination.name,
                 )
             )
         }
