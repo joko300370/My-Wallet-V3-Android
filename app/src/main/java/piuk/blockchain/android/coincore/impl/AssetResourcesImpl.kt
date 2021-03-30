@@ -52,7 +52,7 @@ internal class AssetResourcesImpl(val resources: Resources) : AssetResources {
                 CryptoCurrency.STX -> throw NotImplementedError("STX Not implemented")
                 CryptoCurrency.ALGO -> R.color.color_algo_logo
                 CryptoCurrency.USDT -> R.color.color_usdt_logo
-                CryptoCurrency.DGLD -> R.color.dgld_chart
+                CryptoCurrency.DGLD -> R.color.dgld
                 CryptoCurrency.AAVE -> R.color.aave
                 CryptoCurrency.YFI -> R.color.yfi
                 CryptoCurrency.DOT -> R.color.dot
@@ -169,7 +169,7 @@ internal class AssetResourcesImpl(val resources: Resources) : AssetResources {
             CryptoCurrency.XLM -> R.color.xlm
             CryptoCurrency.ALGO -> R.color.algo
             CryptoCurrency.USDT -> R.color.usdt
-            CryptoCurrency.DGLD -> R.color.black
+            CryptoCurrency.DGLD -> R.color.dgld
             CryptoCurrency.AAVE -> R.color.aave
             CryptoCurrency.YFI -> R.color.yfi
             CryptoCurrency.DOT -> R.color.dot

@@ -94,7 +94,7 @@ object Versions {
     const val sparkline = "1.2.0"
 
     // Third Party SDKs
-    const val veriff = "3.9.0"
+    const val veriff = "3.12.0"
     const val probity = "1.0.0"
     const val sift = "0.11.1"
     const val cardForm = "4.2.0"
