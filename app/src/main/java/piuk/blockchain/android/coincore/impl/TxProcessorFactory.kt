@@ -24,6 +24,7 @@ import piuk.blockchain.android.coincore.impl.txEngine.interest.InterestDepositOn
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.impl.txEngine.TradingToOnChainTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
+import piuk.blockchain.android.coincore.impl.txEngine.interest.InterestDepositTradingEngine
 import piuk.blockchain.android.coincore.impl.txEngine.sell.OnChainSellTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.sell.TradingSellTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.swap.OnChainSwapTxEngine
@@ -203,13 +204,24 @@ class TxProcessorFactory(
                     )
                 )
             )
+        is InterestAccount ->
+            Single.just(
+                TransactionProcessor(
+                    exchangeRates = exchangeRates,
+                    sourceAccount = source,
+                    txTarget = target,
+                    engine = InterestDepositTradingEngine(
+                        walletManager = walletManager
+                    )
+                )
+            )
         is TradingAccount ->
             Single.just(
                 TransactionProcessor(
                     exchangeRates = exchangeRates,
                     sourceAccount = source,
                     txTarget = target,
-                    engine = TradingToTradingSwapTxEngine(
+                    engine =  TradingToTradingSwapTxEngine(
                         walletManager = walletManager,
                         quotesEngine = quotesEngine,
                         kycTierService = kycTierService,
@@ -230,20 +242,6 @@ class TxProcessorFactory(
                 )
             }
         is FiatAccount ->
-            Single.just(
-                TransactionProcessor(
-                    exchangeRates = exchangeRates,
-                    sourceAccount = source,
-                    txTarget = target,
-                    engine = TradingSellTxEngine(
-                        walletManager = walletManager,
-                        quotesEngine = quotesEngine,
-                        kycTierService = kycTierService,
-                        environmentConfig = environmentConfig
-                    )
-                )
-            )
-        is InterestAccount ->
             Single.just(
                 TransactionProcessor(
                     exchangeRates = exchangeRates,
