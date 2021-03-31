@@ -78,7 +78,7 @@ internal class PolkadotAsset(
                     exchangeRates,
                     custodialManager,
                     environmentConfig,
-                    eligibilityProvider
+                    identity
                 )
             )
         )

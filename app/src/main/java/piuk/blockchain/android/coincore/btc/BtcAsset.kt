@@ -55,7 +55,7 @@ internal class BtcAsset(
     environmentConfig: EnvironmentConfig,
     private val walletPreferences: WalletStatus,
     offlineAccounts: OfflineAccountUpdater,
-    identity: UserIdentity
+    private val identity: UserIdentity
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -189,7 +189,8 @@ internal class BtcAsset(
             networkParameters = environmentConfig.bitcoinNetworkParameters,
             walletPreferences = walletPreferences,
             custodialWalletManager = custodialManager,
-            refreshTrigger = this
+            refreshTrigger = this,
+            identity = identity
         )
 
     private fun btcAccountFromImportedAccount(payloadAccount: ImportedAddress): BtcCryptoWalletAccount =
@@ -202,7 +203,8 @@ internal class BtcAsset(
             networkParameters = environmentConfig.bitcoinNetworkParameters,
             walletPreferences = walletPreferences,
             custodialWalletManager = custodialManager,
-            refreshTrigger = this
+            refreshTrigger = this,
+            identity = identity
         )
 
     companion object {
