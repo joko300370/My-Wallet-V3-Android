@@ -4,7 +4,7 @@ import com.blockchain.nabu.datamanagers.BuySellOrder
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialOrderState
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.Product
 import com.blockchain.nabu.datamanagers.TransferDirection
@@ -27,6 +27,8 @@ import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxSourceState
+import piuk.blockchain.android.identity.Feature
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
@@ -40,7 +42,7 @@ open class CustodialTradingAccount(
     val custodialWalletManager: CustodialWalletManager,
     val isNoteSupported: Boolean = false,
     private val environmentConfig: EnvironmentConfig,
-    private val eligibilityProvider: EligibilityProvider
+    private val identity: UserIdentity
 ) : CryptoAccountBase(), TradingAccount {
 
     private val hasFunds = AtomicBoolean(false)
@@ -137,18 +139,20 @@ open class CustodialTradingAccount(
             Singles.zip(
                 accountBalance.map { it.isPositive },
                 actionableBalance.map { it.isPositive },
-                eligibilityProvider.isEligibleForSimpleBuy(),
+                identity.isEligibleFor(Feature.SimpleBuy),
+                identity.isEligibleFor(Feature.Interest(asset)),
                 custodialWalletManager.getSupportedFundsFiats().onErrorReturn { emptyList() }
-            ) { hasFunds, hasActionableBalance, isEligibleForSimpleBuy, fiatAccounts ->
+            ) { hasFunds, hasActionableBalance, isEligibleForSimpleBuy, isEligibleForInterest, fiatAccounts ->
 
                 val activity = AssetAction.ViewActivity
                 val send = AssetAction.Send.takeIf { !isArchived && hasActionableBalance }
+                val interest = AssetAction.InterestDeposit.takeIf { !isArchived && isEligibleForInterest }
                 val swap = AssetAction.Swap.takeIf { !isArchived && hasFunds && isEligibleForSimpleBuy }
                 val sell = AssetAction.Sell.takeIf {
                     !isArchived && hasFunds && isEligibleForSimpleBuy && fiatAccounts.isNotEmpty()
                 }
                 setOfNotNull(
-                    activity, send, swap, sell
+                    activity, send, swap, sell, interest
                 )
             }
 

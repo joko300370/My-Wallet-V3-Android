@@ -7,7 +7,7 @@ import com.blockchain.preferences.WalletStatus
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.XlmFeesFetcher
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.wallet.DefaultLabels
 import org.amshove.kluent.mock
 import org.junit.Rule
@@ -42,7 +42,7 @@ class XlmAssetUriParseTest {
     private val crashLogger: CrashLogger = mock()
     private val environmentConfig: EnvironmentConfig = mock()
     private val walletPreferences: WalletStatus = mock()
-    private val eligibilityProvider: EligibilityProvider = mock()
+    private val eligibilityProvider: SimpleBuyEligibilityProvider = mock()
     private val offlineCache: OfflineAccountUpdater = mock()
 
     private val subject = XlmAsset(

@@ -2,7 +2,7 @@ package piuk.blockchain.android.ui.transactionflow.engine
 
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.nabu.datamanagers.repositories.swap.CustodialRepository
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.preferences.CurrencyPrefs
@@ -44,7 +44,7 @@ class TransactionInteractor(
     private val custodialRepository: CustodialRepository,
     private val custodialWalletManager: CustodialWalletManager,
     private val currencyPrefs: CurrencyPrefs,
-    private val eligibilityProvider: EligibilityProvider,
+    private val eligibilityProvider: SimpleBuyEligibilityProvider,
     private val accountsSorting: AccountsSorting,
     private val linkedBanksFactory: LinkedBanksFactory
 ) {

@@ -5,7 +5,7 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
@@ -32,7 +32,7 @@ internal class DgldAsset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     environmentConfig: EnvironmentConfig,
-    eligibilityProvider: EligibilityProvider,
+    eligibilityProvider: SimpleBuyEligibilityProvider,
     offlineAccounts: OfflineAccountUpdater,
     walletPreferences: WalletStatus,
     private val wDgldFeatureFlag: FeatureFlag

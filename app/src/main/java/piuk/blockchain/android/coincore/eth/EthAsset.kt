@@ -5,7 +5,7 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.util.FormatsUtil
@@ -43,7 +43,7 @@ internal class EthAsset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     environmentConfig: EnvironmentConfig,
-    eligibilityProvider: EligibilityProvider,
+    eligibilityProvider: SimpleBuyEligibilityProvider,
     offlineAccounts: OfflineAccountUpdater
 ) : CryptoAssetBase(
     payloadManager,

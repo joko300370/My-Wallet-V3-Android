@@ -2,7 +2,7 @@ package piuk.blockchain.android.coincore.erc20.yfi
 
 import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.remoteconfig.FeatureFlag
@@ -34,7 +34,7 @@ internal class YfiAsset(
     environmentConfig: EnvironmentConfig,
     walletPreferences: WalletStatus,
     offlineAccounts: OfflineAccountUpdater,
-    eligibilityProvider: EligibilityProvider,
+    eligibilityProvider: SimpleBuyEligibilityProvider,
     private val yfiFeatureFlag: FeatureFlag
 ) : Erc20TokensBase(
     CryptoCurrency.YFI,

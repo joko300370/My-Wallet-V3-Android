@@ -5,7 +5,7 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.wallet.DefaultLabels
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -57,7 +57,7 @@ class BtcAssetTest {
         on { bitcoinNetworkParameters } itReturns btcParams
     }
     private val walletPreferences: WalletStatus = mock()
-    private val eligibilityProvider: EligibilityProvider = mock()
+    private val eligibilityProvider: SimpleBuyEligibilityProvider = mock()
     private val offlineCache: OfflineAccountUpdater = mock()
 
     private val subject = BtcAsset(

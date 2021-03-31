@@ -6,7 +6,7 @@ import com.blockchain.nabu.Authenticator
 import com.blockchain.nabu.service.NabuService
 import io.reactivex.Single
 
-interface EligibilityProvider {
+interface SimpleBuyEligibilityProvider {
     val defCurrency: String
     fun isEligibleForSimpleBuy(currency: String = defCurrency, forceRefresh: Boolean = false): Single<Boolean>
 }
@@ -15,7 +15,7 @@ class NabuCachedEligibilityProvider(
     private val nabuService: NabuService,
     private val authenticator: Authenticator,
     private val currencyPrefs: CurrencyPrefs
-) : EligibilityProvider {
+) : SimpleBuyEligibilityProvider {
     override val defCurrency: String
         get() = currencyPrefs.selectedFiatCurrency
 
@@ -39,7 +39,7 @@ class NabuCachedEligibilityProvider(
     }
 }
 
-class MockedEligibilityProvider(private val isEligible: Boolean) : EligibilityProvider {
+class MockedEligibilityProvider(private val isEligible: Boolean) : SimpleBuyEligibilityProvider {
     override val defCurrency: String
         get() = ""
 

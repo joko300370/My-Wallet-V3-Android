@@ -3,7 +3,7 @@ package piuk.blockchain.android.coincore.impl
 import androidx.annotation.VisibleForTesting
 import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
@@ -48,7 +48,7 @@ internal abstract class CryptoAssetBase(
     private val pitLinking: PitLinking,
     protected val crashLogger: CrashLogger,
     protected val environmentConfig: EnvironmentConfig,
-    private val eligibilityProvider: EligibilityProvider,
+    private val eligibilityProvider: SimpleBuyEligibilityProvider,
     protected val offlineAccounts: OfflineAccountUpdater
 ) : CryptoAsset, AccountRefreshTrigger {
 

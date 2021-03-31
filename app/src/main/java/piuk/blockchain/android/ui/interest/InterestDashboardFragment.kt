@@ -156,12 +156,6 @@ class InterestDashboardFragment : Fragment() {
                         group.accounts.filter { account -> account is TradingAccount || account is NonCustodialAccount }
                     }
                     .subscribe { accounts ->
-                        /*if (accounts.size > 1) {
-                            host.startAccountSelection(Single.just(accounts), interestAccount)
-                        } else {
-                            val defaultNonCustodial = accounts.first { acc -> acc.isDefault }
-                            host.startDepositFlow(defaultNonCustodial, interestAccount)
-                        }*/
                         host.startAccountSelection(Single.just(accounts), interestAccount)
                     }
             }

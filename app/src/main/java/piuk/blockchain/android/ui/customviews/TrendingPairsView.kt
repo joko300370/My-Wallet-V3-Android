@@ -8,7 +8,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
@@ -97,7 +97,7 @@ interface TrendingPairsProvider {
 
 class SwapTrendingPairsProvider(
     private val coincore: Coincore,
-    private val eligibilityProvider: EligibilityProvider
+    private val eligibilityProvider: SimpleBuyEligibilityProvider
 ) : TrendingPairsProvider {
 
     override fun getTrendingPairs(): Single<List<TrendingPair>> =

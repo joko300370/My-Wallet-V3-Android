@@ -241,6 +241,11 @@ class TransactionFlowIntentMapper(
                 target,
                 passwordRequired
             )
+            target.isDefinedTarget() -> TransactionIntent.InitialiseWithTargetAndNoSource(
+                action = action,
+                target = target,
+                passwordRequired = passwordRequired
+            )
             else -> throw IllegalStateException(
                 "Calling interest deposit without source and target is not supported"
             )

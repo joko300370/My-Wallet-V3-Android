@@ -2,7 +2,7 @@ package piuk.blockchain.android.coincore.dot
 
 import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.wallet.DefaultLabels
@@ -32,7 +32,7 @@ internal class PolkadotAsset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     environmentConfig: EnvironmentConfig,
-    private val eligibilityProvider: EligibilityProvider,
+    private val eligibilityProvider: SimpleBuyEligibilityProvider,
     offlineAccounts: OfflineAccountUpdater,
     private val dotFeatureFlag: FeatureFlag
 ) : CryptoAssetBase(

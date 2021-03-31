@@ -2,7 +2,7 @@ package piuk.blockchain.android.sell
 
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.nabu.service.TierService
@@ -25,7 +25,7 @@ class BuySellFlowNavigatorTest {
     private val currencyPrefs: CurrencyPrefs = mock()
     private val custodialWalletManager: CustodialWalletManager = mock()
     private val tierService: TierService = mock()
-    private val eligibilityProvider: EligibilityProvider = mock()
+    private val eligibilityProvider: SimpleBuyEligibilityProvider = mock()
     private lateinit var subject: BuySellFlowNavigator
 
     @Before
