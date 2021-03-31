@@ -98,7 +98,7 @@ open class Erc20OnChainTxEngine(
         )
 
     private fun feeOptions(): Single<FeeOptions> =
-        feeManager.ethFeeOptions.singleOrError()
+        feeManager.getErc20FeeOptions(ethDataManager.erc20ContractAddress(sourceAsset)).singleOrError()
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
         require(amount is CryptoValue)

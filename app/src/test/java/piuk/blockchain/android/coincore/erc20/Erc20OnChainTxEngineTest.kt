@@ -18,6 +18,7 @@ import info.blockchain.wallet.api.data.FeeLimits
 import info.blockchain.wallet.api.data.FeeOptions
 import io.reactivex.Observable
 import io.reactivex.Single
+import org.amshove.kluent.any
 import org.amshove.kluent.itReturns
 import org.amshove.kluent.mock
 import org.junit.After
@@ -48,11 +49,13 @@ import piuk.blockchain.androidcore.data.fees.FeeDataManager
         computationTrampoline()
     }
 
-    private val ethDataManager: EthDataManager = mock()
+    private val ethDataManager: EthDataManager = mock {
+        on { erc20ContractAddress(any()) } itReturns ""
+    }
     private val ethFeeOptions: FeeOptions = mock()
 
     private val feeManager: FeeDataManager = mock {
-        on { ethFeeOptions } itReturns Observable.just(ethFeeOptions)
+        on { getErc20FeeOptions(any()) } itReturns Observable.just(ethFeeOptions)
     }
     private val walletPreferences: WalletStatus = mock {
         on { getFeeTypeForAsset(ASSET) } itReturns FeeLevel.Regular.ordinal
@@ -259,7 +262,8 @@ import piuk.blockchain.androidcore.data.fees.FeeDataManager
         verify(sourceAccount, atLeastOnce()).asset
         verify(sourceAccount).accountBalance
         verify(sourceAccount).actionableBalance
-        verify(feeManager).ethFeeOptions
+        verify(ethDataManager).erc20ContractAddress(any())
+        verify(feeManager).getErc20FeeOptions(any())
         verify(ethFeeOptions).gasLimitContract
         verify(ethFeeOptions).regularFee
 
@@ -321,7 +325,8 @@ import piuk.blockchain.androidcore.data.fees.FeeDataManager
         verify(sourceAccount, atLeastOnce()).asset
         verify(sourceAccount).accountBalance
         verify(sourceAccount).actionableBalance
-        verify(feeManager).ethFeeOptions
+        verify(ethDataManager).erc20ContractAddress(any())
+        verify(feeManager).getErc20FeeOptions(any())
         verify(ethFeeOptions).gasLimitContract
         verify(ethFeeOptions).priorityFee
 
@@ -388,7 +393,8 @@ import piuk.blockchain.androidcore.data.fees.FeeDataManager
         verify(sourceAccount, atLeastOnce()).asset
         verify(sourceAccount).accountBalance
         verify(sourceAccount).actionableBalance
-        verify(feeManager).ethFeeOptions
+        verify(ethDataManager).erc20ContractAddress(any())
+        verify(feeManager).getErc20FeeOptions(any())
         verify(ethFeeOptions).gasLimitContract
         verify(ethFeeOptions).priorityFee
         verify(walletPreferences).setFeeTypeForAsset(ASSET, FeeLevel.Priority.ordinal)
