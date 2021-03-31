@@ -43,7 +43,7 @@ val coincoreModule = module {
                 pitLinking = get(),
                 labels = get(),
                 environmentConfig = get(),
-                eligibilityProvider = get(),
+                identity = get(),
                 offlineAccounts = get()
             )
         }.bind(CryptoAsset::class)
@@ -62,7 +62,7 @@ val coincoreModule = module {
                 crashLogger = get(),
                 labels = get(),
                 walletPreferences = get(),
-                eligibilityProvider = get(),
+                identity = get(),
                 offlineAccounts = get(),
                 coinsWebsocket = get()
             )
@@ -84,7 +84,7 @@ val coincoreModule = module {
                 labels = get(),
                 walletPreferences = get(),
                 offlineAccounts = get(),
-                eligibilityProvider = get()
+                identity = get()
             )
         }.bind(CryptoAsset::class)
 
@@ -104,7 +104,7 @@ val coincoreModule = module {
                 environmentConfig = get(),
                 walletPreferences = get(),
                 offlineAccounts = get(),
-                eligibilityProvider = get()
+                identity = get()
             )
         }.bind(CryptoAsset::class)
 
@@ -123,7 +123,7 @@ val coincoreModule = module {
                 labels = get(),
                 offlineAccounts = get(),
                 environmentConfig = get(),
-                eligibilityProvider = get()
+                identity = get()
             )
         }.bind(CryptoAsset::class)
 
@@ -142,7 +142,7 @@ val coincoreModule = module {
                 offlineAccounts = get(),
                 environmentConfig = get(),
                 walletPreferences = get(),
-                eligibilityProvider = get()
+                identity = get()
             )
         }.bind(CryptoAsset::class)
 
@@ -157,7 +157,7 @@ val coincoreModule = module {
                 crashLogger = get(),
                 labels = get(),
                 environmentConfig = get(),
-                eligibilityProvider = get(),
+                identity = get(),
                 offlineAccounts = get()
             )
         }.bind(CryptoAsset::class)
@@ -187,7 +187,7 @@ val coincoreModule = module {
                 offlineAccounts = get(),
                 environmentConfig = get(),
                 walletPreferences = get(),
-                eligibilityProvider = get()
+                identity = get()
             )
         }.bind(CryptoAsset::class)
 
@@ -205,7 +205,7 @@ val coincoreModule = module {
                 pitLinking = get(),
                 environmentConfig = get(),
                 walletPreferences = get(),
-                eligibilityProvider = get(),
+                identity = get(),
                 offlineAccounts = get(),
                 wDgldFeatureFlag = get(dgldFeatureFlag)
             )
@@ -226,7 +226,7 @@ val coincoreModule = module {
                 offlineAccounts = get(),
                 environmentConfig = get(),
                 walletPreferences = get(),
-                eligibilityProvider = get(),
+                identity = get(),
                 aaveFeatureFlag = get(aaveFeatureFlag)
             )
         }.bind(CryptoAsset::class)
@@ -246,7 +246,7 @@ val coincoreModule = module {
                 offlineAccounts = get(),
                 environmentConfig = get(),
                 walletPreferences = get(),
-                eligibilityProvider = get(),
+                identity = get(),
                 yfiFeatureFlag = get(yfiFeatureFlag)
             )
         }.bind(CryptoAsset::class)
@@ -263,7 +263,7 @@ val coincoreModule = module {
                 pitLinking = get(),
                 offlineAccounts = get(),
                 environmentConfig = get(),
-                eligibilityProvider = get(),
+                identity = get(),
                 dotFeatureFlag = get(dotFeatureFlag)
             )
         }.bind(CryptoAsset::class)

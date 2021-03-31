@@ -74,6 +74,17 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
+
+        <activity-alias
+            android:name=".Launcher"
+            android:targetActivity=".ui.launcher.LauncherActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity-alias>
+
         <activity
             android:name=".ui.transfer.receive.activity.ReceiveActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />

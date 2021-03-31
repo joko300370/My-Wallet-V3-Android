@@ -11,6 +11,7 @@ import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import piuk.blockchain.android.coincore.erc20.Erc20TokensBase
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
@@ -32,7 +33,7 @@ internal class DgldAsset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     environmentConfig: EnvironmentConfig,
-    eligibilityProvider: SimpleBuyEligibilityProvider,
+    identity: UserIdentity,
     offlineAccounts: OfflineAccountUpdater,
     walletPreferences: WalletStatus,
     private val wDgldFeatureFlag: FeatureFlag
@@ -50,8 +51,8 @@ internal class DgldAsset(
     pitLinking,
     crashLogger,
     environmentConfig,
-    eligibilityProvider,
-    offlineAccounts
+    offlineAccounts,
+    identity
 ) {
     private val isDgldFeatureFlagEnabled = AtomicBoolean(false)
 

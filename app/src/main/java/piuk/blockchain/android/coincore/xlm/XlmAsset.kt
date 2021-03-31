@@ -29,6 +29,7 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.android.coincore.SimpleOfflineCacheItem
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
+import piuk.blockchain.android.identity.UserIdentity
 
 internal class XlmAsset(
     payloadManager: PayloadDataManager,
@@ -44,7 +45,7 @@ internal class XlmAsset(
     crashLogger: CrashLogger,
     environmentConfig: EnvironmentConfig,
     private val walletPreferences: WalletStatus,
-    eligibilityProvider: SimpleBuyEligibilityProvider,
+    identity: UserIdentity,
     offlineAccounts: OfflineAccountUpdater
 ) : CryptoAssetBase(
     payloadManager,
@@ -56,8 +57,8 @@ internal class XlmAsset(
     pitLinking,
     crashLogger,
     environmentConfig,
-    eligibilityProvider,
-    offlineAccounts
+    offlineAccounts,
+    identity
 ) {
 
     override val asset: CryptoCurrency
@@ -143,7 +144,7 @@ internal class XlmAddress(
 
     override fun equals(other: Any?): Boolean {
         return (other is XlmAddress) &&
-                (other.asset == asset && other.address == address && other.label == label)
+            (other.asset == asset && other.address == address && other.label == label)
     }
 
     override fun hashCode(): Int {

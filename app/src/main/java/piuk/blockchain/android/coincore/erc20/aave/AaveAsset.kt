@@ -11,6 +11,7 @@ import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import piuk.blockchain.android.coincore.erc20.Erc20TokensBase
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
@@ -34,7 +35,7 @@ internal class AaveAsset(
     environmentConfig: EnvironmentConfig,
     walletPreferences: WalletStatus,
     offlineAccounts: OfflineAccountUpdater,
-    eligibilityProvider: SimpleBuyEligibilityProvider,
+    identity: UserIdentity,
     private val aaveFeatureFlag: FeatureFlag
 ) : Erc20TokensBase(
     CryptoCurrency.AAVE,
@@ -50,8 +51,8 @@ internal class AaveAsset(
     pitLinking,
     crashLogger,
     environmentConfig,
-    eligibilityProvider,
-    offlineAccounts
+    offlineAccounts,
+    identity
 ) {
     private val isAaveFeatureFlagEnabled = AtomicBoolean(false)
 

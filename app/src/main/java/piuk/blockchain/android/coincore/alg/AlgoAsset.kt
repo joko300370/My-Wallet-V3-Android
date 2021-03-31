@@ -15,6 +15,7 @@ import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -32,7 +33,7 @@ internal class AlgoAsset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     environmentConfig: EnvironmentConfig,
-    private val eligibilityProvider: SimpleBuyEligibilityProvider,
+    private val identity: UserIdentity,
     offlineAccounts: OfflineAccountUpdater
 ) : CryptoAssetBase(
     payloadManager,
@@ -44,8 +45,8 @@ internal class AlgoAsset(
     pitLinking,
     crashLogger,
     environmentConfig,
-    eligibilityProvider,
-    offlineAccounts
+    offlineAccounts,
+    identity
 ) {
 
     override val asset: CryptoCurrency
@@ -66,18 +67,21 @@ internal class AlgoAsset(
             payloadManager = payloadManager,
             label = labels.getDefaultNonCustodialWalletLabel(asset),
             custodialWalletManager = custodialManager,
-            exchangeRates = exchangeRates)
+            exchangeRates = exchangeRates
+        )
 
     override fun loadCustodialAccount(): Single<SingleAccountList> =
         Single.just(
-            listOf(AlgoCustodialTradingAccount(
-                asset,
-                labels.getDefaultCustodialWalletLabel(asset),
-                exchangeRates,
-                custodialManager,
-                environmentConfig,
-                eligibilityProvider
-            ))
+            listOf(
+                AlgoCustodialTradingAccount(
+                    asset,
+                    labels.getDefaultCustodialWalletLabel(asset),
+                    exchangeRates,
+                    custodialManager,
+                    environmentConfig,
+                    identity
+                )
+            )
         )
 
     override fun parseAddress(address: String): Maybe<ReceiveAddress> = Maybe.empty()

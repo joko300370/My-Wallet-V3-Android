@@ -19,6 +19,7 @@ import piuk.blockchain.android.coincore.SimpleOfflineCacheItem
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
@@ -41,8 +42,8 @@ internal open class Erc20TokensBase(
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     environmentConfig: EnvironmentConfig,
-    eligibilityProvider: SimpleBuyEligibilityProvider,
-    offlineAccounts: OfflineAccountUpdater
+    offlineAccounts: OfflineAccountUpdater,
+    identity: UserIdentity
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -53,8 +54,8 @@ internal open class Erc20TokensBase(
     pitLinking,
     crashLogger,
     environmentConfig,
-    eligibilityProvider,
-    offlineAccounts
+    offlineAccounts,
+    identity
 ) {
     override fun initToken(): Completable =
         ethDataManager.fetchErc20DataModel(asset)

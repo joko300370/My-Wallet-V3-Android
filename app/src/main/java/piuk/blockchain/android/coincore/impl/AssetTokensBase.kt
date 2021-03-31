@@ -22,6 +22,7 @@ import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.TradingAccount
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -48,8 +49,8 @@ internal abstract class CryptoAssetBase(
     private val pitLinking: PitLinking,
     protected val crashLogger: CrashLogger,
     protected val environmentConfig: EnvironmentConfig,
-    private val eligibilityProvider: SimpleBuyEligibilityProvider,
-    protected val offlineAccounts: OfflineAccountUpdater
+    protected val offlineAccounts: OfflineAccountUpdater,
+    private val identity: UserIdentity
 ) : CryptoAsset, AccountRefreshTrigger {
 
     private val activeAccounts: ActiveAccountList by unsafeLazy {
@@ -154,7 +155,7 @@ internal abstract class CryptoAssetBase(
                     exchangeRates = exchangeRates,
                     custodialWalletManager = custodialManager,
                     environmentConfig = environmentConfig,
-                    eligibilityProvider = eligibilityProvider
+                    identity = identity
                 )
             )
         )

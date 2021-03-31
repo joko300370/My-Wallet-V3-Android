@@ -9,6 +9,7 @@ import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.coincore.erc20.Erc20TokensBase
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
@@ -31,7 +32,7 @@ internal class UsdtAsset(
     environmentConfig: EnvironmentConfig,
     walletPreferences: WalletStatus,
     offlineAccounts: OfflineAccountUpdater,
-    eligibilityProvider: SimpleBuyEligibilityProvider
+    identity: UserIdentity
 ) : Erc20TokensBase(
     CryptoCurrency.USDT,
     payloadManager,
@@ -46,6 +47,6 @@ internal class UsdtAsset(
     pitLinking,
     crashLogger,
     environmentConfig,
-    eligibilityProvider,
-    offlineAccounts
+    offlineAccounts,
+    identity
 )
