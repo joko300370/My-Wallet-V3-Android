@@ -34,7 +34,7 @@ internal class StxAsset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     environmentConfig: EnvironmentConfig,
-    identity: UserIdentity,
+    private val identity: UserIdentity,
     offlineAccounts: OfflineAccountUpdater
 ) : CryptoAssetBase(
     payloadManager,
@@ -71,7 +71,8 @@ internal class StxAsset(
             label = "STX Account",
             address = stxAccount.bitcoinSerializedBase58Address,
             exchangeRates = exchangeRates,
-            custodialWalletManager = custodialManager
+            custodialWalletManager = custodialManager,
+            identity = identity
         )
     }
 

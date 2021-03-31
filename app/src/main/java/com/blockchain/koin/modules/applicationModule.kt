@@ -287,7 +287,9 @@ val applicationModule = module {
         factory {
             NabuUserIdentity(
                 custodialWalletManager = get(),
-                tierService = get()
+                tierService = get(),
+                simpleBuyEligibilityProvider = get(),
+                interestEligibilityProvider = get()
             )
         }.bind(UserIdentity::class)
 

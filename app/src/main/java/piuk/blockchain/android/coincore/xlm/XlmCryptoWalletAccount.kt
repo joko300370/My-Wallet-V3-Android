@@ -14,6 +14,7 @@ import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
@@ -28,8 +29,9 @@ internal class XlmCryptoWalletAccount(
     private val xlmFeesFetcher: XlmFeesFetcher,
     private val walletOptionsDataManager: WalletOptionsDataManager,
     private val walletPreferences: WalletStatus,
-    private val custodialWalletManager: CustodialWalletManager
-) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.XLM, custodialWalletManager) {
+    private val custodialWalletManager: CustodialWalletManager,
+    identity: UserIdentity
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.XLM, custodialWalletManager, identity) {
 
     override val isDefault: Boolean = true // Only one account ever, so always default
 

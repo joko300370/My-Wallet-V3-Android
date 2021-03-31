@@ -16,6 +16,7 @@ import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAsset
+import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 
 typealias AssetDisplayMap = Map<AssetFilter, AssetDisplayInfo>
@@ -136,7 +137,9 @@ class AssetDetailsInteractor(
                     amount = it.balance,
                     fiatValue = fiat,
                     pendingAmount = it.pendingBalance,
-                    actions = it.actions,
+                    actions = it.actions.filter { action ->
+                        action != AssetAction.InterestDeposit
+                    }.toSet(),
                     interestRate = interestRate
                 )
             )

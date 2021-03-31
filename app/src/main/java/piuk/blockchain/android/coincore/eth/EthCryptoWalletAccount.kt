@@ -13,6 +13,7 @@ import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
@@ -26,8 +27,9 @@ internal class EthCryptoWalletAccount(
     private val fees: FeeDataManager,
     private val walletPreferences: WalletStatus,
     override val exchangeRates: ExchangeRateDataManager,
-    private val custodialWalletManager: CustodialWalletManager
-) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ETHER, custodialWalletManager) {
+    private val custodialWalletManager: CustodialWalletManager,
+   identity: UserIdentity
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ETHER, custodialWalletManager,identity) {
 
     internal val address: String
         get() = jsonAccount.address

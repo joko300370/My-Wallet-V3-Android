@@ -44,7 +44,7 @@ internal class EthAsset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     environmentConfig: EnvironmentConfig,
-    identity: UserIdentity,
+    private val identity: UserIdentity,
     offlineAccounts: OfflineAccountUpdater
 ) : CryptoAssetBase(
     payloadManager,
@@ -85,7 +85,8 @@ internal class EthAsset(
                     jsonAccount = it.account,
                     walletPreferences = walletPrefs,
                     exchangeRates = exchangeRates,
-                    custodialWalletManager = custodialManager
+                    custodialWalletManager = custodialManager,
+                    identity = identity
                 )
             }.doOnSuccess {
                 updateOfflineCache(it)

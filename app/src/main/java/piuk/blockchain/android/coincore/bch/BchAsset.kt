@@ -49,7 +49,7 @@ internal class BchAsset(
     crashLogger: CrashLogger,
     private val walletPreferences: WalletStatus,
     offlineAccounts: OfflineAccountUpdater,
-    identity: UserIdentity
+    private val identity: UserIdentity
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -87,7 +87,8 @@ internal class BchAsset(
                             sendDataManager = sendDataManager,
                             walletPreferences = walletPreferences,
                             custodialWalletManager = custodialManager,
-                            refreshTrigger = this@BchAsset
+                            refreshTrigger = this@BchAsset,
+                            identity = identity
                         )
                         if (bchAccount.isDefault) {
                             updateOfflineCache(bchAccount)

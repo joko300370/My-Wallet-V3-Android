@@ -45,7 +45,7 @@ internal class XlmAsset(
     crashLogger: CrashLogger,
     environmentConfig: EnvironmentConfig,
     private val walletPreferences: WalletStatus,
-    identity: UserIdentity,
+    private val identity: UserIdentity,
     offlineAccounts: OfflineAccountUpdater
 ) : CryptoAssetBase(
     payloadManager,
@@ -78,7 +78,8 @@ internal class XlmAsset(
                     xlmFeesFetcher = xlmFeesFetcher,
                     walletOptionsDataManager = walletOptionsDataManager,
                     walletPreferences = walletPreferences,
-                    custodialWalletManager = custodialManager
+                    custodialWalletManager = custodialManager,
+                    identity = identity
                 )
             }.doOnSuccess {
                 updateOfflineCache(it)

@@ -23,6 +23,7 @@ import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.databinding.DialogAssetActionsSheetBinding
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
@@ -119,7 +120,7 @@ class AssetActionsSheet :
         actions: AvailableActions
     ): List<AssetActionItem> {
         val firstAccount = account.selectFirstAccount()
-        return actions.map {
+        return actions.filter { it!= AssetAction.InterestDeposit || firstAccount is InterestAccount }.map {
             mapAction(it, firstAccount.asset, firstAccount)
         }
     }
@@ -183,7 +184,7 @@ class AssetActionsSheet :
                 getString(R.string.dashboard_asset_actions_deposit_dsc, asset.displayTicker),
                 asset, action
             ) {
-                goToDeposit()
+                goToInterestDeposit()
             }
             AssetAction.Sell -> AssetActionItem(
                 getString(R.string.common_sell),
@@ -197,10 +198,8 @@ class AssetActionsSheet :
             AssetAction.FiatDeposit -> throw IllegalStateException("Cannot Deposit a non-fiat currency to Fiat")
         }
 
-    private fun goToDeposit() {
-        checkForKycStatus {
-            model.process(HandleActionIntent(AssetAction.InterestDeposit))
-        }
+    private fun goToInterestDeposit() {
+        model.process(HandleActionIntent(AssetAction.InterestDeposit))
     }
 
     private fun goToSummary() {

@@ -43,7 +43,7 @@ internal open class Erc20TokensBase(
     crashLogger: CrashLogger,
     environmentConfig: EnvironmentConfig,
     offlineAccounts: OfflineAccountUpdater,
-    identity: UserIdentity
+   private val identity: UserIdentity
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -79,7 +79,8 @@ internal open class Erc20TokensBase(
             labels.getDefaultNonCustodialWalletLabel(asset),
             exchangeRates,
             walletPreferences,
-            custodialManager
+            custodialManager,
+            identity
         )
     }
 
