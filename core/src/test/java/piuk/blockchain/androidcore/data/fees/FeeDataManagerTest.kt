@@ -98,4 +98,23 @@ class FeeDataManagerTest {
                 regularFee `should equal to` 100
             }
     }
+
+    @Test
+    fun `Use default ERC20 fee on API Error`() {
+        whenever(feeApi.getErc20FeeOptions(""))
+            .thenReturn(Observable.error(Throwable()))
+        whenever(environmentSettings.environment)
+            .thenReturn(Environment.STAGING)
+        subject.getErc20FeeOptions("")
+            .test()
+            .values()
+            .first()
+            .apply {
+                priorityFee `should equal to` 23
+                regularFee `should equal to` 23
+                gasLimit `should equal to` 21000
+                limits!!.min `should equal to` 23
+                limits!!.max `should equal to` 23
+            }
+    }
 }

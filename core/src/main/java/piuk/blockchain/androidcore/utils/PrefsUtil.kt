@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Base64
 import androidx.annotation.VisibleForTesting
+import com.blockchain.featureflags.GatedFeature
 import com.blockchain.logging.CrashLogger
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.data.Settings.Companion.UNIT_FIAT
@@ -409,6 +410,24 @@ class PrefsUtil(
         removeValue(KEY_SWIPE_RECEIVE_BTC_ACCOUNT_NAME)
         removeValue(KEY_SWIPE_RECEIVE_BCH_ACCOUNT_NAME)
     }
+
+    // internal feature flags
+    override fun isFeatureEnabled(gatedFeature: GatedFeature): Boolean = getValue(gatedFeature.name, false)
+
+    override fun enableFeature(gatedFeature: GatedFeature) = setValue(gatedFeature.name, true)
+
+    override fun disableFeature(gatedFeature: GatedFeature) = setValue(gatedFeature.name, false)
+
+    override fun disableAllFeatures() {
+        GatedFeature.values().forEach { feature ->
+            disableFeature(feature)
+        }
+    }
+
+    override fun getAllFeatures(): Map<GatedFeature, Boolean> =
+        GatedFeature.values().map {
+            it to isFeatureEnabled(it)
+        }.toMap()
 
     // Raw accessors
     override fun getValue(name: String): String? =
