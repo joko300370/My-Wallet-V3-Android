@@ -16,7 +16,6 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus
 import piuk.blockchain.android.ui.base.MvpActivity
 import piuk.blockchain.android.ui.createwallet.CreateWalletActivity
-import piuk.blockchain.android.ui.debug.DebugOptionsBottomDialog
 import piuk.blockchain.android.ui.recover.RecoverFundsActivity
 import piuk.blockchain.android.util.copyHashOnLongClick
 import piuk.blockchain.android.ui.customviews.toast
@@ -94,13 +93,6 @@ class LandingActivity : MvpActivity<LandingView, LandingPresenter>(), LandingVie
             text = stringUtils.getStringWithMappedAnnotations(
                 R.string.wallet_outage_message, learnMoreMap, this@LandingActivity
             )
-        }
-    }
-
-    override fun showDebugMenu() {
-        btn_settings.visible()
-        btn_settings.setOnClickListener {
-            DebugOptionsBottomDialog.show(supportFragmentManager)
         }
     }
 
