@@ -52,7 +52,7 @@ class Coincore internal constructor(
     val fiatAssets: Asset
         get() = fiatAsset
 
-    val cryptoAssets: Iterable<Asset>
+    val cryptoAssets: Iterable<CryptoAsset>
         get() = assetMap.values.filter { it.isEnabled }
 
     val allAssets: Iterable<Asset>

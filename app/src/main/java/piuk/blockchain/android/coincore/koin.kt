@@ -1,22 +1,20 @@
 package piuk.blockchain.android.coincore
 
 import com.blockchain.koin.aaveFeatureFlag
-import com.blockchain.koin.dgldFeatureFlag
 import com.blockchain.koin.dotFeatureFlag
 import com.blockchain.koin.payloadScope
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.koin.yfiFeatureFlag
+import com.blockchain.remoteconfig.FeatureFlag
+import info.blockchain.balance.CryptoCurrency
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import piuk.blockchain.android.coincore.alg.AlgoAsset
 import piuk.blockchain.android.coincore.bch.BchAsset
 import piuk.blockchain.android.coincore.btc.BtcAsset
 import piuk.blockchain.android.coincore.dot.PolkadotAsset
-import piuk.blockchain.android.coincore.erc20.aave.AaveAsset
-import piuk.blockchain.android.coincore.erc20.dgld.DgldAsset
-import piuk.blockchain.android.coincore.erc20.pax.PaxAsset
-import piuk.blockchain.android.coincore.erc20.usdt.UsdtAsset
-import piuk.blockchain.android.coincore.erc20.yfi.YfiAsset
+import piuk.blockchain.android.coincore.erc20.EnabledErc20FeatureFlag
+import piuk.blockchain.android.coincore.erc20.Erc20Asset
 import piuk.blockchain.android.coincore.eth.EthAsset
 import piuk.blockchain.android.coincore.fiat.FiatAsset
 import piuk.blockchain.android.coincore.fiat.LinkedBanksFactory
@@ -128,25 +126,6 @@ val coincoreModule = module {
         }.bind(CryptoAsset::class)
 
         scoped {
-            PaxAsset(
-                payloadManager = get(),
-                ethDataManager = get(),
-                feeDataManager = get(),
-                exchangeRates = get(),
-                historicRates = get(),
-                currencyPrefs = get(),
-                custodialManager = get(),
-                pitLinking = get(),
-                crashLogger = get(),
-                labels = get(),
-                offlineAccounts = get(),
-                environmentConfig = get(),
-                walletPreferences = get(),
-                eligibilityProvider = get()
-            )
-        }.bind(CryptoAsset::class)
-
-        scoped {
             AlgoAsset(
                 payloadManager = get(),
                 exchangeRates = get(),
@@ -171,85 +150,6 @@ val coincoreModule = module {
                 currencyPrefs = get()
             )
         }
-
-        scoped {
-            UsdtAsset(
-                payloadManager = get(),
-                ethDataManager = get(),
-                feeDataManager = get(),
-                exchangeRates = get(),
-                historicRates = get(),
-                currencyPrefs = get(),
-                custodialManager = get(),
-                crashLogger = get(),
-                labels = get(),
-                pitLinking = get(),
-                offlineAccounts = get(),
-                environmentConfig = get(),
-                walletPreferences = get(),
-                eligibilityProvider = get()
-            )
-        }.bind(CryptoAsset::class)
-
-        scoped {
-            DgldAsset(
-                payloadManager = get(),
-                ethDataManager = get(),
-                feeDataManager = get(),
-                exchangeRates = get(),
-                historicRates = get(),
-                currencyPrefs = get(),
-                custodialManager = get(),
-                crashLogger = get(),
-                labels = get(),
-                pitLinking = get(),
-                environmentConfig = get(),
-                walletPreferences = get(),
-                eligibilityProvider = get(),
-                offlineAccounts = get(),
-                wDgldFeatureFlag = get(dgldFeatureFlag)
-            )
-        }.bind(CryptoAsset::class)
-
-        scoped {
-            AaveAsset(
-                payloadManager = get(),
-                ethDataManager = get(),
-                feeDataManager = get(),
-                exchangeRates = get(),
-                historicRates = get(),
-                currencyPrefs = get(),
-                custodialManager = get(),
-                crashLogger = get(),
-                labels = get(),
-                pitLinking = get(),
-                offlineAccounts = get(),
-                environmentConfig = get(),
-                walletPreferences = get(),
-                eligibilityProvider = get(),
-                aaveFeatureFlag = get(aaveFeatureFlag)
-            )
-        }.bind(CryptoAsset::class)
-
-        scoped {
-            YfiAsset(
-                payloadManager = get(),
-                ethDataManager = get(),
-                feeDataManager = get(),
-                exchangeRates = get(),
-                historicRates = get(),
-                currencyPrefs = get(),
-                custodialManager = get(),
-                crashLogger = get(),
-                labels = get(),
-                pitLinking = get(),
-                offlineAccounts = get(),
-                environmentConfig = get(),
-                walletPreferences = get(),
-                eligibilityProvider = get(),
-                yfiFeatureFlag = get(yfiFeatureFlag)
-            )
-        }.bind(CryptoAsset::class)
 
         scoped {
             PolkadotAsset(
@@ -280,9 +180,34 @@ val coincoreModule = module {
         }
 
         scoped {
-            val cryptoAssets: List<CryptoAsset> = payloadScope.getAll()
+            val erc20Assets = CryptoCurrency.erc20Assets().map {
+                val featureFlag: FeatureFlag = when (it) {
+                    CryptoCurrency.AAVE -> get(aaveFeatureFlag)
+                    CryptoCurrency.YFI -> get(yfiFeatureFlag)
+                    else -> EnabledErc20FeatureFlag()
+                }
+                Erc20Asset(
+                    asset = it,
+                    featureFlag = featureFlag,
+                    payloadManager = get(),
+                    ethDataManager = get(),
+                    feeDataManager = get(),
+                    exchangeRates = get(),
+                    historicRates = get(),
+                    currencyPrefs = get(),
+                    custodialManager = get(),
+                    crashLogger = get(),
+                    labels = get(),
+                    pitLinking = get(),
+                    offlineAccounts = get(),
+                    environmentConfig = get(),
+                    walletPreferences = get(),
+                    eligibilityProvider = get()
+                )
+            }
+            val nonErc20Assets: List<CryptoAsset> = payloadScope.getAll()
             CryptoAssetLoader(
-                cryptoAssets = cryptoAssets
+                cryptoAssets = nonErc20Assets + erc20Assets
             )
         }.bind(AssetLoader::class)
 
