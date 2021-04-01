@@ -147,7 +147,7 @@ internal class CryptoInterestAccount(
             }
 
     override val actions: Single<AvailableActions> =
-        Single.just(setOf(AssetAction.InterestDeposit, AssetAction.Summary, AssetAction.ViewActivity))
+        Single.just(setOf(AssetAction.Summary, AssetAction.ViewActivity))
 
     companion object {
         private val displayedStates = setOf(
