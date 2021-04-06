@@ -38,8 +38,9 @@
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -72,6 +73,20 @@
                 <data
                     android:host="${DYNAMIC_LINK_HOST_2}"
                     android:scheme="https" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="piuk.blockchain.com.FeatureFlagsHandlingActivity"
+            android:clearTaskOnLaunch="true"
+            android:excludeFromRecents="true"
+            android:label="BC Debug Opts"
+            android:screenOrientation="portrait"
+            android:taskAffinity="piuk.blockchain.com.FeatureFlagsHandlingActivity"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity

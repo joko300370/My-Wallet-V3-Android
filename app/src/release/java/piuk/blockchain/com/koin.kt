@@ -6,6 +6,6 @@ import org.koin.dsl.module
 
 val internalFeatureFlagsModule = module {
     single {
-        InternalFeatureFlagApiImpl()
+        InternalFeatureFlagReleaseApiImpl()
     }.bind(InternalFeatureFlagApi::class)
 }

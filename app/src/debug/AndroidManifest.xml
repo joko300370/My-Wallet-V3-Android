@@ -8,19 +8,6 @@
         android:fullBackupContent="false"
         android:networkSecurityConfig="@xml/charles_network_security_config"
         tools:replace="fullBackupContent">
-        <activity
-            android:name="piuk.blockchain.com.FeatureFlagsHandlingActivity"
-            android:clearTaskOnLaunch="true"
-            android:excludeFromRecents="true"
-            android:label="BC Debug Opts"
-            android:screenOrientation="portrait"
-            android:taskAffinity="piuk.blockchain.com.FeatureFlagsHandlingActivity"
-            android:theme="@style/AppTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
     </application>
 </manifest>

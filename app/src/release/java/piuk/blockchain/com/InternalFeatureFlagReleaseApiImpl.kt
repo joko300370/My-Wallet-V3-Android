@@ -3,7 +3,7 @@ package piuk.blockchain.com
 import com.blockchain.featureflags.GatedFeature
 import com.blockchain.featureflags.InternalFeatureFlagApi
 
-class InternalFeatureFlagApiImpl : InternalFeatureFlagApi {
+class InternalFeatureFlagReleaseApiImpl : InternalFeatureFlagApi {
     override fun isFeatureEnabled(gatedFeature: GatedFeature): Boolean = false
 
     override fun enable(gatedFeature: GatedFeature) {
