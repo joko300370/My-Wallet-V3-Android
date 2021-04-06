@@ -24,6 +24,7 @@ import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
+import piuk.blockchain.android.identity.NabuUserIdentity
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -57,7 +58,7 @@ class BtcAssetTest {
         on { bitcoinNetworkParameters } itReturns btcParams
     }
     private val walletPreferences: WalletStatus = mock()
-    private val eligibilityProvider: SimpleBuyEligibilityProvider = mock()
+    private val identity: NabuUserIdentity = mock()
     private val offlineCache: OfflineAccountUpdater = mock()
 
     private val subject = BtcAsset(
@@ -75,7 +76,7 @@ class BtcAssetTest {
         environmentConfig = environmentConfig,
         offlineAccounts = offlineCache,
         walletPreferences = walletPreferences,
-        eligibilityProvider = eligibilityProvider
+        identity = identity
     )
 
     @Test

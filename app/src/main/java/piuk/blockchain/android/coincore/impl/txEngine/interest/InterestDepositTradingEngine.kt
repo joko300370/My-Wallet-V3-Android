@@ -7,6 +7,7 @@ import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.InterestAccount
@@ -23,6 +24,8 @@ class InterestDepositTradingEngine(private val walletManager: CustodialWalletMan
     override fun assertInputsValid() {
         check(sourceAccount is TradingAccount)
         check(txTarget is InterestAccount)
+        check(txTarget is CryptoAccount)
+        check(sourceAsset == (txTarget as CryptoAccount).asset)
     }
 
     private val availableBalance: Single<Money>

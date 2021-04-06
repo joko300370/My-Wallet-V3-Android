@@ -60,7 +60,7 @@ class XlmAssetUriParseTest {
         environmentConfig = environmentConfig,
         walletPreferences = walletPreferences,
         offlineAccounts = offlineCache,
-        eligibilityProvider = eligibilityProvider
+        identity = mock()
     )
 
     @Test
