@@ -25,7 +25,6 @@ import org.junit.Test
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
 import piuk.blockchain.android.coincore.BlockchainAccount
-import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.btc.BtcCryptoWalletAccount
@@ -171,7 +170,6 @@ class InterestDepositTradingEngineTest {
             exchangeRates
         )
 
-
         whenever(custodialWalletManager.getInterestLimits(ASSET)).thenReturn(Maybe.empty())
 
         // Act
@@ -180,7 +178,6 @@ class InterestDepositTradingEngineTest {
             .assertError(NoSuchElementException::class.java)
 
         verify(sourceAccount, atLeastOnce()).asset
-
 
         verify(custodialWalletManager).getInterestLimits(ASSET)
         verify(sourceAccount).accountBalance

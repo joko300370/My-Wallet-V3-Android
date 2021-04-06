@@ -25,7 +25,6 @@ import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.coincore.impl.AccountRefreshTrigger
-import piuk.blockchain.android.identity.NabuUserIdentity
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager

@@ -8,6 +8,7 @@ import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.LinkBankTransfer
+import com.blockchain.nabu.models.data.LinkedBank
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
@@ -48,6 +49,8 @@ data class SimpleBuyState(
     @Transient val exchangePrice: FiatValue? = null,
     @Transient val isLoading: Boolean = false,
     @Transient val everypayAuthOptions: EverypayAuthOptions? = null,
+    @Transient val authorisePaymentUrl: String? = null,
+    @Transient val linkedBank: LinkedBank? = null,
     val paymentSucceeded: Boolean = false,
     val showRating: Boolean = false,
     @Transient val shouldShowUnlockHigherFunds: Boolean = false,
@@ -181,6 +184,14 @@ sealed class ErrorState : Serializable {
     object LinkedBankAccountUnsupported : ErrorState()
     object LinkedBankNamesMismatched : ErrorState()
     object LinkedBankNotSupported : ErrorState()
+    object LinkedBankRejected : ErrorState()
+    object LinkedBankExpired : ErrorState()
+    object LinkedBankFailure : ErrorState()
+    object ApprovedBankDeclined : ErrorState()
+    object ApprovedBankRejected : ErrorState()
+    object ApprovedBankFailed : ErrorState()
+    object ApprovedBankExpired : ErrorState()
+    object ApprovedGenericError : ErrorState()
     object DailyLimitExceeded : ErrorState()
     object WeeklyLimitExceeded : ErrorState()
     object YearlyLimitExceeded : ErrorState()

@@ -5,15 +5,16 @@ import android.net.Uri
 import androidx.annotation.StringRes
 import com.blockchain.extensions.exhaustive
 import com.blockchain.logging.CrashLogger
-import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.notifications.analytics.AnalyticsEvents
-import com.blockchain.sunriver.XlmDataManager
-import com.blockchain.nabu.NabuToken
-import com.blockchain.nabu.datamanagers.NabuDataManager
+import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.models.responses.nabu.CampaignData
 import com.blockchain.nabu.models.responses.nabu.KycState
 import com.blockchain.nabu.models.responses.nabu.NabuApiException
 import com.blockchain.nabu.models.responses.nabu.NabuErrorCodes
+import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.notifications.analytics.AnalyticsEvents
+import com.blockchain.preferences.BankLinkingPrefs
+import com.blockchain.sunriver.XlmDataManager
+import com.google.gson.JsonSyntaxException
 import info.blockchain.wallet.api.Environment
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
@@ -28,6 +29,7 @@ import piuk.blockchain.android.coincore.CryptoTarget
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerifiedLinkState
 import piuk.blockchain.android.deeplink.LinkState
+import piuk.blockchain.android.deeplink.OpenBankingLinkType
 import piuk.blockchain.android.kyc.KycLinkState
 import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.android.scan.QrScanResultProcessor
@@ -38,6 +40,7 @@ import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.ui.base.MvpPresenter
 import piuk.blockchain.android.ui.base.MvpView
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
+import piuk.blockchain.android.ui.linkbank.BankLinkingInfo
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -80,25 +83,15 @@ class MainPresenter internal constructor(
     private val sunriverCampaignRegistration: SunriverCampaignRegistration,
     private val xlmDataManager: XlmDataManager,
     private val pitLinking: PitLinking,
-    private val nabuDataManager: NabuDataManager,
     private val simpleBuySync: SimpleBuySyncFactory,
     private val crashLogger: CrashLogger,
     private val analytics: Analytics,
     private val credentialsWiper: CredentialsWiper,
-    nabuToken: NabuToken
+    private val bankLinkingPrefs: BankLinkingPrefs
 ) : MvpPresenter<MainView>() {
 
     override val alwaysDisableScreenshots: Boolean = false
     override val enableLogoutTimer: Boolean = true
-
-    internal val defaultCurrency: String
-        get() = prefs.selectedFiatCurrency
-
-    private val nabuUser = nabuToken
-        .fetchNabuToken()
-        .flatMap {
-            nabuDataManager.getUser(it)
-        }
 
     override fun onViewAttached() {
         if (!accessState.isLoggedIn) {
@@ -191,7 +184,7 @@ class MainPresenter internal constructor(
 
     private fun checkForPendingLinks() {
         compositeDisposable += deepLinkProcessor.getLink(view!!.getStartIntent())
-            .filter { !view!!.shouldIgnoreDeepLinking() }
+            .filter { view?.shouldIgnoreDeepLinking() == false }
             .subscribeBy(
                 onError = { Timber.e(it) },
                 onSuccess = { dispatchDeepLink(it) }
@@ -204,6 +197,7 @@ class MainPresenter internal constructor(
             is LinkState.EmailVerifiedDeepLink -> handleEmailVerifiedDeepLink(linkState)
             is LinkState.KycDeepLink -> handleKycDeepLink(linkState)
             is LinkState.ThePitDeepLink -> handleThePitDeepLink(linkState)
+            is LinkState.OpenBankingLink -> handleOpenBankingDeepLink(linkState.type)
             else -> {
             }
         }
@@ -240,6 +234,41 @@ class MainPresenter internal constructor(
 
     private fun handleThePitDeepLink(linkState: LinkState.ThePitDeepLink) {
         view?.launchThePitLinking(linkState.linkId)
+    }
+
+    private fun handleOpenBankingDeepLink(type: OpenBankingLinkType) =
+        when (type) {
+            OpenBankingLinkType.LINK_BANK -> handleBankLinking()
+            OpenBankingLinkType.PAYMENT_APPROVAL -> handleBankApproval()
+            OpenBankingLinkType.UNKNOWN -> view?.showOpenBankingDeepLinkError()
+        }
+
+    private fun handleBankApproval() {
+        if (bankLinkingPrefs.getPaymentApprovalConsumed()) {
+            return
+        }
+
+        simpleBuySync.currentState()?.let {
+            if (it.orderState == OrderState.AWAITING_FUNDS) {
+                view?.launchSimpleBuyFromDeepLinkApproval()
+            } else {
+                view?.handlePaymentForCancelledOrder()
+            }
+        }
+    }
+
+    private fun handleBankLinking() {
+        if (bankLinkingPrefs.getBankLinkingInfo().isEmpty()) {
+            return
+        }
+        try {
+            val bankLinkingInfo = BankLinkingInfo.fromJson(bankLinkingPrefs.getBankLinkingInfo())
+            bankLinkingPrefs.clearBankLinkingInfo()
+
+            view?.launchOpenBankingLinking(bankLinkingInfo)
+        } catch (e: JsonSyntaxException) {
+            view?.showOpenBankingDeepLinkError()
+        }
     }
 
     private fun handleEmailVerifiedDeepLink(linkState: LinkState.EmailVerifiedDeepLink) {
@@ -338,7 +367,8 @@ class MainPresenter internal constructor(
                         is ScanResult.TxTarget -> {
                             view?.startTransactionFlowWithTarget(it.targets)
                         }
-                        is ScanResult.ImportedWallet -> { } // TODO: as part of Auth
+                        is ScanResult.ImportedWallet -> {
+                        } // TODO: as part of Auth
                     }.exhaustive
                 },
                 onError = {

@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/checkout_parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/amount"
         style="@style/Text.Semibold.32"
@@ -20,6 +22,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="$10000 of BTC" />
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/status"
         style="@style/Text.Semibold.14"
@@ -31,6 +34,7 @@
         app:layout_constraintTop_toBottomOf="@id/amount"
         tools:background="@drawable/bkgd_green_100_rounded"
         tools:text="Completed" />
+
     <View
         android:id="@+id/separator_top"
         style="@style/SeparatorWithoutMargins"
@@ -40,6 +44,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/status" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler"
         android:layout_width="match_parent"
@@ -53,6 +58,7 @@
         app:layout_constraintVertical_bias="0.0"
         tools:itemCount="7"
         tools:listitem="@layout/item_simple_buy_checkout_info" />
+
     <View
         android:id="@+id/separator_bottom"
         style="@style/SeparatorWithoutMargins"
@@ -63,42 +69,45 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_goneMarginBottom="@dimen/small_margin" />
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/purchase_note"
         style="@style/Text.Light.12"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/very_small_margin"
-        app:layout_constraintBottom_toTopOf="@id/button_cancel"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginEnd="@dimen/standard_margin"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_goneMarginBottom="@dimen/standard_margin"
-        tools:text="@string/purchase_card_note_1"
-        />
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button_cancel"
-        style="@style/CtaButton.White"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/tiny_margin"
-        android:text="@string/common_cancel"
-        android:textColor="@color/red_400"
+        android:layout_marginBottom="@dimen/very_small_margin"
         app:layout_constraintBottom_toTopOf="@id/button_action"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:visibility="visible" />
+        app:layout_goneMarginBottom="@dimen/standard_margin"
+        tools:text="@string/purchase_card_note_1" />
+
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button_action"
-        style="@style/CtaButton.Blue"
+        android:id="@+id/button_cancel"
+        style="@style/CtaButton.NoBackgroundRedText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/standard_margin"
+        android:text="@string/common_cancel"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:visibility="visible" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/button_action"
+        style="@style/CtaButton.Blue"
+        android:layout_width="0dp"
+        android:layout_marginBottom="@dimen/tiny_margin"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/button_cancel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="Buy"
+        tools:visibility="visible" />
+
     <ProgressBar
         android:id="@+id/progress"
         android:layout_width="wrap_content"

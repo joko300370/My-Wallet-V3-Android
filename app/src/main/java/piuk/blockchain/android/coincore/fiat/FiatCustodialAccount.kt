@@ -90,7 +90,8 @@ internal class FiatCustodialAccount(
         }
 
     override val actions: Single<AvailableActions> =
-        custodialWalletManager.canTransactWithBankMethods(fiatCurrency).zipWith(actionableBalance.map { it.isPositive })
+        custodialWalletManager.canTransactWithBankMethods(fiatCurrency)
+            .zipWith(actionableBalance.map { it.isPositive })
             .map { (canTransactWithBanks, hasActionableBalance) ->
                 if (canTransactWithBanks) {
                     setOfNotNull(

@@ -17,6 +17,7 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.isCustodial
+import piuk.blockchain.android.ui.linkbank.BankAuthSource
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.account.AccountInfoBank
 import piuk.blockchain.android.ui.customviews.account.AccountInfoCrypto
@@ -784,6 +785,19 @@ class TransactionFlowCustomiserImpl(
                 }
             }
             else -> throw IllegalStateException("Action is not supported")
+        }
+
+    override fun getLinkingSourceForAction(state: TransactionState): BankAuthSource =
+        when (state.action) {
+            AssetAction.FiatDeposit -> {
+                BankAuthSource.DEPOSIT
+            }
+            AssetAction.Withdraw -> {
+                BankAuthSource.WITHDRAW
+            }
+            else -> {
+                throw IllegalStateException("Attempting to link from an unsupported action")
+            }
         }
 
     companion object {

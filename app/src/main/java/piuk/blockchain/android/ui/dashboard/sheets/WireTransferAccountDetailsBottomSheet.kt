@@ -6,11 +6,8 @@ import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.blockchain.koin.scopedInject
-import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
-import piuk.blockchain.android.simplebuy.linkBankEventWithCurrency
-import piuk.blockchain.android.simplebuy.linkBankFieldCopied
-import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.ui.urllinks.MODULAR_TERMS_AND_CONDITIONS
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -22,14 +19,17 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.databinding.DialogSheetLinkBankAccountBinding
 import piuk.blockchain.android.simplebuy.BankDetailField
 import piuk.blockchain.android.simplebuy.CopyFieldListener
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
+import piuk.blockchain.android.simplebuy.linkBankEventWithCurrency
+import piuk.blockchain.android.simplebuy.linkBankFieldCopied
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 
-class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog<DialogSheetLinkBankAccountBinding>() {
+class WireTransferAccountDetailsBottomSheet : SlidingModalBottomDialog<DialogSheetLinkBankAccountBinding>() {
 
     private val compositeDisposable = CompositeDisposable()
     private val custodialWalletManager: CustodialWalletManager by scopedInject()
@@ -62,7 +62,7 @@ class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog<DialogSheetLi
 
                     analytics.logEvent(
                         linkBankEventWithCurrency(
-                            SimpleBuyAnalytics.LINK_BANK_SCREEN_SHOWN,
+                            SimpleBuyAnalytics.WIRE_TRANSFER_SCREEN_SHOWN,
                             fiatCurrency
                         )
                     )
@@ -71,7 +71,7 @@ class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog<DialogSheetLi
                     renderErrorUi()
                     analytics.logEvent(
                         linkBankEventWithCurrency(
-                            SimpleBuyAnalytics.LINK_BANK_LOADING_ERROR,
+                            SimpleBuyAnalytics.WIRE_TRANSFER_LOADING_ERROR,
                             fiatCurrency
                         )
                     )
@@ -146,17 +146,17 @@ class LinkBankAccountDetailsBottomSheet : SlidingModalBottomDialog<DialogSheetLi
         private const val IS_FOR_LINK = "IS_FOR_LINK"
 
         fun newInstance(fiatAccount: FiatAccount) =
-            LinkBankAccountDetailsBottomSheet().apply {
+            WireTransferAccountDetailsBottomSheet().apply {
                 arguments = Bundle().apply {
                     putString(FIAT_CURRENCY, fiatAccount.fiatCurrency)
                     putBoolean(IS_FOR_LINK, !fiatAccount.isFunded)
                 }
             }
 
-        fun newInstance() = LinkBankAccountDetailsBottomSheet()
+        fun newInstance() = WireTransferAccountDetailsBottomSheet()
 
         fun newInstance(fiatCurrency: String) =
-            LinkBankAccountDetailsBottomSheet().apply {
+            WireTransferAccountDetailsBottomSheet().apply {
                 arguments = Bundle().apply {
                     putString(FIAT_CURRENCY, fiatCurrency)
                 }

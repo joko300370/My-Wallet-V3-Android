@@ -26,6 +26,7 @@ import piuk.blockchain.android.simplebuy.yodlee.FastLinkMessage
 import piuk.blockchain.android.simplebuy.yodlee.MessageData
 import piuk.blockchain.android.simplebuy.yodlee.SiteData
 import piuk.blockchain.android.ui.base.setupToolbar
+import piuk.blockchain.android.ui.linkbank.BankAuthFlowNavigator
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
@@ -156,9 +157,9 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
         yodlee_icon.visibleIf { visible }
     }
 
-    private fun navigator(): YodleeLinkingFlowNavigator =
-        (activity as? YodleeLinkingFlowNavigator)
-            ?: throw IllegalStateException("Parent must implement SimpleBuyNavigator")
+    private fun navigator(): BankAuthFlowNavigator =
+        (activity as? BankAuthFlowNavigator)
+            ?: throw IllegalStateException("Parent must implement BankAuthFlowNavigator")
 
     companion object {
         private const val ATTRIBUTES: String = "ATTRIBUTES"

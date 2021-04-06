@@ -38,8 +38,9 @@
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -75,6 +76,20 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="piuk.blockchain.com.FeatureFlagsHandlingActivity"
+            android:clearTaskOnLaunch="true"
+            android:excludeFromRecents="true"
+            android:label="BC Debug Opts"
+            android:screenOrientation="portrait"
+            android:taskAffinity="piuk.blockchain.com.FeatureFlagsHandlingActivity"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ui.transfer.receive.activity.ReceiveActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
@@ -172,7 +187,7 @@
             android:name=".ui.interest.InterestDashboardActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.linkbank.LinkBankActivity"
+            android:name=".ui.linkbank.BankAuthActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <meta-data
@@ -224,6 +239,9 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <receiver android:name=".ui.linkbank.ChooserReceiver" android:exported="false"/>
+
     </application>
 
 </manifest>

@@ -9,6 +9,7 @@ import com.blockchain.logging.TimberLogger
 import com.blockchain.metadata.MetadataRepository
 import com.blockchain.payload.PayloadDecrypt
 import com.blockchain.preferences.AuthPrefs
+import com.blockchain.preferences.BankLinkingPrefs
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.DashboardPrefs
 import com.blockchain.preferences.InternalFeatureFlagPrefs
@@ -211,6 +212,7 @@ val coreModule = module {
         .bind(EncryptedPrefs::class)
         .bind(OfflineCachePrefs::class)
         .bind(AuthPrefs::class)
+        .bind(BankLinkingPrefs::class)
         .bind(InternalFeatureFlagPrefs::class)
 
     factory { PaymentService(get(), get(), get()) }

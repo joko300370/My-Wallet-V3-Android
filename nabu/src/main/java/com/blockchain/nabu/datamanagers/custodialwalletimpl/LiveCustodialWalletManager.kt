@@ -1,6 +1,7 @@
 package com.blockchain.nabu.datamanagers.custodialwalletimpl
 
 import com.blockchain.nabu.Authenticator
+import com.blockchain.nabu.datamanagers.ApprovalErrorStatus
 import com.blockchain.nabu.datamanagers.Bank
 import com.blockchain.nabu.datamanagers.BankAccount
 import com.blockchain.nabu.datamanagers.BankState
@@ -51,6 +52,7 @@ import com.blockchain.nabu.models.data.LinkedBankErrorState
 import com.blockchain.nabu.models.data.LinkedBankState
 import com.blockchain.nabu.models.data.WithdrawalFeeAndLimit
 import com.blockchain.nabu.models.responses.banktransfer.BankInfoResponse
+import com.blockchain.nabu.models.responses.banktransfer.BankMediaResponse.Companion.ICON
 import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentBody
 import com.blockchain.nabu.models.responses.banktransfer.CreateLinkBankResponse
 import com.blockchain.nabu.models.responses.banktransfer.LinkedBankTransferResponse
@@ -69,10 +71,10 @@ import com.blockchain.nabu.models.responses.simplebuy.AmountResponse
 import com.blockchain.nabu.models.responses.simplebuy.BankAccountResponse
 import com.blockchain.nabu.models.responses.simplebuy.BuyOrderListResponse
 import com.blockchain.nabu.models.responses.simplebuy.BuySellOrderResponse
-import com.blockchain.nabu.models.responses.simplebuy.CardPartnerAttributes
 import com.blockchain.nabu.models.responses.simplebuy.ConfirmOrderRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
 import com.blockchain.nabu.models.responses.simplebuy.ProductTransferRequestBody
+import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyConfirmationAttributes
 import com.blockchain.nabu.models.responses.simplebuy.TransactionResponse
 import com.blockchain.nabu.models.responses.simplebuy.TransferRequest
 import com.blockchain.nabu.models.responses.swap.CreateOrderRequest
@@ -396,7 +398,7 @@ class LiveCustodialWalletManager(
             nabuService.linkToABank(it, fiatCurrency)
                 .zipWith(bankLinkingEnabledProvider.supportedBankPartners())
         }.flatMap { (response, supportedPartners) ->
-            response.partner.toLinkBankedPartner(supportedPartners)?.let {
+            response.partner.toLinkingBankPartner(supportedPartners)?.let {
                 val attributes =
                     response.attributes
                         ?: return@flatMap Single.error<LinkBankTransfer>(IllegalStateException("Missing attributes"))
@@ -411,14 +413,29 @@ class LiveCustodialWalletManager(
         }
     }
 
-    override fun updateAccountProviderId(linkingId: String, providerAccountId: String, accountId: String) =
-        authenticator.authenticateCompletable {
-            nabuService.updateAccountProviderId(
-                it, linkingId, UpdateProviderAccountBody(
-                    ProviderAccountAttrs(providerAccountId = providerAccountId, accountId = accountId)
-                )
+    override fun updateSelectedBankAccount(
+        linkingId: String,
+        providerAccountId: String,
+        accountId: String,
+        partner: BankPartner
+    ): Completable = authenticator.authenticateCompletable {
+        nabuService.updateAccountProviderId(
+            it, linkingId, UpdateProviderAccountBody(
+                when (partner) {
+                    BankPartner.YODLEE ->
+                        ProviderAccountAttrs(
+                            providerAccountId = providerAccountId,
+                            accountId = accountId
+                        )
+                    BankPartner.YAPILY ->
+                        ProviderAccountAttrs(
+                            institutionId = accountId,
+                            callback = BankPartner.YAPILY_DEEPLINK_BANK_LINK_URL
+                        )
+                }
             )
-        }
+        )
+    }
 
     override fun fetchSuggestedPaymentMethod(
         fiatCurrency: String,
@@ -451,7 +468,7 @@ class LiveCustodialWalletManager(
         methods.filter { method -> method.eligible || !onlyEligible }
     }.doOnSuccess {
         updateSupportedCards(it)
-    }.zipWith(bankLinkingEnabledProvider.bankLinkingEnabled()).map { (methods, enabled) ->
+    }.zipWith(bankLinkingEnabledProvider.bankLinkingEnabled(fiatCurrency)).map { (methods, enabled) ->
         methods.filter {
             it.type != PaymentMethodResponse.BANK_TRANSFER || enabled
         }
@@ -607,30 +624,38 @@ class LiveCustodialWalletManager(
                 sessionToken = it,
                 currency = fiatCurrency,
                 eligibleOnly = true
-            ).map { methodsResponse ->
-                methodsResponse.mapNotNull { method ->
-                    when (method.type) {
-                        PaymentMethodResponse.PAYMENT_CARD -> EligiblePaymentMethodType(
-                            PaymentMethodType.PAYMENT_CARD,
-                            method.currency ?: return@mapNotNull null
-                        )
-                        PaymentMethodResponse.BANK_TRANSFER -> EligiblePaymentMethodType(
-                            PaymentMethodType.BANK_TRANSFER,
-                            method.currency ?: return@mapNotNull null
-                        )
-                        PaymentMethodResponse.BANK_ACCOUNT -> EligiblePaymentMethodType(
-                            PaymentMethodType.BANK_ACCOUNT,
-                            method.currency ?: return@mapNotNull null
-                        )
-                        else -> null
+            ).zipWith(bankLinkingEnabledProvider.bankLinkingEnabled(fiatCurrency))
+                .map { (methodsResponse, bankLinkingEnabled) ->
+                    methodsResponse.mapNotNull { method ->
+                        when (method.type) {
+                            PaymentMethodResponse.PAYMENT_CARD -> EligiblePaymentMethodType(
+                                PaymentMethodType.PAYMENT_CARD,
+                                method.currency ?: return@mapNotNull null
+                            )
+                            PaymentMethodResponse.BANK_TRANSFER -> {
+                                if (bankLinkingEnabled) {
+                                    EligiblePaymentMethodType(
+                                        PaymentMethodType.BANK_TRANSFER,
+                                        method.currency ?: return@mapNotNull null
+                                    )
+                                } else {
+                                    return@mapNotNull null
+                                }
+                            }
+                            PaymentMethodResponse.BANK_ACCOUNT
+                            -> EligiblePaymentMethodType(
+                                PaymentMethodType.BANK_ACCOUNT,
+                                method.currency ?: return@mapNotNull null
+                            )
+                            else -> null
+                        }
                     }
                 }
-            }
         }
 
     override fun activateCard(
         cardId: String,
-        attributes: CardPartnerAttributes
+        attributes: SimpleBuyConfirmationAttributes
     ): Single<PartnerCredentials> =
         authenticator.authenticate {
             nabuService.activateCard(it, cardId, attributes)
@@ -668,15 +693,19 @@ class LiveCustodialWalletManager(
 
     override fun confirmOrder(
         orderId: String,
-        attributes: CardPartnerAttributes?,
-        paymentMethodId: String?
+        attributes: SimpleBuyConfirmationAttributes?,
+        paymentMethodId: String?,
+        isBankPartner: Boolean?
     ): Single<BuySellOrder> =
         authenticator.authenticate {
             nabuService.confirmOrder(
                 it, orderId,
                 ConfirmOrderRequestBody(
                     paymentMethodId = paymentMethodId,
-                    attributes = attributes
+                    attributes = attributes,
+                    paymentType = if (isBankPartner == true) {
+                        PaymentMethodResponse.BANK_TRANSFER
+                    } else null
                 )
             )
         }.map {
@@ -931,32 +960,39 @@ class LiveCustodialWalletManager(
                 sessionToken = sessionToken
             )
         }.map { banksResponse ->
-            banksResponse.mapNotNull { it.toBank() }
+            banksResponse.map { it.toBank() }
         }
     }
 
     private fun BankInfoResponse.toBank(): Bank =
         Bank(
             id = id,
-            name = name,
+            name = accountName ?: name,
             state = state.toBankState(),
             currency = currency,
             account = accountNumber ?: "",
             accountType = bankAccountType ?: "",
             paymentMethodType = if (this.isBankTransferAccount)
-                PaymentMethodType.BANK_TRANSFER else PaymentMethodType.BANK_ACCOUNT
+                PaymentMethodType.BANK_TRANSFER else PaymentMethodType.BANK_ACCOUNT,
+            iconUrl = attributes?.media?.find { it.type == ICON }?.source ?: ""
         )
 
     private fun LinkedBankTransferResponse.toLinkedBank(): LinkedBank? {
         return LinkedBank(
             id = id,
             currency = currency,
-            partner = partner.toLinkBankedPartner(BankPartner.values().toList()) ?: return null,
+            partner = partner.toLinkingBankPartner(BankPartner.values().toList()) ?: return null,
             state = state.toLinkedBankState(),
-            name = details?.bankName ?: "",
+            name = details?.accountName ?: "",
             accountNumber = details?.accountNumber?.replace("x", "") ?: "",
             errorStatus = error?.toLinkedBankErrorState() ?: LinkedBankErrorState.NONE,
-            accountType = details?.bankAccountType ?: ""
+            accountType = details?.bankAccountType ?: "",
+            authorisationUrl = attributes?.authorisationUrl ?: "",
+            sortCode = details?.sortCode ?: "",
+            accountIban = details?.iban ?: "",
+            bic = details?.bic ?: "",
+            entity = attributes?.entity ?: "",
+            iconUrl = attributes?.media?.find { it.source == ICON }?.source ?: ""
         )
     }
 
@@ -984,7 +1020,7 @@ class LiveCustodialWalletManager(
 
     override fun startBankTransfer(id: String, amount: Money, currency: String): Single<String> =
         authenticator.authenticate { sessionToken ->
-            nabuService.startAchPayment(
+            nabuService.startBankTransferPayment(
                 sessionToken = sessionToken,
                 id = id,
                 body = BankTransferPaymentBody(
@@ -1037,7 +1073,8 @@ class LiveCustodialWalletManager(
             bankName = this.name,
             accountEnding = this.account,
             accountType = this.accountType,
-            isEligible = true
+            isEligible = true,
+            iconUrl = this.iconUrl
         )
 
     private fun String.isActive(): Boolean =
@@ -1058,8 +1095,11 @@ class LiveCustodialWalletManager(
 
     private fun String.toLinkedBankState(): LinkedBankState =
         when (this) {
+            LinkedBankTransferResponse.CREATED -> LinkedBankState.CREATED
             LinkedBankTransferResponse.ACTIVE -> LinkedBankState.ACTIVE
-            LinkedBankTransferResponse.PENDING -> LinkedBankState.PENDING
+            LinkedBankTransferResponse.PENDING,
+            LinkedBankTransferResponse.FRAUD_REVIEW,
+            LinkedBankTransferResponse.MANUAL_REVIEW -> LinkedBankState.PENDING
             LinkedBankTransferResponse.BLOCKED -> LinkedBankState.BLOCKED
             else -> LinkedBankState.UNKNOWN
         }
@@ -1153,9 +1193,10 @@ private fun String.toLinkedBankState(): LinkedBankState =
         else -> LinkedBankState.UNKNOWN
     }
 
-private fun String.toLinkBankedPartner(supportedBankPartners: List<BankPartner>): BankPartner? {
+private fun String.toLinkingBankPartner(supportedBankPartners: List<BankPartner>): BankPartner? {
     val partner = when (this) {
         CreateLinkBankResponse.YODLEE_PARTNER -> BankPartner.YODLEE
+        CreateLinkBankResponse.YAPILY_PARTNER -> BankPartner.YAPILY
         else -> null
     }
 
@@ -1168,7 +1209,10 @@ private fun String.toLinkedBankErrorState(): LinkedBankErrorState =
     when (this) {
         LinkedBankTransferResponse.ERROR_ALREADY_LINKED -> LinkedBankErrorState.ACCOUNT_ALREADY_LINKED
         LinkedBankTransferResponse.ERROR_UNSUPPORTED_ACCOUNT -> LinkedBankErrorState.ACCOUNT_TYPE_UNSUPPORTED
-        LinkedBankTransferResponse.ERROR_NAMES_MISS_MATCHED -> LinkedBankErrorState.NAMES_MISS_MATCHED
+        LinkedBankTransferResponse.ERROR_NAMES_MISMATCHED -> LinkedBankErrorState.NAMES_MISMATCHED
+        LinkedBankTransferResponse.ERROR_ACCOUNT_EXPIRED -> LinkedBankErrorState.EXPIRED
+        LinkedBankTransferResponse.ERROR_ACCOUNT_REJECTED -> LinkedBankErrorState.REJECTED
+        LinkedBankTransferResponse.ERROR_ACCOUNT_FAILURE -> LinkedBankErrorState.FAILURE
         else -> LinkedBankErrorState.UNKNOWN
     }
 
@@ -1300,9 +1344,19 @@ private fun BuySellOrderResponse.toBuySellOrder(): BuySellOrder {
             FiatValue.fromMinor(outputCurrency, outputQuantity.toLongOrDefault(0)),
         attributes = attributes,
         type = type(),
-        depositPaymentId = depositPaymentId ?: ""
+        depositPaymentId = depositPaymentId ?: "",
+        approvalErrorStatus = attributes?.status?.toApprovalError() ?: ApprovalErrorStatus.NONE
     )
 }
+
+private fun String.toApprovalError(): ApprovalErrorStatus =
+    when (this) {
+        BuySellOrderResponse.APPROVAL_ERROR_FAILED -> ApprovalErrorStatus.FAILED
+        BuySellOrderResponse.APPROVAL_ERROR_DECLINED -> ApprovalErrorStatus.DECLINED
+        BuySellOrderResponse.APPROVAL_ERROR_REJECTED -> ApprovalErrorStatus.REJECTED
+        BuySellOrderResponse.APPROVAL_ERROR_EXPIRED -> ApprovalErrorStatus.EXPIRED
+        else -> ApprovalErrorStatus.UNKNOWN
+    }
 
 private fun String.toPaymentMethodType(): PaymentMethodType =
     when (this) {

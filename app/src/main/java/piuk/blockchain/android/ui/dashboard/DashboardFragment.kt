@@ -49,12 +49,13 @@ import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementList
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsFlow
 import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsDetailSheet
 import piuk.blockchain.android.ui.dashboard.sheets.ForceBackupForSendSheet
-import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankMethodChooserBottomSheet
+import piuk.blockchain.android.ui.dashboard.sheets.WireTransferAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.interest.InterestSummarySheet
-import piuk.blockchain.android.ui.linkbank.LinkBankActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthSource
 import piuk.blockchain.android.ui.sell.BuySellFragment
 import piuk.blockchain.android.ui.settings.BankLinkingHost
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
@@ -215,13 +216,26 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     }
 
     private fun startBankLinking(linkBankTransfer: LinkBankTransfer) {
-        startActivityForResult(
-            LinkBankActivity.newInstance(
-                linkBankTransfer,
-                requireContext()
-            ),
-            LinkBankActivity.LINK_BANK_REQUEST_CODE
-        )
+        (state?.dashboardNavigationAction as? DashboardNavigationAction.LinkBankWithPartner)?.let {
+            startActivityForResult(
+                BankAuthActivity.newInstance(
+                    linkBankTransfer,
+                    when (it.assetAction) {
+                        AssetAction.FiatDeposit -> {
+                            BankAuthSource.DEPOSIT
+                        }
+                        AssetAction.Withdraw -> {
+                            BankAuthSource.WITHDRAW
+                        }
+                        else -> {
+                            throw IllegalStateException("Attempting to link from an unsupported action")
+                        }
+                    },
+                    requireContext()
+                ),
+                BankAuthActivity.LINK_BANK_REQUEST_CODE
+            )
+        }
     }
 
     private fun handleBottomSheet(state: DashboardState) {
@@ -243,8 +257,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                 )
                 DashboardNavigationAction.LinkOrDeposit -> {
                     state.selectedFiatAccount?.let {
-                        LinkBankAccountDetailsBottomSheet.newInstance(it)
-                    } ?: LinkBankAccountDetailsBottomSheet.newInstance()
+                        WireTransferAccountDetailsBottomSheet.newInstance(it)
+                    } ?: WireTransferAccountDetailsBottomSheet.newInstance()
                 }
                 DashboardNavigationAction.PaymentMethods -> {
                     state.linkablePaymentMethodsForAction?.let {
@@ -402,7 +416,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                     model.process(CheckBackupStatus(it.account, it.action))
                 }
             }
-            LinkBankActivity.LINK_BANK_REQUEST_CODE -> {
+            BankAuthActivity.LINK_BANK_REQUEST_CODE -> {
                 if (resultCode == RESULT_OK) {
                     state?.selectedFiatAccount?.let { fiatAccount ->
                         (state?.dashboardNavigationAction as? DashboardNavigationAction.LinkBankWithPartner)?.let {

@@ -10,8 +10,8 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.FiatValue
-import kotlinx.android.synthetic.main.fragment_checkout.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.FragmentSimplebuyCheckoutBinding
 import piuk.blockchain.android.ui.base.ErrorDialogData
 import piuk.blockchain.android.ui.base.ErrorSlidingBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviFragment
@@ -19,7 +19,6 @@ import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.goneIf
-import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.secondsToDays
 import piuk.blockchain.android.util.setOnClickListenerDebounced
 import piuk.blockchain.android.util.visible
@@ -28,6 +27,10 @@ import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 
 class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(), SimpleBuyScreen,
     SimpleBuyCancelOrderBottomSheet.Host {
+
+    private var _binding: FragmentSimplebuyCheckoutBinding? = null
+    private val binding: FragmentSimplebuyCheckoutBinding
+        get() = _binding!!
 
     override val model: SimpleBuyModel by scopedInject()
     private var lastState: SimpleBuyState? = null
@@ -45,11 +48,14 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_checkout)
+    ): View {
+        _binding = FragmentSimplebuyCheckoutBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        recycler.apply {
+        binding.recycler.apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = checkoutAdapter
             addItemDecoration(BlockchainListDividerDecor(requireContext()))
@@ -96,7 +102,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
             lastState = newState
         }
 
-        progress.visibleIf { newState.isLoading }
+        binding.progress.visibleIf { newState.isLoading }
         val note = when {
             newState.selectedPaymentMethod?.isCard() == true -> {
                 getString(R.string.purchase_card_note_1)
@@ -112,7 +118,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
             else -> ""
         }
 
-        purchase_note.apply {
+        binding.purchaseNote.apply {
             if (note.isNullOrBlank())
                 gone()
             else {
@@ -152,29 +158,31 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
     }
 
     private fun showAmountForMethod(newState: SimpleBuyState) {
-        amount.text = newState.orderValue?.toStringWithSymbol()
+        binding.amount.text = newState.orderValue?.toStringWithSymbol()
     }
 
     private fun updateStatusPill(newState: SimpleBuyState) {
-        when {
-            isPendingOrAwaitingFunds(newState.orderState) -> {
-                status.text = getString(R.string.order_pending)
-                status.background =
-                    ContextCompat.getDrawable(requireContext(), R.drawable.bkgd_status_unconfirmed)
-                status.setTextColor(
-                    ContextCompat.getColor(requireContext(), R.color.grey_800)
-                )
-            }
-            newState.orderState == OrderState.FINISHED -> {
-                status.text = getString(R.string.order_complete)
-                status.background =
-                    ContextCompat.getDrawable(requireContext(), R.drawable.bkgd_green_100_rounded)
-                status.setTextColor(
-                    ContextCompat.getColor(requireContext(), R.color.green_600)
-                )
-            }
-            else -> {
-                status.gone()
+        with(binding.status) {
+            when {
+                isPendingOrAwaitingFunds(newState.orderState) -> {
+                    text = getString(R.string.order_pending)
+                    background =
+                        ContextCompat.getDrawable(requireContext(), R.drawable.bkgd_status_unconfirmed)
+                    setTextColor(
+                        ContextCompat.getColor(requireContext(), R.color.grey_800)
+                    )
+                }
+                newState.orderState == OrderState.FINISHED -> {
+                    text = getString(R.string.order_complete)
+                    background =
+                        ContextCompat.getDrawable(requireContext(), R.drawable.bkgd_green_100_rounded)
+                    setTextColor(
+                        ContextCompat.getColor(requireContext(), R.color.green_600)
+                    )
+                }
+                else -> {
+                    gone()
+                }
             }
         }
     }
@@ -216,40 +224,42 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
     private fun configureButtons(state: SimpleBuyState) {
         val isOrderAwaitingFunds = state.orderState == OrderState.AWAITING_FUNDS
 
-        button_action.apply {
-            if (!isForPendingPayment && !isOrderAwaitingFunds) {
-                text = getString(R.string.buy_now_1, state.orderValue?.toStringWithSymbol())
-                setOnClickListener {
-                    model.process(SimpleBuyIntent.ConfirmOrder)
-                    analytics.logEvent(
-                        eventWithPaymentMethod(
-                            SimpleBuyAnalytics.CHECKOUT_SUMMARY_CONFIRMED,
-                            state.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString() ?: ""
+        with(binding) {
+            buttonAction.apply {
+                if (!isForPendingPayment && !isOrderAwaitingFunds) {
+                    text = getString(R.string.buy_now_1, state.orderValue?.toStringWithSymbol())
+                    setOnClickListener {
+                        model.process(SimpleBuyIntent.ConfirmOrder)
+                        analytics.logEvent(
+                            eventWithPaymentMethod(
+                                SimpleBuyAnalytics.CHECKOUT_SUMMARY_CONFIRMED,
+                                state.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString() ?: ""
+                            )
                         )
-                    )
-                }
-            } else {
-                text = if (isOrderAwaitingFunds && !isForPendingPayment) {
-                    getString(R.string.complete_payment)
+                    }
                 } else {
-                    getString(R.string.ok_cap)
-                }
-                setOnClickListener {
-                    if (isForPendingPayment) {
-                        navigator().exitSimpleBuyFlow()
+                    text = if (isOrderAwaitingFunds && !isForPendingPayment) {
+                        getString(R.string.complete_payment)
                     } else {
-                        navigator().goToPaymentScreen()
+                        getString(R.string.ok_cap)
+                    }
+                    setOnClickListener {
+                        if (isForPendingPayment) {
+                            navigator().exitSimpleBuyFlow()
+                        } else {
+                            navigator().goToPaymentScreen()
+                        }
                     }
                 }
+                visibleIf { !showOnlyOrderData }
             }
-            visibleIf { !showOnlyOrderData }
-        }
 
-        button_action.isEnabled = !state.isLoading
-        button_cancel.goneIf { isOrderAwaitingFunds || isForPendingPayment }
-        button_cancel.setOnClickListenerDebounced {
-            analytics.logEvent(SimpleBuyAnalytics.CHECKOUT_SUMMARY_PRESS_CANCEL)
-            showBottomSheet(SimpleBuyCancelOrderBottomSheet.newInstance())
+            buttonAction.isEnabled = !state.isLoading
+            buttonCancel.goneIf { isOrderAwaitingFunds || isForPendingPayment }
+            buttonCancel.setOnClickListenerDebounced {
+                analytics.logEvent(SimpleBuyAnalytics.CHECKOUT_SUMMARY_PRESS_CANCEL)
+                showBottomSheet(SimpleBuyCancelOrderBottomSheet.newInstance())
+            }
         }
     }
 

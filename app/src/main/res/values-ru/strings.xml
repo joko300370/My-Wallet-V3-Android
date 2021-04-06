@@ -1066,7 +1066,7 @@
     <string name="by_depositing_funds_terms_and_conds">Внося средства на этот счет, вы соглашаетесь с <annotation link="modular_terms_and_conditions">Условиями и положениями Modulr</annotation> – нашего банковского партнера.</string>
     <string name="add_bank_with_currency">Добавить банк %1s</string>
     <string name="deposit_currency">Внести на счет %1s</string>
-    <string name="payment">Платеж</string>
+    <string name="common_payment">Платеж</string>
     <string name="buy_now_1">Купить %1s</string>
     <string name="simple_buy_transfer_details_error">Что-то пошло не так при загрузке данных перевода.
 
@@ -1486,17 +1486,17 @@
     <string name="yodlee_connection_subtitle">Это может занять до 30 секунд.</string>
     <string name="yodlee_linking_title">Возвращаемся к вашему кошельку…</string>
     <string name="yodlee_linking_subtitle">Это может занять до 30 секунд. Пожалуйста, не возвращайтесь назад и не закрывайте приложение.</string>
-    <string name="yodlee_linking_generic_error_title">Ой! Что-то пошло не так</string>
-    <string name="yodlee_linking_is_this_your_bank">Это ваш банк?</string>
-    <string name="yodlee_linking_generic_error_subtitle">Пожалуйста, попробуйте снова установить связь с вашим банком. Если это повторяется, обратитесь в службу поддержки.</string>
-    <string name="yodlee_linking_timeout_error_subtitle">Установление соединения с вашим банком длится слишком долго, пожалуйста, попробуйте еще раз.</string>
-    <string name="yodlee_linking_already_linked_error_subtitle">Мы заметили, что <annotation font="bold">имена не совпадают.</annotation> В банке, который вы привязываете, должны быть такие же официальные имя и фамилия, как и в счете Blockchain.com. <annotation link="yodlee_names_dont_match_learn_more">Подробнее →</annotation></string>
-    <string name="yodlee_linking_checking_error_title">Пожалуйста, привяжите текущий счет.</string>
-    <string name="yodlee_linking_checking_error_subtitle">Ваш банк может взимать дополнительную комиссию, если вы покупаете криптовалюту без текущего счета.</string>
-    <string name="yodlee_linking_success_title">Банк привязан!</string>
-    <string name="yodlee_linking_success_subtitle">Ваш счет %1$s теперь привязан к кошельку Blockchain.com.</string>
-    <string name="yodlee_linking_try_different_bank">Попробуйте другой банк</string>
-    <string name="yodlee_linking_try_different_account">Попробуйте другой счет</string>
+    <string name="bank_linking_generic_error_title">Ой! Что-то пошло не так</string>
+    <string name="bank_linking_is_this_your_bank">Это ваш банк?</string>
+    <string name="bank_linking_generic_error_subtitle">Пожалуйста, попробуйте снова установить связь с вашим банком. Если это повторяется, обратитесь в службу поддержки.</string>
+    <string name="bank_linking_timeout_error_subtitle">Установление соединения с вашим банком длится слишком долго, пожалуйста, попробуйте еще раз.</string>
+    <string name="bank_linking_already_linked_error_subtitle">Мы заметили, что <annotation font="bold">имена не совпадают.</annotation> В банке, который вы привязываете, должны быть такие же официальные имя и фамилия, как и в счете Blockchain.com. <annotation link="yodlee_names_dont_match_learn_more">Подробнее →</annotation></string>
+    <string name="bank_linking_checking_error_title">Пожалуйста, привяжите текущий счет.</string>
+    <string name="bank_linking_checking_error_subtitle">Ваш банк может взимать дополнительную комиссию, если вы покупаете криптовалюту без текущего счета.</string>
+    <string name="bank_linking_success_title">Банк привязан!</string>
+    <string name="bank_linking_success_subtitle">Ваш счет %1$s теперь привязан к кошельку Blockchain.com.</string>
+    <string name="bank_linking_try_different_bank">Попробуйте другой банк</string>
+    <string name="bank_linking_try_different_account">Попробуйте другой счет</string>
     <string name="yodlee_parsing_error">При установлении соединения с Yodlee возникла проблема. Пожалуйста, попробуйте еще раз или свяжитесь со службой поддержки.</string>
     <string name="yodlee_flow_exited">Соединение с Yodlee прекращено, хотите попробовать еще раз?</string>
     <string name="yodlee_unexpected_error">К сожалению, при установлении связи с Yodlee что-то пошло не так, пожалуйста, попробуйте еще раз.</string>

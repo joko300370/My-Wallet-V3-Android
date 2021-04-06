@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import com.blockchain.koin.scopedInject
-import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.ExchangeRates
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -44,7 +43,6 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog<DialogSheetFiatFundsDetail
 
     private val prefs: CurrencyPrefs by scopedInject()
     private val exchangeRates: ExchangeRates by scopedInject()
-    private val custodialWalletManager: CustodialWalletManager by scopedInject()
     private val disposables = CompositeDisposable()
 
     private var account: FiatAccount = NullFiatAccount

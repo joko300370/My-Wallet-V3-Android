@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.dashboard.announcements
 
-import com.blockchain.koin.dgldFeatureFlag
 import com.blockchain.koin.payloadScope
 import com.blockchain.koin.payloadScopeQualifier
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -22,7 +21,6 @@ import piuk.blockchain.android.ui.dashboard.announcements.rule.KycResubmissionAn
 import piuk.blockchain.android.ui.dashboard.announcements.rule.RegisterBiometricsAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.RegisteredForAirdropMiniAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SellIntroAnnouncement
-import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyAddCardAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyFinishSignupAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.StxCompleteAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SwapAnnouncement
@@ -183,14 +181,6 @@ val dashboardAnnouncementsModule = module {
         }.bind(AnnouncementRule::class)
 
         factory {
-            SimpleBuyAddCardAnnouncement(
-                dismissRecorder = get(),
-                analytics = get(),
-                queries = get()
-            )
-        }.bind(AnnouncementRule::class)
-
-        factory {
             FiatFundsNoKycAnnouncement(
                 dismissRecorder = get(),
                 featureEligibility = get()
@@ -228,8 +218,7 @@ val dashboardAnnouncementsModule = module {
 
         factory {
             WDGLDAvailableAnnouncement(
-                dismissRecorder = get(),
-                dgldFeatureFlag = get(dgldFeatureFlag)
+                dismissRecorder = get()
             )
         }.bind(AnnouncementRule::class)
 

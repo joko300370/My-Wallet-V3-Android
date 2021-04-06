@@ -8,7 +8,6 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.SimpleBuyCancelOrderBottomSheetBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.util.setOnClickListenerDebounced
-import java.lang.IllegalStateException
 
 class SimpleBuyCancelOrderBottomSheet : SlidingModalBottomDialog<SimpleBuyCancelOrderBottomSheetBinding>() {
 
@@ -42,10 +41,12 @@ class SimpleBuyCancelOrderBottomSheet : SlidingModalBottomDialog<SimpleBuyCancel
                     state.selectedCryptoCurrency.displayTicker
                 )
                 cancelOrder.setOnClickListenerDebounced {
+                    analytics.logEvent(SimpleBuyAnalytics.BANK_DETAILS_CANCEL_CONFIRMED)
                     dismiss()
                     host.cancelOrderConfirmAction(true, state.id)
                 }
                 goBack.setOnClickListenerDebounced {
+                    analytics.logEvent(SimpleBuyAnalytics.BANK_DETAILS_CANCEL_GO_BACK)
                     dismiss()
                     host.cancelOrderConfirmAction(false, null)
                 }

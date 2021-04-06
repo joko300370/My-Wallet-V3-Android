@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/standard_margin"
+    android:orientation="horizontal"
+    android:paddingBottom="@dimen/medium_margin">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/yapily_header_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="@dimen/standard_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@drawable/ic_safeconnect" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/yapily_header_title"
+        style="@style/Text.Standard.20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/medium_margin"
+        app:layout_constraintStart_toEndOf="@id/yapily_header_icon"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@string/yapily_agreement_title" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/yapily_subheader"
+        style="@style/Text.Standard.20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/standard_margin"
+        android:text="@string/yapily_approval_header"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@id/yapily_header_icon"
+        app:layout_constraintTop_toBottomOf="@id/yapily_header_title"
+        tools:visibility="visible" />
+</androidx.constraintlayout.widget.ConstraintLayout>

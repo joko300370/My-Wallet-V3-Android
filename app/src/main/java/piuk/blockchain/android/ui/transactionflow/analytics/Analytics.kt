@@ -21,6 +21,7 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
 
 const val WALLET_TYPE_NON_CUSTODIAL = "non_custodial"
 const val WALLET_TYPE_CUSTODIAL = "custodial"
+const val WALLET_TYPE_FIAT = "fiat"
 const val WALLET_TYPE_INTEREST = "interest"
 const val WALLET_TYPE_BANK = "bank"
 const val WALLET_TYPE_EXTERNAL = "external"

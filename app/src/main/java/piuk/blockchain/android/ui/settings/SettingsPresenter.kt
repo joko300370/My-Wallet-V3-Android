@@ -183,7 +183,9 @@ class SettingsPresenter(
         }
 
     private fun linkedBanks(): Single<Set<Bank>> =
-        custodialWalletManager.getBanks().map { banks -> banks.filter { it.state == BankState.ACTIVE } }.map { banks ->
+        custodialWalletManager.getBanks().map { banks ->
+            banks.filter { it.state == BankState.ACTIVE }
+        }.map { banks ->
             banks.toSet()
         }
 

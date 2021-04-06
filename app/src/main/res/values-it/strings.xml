@@ -1066,7 +1066,7 @@
     <string name="by_depositing_funds_terms_and_conds">Depositando fondi su questo conto, accetti <annotation link="modular_terms_and_conditions"> Termini e condizioni di Modulr </annotation> , il nostro partner bancario.</string>
     <string name="add_bank_with_currency">Aggiungi una banca %1s</string>
     <string name="deposit_currency">Deposito %1s</string>
-    <string name="payment">Pagamento</string>
+    <string name="common_payment">Pagamento</string>
     <string name="buy_now_1">Acquista %1s</string>
     <string name="simple_buy_transfer_details_error">Si è verificato un errore durante il caricamento dei dettagli del trasferimento.
 
@@ -1482,17 +1482,17 @@
     <string name="yodlee_connection_subtitle">Potrebbero volerci fino a 30 secondi.</string>
     <string name="yodlee_linking_title">Reindirizzamento al portafoglio..</string>
     <string name="yodlee_linking_subtitle">Potrebbero volerci fino a 30 secondi. Si prega di non tornare indietro e di non chiudere l\'applicazione.</string>
-    <string name="yodlee_linking_generic_error_title">Ops! Qualcosa è andato storto</string>
-    <string name="yodlee_linking_is_this_your_bank">Questa è la tua banca?</string>
-    <string name="yodlee_linking_generic_error_subtitle">Prova a collegare di nuovo la tua banca. Se il problema persiste, contatta l\'assistenza.</string>
-    <string name="yodlee_linking_timeout_error_subtitle">Il collegamento alla tua banca impiega troppo tempo, riprova.</string>
-    <string name="yodlee_linking_already_linked_error_subtitle">Abbiamo notato che <annotation font="bold">i nomi non corrispondono.</annotation> La banca che colleghi deve avere un nome legale che corrisponda a quello del tuo account Blockchain.com. <annotation link="yodlee_names_dont_match_learn_more">Maggiori informazioni →</annotation></string>
-    <string name="yodlee_linking_checking_error_title">Collega un conto corrente.</string>
-    <string name="yodlee_linking_checking_error_subtitle">La tua banca potrebbe addebitarti costi aggiuntivi se acquisti criptovaluta senza un conto corrente.</string>
-    <string name="yodlee_linking_success_title">Banca collegata!</string>
-    <string name="yodlee_linking_success_subtitle">Il tuo account %1$s è ora collegato al tuo portafoglio Blockchain.com.</string>
-    <string name="yodlee_linking_try_different_bank">Prova una banca diversa</string>
-    <string name="yodlee_linking_try_different_account">Prova un account diverso</string>
+    <string name="bank_linking_generic_error_title">Ops! Qualcosa è andato storto</string>
+    <string name="bank_linking_is_this_your_bank">Questa è la tua banca?</string>
+    <string name="bank_linking_generic_error_subtitle">Prova a collegare di nuovo la tua banca. Se il problema persiste, contatta l\'assistenza.</string>
+    <string name="bank_linking_timeout_error_subtitle">Il collegamento alla tua banca impiega troppo tempo, riprova.</string>
+    <string name="bank_linking_already_linked_error_subtitle">Abbiamo notato che <annotation font="bold">i nomi non corrispondono.</annotation> La banca che colleghi deve avere un nome legale che corrisponda a quello del tuo account Blockchain.com. <annotation link="yodlee_names_dont_match_learn_more">Maggiori informazioni →</annotation></string>
+    <string name="bank_linking_checking_error_title">Collega un conto corrente.</string>
+    <string name="bank_linking_checking_error_subtitle">La tua banca potrebbe addebitarti costi aggiuntivi se acquisti criptovaluta senza un conto corrente.</string>
+    <string name="bank_linking_success_title">Banca collegata!</string>
+    <string name="bank_linking_success_subtitle">Il tuo account %1$s è ora collegato al tuo portafoglio Blockchain.com.</string>
+    <string name="bank_linking_try_different_bank">Prova una banca diversa</string>
+    <string name="bank_linking_try_different_account">Prova un account diverso</string>
     <string name="yodlee_parsing_error">Si è verificato un problema durante il collegamento con Yodlee, riprova o contatta l\'assistenza.</string>
     <string name="yodlee_flow_exited">Collegamento di Yodlee terminato, riprovare?</string>
     <string name="yodlee_unexpected_error">Si è verificato un problema durante il collegamento con Yodlee, riprova.</string>

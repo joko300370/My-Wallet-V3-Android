@@ -84,10 +84,11 @@ import piuk.blockchain.android.ui.customviews.PasswordStrengthView
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.dashboard.LinkablePaymentMethodsForAction
-import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
+import piuk.blockchain.android.ui.dashboard.sheets.WireTransferAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankMethodChooserBottomSheet
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
-import piuk.blockchain.android.ui.linkbank.LinkBankActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthSource
 import piuk.blockchain.android.ui.settings.preferences.BankPreference
 import piuk.blockchain.android.ui.settings.preferences.CardPreference
 import piuk.blockchain.android.ui.settings.preferences.KycStatusPreference
@@ -536,8 +537,8 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
 
     override fun onBankWireTransferSelected(currency: String) {
-        LinkBankAccountDetailsBottomSheet.newInstance(currency).show(childFragmentManager, BOTTOM_SHEET)
-        analytics.logEvent(linkBankEventWithCurrency(SimpleBuyAnalytics.LINK_BANK_CLICKED, currency))
+        WireTransferAccountDetailsBottomSheet.newInstance(currency).show(childFragmentManager, BOTTOM_SHEET)
+        analytics.logEvent(linkBankEventWithCurrency(SimpleBuyAnalytics.WIRE_TRANSFER_CLICKED, currency))
     }
 
     private fun linkBank(linkablePaymentMethods: LinkablePaymentMethods) {
@@ -955,7 +956,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
                         )
                     )
                 }
-                LinkBankActivity.LINK_BANK_REQUEST_CODE -> {
+                BankAuthActivity.LINK_BANK_REQUEST_CODE -> {
                     settingsPresenter.updateBanks()
                 }
                 REQUEST_CODE_BIOMETRIC_ENROLLMENT -> {
@@ -1239,7 +1240,12 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
     override fun linkBankWithPartner(linkBankTransfer: LinkBankTransfer) {
         startActivityForResult(
-            LinkBankActivity.newInstance(linkBankTransfer, requireContext()), LinkBankActivity.LINK_BANK_REQUEST_CODE
+            BankAuthActivity.newInstance(
+                linkBankTransfer,
+                BankAuthSource.SETTINGS,
+                requireContext()
+            ),
+            BankAuthActivity.LINK_BANK_REQUEST_CODE
         )
     }
 }

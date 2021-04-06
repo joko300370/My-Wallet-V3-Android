@@ -33,6 +33,7 @@ data class InterestActivityItemResponse(
         const val REJECTED = "REJECTED"
         const val PROCESSING = "PROCESSING"
         const val COMPLETE = "COMPLETE"
+        const val CREATED = "CREATED"
         const val PENDING = "PENDING"
         const val MANUAL_REVIEW = "MANUAL_REVIEW"
         const val CLEARED = "CLEARED"

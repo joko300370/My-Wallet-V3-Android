@@ -327,6 +327,10 @@ dependencies {
     implementation Libraries.rxReplayShare
     implementation Libraries.rxRelay
 
+    // Glide
+    implementation Libraries.glide
+    annotationProcessor Libraries.glideAnnotations
+
     // Custom Views
     implementation Libraries.materialDatePicker
 

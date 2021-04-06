@@ -28,11 +28,11 @@ import com.blockchain.nabu.models.responses.sdd.SDDEligibilityResponse
 import com.blockchain.nabu.models.responses.sdd.SDDStatusResponse
 import com.blockchain.nabu.models.responses.simplebuy.AddNewCardBodyRequest
 import com.blockchain.nabu.models.responses.simplebuy.BankAccountResponse
-import com.blockchain.nabu.models.responses.simplebuy.CardPartnerAttributes
 import com.blockchain.nabu.models.responses.simplebuy.ConfirmOrderRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
 import com.blockchain.nabu.models.responses.simplebuy.DepositRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.ProductTransferRequestBody
+import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyConfirmationAttributes
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyCurrency
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyEligibility
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyPairsResp
@@ -461,7 +461,7 @@ class NabuService(retrofit: Retrofit) {
     fun activateCard(
         sessionToken: NabuSessionTokenResponse,
         cardId: String,
-        attributes: CardPartnerAttributes
+        attributes: SimpleBuyConfirmationAttributes
     ) = service.activateCard(
         sessionToken.authHeader, cardId, attributes
     ).wrapErrorMessage()
@@ -644,7 +644,7 @@ class NabuService(retrofit: Retrofit) {
     ) = service.getBanks(authorization = sessionToken.authHeader)
         .wrapErrorMessage()
 
-    fun startAchPayment(
+    fun startBankTransferPayment(
         sessionToken: NabuSessionTokenResponse,
         id: String,
         body: BankTransferPaymentBody

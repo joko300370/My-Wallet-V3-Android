@@ -290,43 +290,80 @@ class DashboardInteractor(
         shouldLaunchBankLinkTransfer: Boolean
     ): Disposable {
         require(targetAccount is FiatAccount)
-        return Singles.zip(
-            linkedBanksFactory.eligibleBankPaymentMethods(targetAccount.fiatCurrency).map { paymentMethods ->
-                // Ignore any WireTransferMethods In case BankLinkTransfer should launch
-                paymentMethods.filter { it == PaymentMethodType.BANK_TRANSFER || !shouldLaunchBankLinkTransfer }
-            },
-            linkedBanksFactory.getNonWireTransferBanks().map {
-                it.filter { bank -> bank.currency == targetAccount.fiatCurrency }
-            }
-        ).flatMap { (paymentMethods, linkedBanks) ->
-            when {
-                linkedBanks.isEmpty() -> {
-                    handleNoLinkedBanks(
-                        targetAccount,
-                        LinkablePaymentMethodsForAction.LinkablePaymentMethodsForDeposit(
-                            linkablePaymentMethods = LinkablePaymentMethods(
-                                targetAccount.fiatCurrency,
-                                paymentMethods
-                            )
+        // TODO remove this when we can link banks from deposit
+        return if (targetAccount.isOpenBankingCurrency()) {
+            handleDepositForOpenBanking(targetAccount, model, action)
+        } else {
+            handleFiatDeposit(targetAccount, shouldLaunchBankLinkTransfer, model, action)
+        }
+    }
+
+    private fun handleFiatDeposit(
+        targetAccount: FiatAccount,
+        shouldLaunchBankLinkTransfer: Boolean,
+        model: DashboardModel,
+        action: AssetAction
+    ) = Singles.zip(
+        linkedBanksFactory.eligibleBankPaymentMethods(targetAccount.fiatCurrency).map { paymentMethods ->
+            // Ignore any WireTransferMethods In case BankLinkTransfer should launch
+            paymentMethods.filter { it == PaymentMethodType.BANK_TRANSFER || !shouldLaunchBankLinkTransfer }
+        },
+        linkedBanksFactory.getNonWireTransferBanks().map {
+            it.filter { bank -> bank.currency == targetAccount.fiatCurrency }
+        }
+    ).flatMap { (paymentMethods, linkedBanks) ->
+        when {
+            linkedBanks.isEmpty() -> {
+                handleNoLinkedBanks(
+                    targetAccount,
+                    LinkablePaymentMethodsForAction.LinkablePaymentMethodsForDeposit(
+                        linkablePaymentMethods = LinkablePaymentMethods(
+                            targetAccount.fiatCurrency,
+                            paymentMethods
                         )
                     )
-                }
-                linkedBanks.size == 1 -> {
-                    Single.just(FiatTransactionRequestResult.LaunchDepositFlow(linkedBanks[0]))
-                }
-                else -> {
-                    Single.just(FiatTransactionRequestResult.LaunchDepositFlowWithMultipleAccounts)
-                }
+                )
             }
-        }.subscribeBy(
-            onSuccess = {
-                handlePaymentMethodsUpdate(it, model, targetAccount, action)
-            },
-            onError = {
-                // TODO Add error state to Dashboard
+            linkedBanks.size == 1 -> {
+                Single.just(FiatTransactionRequestResult.LaunchDepositFlow(linkedBanks[0]))
             }
+            else -> {
+                Single.just(FiatTransactionRequestResult.LaunchDepositFlowWithMultipleAccounts)
+            }
+        }
+    }.subscribeBy(
+        onSuccess = {
+            handlePaymentMethodsUpdate(it, model, targetAccount, action)
+        },
+        onError = {
+            // TODO Add error state to Dashboard
+        }
+    )
+
+    private fun handleDepositForOpenBanking(
+        targetAccount: FiatAccount,
+        model: DashboardModel,
+        action: AssetAction
+    ) = linkedBanksFactory.eligibleBankPaymentMethods(targetAccount.fiatCurrency).map { paymentMethods ->
+        paymentMethods.filter { it == PaymentMethodType.BANK_ACCOUNT }
+    }.flatMap {
+        handleNoLinkedBanks(
+            targetAccount,
+            LinkablePaymentMethodsForAction.LinkablePaymentMethodsForDeposit(
+                linkablePaymentMethods = LinkablePaymentMethods(
+                    targetAccount.fiatCurrency,
+                    it
+                )
+            )
         )
-    }
+    }.subscribeBy(
+        onSuccess = {
+            handlePaymentMethodsUpdate(it, model, targetAccount, action)
+        },
+        onError = {
+            // TODO Add error state to Dashboard
+        }
+    )
 
     private fun handlePaymentMethodsUpdate(
         it: FiatTransactionRequestResult?,
@@ -399,6 +436,9 @@ class DashboardInteractor(
         }
     }
 
+    private fun FiatAccount.isOpenBankingCurrency() =
+        this.fiatCurrency == "EUR" || this.fiatCurrency == "GBP"
+
     private fun handleNoLinkedBanks(
         targetAccount: FiatAccount,
         paymentMethodForAction: LinkablePaymentMethodsForAction
@@ -450,15 +490,20 @@ class DashboardInteractor(
         ).flatMap { (paymentMethods, linkedBanks) ->
             when {
                 linkedBanks.isEmpty() -> {
-                    handleNoLinkedBanks(
-                        sourceAccount,
-                        LinkablePaymentMethodsForAction.LinkablePaymentMethodsForWithdraw(
-                            LinkablePaymentMethods(
-                                sourceAccount.fiatCurrency,
-                                paymentMethods
+                    // TODO remove this when we can link banks from withdraw
+                    if (sourceAccount.isOpenBankingCurrency()) {
+                        handleNoLinkedBanksWithdrawalForOpenBanking(sourceAccount)
+                    } else {
+                        handleNoLinkedBanks(
+                            sourceAccount,
+                            LinkablePaymentMethodsForAction.LinkablePaymentMethodsForWithdraw(
+                                LinkablePaymentMethods(
+                                    sourceAccount.fiatCurrency,
+                                    paymentMethods
+                                )
                             )
                         )
-                    )
+                    }
                 }
                 linkedBanks.size == 1 -> {
                     Single.just(FiatTransactionRequestResult.LaunchWithdrawalFlow(linkedBanks[0]))
@@ -476,6 +521,22 @@ class DashboardInteractor(
             }
         )
     }
+
+    private fun handleNoLinkedBanksWithdrawalForOpenBanking(sourceAccount: FiatAccount) =
+        linkedBanksFactory.eligibleBankPaymentMethods(sourceAccount.fiatCurrency)
+            .map { pM ->
+                pM.filter { it == PaymentMethodType.BANK_ACCOUNT }
+            }.flatMap {
+                handleNoLinkedBanks(
+                    sourceAccount,
+                    LinkablePaymentMethodsForAction.LinkablePaymentMethodsForWithdraw(
+                        LinkablePaymentMethods(
+                            sourceAccount.fiatCurrency,
+                            it
+                        )
+                    )
+                )
+            }
 
     companion object {
         private val FLATLINE_CHART = listOf(

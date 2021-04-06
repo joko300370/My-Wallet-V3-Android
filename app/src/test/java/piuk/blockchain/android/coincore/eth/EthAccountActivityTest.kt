@@ -27,7 +27,6 @@ import org.junit.Test
 import org.mockito.Mockito.spy
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.TradeActivitySummaryItem
-import piuk.blockchain.android.identity.NabuUserIdentity
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager

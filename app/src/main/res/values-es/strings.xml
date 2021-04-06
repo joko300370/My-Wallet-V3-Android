@@ -1061,7 +1061,7 @@ Euros/Dolares</string>
     <string name="by_depositing_funds_terms_and_conds">Al depositar fondos en esta cuenta, usted acepta los <annotation link="modular_terms_and_conditions">Términos y condiciones de Modulr</annotation>, nuestro socio bancario.</string>
     <string name="add_bank_with_currency">Agregar un banco %1s</string>
     <string name="deposit_currency">Depósito %1s</string>
-    <string name="payment">Pago</string>
+    <string name="common_payment">Pago</string>
     <string name="buy_now_1">Comprar %1s</string>
     <string name="simple_buy_transfer_details_error">Se produjo un error al cargar los detalles de la transferencia.
 
@@ -1476,17 +1476,17 @@ Nota: No podrá enviar ni retirar estos fondos de su monedero durante los próxi
     <string name="yodlee_connection_subtitle">Esto puede tardar hasta 30 segundos.</string>
     <string name="yodlee_linking_title">Llevándole de vuelta a su monedero...</string>
     <string name="yodlee_linking_subtitle">Esto podría tardar hasta 30 segundos. No retroceda ni cierre la aplicación.</string>
-    <string name="yodlee_linking_generic_error_title">Vaya, se ha producido un error.</string>
-    <string name="yodlee_linking_is_this_your_bank">¿Es este su banco?</string>
-    <string name="yodlee_linking_generic_error_subtitle">Intente vincular su banco nuevamente. Si se sigue produciendo este problema, póngase en contacto con Asistencia.</string>
-    <string name="yodlee_linking_timeout_error_subtitle">La conexión de su banco está tardando demasiado, inténtelo de nuevo.</string>
-    <string name="yodlee_linking_already_linked_error_subtitle">Hemos notado que <annotation font="bold">los nombres no coinciden.</annotation> El banco al que se conecta debe contar con un nombre y apellido legal que coincida con el de su cuenta en Blockchain.com. <annotation link="yodlee_names_dont_match_learn_more">Más información →</annotation></string>
-    <string name="yodlee_linking_checking_error_title">Vincule una cuenta corriente.</string>
-    <string name="yodlee_linking_checking_error_subtitle">Su banco puede cobrarle tarifas adicionales si compra criptomonedas sin una cuenta corriente.</string>
-    <string name="yodlee_linking_success_title">¡Banco vinculado!</string>
-    <string name="yodlee_linking_success_subtitle">Su cuenta %1$s ahora está vinculada a su monedero Blockchain.com.</string>
-    <string name="yodlee_linking_try_different_bank">Pruebe con un banco diferente</string>
-    <string name="yodlee_linking_try_different_account">Pruebe con una cuenta diferente</string>
+    <string name="bank_linking_generic_error_title">Vaya, se ha producido un error.</string>
+    <string name="bank_linking_is_this_your_bank">¿Es este su banco?</string>
+    <string name="bank_linking_generic_error_subtitle">Intente vincular su banco nuevamente. Si se sigue produciendo este problema, póngase en contacto con Asistencia.</string>
+    <string name="bank_linking_timeout_error_subtitle">La conexión de su banco está tardando demasiado, inténtelo de nuevo.</string>
+    <string name="bank_linking_already_linked_error_subtitle">Hemos notado que <annotation font="bold">los nombres no coinciden.</annotation> El banco al que se conecta debe contar con un nombre y apellido legal que coincida con el de su cuenta en Blockchain.com. <annotation link="yodlee_names_dont_match_learn_more">Más información →</annotation></string>
+    <string name="bank_linking_checking_error_title">Vincule una cuenta corriente.</string>
+    <string name="bank_linking_checking_error_subtitle">Su banco puede cobrarle tarifas adicionales si compra criptomonedas sin una cuenta corriente.</string>
+    <string name="bank_linking_success_title">¡Banco vinculado!</string>
+    <string name="bank_linking_success_subtitle">Su cuenta %1$s ahora está vinculada a su monedero Blockchain.com.</string>
+    <string name="bank_linking_try_different_bank">Pruebe con un banco diferente</string>
+    <string name="bank_linking_try_different_account">Pruebe con una cuenta diferente</string>
     <string name="yodlee_parsing_error">Se ha producido un error al vincular Yodlee. Vuelva a intentarlo o póngase en contacto con Asistencia.</string>
     <string name="yodlee_flow_exited">Se ha cerrado la vinculación a Yodlee. ¿Desea volver a intentarlo?</string>
     <string name="yodlee_unexpected_error">Vaya, se produjo un error al vincular Yodlee. Vuelva a intentarlo.</string>

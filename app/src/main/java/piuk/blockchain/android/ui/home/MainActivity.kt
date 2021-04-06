@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -51,12 +52,19 @@ import piuk.blockchain.android.ui.addresses.AccountActivity
 import piuk.blockchain.android.ui.airdrops.AirdropCentreActivity
 import piuk.blockchain.android.ui.backup.BackupWalletActivity
 import piuk.blockchain.android.ui.base.MvpActivity
+import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.dashboard.DashboardFragment
 import piuk.blockchain.android.ui.home.analytics.SideNavEvent
 import piuk.blockchain.android.ui.interest.InterestDashboardActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.kyc.status.KycStatusActivity
 import piuk.blockchain.android.ui.launcher.LauncherActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthActivity.Companion.LINKED_BANK_ID_KEY
+import piuk.blockchain.android.ui.linkbank.BankAuthSource
+import piuk.blockchain.android.ui.linkbank.BankLinkingInfo
+import piuk.blockchain.android.ui.linkbank.yapily.PaymentForCancelledOrderBottomSheet
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity
 import piuk.blockchain.android.ui.pairingcode.PairingCodeActivity
 import piuk.blockchain.android.ui.scan.QrExpected
@@ -74,10 +82,9 @@ import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.transfer.TransferFragment
 import piuk.blockchain.android.util.AndroidUtils
+import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.android.util.getAccount
-import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import timber.log.Timber
@@ -86,7 +93,8 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     HomeNavigator,
     MainView,
     IntroTourHost,
-    DialogFlow.FlowHost {
+    DialogFlow.FlowHost,
+    SlidingModalBottomDialog.Host {
 
     override val presenter: MainPresenter by scopedInject()
     private val qrProcessor: QrScanResultProcessor by scopedInject()
@@ -278,6 +286,16 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                         }
                     }
                 }
+                BANK_DEEP_LINK_SIMPLE_BUY -> {
+                    if (resultCode == RESULT_OK) {
+                        launchBuy(data?.getStringExtra(LINKED_BANK_ID_KEY))
+                    }
+                }
+                BANK_DEEP_LINK_SETTINGS -> {
+                    if (resultCode == RESULT_OK) {
+                        startActivity(Intent(this, SettingsActivity::class.java))
+                    }
+                }
                 else -> super.onActivityResult(requestCode, resultCode, data)
             }
         }
@@ -314,11 +332,15 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         when (menuItem.itemId) {
             R.id.nav_the_exchange -> presenter.onThePitMenuClicked()
             R.id.nav_airdrops -> AirdropCentreActivity.start(this)
-            R.id.nav_addresses -> startActivityForResult(Intent(this, AccountActivity::class.java),
-                ACCOUNT_EDIT)
+            R.id.nav_addresses -> startActivityForResult(
+                Intent(this, AccountActivity::class.java),
+                ACCOUNT_EDIT
+            )
             R.id.login_web_wallet -> PairingCodeActivity.start(this)
-            R.id.nav_settings -> startActivityForResult(Intent(this, SettingsActivity::class.java),
-                SETTINGS_EDIT)
+            R.id.nav_settings -> startActivityForResult(
+                Intent(this, SettingsActivity::class.java),
+                SETTINGS_EDIT
+            )
             R.id.nav_support -> onSupportClicked()
             R.id.nav_logout -> showLogoutDialog()
             R.id.nav_interest -> launchInterestDashboard()
@@ -508,6 +530,15 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         )
     }
 
+    private fun launchBuy(linkedBankId: String?) {
+        startActivity(
+            SimpleBuyActivity.newInstance(
+                context = activity,
+                preselectedPaymentMethodId = linkedBankId
+            )
+        )
+    }
+
     @SuppressLint("CheckResult")
     private fun disambiguateSendScan(targets: Collection<CryptoTarget>) {
         qrProcessor.disambiguateScan(this, targets, assetResources)
@@ -643,6 +674,8 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         const val SETTINGS_EDIT = 2009
         const val KYC_STARTED = 2011
         const val INTEREST_DASHBOARD = 2012
+        const val BANK_DEEP_LINK_SIMPLE_BUY = 2013
+        const val BANK_DEEP_LINK_SETTINGS = 2014
 
         // Keep these constants - the position of the toolbar items - and the generation of the toolbar items
         // together.
@@ -653,27 +686,29 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         private const val ITEM_TRANSFER = 4
 
         private fun toolbarNavigationItems(): List<AHBottomNavigationItem> =
-            listOf(AHBottomNavigationItem(
-                R.string.toolbar_cmd_activity,
-                R.drawable.ic_vector_toolbar_activity,
-                R.color.white
-            ), AHBottomNavigationItem(
-                R.string.toolbar_cmd_swap,
-                R.drawable.ic_vector_toolbar_swap,
-                R.color.white
-            ), AHBottomNavigationItem(
-                R.string.toolbar_cmd_home,
-                R.drawable.ic_vector_toolbar_home,
-                R.color.white
-            ), AHBottomNavigationItem(
-                R.string.buy_and_sell,
-                R.drawable.ic_tab_cart,
-                R.color.white
-            ), AHBottomNavigationItem(
-                R.string.toolbar_cmd_transfer,
-                R.drawable.ic_vector_toolbar_transfer,
-                R.color.white
-            ))
+            listOf(
+                AHBottomNavigationItem(
+                    R.string.toolbar_cmd_activity,
+                    R.drawable.ic_vector_toolbar_activity,
+                    R.color.white
+                ), AHBottomNavigationItem(
+                    R.string.toolbar_cmd_swap,
+                    R.drawable.ic_vector_toolbar_swap,
+                    R.color.white
+                ), AHBottomNavigationItem(
+                    R.string.toolbar_cmd_home,
+                    R.drawable.ic_vector_toolbar_home,
+                    R.color.white
+                ), AHBottomNavigationItem(
+                    R.string.buy_and_sell,
+                    R.drawable.ic_tab_cart,
+                    R.color.white
+                ), AHBottomNavigationItem(
+                    R.string.toolbar_cmd_transfer,
+                    R.drawable.ic_vector_toolbar_transfer,
+                    R.color.white
+                )
+            )
 
         fun start(context: Context, bundle: Bundle) {
             Intent(context, MainActivity::class.java).apply {
@@ -730,6 +765,31 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         replaceContentFragment(buySellFragment)
     }
 
+    override fun launchOpenBankingLinking(bankLinkingInfo: BankLinkingInfo) {
+        startActivityForResult(
+            BankAuthActivity.newInstance(bankLinkingInfo.linkingId, bankLinkingInfo.bankAuthSource, this),
+            when (bankLinkingInfo.bankAuthSource) {
+                BankAuthSource.SIMPLE_BUY -> BANK_DEEP_LINK_SIMPLE_BUY
+                BankAuthSource.SETTINGS -> BANK_DEEP_LINK_SETTINGS
+                else -> -1
+            }
+        )
+    }
+
+    override fun launchSimpleBuyFromDeepLinkApproval() {
+        startActivity(SimpleBuyActivity.newInstance(this, launchFromApprovalDeepLink = true))
+    }
+
+    override fun handlePaymentForCancelledOrder() {
+        showBottomSheet(PaymentForCancelledOrderBottomSheet.newInstance())
+    }
+
+    override fun showOpenBankingDeepLinkError() {
+        ToastCustom.makeText(
+            this, getString(R.string.open_banking_deeplink_error), Toast.LENGTH_LONG, ToastCustom.TYPE_ERROR
+        )
+    }
+
     override fun onTourFinished() {
         drawer_layout.closeDrawers()
         startDashboardFragment()
@@ -741,5 +801,8 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     }
 
     override fun onFlowFinished() {
+    }
+
+    override fun onSheetClosed() {
     }
 }

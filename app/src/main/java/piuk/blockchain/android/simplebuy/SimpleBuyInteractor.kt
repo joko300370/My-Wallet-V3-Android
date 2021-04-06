@@ -16,14 +16,15 @@ import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.datamanagers.repositories.WithdrawLocksRepository
+import com.blockchain.nabu.models.data.BankPartner
 import com.blockchain.nabu.models.data.LinkedBank
-import com.blockchain.nabu.models.data.LinkedBankState
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.models.responses.nabu.KycTiers
-import com.blockchain.nabu.models.responses.simplebuy.CardPartnerAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
+import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyConfirmationAttributes
 import com.blockchain.nabu.service.TierService
 import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.preferences.BankLinkingPrefs
 import com.blockchain.ui.trackProgress
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
@@ -35,6 +36,8 @@ import piuk.blockchain.android.cards.CardIntent
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.networking.PollService
 import piuk.blockchain.android.sdd.SDDAnalytics
+import piuk.blockchain.android.ui.linkbank.BankAuthSource
+import piuk.blockchain.android.ui.linkbank.BankLinkingInfo
 import piuk.blockchain.android.util.AppUtil
 import java.util.concurrent.TimeUnit
 
@@ -45,7 +48,8 @@ class SimpleBuyInteractor(
     private val appUtil: AppUtil,
     private val analytics: Analytics,
     private val eligibilityProvider: SimpleBuyEligibilityProvider,
-    private val coincore: Coincore
+    private val coincore: Coincore,
+    private val bankLinkingPrefs: BankLinkingPrefs
 ) {
 
     // ignore limits when user is in tier 0
@@ -134,7 +138,7 @@ class SimpleBuyInteractor(
             }.onErrorReturn {
                 SimpleBuyIntent.KycStateUpdated(KycState.PENDING)
             }
-            .repeatWhen { it.delay(5, TimeUnit.SECONDS).zipWith(Flowable.range(0, 6)) }
+            .repeatWhen { it.delay(INTERVAL, TimeUnit.SECONDS).zipWith(Flowable.range(0, RETRIES_SHORT)) }
             .takeUntil { it.kycState != KycState.PENDING }
             .last(SimpleBuyIntent.KycStateUpdated(KycState.PENDING))
             .map {
@@ -145,18 +149,37 @@ class SimpleBuyInteractor(
                 }
             }
 
-    fun updateAccountProviderId(linkingId: String, providerAccountId: String, accountId: String): Completable =
-        custodialWalletManager.updateAccountProviderId(
+    fun updateSelectedBankAccountId(
+        linkingId: String,
+        providerAccountId: String = "",
+        accountId: String,
+        partner: BankPartner,
+        source: BankAuthSource
+    ): Completable {
+        val linkingInfo = BankLinkingInfo(linkingId, source)
+        bankLinkingPrefs.setBankLinkingInfo(BankLinkingInfo.toJson(linkingInfo))
+
+        return custodialWalletManager.updateSelectedBankAccount(
             linkingId = linkingId,
             providerAccountId = providerAccountId,
-            accountId = accountId
+            accountId = accountId,
+            partner = partner
         )
+    }
 
-    fun pollForLinkedBankState(id: String): Single<LinkedBank> = PollService(
+    fun pollForLinkedBankState(id: String, partner: BankPartner?): Single<LinkedBank> = PollService(
         custodialWalletManager.getLinkedBank(id)
     ) {
-        it.state != LinkedBankState.PENDING
-    }.start(timerInSec = 5, retries = 12).map {
+        !it.isLinkingPending() || (it.partner == partner && it.isLinkingPending())
+    }.start(timerInSec = INTERVAL, retries = RETRIES_DEFAULT).map {
+        it.value
+    }
+
+    fun pollForBankLinkingCompleted(id: String): Single<LinkedBank> = PollService(
+        custodialWalletManager.getLinkedBank(id)
+    ) {
+        it.isLinkingInFinishedState()
+    }.start(timerInSec = INTERVAL, retries = RETRIES_DEFAULT).map {
         it.value
     }
 
@@ -231,17 +254,28 @@ class SimpleBuyInteractor(
     fun confirmOrder(
         orderId: String,
         paymentMethodId: String?,
-        attributes: CardPartnerAttributes?
-    ): Single<BuySellOrder> = custodialWalletManager.confirmOrder(orderId, attributes, paymentMethodId)
+        attributes: SimpleBuyConfirmationAttributes?,
+        isBankPartner: Boolean?
+    ): Single<BuySellOrder> = custodialWalletManager.confirmOrder(orderId, attributes, paymentMethodId, isBankPartner)
 
     fun pollForOrderStatus(orderId: String): Single<BuySellOrder> =
         custodialWalletManager.getBuyOrder(orderId)
-            .repeatWhen { it.delay(5, TimeUnit.SECONDS).zipWith(Flowable.range(0, 20)) }
+            .repeatWhen { it.delay(INTERVAL, TimeUnit.SECONDS).zipWith(Flowable.range(0, RETRIES_LONG)) }
             .takeUntil {
                 it.state == OrderState.FINISHED ||
                     it.state == OrderState.FAILED ||
                     it.state == OrderState.CANCELED
             }.lastOrError()
+
+    fun pollForAuthorisationUrl(orderId: String): Single<BuySellOrder> =
+        PollService(
+            custodialWalletManager.getBuyOrder(orderId)
+        ) {
+            it.attributes?.authorisationUrl != null
+        }.start()
+            .map {
+                it.value
+            }
 
     fun pollForCardStatus(cardId: String): Single<CardIntent.CardUpdated> =
         PollService(
@@ -261,6 +295,9 @@ class SimpleBuyInteractor(
             fiatCurrency = fiatCurrency
         )
 
+    fun getLinkedBankInfo(paymentMethodId: String) =
+        custodialWalletManager.getLinkedBank(paymentMethodId)
+
     fun fetchOrder(orderId: String) = custodialWalletManager.getBuyOrder(orderId)
 
     fun addNewCard(fiatCurrency: String, billingAddress: BillingAddress): Single<CardToBeActivated> =
@@ -270,4 +307,11 @@ class SimpleBuyInteractor(
         custodialWalletManager.getEligiblePaymentMethodTypes(fiatCurrency).map {
             it.contains(EligiblePaymentMethodType(PaymentMethodType.BANK_TRANSFER, fiatCurrency))
         }
+
+    companion object {
+        private const val INTERVAL: Long = 5
+        private const val RETRIES_SHORT = 6
+        private const val RETRIES_DEFAULT = 12
+        private const val RETRIES_LONG = 20
+    }
 }

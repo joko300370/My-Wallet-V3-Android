@@ -1,6 +1,7 @@
 package piuk.blockchain.androidcore.utils
 
 import com.blockchain.preferences.AuthPrefs
+import com.blockchain.preferences.BankLinkingPrefs
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.DashboardPrefs
 import com.blockchain.preferences.InternalFeatureFlagPrefs
@@ -24,6 +25,7 @@ interface PersistentPrefs :
     OfflineCachePrefs,
     EncryptedPrefs,
     AuthPrefs,
+    BankLinkingPrefs,
     InternalFeatureFlagPrefs {
 
     val isLoggedOut: Boolean

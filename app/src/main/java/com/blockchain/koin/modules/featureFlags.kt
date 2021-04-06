@@ -2,11 +2,9 @@ package com.blockchain.koin.modules
 
 import com.blockchain.koin.aaveFeatureFlag
 import com.blockchain.koin.achDepositWithdrawFeatureFlag
-import com.blockchain.koin.achFeatureFlag
-import com.blockchain.koin.bankLinkingFeatureFlag
-import com.blockchain.koin.dgldFeatureFlag
 import com.blockchain.koin.dotFeatureFlag
 import com.blockchain.koin.interestAccountFeatureFlag
+import com.blockchain.koin.obFeatureFlag
 import com.blockchain.koin.sddFeatureFlag
 import com.blockchain.koin.yfiFeatureFlag
 import com.blockchain.remoteconfig.RemoteConfig
@@ -17,10 +15,6 @@ val featureFlagsModule = module {
 
     factory(interestAccountFeatureFlag) {
         get<RemoteConfig>().featureFlag("interest_account_enabled")
-    }
-
-    factory(dgldFeatureFlag) {
-        get<RemoteConfig>().featureFlag("wdgld_enabled")
     }
 
     factory(aaveFeatureFlag) {
@@ -35,13 +29,10 @@ val featureFlagsModule = module {
         get<RemoteConfig>().featureFlag("dot_enabled")
     }
 
-    factory(achFeatureFlag) {
-        get<RemoteConfig>().featureFlag("ach_enabled")
+    factory(obFeatureFlag) {
+        get<RemoteConfig>().featureFlag("ob_enabled")
     }
 
-    factory(bankLinkingFeatureFlag) {
-        get<RemoteConfig>().featureFlag("bank_linking_enabled")
-    }
     factory(achDepositWithdrawFeatureFlag) {
         get<RemoteConfig>().featureFlag("ach_deposit_withdrawal_enabled")
     }

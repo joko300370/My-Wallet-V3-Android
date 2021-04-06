@@ -4,12 +4,10 @@ import org.koin.core.qualifier.StringQualifier
 import org.koin.core.qualifier.named
 
 val interestAccountFeatureFlag = StringQualifier("ff_interest_account")
-val dgldFeatureFlag = StringQualifier("ff_wdgld")
 val aaveFeatureFlag = StringQualifier("ff_aave")
 val yfiFeatureFlag = StringQualifier("ff_yfi")
 val dotFeatureFlag = StringQualifier("ff_dot")
-val achFeatureFlag = StringQualifier("ff_ach")
-val bankLinkingFeatureFlag = StringQualifier("ff_bank_linking")
+val obFeatureFlag = StringQualifier("ff_ob")
 val achDepositWithdrawFeatureFlag = StringQualifier("ff_ach_deposit_withdrawal")
 val sddFeatureFlag = StringQualifier("ff_sdd")
 val moshiExplorerRetrofit = StringQualifier("moshi_explorer")
