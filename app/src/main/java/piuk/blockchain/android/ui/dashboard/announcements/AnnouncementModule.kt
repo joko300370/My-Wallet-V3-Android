@@ -19,7 +19,7 @@ import piuk.blockchain.android.ui.dashboard.announcements.rule.IntroTourAnnounce
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycIncompleteAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycMoreInfoAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycResubmissionAnnouncement
-import piuk.blockchain.android.ui.dashboard.announcements.rule.RegisterFingerprintsAnnouncement
+import piuk.blockchain.android.ui.dashboard.announcements.rule.RegisterBiometricsAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.RegisteredForAirdropMiniAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SellIntroAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyAddCardAnnouncement
@@ -147,7 +147,7 @@ val dashboardAnnouncementsModule = module {
         }.bind(AnnouncementRule::class)
 
         factory {
-            RegisterFingerprintsAnnouncement(
+            RegisterBiometricsAnnouncement(
                 dismissRecorder = get(),
                 biometricsController = get()
             )

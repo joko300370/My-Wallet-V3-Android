@@ -18,7 +18,7 @@ import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 
 internal class OnboardingActivity : BaseMvpActivity<OnboardingView, OnboardingPresenter>(),
     OnboardingView,
-    FingerprintPromptFragment.OnFragmentInteractionListener,
+    BiometricsPromptFragment.OnFragmentInteractionListener,
     EmailPromptFragment.OnFragmentInteractionListener {
 
     private val onboardingPresenter: OnboardingPresenter by scopedInject()
@@ -59,7 +59,7 @@ internal class OnboardingActivity : BaseMvpActivity<OnboardingView, OnboardingPr
             dismissDialog()
             val fragmentManager = supportFragmentManager
             fragmentManager.beginTransaction()
-                .replace(R.id.content_frame, FingerprintPromptFragment.newInstance())
+                .replace(R.id.content_frame, BiometricsPromptFragment.newInstance())
                 .commit()
         }
     }
