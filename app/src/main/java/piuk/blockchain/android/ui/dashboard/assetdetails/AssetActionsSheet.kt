@@ -120,8 +120,13 @@ class AssetActionsSheet :
         actions: AvailableActions
     ): List<AssetActionItem> {
         val firstAccount = account.selectFirstAccount()
-        return actions.filter { it!= AssetAction.InterestDeposit || firstAccount is InterestAccount }.map {
-            mapAction(it, firstAccount.asset, firstAccount)
+        return when (firstAccount) {
+            is InterestAccount -> actions.toMutableList().apply {
+                add(AssetAction.InterestDeposit)
+            }.map { mapAction(it, firstAccount.asset, firstAccount) }
+            else -> actions.toMutableList().apply {
+                remove(AssetAction.InterestDeposit)
+            }.map { mapAction(it, firstAccount.asset, firstAccount) }
         }
     }
 

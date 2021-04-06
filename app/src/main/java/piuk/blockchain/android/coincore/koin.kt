@@ -41,7 +41,7 @@ val coincoreModule = module {
                 pitLinking = get(),
                 labels = get(),
                 environmentConfig = get(),
-                eligibilityProvider = get(),
+                identity = get(),
                 offlineAccounts = get()
             )
         }.bind(CryptoAsset::class)
@@ -60,9 +60,9 @@ val coincoreModule = module {
                 crashLogger = get(),
                 labels = get(),
                 walletPreferences = get(),
-                eligibilityProvider = get(),
                 offlineAccounts = get(),
-                coinsWebsocket = get()
+                coinsWebsocket = get(),
+                identity = get()
             )
         }.bind(CryptoAsset::class)
 
@@ -82,7 +82,7 @@ val coincoreModule = module {
                 labels = get(),
                 walletPreferences = get(),
                 offlineAccounts = get(),
-                eligibilityProvider = get()
+                identity = get()
             )
         }.bind(CryptoAsset::class)
 
@@ -102,7 +102,7 @@ val coincoreModule = module {
                 environmentConfig = get(),
                 walletPreferences = get(),
                 offlineAccounts = get(),
-                eligibilityProvider = get()
+                identity = get()
             )
         }.bind(CryptoAsset::class)
 
@@ -121,7 +121,7 @@ val coincoreModule = module {
                 labels = get(),
                 offlineAccounts = get(),
                 environmentConfig = get(),
-                eligibilityProvider = get()
+                identity = get()
             )
         }.bind(CryptoAsset::class)
 
@@ -136,7 +136,7 @@ val coincoreModule = module {
                 crashLogger = get(),
                 labels = get(),
                 environmentConfig = get(),
-                eligibilityProvider = get(),
+                identity = get(),
                 offlineAccounts = get()
             )
         }.bind(CryptoAsset::class)
@@ -163,7 +163,7 @@ val coincoreModule = module {
                 pitLinking = get(),
                 offlineAccounts = get(),
                 environmentConfig = get(),
-                eligibilityProvider = get(),
+                identity = get(),
                 dotFeatureFlag = get(dotFeatureFlag)
             )
         }.bind(CryptoAsset::class)
@@ -202,7 +202,7 @@ val coincoreModule = module {
                     offlineAccounts = get(),
                     environmentConfig = get(),
                     walletPreferences = get(),
-                    eligibilityProvider = get()
+                    identity = get()
                 )
             }
             val nonErc20Assets: List<CryptoAsset> = payloadScope.getAll()
