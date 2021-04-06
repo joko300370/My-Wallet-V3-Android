@@ -191,7 +191,7 @@ class ProductTransferRequestBody(
     val currency: String,
     val amount: String,
     val origin: String,
-    val destination: String,
+    val destination: String
 )
 
 data class ActivateCardResponse(

@@ -18,15 +18,13 @@ import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.Asset
 import piuk.blockchain.android.coincore.AssetAction
-import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.SingleAccount
-import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.databinding.DialogSheetInterestDetailsBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
@@ -41,7 +39,7 @@ class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetails
     interface Host : SlidingModalBottomDialog.Host {
         fun gotoActivityFor(account: BlockchainAccount)
         fun goToInterestDeposit(
-            toAccount: SingleAccount
+            toAccount: InterestAccount
         )
     }
 
@@ -91,7 +89,7 @@ class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetails
                         interestDetailsDepositCta.text =
                             getString(R.string.tx_title_deposit, cryptoCurrency.displayTicker)
                         interestDetailsDepositCta.setOnClickListener {
-                            host.goToInterestDeposit(account)
+                            host.goToInterestDeposit(account as InterestAccount)
                             analytics.logEvent(InterestAnalytics.INTEREST_SUMMARY_DEPOSIT_CTA)
                         }
                     } else {

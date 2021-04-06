@@ -19,7 +19,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.rxkotlin.zipWith
 import kotlinx.android.synthetic.main.fragment_interest_dashboard.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
@@ -27,10 +26,7 @@ import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
-import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.SingleAccount
-import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.util.gone
@@ -164,21 +160,6 @@ class InterestDashboardFragment : Fragment() {
                     target = it.accounts.first(),
                     action = AssetAction.InterestDeposit
                 ).startFlow(parentFragmentManager, activity as DialogFlow.FlowHost)
-                /*disposables += coincore.allWalletsWithActions(setOf(AssetAction.InterestDeposit))
-                    .map { accounts ->
-                        accounts.filter { account -> account is CryptoAccount && account.asset == cryptoCurrency }
-                    }
-                    .subscribe { accountList ->
-                        if (accountList.size > 1) {
-                            host.startAccountSelection(Single.just(accountList), interestAccount)
-                        } else {
-                            val account =
-                                accountList.firstOrNull() ?: throw IllegalStateException(
-                                    "No account found for interest deposit"
-                                )
-                            host.startDepositFlow(account, interestAccount)
-                        }
-                    }*/
             }
         }
     }

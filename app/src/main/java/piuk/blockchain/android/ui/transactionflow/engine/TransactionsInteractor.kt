@@ -17,7 +17,6 @@ import io.reactivex.rxkotlin.zipWith
 import io.reactivex.subjects.PublishSubject
 import piuk.blockchain.android.coincore.AddressFactory
 import piuk.blockchain.android.coincore.AddressParseError
-import piuk.blockchain.android.coincore.Asset
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore

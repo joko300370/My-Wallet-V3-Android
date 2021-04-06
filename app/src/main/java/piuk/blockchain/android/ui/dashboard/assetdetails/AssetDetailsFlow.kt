@@ -18,7 +18,6 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.SingleAccount
-import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.impl.CryptoAccountCustodialGroup
 import piuk.blockchain.android.coincore.impl.CryptoAccountNonCustodialGroup
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
@@ -44,10 +43,8 @@ class AssetDetailsFlow(
         fun gotoActivityFor(account: BlockchainAccount)
         fun gotoSwap(account: SingleAccount)
         fun goToSellFrom(account: CryptoAccount)
-        fun goToDeposit(
-            fromAccount: SingleAccount,
-            toAccount: SingleAccount,
-            action: AssetAction
+        fun goToInterestDeposit(
+            toAccount: InterestAccount
         )
 
         fun goToSummary(account: SingleAccount, asset: CryptoCurrency)
@@ -186,15 +183,14 @@ class AssetDetailsFlow(
                     }
                 )
             }
-            AssetAction.Summary -> getInterestAccountAndNavigate(
-                newState.selectedAccount.selectFirstAccount(), newState.hostAction
+            AssetAction.Summary -> assetFlowHost.goToSummary(
+                newState.selectedAccount.selectFirstAccount(), newState.selectedAccount.selectFirstAccount().asset
             )
             AssetAction.InterestDeposit -> {
-                selectAccountOrPerformAction(
-                    state = newState,
-                    singleAccountAction = {
-                        getInterestAccountAndNavigate(it, newState.hostAction)
-                    }
+                val account = newState.selectedAccount.selectFirstAccount()
+                check(account is InterestAccount)
+                assetFlowHost.goToInterestDeposit(
+                    toAccount = account
                 )
             }
         }
@@ -254,7 +250,6 @@ class AssetDetailsFlow(
     override fun onAccountSelected(account: BlockchainAccount) {
         val singleAccount = account as SingleAccount
         when (localState.hostAction) {
-            AssetAction.InterestDeposit -> getInterestAccountAndNavigate(singleAccount, AssetAction.InterestDeposit)
             AssetAction.Send -> launchNewSend(singleAccount)
             AssetAction.Sell -> launchSell(singleAccount)
             AssetAction.ViewActivity -> launchActivity(singleAccount)
@@ -271,31 +266,6 @@ class AssetDetailsFlow(
             assetFlowHost.goToSellFrom(it)
             finishFlow()
         }
-    }
-
-    private fun getInterestAccountAndNavigate(account: SingleAccount, assetAction: AssetAction) {
-        localState.asset?.let { ca ->
-            disposables += account.sourceState.subscribeBy {
-                if (it == TxSourceState.TRANSACTION_IN_FLIGHT) {
-                    model.process(TransactionInFlight)
-                } else {
-                    ca.accountGroup(AssetFilter.Interest).subscribeBy { ag ->
-                        if (assetAction == AssetAction.InterestDeposit) {
-                            assetFlowHost.goToDeposit(
-                                account,
-                                ag.accounts.first(),
-                                assetAction
-                            )
-                        } else if (assetAction == AssetAction.Summary) {
-                            localState.asset?.asset?.let {
-                                assetFlowHost.goToSummary(ag.accounts.first(), it)
-                            } ?: throw IllegalStateException("No crypto defined for Interest Summary")
-                            finishFlow()
-                        }
-                    }
-                }
-            }
-        } ?: throw IllegalStateException("No asset defined in local state - action: $assetAction")
     }
 
     private fun launchNewSend(account: SingleAccount) {

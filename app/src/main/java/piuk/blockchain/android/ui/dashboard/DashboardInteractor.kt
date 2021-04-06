@@ -30,6 +30,7 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.fiat.LinkedBankAccount
 import piuk.blockchain.android.coincore.fiat.LinkedBanksFactory
@@ -268,21 +269,17 @@ class DashboardInteractor(
 
     fun getInterestDepositFlow(
         model: DashboardModel,
-        sourceAccount: SingleAccount,
-        targetAccount: SingleAccount,
-        action: AssetAction
+        targetAccount: InterestAccount
     ): Disposable? {
-        if (sourceAccount is CryptoAccount) {
+        require(targetAccount is CryptoAccount)
             model.process(
                 UpdateLaunchDialogFlow(
                     TransactionFlow(
-                        sourceAccount = sourceAccount,
                         target = targetAccount,
-                        action = action
+                        action = AssetAction.InterestDeposit
                     )
                 )
             )
-        }
         return null
     }
 

@@ -271,7 +271,7 @@ class DashboardModel(
             is CancelSimpleBuyOrder -> interactor.cancelSimpleBuyOrder(intent.orderId)
             is LaunchAssetDetailsFlow -> interactor.getAssetDetailsFlow(this, intent.cryptoCurrency)
             is LaunchInterestDepositFlow ->
-                interactor.getInterestDepositFlow(this, intent.fromAccount, intent.toAccount, intent.action)
+                interactor.getInterestDepositFlow(this, intent.toAccount)
             is LaunchBankTransferFlow -> processBankTransferFlow(intent)
             is LaunchSendFlow -> interactor.getSendFlow(this, intent.fromAccount, intent.action)
             is FiatBalanceUpdate,

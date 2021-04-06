@@ -221,7 +221,7 @@ class TxProcessorFactory(
                     exchangeRates = exchangeRates,
                     sourceAccount = source,
                     txTarget = target,
-                    engine =  TradingToTradingSwapTxEngine(
+                    engine = TradingToTradingSwapTxEngine(
                         walletManager = walletManager,
                         quotesEngine = quotesEngine,
                         kycTierService = kycTierService,

@@ -11,8 +11,6 @@ import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
-import piuk.blockchain.android.coincore.TxEngine
-import piuk.blockchain.android.coincore.TxFee
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
@@ -50,7 +48,7 @@ class InterestDepositOnChainTxEngine(
     override fun doInitialiseTx(): Single<PendingTx> =
         onChainEngine.doInitialiseTx()
             .flatMap { pendingTx ->
-               getLimits()
+                getLimits()
                     .map {
                         pendingTx.copy(
                             minLimit = it.minDepositAmount,
@@ -60,7 +58,7 @@ class InterestDepositOnChainTxEngine(
                             )
                         )
                     }
-                }
+            }
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> =
         onChainEngine.doUpdateAmount(amount, pendingTx)

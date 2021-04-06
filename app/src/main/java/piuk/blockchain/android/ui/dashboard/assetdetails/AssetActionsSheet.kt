@@ -115,6 +115,9 @@ class AssetActionsSheet :
         )
     }
 
+    // we want to display Interest deposit only for Interest accounts and not for the accounts that
+    // have the InterestDeposit as an available action (can be used as source account) to perform the
+    // corresponding action
     private fun mapActions(
         account: BlockchainAccount,
         actions: AvailableActions

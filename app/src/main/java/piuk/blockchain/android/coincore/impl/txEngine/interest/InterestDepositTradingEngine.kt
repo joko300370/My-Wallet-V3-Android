@@ -61,7 +61,7 @@ class InterestDepositTradingEngine(private val walletManager: CustodialWalletMan
         } else {
             Single.just(
                 modifyEngineConfirmations(
-                    pendingTx = pendingTx,
+                    pendingTx = pendingTx
                 )
             )
         }

@@ -4,7 +4,6 @@ import com.blockchain.annotations.CommonCode
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.wallet.DefaultLabels
@@ -46,7 +45,7 @@ internal class Erc20Asset(
     crashLogger: CrashLogger,
     environmentConfig: EnvironmentConfig,
     offlineAccounts: OfflineAccountUpdater,
-   private val identity: UserIdentity
+    private val identity: UserIdentity
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,

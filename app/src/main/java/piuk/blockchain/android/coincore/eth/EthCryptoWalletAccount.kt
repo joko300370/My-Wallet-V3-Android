@@ -28,8 +28,8 @@ internal class EthCryptoWalletAccount(
     private val walletPreferences: WalletStatus,
     override val exchangeRates: ExchangeRateDataManager,
     private val custodialWalletManager: CustodialWalletManager,
-   identity: UserIdentity
-) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ETHER, custodialWalletManager,identity) {
+    identity: UserIdentity
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ETHER, custodialWalletManager, identity) {
 
     internal val address: String
         get() = jsonAccount.address

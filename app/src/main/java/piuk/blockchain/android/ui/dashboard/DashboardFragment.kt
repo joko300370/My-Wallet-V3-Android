@@ -32,8 +32,8 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.SingleAccount
-import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
@@ -556,16 +556,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     override fun gotoActivityFor(account: BlockchainAccount) =
         navigator().gotoActivityFor(account)
 
-    override fun goToInterestDeposit(toAccount: SingleAccount) {
-        throw NotImplementedError()
-    }
-
-    override fun goToDeposit(
-        fromAccount: SingleAccount,
-        toAccount: SingleAccount,
-        action: AssetAction
-    ) {
-        model.process(LaunchInterestDepositFlow(toAccount, fromAccount, action))
+    override fun goToInterestDeposit(toAccount: InterestAccount) {
+        model.process(LaunchInterestDepositFlow(toAccount))
     }
 
     override fun goToSummary(account: SingleAccount, asset: CryptoCurrency) {

@@ -12,8 +12,8 @@ import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.SingleAccount
-import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
@@ -56,8 +56,9 @@ class InterestDashboardActivity : BlockchainActivity(),
         finish()
     }
 
-    override fun goToInterestDeposit(toAccount: SingleAccount) {
+    override fun goToInterestDeposit(toAccount: InterestAccount) {
         clearBottomSheet()
+        require(toAccount is CryptoAccount)
         TransactionFlow(
             target = toAccount,
             action = AssetAction.InterestDeposit
