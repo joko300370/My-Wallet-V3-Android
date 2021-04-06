@@ -116,8 +116,7 @@ class AssetActionsSheet :
     }
 
     // we want to display Interest deposit only for Interest accounts and not for the accounts that
-    // have the InterestDeposit as an available action (can be used as source account) to perform the
-    // corresponding action
+    // have the InterestDeposit as an available action (can be used as source account for interest deposit)
     private fun mapActions(
         account: BlockchainAccount,
         actions: AvailableActions
@@ -125,7 +124,7 @@ class AssetActionsSheet :
         val firstAccount = account.selectFirstAccount()
         return when (firstAccount) {
             is InterestAccount -> actions.toMutableList().apply {
-                add(AssetAction.InterestDeposit)
+                add(0, AssetAction.InterestDeposit)
             }.map { mapAction(it, firstAccount.asset, firstAccount) }
             else -> actions.toMutableList().apply {
                 remove(AssetAction.InterestDeposit)
