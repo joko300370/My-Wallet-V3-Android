@@ -13,6 +13,7 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
@@ -55,9 +56,12 @@ class InterestDashboardActivity : BlockchainActivity(),
         finish()
     }
 
-    override fun goToDeposit(fromAccount: SingleAccount, toAccount: SingleAccount, action: AssetAction) {
+    override fun goToInterestDeposit(toAccount: SingleAccount) {
         clearBottomSheet()
-        startDeposit(fromAccount, toAccount, action)
+        TransactionFlow(
+            target = toAccount,
+            action = AssetAction.InterestDeposit
+        ).startFlow(supportFragmentManager, this)
     }
 
     override fun onSheetClosed() {
@@ -75,7 +79,7 @@ class InterestDashboardActivity : BlockchainActivity(),
 
     override fun startDepositFlow(fromAccount: SingleAccount, toAccount: SingleAccount) {
         analytics.logEvent(InterestAnalytics.INTEREST_DASHBOARD_ACTION)
-        startDeposit(fromAccount, toAccount, AssetAction.InterestDeposit)
+        startDeposit(fromAccount, toAccount)
     }
 
     override fun startAccountSelection(
@@ -85,24 +89,24 @@ class InterestDashboardActivity : BlockchainActivity(),
         showBottomSheet(
             AccountSelectSheet.newInstance(object : AccountSelectSheet.SelectionHost {
                 override fun onAccountSelected(account: BlockchainAccount) {
-                    startDeposit(account as SingleAccount, toAccount, AssetAction.InterestDeposit)
+                    startDeposit(account as SingleAccount, toAccount)
                 }
 
                 override fun onSheetClosed() {
                     // do nothing
                 }
-            }, filter, R.string.select_deposit_source_title))
+            }, filter, R.string.select_deposit_source_title)
+        )
     }
 
     private fun startDeposit(
         fromAccount: SingleAccount,
-        toAccount: SingleAccount,
-        assetAction: AssetAction
+        toAccount: SingleAccount
     ) {
         TransactionFlow(
             sourceAccount = fromAccount as CryptoAccount,
             target = toAccount,
-            action = assetAction
+            action = AssetAction.InterestDeposit
         ).startFlow(supportFragmentManager, this)
     }
 

@@ -22,13 +22,17 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.zipWith
 import kotlinx.android.synthetic.main.fragment_interest_dashboard.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.TradingAccount
+import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.visible
@@ -104,6 +108,11 @@ class InterestDashboardFragment : Fragment() {
                 )
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        disposables.clear()
+    }
+
     private fun renderInterestDetails(
         tiers: KycTiers,
         enabledAssets: List<CryptoCurrency>
@@ -151,13 +160,25 @@ class InterestDashboardFragment : Fragment() {
             if (hasBalance) {
                 host.showInterestSummarySheet(interestAccount, cryptoCurrency)
             } else {
-                disposables += coincore[cryptoCurrency].accountGroup(AssetFilter.All)
-                    .map { group ->
-                        group.accounts.filter { account -> account is TradingAccount || account is NonCustodialAccount }
+                TransactionFlow(
+                    target = it.accounts.first(),
+                    action = AssetAction.InterestDeposit
+                ).startFlow(parentFragmentManager, activity as DialogFlow.FlowHost)
+                /*disposables += coincore.allWalletsWithActions(setOf(AssetAction.InterestDeposit))
+                    .map { accounts ->
+                        accounts.filter { account -> account is CryptoAccount && account.asset == cryptoCurrency }
                     }
-                    .subscribe { accounts ->
-                        host.startAccountSelection(Single.just(accounts), interestAccount)
-                    }
+                    .subscribe { accountList ->
+                        if (accountList.size > 1) {
+                            host.startAccountSelection(Single.just(accountList), interestAccount)
+                        } else {
+                            val account =
+                                accountList.firstOrNull() ?: throw IllegalStateException(
+                                    "No account found for interest deposit"
+                                )
+                            host.startDepositFlow(account, interestAccount)
+                        }
+                    }*/
             }
         }
     }

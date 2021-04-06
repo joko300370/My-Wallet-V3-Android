@@ -162,8 +162,12 @@ class TransactionModel(
                 intent.fromAccount,
                 intent.action
             )
-            is TransactionIntent.InitialiseWithNoSourceOrTargetAccount -> processSourceAccountsListUpdate(intent.action)
-            is TransactionIntent.InitialiseWithTargetAndNoSource -> processSourceAccountsListUpdate(intent.action)
+            is TransactionIntent.InitialiseWithNoSourceOrTargetAccount -> processSourceAccountsListUpdate(
+                intent.action, NullAddress
+            )
+            is TransactionIntent.InitialiseWithTargetAndNoSource -> processSourceAccountsListUpdate(
+                intent.action, intent.target
+            )
             is TransactionIntent.ValidatePassword -> processPasswordValidation(intent.password)
             is TransactionIntent.UpdatePasswordIsValidated -> null
             is TransactionIntent.UpdatePasswordNotValidated -> null
@@ -227,7 +231,9 @@ class TransactionModel(
             is TransactionIntent.StartLinkABank -> processLinkABank(previousState)
             is TransactionIntent.LinkBankInfoSuccess -> null
             is TransactionIntent.LinkBankFailed -> null
-            is TransactionIntent.RefreshSourceAccounts -> processSourceAccountsListUpdate(previousState.action)
+            is TransactionIntent.RefreshSourceAccounts -> processSourceAccountsListUpdate(
+                previousState.action, previousState.selectedTarget
+            )
             is TransactionIntent.NavigateBackFromEnterAmount -> processTransactionInvalidation(previousState.action)
         }
     }
@@ -270,8 +276,8 @@ class TransactionModel(
             null
         }
 
-    private fun processSourceAccountsListUpdate(action: AssetAction): Disposable =
-        interactor.getAvailableSourceAccounts(action).subscribeBy(
+    private fun processSourceAccountsListUpdate(action: AssetAction, transactionTarget: TransactionTarget): Disposable =
+        interactor.getAvailableSourceAccounts(action, transactionTarget).subscribeBy(
             onSuccess = {
                 process(
                     TransactionIntent.AvailableSourceAccountsListUpdated(it)
