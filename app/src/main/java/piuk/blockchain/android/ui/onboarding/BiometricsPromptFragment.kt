@@ -2,15 +2,14 @@ package piuk.blockchain.android.ui.onboarding
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_fingerprint_prompt.*
-
 import piuk.blockchain.android.R
 
-class FingerprintPromptFragment : Fragment() {
+class BiometricsPromptFragment : Fragment() {
 
     private var listener: OnFragmentInteractionListener? = null
 
@@ -45,8 +44,8 @@ class FingerprintPromptFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance(): FingerprintPromptFragment {
-            return FingerprintPromptFragment()
+        fun newInstance(): BiometricsPromptFragment {
+            return BiometricsPromptFragment()
         }
     }
 }

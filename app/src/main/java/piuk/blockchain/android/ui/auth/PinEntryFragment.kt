@@ -53,7 +53,6 @@ import piuk.blockchain.android.databinding.FragmentPinEntryBinding
 import piuk.blockchain.android.ui.customviews.PinEntryKeypad
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
-import piuk.blockchain.android.ui.debug.DebugOptionsBottomDialog
 import piuk.blockchain.android.ui.home.MobileNoticeDialogFragment
 import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.ui.start.PasswordRequiredActivity
@@ -151,13 +150,6 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
                 ToastCustom.LENGTH_SHORT,
                 ToastCustom.TYPE_GENERAL
             )
-
-            binding?.buttonSettings?.visibility = View.VISIBLE
-            binding?.buttonSettings?.setOnClickListener {
-                if (activity != null) {
-                    DebugOptionsBottomDialog.show(requireFragmentManager())
-                }
-            }
         }
 
         binding?.textViewVersionCode?.text = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"

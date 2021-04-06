@@ -7,23 +7,23 @@ import org.junit.Test
 import piuk.blockchain.android.data.biometrics.BiometricsController
 import piuk.blockchain.android.ui.dashboard.announcements.DismissRecorder
 
-class RegisterFingerprintsAnnouncementTest {
+class RegisterBiometricsAnnouncementTest {
 
     private val dismissRecorder: DismissRecorder = mock()
     private val dismissEntry: DismissRecorder.DismissEntry = mock()
     private val biometricsController: BiometricsController = mock()
 
-    private lateinit var subject: RegisterFingerprintsAnnouncement
+    private lateinit var subject: RegisterBiometricsAnnouncement
 
     @Before
     fun setUp() {
-        whenever(dismissRecorder[RegisterFingerprintsAnnouncement.DISMISS_KEY])
+        whenever(dismissRecorder[RegisterBiometricsAnnouncement.DISMISS_KEY])
             .thenReturn(dismissEntry)
         whenever(dismissEntry.prefsKey)
-            .thenReturn(RegisterFingerprintsAnnouncement.DISMISS_KEY)
+            .thenReturn(RegisterBiometricsAnnouncement.DISMISS_KEY)
 
         subject =
-            RegisterFingerprintsAnnouncement(
+            RegisterBiometricsAnnouncement(
                 dismissRecorder = dismissRecorder,
                 biometricsController = biometricsController
             )

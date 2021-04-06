@@ -647,13 +647,13 @@
     <string name="swipe_to_receive_request">Receive %1$s</string>
     <string name="swipe_receive_left_arrow">Swipe to Receive Left Arrow</string>
     <string name="swipe_receive_right_arrow">Swipe to Receive Right Arrow</string>
-    <string name="onboarding_fingerprint_title">Fingerprint Login</string>
+    <string name="onboarding_fingerprint_title_1">Biometric Login</string>
 
     <!-- ONBOARDING -->
-    <string name="onboarding_fingerprint_summary">Use fingerprint login instead of your PIN to
+    <string name="onboarding_fingerprint_summary_1">Use biometric login instead of your PIN to
         authenticate and access your wallet.
     </string>
-    <string name="onboarding_fingerprint_enable">Enable fingerprint</string>
+    <string name="onboarding_fingerprint_enable_1">Enable biometrics</string>
     <string name="onboarding_check_inbox_title">Check Your Inbox</string>
     <string name="onboarding_check_inbox_summary">Look for an email from Blockchain and click the
         verification link to complete your wallet setup.
@@ -875,8 +875,8 @@
     <string name="simple_buy_add_card_card_cta">Add Card</string>
 
     <!-- Enrole fingerprints announcement -->
-    <string name="register_fingerprint_card_title">Fingerprint Log in</string>
-    <string name="register_fingerprint_card_body">Enable fingerprint to quickly log into your wallet instead of using your PIN.</string>
+    <string name="register_fingerprint_card_title_1">Biometric Log in</string>
+    <string name="register_fingerprint_card_body_1">Enable biometrics to quickly log into your wallet instead of using your PIN.</string>
     <string name="register_fingerprint_card_cta">Enable Now</string>
 
     <!-- Sell announcement -->

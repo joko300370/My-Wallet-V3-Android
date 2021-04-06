@@ -1,16 +1,16 @@
 package piuk.blockchain.com
 
-import com.blockchain.nabu.datamanagers.featureflags.InternalFeatureFlagApi
-import com.blockchain.preferences.Feature
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.featureflags.InternalFeatureFlagApi
 
-class InternalFeatureFlagApiImpl() : InternalFeatureFlagApi {
-    override fun isEnabled(feature: Feature): Boolean = false
+class InternalFeatureFlagApiImpl : InternalFeatureFlagApi {
+    override fun isFeatureEnabled(gatedFeature: GatedFeature): Boolean = false
 
-    override fun enable(feature: Feature) {
+    override fun enable(gatedFeature: GatedFeature) {
         // do nothing
     }
 
-    override fun disable(feature: Feature) {
+    override fun disable(gatedFeature: GatedFeature) {
         // do nothing
     }
 
@@ -18,7 +18,7 @@ class InternalFeatureFlagApiImpl() : InternalFeatureFlagApi {
         // do nothing
     }
 
-    override fun getAll(): Map<Feature, Boolean> {
+    override fun getAll(): Map<GatedFeature, Boolean> {
         // do nothing
         return mapOf()
     }

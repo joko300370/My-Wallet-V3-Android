@@ -10,7 +10,7 @@ import piuk.blockchain.android.ui.dashboard.announcements.DismissRecorder
 import piuk.blockchain.android.ui.dashboard.announcements.DismissRule
 import piuk.blockchain.android.ui.dashboard.announcements.StandardAnnouncementCard
 
-class RegisterFingerprintsAnnouncement(
+class RegisterBiometricsAnnouncement(
     dismissRecorder: DismissRecorder,
     private val biometricsController: BiometricsController
 ) : AnnouncementRule(dismissRecorder) {
@@ -34,8 +34,8 @@ class RegisterFingerprintsAnnouncement(
                 name = name,
                 dismissRule = DismissRule.CardPeriodic,
                 dismissEntry = dismissEntry,
-                titleText = R.string.register_fingerprint_card_title,
-                bodyText = R.string.register_fingerprint_card_body,
+                titleText = R.string.register_fingerprint_card_title_1,
+                bodyText = R.string.register_fingerprint_card_body_1,
                 ctaText = R.string.register_fingerprint_card_cta,
                 iconImage = R.drawable.ic_announce_fingerprint,
                 dismissFunction = {

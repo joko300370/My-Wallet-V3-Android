@@ -1,7 +1,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="piuk.blockchain.android.ui.onboarding.FingerprintPromptFragment">
+    tools:context="piuk.blockchain.android.ui.onboarding.BiometricsPromptFragment">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -24,7 +24,7 @@
                     android:layout_height="96dp"
                     android:layout_gravity="center"
                     android:contentDescription="@string/fingerprint_login_title"
-                    android:tint="@color/white"
+                    app:tint="@color/white"
                     app:srcCompat="@drawable/vector_fingerprint" />
 
             </FrameLayout>
@@ -32,12 +32,12 @@
             <TextView
                 style="@style/OnboardingHeader"
                 android:layout_marginTop="16dp"
-                android:text="@string/onboarding_fingerprint_title" />
+                android:text="@string/onboarding_fingerprint_title_1" />
 
             <TextView
                 style="@style/OnBoardingDetail"
                 android:gravity="center"
-                android:text="@string/onboarding_fingerprint_summary" />
+                android:text="@string/onboarding_fingerprint_summary_1" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -54,8 +54,8 @@
                     android:layout_marginLeft="64dp"
                     android:layout_marginRight="64dp"
                     android:layout_marginBottom="64dp"
-                    android:contentDescription="@string/onboarding_fingerprint_enable"
-                    android:text="@string/onboarding_fingerprint_enable" />
+                    android:contentDescription="@string/onboarding_fingerprint_enable_1"
+                    android:text="@string/onboarding_fingerprint_enable_1" />
 
             </LinearLayout>
         </LinearLayout>

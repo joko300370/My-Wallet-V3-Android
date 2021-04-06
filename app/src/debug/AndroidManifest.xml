@@ -12,7 +12,7 @@
             android:name="piuk.blockchain.com.FeatureFlagsHandlingActivity"
             android:clearTaskOnLaunch="true"
             android:excludeFromRecents="true"
-            android:label="BC FFs"
+            android:label="BC Debug Opts"
             android:screenOrientation="portrait"
             android:taskAffinity="piuk.blockchain.com.FeatureFlagsHandlingActivity"
             android:theme="@style/AppTheme">
