@@ -1063,7 +1063,7 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
     <string name="by_depositing_funds_terms_and_conds">Bu hesaba para yatırarak, bankacılık ortağımız olan <annotation link="modular_terms_and_conditions">Modulr Şartlar ve Koşullar</annotation> belgesini kabul etmiş olursunuz.</string>
     <string name="add_bank_with_currency">%1s Bankası Ekleyin</string>
     <string name="deposit_currency">%1s Yatırın</string>
-    <string name="payment">Ödeme</string>
+    <string name="common_payment">Ödeme</string>
     <string name="buy_now_1">%1s satın al</string>
     <string name="simple_buy_transfer_details_error">Transfer bilgileri yüklenirken bir hata oluştu.
 
@@ -1481,17 +1481,17 @@ Not: Önümüzdeki %1$s gün boyunca Bu tutarı cüzdanınızdan gönderemeyecek
     <string name="yodlee_connection_subtitle">Bu işlem 30 saniye kadar sürebilir.</string>
     <string name="yodlee_linking_title">Sizi Cüzdanınıza geri götürüyoruz…</string>
     <string name="yodlee_linking_subtitle">Bu işlem 30 saniye kadar sürebilir. Lütfen geri dönmeyin veya uygulamayı kapatmayın.</string>
-    <string name="yodlee_linking_generic_error_title">Hay aksi! Ters giden bir şeyler var</string>
-    <string name="yodlee_linking_is_this_your_bank">Bu sizin bankanız mı?</string>
-    <string name="yodlee_linking_generic_error_subtitle">Lütfen bankanızı tekrar bağlamayı deneyin. Hata devam ederse lütfen desteğe başvurun.</string>
-    <string name="yodlee_linking_timeout_error_subtitle">Bankanızın bağlanması çok uzun sürüyor, lütfen tekrar deneyin.</string>
-    <string name="yodlee_linking_already_linked_error_subtitle">Adların eşleşmediğini <annotation font="bold"> fark ettik. </annotation> Bağladığınız bankanın, Blockchain.com Hesabınızdaki ile eşleşen yasal bir adı ve soyadı olmalıdır. <annotation link="yodlee_names_dont_match_learn_more"> Daha fazla bilgi edinin →</annotation></string>
-    <string name="yodlee_linking_checking_error_title">LÜtfen bir Çek Hesabı bağlayın</string>
-    <string name="yodlee_linking_checking_error_subtitle">Çek hesabı olmadan kripto satın alırsanız, bankanız sizden ekstra ücret talep edebilir.</string>
-    <string name="yodlee_linking_success_title">Banka Bağlandı!</string>
-    <string name="yodlee_linking_success_subtitle">%1$s hesabınız artık Blockchain.com Cüzdanınıza bağlı.</string>
-    <string name="yodlee_linking_try_different_bank">Farklı Bir Banka Deneyin</string>
-    <string name="yodlee_linking_try_different_account">Farklı Bir Hesap Deneyin</string>
+    <string name="bank_linking_generic_error_title">Hay aksi! Ters giden bir şeyler var</string>
+    <string name="bank_linking_is_this_your_bank">Bu sizin bankanız mı?</string>
+    <string name="bank_linking_generic_error_subtitle">Lütfen bankanızı tekrar bağlamayı deneyin. Hata devam ederse lütfen desteğe başvurun.</string>
+    <string name="bank_linking_timeout_error_subtitle">Bankanızın bağlanması çok uzun sürüyor, lütfen tekrar deneyin.</string>
+    <string name="bank_linking_already_linked_error_subtitle">Adların eşleşmediğini <annotation font="bold"> fark ettik. </annotation> Bağladığınız bankanın, Blockchain.com Hesabınızdaki ile eşleşen yasal bir adı ve soyadı olmalıdır. <annotation link="yodlee_names_dont_match_learn_more"> Daha fazla bilgi edinin →</annotation></string>
+    <string name="bank_linking_checking_error_title">LÜtfen bir Çek Hesabı bağlayın</string>
+    <string name="bank_linking_checking_error_subtitle">Çek hesabı olmadan kripto satın alırsanız, bankanız sizden ekstra ücret talep edebilir.</string>
+    <string name="bank_linking_success_title">Banka Bağlandı!</string>
+    <string name="bank_linking_success_subtitle">%1$s hesabınız artık Blockchain.com Cüzdanınıza bağlı.</string>
+    <string name="bank_linking_try_different_bank">Farklı Bir Banka Deneyin</string>
+    <string name="bank_linking_try_different_account">Farklı Bir Hesap Deneyin</string>
     <string name="yodlee_parsing_error">Yodlee ile bağlantı kurulurken bir sorun oldu, lütfen tekrar deneyin veya destek ile iletişime geçin.</string>
     <string name="yodlee_flow_exited">Yodlee bağlantısından çıkıldı, tekrar denemek ister misiniz?</string>
     <string name="yodlee_unexpected_error">Hay aksi, Yodlee ile bağlantı kurulurken bir şeyler ters gitti, lütfen tekrar deneyin.</string>

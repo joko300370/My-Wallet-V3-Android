@@ -14,10 +14,12 @@ import androidx.core.content.ContextCompat
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.models.data.LinkedBank
 import com.blockchain.preferences.RatingPrefs
 import com.blockchain.ui.urllinks.URL_SUPPORT_BALANCE_LOCKED
 import com.google.android.play.core.review.ReviewInfo
 import com.google.android.play.core.review.ReviewManagerFactory
+import info.blockchain.balance.FiatValue
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
@@ -29,6 +31,8 @@ import piuk.blockchain.android.sdd.SDDAnalytics
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthSource
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionFlowCustomiserImpl.Companion.getEstimatedTransactionCompletionTime
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.secondsToDays
@@ -42,6 +46,10 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
     private val assetResources: AssetResources by scopedInject()
     private var reviewInfo: ReviewInfo? = null
     private var isFirstLoad = false
+
+    private val isPaymentAuthorised: Boolean by lazy {
+        arguments?.getBoolean(IS_PAYMENT_AUTHORISED, false) ?: false
+    }
 
     private val reviewManager by lazy {
         ReviewManagerFactory.create(activity)
@@ -66,7 +74,7 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        activity.setupToolbar(R.string.payment, false)
+        activity.setupToolbar(R.string.common_payment, false)
 
         // we need to make the request as soon as possible and cache the result
         if (!ratingPrefs.hasSeenRatingDialog) {
@@ -91,10 +99,24 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
             } ?: 0
         )
 
+        newState.errorState?.let {
+            handleErrorStates(it)
+        }
+
+        if (newState.orderState == OrderState.CANCELED) {
+            navigator().exitSimpleBuyFlow()
+            return
+        }
+
         if (newState.orderState == OrderState.AWAITING_FUNDS && isFirstLoad) {
-            model.process(SimpleBuyIntent.MakePayment(newState.id ?: return))
+            if (isPaymentAuthorised) {
+                model.process(SimpleBuyIntent.CheckOrderStatus)
+            } else {
+                model.process(SimpleBuyIntent.MakePayment(newState.id ?: return))
+            }
             isFirstLoad = false
         }
+
         require(newState.selectedPaymentMethod != null)
 
         renderTitleAndSubtitle(
@@ -115,9 +137,60 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
             )
         }
 
+        if (newState.authorisePaymentUrl != null && newState.linkedBank != null) {
+            newState.order.amount?.let { orderValue ->
+                launchExternalAuthoriseUrlFlow(
+                    newState.authorisePaymentUrl, newState.linkedBank, orderValue
+                )
+            }
+        }
+
         if (newState.showRating) {
             tryToShowInAppRating()
         }
+    }
+
+    private fun handleErrorStates(errorState: ErrorState) =
+        when (errorState) {
+            ErrorState.ApprovedBankDeclined -> showError(
+                getString(R.string.bank_linking_declined_title), getString(R.string.bank_linking_declined_subtitle)
+            )
+            ErrorState.ApprovedBankRejected -> showError(
+                getString(R.string.bank_linking_rejected_title), getString(R.string.bank_linking_rejected_subtitle)
+            )
+            ErrorState.ApprovedBankFailed -> showError(
+                getString(R.string.bank_linking_failure_title), getString(R.string.bank_linking_failure_subtitle)
+            )
+            ErrorState.ApprovedBankExpired -> showError(
+                getString(R.string.bank_linking_expired_title), getString(R.string.bank_linking_expired_subtitle)
+            )
+            ErrorState.ApprovedGenericError -> showError(
+                getString(R.string.common_oops), getString(R.string.common_error)
+            )
+            else -> {
+                // do nothing - we only want to handle OB approval errors in this fragment
+            }
+        }
+
+    private fun showError(title: String, subtitle: String) {
+        binding.transactionProgressView.onCtaClick {
+            navigator().exitSimpleBuyFlow()
+        }
+        binding.transactionProgressView.showTxError(title, subtitle)
+    }
+
+    private fun launchExternalAuthoriseUrlFlow(
+        authorisationUrl: String,
+        linkedBank: LinkedBank,
+        orderValue: FiatValue
+    ) {
+        startActivityForResult(
+            BankAuthActivity.newInstance(
+                BankAuthActivity.BankPaymentApproval(
+                    authorisationUrl, linkedBank.id, linkedBank, orderValue
+                ), BankAuthSource.SIMPLE_BUY, requireContext()
+            ), BANK_APPROVAL
+        )
     }
 
     private fun tryToShowInAppRating() {
@@ -246,6 +319,10 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
         ) {
             navigator().exitSimpleBuyFlow()
         }
+
+        if (requestCode == BANK_APPROVAL && resultCode == Activity.RESULT_CANCELED) {
+            model.process(SimpleBuyIntent.CancelOrderAndResetAuthorisation)
+        }
     }
 
     override fun unlockHigherLimits() {
@@ -262,5 +339,17 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
 
     override fun backPressedHandled(): Boolean {
         return true
+    }
+
+    companion object {
+        private const val IS_PAYMENT_AUTHORISED = "IS_PAYMENT_AUTHORISED"
+        private const val BANK_APPROVAL = 5123
+
+        fun newInstance(isFromDeepLink: Boolean) =
+            SimpleBuyPaymentFragment().apply {
+                arguments = Bundle().apply {
+                    putBoolean(IS_PAYMENT_AUTHORISED, isFromDeepLink)
+                }
+            }
     }
 }

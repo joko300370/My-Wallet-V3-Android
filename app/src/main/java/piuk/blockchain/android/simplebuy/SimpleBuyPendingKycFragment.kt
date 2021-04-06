@@ -8,10 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.preferences.CurrencyPrefs
 import kotlinx.android.synthetic.main.fragment_simple_buy_kyc_pending.*
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.cards.CardDetailsActivity
 import piuk.blockchain.android.ui.base.mvi.MviFragment
+import piuk.blockchain.android.ui.linkbank.BankAuthActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthSource
 import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
@@ -19,6 +23,7 @@ import piuk.blockchain.android.util.visibleIf
 class SimpleBuyPendingKycFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(), SimpleBuyScreen {
 
     override val model: SimpleBuyModel by scopedInject()
+    private val currencyPrefs: CurrencyPrefs by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -81,7 +86,13 @@ class SimpleBuyPendingKycFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent,
         }
 
         newState.linkBankTransfer?.let {
-            navigator().linkBankWithPartner(it)
+            model.process(SimpleBuyIntent.ResetLinkBankTransfer)
+            startActivityForResult(
+                BankAuthActivity.newInstance(
+                    it, BankAuthSource.SIMPLE_BUY, requireContext()
+                ),
+                BankAuthActivity.LINK_BANK_REQUEST_CODE
+            )
         }
         if (
             newState.kycVerificationState == KycState.VERIFIED_AND_ELIGIBLE &&
@@ -162,6 +173,8 @@ class SimpleBuyPendingKycFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent,
                 model.process(SimpleBuyIntent.ClearState)
                 navigator().exitSimpleBuyFlow()
             }
+        } else if (requestCode == BankAuthActivity.LINK_BANK_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            navigator().pop()
         }
     }
 

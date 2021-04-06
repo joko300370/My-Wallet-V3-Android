@@ -13,8 +13,8 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/payment_method_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/size_large"
+        android:layout_height="@dimen/size_large"
         android:layout_marginTop="@dimen/standard_margin"
         android:layout_marginEnd="@dimen/small_margin"
         android:layout_marginBottom="@dimen/small_margin"
@@ -28,10 +28,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/small_margin"
-        android:layout_marginEnd="@dimen/standard_margin"
         android:ellipsize="end"
+        android:maxLines="1"
         android:singleLine="true"
         android:text="@string/bank_transfer"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/payment_method_icon"
         app:layout_constraintTop_toTopOf="@+id/payment_method_icon" />
 

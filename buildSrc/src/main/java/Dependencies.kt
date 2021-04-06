@@ -62,6 +62,7 @@ object Versions {
     const val rxBinding = "2.1.1"
     const val rxReplayShare = "2.0.1"
     const val rxRelay = "2.1.1"
+    const val glide = "4.12.0"
 
     // Utils, Ethereum
     const val web3j = "3.3.1-android"
@@ -192,6 +193,8 @@ object Libraries {
     const val kotlinJson = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.kotlinJson}"
     const val koin = "org.koin:koin-core:${Versions.koin}"
     const val koinAndroid = "org.koin:koin-android:${Versions.koin}"
+    const val glide = "com.github.bumptech.glide:glide:${Versions.glide}"
+    const val glideAnnotations = "com.github.bumptech.glide:compiler:${Versions.glide}"
     const val chuckerDebug = "com.github.chuckerteam.chucker:library:${Versions.chucker}"
     const val chuckerRelease = "com.github.chuckerteam.chucker:library-no-op:${Versions.chucker}"
 

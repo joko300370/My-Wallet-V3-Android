@@ -12,6 +12,7 @@ import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
+import piuk.blockchain.android.ui.linkbank.BankLinkingInfo
 import piuk.blockchain.android.ui.sell.BuySellFragment
 
 interface HomeScreenFragment {
@@ -42,6 +43,10 @@ interface HomeNavigator {
     fun launchTransfer()
     fun launchIntroTour()
     fun launchSimpleBuySell(viewType: BuySellFragment.BuySellViewType = BuySellFragment.BuySellViewType.TYPE_BUY)
+    fun launchOpenBankingLinking(bankLinkingInfo: BankLinkingInfo)
+    fun launchSimpleBuyFromDeepLinkApproval()
+    fun handlePaymentForCancelledOrder()
+    fun showOpenBankingDeepLinkError()
 
     fun gotoActivityFor(account: BlockchainAccount?)
     fun goToTransfer()

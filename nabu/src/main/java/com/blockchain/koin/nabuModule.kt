@@ -12,8 +12,6 @@ import com.blockchain.nabu.datamanagers.BalancesProvider
 import com.blockchain.nabu.datamanagers.CreateNabuTokenAdapter
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligibilityProvider
-import com.blockchain.nabu.datamanagers.ExtraAttributesProvider
-import com.blockchain.nabu.datamanagers.ExtraAttributesProviderImpl
 import com.blockchain.nabu.datamanagers.NabuAuthenticator
 import com.blockchain.nabu.datamanagers.NabuCachedEligibilityProvider
 import com.blockchain.nabu.datamanagers.NabuDataManager
@@ -120,13 +118,9 @@ val nabuModule = module {
         }
 
         factory {
-            ExtraAttributesProviderImpl()
-        }.bind(ExtraAttributesProvider::class)
-
-        factory {
             BankLinkingEnabledProviderImpl(
-                achFF = get(achFeatureFlag),
-                globalLinkingFF = get(bankLinkingFeatureFlag)
+                obFF = get(obFeatureFlag),
+                internalFlags = get()
             )
         }.bind(BankLinkingEnabledProvider::class)
 

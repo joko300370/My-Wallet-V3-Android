@@ -36,6 +36,10 @@
     <string name="common_try_again">Try Again</string>
     <string name="common_oops">Oops! Something went wrong.</string>
     <string name="common_sell">Sell</string>
+    <string name="common_search">Search</string>
+    <string name="common_approve">Approve</string>
+    <string name="common_deny">Deny</string>
+    <string name="common_payment">Payment</string>
 
     <plurals name="transfer_label_plural">
         <item quantity="one">1 imported address</item>
@@ -494,6 +498,9 @@
     <string name="pairing_code_show_qr">Show QR code</string>
     <string name="pairing_code_hide_qr">Hide QR code</string>
     <string name="pairing_code_instructions_alert">Never share your mobile pairing QR code with anyone. Anyone who can view this QR code can withdraw funds. Blockchain.com will never ask to view or receive your mobile pairing QR code.</string>
+    <string name="email_request_subject_btc">Bitcoin payment request</string>
+    <string name="settings_bank_remove_check_title">Are you sure?</string>
+    <string name="settings_bank_remove_check_subtitle">You’re about to remove your %1$s Account</string>
 
     <!-- SHARE RECEIVE ADDRESS -->
     <string name="email_request_subject">%1$s payment request</string>
@@ -868,11 +875,6 @@
     <string name="simple_buy_pending_buy_card_title">Pending Buy</string>
     <string name="simple_buy_pending_buy_card_body">Once we receive your bank transfer, your buy order will be complete.</string>
     <string name="simple_buy_pending_buy_card_cta">View Bank Transfer Details</string>
-
-    <!-- Simple buy add card -->
-    <string name="simple_buy_add_card_card_title">You’re Approved to Buy Crypto.</string>
-    <string name="simple_buy_add_card_card_body">Complete your order by adding your credit or debit card to your Blockchain Wallet.</string>
-    <string name="simple_buy_add_card_card_cta">Add Card</string>
 
     <!-- Enrole fingerprints announcement -->
     <string name="register_fingerprint_card_title_1">Biometric Log in</string>
@@ -1317,7 +1319,6 @@
     <string name="cancel_order">Cancel Order</string>
     <string name="cancel_order_do_cancel">Cancel Order</string>
     <string name="cancel_order_go_back">Go Back</string>
-    <string name="payment">Payment</string>
     <string name="cancel_order_do_cancel_dashboard">Yes, Cancel</string>
     <string name="cancel_order_go_back_dashboard">No, Keep Order</string>
     <string name="cancel_token_instruction">This will remove your %1$s Buy order.</string>
@@ -1355,7 +1356,7 @@
     <string name="activity_state_uninitialised">Uninitialised</string>
     <string name="activity_state_awaiting_funds">Waiting On Funds</string>
     <string name="activity_state_pending">Pending</string>
-    <string name="activity_state_canceled">Canceled</string>
+    <string name="activity_state_canceled">Cancelled</string>
     <string name="activity_state_unknown">Unknown</string>
     <string name="activity_state_failed">Failed</string>
     <string name="activity_state_cleared">Cleared</string>
@@ -1811,6 +1812,7 @@
     <string name="swap_better_experience">We’ve updated Swap with a new look and better experience.</string>
     <string name="swap_faster_cheaper_better">Faster. Cheaper. Better. Our new Swap experience lets you exchange crypto in fewer taps.</string>
     <string name="link_a_bank">Link a Bank</string>
+    <string name="approve_payment">Approve Your Payment</string>
     <string name="instantly_buy_crypto_with_link_a_bank">Link your bank and instantly buy crypto at anytime.</string>
     <string name="add_payment_method">+ Add New</string>
     <string name="pay_with_my_dotted">Pay with my…</string>
@@ -1823,17 +1825,6 @@
     <string name="yodlee_connection_subtitle">This could take up to 30 seconds.</string>
     <string name="yodlee_linking_title">Taking you back to your Wallet…</string>
     <string name="yodlee_linking_subtitle">This could take up to 30 seconds. Please do not go back or close the app.</string>
-    <string name="yodlee_linking_generic_error_title">Oops! Something went wrong</string>
-    <string name="yodlee_linking_is_this_your_bank">Is this your bank?</string>
-    <string name="yodlee_linking_generic_error_subtitle">Please try linking your bank again. If this keeps happening please contact support.</string>
-    <string name="yodlee_linking_timeout_error_subtitle">It’s taking too long to link your bank, please try again.</string>
-    <string name="yodlee_linking_already_linked_error_subtitle">We noticed <annotation font="bold">the names don’t match.</annotation> The bank you link must have a matching legal first &amp; last name as your Blockchain.com Account. <annotation link="yodlee_names_dont_match_learn_more">Learn more →</annotation></string>
-    <string name="yodlee_linking_checking_error_title">Please link a Checking Account.</string>
-    <string name="yodlee_linking_checking_error_subtitle">Your bank may charge you extra fees if you buy crypto without a checking account.</string>
-    <string name="yodlee_linking_success_title">Bank Linked!</string>
-    <string name="yodlee_linking_success_subtitle">Your %1$s account is now linked to your Blockchain.com Wallet.</string>
-    <string name="yodlee_linking_try_different_bank">Try a Different Bank</string>
-    <string name="yodlee_linking_try_different_account">Try a Different Account</string>
     <string name="yodlee_parsing_error">There was an issue linking with Yodlee, please try again or contact support.</string>
     <string name="yodlee_flow_exited">Yodlee linking exited, would you like to try again?</string>
     <string name="yodlee_unexpected_error">Oops, something went wrong while linking with Yodlee, please try again.</string>
@@ -1913,6 +1904,68 @@
     <string name="sb_checkout_yearly_limit_blurb">Oops, looks like you’ve used up your yearly transaction limit for Buys and Deposits.</string>
     <string name="sb_checkout_pending_order_title">Order in progress</string>
     <string name="sb_checkout_pending_order_blurb">Oops, looks like you’ve already got a Buy order in progress, please wait until it completes before buying again.</string>
+
+    <!-- Yapily -->
+    <string name="yapily_empty_blurb">We couldn’t find your bank. Send funds from your bank to your Blockchain Wallet with a Manual Transfer.</string>
+    <string name="yapily_empty_cta">Show Transfer Details</string>
+    <string name="yapily_find_bank_title">Find Your Bank</string>
+    <string name="yapily_agreement_title_1">Data Sharing</string>
+    <string name="yapily_agreement_blurb_1">SafeConnect will retrieve your bank data based on your request and provide this information to Blockchain.</string>
+    <string name="yapily_agreement_title_2">Secure Connection</string>
+    <string name="yapily_agreement_blurb_2">Data is securely retrieved in read-only format and only for the duration agreed with you. You have the right to withdraw your consent at any time.</string>
+    <string name="yapily_agreement_title_3">FCA Authorisation</string>
+    <string name="yapily_agreement_blurb_3">Blockchain is an agent of SafeConnect Ltd. SafeConnect Ltd is authorised and regulated by the Financial Conduct Authority under the Payment Service Regulations 2017 [827001] for the provision of Account Information and Payment Initiation services.</string>
+    <string name="yapily_agreement_title_4">About the access</string>
+    <string name="yapily_agreement_blurb_4">SafeConnect will then use these details with Blockchain solely for the purposes of buying Cryptocurrency. This access is valid until 24th of January 2021, you can cancel consent at any time via the Blockchain settings or via your bank. This request is not a one-off, you will continue to receive consent requests as older versions expire.</string>
+    <string name="yapily_agreement_blurb_5">In order to share your %1$s data with Blockchain, you will now be securely redirected to your bank to confirm your consent for SafeConnect to read the following information:\n\n• Identification details\n\n• Account(s) details</string>
+    <string name="yapily_linking_pending_title">Taking you to %1$s</string>
+    <string name="yapily_linking_pending_subtitle">This could take up to 30 seconds. Please do not go back or close the app.</string>
+    <string name="yapily_linking_in_progress_title">Waiting to hear from %1$s</string>
+    <string name="yapily_linking_in_progress_subtitle">Complete pairing approval with your bank to continue.</string>
+    <string name="yapily_approval_in_progress_subtitle">Complete transaction approval with your bank to continue.</string>
+    <string name="yapily_activating_title">Updating your Wallet…</string>
+    <string name="yapily_activating_subtitle">This could take up to 30 seconds. Please do not go back or close the app..</string>
+    <string name="yapily_approving_title">Taking you to %1$s</string>
+    <string name="yapily_approving_subtitle">This could take up to 30 seconds. Please do not go back or close the app..</string>
+    <string name="yapily_linking_default_bank">your Bank</string>
+    <string name="yapily_bank_link_choice_error_title">Oops, lets try that again</string>
+    <string name="yapily_bank_link_choice_error_subtitle">You need to choose a method to start your bank authentication</string>
+    <string name="yapily_bank_link_app_choice_title">Please choose an app to open this with</string>
+    <string name="yapily_bank_link_no_apps">Oops! Looks like you have no apps that can help you authenticate. Please install an Internet browsing app and try again.</string>
+    <string name="open_banking_deeplink_error">Oops! There was an error while linking your bank, please try again.</string>
+    <string name="yapily_approval_header">Approve Your Payment</string>
+    <string name="yapily_approval_title">Payment Information</string>
+    <string name="yapily_approval_subtitle_1">Bank name</string>
+    <string name="yapily_approval_subtitle_2_uk">Sort Code</string>
+    <string name="yapily_approval_subtitle_2_eu">IBAN</string>
+    <string name="yapily_approval_subtitle_3_uk">Account Number</string>
+    <string name="yapily_approval_subtitle_3_eu">SWIFT/BIC</string>
+    <string name="yapily_approval_blurb">To easily set up payments from your bank to Blockchain, we are about to securely re-direct you to your bank where you will be asked to confirm the payment via SafeConnect, an FCA regulated payment initiation provider for Blockchain.\n\nSafeConnect will share these details with your bank, where you will then be asked to confirm the following payment setup.</string>
+    <string name="yapily_payment_to_fiat_wallet_title">Canceled purchase amount added to %1$s Wallet</string>
+    <string name="yapily_payment_to_fiat_wallet_subtitle">You recently approved a %1$s purchase with your bank and cancelled the order here. Since you approved with your bank, we’ve deposited your purchase amount in your %2$s Wallet.</string>
+    <string name="yapily_payment_to_fiat_wallet_default">crypto</string>
+
+    <!-- Bank Linking Errors -->
+    <string name="bank_linking_generic_error_title">Oops! Something went wrong</string>
+    <string name="bank_linking_is_this_your_bank">Is this your bank?</string>
+    <string name="bank_linking_generic_error_subtitle">Please try linking your bank again. If this keeps happening please contact support.</string>
+    <string name="bank_linking_timeout_error_subtitle">It’s taking too long to link your bank, please try again.</string>
+    <string name="bank_linking_already_linked_error_subtitle">We noticed <annotation font="bold">the names don’t match.</annotation> The bank you link must have a matching legal first &amp; last name as your Blockchain.com Account. <annotation link="yodlee_names_dont_match_learn_more">Learn more →</annotation></string>
+    <string name="bank_linking_checking_error_title">Please link a Checking Account.</string>
+    <string name="bank_linking_checking_error_subtitle">Your bank may charge you extra fees if you buy crypto without a checking account.</string>
+    <string name="bank_linking_success_title">Bank Linked!</string>
+    <string name="bank_linking_success_subtitle">Your %1$s account is now linked to your Blockchain.com Wallet.</string>
+    <string name="bank_linking_try_different_bank">Try a Different Bank</string>
+    <string name="bank_linking_try_different_account">Try a Different Account</string>
+    <string name="bank_linking_expired_title">Expired Account Access</string>
+    <string name="bank_linking_expired_subtitle">Please try linking your bank again. If this keeps happening, please contact support.</string>
+    <string name="bank_linking_rejected_title">Connection Rejected</string>
+    <string name="bank_linking_rejected_subtitle">Please try linking your bank again and approve the connection. If this keeps happening, please contact support.</string>
+    <string name="bank_linking_failure_title">Failed Connection Request</string>
+    <string name="bank_linking_failure_subtitle">Please try again. If this keeps happening, please contact support.</string>
+    <string name="bank_linking_declined_title">Account Access Denied</string>
+    <string name="bank_linking_declined_subtitle">Looks like there was an issue with approving the payment, please try again. If this keeps happening, please contact support.</string>
+
     <string name="wallet_outage_message">We are experiencing an outage. Please rest assured your funds are safe. <annotation link="learn_more">Learn more</annotation></string>
     <string name="increase_your_limits">Increase your limits</string>
     <string name="increase_your_limits_body">Continue your verification to become Gold level and increase your limits and payment methods.</string>

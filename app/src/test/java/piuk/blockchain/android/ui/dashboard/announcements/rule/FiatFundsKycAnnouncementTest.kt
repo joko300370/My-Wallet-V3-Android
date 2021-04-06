@@ -68,7 +68,7 @@ class FiatFundsKycAnnouncementTest {
             .thenReturn(Single.just(true))
 
         whenever(custodialWalletManager.getBanks()).thenReturn(
-            Single.just(listOf(Bank("", "", "", BankState.ACTIVE, "USD", "", PaymentMethodType.BANK_ACCOUNT)))
+            Single.just(listOf(Bank("", "", "", BankState.ACTIVE, "USD", "", PaymentMethodType.BANK_ACCOUNT, "")))
         )
 
         subject.shouldShow()

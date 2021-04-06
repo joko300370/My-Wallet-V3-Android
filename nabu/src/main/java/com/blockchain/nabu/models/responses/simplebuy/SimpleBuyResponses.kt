@@ -7,7 +7,6 @@ import com.blockchain.nabu.models.responses.nabu.Address
 import com.squareup.moshi.Json
 import info.blockchain.balance.CryptoCurrency
 import java.math.BigDecimal
-
 import java.util.Date
 
 data class SimpleBuyPairsResp(val pairs: List<SimpleBuyPairResp>)
@@ -31,9 +30,9 @@ data class SimpleBuyQuoteResponse(
     val time: Date,
     val rate: Long,
     val rateWithoutFee: Long,
-/* the  fee value is more of a feeRate (ie it is the fee per 1 unit of crypto) to get the actual
- "fee" you'll need to multiply by amount of crypto
- */
+    /* the  fee value is more of a feeRate (ie it is the fee per 1 unit of crypto) to get the actual
+     "fee" you'll need to multiply by amount of crypto
+     */
     val fee: Long
 )
 
@@ -156,7 +155,7 @@ data class BuySellOrderResponse(
     val insertedAt: String,
     val price: String?,
     val fee: String?,
-    val attributes: CardPaymentAttributes?,
+    val attributes: PaymentAttributes?,
     val expiresAt: String,
     val updatedAt: String,
     val side: String,
@@ -171,6 +170,11 @@ data class BuySellOrderResponse(
         const val CANCELED = "CANCELED"
         const val FAILED = "FAILED"
         const val EXPIRED = "EXPIRED"
+
+        const val APPROVAL_ERROR_FAILED = "BANK_TRANSFER_PAYMENT_FAILED"
+        const val APPROVAL_ERROR_DECLINED = "BANK_TRANSFER_PAYMENT_DECLINED"
+        const val APPROVAL_ERROR_REJECTED = "BANK_TRANSFER_PAYMENT_REJECTED"
+        const val APPROVAL_ERROR_EXPIRED = "BANK_TRANSFER_PAYMENT_EXPIRED"
     }
 }
 
@@ -197,8 +201,14 @@ data class EveryPayCardCredentialsResponse(
     val paymentLink: String
 )
 
-data class CardPaymentAttributes(
-    val everypay: EverypayPaymentAttrs?
+data class PaymentAttributes(
+    val everypay: EverypayPaymentAttrs?,
+    val authorisationUrl: String?,
+    val status: String?
+)
+
+class PaymentAuthorisationAttrs(
+    val authorisationUrl: String
 )
 
 data class EverypayPaymentAttrs(
@@ -213,7 +223,8 @@ data class EverypayPaymentAttrs(
 data class ConfirmOrderRequestBody(
     private val action: String = "confirm",
     private val paymentMethodId: String?,
-    private val attributes: CardPartnerAttributes?
+    private val attributes: SimpleBuyConfirmationAttributes?,
+    private val paymentType: String?
 )
 
 data class WithdrawRequestBody(
@@ -275,8 +286,9 @@ data class AmountResponse(
     val value: BigDecimal
 )
 
-data class CardPartnerAttributes(
-    private val everypay: EveryPayAttrs?
+data class SimpleBuyConfirmationAttributes(
+    private val everypay: EveryPayAttrs? = null,
+    private val callback: String? = null
 )
 
 data class EveryPayAttrs(private val customerUrl: String)

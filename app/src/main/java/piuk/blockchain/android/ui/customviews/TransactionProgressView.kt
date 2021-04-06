@@ -82,6 +82,20 @@ class TransactionProgressView(context: Context, attrs: AttributeSet) :
         setText(title, subtitle)
     }
 
+    fun showFiatTxSuccess(title: String, subtitle: String, fiat: String) {
+        setAssetIcon(
+            when (fiat) {
+                "EUR" -> R.drawable.ic_funds_euro_masked
+                "GBP" -> R.drawable.ic_funds_euro_masked
+                else -> R.drawable.ic_funds_usd_masked
+            }
+        )
+        tx_state_indicator.setImageResource(R.drawable.ic_tx_deposit_w_green_bkgd)
+        tx_state_indicator.visible()
+        showEndStateUi()
+        setText(title, subtitle)
+    }
+
     private fun showEndStateUi() {
         progress.gone()
         tx_ok_btn.visible()

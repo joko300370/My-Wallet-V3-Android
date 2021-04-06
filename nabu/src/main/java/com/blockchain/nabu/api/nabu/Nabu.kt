@@ -43,13 +43,13 @@ import com.blockchain.nabu.models.responses.simplebuy.AddNewCardResponse
 import com.blockchain.nabu.models.responses.simplebuy.BankAccountResponse
 import com.blockchain.nabu.models.responses.simplebuy.BuyOrderListResponse
 import com.blockchain.nabu.models.responses.simplebuy.BuySellOrderResponse
-import com.blockchain.nabu.models.responses.simplebuy.CardPartnerAttributes
 import com.blockchain.nabu.models.responses.simplebuy.ConfirmOrderRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
 import com.blockchain.nabu.models.responses.simplebuy.DepositRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.FeesResponse
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyAllBalancesResponse
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyBalanceResponse
+import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyConfirmationAttributes
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyCurrency
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyEligibility
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyPairsResp
@@ -362,7 +362,7 @@ internal interface Nabu {
     fun activateCard(
         @Header("authorization") authHeader: String,
         @Path("cardId") cardId: String,
-        @Body attributes: CardPartnerAttributes
+        @Body attributes: SimpleBuyConfirmationAttributes
     ): Single<ActivateCardResponse>
 
     @GET("$NABU_CARDS/{cardId}")

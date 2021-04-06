@@ -32,9 +32,10 @@ import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
 import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
-import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
+import piuk.blockchain.android.ui.dashboard.sheets.WireTransferAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
-import piuk.blockchain.android.ui.linkbank.LinkBankActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthSource
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.visible
@@ -56,6 +57,10 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     private val cryptoCurrency: CryptoCurrency by unsafeLazy {
         arguments?.getSerializable(ARG_CRYPTO_CURRENCY) as? CryptoCurrency
             ?: throw IllegalArgumentException("No cryptoCurrency specified")
+    }
+
+    private val preselectedMethodId: String? by unsafeLazy {
+        arguments?.getString(ARG_PAYMENT_METHOD_ID)
     }
 
     override fun navigator(): SimpleBuyNavigator =
@@ -96,7 +101,9 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         activity.setupToolbar(R.string.simple_buy_buy_crypto_title)
 
         model.process(SimpleBuyIntent.FlowCurrentScreen(FlowScreen.ENTER_AMOUNT))
-        model.process(SimpleBuyIntent.FetchSuggestedPaymentMethod(currencyPrefs.selectedFiatCurrency))
+        model.process(
+            SimpleBuyIntent.FetchSuggestedPaymentMethod(currencyPrefs.selectedFiatCurrency, preselectedMethodId)
+        )
         model.process(SimpleBuyIntent.FetchSupportedFiatCurrencies)
         analytics.logEvent(SimpleBuyAnalytics.BUY_FORM_SHOWN)
 
@@ -241,7 +248,9 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         newState.linkBankTransfer?.let {
             model.process(SimpleBuyIntent.ResetLinkBankTransfer)
             startActivityForResult(
-                LinkBankActivity.newInstance(it, requireContext()), LinkBankActivity.LINK_BANK_REQUEST_CODE
+                BankAuthActivity.newInstance(
+                    it, BankAuthSource.SIMPLE_BUY, requireContext()
+                ), BankAuthActivity.LINK_BANK_REQUEST_CODE
             )
         }
     }
@@ -412,7 +421,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         if (errorState == ErrorState.LinkedBankNotSupported) {
             model.process(SimpleBuyIntent.ClearError)
             model.process(SimpleBuyIntent.ClearAnySelectedPaymentMethods)
-            navigator().launchBankLinkingWithError(errorState)
+            navigator().launchBankAuthWithError(errorState)
         } else {
             showBottomSheet(ErrorSlidingBottomDialog.newInstance(activity))
         }
@@ -466,7 +475,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             }
             PaymentMethodType.FUNDS -> {
                 showBottomSheet(
-                    LinkBankAccountDetailsBottomSheet.newInstance(
+                    WireTransferAccountDetailsBottomSheet.newInstance(
                         lastState?.fiatCurrency ?: return
                     )
                 )
@@ -487,8 +496,8 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             val preselectedId = (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as? PaymentMethod.Card)?.id
             updatePaymentMethods(preselectedId)
         }
-        if (requestCode == LinkBankActivity.LINK_BANK_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            val preselectedId = data?.extras?.getString(LinkBankActivity.LINKED_BANK_ID_KEY)
+        if (requestCode == BankAuthActivity.LINK_BANK_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            val preselectedId = data?.extras?.getString(BankAuthActivity.LINKED_BANK_ID_KEY)
             updatePaymentMethods(preselectedId)
         }
         if (requestCode == SimpleBuyActivity.KYC_STARTED) {
@@ -515,11 +524,14 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     }
 
     companion object {
-        private const val ARG_CRYPTO_CURRENCY = "crypto"
-        fun newInstance(cryptoCurrency: CryptoCurrency): SimpleBuyCryptoFragment {
+        private const val ARG_CRYPTO_CURRENCY = "CRYPTO"
+        private const val ARG_PAYMENT_METHOD_ID = "PAYMENT_METHOD_ID"
+
+        fun newInstance(cryptoCurrency: CryptoCurrency, preselectedMethodId: String? = null): SimpleBuyCryptoFragment {
             return SimpleBuyCryptoFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(ARG_CRYPTO_CURRENCY, cryptoCurrency)
+                    preselectedMethodId?.let { putString(ARG_PAYMENT_METHOD_ID, preselectedMethodId) }
                 }
             }
         }

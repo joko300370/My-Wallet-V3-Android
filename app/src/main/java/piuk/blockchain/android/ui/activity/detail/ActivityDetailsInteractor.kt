@@ -517,5 +517,6 @@ private fun LinkedBank.toPaymentMethod() =
         bankName = name,
         accountEnding = accountNumber,
         accountType = accountType,
-        isEligible = true
+        isEligible = true,
+        iconUrl = iconUrl
     )

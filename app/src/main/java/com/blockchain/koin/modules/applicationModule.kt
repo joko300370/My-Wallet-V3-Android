@@ -42,9 +42,10 @@ import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerificationDeepLinkHelper
-import piuk.blockchain.android.identity.UserIdentity
+import piuk.blockchain.android.deeplink.OpenBankingDeepLinkParser
 import piuk.blockchain.android.identity.NabuUserIdentity
 import piuk.blockchain.android.identity.SiftDigitalTrust
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.kyc.KycDeepLinkHelper
 import piuk.blockchain.android.remoteconfig.AssetOrderingRemoteConfig
 import piuk.blockchain.android.scan.QrCodeDataManager
@@ -91,6 +92,8 @@ import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
 import piuk.blockchain.android.ui.launcher.DeepLinkPersistence
 import piuk.blockchain.android.ui.launcher.LauncherPresenter
 import piuk.blockchain.android.ui.launcher.Prerequisites
+import piuk.blockchain.android.ui.linkbank.BankAuthModel
+import piuk.blockchain.android.ui.linkbank.BankAuthState
 import piuk.blockchain.android.ui.onboarding.OnboardingPresenter
 import piuk.blockchain.android.ui.pairingcode.PairingCodePresenter
 import piuk.blockchain.android.ui.recover.RecoverFundsPresenter
@@ -218,11 +221,10 @@ val applicationModule = module {
                 sunriverCampaignRegistration = get(),
                 xlmDataManager = get(),
                 pitLinking = get(),
-                nabuDataManager = get(),
-                nabuToken = get(),
                 simpleBuySync = get(),
                 crashLogger = get(),
-                analytics = get()
+                analytics = get(),
+                bankLinkingPrefs = get()
             )
         }
 
@@ -364,8 +366,13 @@ val applicationModule = module {
                 kycDeepLinkHelper = get(),
                 sunriverDeepLinkHelper = get(),
                 emailVerifiedLinkHelper = get(),
-                thePitDeepLinkParser = get()
+                thePitDeepLinkParser = get(),
+                openBankingDeepLinkParser = get()
             )
+        }
+
+        factory {
+            OpenBankingDeepLinkParser()
         }
 
         scoped {
@@ -441,8 +448,9 @@ val applicationModule = module {
                 custodialWalletManager = get(),
                 appUtil = get(),
                 coincore = get(),
-                analytics = get(),
-                eligibilityProvider = get()
+                eligibilityProvider = get(),
+                bankLinkingPrefs = get(),
+                analytics = get()
             )
         }
 
@@ -457,6 +465,16 @@ val applicationModule = module {
                 cardActivators = listOf(
                     EverypayCardActivator(get(), get())
                 ),
+                environmentConfig = get(),
+                crashLogger = get()
+            )
+        }
+
+        factory {
+            BankAuthModel(
+                interactor = get(),
+                scheduler = AndroidSchedulers.mainThread(),
+                initialState = BankAuthState(),
                 environmentConfig = get(),
                 crashLogger = get()
             )
