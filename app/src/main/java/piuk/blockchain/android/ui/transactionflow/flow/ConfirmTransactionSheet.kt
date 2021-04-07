@@ -7,6 +7,7 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.ExchangeRates
 import org.koin.android.ext.android.inject
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.databinding.DialogTxFlowConfirmBinding
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
@@ -26,6 +27,7 @@ class ConfirmTransactionSheet : TransactionFlowSheet<DialogTxFlowConfirmBinding>
     private val prefs: CurrencyPrefs by scopedInject()
     private val mapper: TxConfirmReadOnlyMapper by scopedInject()
     private val customiser: TransactionConfirmationCustomisations by inject()
+    private val assetResources: AssetResources by scopedInject()
 
     private val listAdapter: ConfirmTransactionDelegateAdapter by lazy {
         ConfirmTransactionDelegateAdapter(
@@ -35,7 +37,8 @@ class ConfirmTransactionSheet : TransactionFlowSheet<DialogTxFlowConfirmBinding>
             analytics = analyticsHooks,
             mapper = mapper,
             selectedCurrency = prefs.selectedFiatCurrency,
-            exchangeRates = exchangeRates
+            exchangeRates = exchangeRates,
+            assetResources = assetResources
         )
     }
 

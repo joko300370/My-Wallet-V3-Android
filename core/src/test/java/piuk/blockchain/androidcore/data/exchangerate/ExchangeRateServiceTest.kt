@@ -47,7 +47,7 @@ class ExchangeRateServiceTest {
             historicPriceApi.getHistoricPriceSeries(
                 btc.networkTicker,
                 fiat,
-                ExchangeRateService.FIRST_BTC_ENTRY_TIME,
+                btc.startDateForPrice,
                 TimeInterval.FIVE_DAYS.intervalSeconds
             )
         ).thenReturn(Single.just(listOf(PriceDatum())))
@@ -61,7 +61,7 @@ class ExchangeRateServiceTest {
         verify(historicPriceApi).getHistoricPriceSeries(
             btc.networkTicker,
             fiat,
-            ExchangeRateService.FIRST_BTC_ENTRY_TIME,
+            btc.startDateForPrice,
             TimeInterval.FIVE_DAYS.intervalSeconds
         )
         verifyNoMoreInteractions(historicPriceApi)
@@ -76,7 +76,7 @@ class ExchangeRateServiceTest {
             historicPriceApi.getHistoricPriceSeries(
                 eth.networkTicker,
                 fiat,
-                ExchangeRateService.FIRST_ETH_ENTRY_TIME,
+                eth.startDateForPrice,
                 TimeInterval.FIVE_DAYS.intervalSeconds
             )
         ).thenReturn(Single.just(listOf(PriceDatum())))
@@ -90,7 +90,7 @@ class ExchangeRateServiceTest {
         verify(historicPriceApi).getHistoricPriceSeries(
             eth.networkTicker,
             fiat,
-            ExchangeRateService.FIRST_ETH_ENTRY_TIME,
+            eth.startDateForPrice,
             TimeInterval.FIVE_DAYS.intervalSeconds
         )
         verifyNoMoreInteractions(historicPriceApi)

@@ -27,6 +27,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.blockstackCampaignName
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -83,6 +84,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     private val analyticsReporter: BalanceAnalyticsReporter by scopedInject()
     private val currencyPrefs: CurrencyPrefs by inject()
     private val coincore: Coincore by scopedInject()
+    private val assetResources: AssetResources by scopedInject()
 
     private val theAdapter: DashboardDelegateAdapter by lazy {
         DashboardDelegateAdapter(
@@ -90,7 +92,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             onCardClicked = { onAssetClicked(it) },
             analytics = get(),
             onFundsItemClicked = { onFundsClicked(it) },
-            coincore = coincore
+            coincore = coincore,
+            assetResources = assetResources
         )
     }
 
@@ -466,6 +469,10 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
         override fun startSimpleBuy(cryptoCurrency: CryptoCurrency) {
             navigator().startSimpleBuy(cryptoCurrency)
+        }
+
+        override fun startBuy() {
+            navigator().launchSimpleBuySell()
         }
 
         override fun startSell() {

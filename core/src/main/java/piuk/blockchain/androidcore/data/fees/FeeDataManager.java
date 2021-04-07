@@ -57,6 +57,24 @@ public class FeeDataManager {
     }
 
     /**
+     * Returns a {@link FeeOptions} object which contains both a "regular" and a "priority" fee
+     * option for ERC20 tokens.
+     * @param contractAddress the contract address for ERC20
+     *
+     * @return An {@link Observable} wrapping a {@link FeeOptions} object
+     */
+    public Observable<FeeOptions> getErc20FeeOptions(String contractAddress) {
+        if (environmentSettings.getEnvironment().equals(Environment.TESTNET)) {
+            //No Test environment for Eth
+            return Observable.just(FeeOptions.Companion.testnetFeeOptions());
+        } else {
+            return rxPinning.call(() -> feeApi.getErc20FeeOptions(contractAddress))
+                .onErrorReturnItem(FeeOptions.Companion.defaultFee(CryptoCurrency.ETHER))
+                .observeOn(AndroidSchedulers.mainThread());
+        }
+    }
+
+    /**
      * Returns a {@link FeeOptions} object which contains a "regular" fee
      * option, both listed in Satoshis/byte.
      *

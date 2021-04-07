@@ -31,7 +31,6 @@ import piuk.blockchain.android.ui.activity.detail.TransactionId
 import piuk.blockchain.android.ui.activity.detail.Value
 import piuk.blockchain.android.ui.activity.detail.XlmMemo
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.toFormattedString
 
@@ -139,10 +138,11 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
             is BuyPurchaseAmount -> infoType.fundedFiat.toStringWithSymbol()
             is TransactionId -> infoType.txId
             is BuyCryptoWallet -> parent.context.getString(
-                R.string.custodial_wallet_default_label,
-                parent.context.getString(infoType.crypto.assetName())
+                R.string.custodial_wallet_default_label_1
             )
-            is SellCryptoWallet -> parent.context.getString(R.string.currency_funds_wallet, infoType.currency)
+            is SellCryptoWallet -> parent.context.getString(
+                R.string.fiat_currency_funds_wallet_name_1, infoType.currency
+            )
             is SellPurchaseAmount -> infoType.value.toStringWithSymbol()
             is BuyPaymentMethod -> {
                 when {

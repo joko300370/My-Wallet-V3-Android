@@ -132,6 +132,14 @@ public class EthereumWallet {
         return walletData.getAccounts().get(ACCOUNT_INDEX);
     }
 
+    public void renameAccount(String newLabel){
+        EthereumAccount account = getAccount();
+        account.setLabel(newLabel);
+        ArrayList<EthereumAccount> accounts = new ArrayList<>();
+        accounts.add(account);
+        walletData.setAccounts(accounts);
+    }
+
     public HashMap<String, String> getTxNotes() {
         return walletData.getTxNotes();
     }
@@ -202,6 +210,26 @@ public class EthereumWallet {
             map.put(
                 Erc20TokenData.DGLD_CONTRACT_NAME,
                 Erc20TokenData.Companion.createDgldTokenData(labelsMap.get(CryptoCurrency.DGLD))
+            );
+            wasUpdated = true;
+        }
+
+        if (!map.containsKey(Erc20TokenData.AAVE_CONTRACT_NAME) ||
+            !map.get(Erc20TokenData.AAVE_CONTRACT_NAME).hasLabelAndAddressStored()
+        ) {
+            map.put(
+                Erc20TokenData.AAVE_CONTRACT_NAME,
+                Erc20TokenData.Companion.createAaveTokenData(labelsMap.get(CryptoCurrency.AAVE))
+            );
+            wasUpdated = true;
+        }
+
+        if (!map.containsKey(Erc20TokenData.YFI_CONTRACT_NAME) ||
+            !map.get(Erc20TokenData.YFI_CONTRACT_NAME).hasLabelAndAddressStored()
+        ) {
+            map.put(
+                Erc20TokenData.YFI_CONTRACT_NAME,
+                Erc20TokenData.Companion.createYfiTokenData(labelsMap.get(CryptoCurrency.YFI))
             );
             wasUpdated = true;
         }

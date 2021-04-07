@@ -18,6 +18,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.databinding.DialogSheetActivityDetailsBinding
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
@@ -25,7 +26,6 @@ import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.activity.detail.adapter.ActivityDetailsDelegateAdapter
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
-import piuk.blockchain.android.util.makeBlockExplorerUrl
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 
@@ -68,6 +68,8 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
 
     private val simpleBuySync: SimpleBuySyncFactory by scopedInject()
     private val compositeDisposable = CompositeDisposable()
+
+    private val assetResources: AssetResources by scopedInject()
 
     override fun initControls(binding: DialogSheetActivityDetailsBinding) {
         loadActivityDetails(arguments.cryptoCurrency, arguments.txId, arguments.activityType)
@@ -285,7 +287,7 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
     }
 
     private fun onActionItemClicked() {
-        val explorerUri = arguments.cryptoCurrency.makeBlockExplorerUrl(arguments.txId)
+        val explorerUri = assetResources.makeBlockExplorerUrl(arguments.cryptoCurrency, arguments.txId)
         logAnalyticsForExplorer()
         Intent(Intent.ACTION_VIEW).apply {
             data = Uri.parse(explorerUri)

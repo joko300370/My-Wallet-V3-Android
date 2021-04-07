@@ -17,21 +17,21 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AccountIcon
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.InterestAccount
-import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.NullCryptoAccount
-import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.databinding.ViewAccountCryptoOverviewBinding
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
 import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
-import piuk.blockchain.android.util.assetName
-import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.setAssetIconColours
+import piuk.blockchain.android.util.setImageDrawable
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
@@ -45,6 +45,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
     private val exchangeRates: ExchangeRates by scopedInject()
     private val currencyPrefs: CurrencyPrefs by scopedInject()
     private val coincore: Coincore by scopedInject()
+    private val assetResources: AssetResources by scopedInject()
     private val compositeDisposable = CompositeDisposable()
     private var accountBalance: Money? = null
     private var isEnabled: Boolean? = null
@@ -71,18 +72,28 @@ class AccountInfoCrypto @JvmOverloads constructor(
         val accountsAreTheSame = displayedAccount.isTheSameWith(account)
         updateAccountDetails(account, accountsAreTheSame, onAccountClicked, cellDecorator)
 
-        with(binding) {
-            when (account) {
-                is InterestAccount -> setInterestAccountDetails(account, accountsAreTheSame)
-                is TradingAccount -> {
-                    assetAccountIcon.visible()
-                    assetAccountIcon.setImageResource(R.drawable.ic_account_badge_custodial)
-                }
-                is NonCustodialAccount -> assetAccountIcon.gone()
-                else -> assetAccountIcon.gone()
-            }
-        }
+        (account as? InterestAccount)?.let { setInterestAccountDetails(account, accountsAreTheSame) }
+
+        updateAccountIcon(account)
+
         displayedAccount = account
+    }
+
+    private fun updateAccountIcon(account: CryptoAccount) {
+        with(binding) {
+            val accountIcon = AccountIcon(account, assetResources)
+            icon.setImageDrawable(accountIcon.icon)
+            accountIcon.indicator?.let {
+                assetAccountIcon.apply {
+                    visible()
+                    setAssetIconColours(
+                        tintColor = R.color.white,
+                        filterColor = assetResources.assetFilter(account.asset)
+                    )
+                    setImageResource(it)
+                }
+            } ?: kotlin.run { assetAccountIcon.gone() }
+        }
     }
 
     private fun setInterestAccountDetails(
@@ -90,8 +101,6 @@ class AccountInfoCrypto @JvmOverloads constructor(
         accountsAreTheSame: Boolean
     ) {
         with(binding) {
-            assetAccountIcon.setImageResource(R.drawable.ic_account_badge_interest)
-
             compositeDisposable += coincore[account.asset].interestRate().observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe { assetSubtitle.text = resources.getString(R.string.empty) }
                 .doOnSuccess {
@@ -122,10 +131,8 @@ class AccountInfoCrypto @JvmOverloads constructor(
         with(binding) {
             val crypto = account.asset
             walletName.text = account.label
-            icon.setCoinIcon(crypto)
-            icon.visible()
 
-            assetSubtitle.setText(crypto.assetName())
+            assetSubtitle.setText(assetResources.assetNameRes(crypto))
 
             compositeDisposable += account.accountBalance
                 .doOnSuccess {

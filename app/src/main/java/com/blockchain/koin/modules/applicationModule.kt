@@ -28,7 +28,9 @@ import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.cards.CardModel
 import piuk.blockchain.android.cards.partners.EverypayCardActivator
 import piuk.blockchain.android.coincore.AssetOrdering
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.OfflineAccountCache
+import piuk.blockchain.android.coincore.impl.AssetResourcesImpl
 import piuk.blockchain.android.coincore.impl.OfflineBalanceCall
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.android.data.api.bitpay.BitPayService
@@ -105,7 +107,6 @@ import piuk.blockchain.android.ui.transfer.DefaultAccountsSorting
 import piuk.blockchain.android.ui.transfer.receive.activity.ReceivePresenter
 import piuk.blockchain.android.ui.upgrade.UpgradeWalletPresenter
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.AssetResourceFactory
 import piuk.blockchain.android.util.BackupWalletUtil
 import piuk.blockchain.android.util.CurrentContextAccess
 import piuk.blockchain.android.util.OSUtil
@@ -268,7 +269,7 @@ val applicationModule = module {
                 prefs = get(),
                 appUtil = get(),
                 accessState = get(),
-                stringUtils = get(),
+                defaultLabels = get(),
                 authDataManager = get(),
                 payloadDataManager = get(),
                 crashLogger = get()
@@ -547,7 +548,7 @@ val applicationModule = module {
                 appUtil = get(),
                 prefs = get(),
                 payloadDataManager = get(),
-                stringUtils = get(),
+                defaultLabels = get(),
                 accessState = get(),
                 walletOptionsDataManager = get(),
                 environmentSettings = get(),
@@ -748,7 +749,7 @@ val applicationModule = module {
         )
     }
 
-    factory { ResourceDefaultLabels(get()) }.bind(DefaultLabels::class)
+    factory { ResourceDefaultLabels(get(), get()) }.bind(DefaultLabels::class)
 
     factory { DefaultAccountsSorting(get()) }.bind(AccountsSorting::class)
 
@@ -764,8 +765,8 @@ val applicationModule = module {
     }
 
     single {
-        AssetResourceFactory(
+        AssetResourcesImpl(
             resources = get()
         )
-    }
+    }.bind(AssetResources::class)
 }

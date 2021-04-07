@@ -8,17 +8,16 @@ import com.robinhood.spark.SparkAdapter
 import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.item_dashboard_asset_card.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.dashboard.CryptoAssetState
 import piuk.blockchain.android.ui.dashboard.asDeltaPercent
 import piuk.blockchain.android.ui.dashboard.format
 import piuk.blockchain.android.ui.dashboard.showLoading
-import piuk.blockchain.android.util.assetName
-import piuk.blockchain.android.util.chartLineColour
-import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.invisible
+import piuk.blockchain.android.util.setImageDrawable
 import piuk.blockchain.android.util.setOnClickListenerDebounced
 import piuk.blockchain.android.util.visible
 
@@ -26,6 +25,7 @@ import piuk.blockchain.android.util.visible
 
 class AssetCardDelegate<in T>(
     private val prefs: CurrencyPrefs,
+    private val assetResources: AssetResources,
     private val onCardClicked: (CryptoCurrency) -> Unit
 ) : AdapterDelegate<T> {
 
@@ -42,6 +42,7 @@ class AssetCardDelegate<in T>(
     ) = (holder as AssetCardViewHolder).bind(
         items[position] as CryptoAssetState,
         prefs.selectedFiatCurrency,
+        assetResources,
         onCardClicked
     )
 }
@@ -50,19 +51,24 @@ private class AssetCardViewHolder(
     itemView: View
 ) : RecyclerView.ViewHolder(itemView) {
 
-    fun bind(state: CryptoAssetState, fiatSymbol: String, onCardClicked: (CryptoCurrency) -> Unit) {
+    fun bind(
+        state: CryptoAssetState,
+        fiatSymbol: String,
+        assetResources: AssetResources,
+        onCardClicked: (CryptoCurrency) -> Unit
+    ) {
         with(itemView) {
             fiat_balance.contentDescription = "$FIAT_BALANCE_ID${state.currency.networkTicker}"
             crypto_balance.contentDescription = "$CRYPTO_BALANCE_ID${state.currency.networkTicker}"
 
-            icon.setCoinIcon(state.currency)
-            currency.setText(state.currency.assetName())
+            icon.setImageDrawable(assetResources.drawableResFilled(state.currency))
+            currency.setText(assetResources.assetNameRes(state.currency))
         }
 
         when {
             state.hasBalanceError -> renderError(state)
             state.isLoading -> renderLoading()
-            else -> renderLoaded(state, fiatSymbol, onCardClicked)
+            else -> renderLoaded(state, fiatSymbol, assetResources, onCardClicked)
         }
     }
 
@@ -82,7 +88,12 @@ private class AssetCardViewHolder(
         }
     }
 
-    private fun renderLoaded(state: CryptoAssetState, fiatSymbol: String, onCardClicked: (CryptoCurrency) -> Unit) {
+    private fun renderLoaded(
+        state: CryptoAssetState,
+        fiatSymbol: String,
+        assetResources: AssetResources,
+        onCardClicked: (CryptoCurrency) -> Unit
+    ) {
         with(itemView) {
             cardLayout.isEnabled = true
             setOnClickListenerDebounced { onCardClicked(state.currency) }
@@ -98,7 +109,7 @@ private class AssetCardViewHolder(
             price_delta_interval.text = context.getString(R.string.asset_card_rate_period)
 
             if (state.priceTrend.isNotEmpty()) {
-                sparkview.lineColor = state.currency.chartLineColour(context)
+                sparkview.lineColor = assetResources.chartLineColour(state.currency, context)
                 sparkview.adapter = PriceAdapter(state.priceTrend.toFloatArray())
                 sparkview.visible()
             } else {

@@ -15,6 +15,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.blockchain.koin.payloadScope
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.RequestAnalyticsEvents
 import com.blockchain.preferences.CurrencyPrefs
@@ -77,7 +78,7 @@ class ReceiveFragment : MvpFragment<ReceiveView, ReceivePresenter>(),
     private val disposables = CompositeDisposable()
 
     private val receiveIntentHelper by unsafeLazy {
-        ReceiveIntentHelper(requireContext())
+        ReceiveIntentHelper(requireContext(), payloadScope.get())
     }
 
     private val event by unsafeLazy {

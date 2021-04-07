@@ -20,6 +20,7 @@ import com.blockchain.ui.urllinks.URL_TX_FEES
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_send_confirm_select_fee.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.TxConfirmationValue
@@ -29,14 +30,14 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.flow.formatWithExchange
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.AfterTextChangedWatcher
 
 class ConfirmInfoItemFeeOptionDelegate<in T>(
     private val model: TransactionModel,
     private val analytics: TxFlowAnalytics,
-    private val stringUtils: StringUtils
+    private val stringUtils: StringUtils,
+    private val assetResources: AssetResources
 ) : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
         return items[position] is TxConfirmationValue.FeeSelection
@@ -53,7 +54,8 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
         items[position] as TxConfirmationValue.FeeSelection,
         model,
         analytics,
-        stringUtils
+        stringUtils,
+        assetResources
     )
 
     private class FeeOptionViewHolder(
@@ -101,7 +103,8 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
             item: TxConfirmationValue.FeeSelection,
             model: TransactionModel,
             analytics: TxFlowAnalytics,
-            stringUtils: StringUtils
+            stringUtils: StringUtils,
+            assetResources: AssetResources
         ) {
             updateFeeList(item.availableLevels.toList())
             val selectedOption = item.selectedLevel
@@ -124,8 +127,10 @@ class ConfirmInfoItemFeeOptionDelegate<in T>(
                 )
 
                 val boldText = context.getString(R.string.tx_confirmation_fee_learn_more_1)
-                val networkText = context.getString(R.string.tx_confirmation_fee_learn_more_2,
-                    context.getString(item.asset.assetName()))
+                val networkText = context.getString(
+                    R.string.tx_confirmation_fee_learn_more_2,
+                    context.getString(assetResources.assetNameRes(item.asset))
+                )
 
                 val linkedText = stringUtils.getStringWithMappedAnnotations(
                     R.string.tx_confirmation_fee_learn_more_3,

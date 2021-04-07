@@ -24,6 +24,7 @@ import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.cards.CardDetailsActivity
 import piuk.blockchain.android.cards.CardDetailsActivity.Companion.ADD_CARD_REQUEST_CODE
 import piuk.blockchain.android.cards.icon
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.databinding.FragmentSimpleBuyBuyCryptoBinding
 import piuk.blockchain.android.ui.base.ErrorSlidingBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviFragment
@@ -34,8 +35,6 @@ import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.linkbank.LinkBankActivity
-import piuk.blockchain.android.util.assetName
-import piuk.blockchain.android.util.drawableResFilled
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.visible
@@ -49,6 +48,7 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
 
     override val model: SimpleBuyModel by scopedInject()
     private val exchangeRateDataManager: ExchangeRateDataManager by scopedInject()
+    private val assetResources: AssetResources by scopedInject()
 
     private var lastState: SimpleBuyState? = null
     private val compositeDisposable = CompositeDisposable()
@@ -194,11 +194,14 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                 canSwap = false,
                 predefinedAmount = newState.order.amount ?: FiatValue.zero(newState.fiatCurrency)
             )
-            binding.buyIcon.setAssetIconColours(it, activity)
+            binding.buyIcon.setAssetIconColours(
+                tintColor = assetResources.assetTint(it),
+                filterColor = assetResources.assetFilter(it)
+            )
         }
         newState.selectedCryptoCurrency?.let {
-            binding.cryptoIcon.setImageResource(it.drawableResFilled())
-            binding.cryptoText.setText(it.assetName())
+            binding.cryptoIcon.setImageResource(assetResources.drawableResFilled(it))
+            binding.cryptoText.setText(assetResources.assetNameRes(it))
         }
 
         newState.exchangePrice?.let {

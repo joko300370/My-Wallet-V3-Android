@@ -18,6 +18,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
+import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import info.blockchain.balance.CryptoCurrency
@@ -25,8 +26,7 @@ import kotlinx.android.synthetic.main.view_expanding_currency_header.view.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.util.assetName
-import piuk.blockchain.android.util.coinIconWhite
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.android.util.invisible
 import piuk.blockchain.android.util.setAnimationListener
@@ -40,6 +40,7 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
     private lateinit var selectionListener: (CryptoCurrency) -> Unit
 
     private val analytics: Analytics by inject()
+    private val assetResources: AssetResources by scopedInject()
 
     private var expanded = false
     private var firstOpen = true
@@ -170,11 +171,11 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
 
     private fun updateCurrencyUi(asset: CryptoCurrency) {
         textview_selected_currency.run {
-            val title = resources.getString(asset.assetName())
+            val title = resources.getString(assetResources.assetNameRes(asset))
             text = title.toUpperCase()
 
             setCompoundDrawablesWithIntrinsicBounds(
-                AppCompatResources.getDrawable(context, asset.coinIconWhite()),
+                AppCompatResources.getDrawable(context, assetResources.coinIconWhite(asset)),
                 null,
                 arrowDrawable,
                 null

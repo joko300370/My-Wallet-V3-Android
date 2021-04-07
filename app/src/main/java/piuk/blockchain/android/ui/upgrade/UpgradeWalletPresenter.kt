@@ -1,18 +1,19 @@
 package piuk.blockchain.android.ui.upgrade
 
 import com.blockchain.logging.CrashLogger
+import com.blockchain.wallet.DefaultLabels
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.util.PasswordUtil
 import io.reactivex.rxkotlin.plusAssign
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.launcher.LauncherActivity
+import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.data.access.AccessState
-import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import piuk.blockchain.androidcoreui.utils.logging.walletUpgradeEvent
 
@@ -22,7 +23,7 @@ internal class UpgradeWalletPresenter constructor(
     private val accessState: AccessState,
     private val authDataManager: AuthDataManager,
     private val payloadDataManager: PayloadDataManager,
-    private val stringUtils: StringUtils,
+    private val defaultLabels: DefaultLabels,
     private val crashLogger: CrashLogger
 ) : BasePresenter<UpgradeWalletView>() {
 
@@ -43,7 +44,8 @@ internal class UpgradeWalletPresenter constructor(
 
     fun submitPasswords(firstPassword: String, secondPassword: String) {
         if (firstPassword.length < 4 || firstPassword.length > 255 ||
-            secondPassword.length < 4 || secondPassword.length > 255) {
+            secondPassword.length < 4 || secondPassword.length > 255
+        ) {
             view.showToast(R.string.invalid_password, ToastCustom.TYPE_ERROR)
         } else {
             if (firstPassword != secondPassword) {
@@ -70,7 +72,8 @@ internal class UpgradeWalletPresenter constructor(
     internal fun onUpgradeRequested(secondPassword: String?) {
         compositeDisposable += payloadDataManager.upgradeV2toV3(
             secondPassword,
-            stringUtils.getString(R.string.btc_default_wallet_name))
+            defaultLabels.getDefaultNonCustodialWalletLabel(CryptoCurrency.BTC)
+        )
             .doOnSubscribe { view.onUpgradeStarted() }
             .doOnError { accessState.isNewlyCreated = false }
             .doOnComplete { accessState.isNewlyCreated = true }

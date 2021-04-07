@@ -26,6 +26,8 @@ public class EthereumWalletTest extends MockedResponseTest {
     private final String paxLabel = "My USD PAX Wallet";
     private final String usdtLabel = "My Tether Wallet";
     private final String dgldLabel = "My Wrapped-DGLD Wallet";
+    private final String aaveLabel = "My Aave Wallet";
+    private final String yfiLabel = "My YFI Wallet";
     private final HashMap<CryptoCurrency, String> allLabels = new HashMap();
     private final HashMap<CryptoCurrency, String> erc20Labels = new HashMap();
 
@@ -37,10 +39,14 @@ public class EthereumWalletTest extends MockedResponseTest {
         allLabels.put(CryptoCurrency.PAX, paxLabel);
         allLabels.put(CryptoCurrency.USDT, usdtLabel);
         allLabels.put(CryptoCurrency.DGLD, dgldLabel);
+        allLabels.put(CryptoCurrency.AAVE, aaveLabel);
+        allLabels.put(CryptoCurrency.YFI, yfiLabel);
 
         erc20Labels.put(CryptoCurrency.PAX, paxLabel);
         erc20Labels.put(CryptoCurrency.USDT, usdtLabel);
         erc20Labels.put(CryptoCurrency.DGLD, dgldLabel);
+        erc20Labels.put(CryptoCurrency.AAVE, aaveLabel);
+        erc20Labels.put(CryptoCurrency.YFI, yfiLabel);
     }
 
     private HDWallet getWallet(String seedHex) throws Exception {

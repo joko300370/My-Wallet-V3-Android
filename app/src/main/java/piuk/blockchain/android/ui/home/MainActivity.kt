@@ -38,6 +38,7 @@ import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoTarget
@@ -89,6 +90,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     override val presenter: MainPresenter by scopedInject()
     private val qrProcessor: QrScanResultProcessor by scopedInject()
+    private val assetResources: AssetResources by scopedInject()
 
     override val view: MainView = this
 
@@ -508,7 +510,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     @SuppressLint("CheckResult")
     private fun disambiguateSendScan(targets: Collection<CryptoTarget>) {
-        qrProcessor.disambiguateScan(this, targets)
+        qrProcessor.disambiguateScan(this, targets, assetResources)
             .subscribeBy(
                 onSuccess = {
                     startTransactionFlowWithTarget(listOf(it))

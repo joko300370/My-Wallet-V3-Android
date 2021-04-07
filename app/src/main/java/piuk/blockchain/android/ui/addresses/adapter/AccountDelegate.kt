@@ -35,11 +35,11 @@ class AccountDelegate(
     override fun isForViewType(items: List<AccountListItem>, position: Int) =
         (items[position] is AccountListItem.Account)
 
-    private class AccountViewHolder internal constructor(
+    private class AccountViewHolder(
         itemView: View
     ) : RecyclerView.ViewHolder(itemView) {
 
-        internal fun bind(
+        fun bind(
             item: AccountListItem.Account,
             listener: AccountAdapter.Listener
         ) {

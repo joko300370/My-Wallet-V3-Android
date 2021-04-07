@@ -14,14 +14,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
-import piuk.blockchain.android.util.drawableResFilled
+import com.blockchain.koin.scopedInject
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import kotlinx.android.synthetic.main.fragment_swipe_to_receive.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.util.assetName
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -40,6 +40,7 @@ class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePr
 
     private val presenter: SwipeToReceivePresenter by inject()
     private val rxBus: RxBus by inject()
+    private val assetResources: AssetResources by scopedInject()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -65,7 +66,7 @@ class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePr
     }
 
     override fun initPager(assetList: List<CryptoCurrency>) {
-        val assetImageList = assetList.map { it.drawableResFilled() }
+        val assetImageList = assetList.map { assetResources.drawableResFilled(it) }
         val adapter = ImageAdapter(
             requireContext(),
             assetImageList
@@ -101,7 +102,7 @@ class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePr
     }
 
     override fun displayAsset(cryptoCurrency: CryptoCurrency) {
-        val assetName = getString(cryptoCurrency.assetName())
+        val assetName = assetResources.assetName(cryptoCurrency)
         val requestString = getString(R.string.swipe_to_receive_request, assetName)
         textview_request_currency.text = requestString
         textview_request_currency.contentDescription = requestString

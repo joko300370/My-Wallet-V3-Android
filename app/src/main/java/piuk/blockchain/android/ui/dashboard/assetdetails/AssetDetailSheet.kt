@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import piuk.blockchain.android.simplebuy.CustodialBalanceClicked
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.wallet.DefaultLabels
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
@@ -25,6 +26,7 @@ import info.blockchain.wallet.prices.data.PriceDatum
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetFilter
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -35,7 +37,6 @@ import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.account.PendingBalanceAccountDecorator
 import piuk.blockchain.android.ui.dashboard.setDeltaColour
-import piuk.blockchain.android.util.getDecimalPlaces
 import piuk.blockchain.android.util.loadInterMedium
 import piuk.blockchain.androidcore.data.exchangerate.PriceSeries
 import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
@@ -53,6 +54,7 @@ import java.util.Locale
 class AssetDetailSheet : MviBottomSheet<AssetDetailsModel,
     AssetDetailsIntent, AssetDetailsState, DialogSheetDashboardAssetDetailsBinding>() {
     private val currencyPrefs: CurrencyPrefs by inject()
+    private val labels: DefaultLabels by inject()
     private val locale = Locale.getDefault()
 
     private val cryptoCurrency: CryptoCurrency by lazy {
@@ -62,6 +64,8 @@ class AssetDetailSheet : MviBottomSheet<AssetDetailsModel,
 
     private val assetSelect: Coincore by scopedInject()
 
+    private val assetResources: AssetResources by scopedInject()
+
     private val token: CryptoAsset by lazy {
         assetSelect[cryptoCurrency]
     }
@@ -70,7 +74,9 @@ class AssetDetailSheet : MviBottomSheet<AssetDetailsModel,
         AssetDetailAdapter(
             ::onAccountSelected,
             cryptoCurrency.hasFeature(CryptoCurrency.CUSTODIAL_ONLY),
-            token
+            token,
+            assetResources,
+            labels
         ) {
             PendingBalanceAccountDecorator(it.account)
         }
@@ -120,7 +126,7 @@ class AssetDetailSheet : MviBottomSheet<AssetDetailsModel,
             configureChart(
                 chart,
                 getFiatSymbol(currencyPrefs.selectedFiatCurrency),
-                cryptoCurrency.getDecimalPlaces()
+                assetResources.numOfDecimalsForChart(cryptoCurrency)
             )
 
             configureTabs(chartPricePeriods)
@@ -233,7 +239,7 @@ class AssetDetailSheet : MviBottomSheet<AssetDetailsModel,
                     context,
                     R.layout.price_chart_marker,
                     getFiatSymbol(currencyPrefs.selectedFiatCurrency),
-                    cryptoCurrency.getDecimalPlaces()
+                    assetResources.numOfDecimalsForChart(cryptoCurrency)
                 )
             })
             animateX(500)

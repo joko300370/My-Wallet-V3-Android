@@ -1,15 +1,13 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.blockchain.koin.payloadScope
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.service.TierService
@@ -21,6 +19,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.item_asset_action.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -34,9 +33,8 @@ import piuk.blockchain.android.ui.customviews.account.PendingBalanceAccountDecor
 import piuk.blockchain.android.ui.customviews.account.StatusDecorator
 import piuk.blockchain.android.ui.customviews.account.addViewToBottomWithConstraints
 import piuk.blockchain.android.ui.customviews.account.removePossibleBottomView
-import piuk.blockchain.android.util.assetFilter
-import piuk.blockchain.android.util.assetTint
 import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.setAssetIconColours
 import timber.log.Timber
 
 class AssetActionsSheet :
@@ -252,13 +250,15 @@ private class AssetActionAdapter(
 
     private val compositeDisposable = CompositeDisposable()
 
+    private val assetResources: AssetResources = payloadScope.get()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ActionItemViewHolder =
         ActionItemViewHolder(compositeDisposable, parent.inflate(R.layout.item_asset_action))
 
     override fun getItemCount(): Int = itemList.size
 
     override fun onBindViewHolder(holder: ActionItemViewHolder, position: Int) =
-        holder.bind(itemList[position], statusDecorator)
+        holder.bind(itemList[position], statusDecorator, assetResources)
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
@@ -269,13 +269,17 @@ private class AssetActionAdapter(
         RecyclerView.ViewHolder(view) {
         fun bind(
             item: AssetActionItem,
-            statusDecorator: StatusDecorator
+            statusDecorator: StatusDecorator,
+            assetResources: AssetResources
         ) {
             addDecorator(item, statusDecorator)
 
             view.apply {
                 item_action_icon.setImageResource(item.icon)
-                item_action_icon.setAssetIconColours(item.asset, view.context)
+                item_action_icon.setAssetIconColours(
+                    tintColor = assetResources.assetTint(item.asset),
+                    filterColor = assetResources.assetFilter(item.asset)
+                )
                 item_action_title.text = item.title
                 item_action_label.text = item.description
             }
@@ -319,15 +323,6 @@ private class AssetActionAdapter(
             } ?: view.item_action_holder.setOnClickListener {
                 item.actionCta()
             }
-        }
-
-        private fun ImageView.setAssetIconColours(
-            cryptoCurrency: CryptoCurrency,
-            context: Context
-        ) {
-            setBackgroundResource(R.drawable.bkgd_tx_circle)
-            background.setTint(ContextCompat.getColor(context, cryptoCurrency.assetTint()))
-            setColorFilter(ContextCompat.getColor(context, cryptoCurrency.assetFilter()))
         }
     }
 }

@@ -21,6 +21,7 @@ import com.blockchain.ui.urllinks.URL_TX_FEES
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FeeSelection
@@ -29,7 +30,6 @@ import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.AfterTextChangedWatcher
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
@@ -47,6 +47,7 @@ class EditFeesControl @JvmOverloads constructor(
 
     private val stringUtils: StringUtils by inject()
     private val analytics: TxFlowAnalytics by inject()
+    private val assetResources: AssetResources by inject()
 
     private lateinit var textChangedWatcher: AfterTextChangedWatcher
 
@@ -87,8 +88,8 @@ class EditFeesControl @JvmOverloads constructor(
                 "send_tx_fees" to Uri.parse(URL_TX_FEES)
             )
 
-            val assetName = feeSelection.asset?.assetName()?.let {
-                context.getString(it)
+            val assetName = feeSelection.asset?.let {
+                context.getString(assetResources.assetNameRes(it))
             } ?: ""
 
             val boldText = context.getString(R.string.tx_confirmation_fee_learn_more_1)

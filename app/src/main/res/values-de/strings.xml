@@ -917,12 +917,6 @@
     <string name="iban">IBAN</string>
     <string name="estonia">Estland</string>
     <string name="lets_setup_wallet">Lassen Sie uns Ihre Brieftasche einrichten. Sie können Krypto jetzt schnell kaufen oder dies später tun.</string>
-    <string name="btc_default_wallet_name">Meine Bitcoin-Brieftasche</string>
-    <string name="bch_default_account_label">Meine Bitcoin-Geldbörse</string>
-    <string name="eth_default_account_label">Meine Ätherbrieftasche</string>
-    <string name="xlm_default_account_label">Meine hervorragende Brieftasche</string>
-    <string name="pax_default_account_label_1">Mein USD Digital Wallet</string>
-    <string name="exchange_default_account_label">Meine Exchange %1$s Adresse</string>
     <string name="linked_cards">Verknüpfte Karten</string>
     <string name="tx_title_send">%1s senden</string>
     <string name="tx_title_receive">Erhalte %1s</string>
@@ -960,7 +954,6 @@
     <string name="buy_now">Kaufe jetzt</string>
     <string name="default_label_all_wallets">Alle Geldbörsen</string>
     <string name="approximately_symbol">~ %1$s</string>
-    <string name="custodial_wallet_default_label">%1s Trading Wallet</string>
     <string name="select_account_sheet_title">Wählen Sie eine Brieftasche</string>
     <string name="activity_state_initialised">Initialisiert</string>
     <string name="activity_state_uninitialised">Nicht initialisiert</string>
@@ -1008,7 +1001,6 @@
     <string name="common_spaced_strings">%1$s %2$s</string>
     <string name="server_unreachable_exit">Es kann keine Verbindung zum Server hergestellt werden. Versuchen Sie es später erneut.</string>
     <string name="dashboard_asset_balance_interest">Verdiene %1$.1f %% APY</string>
-    <string name="default_label_interest_wallet">Zinsgeldbörse</string>
     <string name="activity_details_created">Datum</string>
     <string name="activity_details_completed">Abgeschlossen</string>
     <string name="activity_details_fee">Gebühr</string>
@@ -1117,7 +1109,6 @@
     <string name="transfer_second_pswd_title">2. Passwort</string>
     <string name="transfer_second_pswd_desc">Bitte geben Sie Ihr 2. Passwort ein, Sie können dann weiter senden.</string>
     <string name="transfer_second_pswd_hint">2. Passwort</string>
-    <string name="currency_wallet">Meine %1s Brieftasche</string>
     <string name="dashboard_asset_item_label_title">Bitte beachten Sie.</string>
     <string name="algorand_asset_label">Die Funktion zum Abheben von ALGO aus Ihrem Handelsportemonnaie ist derzeit nicht verfügbar, wird jedoch in Kürze verfügbar sein.</string>
     <string name="send_state_no_funds">Keine Mittel</string>
@@ -1218,7 +1209,6 @@
     <string name="purchase_card_note_2">Ihre Krypto kann innerhalb von abgerufen werden</string>
     <string name="select_send_sheet_title">Senden von</string>
     <string name="select_send_source_title">Senden von</string>
-    <string name="currency_funds_wallet">Meine %1s Brieftasche</string>
     <string name="us_dollars">US Dollar</string>
     <string name="fiat_funds_detail_withdraw_details">Auszahlung an Ihre Bank</string>
     <string name="withdraw_currency">%1$s abheben</string>

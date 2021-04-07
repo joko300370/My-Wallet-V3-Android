@@ -15,6 +15,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import org.web3j.utils.Convert
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.data.coinswebsocket.models.BtcBchResponse
 import piuk.blockchain.android.data.coinswebsocket.models.Coin
 import piuk.blockchain.android.data.coinswebsocket.models.Entity
@@ -30,7 +31,6 @@ import piuk.blockchain.android.data.coinswebsocket.models.TransactionState
 import piuk.blockchain.android.data.coinswebsocket.service.MessagesSocketHandler
 import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.AssetResourceFactory
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
@@ -69,7 +69,7 @@ class CoinsWebSocketStrategy(
     private val appUtil: AppUtil,
     private val payloadDataManager: PayloadDataManager,
     private val bchDataManager: BchDataManager,
-    private val assetResources: AssetResourceFactory
+    private val assetResources: AssetResources
 ) {
 
     private var coinWebSocketInput: CoinWebSocketInput? = null
@@ -629,6 +629,8 @@ class CoinsWebSocketStrategy(
             entity == Entity.TokenAccount && isErc20ParamType(CryptoCurrency.PAX) -> CryptoCurrency.PAX
             entity == Entity.TokenAccount && isErc20ParamType(CryptoCurrency.USDT) -> CryptoCurrency.USDT
             entity == Entity.TokenAccount && isErc20ParamType(CryptoCurrency.DGLD) -> CryptoCurrency.DGLD
+            entity == Entity.TokenAccount && isErc20ParamType(CryptoCurrency.AAVE) -> CryptoCurrency.AAVE
+            entity == Entity.TokenAccount && isErc20ParamType(CryptoCurrency.YFI) -> CryptoCurrency.YFI
             else -> {
                 throw IllegalStateException("This should never trigger, did we add a new ERC20 token?")
             }
@@ -641,7 +643,9 @@ class CoinsWebSocketStrategy(
     private fun EthResponse.isErc20Token(): Boolean =
         isErc20TransactionType(CryptoCurrency.PAX) ||
             isErc20TransactionType(CryptoCurrency.USDT) ||
-            isErc20TransactionType(CryptoCurrency.DGLD)
+            isErc20TransactionType(CryptoCurrency.DGLD) ||
+            isErc20TransactionType(CryptoCurrency.AAVE) ||
+            isErc20TransactionType(CryptoCurrency.YFI)
 
     private fun EthResponse.isErc20TransactionType(cryptoCurrency: CryptoCurrency) =
         transaction?.to.equals(ethDataManager.getErc20TokenData(cryptoCurrency).contractAddress, true)
