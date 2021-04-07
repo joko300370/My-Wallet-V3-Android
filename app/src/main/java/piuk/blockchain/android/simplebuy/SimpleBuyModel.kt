@@ -15,6 +15,7 @@ import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyConfirmationAttri
 import com.blockchain.preferences.RatingPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.google.gson.Gson
+import info.blockchain.balance.FiatValue
 import io.reactivex.Completable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
@@ -220,7 +221,7 @@ class SimpleBuyModel(
                         updatePersistingCountersForCompletedOrders()
                         process(SimpleBuyIntent.PaymentSucceeded)
                     } else if (it.state == OrderState.AWAITING_FUNDS || it.state == OrderState.PENDING_EXECUTION) {
-                        process(SimpleBuyIntent.CardPaymentPending)
+                        process(SimpleBuyIntent.PaymentPending)
                     } else {
                         if (it.approvalErrorStatus != ApprovalErrorStatus.NONE) {
                             handleApprovalErrorState(it)
@@ -277,11 +278,18 @@ class SimpleBuyModel(
         order.attributes?.everypay?.let {
             handleCardPayment(order)
         } ?: kotlin.run {
-            order.attributes?.authorisationUrl?.let {
-                handleBankAuthorisationPayment(order.paymentMethodId, it)
-            } ?: process(SimpleBuyIntent.GetAuthorisationUrl(order.id))
+            if (!order.fiat.isOpenBankingCurrency()) {
+                process(SimpleBuyIntent.CheckOrderStatus)
+            } else {
+                order.attributes?.authorisationUrl?.let {
+                    handleBankAuthorisationPayment(order.paymentMethodId, it)
+                } ?: process(SimpleBuyIntent.GetAuthorisationUrl(order.id))
+            }
         }
     }
+
+    private fun FiatValue.isOpenBankingCurrency() =
+        this.currencyCode == "EUR" || this.currencyCode == "GBP"
 
     private fun processConfirmOrder(previousState: SimpleBuyState): Disposable {
         val isBankPayment = previousState.selectedPaymentMethod?.isBank()

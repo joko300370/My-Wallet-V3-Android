@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.models.data.BankPartner
 import com.blockchain.nabu.models.data.LinkedBank
 import com.blockchain.preferences.RatingPrefs
 import com.blockchain.ui.urllinks.URL_SUPPORT_BALANCE_LOCKED
@@ -238,7 +239,19 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
                             getString(
                                 R.string.bank_transfer_in_progress_title, newState.orderValue.formatOrSymbolForZero()
                             ),
-                            getString(R.string.bank_transfer_in_progress_blurb, getEstimatedTransactionCompletionTime())
+                            newState.linkBankTransfer?.partner?.let {
+                                when (it) {
+                                    BankPartner.YAPILY -> {
+                                        getString(R.string.bank_transfer_in_progress_ob_blurb)
+                                    }
+                                    BankPartner.YODLEE -> {
+                                        getString(
+                                            R.string.bank_transfer_in_progress_blurb,
+                                            getEstimatedTransactionCompletionTime()
+                                        )
+                                    }
+                                }
+                            } ?: getString(R.string.completing_card_buy)
                         )
                     }
                     else -> {

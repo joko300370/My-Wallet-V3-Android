@@ -411,7 +411,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
             oldState.copy(shouldShowUnlockHigherFunds = true)
     }
 
-    object CardPaymentPending : SimpleBuyIntent() {
+    object PaymentPending : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(paymentPending = true, isLoading = false)
     }
