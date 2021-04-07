@@ -67,7 +67,8 @@ class SimpleBuyModel(
                         onSuccess = { process(it) },
                         onError = { process(SimpleBuyIntent.ErrorIntent()) }
                     )
-            is SimpleBuyIntent.CancelOrder -> (previousState.id?.let {
+            is SimpleBuyIntent.CancelOrder,
+            is SimpleBuyIntent.CancelOrderAndResetAuthorisation -> (previousState.id?.let {
                 interactor.cancelOrder(it)
             } ?: Completable.complete())
                 .subscribeBy(

@@ -1936,7 +1936,7 @@
     <string name="open_banking_deeplink_error">Oops! There was an error while linking your bank, please try again.</string>
     <string name="yapily_approval_header">Approve Your Payment</string>
     <string name="yapily_approval_title">Payment Information</string>
-    <string name="yapily_approval_subtitle_1">Bank name</string>
+    <string name="yapily_approval_subtitle_1">Account name</string>
     <string name="yapily_approval_subtitle_2_uk">Sort Code</string>
     <string name="yapily_approval_subtitle_2_eu">IBAN</string>
     <string name="yapily_approval_subtitle_3_uk">Account Number</string>

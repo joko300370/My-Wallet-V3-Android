@@ -28,10 +28,10 @@ import org.koin.core.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.Coincore
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.android.util.invisible
 import piuk.blockchain.android.util.setAnimationListener
 import piuk.blockchain.android.util.visible
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 
 class ExpandableCurrencyHeader @JvmOverloads constructor(
     context: Context,
@@ -42,7 +42,7 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
 
     private val analytics: Analytics by inject()
     private val assetResources: AssetResources by scopedInject()
-    private val coincore: Coincore by inject()
+    private val coincore: Coincore by scopedInject()
 
     private var expanded = false
     private var firstOpen = true
