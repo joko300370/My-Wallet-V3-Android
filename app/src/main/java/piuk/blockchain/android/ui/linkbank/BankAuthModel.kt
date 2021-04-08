@@ -44,6 +44,10 @@ class BankAuthModel(
             is BankAuthIntent.UpdateAccountProvider -> processBankLinkingUpdate(intent)
             is BankAuthIntent.GetLinkedBankState -> processBankLinkStateUpdate(intent)
             is BankAuthIntent.StartPollingForLinkStatus -> processLinkStatusPolling(intent, previousState)
+            is BankAuthIntent.StartBankApproval -> {
+                interactor.updateApprovalStatus()
+                null
+            }
             else -> null
         }
 
