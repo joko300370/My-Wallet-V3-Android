@@ -4,7 +4,6 @@ import com.blockchain.annotations.CommonCode
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.wallet.DefaultLabels
@@ -20,6 +19,7 @@ import piuk.blockchain.android.coincore.SimpleOfflineCacheItem
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
@@ -44,8 +44,8 @@ internal class Erc20Asset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     environmentConfig: EnvironmentConfig,
-    eligibilityProvider: EligibilityProvider,
-    offlineAccounts: OfflineAccountUpdater
+    offlineAccounts: OfflineAccountUpdater,
+    private val identity: UserIdentity
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -56,8 +56,8 @@ internal class Erc20Asset(
     pitLinking,
     crashLogger,
     environmentConfig,
-    eligibilityProvider,
-    offlineAccounts
+    offlineAccounts,
+    identity
 ) {
 
     private val isFeatureFlagEnabled = AtomicBoolean(false)
@@ -92,7 +92,8 @@ internal class Erc20Asset(
             labels.getDefaultNonCustodialWalletLabel(asset),
             exchangeRates,
             walletPreferences,
-            custodialManager
+            custodialManager,
+            identity
         )
     }
 

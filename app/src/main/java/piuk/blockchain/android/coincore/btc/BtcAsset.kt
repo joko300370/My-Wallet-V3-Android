@@ -4,7 +4,6 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -29,6 +28,7 @@ import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -54,7 +54,7 @@ internal class BtcAsset(
     environmentConfig: EnvironmentConfig,
     private val walletPreferences: WalletStatus,
     offlineAccounts: OfflineAccountUpdater,
-    eligibilityProvider: EligibilityProvider
+    private val identity: UserIdentity
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -65,8 +65,8 @@ internal class BtcAsset(
     pitLinking,
     crashLogger,
     environmentConfig,
-    eligibilityProvider,
-    offlineAccounts
+    offlineAccounts,
+    identity
 ) {
 
     override val asset: CryptoCurrency
@@ -188,7 +188,8 @@ internal class BtcAsset(
             networkParameters = environmentConfig.bitcoinNetworkParameters,
             walletPreferences = walletPreferences,
             custodialWalletManager = custodialManager,
-            refreshTrigger = this
+            refreshTrigger = this,
+            identity = identity
         )
 
     private fun btcAccountFromImportedAccount(payloadAccount: ImportedAddress): BtcCryptoWalletAccount =
@@ -201,7 +202,8 @@ internal class BtcAsset(
             networkParameters = environmentConfig.bitcoinNetworkParameters,
             walletPreferences = walletPreferences,
             custodialWalletManager = custodialManager,
-            refreshTrigger = this
+            refreshTrigger = this,
+            identity = identity
         )
 
     companion object {

@@ -1,4 +1,4 @@
-package piuk.blockchain.android.coincore.impl.txEngine
+package piuk.blockchain.android.coincore.impl.txEngine.interest
 
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.Money
@@ -11,17 +11,16 @@ import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
-import piuk.blockchain.android.coincore.TxEngine
-import piuk.blockchain.android.coincore.TxFee
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
+import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
-class InterestDepositTxEngine(
-    private val walletManager: CustodialWalletManager,
+class InterestDepositOnChainTxEngine(
+    walletManager: CustodialWalletManager,
     private val onChainEngine: OnChainTxEngineBase
-) : TxEngine() {
+) : InterestEngine(walletManager) {
 
     override fun assertInputsValid() {
         check(sourceAccount is CryptoNonCustodialAccount)
@@ -49,8 +48,7 @@ class InterestDepositTxEngine(
     override fun doInitialiseTx(): Single<PendingTx> =
         onChainEngine.doInitialiseTx()
             .flatMap { pendingTx ->
-                walletManager.getInterestLimits(sourceAsset)
-                    .toSingle()
+                getLimits()
                     .map {
                         pendingTx.copy(
                             minLimit = it.minDepositAmount,
@@ -60,7 +58,7 @@ class InterestDepositTxEngine(
                             )
                         )
                     }
-                }
+            }
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> =
         onChainEngine.doUpdateAmount(amount, pendingTx)
@@ -87,36 +85,6 @@ class InterestDepositTxEngine(
             }
         }
 
-    private fun modifyEngineConfirmations(
-        pendingTx: PendingTx,
-        termsChecked: Boolean = false,
-        agreementChecked: Boolean = false
-    ): PendingTx =
-        pendingTx.removeOption(TxConfirmation.DESCRIPTION)
-            .removeOption(TxConfirmation.FEE_SELECTION)
-            .addOrReplaceOption(
-                TxConfirmationValue.NetworkFee(
-                    txFee = TxFee(
-                        pendingTx.feeAmount,
-                        TxFee.FeeType.DEPOSIT_FEE,
-                        sourceAsset
-                    )
-                )
-            )
-            .addOrReplaceOption(
-                TxConfirmationValue.TxBooleanConfirmation<Unit>(
-                    confirmation = TxConfirmation.AGREEMENT_INTEREST_T_AND_C,
-                    value = termsChecked
-                )
-            )
-            .addOrReplaceOption(
-                TxConfirmationValue.TxBooleanConfirmation(
-                    confirmation = TxConfirmation.AGREEMENT_INTEREST_TRANSFER,
-                    data = pendingTx.amount,
-                    value = agreementChecked
-                )
-            )
-
     override fun doOptionUpdateRequest(pendingTx: PendingTx, newConfirmation: TxConfirmationValue): Single<PendingTx> =
         if (newConfirmation.confirmation in setOf(
                 TxConfirmation.AGREEMENT_INTEREST_T_AND_C,
@@ -128,9 +96,7 @@ class InterestDepositTxEngine(
             onChainEngine.doOptionUpdateRequest(pendingTx, newConfirmation)
                 .map { pTx ->
                     modifyEngineConfirmations(
-                        pendingTx = pTx,
-                        termsChecked = getTermsOptionValue(pendingTx),
-                        agreementChecked = getAgreementOptionValue(pendingTx)
+                        pendingTx = pTx
                     )
                 }
         }
@@ -154,22 +120,6 @@ class InterestDepositTxEngine(
                     it
                 }
             }
-
-    private fun areOptionsValid(pendingTx: PendingTx): Boolean {
-        val terms = getTermsOptionValue(pendingTx)
-        val agreement = getAgreementOptionValue(pendingTx)
-        return (terms && agreement)
-    }
-
-    private fun getTermsOptionValue(pendingTx: PendingTx): Boolean =
-        pendingTx.getOption<TxConfirmationValue.TxBooleanConfirmation<Unit>>(
-            TxConfirmation.AGREEMENT_INTEREST_T_AND_C
-        )?.value ?: false
-
-    private fun getAgreementOptionValue(pendingTx: PendingTx): Boolean =
-        pendingTx.getOption<TxConfirmationValue.TxBooleanConfirmation<Money>>(
-            TxConfirmation.AGREEMENT_INTEREST_TRANSFER
-        )?.value ?: false
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
         onChainEngine.doExecute(pendingTx, secondPassword)

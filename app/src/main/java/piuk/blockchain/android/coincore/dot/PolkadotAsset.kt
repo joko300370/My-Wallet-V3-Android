@@ -2,7 +2,6 @@ package piuk.blockchain.android.coincore.dot
 
 import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.wallet.DefaultLabels
@@ -15,6 +14,7 @@ import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -32,7 +32,7 @@ internal class PolkadotAsset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     environmentConfig: EnvironmentConfig,
-    private val eligibilityProvider: EligibilityProvider,
+    private val identity: UserIdentity,
     offlineAccounts: OfflineAccountUpdater,
     private val dotFeatureFlag: FeatureFlag
 ) : CryptoAssetBase(
@@ -45,8 +45,8 @@ internal class PolkadotAsset(
     pitLinking,
     crashLogger,
     environmentConfig,
-    eligibilityProvider,
-    offlineAccounts
+    offlineAccounts,
+    identity
 ) {
 
     override val asset: CryptoCurrency
@@ -77,7 +77,7 @@ internal class PolkadotAsset(
                     exchangeRates,
                     custodialManager,
                     environmentConfig,
-                    eligibilityProvider
+                    identity
                 )
             )
         )

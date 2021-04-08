@@ -23,6 +23,7 @@ import piuk.blockchain.android.coincore.impl.AccountRefreshTrigger
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.transactionFetchCount
 import piuk.blockchain.android.coincore.impl.transactionFetchOffset
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -43,8 +44,9 @@ internal class BtcCryptoWalletAccount(
     val isHDAccount: Boolean,
     private val walletPreferences: WalletStatus,
     private val custodialWalletManager: CustodialWalletManager,
-    private val refreshTrigger: AccountRefreshTrigger
-) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BTC, custodialWalletManager) {
+    private val refreshTrigger: AccountRefreshTrigger,
+    identity: UserIdentity
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BTC, custodialWalletManager, identity) {
 
     private val hasFunds = AtomicBoolean(false)
 
@@ -250,7 +252,8 @@ internal class BtcCryptoWalletAccount(
             networkParameters: NetworkParameters,
             walletPreferences: WalletStatus,
             custodialWalletManager: CustodialWalletManager,
-            refreshTrigger: AccountRefreshTrigger
+            refreshTrigger: AccountRefreshTrigger,
+            identity: UserIdentity
         ) = BtcCryptoWalletAccount(
             payloadManager = payloadManager,
             hdAccountIndex = hdAccountIndex,
@@ -262,7 +265,8 @@ internal class BtcCryptoWalletAccount(
             isHDAccount = true,
             walletPreferences = walletPreferences,
             custodialWalletManager = custodialWalletManager,
-            refreshTrigger = refreshTrigger
+            refreshTrigger = refreshTrigger,
+            identity = identity
         )
 
         fun createImportedAccount(
@@ -274,7 +278,8 @@ internal class BtcCryptoWalletAccount(
             networkParameters: NetworkParameters,
             walletPreferences: WalletStatus,
             custodialWalletManager: CustodialWalletManager,
-            refreshTrigger: AccountRefreshTrigger
+            refreshTrigger: AccountRefreshTrigger,
+            identity: UserIdentity
         ) = BtcCryptoWalletAccount(
             payloadManager = payloadManager,
             hdAccountIndex = IMPORTED_ACCOUNT_NO_INDEX,
@@ -286,7 +291,8 @@ internal class BtcCryptoWalletAccount(
             isHDAccount = false,
             walletPreferences = walletPreferences,
             custodialWalletManager = custodialWalletManager,
-            refreshTrigger = refreshTrigger
+            refreshTrigger = refreshTrigger,
+            identity = identity
         )
 
         private const val IMPORTED_ACCOUNT_NO_INDEX = -1

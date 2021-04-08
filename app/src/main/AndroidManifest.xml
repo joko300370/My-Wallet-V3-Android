@@ -75,6 +75,7 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
+
         <activity
             android:name="piuk.blockchain.com.FeatureFlagsHandlingActivity"
             android:clearTaskOnLaunch="true"

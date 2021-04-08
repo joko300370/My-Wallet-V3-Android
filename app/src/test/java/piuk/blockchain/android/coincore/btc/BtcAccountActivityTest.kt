@@ -60,7 +60,8 @@ class BtcAccountActivityTest {
             isHDAccount = true,
             walletPreferences = walletPrefs,
             custodialWalletManager = custodialWalletManager,
-            refreshTrigger = refreshTrigger
+            refreshTrigger = refreshTrigger,
+            identity = mock()
         )
 
     @get:Rule

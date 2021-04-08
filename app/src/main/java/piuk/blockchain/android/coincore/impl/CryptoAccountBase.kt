@@ -13,6 +13,7 @@ import info.blockchain.balance.total
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
@@ -27,6 +28,8 @@ import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxSourceState
+import piuk.blockchain.android.identity.Feature
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -163,21 +166,25 @@ abstract class CryptoNonCustodialAccount(
     // TODO: Build an interface on PayloadDataManager/PayloadManager for 'global' crypto calls; second password etc?
     protected val payloadDataManager: PayloadDataManager,
     override val asset: CryptoCurrency,
-    private val custodialWalletManager: CustodialWalletManager
+    private val custodialWalletManager: CustodialWalletManager,
+    private val identity: UserIdentity
 ) : CryptoAccountBase(), NonCustodialAccount {
 
     override val isFunded: Boolean = true
 
     // The plan here is once we are caching the non custodial balances to remove this isFunded
     override val actions: Single<AvailableActions>
-        get() = custodialWalletManager.getSupportedFundsFiats().onErrorReturn { emptyList() }.map { fiatAccounts ->
+        get() = custodialWalletManager.getSupportedFundsFiats().onErrorReturn { emptyList() }.zipWith(
+            identity.isEligibleFor(Feature.Interest(asset))
+        ).map { (fiatAccounts, isEligibleForInterest) ->
             val activity = AssetAction.ViewActivity
             val receive = AssetAction.Receive.takeIf { !isArchived }
             val send = AssetAction.Send.takeIf { !isArchived && isFunded }
             val swap = AssetAction.Swap.takeIf { !isArchived && isFunded }
             val sell = AssetAction.Sell.takeIf { !isArchived && isFunded && fiatAccounts.isNotEmpty() }
+            val interest = AssetAction.InterestDeposit.takeIf { !isArchived && isFunded && isEligibleForInterest }
             setOfNotNull(
-                activity, receive, send, swap, sell
+                activity, receive, send, swap, sell, interest
             )
         }
 

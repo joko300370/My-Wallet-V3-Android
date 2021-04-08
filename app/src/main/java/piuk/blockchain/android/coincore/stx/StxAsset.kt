@@ -3,7 +3,6 @@ package piuk.blockchain.android.coincore.stx
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
@@ -16,6 +15,7 @@ import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -33,7 +33,7 @@ internal class StxAsset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     environmentConfig: EnvironmentConfig,
-    eligibilityProvider: EligibilityProvider,
+    private val identity: UserIdentity,
     offlineAccounts: OfflineAccountUpdater
 ) : CryptoAssetBase(
     payloadManager,
@@ -45,8 +45,8 @@ internal class StxAsset(
     pitLinking,
     crashLogger,
     environmentConfig,
-    eligibilityProvider,
-    offlineAccounts
+    offlineAccounts,
+    identity
 ) {
 
     override val asset: CryptoCurrency
@@ -70,7 +70,8 @@ internal class StxAsset(
             label = "STX Account",
             address = stxAccount.bitcoinSerializedBase58Address,
             exchangeRates = exchangeRates,
-            custodialWalletManager = custodialManager
+            custodialWalletManager = custodialManager,
+            identity = identity
         )
     }
 

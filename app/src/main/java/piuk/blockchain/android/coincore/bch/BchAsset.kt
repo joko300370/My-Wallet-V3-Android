@@ -4,7 +4,6 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -21,6 +20,7 @@ import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
@@ -48,7 +48,7 @@ internal class BchAsset(
     crashLogger: CrashLogger,
     private val walletPreferences: WalletStatus,
     offlineAccounts: OfflineAccountUpdater,
-    eligibilityProvider: EligibilityProvider
+    private val identity: UserIdentity
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -59,8 +59,8 @@ internal class BchAsset(
     pitLinking,
     crashLogger,
     environmentSettings,
-    eligibilityProvider,
-    offlineAccounts
+    offlineAccounts,
+    identity
 ) {
     override val asset: CryptoCurrency
         get() = CryptoCurrency.BCH
@@ -86,7 +86,8 @@ internal class BchAsset(
                             sendDataManager = sendDataManager,
                             walletPreferences = walletPreferences,
                             custodialWalletManager = custodialManager,
-                            refreshTrigger = this@BchAsset
+                            refreshTrigger = this@BchAsset,
+                            identity = identity
                         )
                         if (bchAccount.isDefault) {
                             updateOfflineCache(bchAccount)

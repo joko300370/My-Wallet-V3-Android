@@ -73,6 +73,7 @@ import com.blockchain.nabu.models.responses.simplebuy.BuyOrderListResponse
 import com.blockchain.nabu.models.responses.simplebuy.BuySellOrderResponse
 import com.blockchain.nabu.models.responses.simplebuy.ConfirmOrderRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
+import com.blockchain.nabu.models.responses.simplebuy.ProductTransferRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyConfirmationAttributes
 import com.blockchain.nabu.models.responses.simplebuy.TransactionResponse
 import com.blockchain.nabu.models.responses.simplebuy.TransferRequest
@@ -1029,6 +1030,19 @@ class LiveCustodialWalletManager(
             ).map {
                 it.paymentId
             }
+        }
+
+    override fun executeCustodialTransfer(amount: Money, origin: Product, destination: Product): Completable =
+        authenticator.authenticateCompletable { sessionToken ->
+            nabuService.executeTransfer(
+                sessionToken = sessionToken,
+                body = ProductTransferRequestBody(
+                    amount = amount.toBigInteger().toString(),
+                    currency = amount.currencyCode,
+                    origin = origin.name,
+                    destination = destination.name
+                )
+            )
         }
 
     private fun CardResponse.toCardPaymentMethod(cardLimits: PaymentLimits) =

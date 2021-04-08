@@ -5,7 +5,6 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.util.FormatsUtil
@@ -29,6 +28,7 @@ import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.coincore.SimpleOfflineCacheItem
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
+import piuk.blockchain.android.identity.UserIdentity
 
 internal class EthAsset(
     payloadManager: PayloadDataManager,
@@ -43,7 +43,7 @@ internal class EthAsset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     environmentConfig: EnvironmentConfig,
-    eligibilityProvider: EligibilityProvider,
+    private val identity: UserIdentity,
     offlineAccounts: OfflineAccountUpdater
 ) : CryptoAssetBase(
     payloadManager,
@@ -55,8 +55,8 @@ internal class EthAsset(
     pitLinking,
     crashLogger,
     environmentConfig,
-    eligibilityProvider,
-    offlineAccounts
+    offlineAccounts,
+    identity
 ) {
 
     private val labelList = mapOf(
@@ -84,7 +84,8 @@ internal class EthAsset(
                     jsonAccount = it.account,
                     walletPreferences = walletPrefs,
                     exchangeRates = exchangeRates,
-                    custodialWalletManager = custodialManager
+                    custodialWalletManager = custodialManager,
+                    identity = identity
                 )
             }.doOnSuccess {
                 updateOfflineCache(it)

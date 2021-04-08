@@ -11,6 +11,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransactionTarget
@@ -19,10 +20,11 @@ import piuk.blockchain.android.coincore.fiat.LinkedBankAccount
 import piuk.blockchain.android.coincore.impl.txEngine.BitpayTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.FiatDepositTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.FiatWithdrawalTxEngine
-import piuk.blockchain.android.coincore.impl.txEngine.InterestDepositTxEngine
+import piuk.blockchain.android.coincore.impl.txEngine.interest.InterestDepositOnChainTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.impl.txEngine.TradingToOnChainTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
+import piuk.blockchain.android.coincore.impl.txEngine.interest.InterestDepositTradingEngine
 import piuk.blockchain.android.coincore.impl.txEngine.sell.OnChainSellTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.sell.TradingSellTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.swap.OnChainSwapTxEngine
@@ -128,7 +130,7 @@ class TxProcessorFactory(
                             exchangeRates = exchangeRates,
                             sourceAccount = source,
                             txTarget = it,
-                            engine = InterestDepositTxEngine(
+                            engine = InterestDepositOnChainTxEngine(
                                 walletManager = walletManager,
                                 onChainEngine = engine
                             )
@@ -199,6 +201,17 @@ class TxProcessorFactory(
                     engine = TradingToOnChainTxEngine(
                         walletManager = walletManager,
                         isNoteSupported = source.isNoteSupported
+                    )
+                )
+            )
+        is InterestAccount ->
+            Single.just(
+                TransactionProcessor(
+                    exchangeRates = exchangeRates,
+                    sourceAccount = source,
+                    txTarget = target,
+                    engine = InterestDepositTradingEngine(
+                        walletManager = walletManager
                     )
                 )
             )

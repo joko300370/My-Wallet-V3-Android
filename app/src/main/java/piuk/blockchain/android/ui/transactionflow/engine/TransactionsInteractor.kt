@@ -2,7 +2,7 @@ package piuk.blockchain.android.ui.transactionflow.engine
 
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.nabu.datamanagers.repositories.swap.CustodialRepository
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.preferences.CurrencyPrefs
@@ -23,6 +23,7 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.ReceiveAddress
@@ -44,7 +45,7 @@ class TransactionInteractor(
     private val custodialRepository: CustodialRepository,
     private val custodialWalletManager: CustodialWalletManager,
     private val currencyPrefs: CurrencyPrefs,
-    private val eligibilityProvider: EligibilityProvider,
+    private val eligibilityProvider: SimpleBuyEligibilityProvider,
     private val accountsSorting: AccountsSorting,
     private val linkedBanksFactory: LinkedBanksFactory
 ) {
@@ -153,7 +154,7 @@ class TransactionInteractor(
                 }
         }
 
-    fun getAvailableSourceAccounts(action: AssetAction) =
+    fun getAvailableSourceAccounts(action: AssetAction, targetAccount: TransactionTarget) =
         when (action) {
             AssetAction.Swap -> {
                 coincore.allWalletsWithActions(setOf(action), accountsSorting.sorter())
@@ -166,6 +167,15 @@ class TransactionInteractor(
                     }.map {
                         it.map { account -> account as CryptoAccount }
                     }
+            }
+            AssetAction.InterestDeposit -> {
+                require(targetAccount is InterestAccount)
+                require(targetAccount is CryptoAccount)
+                coincore.allWalletsWithActions(setOf(action), accountsSorting.sorter()).map {
+                    it.filter { acc ->
+                        acc is CryptoAccount && acc.asset == targetAccount.asset
+                    }
+                }
             }
             AssetAction.FiatDeposit -> {
                 linkedBanksFactory.getNonWireTransferBanks()

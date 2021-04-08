@@ -18,6 +18,7 @@ import piuk.blockchain.android.coincore.impl.AccountRefreshTrigger
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.transactionFetchCount
 import piuk.blockchain.android.coincore.impl.transactionFetchOffset
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
@@ -39,8 +40,9 @@ internal class BchCryptoWalletAccount private constructor(
     private val internalAccount: GenericMetadataAccount,
     private val walletPreferences: WalletStatus,
     private val custodialWalletManager: CustodialWalletManager,
-    private val refreshTrigger: AccountRefreshTrigger
-) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BCH, custodialWalletManager) {
+    private val refreshTrigger: AccountRefreshTrigger,
+    identity: UserIdentity
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BCH, custodialWalletManager, identity) {
 
     private val hasFunds = AtomicBoolean(false)
 
@@ -169,7 +171,8 @@ internal class BchCryptoWalletAccount private constructor(
             sendDataManager: SendDataManager,
             walletPreferences: WalletStatus,
             custodialWalletManager: CustodialWalletManager,
-            refreshTrigger: AccountRefreshTrigger
+            refreshTrigger: AccountRefreshTrigger,
+            identity: UserIdentity
         ) = BchCryptoWalletAccount(
             payloadManager = payloadManager,
             bchManager = bchManager,
@@ -181,7 +184,8 @@ internal class BchCryptoWalletAccount private constructor(
             internalAccount = jsonAccount,
             walletPreferences = walletPreferences,
             custodialWalletManager = custodialWalletManager,
-            refreshTrigger = refreshTrigger
+            refreshTrigger = refreshTrigger,
+            identity = identity
         )
     }
 }

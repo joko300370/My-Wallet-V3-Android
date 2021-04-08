@@ -2,7 +2,7 @@ package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.remoteconfig.FeatureFlag
-import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
@@ -21,7 +21,7 @@ class SellIntroAnnouncementTest {
     private val sellFeatureFlag: FeatureFlag = mock()
     private val coincore: Coincore = mock()
     private val analytics: Analytics = mock()
-    private val eligibilityProvider: EligibilityProvider = mock()
+    private val eligibilityProvider: SimpleBuyEligibilityProvider = mock()
     private val dismissEntry: DismissRecorder.DismissEntry = mock()
 
     private lateinit var subject: SellIntroAnnouncement

@@ -443,6 +443,7 @@ class TransactionFlowCustomiserImpl(
         return when (state.action) {
             AssetAction.Swap -> resources.getString(R.string.common_swap)
             AssetAction.FiatDeposit -> resources.getString(R.string.deposit_source_select_title)
+            AssetAction.InterestDeposit -> resources.getString(R.string.select_deposit_source_title)
             else -> ""
         }
     }
@@ -778,6 +779,7 @@ class TransactionFlowCustomiserImpl(
                     SwapAccountSelectSheetFeeDecorator(it)
                 }
             }
+            AssetAction.InterestDeposit,
             AssetAction.Withdraw,
             AssetAction.FiatDeposit -> {
                 {

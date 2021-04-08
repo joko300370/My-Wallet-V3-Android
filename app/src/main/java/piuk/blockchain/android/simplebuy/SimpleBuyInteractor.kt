@@ -5,7 +5,7 @@ import com.blockchain.nabu.datamanagers.BuySellOrder
 import com.blockchain.nabu.datamanagers.BuySellPairs
 import com.blockchain.nabu.datamanagers.CardToBeActivated
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.nabu.datamanagers.EligiblePaymentMethodType
 import com.blockchain.nabu.datamanagers.OrderInput
 import com.blockchain.nabu.datamanagers.OrderOutput
@@ -47,7 +47,7 @@ class SimpleBuyInteractor(
     private val withdrawLocksRepository: WithdrawLocksRepository,
     private val appUtil: AppUtil,
     private val analytics: Analytics,
-    private val eligibilityProvider: EligibilityProvider,
+    private val eligibilityProvider: SimpleBuyEligibilityProvider,
     private val coincore: Coincore,
     private val bankLinkingPrefs: BankLinkingPrefs
 ) {

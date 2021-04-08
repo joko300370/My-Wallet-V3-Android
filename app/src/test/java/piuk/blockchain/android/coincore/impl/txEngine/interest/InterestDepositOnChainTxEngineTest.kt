@@ -1,4 +1,4 @@
-package piuk.blockchain.android.coincore.impl.txEngine
+package piuk.blockchain.android.coincore.impl.txEngine.interest
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.koin.payloadScopeQualifier
@@ -39,9 +39,10 @@ import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.btc.BtcCryptoWalletAccount
 import piuk.blockchain.android.coincore.impl.CryptoInterestAccount
 import piuk.blockchain.android.coincore.impl.injectMocks
+import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
-class InterestDepositTxEngineTest {
+class InterestDepositOnChainTxEngineTest {
 
     @get:Rule
     val initSchedulers = rxInit {
@@ -59,7 +60,7 @@ class InterestDepositTxEngineTest {
 
     private val onChainEngine: OnChainTxEngineBase = mock()
 
-    private val subject = InterestDepositTxEngine(
+    private val subject = InterestDepositOnChainTxEngine(
         walletManager = walletManager,
         onChainEngine = onChainEngine
     )
@@ -378,7 +379,7 @@ class InterestDepositTxEngineTest {
     }
 
     @Test(expected = IllegalArgumentException::class)
-        fun `update fee level from REGULAR to PRIORITY is rejected`() {
+    fun `update fee level from REGULAR to PRIORITY is rejected`() {
         // Arrange
         val totalBalance = 21.bitcoin()
         val actionableBalance = 20.bitcoin()

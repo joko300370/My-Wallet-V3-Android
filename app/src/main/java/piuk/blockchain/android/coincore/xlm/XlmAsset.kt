@@ -9,7 +9,6 @@ import com.blockchain.sunriver.XlmFeesFetcher
 import com.blockchain.sunriver.fromStellarUri
 import com.blockchain.sunriver.isValidXlmQr
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
@@ -29,6 +28,7 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.android.coincore.SimpleOfflineCacheItem
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
+import piuk.blockchain.android.identity.UserIdentity
 
 internal class XlmAsset(
     payloadManager: PayloadDataManager,
@@ -44,7 +44,7 @@ internal class XlmAsset(
     crashLogger: CrashLogger,
     environmentConfig: EnvironmentConfig,
     private val walletPreferences: WalletStatus,
-    eligibilityProvider: EligibilityProvider,
+    private val identity: UserIdentity,
     offlineAccounts: OfflineAccountUpdater
 ) : CryptoAssetBase(
     payloadManager,
@@ -56,8 +56,8 @@ internal class XlmAsset(
     pitLinking,
     crashLogger,
     environmentConfig,
-    eligibilityProvider,
-    offlineAccounts
+    offlineAccounts,
+    identity
 ) {
 
     override val asset: CryptoCurrency
@@ -77,7 +77,8 @@ internal class XlmAsset(
                     xlmFeesFetcher = xlmFeesFetcher,
                     walletOptionsDataManager = walletOptionsDataManager,
                     walletPreferences = walletPreferences,
-                    custodialWalletManager = custodialManager
+                    custodialWalletManager = custodialManager,
+                    identity = identity
                 )
             }.doOnSuccess {
                 updateOfflineCache(it)
@@ -143,7 +144,7 @@ internal class XlmAddress(
 
     override fun equals(other: Any?): Boolean {
         return (other is XlmAddress) &&
-                (other.asset == asset && other.address == address && other.label == label)
+            (other.asset == asset && other.address == address && other.label == label)
     }
 
     override fun hashCode(): Int {

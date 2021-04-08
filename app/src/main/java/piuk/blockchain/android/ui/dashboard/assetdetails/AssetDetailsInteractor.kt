@@ -136,7 +136,9 @@ class AssetDetailsInteractor(
                     amount = it.balance,
                     fiatValue = fiat,
                     pendingAmount = it.pendingBalance,
-                    actions = it.actions,
+                    actions = it.actions.filter { action ->
+                        action != AssetAction.InterestDeposit
+                    }.toSet(),
                     interestRate = interestRate
                 )
             )

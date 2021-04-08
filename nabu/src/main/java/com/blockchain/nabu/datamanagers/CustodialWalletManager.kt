@@ -245,6 +245,8 @@ interface CustodialWalletManager {
 
     fun startBankTransfer(id: String, amount: Money, currency: String): Single<String>
 
+    fun executeCustodialTransfer(amount: Money, origin: Product, destination: Product): Completable
+
     val defaultFiatCurrency: String
 }
 

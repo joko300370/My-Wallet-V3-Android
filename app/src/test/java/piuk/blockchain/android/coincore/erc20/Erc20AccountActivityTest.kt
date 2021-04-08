@@ -46,7 +46,8 @@ class Erc20AccountActivityTest {
         ethDataManager = ethDataManager,
         exchangeRates = exchangeRates,
         walletPreferences = walletPreferences,
-        custodialWalletManager = custodialWalletManager
+        custodialWalletManager = custodialWalletManager,
+        identity = mock()
     )
 
     @get:Rule
@@ -93,14 +94,18 @@ class Erc20AccountActivityTest {
         whenever(ethDataManager.getErc20Transactions(CryptoCurrency.DGLD))
             .thenReturn(Observable.just(listOf(erc20Transfer)))
 
-        whenever(ethDataManager
-            .getTransaction("0xfd7d583fa54bf55f6cfbfec97c0c55cc6af8c121b71addb7d06a9e1e305ae8ff"))
-            .thenReturn(Observable.just(
-                EthTransaction(
-                    gasPrice = 100.toBigInteger(),
-                    gasUsed = 2.toBigInteger()
+        whenever(
+            ethDataManager
+                .getTransaction("0xfd7d583fa54bf55f6cfbfec97c0c55cc6af8c121b71addb7d06a9e1e305ae8ff")
+        )
+            .thenReturn(
+                Observable.just(
+                    EthTransaction(
+                        gasPrice = 100.toBigInteger(),
+                        gasUsed = 2.toBigInteger()
+                    )
+                )
             )
-        ))
 
         whenever(ethDataManager.fetchErc20DataModel(CryptoCurrency.DGLD))
             .thenReturn(Observable.just(mock()))
@@ -114,7 +119,7 @@ class Erc20AccountActivityTest {
                     number = erc20Transfer.blockNumber.plus(3.toBigInteger())
                 }
             )
-        )
+            )
 
         whenever(custodialWalletManager.getCustodialActivityForAsset(any(), any()))
             .thenReturn(Single.just(summaryList))
@@ -127,18 +132,18 @@ class Erc20AccountActivityTest {
             .assertValue {
                 it.size == 1 && it[0].run {
                     this is Erc20ActivitySummaryItem &&
-                    cryptoCurrency == CryptoCurrency.DGLD &&
-                    !doubleSpend &&
-                    !isFeeTransaction &&
-                    confirmations == 3 &&
-                    timeStampMs == 1557334297000L &&
-                    transactionType == TransactionSummary.TransactionType.SENT &&
-                    txId == "0xfd7d583fa54bf55f6cfbfec97c0c55cc6af8c121b71addb7d06a9e1e305ae8ff" &&
-                    confirmations == 3 &&
-                    value == CryptoValue.fromMinor(CryptoCurrency.DGLD, 10000.toBigInteger()) &&
-                    inputsMap["0x4058a004dd718babab47e14dd0d744742e5b9903"] ==
+                        cryptoCurrency == CryptoCurrency.DGLD &&
+                        !doubleSpend &&
+                        !isFeeTransaction &&
+                        confirmations == 3 &&
+                        timeStampMs == 1557334297000L &&
+                        transactionType == TransactionSummary.TransactionType.SENT &&
+                        txId == "0xfd7d583fa54bf55f6cfbfec97c0c55cc6af8c121b71addb7d06a9e1e305ae8ff" &&
+                        confirmations == 3 &&
+                        value == CryptoValue.fromMinor(CryptoCurrency.DGLD, 10000.toBigInteger()) &&
+                        inputsMap["0x4058a004dd718babab47e14dd0d744742e5b9903"] ==
                         CryptoValue.fromMinor(CryptoCurrency.DGLD, 10000.toBigInteger()) &&
-                    outputsMap["0x2ca28ffadd20474ffe2705580279a1e67cd10a29"] ==
+                        outputsMap["0x2ca28ffadd20474ffe2705580279a1e67cd10a29"] ==
                         CryptoValue.fromMinor(CryptoCurrency.DGLD, 10000.toBigInteger())
                 }
             }

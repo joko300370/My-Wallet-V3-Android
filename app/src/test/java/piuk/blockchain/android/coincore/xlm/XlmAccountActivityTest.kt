@@ -58,7 +58,8 @@ class XlmAccountActivityTest {
             xlmFeesFetcher = xlmFeesFetcher,
             walletOptionsDataManager = walletOptionsDataManager,
             walletPreferences = walletPreferences,
-            custodialWalletManager = custodialWalletManager
+            custodialWalletManager = custodialWalletManager,
+            identity = mock()
         )
 
     @get:Rule

@@ -162,10 +162,14 @@ class TransactionModel(
                 intent.fromAccount,
                 intent.action
             )
-            is TransactionIntent.InitialiseWithNoSourceOrTargetAccount -> processSourceAccountsListUpdate(intent.action)
-            is TransactionIntent.InitialiseWithTargetAndNoSource -> processSourceAccountsListUpdate(intent.action)
+            is TransactionIntent.InitialiseWithNoSourceOrTargetAccount -> processSourceAccountsListUpdate(
+                intent.action, NullAddress
+            )
+            is TransactionIntent.InitialiseWithTargetAndNoSource -> processSourceAccountsListUpdate(
+                intent.action, intent.target
+            )
             is TransactionIntent.ReInitialiseWithTargetAndNoSource -> processSourceAccountsListUpdate(
-                intent.action, true
+                intent.action, intent.target, true
             )
             is TransactionIntent.ValidatePassword -> processPasswordValidation(intent.password)
             is TransactionIntent.UpdatePasswordIsValidated -> null
@@ -229,8 +233,10 @@ class TransactionModel(
             is TransactionIntent.StartLinkABank -> processLinkABank(previousState)
             is TransactionIntent.LinkBankInfoSuccess -> null
             is TransactionIntent.LinkBankFailed -> null
+            is TransactionIntent.RefreshSourceAccounts -> processSourceAccountsListUpdate(
+                previousState.action, previousState.selectedTarget
+            )
             is TransactionIntent.ClearBackStack -> null
-            is TransactionIntent.RefreshSourceAccounts -> processSourceAccountsListUpdate(previousState.action)
             is TransactionIntent.NavigateBackFromEnterAmount -> processTransactionInvalidation(previousState.action)
         }
     }
@@ -275,9 +281,10 @@ class TransactionModel(
 
     private fun processSourceAccountsListUpdate(
         action: AssetAction,
+        transactionTarget: TransactionTarget,
         shouldResetBackStack: Boolean = false
     ): Disposable =
-        interactor.getAvailableSourceAccounts(action).subscribeBy(
+        interactor.getAvailableSourceAccounts(action, transactionTarget).subscribeBy(
             onSuccess = {
                 process(
                     TransactionIntent.AvailableSourceAccountsListUpdated(it)

@@ -11,7 +11,7 @@ import com.blockchain.nabu.datamanagers.BalanceProviderImpl
 import com.blockchain.nabu.datamanagers.BalancesProvider
 import com.blockchain.nabu.datamanagers.CreateNabuTokenAdapter
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.nabu.datamanagers.NabuAuthenticator
 import com.blockchain.nabu.datamanagers.NabuCachedEligibilityProvider
 import com.blockchain.nabu.datamanagers.NabuDataManager
@@ -130,7 +130,7 @@ val nabuModule = module {
                 authenticator = get(),
                 currencyPrefs = get()
             )
-        }.bind(EligibilityProvider::class)
+        }.bind(SimpleBuyEligibilityProvider::class)
 
         factory {
             InterestLimitsProviderImpl(
