@@ -14,6 +14,7 @@ import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.UndefinedPaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.preferences.CurrencyPrefs
+import com.bumptech.glide.Glide
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import io.reactivex.disposables.CompositeDisposable
@@ -363,6 +364,8 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     private fun renderBankPayment(paymentMethod: PaymentMethod.Bank) {
         with(binding) {
             paymentMethodIcon.setImageResource(R.drawable.ic_bank_transfer)
+            Glide.with(requireContext()).load(paymentMethod.iconUrl).into(paymentMethodIcon)
+
             paymentMethodTitle.text = paymentMethod.bankName
             paymentMethodBankInfo.text =
                 requireContext().getString(

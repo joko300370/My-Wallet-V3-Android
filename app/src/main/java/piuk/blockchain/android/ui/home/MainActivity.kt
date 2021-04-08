@@ -61,6 +61,7 @@ import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.kyc.status.KycStatusActivity
 import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.ui.linkbank.BankAuthActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthActivity.Companion.LINKED_BANK_CURRENCY
 import piuk.blockchain.android.ui.linkbank.BankAuthActivity.Companion.LINKED_BANK_ID_KEY
 import piuk.blockchain.android.ui.linkbank.BankAuthSource
 import piuk.blockchain.android.ui.linkbank.BankLinkingInfo
@@ -296,8 +297,20 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                         startActivity(Intent(this, SettingsActivity::class.java))
                     }
                 }
+                BANK_DEEP_LINK_DEPOSIT -> {
+                    if (resultCode == RESULT_OK) {
+                        launchDepositFlow(data?.getStringExtra(LINKED_BANK_CURRENCY))
+                    }
+                }
                 else -> super.onActivityResult(requestCode, resultCode, data)
             }
+        }
+    }
+
+    private fun launchDepositFlow(currency: String?) {
+        currency?.let {
+            val fragment = DashboardFragment.newInstance(AssetAction.FiatDeposit, it)
+            replaceContentFragment(fragment)
         }
     }
 
@@ -676,6 +689,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         const val INTEREST_DASHBOARD = 2012
         const val BANK_DEEP_LINK_SIMPLE_BUY = 2013
         const val BANK_DEEP_LINK_SETTINGS = 2014
+        const val BANK_DEEP_LINK_DEPOSIT = 2015
 
         // Keep these constants - the position of the toolbar items - and the generation of the toolbar items
         // together.
@@ -771,6 +785,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
             when (bankLinkingInfo.bankAuthSource) {
                 BankAuthSource.SIMPLE_BUY -> BANK_DEEP_LINK_SIMPLE_BUY
                 BankAuthSource.SETTINGS -> BANK_DEEP_LINK_SETTINGS
+                BankAuthSource.DEPOSIT -> BANK_DEEP_LINK_DEPOSIT
                 else -> -1
             }
         )

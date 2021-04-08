@@ -5,8 +5,8 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
 import piuk.blockchain.android.coincore.AssetAction
-import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.InvoiceTarget
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.NullCryptoAccount
@@ -109,9 +109,26 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             )
     }
 
-    object ClearBackStack : TransactionIntent() {
+    data class ReInitialiseWithTargetAndNoSource(
+        val action: AssetAction,
+        val target: TransactionTarget,
+        private val passwordRequired: Boolean
+    ) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
-            oldState.copy(stepsBackStack = Stack())
+            oldState.copy(
+                action = action,
+                selectedTarget = target,
+                errorState = TransactionErrorState.NONE,
+                passwordRequired = passwordRequired,
+                nextEnabled = true,
+                stepsBackStack = Stack()
+            )
+    }
+
+    object ClearBackStack : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState = oldState.copy(
+            stepsBackStack = Stack()
+        )
     }
 
     object ResetFlow : TransactionIntent() {

@@ -168,6 +168,9 @@ class TransactionModel(
             is TransactionIntent.InitialiseWithTargetAndNoSource -> processSourceAccountsListUpdate(
                 intent.action, intent.target
             )
+            is TransactionIntent.ReInitialiseWithTargetAndNoSource -> processSourceAccountsListUpdate(
+                intent.action, intent.target
+            )
             is TransactionIntent.ValidatePassword -> processPasswordValidation(intent.password)
             is TransactionIntent.UpdatePasswordIsValidated -> null
             is TransactionIntent.UpdatePasswordNotValidated -> null
@@ -223,7 +226,6 @@ class TransactionModel(
             is TransactionIntent.SetFeeLevel -> processSetFeeLevel(intent)
             is TransactionIntent.InvalidateTransaction -> processInvalidateTransaction()
             is TransactionIntent.InvalidateTransactionKeepingTarget -> processInvalidationAndNavigate(previousState)
-            is TransactionIntent.ClearBackStack -> null
             is TransactionIntent.ResetFlow -> {
                 interactor.reset()
                 null
@@ -234,6 +236,7 @@ class TransactionModel(
             is TransactionIntent.RefreshSourceAccounts -> processSourceAccountsListUpdate(
                 previousState.action, previousState.selectedTarget
             )
+            is TransactionIntent.ClearBackStack -> null
             is TransactionIntent.NavigateBackFromEnterAmount -> processTransactionInvalidation(previousState.action)
         }
     }
@@ -276,14 +279,23 @@ class TransactionModel(
             null
         }
 
-    private fun processSourceAccountsListUpdate(action: AssetAction, transactionTarget: TransactionTarget): Disposable =
+    private fun processSourceAccountsListUpdate(
+        action: AssetAction,
+        transactionTarget: TransactionTarget,
+        shouldResetBackStack: Boolean = false
+    ): Disposable =
         interactor.getAvailableSourceAccounts(action, transactionTarget).subscribeBy(
             onSuccess = {
                 process(
                     TransactionIntent.AvailableSourceAccountsListUpdated(it)
                 )
+                if (shouldResetBackStack) {
+                    process(TransactionIntent.ClearBackStack)
+                }
             },
-            onError = { }
+            onError = {
+                Timber.e("Error getting available accounts for action $action")
+            }
         )
 
     override fun onScanLoopError(t: Throwable) {
@@ -312,11 +324,10 @@ class TransactionModel(
             .subscribeBy(
                 onComplete = {
                     process(
-                        TransactionIntent.InitialiseWithTargetAndNoSource(
+                        TransactionIntent.ReInitialiseWithTargetAndNoSource(
                             state.action, state.selectedTarget, state.passwordRequired
                         )
                     )
-                    process(TransactionIntent.ClearBackStack)
                 },
                 onError = { t ->
                     errorLogger.log(TxFlowLogError.ResetFail(t))

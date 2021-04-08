@@ -61,6 +61,7 @@ abstract class MviModel<S : MviState, I : MviIntent<S>>(
     }
 
     fun process(intent: I) = intents.onNext(intent)
+
     fun destroy() {
         disposables.clear()
     }

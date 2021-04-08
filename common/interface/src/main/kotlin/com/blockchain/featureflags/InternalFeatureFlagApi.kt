@@ -9,5 +9,7 @@ interface InternalFeatureFlagApi {
 }
 
 enum class GatedFeature {
-    OPEN_BANKING, SEGWIT;
+    OPEN_BANKING,
+    SEGWIT,
+    OPEN_BANKING_DEPOSIT
 }

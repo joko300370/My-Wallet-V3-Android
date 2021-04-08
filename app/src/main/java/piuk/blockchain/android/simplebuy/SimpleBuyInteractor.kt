@@ -308,6 +308,8 @@ class SimpleBuyInteractor(
             it.contains(EligiblePaymentMethodType(PaymentMethodType.BANK_TRANSFER, fiatCurrency))
         }
 
+    fun updateApprovalStatus() = bankLinkingPrefs.setPaymentApprovalConsumed(false)
+
     companion object {
         private const val INTERVAL: Long = 5
         private const val RETRIES_SHORT = 6

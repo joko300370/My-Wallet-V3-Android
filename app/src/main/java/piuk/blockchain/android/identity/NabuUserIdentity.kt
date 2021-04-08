@@ -24,7 +24,7 @@ class NabuUserIdentity(
             is Feature.Interest -> interestEligibilityProvider.getEligibilityForAllAssets()
                 .map { assets -> assets.map { it.cryptoCurrency }.contains(feature.currency) }
             is Feature.SimplifiedDueDiligence -> custodialWalletManager.isSimplifiedDueDiligenceEligible()
-        }
+        }.exhaustive
     }
 
     override fun isVerifiedFor(feature: Feature): Single<Boolean> {
@@ -37,7 +37,7 @@ class NabuUserIdentity(
             }
             is Feature.SimpleBuy,
             is Feature.Interest -> throw IllegalArgumentException("Cannot be verified for $feature")
-        }
+        }.exhaustive
     }
 
     private fun Tier.toKycTierLevel(): KycTierLevel =

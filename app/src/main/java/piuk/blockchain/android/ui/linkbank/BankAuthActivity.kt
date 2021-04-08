@@ -204,9 +204,10 @@ class BankAuthActivity : BlockchainActivity(), BankAuthFlowNavigator,
         }
     }
 
-    override fun bankLinkingFinished(bankId: String) {
+    override fun bankLinkingFinished(bankId: String, currency: String) {
         val data = Intent()
         data.putExtra(LINKED_BANK_ID_KEY, bankId)
+        data.putExtra(LINKED_BANK_CURRENCY, currency)
         setResult(RESULT_OK, data)
         finish()
     }
@@ -234,6 +235,7 @@ class BankAuthActivity : BlockchainActivity(), BankAuthFlowNavigator,
 
         const val LINK_BANK_REQUEST_CODE = 999
         const val LINKED_BANK_ID_KEY = "LINKED_BANK_ID"
+        const val LINKED_BANK_CURRENCY = "LINKED_BANK_CURRENCY"
 
         fun newInstance(
             linkBankTransfer: LinkBankTransfer,

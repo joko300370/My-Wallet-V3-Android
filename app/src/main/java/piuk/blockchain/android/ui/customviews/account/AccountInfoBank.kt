@@ -117,10 +117,12 @@ class AccountInfoBank @JvmOverloads constructor(
         analytics: TxFlowAnalytics
     ) {
         this.model = model
-        binding.bankSeparator.visible()
-        binding.bankChevron.visible()
-        binding.bankStatusMin.gone()
-        binding.bankStatusFee.gone()
+        with(binding) {
+            bankSeparator.visible()
+            bankChevron.visible()
+            bankStatusMin.gone()
+            bankStatusFee.gone()
+        }
     }
 
     override fun update(state: TransactionState) {
