@@ -178,7 +178,8 @@ class BankAuthFragment : MviFragment<BankAuthModel, BankAuthIntent, BankAuthStat
                 showLinkingSuccess(
                     label = it.name,
                     id = it.id,
-                    partner = it.partner
+                    partner = it.partner,
+                    currency = it.currency
                 )
             }
         }
@@ -486,7 +487,7 @@ class BankAuthFragment : MviFragment<BankAuthModel, BankAuthIntent, BankAuthStat
         }
     }
 
-    private fun showLinkingSuccess(label: String, id: String, partner: BankPartner?) {
+    private fun showLinkingSuccess(label: String, id: String, partner: BankPartner?, currency: String) {
         logAnalytics(BankAuthAnalytics.SUCCESS, partner)
 
         with(binding) {
@@ -496,7 +497,7 @@ class BankAuthFragment : MviFragment<BankAuthModel, BankAuthIntent, BankAuthStat
             linkBankStateIndicator.visible()
             linkBankBtn.visible()
             linkBankBtn.setOnClickListener {
-                navigator().bankLinkingFinished(id)
+                navigator().bankLinkingFinished(id, currency)
             }
             setTitleAndSubtitle(
                 getString(R.string.bank_linking_success_title),

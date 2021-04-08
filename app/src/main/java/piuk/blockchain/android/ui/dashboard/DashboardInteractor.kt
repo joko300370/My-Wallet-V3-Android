@@ -1,5 +1,7 @@
 package piuk.blockchain.android.ui.dashboard
 
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
@@ -55,7 +57,8 @@ class DashboardInteractor(
     private val analytics: Analytics,
     private val crashLogger: CrashLogger,
     private val linkedBanksFactory: LinkedBanksFactory,
-    private val assetOrdering: AssetOrdering
+    private val assetOrdering: AssetOrdering,
+    private val internalFlags: InternalFeatureFlagApi
 ) {
 
     // We have a problem here, in that pax init depends on ETH init
@@ -293,8 +296,10 @@ class DashboardInteractor(
         shouldLaunchBankLinkTransfer: Boolean
     ): Disposable {
         require(targetAccount is FiatAccount)
-        // TODO remove this when we can link banks from deposit
-        return if (targetAccount.isOpenBankingCurrency()) {
+        return if (targetAccount.isOpenBankingCurrency() && !internalFlags.isFeatureEnabled(
+                GatedFeature.OPEN_BANKING_DEPOSIT
+            )
+        ) {
             handleDepositForOpenBanking(targetAccount, model, action)
         } else {
             handleFiatDeposit(targetAccount, shouldLaunchBankLinkTransfer, model, action)

@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
-import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.preferences.CurrencyPrefs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -20,6 +19,7 @@ import info.blockchain.balance.CryptoCurrency
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
@@ -107,6 +107,14 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
     private val actionEvent by unsafeLazy {
         rxBus.register(ActionEvent::class.java)
+    }
+
+    private val flowToLaunch: AssetAction? by unsafeLazy {
+        arguments?.getSerializable(FLOW_TO_LAUNCH) as? AssetAction
+    }
+
+    private val flowCurrency: String? by unsafeLazy {
+        arguments?.getString(FLOW_FIAT_CURRENCY)
     }
 
     private var state: DashboardState? =
@@ -209,16 +217,16 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                 model.process(ResetDashboardNavigation)
             }
             state.dashboardNavigationAction is LinkBankNavigationAction -> {
-                startBankLinking(state.dashboardNavigationAction.linkBankTransfer)
+                startBankLinking(state.dashboardNavigationAction)
             }
         }
     }
 
-    private fun startBankLinking(linkBankTransfer: LinkBankTransfer) {
-        (state?.dashboardNavigationAction as? DashboardNavigationAction.LinkBankWithPartner)?.let {
+    private fun startBankLinking(action: DashboardNavigationAction) {
+        (action as? DashboardNavigationAction.LinkBankWithPartner)?.let {
             startActivityForResult(
                 BankAuthActivity.newInstance(
-                    linkBankTransfer,
+                    action.linkBankTransfer,
                     when (it.assetAction) {
                         AssetAction.FiatDeposit -> {
                             BankAuthSource.DEPOSIT
@@ -336,6 +344,33 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
         setupSwipeRefresh()
         setupRecycler()
+
+        if (flowToLaunch != null && flowCurrency != null) {
+            compositeDisposable += coincore.fiatAssets.accountGroup().subscribeBy(
+                onSuccess = { fiatGroup ->
+                    val selectedAccount = fiatGroup.accounts.first {
+                        (it as FiatAccount).fiatCurrency == flowCurrency
+                    }
+
+                    when (flowToLaunch) {
+                        AssetAction.FiatDeposit -> {
+                            model.process(
+                                LaunchBankTransferFlow(
+                                    selectedAccount, AssetAction.FiatDeposit, false
+                                )
+                            )
+                        }
+                        AssetAction.Withdraw -> {
+                            // TODO in next story
+                        }
+                        else -> throw IllegalStateException("Unsupported flow launch for action $flowToLaunch")
+                    }
+                },
+                onError = {
+                    // TODO
+                }
+            )
+        }
     }
 
     private fun setupRecycler() {
@@ -620,6 +655,17 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
     companion object {
         fun newInstance() = DashboardFragment()
+
+        fun newInstance(flowToLaunch: AssetAction, fiatCurrency: String) =
+            DashboardFragment().apply {
+                arguments = Bundle().apply {
+                    putSerializable(FLOW_TO_LAUNCH, flowToLaunch)
+                    putString(FLOW_FIAT_CURRENCY, fiatCurrency)
+                }
+            }
+
+        private const val FLOW_TO_LAUNCH = "FLOW_TO_LAUNCH"
+        private const val FLOW_FIAT_CURRENCY = "FLOW_FIAT_CURRENCY"
 
         private const val IDX_CARD_ANNOUNCE = 0
         private const val IDX_CARD_BALANCE = 1

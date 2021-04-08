@@ -9,7 +9,7 @@ interface BankAuthFlowNavigator {
     fun launchYodleeWebview(attributes: YodleeAttributes, bankId: String)
     fun launchBankLinking(accountProviderId: String, accountId: String, bankId: String)
     fun retry()
-    fun bankLinkingFinished(bankId: String)
+    fun bankLinkingFinished(bankId: String, currency: String)
     fun bankAuthCancelled()
     fun launchYapilyBankSelection(attributes: YapilyAttributes)
     fun showTransferDetails()

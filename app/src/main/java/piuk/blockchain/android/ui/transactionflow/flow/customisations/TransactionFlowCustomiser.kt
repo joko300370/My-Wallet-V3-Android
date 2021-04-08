@@ -236,9 +236,11 @@ class TransactionFlowCustomiserImpl(
 
     override fun enterAmountLimitsViewInfo(state: TransactionState): String =
         when (state.action) {
-            AssetAction.FiatDeposit -> resources.getString(
-                R.string.deposit_enter_amount_limit_label, state.pendingTx?.maxLimit?.toStringWithSymbol()
-            )
+            AssetAction.FiatDeposit ->
+                resources.getString(
+                    R.string.deposit_enter_amount_limit_label,
+                    state.pendingTx?.maxLimit?.toStringWithSymbol() ?: ""
+                )
             AssetAction.Withdraw -> state.availableBalance.toStringWithSymbol()
             else -> throw java.lang.IllegalStateException("Limits info view not configured for ${state.action}")
         }

@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.dashboard
 
 import com.blockchain.android.testutils.rxInit
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.BankPartner
@@ -31,6 +32,8 @@ class DashboardInteractorTest {
         on { fiatCurrency } `it returns` "USD"
     }
 
+    private val internalFlags: InternalFeatureFlagApi = mock()
+
     @get:Rule
     val rx = rxInit {
         ioTrampoline()
@@ -50,7 +53,8 @@ class DashboardInteractorTest {
             assetOrdering = mock(),
             crashLogger = mock(),
             analytics = mock(),
-            simpleBuyPrefs = mock()
+            simpleBuyPrefs = mock(),
+            internalFlags = internalFlags
         )
     }
 
@@ -66,6 +70,8 @@ class DashboardInteractorTest {
                 emptyList()
             )
         )
+
+        whenever(internalFlags.isFeatureEnabled(any())).thenReturn(true)
 
         interactor.getBankDepositFlow(
             model = model,
@@ -107,6 +113,7 @@ class DashboardInteractorTest {
                 )
             )
         )
+        whenever(internalFlags.isFeatureEnabled(any())).thenReturn(true)
 
         interactor.getBankDepositFlow(
             model = model,
@@ -168,6 +175,8 @@ class DashboardInteractorTest {
             )
         )
 
+        whenever(internalFlags.isFeatureEnabled(any())).thenReturn(true)
+
         interactor.getBankDepositFlow(
             model = model,
             targetAccount = targetFiatAccount,
@@ -198,6 +207,8 @@ class DashboardInteractorTest {
                 )
             )
         )
+
+        whenever(internalFlags.isFeatureEnabled(any())).thenReturn(true)
 
         interactor.getBankDepositFlow(
             model = model,
