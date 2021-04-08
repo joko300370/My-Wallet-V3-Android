@@ -169,7 +169,7 @@ class TransactionModel(
                 intent.action, intent.target
             )
             is TransactionIntent.ReInitialiseWithTargetAndNoSource -> processSourceAccountsListUpdate(
-                intent.action, intent.target
+                intent.action, intent.target, true
             )
             is TransactionIntent.ValidatePassword -> processPasswordValidation(intent.password)
             is TransactionIntent.UpdatePasswordIsValidated -> null
