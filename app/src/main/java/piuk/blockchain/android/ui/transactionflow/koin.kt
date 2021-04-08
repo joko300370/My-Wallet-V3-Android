@@ -144,7 +144,8 @@ val transactionModule = module {
                 currencyPrefs = get(),
                 eligibilityProvider = payloadScope.get(),
                 accountsSorting = get(),
-                linkedBanksFactory = payloadScope.get()
+                linkedBanksFactory = payloadScope.get(),
+                bankLinkingPrefs = payloadScope.get()
             )
         }
 

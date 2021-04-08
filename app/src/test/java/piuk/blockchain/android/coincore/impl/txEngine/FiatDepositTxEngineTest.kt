@@ -414,7 +414,7 @@ class FiatDepositTxEngineTest {
             .assertNoErrors()
             .assertValue {
                 it is TxResult.HashedTxResult &&
-                    it.txHash == txId
+                    it.txId == txId
             }
 
         verify(walletManager).startBankTransfer(bankAccountAddress.address, amount, TGT_ASSET)

@@ -17,6 +17,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 import org.koin.core.KoinComponent
+import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -44,6 +45,7 @@ enum class ValidationState {
 }
 
 class TxValidationFailure(val state: ValidationState) : TransferError("Invalid Send Tx: $state")
+class NeedsApprovalException(val bankPaymentData: BankPaymentApproval) : Throwable()
 
 enum class FeeLevel {
     None,
@@ -366,7 +368,7 @@ abstract class TxEngine : KoinComponent {
 
     // Action to be executed once the transaction has been executed, it will have been validated before this is called, so the expectation
     // is that it will succeed.
-    open fun doPostExecute(txResult: TxResult): Completable = Completable.complete()
+    open fun doPostExecute(pendingTx: PendingTx, txResult: TxResult): Completable = Completable.complete()
 
     // Action to be executed when confirmations have been built and we want to start checking for updates on them
     open fun startConfirmationsUpdate(pendingTx: PendingTx): Single<PendingTx> =
@@ -507,7 +509,7 @@ class TransactionProcessor(
         when (this) {
             ValidationState.CAN_EXECUTE -> {
                 engine.doExecute(pendingTx, secondPassword).flatMapCompletable { result ->
-                    engine.doPostExecute(result)
+                    engine.doPostExecute(pendingTx, result)
                 }
             }
             ValidationState.UNINITIALISED -> Completable.error(TransactionError.UnexpectedError)
@@ -596,7 +598,7 @@ private fun updateOptionsWithValidityWarning(pendingTx: PendingTx): PendingTx =
     }
 
 sealed class TxResult(val amount: Money) {
-    class HashedTxResult(val txHash: String, amount: Money) : TxResult(amount)
+    class HashedTxResult(val txId: String, amount: Money) : TxResult(amount)
     class UnHashedTxResult(amount: Money) : TxResult(amount)
 }
 

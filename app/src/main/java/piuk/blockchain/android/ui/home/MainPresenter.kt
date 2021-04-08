@@ -15,6 +15,7 @@ import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.preferences.BankLinkingPrefs
 import com.blockchain.sunriver.XlmDataManager
 import com.google.gson.JsonSyntaxException
+import info.blockchain.balance.FiatValue
 import info.blockchain.wallet.api.Environment
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
@@ -41,6 +42,7 @@ import piuk.blockchain.android.ui.base.MvpPresenter
 import piuk.blockchain.android.ui.base.MvpView
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
 import piuk.blockchain.android.ui.linkbank.BankLinkingInfo
+import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -49,6 +51,9 @@ import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import piuk.blockchain.androidcoreui.utils.logging.secondPasswordEvent
 import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 interface MainView : MvpView, HomeNavigator {
 
@@ -69,6 +74,11 @@ interface MainView : MvpView, HomeNavigator {
 
     fun startTransactionFlowWithTarget(targets: Collection<CryptoTarget>)
     fun showScanTargetError(error: QrScanError)
+    fun handleApprovalDepositComplete(
+        orderValue: FiatValue,
+        currency: String,
+        estimatedTransactionCompletionTime: String
+    )
 }
 
 class MainPresenter internal constructor(
@@ -244,17 +254,31 @@ class MainPresenter internal constructor(
         }
 
     private fun handleBankApproval() {
-        if (bankLinkingPrefs.getPaymentApprovalConsumed()) {
-            return
-        }
-
-        simpleBuySync.currentState()?.let {
-            if (it.orderState == OrderState.AWAITING_FUNDS) {
-                view?.launchSimpleBuyFromDeepLinkApproval()
-            } else {
-                view?.handlePaymentForCancelledOrder()
+        val fiatDepositData = bankLinkingPrefs.getFiatDepositApprovalInProgress()
+        when {
+            fiatDepositData.isNotEmpty() -> {
+                val info = BankPaymentApproval.fromJson(fiatDepositData)
+                bankLinkingPrefs.setFiatDepositApprovalInProgress("")
+                view?.handleApprovalDepositComplete(
+                    info.orderValue, info.linkedBank.currency, getEstimatedDepositCompletionTime()
+                )
+            }
+            bankLinkingPrefs.getPaymentApprovalConsumed() -> return
+            else -> simpleBuySync.currentState()?.let {
+                if (it.orderState == OrderState.AWAITING_FUNDS) {
+                    view?.launchSimpleBuyFromDeepLinkApproval()
+                } else {
+                    view?.handlePaymentForCancelledOrder(it)
+                }
             }
         }
+    }
+
+    private fun getEstimatedDepositCompletionTime(): String {
+        val cal = Calendar.getInstance()
+        cal.add(Calendar.DAY_OF_YEAR, 3)
+        val sdf = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
+        return sdf.format(cal.time)
     }
 
     private fun handleBankLinking() {

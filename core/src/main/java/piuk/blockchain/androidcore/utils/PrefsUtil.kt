@@ -169,31 +169,23 @@ class PrefsUtil(
     override fun getSupportedCardTypes(): String? =
         getValue(KEY_SUPPORTED_CARDS_STATE, "").takeIf { it != "" }
 
-    override fun updateSimpleBuyState(simpleBuyState: String) {
-        setValue(KEY_SIMPLE_BUY_STATE, simpleBuyState)
-    }
+    override fun updateSimpleBuyState(simpleBuyState: String) = setValue(KEY_SIMPLE_BUY_STATE, simpleBuyState)
 
-    override fun setBankLinkingInfo(bankLinkingInfo: String) {
-        setValue(KEY_SIMPLE_BUY_BANK_LINK, bankLinkingInfo)
-    }
+    override fun setBankLinkingInfo(bankLinkingInfo: String) = setValue(KEY_SIMPLE_BUY_BANK_LINK, bankLinkingInfo)
 
-    override fun getBankLinkingInfo(): String =
-        getValue(KEY_SIMPLE_BUY_BANK_LINK, "")
+    override fun getBankLinkingInfo(): String = getValue(KEY_SIMPLE_BUY_BANK_LINK, "")
 
-    override fun clearBankLinkingInfo() {
-        removeValue(KEY_SIMPLE_BUY_BANK_LINK)
-    }
+    override fun clearBankLinkingInfo() = removeValue(KEY_SIMPLE_BUY_BANK_LINK)
 
-    override fun getPaymentApprovalConsumed(): Boolean =
-        getValue(KEY_SIMPLE_BUY_APPROVAL, false)
+    override fun getPaymentApprovalConsumed(): Boolean = getValue(KEY_SIMPLE_BUY_APPROVAL, false)
 
-    override fun setPaymentApprovalConsumed(state: Boolean) {
-        setValue(KEY_SIMPLE_BUY_APPROVAL, state)
-    }
+    override fun setPaymentApprovalConsumed(state: Boolean) = setValue(KEY_SIMPLE_BUY_APPROVAL, state)
 
-    override fun clearState() {
-        removeValue(KEY_SIMPLE_BUY_STATE)
-    }
+    override fun getFiatDepositApprovalInProgress(): String = getValue(KEY_DEPOSIT_APPROVAL, "")
+
+    override fun setFiatDepositApprovalInProgress(state: String) = setValue(KEY_DEPOSIT_APPROVAL, state)
+
+    override fun clearState() = removeValue(KEY_SIMPLE_BUY_STATE)
 
     override var addCardInfoDismissed: Boolean
         get() = getValue(KEY_ADD_CARD_INFO, false)
@@ -546,6 +538,7 @@ class PrefsUtil(
         private const val KEY_SUPPORTED_CARDS_STATE = "key_supported_cards"
         private const val KEY_SIMPLE_BUY_BANK_LINK = "KEY_SIMPLE_BUY_BANK_LINK"
         private const val KEY_SIMPLE_BUY_APPROVAL = "KEY_SIMPLE_BUY_APPROVAL"
+        private const val KEY_DEPOSIT_APPROVAL = "KEY_DEPOSIT_APPROVAL"
 
         private const val KEY_SWAP_INTRO_COMPLETED = "key_swap_intro_completed"
         private const val KEY_INTRO_TOUR_COMPLETED = "key_intro_tour_complete"

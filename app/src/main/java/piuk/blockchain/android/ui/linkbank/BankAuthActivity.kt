@@ -4,13 +4,13 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.models.data.BankPartner
 import com.blockchain.nabu.models.data.LinkBankTransfer
-import com.blockchain.nabu.models.data.LinkedBank
 import com.blockchain.nabu.models.data.YapilyAttributes
 import com.blockchain.nabu.models.data.YapilyInstitution
 import com.blockchain.nabu.models.data.YodleeAttributes
-import info.blockchain.balance.FiatValue
+import com.blockchain.preferences.BankLinkingPrefs
 import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.simplebuy.ErrorState
@@ -23,7 +23,6 @@ import piuk.blockchain.android.ui.linkbank.yapily.YapilyPermissionFragment
 import piuk.blockchain.android.ui.linkbank.yodlee.YodleeSplashFragment
 import piuk.blockchain.android.ui.linkbank.yodlee.YodleeWebViewFragment
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
-import java.io.Serializable
 
 class BankAuthActivity : BlockchainActivity(), BankAuthFlowNavigator,
     SlidingModalBottomDialog.Host {
@@ -45,6 +44,8 @@ class BankAuthActivity : BlockchainActivity(), BankAuthFlowNavigator,
 
     private val isFromDeepLink: Boolean
         get() = intent.getBooleanExtra(LAUNCHED_FROM_DEEP_LINK, false)
+
+    private val bankLinkingPrefs: BankLinkingPrefs by scopedInject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -145,13 +146,24 @@ class BankAuthActivity : BlockchainActivity(), BankAuthFlowNavigator,
             .commitAllowingStateLoss()
     }
 
-    override fun yapilyAgreementCancelled(isFromApproval: Boolean) {
+    override fun yapilyAgreementCancelled(isFromApproval: Boolean) =
         if (isFromApproval) {
-            setResult(Activity.RESULT_CANCELED)
-            finish()
+            resetApproval()
         } else {
             supportFragmentManager.popBackStack()
         }
+
+    override fun onBackPressed() =
+        if (approvalDetails != null) {
+            resetApproval()
+        } else {
+            super.onBackPressed()
+        }
+
+    private fun resetApproval() {
+        bankLinkingPrefs.setFiatDepositApprovalInProgress("")
+        setResult(Activity.RESULT_CANCELED)
+        finish()
     }
 
     override fun launchYodleeSplash(attributes: YodleeAttributes, bankId: String) {
@@ -270,11 +282,4 @@ class BankAuthActivity : BlockchainActivity(), BankAuthFlowNavigator,
             return intent
         }
     }
-
-    class BankPaymentApproval(
-        val authorisationUrl: String,
-        val bankLinkingId: String,
-        val linkedBank: LinkedBank,
-        val orderValue: FiatValue
-    ) : Serializable
 }

@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.impl.txEngine
 
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.models.data.BankPartner.Companion.YAPILY_DEEPLINK_PAYMENT_APPROVAL_URL
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import io.reactivex.Completable
@@ -9,6 +10,7 @@ import piuk.blockchain.android.coincore.BankAccount
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.NeedsApprovalException
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxEngine
@@ -17,6 +19,8 @@ import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.fiat.LinkedBankAccount
 import piuk.blockchain.android.coincore.updateTxValidity
+import piuk.blockchain.android.networking.PollService
+import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
 
 class FiatDepositTxEngine(
     private val walletManager: CustodialWalletManager
@@ -115,8 +119,36 @@ class FiatDepositTxEngine(
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
         sourceAccount.receiveAddress.flatMap {
-            walletManager.startBankTransfer(it.address, pendingTx.amount, pendingTx.amount.currencyCode)
+            walletManager.startBankTransfer(
+                it.address, pendingTx.amount, pendingTx.amount.currencyCode, if (pendingTx.isOpenBankingCurrency()) {
+                    YAPILY_DEEPLINK_PAYMENT_APPROVAL_URL
+                } else {
+                    null
+                }
+            )
         }.map {
             TxResult.HashedTxResult(it, pendingTx.amount)
         }
+
+    override fun doPostExecute(pendingTx: PendingTx, txResult: TxResult): Completable =
+        if (pendingTx.isOpenBankingCurrency()) {
+            PollService(walletManager.getBankTransferCharge((txResult as TxResult.HashedTxResult).txId)) {
+                it.extraAttributes.authorisationUrl != null
+            }.start().map { it.value }.flatMap { transferResponse ->
+                walletManager.getLinkedBank(transferResponse.beneficiaryId).map { linkedBank ->
+                    BankPaymentApproval(
+                        transferResponse.extraAttributes.authorisationUrl!!,
+                        linkedBank,
+                        FiatValue.fromMinor(transferResponse.amount.symbol, transferResponse.amountMinor.toLong())
+                    )
+                }
+            }.flatMapCompletable {
+                Completable.error(NeedsApprovalException(it))
+            }
+        } else {
+            Completable.complete()
+        }
+
+    private fun PendingTx.isOpenBankingCurrency() =
+        this.selectedFiat == "EUR" || this.selectedFiat == "GBP"
 }

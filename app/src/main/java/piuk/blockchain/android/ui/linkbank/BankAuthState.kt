@@ -3,9 +3,11 @@ package piuk.blockchain.android.ui.linkbank
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
 import com.google.gson.Gson
+import info.blockchain.balance.FiatValue
 import piuk.blockchain.android.simplebuy.ErrorState
 import piuk.blockchain.android.simplebuy.SelectedPaymentMethod
 import piuk.blockchain.android.ui.base.mvi.MviState
+import java.io.Serializable
 
 data class BankAuthState(
     val id: String? = null,
@@ -46,4 +48,17 @@ enum class BankAuthSource {
     SETTINGS,
     DEPOSIT,
     WITHDRAW
+}
+
+data class BankPaymentApproval(
+    val authorisationUrl: String,
+    val linkedBank: LinkedBank,
+    val orderValue: FiatValue
+) : Serializable {
+    companion object {
+        private val gson = Gson()
+        fun fromJson(json: String): BankPaymentApproval = gson.fromJson(json, BankPaymentApproval::class.java)
+        fun toJson(bankPaymentData: BankPaymentApproval): String =
+            gson.toJson(bankPaymentData, BankPaymentApproval::class.java)
+    }
 }

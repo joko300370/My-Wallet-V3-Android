@@ -53,6 +53,8 @@ import com.blockchain.nabu.models.data.LinkedBankState
 import com.blockchain.nabu.models.data.WithdrawalFeeAndLimit
 import com.blockchain.nabu.models.responses.banktransfer.BankInfoResponse
 import com.blockchain.nabu.models.responses.banktransfer.BankMediaResponse.Companion.ICON
+import com.blockchain.nabu.models.responses.banktransfer.BankTransferChargeResponse
+import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentAttributes
 import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentBody
 import com.blockchain.nabu.models.responses.banktransfer.CreateLinkBankResponse
 import com.blockchain.nabu.models.responses.banktransfer.LinkedBankTransferResponse
@@ -1018,18 +1020,34 @@ class LiveCustodialWalletManager(
             )
         }
 
-    override fun startBankTransfer(id: String, amount: Money, currency: String): Single<String> =
+    override fun startBankTransfer(
+        id: String,
+        amount: Money,
+        currency: String,
+        callback: String?
+    ): Single<String> =
         authenticator.authenticate { sessionToken ->
             nabuService.startBankTransferPayment(
                 sessionToken = sessionToken,
                 id = id,
                 body = BankTransferPaymentBody(
                     amountMinor = amount.toBigInteger().toString(),
-                    currency = currency
+                    currency = currency,
+                    attributes = if (callback != null) {
+                        BankTransferPaymentAttributes(callback)
+                    } else null
                 )
             ).map {
                 it.paymentId
             }
+        }
+
+    override fun getBankTransferCharge(paymentId: String): Single<BankTransferChargeResponse> =
+        authenticator.authenticate { sessionToken ->
+            nabuService.getBankTransferCharge(
+                sessionToken = sessionToken,
+                paymentId = paymentId
+            )
         }
 
     override fun executeCustodialTransfer(amount: Money, origin: Product, destination: Product): Completable =

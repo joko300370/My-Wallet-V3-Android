@@ -56,7 +56,7 @@ internal class CryptoInterestAccount(
                 custodialWalletManager.createPendingDeposit(
                     crypto = txResult.amount.currency,
                     address = receiveAddress.address,
-                    hash = txResult.txHash,
+                    hash = txResult.txId,
                     amount = txResult.amount,
                     product = Product.SAVINGS
                 )

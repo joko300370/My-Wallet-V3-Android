@@ -1945,6 +1945,7 @@
     <string name="yapily_payment_to_fiat_wallet_title">Canceled purchase amount added to %1$s Wallet</string>
     <string name="yapily_payment_to_fiat_wallet_subtitle">You recently approved a %1$s purchase with your bank and cancelled the order here. Since you approved with your bank, we’ve deposited your purchase amount in your %2$s Wallet.</string>
     <string name="yapily_payment_to_fiat_wallet_default">crypto</string>
+    <string name="yapily_fiat_deposit_success_subtitle">While we wait for your bank to send the cash, here’s early access to %1$s in your %2$s Cash Account so you can buy crypto right away.\n\nYour funds will be available to withdraw once the bank transfer is complete on %3$s.</string>
 
     <!-- Bank Linking Errors -->
     <string name="bank_linking_generic_error_title">Oops! Something went wrong</string>

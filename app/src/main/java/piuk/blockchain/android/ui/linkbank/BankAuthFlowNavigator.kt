@@ -15,6 +15,6 @@ interface BankAuthFlowNavigator {
     fun showTransferDetails()
     fun yapilyInstitutionSelected(institution: YapilyInstitution, entity: String)
     fun yapilyAgreementAccepted(institution: YapilyInstitution)
-    fun yapilyApprovalAccepted(approvalDetails: BankAuthActivity.BankPaymentApproval)
+    fun yapilyApprovalAccepted(approvalDetails: BankPaymentApproval)
     fun yapilyAgreementCancelled(isFromApproval: Boolean)
 }

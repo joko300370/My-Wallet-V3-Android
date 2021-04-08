@@ -654,6 +654,14 @@ class NabuService(retrofit: Retrofit) {
         body = body
     ).wrapErrorMessage()
 
+    fun getBankTransferCharge(
+        sessionToken: NabuSessionTokenResponse,
+        paymentId: String
+    ) = service.getBankTransferCharge(
+        authorization = sessionToken.authHeader,
+        paymentId = paymentId
+    ).wrapErrorMessage()
+
     fun executeTransfer(
         sessionToken: NabuSessionTokenResponse,
         body: ProductTransferRequestBody

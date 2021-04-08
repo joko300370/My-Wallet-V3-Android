@@ -383,8 +383,8 @@ class BtcOnChainTxEngine(
         }
     }
 
-    override fun doPostExecute(txResult: TxResult): Completable =
-        super.doPostExecute(txResult)
+    override fun doPostExecute(pendingTx: PendingTx, txResult: TxResult): Completable =
+        super.doPostExecute(pendingTx, txResult)
             .doOnComplete { btcSource.forceRefresh() }
 
     companion object {

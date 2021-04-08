@@ -94,7 +94,12 @@ data class LinkedBankDetailsResponse(
 data class BankTransferPaymentBody(
     val amountMinor: String,
     val currency: String,
-    val product: String = "SIMPLEBUY"
+    val product: String = "SIMPLEBUY",
+    val attributes: BankTransferPaymentAttributes?
+)
+
+data class BankTransferPaymentAttributes(
+    val callback: String?
 )
 
 data class BankTransferPaymentResponse(
@@ -120,6 +125,22 @@ data class BankInfoResponse(
         const val BLOCKED = "BLOCKED"
     }
 }
+
+data class BankTransferChargeResponse(
+    val beneficiaryId: String,
+    val amountMinor: String,
+    val amount: BankTransferFiatAmount,
+    val extraAttributes: BankTransferChargeAttributes
+)
+
+data class BankTransferFiatAmount(
+    val symbol: String,
+    val value: String
+)
+
+data class BankTransferChargeAttributes(
+    val authorisationUrl: String?
+)
 
 data class BankInfoAttributes(
     val entity: String,

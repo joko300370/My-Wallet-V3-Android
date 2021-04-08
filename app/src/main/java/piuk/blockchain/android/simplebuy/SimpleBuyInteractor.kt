@@ -72,8 +72,10 @@ class SimpleBuyInteractor(
             .map { SimpleBuyIntent.SupportedCurrenciesUpdated(it) }
             .trackProgress(appUtil.activityIndicator)
 
-    fun cancelOrder(orderId: String): Completable =
-        custodialWalletManager.deleteBuyOrder(orderId)
+    fun cancelOrder(orderId: String): Completable {
+        bankLinkingPrefs.setFiatDepositApprovalInProgress("")
+        return custodialWalletManager.deleteBuyOrder(orderId)
+    }
 
     fun createOrder(
         cryptoCurrency: CryptoCurrency,

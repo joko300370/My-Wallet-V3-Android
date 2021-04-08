@@ -5,6 +5,7 @@ import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.nabu.datamanagers.repositories.swap.CustodialRepository
 import com.blockchain.nabu.models.data.LinkBankTransfer
+import com.blockchain.preferences.BankLinkingPrefs
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
@@ -35,6 +36,7 @@ import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.fiat.LinkedBanksFactory
+import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
 import piuk.blockchain.android.ui.transfer.AccountsSorting
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import timber.log.Timber
@@ -47,7 +49,8 @@ class TransactionInteractor(
     private val currencyPrefs: CurrencyPrefs,
     private val eligibilityProvider: SimpleBuyEligibilityProvider,
     private val accountsSorting: AccountsSorting,
-    private val linkedBanksFactory: LinkedBanksFactory
+    private val linkedBanksFactory: LinkedBanksFactory,
+    private val bankLinkingPrefs: BankLinkingPrefs
 ) {
     private var transactionProcessor: TransactionProcessor? = null
     private val invalidate = PublishSubject.create<Unit>()
@@ -208,6 +211,9 @@ class TransactionInteractor(
     }
 
     fun linkABank(selectedFiat: String): Single<LinkBankTransfer> = custodialWalletManager.linkToABank(selectedFiat)
+
+    fun updateFiatDepositState(bankPaymentData: BankPaymentApproval) =
+        bankLinkingPrefs.setFiatDepositApprovalInProgress(BankPaymentApproval.toJson(bankPaymentData))
 }
 
 private fun CryptoAccount.isAvailableToSwapFrom(pairs: List<CurrencyPair.CryptoCurrencyPair>): Boolean =

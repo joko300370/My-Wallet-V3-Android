@@ -15,6 +15,7 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.NeedsApprovalException
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
@@ -25,6 +26,7 @@ import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.fiat.LinkedBankAccount
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
+import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import timber.log.Timber
 import java.util.Stack
@@ -70,6 +72,7 @@ sealed class TxExecutionStatus {
     object NotStarted : TxExecutionStatus()
     object InProgress : TxExecutionStatus()
     object Completed : TxExecutionStatus()
+    class ApprovalRequired(val approvalData: BankPaymentApproval) : TxExecutionStatus()
     data class Error(val exception: Throwable) : TxExecutionStatus()
 }
 
@@ -238,6 +241,7 @@ class TransactionModel(
             )
             is TransactionIntent.ClearBackStack -> null
             is TransactionIntent.NavigateBackFromEnterAmount -> processTransactionInvalidation(previousState.action)
+            is TransactionIntent.ApprovalRequired -> null
         }
     }
 
@@ -430,9 +434,14 @@ class TransactionModel(
                     process(TransactionIntent.UpdateTransactionComplete)
                 },
                 onError = {
-                    Timber.d("!TRANSACTION!> Unable to execute transaction: $it")
-                    errorLogger.log(TxFlowLogError.ExecuteFail(it))
-                    process(TransactionIntent.FatalTransactionError(it))
+                    if (it is NeedsApprovalException) {
+                        interactor.updateFiatDepositState(it.bankPaymentData)
+                        process(TransactionIntent.ApprovalRequired(it.bankPaymentData))
+                    } else {
+                        Timber.d("!TRANSACTION!> Unable to execute transaction: $it")
+                        errorLogger.log(TxFlowLogError.ExecuteFail(it))
+                        process(TransactionIntent.FatalTransactionError(it))
+                    }
                 }
             )
 

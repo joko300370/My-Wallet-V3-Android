@@ -6,6 +6,8 @@ import android.view.ViewGroup
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.DialogTxFlowInProgressBinding
+import piuk.blockchain.android.ui.linkbank.BankAuthActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthSource
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
 import piuk.blockchain.android.ui.transactionflow.engine.TxExecutionStatus
@@ -26,6 +28,13 @@ class TransactionProgressSheet : TransactionFlowSheet<DialogTxFlowInProgressBind
 
         binding.txProgressView.setAssetIcon(customiser.transactionProgressIcon(newState))
 
+        handleStatusUpdates(newState)
+        cacheState(newState)
+    }
+
+    private fun handleStatusUpdates(
+        newState: TransactionState
+    ) {
         when (newState.executionStatus) {
             is TxExecutionStatus.InProgress -> binding.txProgressView.showTxInProgress(
                 customiser.transactionProgressTitle(newState),
@@ -37,6 +46,18 @@ class TransactionProgressSheet : TransactionFlowSheet<DialogTxFlowInProgressBind
                     customiser.transactionCompleteTitle(newState),
                     customiser.transactionCompleteMessage(newState)
                 )
+            }
+            is TxExecutionStatus.ApprovalRequired -> {
+                binding.txProgressView.showTxInProgress(
+                    customiser.transactionProgressTitle(newState),
+                    customiser.transactionProgressMessage(newState)
+                )
+                startActivity(
+                    BankAuthActivity.newInstance(
+                        newState.executionStatus.approvalData, BankAuthSource.DEPOSIT, requireContext()
+                    )
+                )
+                dismiss()
             }
             is TxExecutionStatus.Error -> {
                 analyticsHooks.onTransactionFailure(
@@ -51,7 +72,6 @@ class TransactionProgressSheet : TransactionFlowSheet<DialogTxFlowInProgressBind
                 // do nothing
             }
         }
-        cacheState(newState)
     }
 
     private fun collectStackTraceString(e: Throwable): String {

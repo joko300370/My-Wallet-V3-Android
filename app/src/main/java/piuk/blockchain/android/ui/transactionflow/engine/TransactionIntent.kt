@@ -16,6 +16,7 @@ import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.ui.base.mvi.MviIntent
+import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
 import java.util.Stack
 
 sealed class TransactionIntent : MviIntent<TransactionState> {
@@ -385,6 +386,16 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
                 nextEnabled = true,
                 currentStep = TransactionStep.IN_PROGRESS,
                 executionStatus = TxExecutionStatus.Error(error)
+            ).updateBackstack(oldState)
+    }
+
+    class ApprovalRequired(
+        private val bankApprovalData: BankPaymentApproval
+    ) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                currentStep = TransactionStep.IN_PROGRESS,
+                executionStatus = TxExecutionStatus.ApprovalRequired(bankApprovalData)
             ).updateBackstack(oldState)
     }
 

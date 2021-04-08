@@ -1,6 +1,7 @@
 package com.blockchain.nabu.api.nabu
 
 import com.blockchain.nabu.models.responses.banktransfer.BankInfoResponse
+import com.blockchain.nabu.models.responses.banktransfer.BankTransferChargeResponse
 import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentBody
 import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentResponse
 import com.blockchain.nabu.models.responses.banktransfer.CreateLinkBankRequestBody
@@ -505,6 +506,12 @@ internal interface Nabu {
         @Path("id") id: String,
         @Body body: BankTransferPaymentBody
     ): Single<BankTransferPaymentResponse>
+
+    @GET("$NABU_BANK_TRANSFER_CHARGE/{paymentId}")
+    fun getBankTransferCharge(
+        @Header("authorization") authorization: String,
+        @Path("paymentId") paymentId: String
+    ): Single<BankTransferChargeResponse>
 
     @POST(NABU_TRANSFER)
     fun executeTransfer(

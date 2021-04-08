@@ -30,6 +30,7 @@ import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_SUPPORT_PORTAL
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.Snackbar
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.FiatValue
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
@@ -47,6 +48,7 @@ import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.android.scan.QrScanResultProcessor
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
+import piuk.blockchain.android.simplebuy.SimpleBuyState
 import piuk.blockchain.android.ui.activity.ActivitiesFragment
 import piuk.blockchain.android.ui.addresses.AccountActivity
 import piuk.blockchain.android.ui.airdrops.AirdropCentreActivity
@@ -65,7 +67,7 @@ import piuk.blockchain.android.ui.linkbank.BankAuthActivity.Companion.LINKED_BAN
 import piuk.blockchain.android.ui.linkbank.BankAuthActivity.Companion.LINKED_BANK_ID_KEY
 import piuk.blockchain.android.ui.linkbank.BankAuthSource
 import piuk.blockchain.android.ui.linkbank.BankLinkingInfo
-import piuk.blockchain.android.ui.linkbank.yapily.PaymentForCancelledOrderBottomSheet
+import piuk.blockchain.android.ui.linkbank.yapily.FiatTransactionSuccessBottomSheet
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity
 import piuk.blockchain.android.ui.pairingcode.PairingCodeActivity
 import piuk.blockchain.android.ui.scan.QrExpected
@@ -795,8 +797,36 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         startActivity(SimpleBuyActivity.newInstance(this, launchFromApprovalDeepLink = true))
     }
 
-    override fun handlePaymentForCancelledOrder() {
-        showBottomSheet(PaymentForCancelledOrderBottomSheet.newInstance())
+    override fun handlePaymentForCancelledOrder(state: SimpleBuyState) {
+        showBottomSheet(
+            FiatTransactionSuccessBottomSheet.newInstance(
+                state.fiatCurrency, getString(R.string.yapily_payment_to_fiat_wallet_title, state.fiatCurrency),
+                getString(
+                    R.string.yapily_payment_to_fiat_wallet_subtitle,
+                    state.selectedCryptoCurrency?.displayTicker ?: getString(
+                        R.string.yapily_payment_to_fiat_wallet_default
+                    ),
+                    state.fiatCurrency
+                )
+            )
+        )
+    }
+
+    override fun handleApprovalDepositComplete(
+        orderValue: FiatValue,
+        currency: String,
+        estimatedTransactionCompletionTime: String
+    ) {
+        showBottomSheet(
+            FiatTransactionSuccessBottomSheet.newInstance(
+                currency,
+                getString(R.string.deposit_confirmation_success_title, orderValue.toStringWithSymbol()),
+                getString(
+                    R.string.yapily_fiat_deposit_success_subtitle, orderValue.toStringWithSymbol(), currency,
+                    estimatedTransactionCompletionTime
+                )
+            )
+        )
     }
 
     override fun showOpenBankingDeepLinkError() {

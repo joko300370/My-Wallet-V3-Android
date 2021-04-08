@@ -57,8 +57,8 @@ class BankAuthFragment : MviFragment<BankAuthModel, BankAuthIntent, BankAuthStat
         arguments?.getString(ACCOUNT_ID) ?: ""
     }
 
-    private val approvalData: BankAuthActivity.BankPaymentApproval? by unsafeLazy {
-        arguments?.getSerializable(APPROVAL_DATA) as? BankAuthActivity.BankPaymentApproval
+    private val approvalData: BankPaymentApproval? by unsafeLazy {
+        arguments?.getSerializable(APPROVAL_DATA) as? BankPaymentApproval
     }
 
     private val linkingBankId: String by lazy {
@@ -559,7 +559,7 @@ class BankAuthFragment : MviFragment<BankAuthModel, BankAuthIntent, BankAuthStat
         }
 
         fun newInstance(
-            approvalData: BankAuthActivity.BankPaymentApproval,
+            approvalData: BankPaymentApproval,
             authSource: BankAuthSource
         ) = BankAuthFragment().apply {
             arguments = Bundle().apply {

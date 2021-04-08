@@ -67,7 +67,7 @@ open class CustodialTradingAccount(
                 custodialWalletManager.createPendingDeposit(
                     crypto = txResult.amount.currency,
                     address = it.address,
-                    hash = txResult.txHash,
+                    hash = txResult.txId,
                     amount = txResult.amount,
                     product = Product.SIMPLEBUY
                 )

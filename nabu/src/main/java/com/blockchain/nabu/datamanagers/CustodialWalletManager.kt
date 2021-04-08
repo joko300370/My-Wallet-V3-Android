@@ -12,6 +12,7 @@ import com.blockchain.nabu.models.data.BankPartner
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
 import com.blockchain.nabu.models.data.WithdrawalFeeAndLimit
+import com.blockchain.nabu.models.responses.banktransfer.BankTransferChargeResponse
 import com.blockchain.nabu.models.responses.interest.InterestActivityItemResponse
 import com.blockchain.nabu.models.responses.interest.InterestAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
@@ -243,7 +244,9 @@ interface CustodialWalletManager {
 
     fun isFiatCurrencySupported(destination: String): Boolean
 
-    fun startBankTransfer(id: String, amount: Money, currency: String): Single<String>
+    fun startBankTransfer(id: String, amount: Money, currency: String, callback: String? = null): Single<String>
+
+    fun getBankTransferCharge(paymentId: String): Single<BankTransferChargeResponse>
 
     fun executeCustodialTransfer(amount: Money, origin: Product, destination: Product): Completable
 

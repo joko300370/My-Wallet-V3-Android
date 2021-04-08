@@ -12,10 +12,10 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.FragmentYapilyAgreementBinding
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
-import piuk.blockchain.android.ui.linkbank.BankAuthActivity
 import piuk.blockchain.android.ui.linkbank.BankAuthAnalytics
 import piuk.blockchain.android.ui.linkbank.BankAuthFlowNavigator
 import piuk.blockchain.android.ui.linkbank.BankAuthSource
+import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
 import piuk.blockchain.android.ui.linkbank.bankAuthEvent
 import piuk.blockchain.android.ui.linkbank.yapily.adapters.YapilyAgreementDelegateAdapter
 import piuk.blockchain.android.ui.linkbank.yapily.adapters.YapilyApprovalDelegateAdapter
@@ -31,8 +31,8 @@ class YapilyPermissionFragment : Fragment() {
         arguments?.getSerializable(INSTITUTION) as YapilyInstitution
     }
 
-    private val approvalDetails: BankAuthActivity.BankPaymentApproval by lazy {
-        arguments?.getSerializable(APPROVAL_DETAILS) as BankAuthActivity.BankPaymentApproval
+    private val approvalDetails: BankPaymentApproval by lazy {
+        arguments?.getSerializable(APPROVAL_DETAILS) as BankPaymentApproval
     }
 
     private val entity: String by lazy {
@@ -266,7 +266,7 @@ class YapilyPermissionFragment : Fragment() {
             }
 
         fun newInstance(
-            approvalDetails: BankAuthActivity.BankPaymentApproval,
+            approvalDetails: BankPaymentApproval,
             authSource: BankAuthSource
         ): YapilyPermissionFragment =
             YapilyPermissionFragment().apply {

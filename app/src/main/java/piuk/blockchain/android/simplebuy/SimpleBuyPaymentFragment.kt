@@ -34,6 +34,7 @@ import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.linkbank.BankAuthActivity
 import piuk.blockchain.android.ui.linkbank.BankAuthSource
+import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionFlowCustomiserImpl.Companion.getEstimatedTransactionCompletionTime
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.secondsToDays
@@ -187,8 +188,8 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
     ) {
         startActivityForResult(
             BankAuthActivity.newInstance(
-                BankAuthActivity.BankPaymentApproval(
-                    authorisationUrl, linkedBank.id, linkedBank, orderValue
+                BankPaymentApproval(
+                    authorisationUrl, linkedBank, orderValue
                 ), BankAuthSource.SIMPLE_BUY, requireContext()
             ), BANK_APPROVAL
         )
