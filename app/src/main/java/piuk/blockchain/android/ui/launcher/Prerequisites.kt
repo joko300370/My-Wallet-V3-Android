@@ -2,6 +2,8 @@ package piuk.blockchain.android.ui.launcher
 
 import com.blockchain.logging.CrashLogger
 import info.blockchain.wallet.api.data.Settings
+import info.blockchain.wallet.exceptions.HDWalletException
+import info.blockchain.wallet.exceptions.InvalidCredentialsException
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
@@ -27,7 +29,10 @@ class Prerequisites(
 
     fun initMetadataAndRelatedPrerequisites(): Completable =
         metadataManager.attemptMetadataSetup().logOnError(METADATA_ERROR_MESSAGE).onErrorResumeNext {
-            Completable.error(MetadataInitException(it))
+            if (it is InvalidCredentialsException || it is HDWalletException) {
+                Completable.error(it)
+            } else
+                Completable.error(MetadataInitException(it))
         }
             .then { simpleBuySync.performSync().logAndCompleteOnError(SIMPLE_BUY_SYNC) }
             .then { coincore.init() } // Coincore signals the crash logger internally

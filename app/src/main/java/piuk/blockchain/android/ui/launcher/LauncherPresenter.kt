@@ -221,7 +221,9 @@ class LauncherPresenter(
                     },
                     onComplete = {
                         view.updateProgressVisibility(false)
-                        appUtil.restartApp(piuk.blockchain.android.ui.launcher.LauncherActivity::class.java)
+                        appUtil.restartAppWithVerifiedPin(
+                            piuk.blockchain.android.ui.launcher.LauncherActivity::class.java
+                        )
                     }
                 )
         }
