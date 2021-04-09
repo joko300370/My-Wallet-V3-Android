@@ -46,7 +46,10 @@ import piuk.blockchain.android.ui.dashboard.adapter.DashboardDelegateAdapter
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementList
+import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsAnalytics
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsFlow
+import piuk.blockchain.android.ui.dashboard.assetdetails.assetActionEvent
+import piuk.blockchain.android.ui.dashboard.assetdetails.fiatAssetAction
 import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsDetailSheet
 import piuk.blockchain.android.ui.dashboard.sheets.ForceBackupForSendSheet
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankMethodChooserBottomSheet
@@ -472,10 +475,12 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     }
 
     private fun onAssetClicked(cryptoCurrency: CryptoCurrency) {
+        analytics.logEvent(assetActionEvent(AssetDetailsAnalytics.WALLET_DETAILS, cryptoCurrency.networkTicker))
         model.process(LaunchAssetDetailsFlow(cryptoCurrency))
     }
 
     private fun onFundsClicked(fiatAccount: FiatAccount) {
+        analytics.logEvent(fiatAssetAction(AssetDetailsAnalytics.FIAT_DETAIL_CLICKED, fiatAccount.fiatCurrency))
         model.process(ShowFiatAssetDetails(fiatAccount))
     }
 

@@ -21,6 +21,8 @@ import piuk.blockchain.android.coincore.NullFiatAccount
 import piuk.blockchain.android.databinding.DialogSheetFiatFundsDetailBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsAnalytics
+import piuk.blockchain.android.ui.dashboard.assetdetails.fiatAssetAction
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
@@ -82,14 +84,17 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog<DialogSheetFiatFundsDetail
                 )
 
             fundsDepositHolder.setOnClickListener {
+                analytics.logEvent(fiatAssetAction(AssetDetailsAnalytics.FIAT_DEPOSIT_CLICKED, account.fiatCurrency))
                 dismiss()
                 host.startDepositFlow(account)
             }
             fundsWithdrawHolder.setOnClickListener {
+                analytics.logEvent(fiatAssetAction(AssetDetailsAnalytics.FIAT_WITHDRAW_CLICKED, account.fiatCurrency))
                 handleWithdrawalChecks()
             }
 
             fundsActivityHolder.setOnClickListener {
+                analytics.logEvent(fiatAssetAction(AssetDetailsAnalytics.FIAT_ACTIVITY_CLICKED, account.fiatCurrency))
                 dismiss()
                 host.gotoActivityFor(account)
             }

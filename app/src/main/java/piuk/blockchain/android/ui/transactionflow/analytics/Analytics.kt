@@ -8,6 +8,7 @@ import piuk.blockchain.android.coincore.BankAccount
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.NullAddress
@@ -50,7 +51,16 @@ class TxFlowAnalytics(
                     analytics.logEvent(SwapAnalyticsEvents.CancelTransaction)
             AssetAction.InterestDeposit ->
                 if (state.currentStep == TransactionStep.CONFIRM_DETAIL)
-                    analytics.logEvent(DepositAnalyticsEvent.CancelTransaction)
+                    analytics.logEvent(InterestDepositAnalyticsEvent.CancelTransaction)
+            AssetAction.Withdraw ->
+                if (state.currentStep == TransactionStep.CONFIRM_DETAIL) {
+                    analytics.logEvent(
+                        withdrawEvent(
+                            WithdrawAnalytics.WITHDRAW_CHECKOUT_CANCEL,
+                            (state.sendingAccount as FiatAccount).fiatCurrency
+                        )
+                    )
+                }
             else -> {
             }
         }
@@ -62,6 +72,23 @@ class TxFlowAnalytics(
             AssetAction.Sell -> triggerSellScreenEvent(state)
             AssetAction.Swap -> triggerSwapScreenEvent(state.currentStep)
             AssetAction.InterestDeposit -> triggerDepositScreenEvent(state.currentStep)
+            AssetAction.Withdraw -> triggerWithdrawScreenEvent(
+                state.currentStep, (state.sendingAccount as FiatAccount).fiatCurrency
+            )
+            else -> {
+            }
+        }
+    }
+
+    private fun triggerWithdrawScreenEvent(step: TransactionStep, currency: String) {
+        when (step) {
+            TransactionStep.SELECT_SOURCE,
+            TransactionStep.SELECT_TARGET_ACCOUNT -> analytics.logEvent(
+                withdrawEvent(WithdrawAnalytics.WITHDRAW_SHOWN, currency)
+            )
+            TransactionStep.CONFIRM_DETAIL -> analytics.logEvent(
+                withdrawEvent(WithdrawAnalytics.WITHDRAW_CHECKOUT_SHOWN, currency)
+            )
             else -> {
             }
         }
@@ -91,8 +118,8 @@ class TxFlowAnalytics(
 
     private fun triggerDepositScreenEvent(step: TransactionStep) {
         when (step) {
-            TransactionStep.ENTER_AMOUNT -> analytics.logEvent(DepositAnalyticsEvent.EnterAmountSeen)
-            TransactionStep.CONFIRM_DETAIL -> analytics.logEvent(DepositAnalyticsEvent.ConfirmationsSeen)
+            TransactionStep.ENTER_AMOUNT -> analytics.logEvent(InterestDepositAnalyticsEvent.EnterAmountSeen)
+            TransactionStep.CONFIRM_DETAIL -> analytics.logEvent(InterestDepositAnalyticsEvent.ConfirmationsSeen)
             else -> {
             }
         }
@@ -171,12 +198,18 @@ class TxFlowAnalytics(
                     )
                 )
             AssetAction.InterestDeposit ->
-                analytics.logEvent(DepositAnalyticsEvent.EnterAmountCtaClick(state.sendingAsset))
+                analytics.logEvent(InterestDepositAnalyticsEvent.EnterAmountCtaClick(state.sendingAsset))
             AssetAction.Swap ->
                 analytics.logEvent(
                     SwapAnalyticsEvents.EnterAmountCtaClick(
                         source = state.sendingAsset,
                         target = state.selectedTarget.toCategory()
+                    )
+                )
+            AssetAction.Withdraw ->
+                analytics.logEvent(
+                    withdrawEvent(
+                        WithdrawAnalytics.WITHDRAW_CONFIRM, (state.sendingAccount as FiatAccount).fiatCurrency
                     )
                 )
             else -> {
@@ -198,7 +231,7 @@ class TxFlowAnalytics(
                 )
             AssetAction.InterestDeposit ->
                 analytics.logEvent(
-                    DepositAnalyticsEvent.ConfirmationsCtaClick(
+                    InterestDepositAnalyticsEvent.ConfirmationsCtaClick(
                         state.sendingAsset
                     )
                 )
@@ -215,6 +248,12 @@ class TxFlowAnalytics(
                     SwapAnalyticsEvents.SwapConfirmCta(
                         source = state.sendingAsset,
                         target = state.selectedTarget.toCategory()
+                    )
+                )
+            AssetAction.Withdraw ->
+                analytics.logEvent(
+                    withdrawEvent(
+                        WithdrawAnalytics.WITHDRAW_CHECKOUT_CONFIRM, (state.sendingAccount as FiatAccount).fiatCurrency
                     )
                 )
             else -> {
@@ -241,7 +280,7 @@ class TxFlowAnalytics(
                 )
             )
             AssetAction.InterestDeposit -> analytics.logEvent(
-                DepositAnalyticsEvent.TransactionSuccess(state.sendingAsset)
+                InterestDepositAnalyticsEvent.TransactionSuccess(state.sendingAsset)
             )
             AssetAction.Swap -> analytics.logEvent(
                 SwapAnalyticsEvents.TransactionSuccess(
@@ -250,6 +289,12 @@ class TxFlowAnalytics(
                     source = state.sendingAccount.toCategory()
                 )
             )
+            AssetAction.Withdraw ->
+                analytics.logEvent(
+                    withdrawEvent(
+                        WithdrawAnalytics.WITHDRAW_SUCCESS, (state.sendingAccount as FiatAccount).fiatCurrency
+                    )
+                )
             else -> {
             }
         }
@@ -273,7 +318,7 @@ class TxFlowAnalytics(
                 )
             )
             AssetAction.InterestDeposit -> analytics.logEvent(
-                DepositAnalyticsEvent.TransactionFailed(state.sendingAsset)
+                InterestDepositAnalyticsEvent.TransactionFailed(state.sendingAsset)
             )
             AssetAction.Swap -> analytics.logEvent(
                 SwapAnalyticsEvents.TransactionFailed(
@@ -283,6 +328,12 @@ class TxFlowAnalytics(
                     error = error
                 )
             )
+            AssetAction.Withdraw ->
+                analytics.logEvent(
+                    withdrawEvent(
+                        WithdrawAnalytics.WITHDRAW_ERROR, (state.sendingAccount as FiatAccount).fiatCurrency
+                    )
+                )
             else -> {
             }
         }

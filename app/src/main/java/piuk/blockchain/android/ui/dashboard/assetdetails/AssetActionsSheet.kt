@@ -146,6 +146,7 @@ class AssetActionsSheet :
                     getString(R.string.fiat_funds_detail_activity_details), asset,
                     action
                 ) {
+                    logActionEvent(AssetDetailsAnalytics.ACTIVITY_CLICKED, asset)
                     processAction(AssetAction.ViewActivity)
                 }
             AssetAction.Send ->
@@ -156,6 +157,7 @@ class AssetActionsSheet :
                         asset.displayTicker
                     ), asset, action
                 ) {
+                    logActionEvent(AssetDetailsAnalytics.SEND_CLICKED, asset)
                     processAction(AssetAction.Send)
                 }
             AssetAction.Receive ->
@@ -166,6 +168,7 @@ class AssetActionsSheet :
                         asset.displayTicker
                     ), asset, action
                 ) {
+                    logActionEvent(AssetDetailsAnalytics.RECEIVE_CLICKED, asset)
                     processAction(AssetAction.Receive)
                 }
             AssetAction.Swap -> AssetActionItem(
@@ -174,6 +177,7 @@ class AssetActionsSheet :
                 getString(R.string.dashboard_asset_actions_swap_dsc, asset.displayTicker),
                 asset, action
             ) {
+                logActionEvent(AssetDetailsAnalytics.SWAP_CLICKED, asset)
                 processAction(AssetAction.Swap)
             }
             AssetAction.Summary -> AssetActionItem(
@@ -199,11 +203,16 @@ class AssetActionsSheet :
                 getString(R.string.convert_your_crypto_to_cash),
                 asset, action
             ) {
+                logActionEvent(AssetDetailsAnalytics.SELL_CLICKED, asset)
                 processAction(AssetAction.Sell)
             }
             AssetAction.Withdraw -> throw IllegalStateException("Cannot Withdraw a non-fiat currency")
             AssetAction.FiatDeposit -> throw IllegalStateException("Cannot Deposit a non-fiat currency to Fiat")
         }
+
+    private fun logActionEvent(event: AssetDetailsAnalytics, asset: CryptoCurrency) {
+        analytics.logEvent(assetActionEvent(event, asset.networkTicker))
+    }
 
     private fun goToInterestDeposit() {
         model.process(HandleActionIntent(AssetAction.InterestDeposit))
