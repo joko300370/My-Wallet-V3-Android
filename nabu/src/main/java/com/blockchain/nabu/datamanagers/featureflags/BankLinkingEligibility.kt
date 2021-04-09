@@ -22,7 +22,7 @@ class BankLinkingEnabledProviderImpl(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 supportedPartners.add(BankPartner.YODLEE)
             }
-            if (ob && internalFlags.isFeatureEnabled(GatedFeature.OPEN_BANKING)) {
+            if (ob && internalFlags.isFeatureEnabled(GatedFeature.OB_SB_SETT)) {
                 supportedPartners.add(BankPartner.YAPILY)
             }
             supportedPartners
@@ -31,7 +31,7 @@ class BankLinkingEnabledProviderImpl(
     override fun bankLinkingEnabled(fiatCurrency: String): Single<Boolean> =
         if (fiatCurrency == "EUR" || fiatCurrency == "GBP") {
             obFF.enabled.map { obEnabled ->
-                obEnabled && internalFlags.isFeatureEnabled(GatedFeature.OPEN_BANKING)
+                obEnabled && internalFlags.isFeatureEnabled(GatedFeature.OB_SB_SETT)
             }
         } else {
             Single.just(true)

@@ -109,7 +109,7 @@ data class BankTransferPaymentResponse(
 
 data class BankInfoResponse(
     val id: String,
-    val name: String,
+    val bankName: String,
     val accountName: String?,
     val currency: String,
     val state: String,

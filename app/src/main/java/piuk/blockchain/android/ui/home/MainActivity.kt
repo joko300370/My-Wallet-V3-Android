@@ -17,6 +17,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem
+import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.NotificationsUtil
 import com.blockchain.notifications.analytics.AnalyticsEvents
@@ -301,7 +302,12 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 }
                 BANK_DEEP_LINK_DEPOSIT -> {
                     if (resultCode == RESULT_OK) {
-                        launchDepositFlow(data?.getStringExtra(LINKED_BANK_CURRENCY))
+                        launchDashboardFlow(AssetAction.FiatDeposit, data?.getStringExtra(LINKED_BANK_CURRENCY))
+                    }
+                }
+                BANK_DEEP_LINK_WITHDRAW -> {
+                    if (resultCode == RESULT_OK) {
+                        launchDashboardFlow(AssetAction.Withdraw, data?.getStringExtra(LINKED_BANK_CURRENCY))
                     }
                 }
                 else -> super.onActivityResult(requestCode, resultCode, data)
@@ -309,9 +315,9 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         }
     }
 
-    private fun launchDepositFlow(currency: String?) {
+    private fun launchDashboardFlow(action: AssetAction, currency: String?) {
         currency?.let {
-            val fragment = DashboardFragment.newInstance(AssetAction.FiatDeposit, it)
+            val fragment = DashboardFragment.newInstance(action, it)
             replaceContentFragment(fragment)
         }
     }
@@ -692,6 +698,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         const val BANK_DEEP_LINK_SIMPLE_BUY = 2013
         const val BANK_DEEP_LINK_SETTINGS = 2014
         const val BANK_DEEP_LINK_DEPOSIT = 2015
+        const val BANK_DEEP_LINK_WITHDRAW = 2021
 
         // Keep these constants - the position of the toolbar items - and the generation of the toolbar items
         // together.
@@ -788,8 +795,8 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 BankAuthSource.SIMPLE_BUY -> BANK_DEEP_LINK_SIMPLE_BUY
                 BankAuthSource.SETTINGS -> BANK_DEEP_LINK_SETTINGS
                 BankAuthSource.DEPOSIT -> BANK_DEEP_LINK_DEPOSIT
-                else -> -1
-            }
+                BankAuthSource.WITHDRAW -> BANK_DEEP_LINK_WITHDRAW
+            }.exhaustive
         )
     }
 

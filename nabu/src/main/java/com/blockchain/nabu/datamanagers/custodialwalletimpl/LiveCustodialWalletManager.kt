@@ -969,7 +969,7 @@ class LiveCustodialWalletManager(
     private fun BankInfoResponse.toBank(): Bank =
         Bank(
             id = id,
-            name = accountName ?: name,
+            name = accountName ?: bankName,
             state = state.toBankState(),
             currency = currency,
             account = accountNumber ?: "",

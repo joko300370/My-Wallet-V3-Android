@@ -354,16 +354,16 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                     }
 
                     when (flowToLaunch) {
-                        AssetAction.FiatDeposit -> {
-                            model.process(
-                                LaunchBankTransferFlow(
-                                    selectedAccount, AssetAction.FiatDeposit, false
-                                )
+                        AssetAction.FiatDeposit -> model.process(
+                            LaunchBankTransferFlow(
+                                selectedAccount, AssetAction.FiatDeposit, false
                             )
-                        }
-                        AssetAction.Withdraw -> {
-                            // TODO in next story
-                        }
+                        )
+                        AssetAction.Withdraw -> model.process(
+                            LaunchBankTransferFlow(
+                                selectedAccount, AssetAction.Withdraw, false
+                            )
+                        )
                         else -> throw IllegalStateException("Unsupported flow launch for action $flowToLaunch")
                     }
                 },

@@ -8,8 +8,8 @@ interface InternalFeatureFlagApi {
     fun getAll(): Map<GatedFeature, Boolean>
 }
 
-enum class GatedFeature {
-    OPEN_BANKING,
-    SEGWIT,
-    OPEN_BANKING_DEPOSIT
+enum class GatedFeature(val readableName: String) {
+    OB_SB_SETT("OB Simple buy & Settings"),
+    SEGWIT("Segwit"),
+    OB_DEPO_WITH("OB Deposit & Withdraw")
 }

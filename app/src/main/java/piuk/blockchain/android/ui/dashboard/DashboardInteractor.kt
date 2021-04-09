@@ -294,7 +294,7 @@ class DashboardInteractor(
     ): Disposable {
         require(targetAccount is FiatAccount)
         return if (targetAccount.isOpenBankingCurrency() && !internalFlags.isFeatureEnabled(
-                GatedFeature.OPEN_BANKING_DEPOSIT
+                GatedFeature.OB_DEPO_WITH
             )
         ) {
             handleDepositForOpenBanking(targetAccount, model, action)
@@ -495,8 +495,10 @@ class DashboardInteractor(
         ).flatMap { (paymentMethods, linkedBanks) ->
             when {
                 linkedBanks.isEmpty() -> {
-                    // TODO remove this when we can link banks from withdraw
-                    if (sourceAccount.isOpenBankingCurrency()) {
+                    if (sourceAccount.isOpenBankingCurrency() && !internalFlags.isFeatureEnabled(
+                            GatedFeature.OB_DEPO_WITH
+                        )
+                    ) {
                         handleNoLinkedBanksWithdrawalForOpenBanking(sourceAccount)
                     } else {
                         handleNoLinkedBanks(

@@ -46,7 +46,7 @@ class FeatureFlagsHandlingActivity : AppCompatActivity() {
             val parent = binding.nestedParent
             featureFlags.entries.forEachIndexed { index, flag ->
                 val switch = SwitchCompat(this)
-                switch.text = flag.key.name
+                switch.text = flag.key.readableName
                 switch.isChecked = flag.value
                 switch.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {
