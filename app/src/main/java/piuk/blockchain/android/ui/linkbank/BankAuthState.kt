@@ -34,14 +34,7 @@ enum class BankLinkingProcessState {
 data class BankLinkingInfo(
     val linkingId: String,
     val bankAuthSource: BankAuthSource
-) {
-
-    companion object {
-        private val gson = Gson()
-        fun fromJson(json: String): BankLinkingInfo = gson.fromJson(json, BankLinkingInfo::class.java)
-        fun toJson(bankLinkingInfo: BankLinkingInfo): String = gson.toJson(bankLinkingInfo, BankLinkingInfo::class.java)
-    }
-}
+) : Serializable
 
 enum class BankAuthSource {
     SIMPLE_BUY,
@@ -54,11 +47,24 @@ data class BankPaymentApproval(
     val authorisationUrl: String,
     val linkedBank: LinkedBank,
     val orderValue: FiatValue
-) : Serializable {
-    companion object {
-        private val gson = Gson()
-        fun fromJson(json: String): BankPaymentApproval = gson.fromJson(json, BankPaymentApproval::class.java)
-        fun toJson(bankPaymentData: BankPaymentApproval): String =
-            gson.toJson(bankPaymentData, BankPaymentApproval::class.java)
-    }
+) : Serializable
+
+data class BankAuthDeepLinkState(
+    val bankAuthFlow: BankAuthFlowState = BankAuthFlowState.NONE,
+    val bankPaymentData: BankPaymentApproval? = null,
+    val bankLinkingInfo: BankLinkingInfo? = null
+)
+
+fun BankAuthDeepLinkState.toPreferencesValue(): String =
+    Gson().toJson(this, BankAuthDeepLinkState::class.java)
+
+internal fun String.fromPreferencesValue(): BankAuthDeepLinkState =
+    Gson().fromJson(this, BankAuthDeepLinkState::class.java)
+
+enum class BankAuthFlowState {
+    BANK_LINK_PENDING,
+    BANK_LINK_COMPLETE,
+    BANK_APPROVAL_PENDING,
+    BANK_APPROVAL_COMPLETE,
+    NONE
 }

@@ -171,19 +171,9 @@ class PrefsUtil(
 
     override fun updateSimpleBuyState(simpleBuyState: String) = setValue(KEY_SIMPLE_BUY_STATE, simpleBuyState)
 
-    override fun setBankLinkingInfo(bankLinkingInfo: String) = setValue(KEY_SIMPLE_BUY_BANK_LINK, bankLinkingInfo)
+    override fun getBankLinkingState(): String = getValue(KEY_BANK_LINKING, "")
 
-    override fun getBankLinkingInfo(): String = getValue(KEY_SIMPLE_BUY_BANK_LINK, "")
-
-    override fun clearBankLinkingInfo() = removeValue(KEY_SIMPLE_BUY_BANK_LINK)
-
-    override fun getPaymentApprovalConsumed(): Boolean = getValue(KEY_SIMPLE_BUY_APPROVAL, false)
-
-    override fun setPaymentApprovalConsumed(state: Boolean) = setValue(KEY_SIMPLE_BUY_APPROVAL, state)
-
-    override fun getFiatDepositApprovalInProgress(): String = getValue(KEY_DEPOSIT_APPROVAL, "")
-
-    override fun setFiatDepositApprovalInProgress(state: String) = setValue(KEY_DEPOSIT_APPROVAL, state)
+    override fun setBankLinkingState(state: String) = setValue(KEY_BANK_LINKING, state)
 
     override fun clearState() = removeValue(KEY_SIMPLE_BUY_STATE)
 
@@ -539,6 +529,7 @@ class PrefsUtil(
         private const val KEY_SIMPLE_BUY_BANK_LINK = "KEY_SIMPLE_BUY_BANK_LINK"
         private const val KEY_SIMPLE_BUY_APPROVAL = "KEY_SIMPLE_BUY_APPROVAL"
         private const val KEY_DEPOSIT_APPROVAL = "KEY_DEPOSIT_APPROVAL"
+        private const val KEY_BANK_LINKING = "KEY_BANK_LINKING"
 
         private const val KEY_SWAP_INTRO_COMPLETED = "key_swap_intro_completed"
         private const val KEY_INTRO_TOUR_COMPLETED = "key_intro_tour_complete"

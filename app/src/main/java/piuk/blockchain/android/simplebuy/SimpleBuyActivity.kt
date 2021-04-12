@@ -18,7 +18,10 @@ import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.linkbank.BankAuthActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthFlowState
 import piuk.blockchain.android.ui.linkbank.BankAuthSource
+import piuk.blockchain.android.ui.linkbank.fromPreferencesValue
+import piuk.blockchain.android.ui.linkbank.toPreferencesValue
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
@@ -60,7 +63,10 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
         setSupportActionBar(toolbar_general)
         if (savedInstanceState == null) {
             if (startedFromApprovalDeepLink) {
-                bankLinkingPrefs.setPaymentApprovalConsumed(true)
+                val currentState = bankLinkingPrefs.getBankLinkingState().fromPreferencesValue()
+                bankLinkingPrefs.setBankLinkingState(
+                    currentState.copy(bankAuthFlow = BankAuthFlowState.BANK_APPROVAL_COMPLETE).toPreferencesValue()
+                )
             }
 
             subscribeForNavigation()

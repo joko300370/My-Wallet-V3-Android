@@ -148,20 +148,20 @@ class BankAuthActivity : BlockchainActivity(), BankAuthFlowNavigator,
 
     override fun yapilyAgreementCancelled(isFromApproval: Boolean) =
         if (isFromApproval) {
-            resetApproval()
+            resetLocalState()
         } else {
             supportFragmentManager.popBackStack()
         }
 
     override fun onBackPressed() =
         if (approvalDetails != null) {
-            resetApproval()
+            resetLocalState()
         } else {
             super.onBackPressed()
         }
 
-    private fun resetApproval() {
-        bankLinkingPrefs.setFiatDepositApprovalInProgress("")
+    private fun resetLocalState() {
+        bankLinkingPrefs.setBankLinkingState(BankAuthDeepLinkState().toPreferencesValue())
         setResult(Activity.RESULT_CANCELED)
         finish()
     }
@@ -225,8 +225,7 @@ class BankAuthActivity : BlockchainActivity(), BankAuthFlowNavigator,
     }
 
     override fun bankAuthCancelled() {
-        setResult(Activity.RESULT_CANCELED)
-        finish()
+        resetLocalState()
     }
 
     override fun onSupportNavigateUp(): Boolean = consume {

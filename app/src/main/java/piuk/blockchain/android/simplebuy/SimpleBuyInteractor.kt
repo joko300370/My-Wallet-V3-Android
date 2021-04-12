@@ -5,13 +5,13 @@ import com.blockchain.nabu.datamanagers.BuySellOrder
 import com.blockchain.nabu.datamanagers.BuySellPairs
 import com.blockchain.nabu.datamanagers.CardToBeActivated
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.nabu.datamanagers.EligiblePaymentMethodType
 import com.blockchain.nabu.datamanagers.OrderInput
 import com.blockchain.nabu.datamanagers.OrderOutput
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.Product
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
@@ -36,8 +36,12 @@ import piuk.blockchain.android.cards.CardIntent
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.networking.PollService
 import piuk.blockchain.android.sdd.SDDAnalytics
+import piuk.blockchain.android.ui.linkbank.BankAuthDeepLinkState
+import piuk.blockchain.android.ui.linkbank.BankAuthFlowState
 import piuk.blockchain.android.ui.linkbank.BankAuthSource
 import piuk.blockchain.android.ui.linkbank.BankLinkingInfo
+import piuk.blockchain.android.ui.linkbank.fromPreferencesValue
+import piuk.blockchain.android.ui.linkbank.toPreferencesValue
 import piuk.blockchain.android.util.AppUtil
 import java.util.concurrent.TimeUnit
 
@@ -73,7 +77,7 @@ class SimpleBuyInteractor(
             .trackProgress(appUtil.activityIndicator)
 
     fun cancelOrder(orderId: String): Completable {
-        bankLinkingPrefs.setFiatDepositApprovalInProgress("")
+        bankLinkingPrefs.setBankLinkingState(BankAuthDeepLinkState().toPreferencesValue())
         return custodialWalletManager.deleteBuyOrder(orderId)
     }
 
@@ -158,8 +162,12 @@ class SimpleBuyInteractor(
         partner: BankPartner,
         source: BankAuthSource
     ): Completable {
-        val linkingInfo = BankLinkingInfo(linkingId, source)
-        bankLinkingPrefs.setBankLinkingInfo(BankLinkingInfo.toJson(linkingInfo))
+        bankLinkingPrefs.setBankLinkingState(
+            BankAuthDeepLinkState(
+                bankAuthFlow = BankAuthFlowState.BANK_LINK_PENDING,
+                bankLinkingInfo = BankLinkingInfo(linkingId, source)
+            ).toPreferencesValue()
+        )
 
         return custodialWalletManager.updateSelectedBankAccount(
             linkingId = linkingId,
@@ -305,12 +313,12 @@ class SimpleBuyInteractor(
     fun addNewCard(fiatCurrency: String, billingAddress: BillingAddress): Single<CardToBeActivated> =
         custodialWalletManager.addNewCard(fiatCurrency, billingAddress)
 
-    fun userIsEligibleToLinkABank(fiatCurrency: String): Single<Boolean> =
-        custodialWalletManager.getEligiblePaymentMethodTypes(fiatCurrency).map {
-            it.contains(EligiblePaymentMethodType(PaymentMethodType.BANK_TRANSFER, fiatCurrency))
-        }
-
-    fun updateApprovalStatus() = bankLinkingPrefs.setPaymentApprovalConsumed(false)
+    fun updateApprovalStatus() {
+        val currentState = bankLinkingPrefs.getBankLinkingState().fromPreferencesValue()
+        bankLinkingPrefs.setBankLinkingState(
+            currentState.copy(bankAuthFlow = BankAuthFlowState.BANK_APPROVAL_PENDING).toPreferencesValue()
+        )
+    }
 
     companion object {
         private const val INTERVAL: Long = 5

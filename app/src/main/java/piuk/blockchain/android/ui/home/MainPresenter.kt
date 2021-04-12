@@ -41,8 +41,9 @@ import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.ui.base.MvpPresenter
 import piuk.blockchain.android.ui.base.MvpView
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
-import piuk.blockchain.android.ui.linkbank.BankLinkingInfo
-import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
+import piuk.blockchain.android.ui.linkbank.BankAuthFlowState
+import piuk.blockchain.android.ui.linkbank.fromPreferencesValue
+import piuk.blockchain.android.ui.linkbank.toPreferencesValue
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -254,21 +255,27 @@ class MainPresenter internal constructor(
         }
 
     private fun handleBankApproval() {
-        val fiatDepositData = bankLinkingPrefs.getFiatDepositApprovalInProgress()
-        when {
-            fiatDepositData.isNotEmpty() -> {
-                val info = BankPaymentApproval.fromJson(fiatDepositData)
-                bankLinkingPrefs.setFiatDepositApprovalInProgress("")
+        val deepLinkState = bankLinkingPrefs.getBankLinkingState().fromPreferencesValue()
+
+        if (deepLinkState.bankAuthFlow == BankAuthFlowState.BANK_APPROVAL_COMPLETE) {
+            return
+        }
+
+        if (deepLinkState.bankAuthFlow == BankAuthFlowState.BANK_APPROVAL_PENDING) {
+            bankLinkingPrefs.setBankLinkingState(
+                deepLinkState.copy(bankAuthFlow = BankAuthFlowState.BANK_APPROVAL_COMPLETE).toPreferencesValue()
+            )
+            deepLinkState.bankPaymentData?.let {
                 view?.handleApprovalDepositComplete(
-                    info.orderValue, info.linkedBank.currency, getEstimatedDepositCompletionTime()
+                    it.orderValue, it.linkedBank.currency, getEstimatedDepositCompletionTime()
                 )
-            }
-            bankLinkingPrefs.getPaymentApprovalConsumed() -> return
-            else -> simpleBuySync.currentState()?.let {
-                if (it.orderState == OrderState.AWAITING_FUNDS) {
-                    view?.launchSimpleBuyFromDeepLinkApproval()
-                } else {
-                    view?.handlePaymentForCancelledOrder(it)
+            } ?: kotlin.run {
+                simpleBuySync.currentState()?.let {
+                    if (it.orderState == OrderState.AWAITING_FUNDS) {
+                        view?.launchSimpleBuyFromDeepLinkApproval()
+                    } else {
+                        view?.handlePaymentForCancelledOrder(it)
+                    }
                 }
             }
         }
@@ -282,14 +289,20 @@ class MainPresenter internal constructor(
     }
 
     private fun handleBankLinking() {
-        if (bankLinkingPrefs.getBankLinkingInfo().isEmpty()) {
+        val linkingState = bankLinkingPrefs.getBankLinkingState().fromPreferencesValue()
+
+        if (linkingState.bankAuthFlow == BankAuthFlowState.BANK_LINK_COMPLETE) {
             return
         }
-        try {
-            val bankLinkingInfo = BankLinkingInfo.fromJson(bankLinkingPrefs.getBankLinkingInfo())
-            bankLinkingPrefs.clearBankLinkingInfo()
 
-            view?.launchOpenBankingLinking(bankLinkingInfo)
+        try {
+            bankLinkingPrefs.setBankLinkingState(
+                linkingState.copy(bankAuthFlow = BankAuthFlowState.BANK_LINK_COMPLETE).toPreferencesValue()
+            )
+
+            linkingState.bankLinkingInfo?.let {
+                view?.launchOpenBankingLinking(it)
+            }
         } catch (e: JsonSyntaxException) {
             view?.showOpenBankingDeepLinkError()
         }

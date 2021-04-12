@@ -36,7 +36,10 @@ import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.fiat.LinkedBanksFactory
+import piuk.blockchain.android.ui.linkbank.BankAuthDeepLinkState
+import piuk.blockchain.android.ui.linkbank.BankAuthFlowState
 import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
+import piuk.blockchain.android.ui.linkbank.toPreferencesValue
 import piuk.blockchain.android.ui.transfer.AccountsSorting
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import timber.log.Timber
@@ -213,7 +216,9 @@ class TransactionInteractor(
     fun linkABank(selectedFiat: String): Single<LinkBankTransfer> = custodialWalletManager.linkToABank(selectedFiat)
 
     fun updateFiatDepositState(bankPaymentData: BankPaymentApproval) =
-        bankLinkingPrefs.setFiatDepositApprovalInProgress(BankPaymentApproval.toJson(bankPaymentData))
+        bankLinkingPrefs.setBankLinkingState(
+            BankAuthDeepLinkState(BankAuthFlowState.BANK_APPROVAL_PENDING, bankPaymentData).toPreferencesValue()
+        )
 }
 
 private fun CryptoAccount.isAvailableToSwapFrom(pairs: List<CurrencyPair.CryptoCurrencyPair>): Boolean =
