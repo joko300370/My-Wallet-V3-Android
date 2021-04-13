@@ -1582,6 +1582,12 @@
     <string name="deposit_confirmation_progress_message">We’re completing your deposit now.</string>
     <string name="deposit_confirmation_success_title">%1$s Deposited!</string>
     <string name="deposit_confirmation_success_message">While we wait for your bank to send the cash, here’s early access to %1$s in your %2$s Cash Account so you can buy crypto right away.\n\nYour funds will be available to withdraw once the bank transfer is complete on %3$s.</string>
+    <string name="deposit_confirmation_pending_title">We’re waiting on your bank</string>
+    <string name="deposit_confirmation_pending_subtitle">Please wait while we confirm the transaction. You can safely close this, and check the progress under the Activity tab.</string>
+    <string name="deposit_confirmation_timeout_title">Oops, it took too long to confirm the transaction!</string>
+    <string name="deposit_confirmation_timeout_subtitle">Payments can sometimes take a while to go through. If you approved the transaction, you can safely close this, and check the Deposit progress under the Activity tab.</string>
+    <string name="deposit_confirmation_error_title">Oops, looks like something went wrong!</string>
+    <string name="deposit_confirmation_error_subtitle">There was an issue with your Deposit, please try again or contact support if the problem persists.</string>
     <string name="sell_confirmation_cta_button">Sell %1$s</string>
     <string name="sell_confirmation_progress_title">Selling %1$s</string>
     <string name="sell_confirmation_progress_message">We’re completing your sell now.</string>

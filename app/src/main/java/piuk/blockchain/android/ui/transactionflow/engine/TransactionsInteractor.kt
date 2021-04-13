@@ -217,7 +217,10 @@ class TransactionInteractor(
 
     fun updateFiatDepositState(bankPaymentData: BankPaymentApproval) =
         bankLinkingPrefs.setBankLinkingState(
-            BankAuthDeepLinkState(BankAuthFlowState.BANK_APPROVAL_PENDING, bankPaymentData).toPreferencesValue()
+            BankAuthDeepLinkState(
+                bankAuthFlow = BankAuthFlowState.BANK_APPROVAL_PENDING,
+                bankPaymentData = bankPaymentData
+            ).toPreferencesValue()
         )
 }
 

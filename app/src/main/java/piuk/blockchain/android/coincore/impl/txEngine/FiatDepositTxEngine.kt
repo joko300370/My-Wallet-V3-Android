@@ -21,6 +21,7 @@ import piuk.blockchain.android.coincore.fiat.LinkedBankAccount
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.android.networking.PollService
 import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
+import java.security.InvalidParameterException
 
 class FiatDepositTxEngine(
     private val walletManager: CustodialWalletManager
@@ -132,15 +133,19 @@ class FiatDepositTxEngine(
 
     override fun doPostExecute(pendingTx: PendingTx, txResult: TxResult): Completable =
         if (pendingTx.isOpenBankingCurrency()) {
-            PollService(walletManager.getBankTransferCharge((txResult as TxResult.HashedTxResult).txId)) {
-                it.extraAttributes.authorisationUrl != null
-            }.start().map { it.value }.flatMap { transferResponse ->
-                walletManager.getLinkedBank(transferResponse.beneficiaryId).map { linkedBank ->
-                    BankPaymentApproval(
-                        transferResponse.extraAttributes.authorisationUrl!!,
-                        linkedBank,
-                        FiatValue.fromMinor(transferResponse.amount.symbol, transferResponse.amountMinor.toLong())
-                    )
+            val paymentId = (txResult as TxResult.HashedTxResult).txId
+            PollService(walletManager.getBankTransferCharge(paymentId)) {
+                it.authorisationUrl != null
+            }.start().map { it.value }.flatMap { bankTransferDetails ->
+                walletManager.getLinkedBank(bankTransferDetails.id).map { linkedBank ->
+                    bankTransferDetails.authorisationUrl?.let {
+                        BankPaymentApproval(
+                            paymentId,
+                            it,
+                            linkedBank,
+                            bankTransferDetails.amount
+                        )
+                    } ?: throw InvalidParameterException("No auth url was returned")
                 }
             }.flatMapCompletable {
                 Completable.error(NeedsApprovalException(it))

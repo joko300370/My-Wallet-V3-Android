@@ -526,9 +526,6 @@ class PrefsUtil(
         private const val KEY_HAS_COMPLETED_AT_LEAST_ONE_BUY = "has_completed_at_least_one_buy"
 
         private const val KEY_SUPPORTED_CARDS_STATE = "key_supported_cards"
-        private const val KEY_SIMPLE_BUY_BANK_LINK = "KEY_SIMPLE_BUY_BANK_LINK"
-        private const val KEY_SIMPLE_BUY_APPROVAL = "KEY_SIMPLE_BUY_APPROVAL"
-        private const val KEY_DEPOSIT_APPROVAL = "KEY_DEPOSIT_APPROVAL"
         private const val KEY_BANK_LINKING = "KEY_BANK_LINKING"
 
         private const val KEY_SWAP_INTRO_COMPLETED = "key_swap_intro_completed"

@@ -195,6 +195,12 @@ abstract class BlockchainActivity : ToolBarActivity() {
         }
     }
 
+    @UiThread
+    fun replaceBottomSheet(bottomSheet: BottomSheetDialogFragment) {
+        clearBottomSheet()
+        showBottomSheet(bottomSheet)
+    }
+
     override fun onBackPressed() {
         val fragments = supportFragmentManager.fragments
         for (fragment in fragments) {

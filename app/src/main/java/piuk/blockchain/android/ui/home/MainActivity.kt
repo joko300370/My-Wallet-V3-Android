@@ -68,7 +68,8 @@ import piuk.blockchain.android.ui.linkbank.BankAuthActivity.Companion.LINKED_BAN
 import piuk.blockchain.android.ui.linkbank.BankAuthActivity.Companion.LINKED_BANK_ID_KEY
 import piuk.blockchain.android.ui.linkbank.BankAuthSource
 import piuk.blockchain.android.ui.linkbank.BankLinkingInfo
-import piuk.blockchain.android.ui.linkbank.yapily.FiatTransactionSuccessBottomSheet
+import piuk.blockchain.android.ui.linkbank.FiatTransactionState
+import piuk.blockchain.android.ui.linkbank.yapily.FiatTransactionBottomSheet
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity
 import piuk.blockchain.android.ui.pairingcode.PairingCodeActivity
 import piuk.blockchain.android.ui.scan.QrExpected
@@ -804,9 +805,9 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         startActivity(SimpleBuyActivity.newInstance(this, launchFromApprovalDeepLink = true))
     }
 
-    override fun handlePaymentForCancelledOrder(state: SimpleBuyState) {
-        showBottomSheet(
-            FiatTransactionSuccessBottomSheet.newInstance(
+    override fun handlePaymentForCancelledOrder(state: SimpleBuyState) =
+        replaceBottomSheet(
+            FiatTransactionBottomSheet.newInstance(
                 state.fiatCurrency, getString(R.string.yapily_payment_to_fiat_wallet_title, state.fiatCurrency),
                 getString(
                     R.string.yapily_payment_to_fiat_wallet_subtitle,
@@ -814,27 +815,63 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                         R.string.yapily_payment_to_fiat_wallet_default
                     ),
                     state.fiatCurrency
-                )
+                ),
+                FiatTransactionState.SUCCESS
             )
         )
-    }
 
     override fun handleApprovalDepositComplete(
         orderValue: FiatValue,
-        currency: String,
         estimatedTransactionCompletionTime: String
-    ) {
-        showBottomSheet(
-            FiatTransactionSuccessBottomSheet.newInstance(
-                currency,
+    ) =
+        replaceBottomSheet(
+            FiatTransactionBottomSheet.newInstance(
+                orderValue.currencyCode,
                 getString(R.string.deposit_confirmation_success_title, orderValue.toStringWithSymbol()),
                 getString(
-                    R.string.yapily_fiat_deposit_success_subtitle, orderValue.toStringWithSymbol(), currency,
+                    R.string.yapily_fiat_deposit_success_subtitle, orderValue.toStringWithSymbol(),
+                    orderValue.currencyCode,
                     estimatedTransactionCompletionTime
-                )
+                ),
+                FiatTransactionState.SUCCESS
             )
         )
-    }
+
+    override fun handleApprovalDepositError(currency: String) =
+        replaceBottomSheet(
+            FiatTransactionBottomSheet.newInstance(
+                currency,
+                getString(R.string.deposit_confirmation_error_title),
+                getString(
+                    R.string.deposit_confirmation_error_subtitle
+                ),
+                FiatTransactionState.ERROR
+            )
+        )
+
+    override fun handleApprovalDepositInProgress(amount: FiatValue) =
+        replaceBottomSheet(
+            FiatTransactionBottomSheet.newInstance(
+                amount.currencyCode,
+                getString(R.string.deposit_confirmation_pending_title),
+                getString(
+                    R.string.deposit_confirmation_pending_subtitle
+                ),
+                FiatTransactionState.PENDING
+            )
+        )
+
+    override fun handleApprovalDepositTimeout(currencyCode: String) =
+        replaceBottomSheet(
+            FiatTransactionBottomSheet.newInstance(
+                currencyCode,
+                getString(R.string.deposit_confirmation_pending_title),
+                getString(
+                    R.string.deposit_confirmation_pending_subtitle
+                ),
+                FiatTransactionState.ERROR
+            )
+        )
 
     override fun showOpenBankingDeepLinkError() {
         ToastCustom.makeText(

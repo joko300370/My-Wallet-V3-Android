@@ -128,6 +128,7 @@ data class BankInfoResponse(
 
 data class BankTransferChargeResponse(
     val beneficiaryId: String,
+    val state: String?,
     val amountMinor: String,
     val amount: BankTransferFiatAmount,
     val extraAttributes: BankTransferChargeAttributes
@@ -139,8 +140,25 @@ data class BankTransferFiatAmount(
 )
 
 data class BankTransferChargeAttributes(
-    val authorisationUrl: String?
-)
+    val authorisationUrl: String?,
+    val status: String?
+) {
+    companion object {
+        const val CREATED = "CREATED"
+        const val PRE_CHARGE_REVIEW = "PRE_CHARGE_REVIEW"
+        const val AWAITING_AUTHORIZATION = "AWAITING_AUTHORIZATION"
+        const val PRE_CHARGE_APPROVED = "PRE_CHARGE_APPROVED"
+        const val PENDING = "PENDING"
+        const val AUTHORIZED = "AUTHORIZED"
+        const val CREDITED = "CREDITED"
+        const val FAILED = "FAILED"
+        const val FRAUD_REVIEW = "FRAUD_REVIEW"
+        const val MANUAL_REVIEW = "MANUAL_REVIEW"
+        const val REJECTED = "REJECTED"
+        const val CLEARED = "CLEARED"
+        const val COMPLETE = "COMPLETE"
+    }
+}
 
 data class BankInfoAttributes(
     val entity: String,

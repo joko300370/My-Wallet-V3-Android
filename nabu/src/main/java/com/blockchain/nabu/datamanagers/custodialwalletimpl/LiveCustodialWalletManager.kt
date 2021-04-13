@@ -46,6 +46,8 @@ import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.blockchain.nabu.extensions.fromIso8601ToUtc
 import com.blockchain.nabu.extensions.toLocalTime
 import com.blockchain.nabu.models.data.BankPartner
+import com.blockchain.nabu.models.data.BankTransferDetails
+import com.blockchain.nabu.models.data.BankTransferStatus
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
 import com.blockchain.nabu.models.data.LinkedBankErrorState
@@ -53,6 +55,7 @@ import com.blockchain.nabu.models.data.LinkedBankState
 import com.blockchain.nabu.models.data.WithdrawalFeeAndLimit
 import com.blockchain.nabu.models.responses.banktransfer.BankInfoResponse
 import com.blockchain.nabu.models.responses.banktransfer.BankMediaResponse.Companion.ICON
+import com.blockchain.nabu.models.responses.banktransfer.BankTransferChargeAttributes
 import com.blockchain.nabu.models.responses.banktransfer.BankTransferChargeResponse
 import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentAttributes
 import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentBody
@@ -969,10 +972,10 @@ class LiveCustodialWalletManager(
     private fun BankInfoResponse.toBank(): Bank =
         Bank(
             id = id,
-            name = accountName ?: bankName,
+            name = accountName ?: bankName ?: "",
             state = state.toBankState(),
             currency = currency,
-            account = accountNumber ?: "",
+            account = accountNumber ?: "****",
             accountType = bankAccountType ?: "",
             paymentMethodType = if (this.isBankTransferAccount)
                 PaymentMethodType.BANK_TRANSFER else PaymentMethodType.BANK_ACCOUNT,
@@ -1042,12 +1045,14 @@ class LiveCustodialWalletManager(
             }
         }
 
-    override fun getBankTransferCharge(paymentId: String): Single<BankTransferChargeResponse> =
+    override fun getBankTransferCharge(paymentId: String): Single<BankTransferDetails> =
         authenticator.authenticate { sessionToken ->
             nabuService.getBankTransferCharge(
                 sessionToken = sessionToken,
                 paymentId = paymentId
-            )
+            ).map {
+                it.toBankTransferDetails()
+            }
         }
 
     override fun executeCustodialTransfer(amount: Money, origin: Product, destination: Product): Completable =
@@ -1120,6 +1125,33 @@ class LiveCustodialWalletManager(
             LinkedBankTransferResponse.MANUAL_REVIEW -> LinkedBankState.PENDING
             LinkedBankTransferResponse.BLOCKED -> LinkedBankState.BLOCKED
             else -> LinkedBankState.UNKNOWN
+        }
+
+    private fun BankTransferChargeResponse.toBankTransferDetails() =
+        BankTransferDetails(
+            id = this.beneficiaryId,
+            amount = FiatValue.fromMinor(this.amount.symbol, this.amountMinor.toLong()),
+            authorisationUrl = this.extraAttributes.authorisationUrl,
+            status = this.state?.toBankTransferStatus() ?: this.extraAttributes.status?.toBankTransferStatus()
+            ?: BankTransferStatus.UNKNOWN
+        )
+
+    private fun String.toBankTransferStatus() =
+        when (this) {
+            BankTransferChargeAttributes.CREATED,
+            BankTransferChargeAttributes.PRE_CHARGE_REVIEW,
+            BankTransferChargeAttributes.PRE_CHARGE_APPROVED,
+            BankTransferChargeAttributes.AWAITING_AUTHORIZATION,
+            BankTransferChargeAttributes.PENDING,
+            BankTransferChargeAttributes.AUTHORIZED,
+            BankTransferChargeAttributes.CREDITED -> BankTransferStatus.PENDING
+            BankTransferChargeAttributes.FAILED,
+            BankTransferChargeAttributes.FRAUD_REVIEW,
+            BankTransferChargeAttributes.MANUAL_REVIEW,
+            BankTransferChargeAttributes.REJECTED -> BankTransferStatus.ERROR
+            BankTransferChargeAttributes.CLEARED,
+            BankTransferChargeAttributes.COMPLETE -> BankTransferStatus.COMPLETE
+            else -> BankTransferStatus.UNKNOWN
         }
 
     override fun getSwapTrades(): Single<List<CustodialOrder>> =

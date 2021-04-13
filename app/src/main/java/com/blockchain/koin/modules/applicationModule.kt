@@ -224,7 +224,8 @@ val applicationModule = module {
                 simpleBuySync = get(),
                 crashLogger = get(),
                 analytics = get(),
-                bankLinkingPrefs = get()
+                bankLinkingPrefs = get(),
+                custodialWalletManager = get()
             )
         }
 

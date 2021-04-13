@@ -139,10 +139,11 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
             )
         }
 
-        if (newState.authorisePaymentUrl != null && newState.linkedBank != null) {
+        if (newState.shouldLaunchExternalFlow()) {
             newState.order.amount?.let { orderValue ->
                 launchExternalAuthoriseUrlFlow(
-                    newState.authorisePaymentUrl, newState.linkedBank, orderValue
+                    // !! here is safe because the state check validates nullability
+                    newState.id!!, newState.authorisePaymentUrl!!, newState.linkedBank!!, orderValue
                 )
             }
         }
@@ -182,6 +183,7 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
     }
 
     private fun launchExternalAuthoriseUrlFlow(
+        paymentId: String,
         authorisationUrl: String,
         linkedBank: LinkedBank,
         orderValue: FiatValue
@@ -189,7 +191,7 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
         startActivityForResult(
             BankAuthActivity.newInstance(
                 BankPaymentApproval(
-                    authorisationUrl, linkedBank, orderValue
+                    paymentId, authorisationUrl, linkedBank, orderValue
                 ), BankAuthSource.SIMPLE_BUY, requireContext()
             ), BANK_APPROVAL
         )

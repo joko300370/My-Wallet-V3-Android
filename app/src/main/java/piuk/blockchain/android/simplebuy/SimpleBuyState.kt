@@ -142,6 +142,9 @@ data class SimpleBuyState(
             }
         }
     }
+
+    fun shouldLaunchExternalFlow(): Boolean =
+        authorisePaymentUrl != null && linkedBank != null && id != null
 }
 
 enum class KycState {

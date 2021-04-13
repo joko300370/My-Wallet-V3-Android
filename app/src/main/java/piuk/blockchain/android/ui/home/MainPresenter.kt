@@ -5,7 +5,10 @@ import android.net.Uri
 import androidx.annotation.StringRes
 import com.blockchain.extensions.exhaustive
 import com.blockchain.logging.CrashLogger
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.models.data.BankTransferDetails
+import com.blockchain.nabu.models.data.BankTransferStatus
 import com.blockchain.nabu.models.responses.nabu.CampaignData
 import com.blockchain.nabu.models.responses.nabu.KycState
 import com.blockchain.nabu.models.responses.nabu.NabuApiException
@@ -32,6 +35,7 @@ import piuk.blockchain.android.deeplink.EmailVerifiedLinkState
 import piuk.blockchain.android.deeplink.LinkState
 import piuk.blockchain.android.deeplink.OpenBankingLinkType
 import piuk.blockchain.android.kyc.KycLinkState
+import piuk.blockchain.android.networking.PollService
 import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.android.scan.QrScanResultProcessor
 import piuk.blockchain.android.scan.ScanResult
@@ -42,6 +46,7 @@ import piuk.blockchain.android.ui.base.MvpPresenter
 import piuk.blockchain.android.ui.base.MvpView
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
 import piuk.blockchain.android.ui.linkbank.BankAuthFlowState
+import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
 import piuk.blockchain.android.ui.linkbank.fromPreferencesValue
 import piuk.blockchain.android.ui.linkbank.toPreferencesValue
 import piuk.blockchain.androidcore.data.access.AccessState
@@ -75,11 +80,11 @@ interface MainView : MvpView, HomeNavigator {
 
     fun startTransactionFlowWithTarget(targets: Collection<CryptoTarget>)
     fun showScanTargetError(error: QrScanError)
-    fun handleApprovalDepositComplete(
-        orderValue: FiatValue,
-        currency: String,
-        estimatedTransactionCompletionTime: String
-    )
+    fun handleApprovalDepositComplete(orderValue: FiatValue, estimatedTransactionCompletionTime: String)
+
+    fun handleApprovalDepositInProgress(amount: FiatValue)
+    fun handleApprovalDepositError(currency: String)
+    fun handleApprovalDepositTimeout(currencyCode: String)
 }
 
 class MainPresenter internal constructor(
@@ -98,7 +103,8 @@ class MainPresenter internal constructor(
     private val crashLogger: CrashLogger,
     private val analytics: Analytics,
     private val credentialsWiper: CredentialsWiper,
-    private val bankLinkingPrefs: BankLinkingPrefs
+    private val bankLinkingPrefs: BankLinkingPrefs,
+    private val custodialWalletManager: CustodialWalletManager
 ) : MvpPresenter<MainView>() {
 
     override val alwaysDisableScreenshots: Boolean = false
@@ -262,21 +268,61 @@ class MainPresenter internal constructor(
         }
 
         if (deepLinkState.bankAuthFlow == BankAuthFlowState.BANK_APPROVAL_PENDING) {
-            bankLinkingPrefs.setBankLinkingState(
-                deepLinkState.copy(bankAuthFlow = BankAuthFlowState.BANK_APPROVAL_COMPLETE).toPreferencesValue()
-            )
-            deepLinkState.bankPaymentData?.let {
-                view?.handleApprovalDepositComplete(
-                    it.orderValue, it.linkedBank.currency, getEstimatedDepositCompletionTime()
-                )
-            } ?: kotlin.run {
-                simpleBuySync.currentState()?.let {
-                    if (it.orderState == OrderState.AWAITING_FUNDS) {
-                        view?.launchSimpleBuyFromDeepLinkApproval()
-                    } else {
-                        view?.handlePaymentForCancelledOrder(it)
+            deepLinkState.bankPaymentData?.let { paymentData ->
+                PollService(
+                    custodialWalletManager.getBankTransferCharge(paymentData.paymentId)
+                ) { transferDetails ->
+                    transferDetails.status != BankTransferStatus.PENDING
+                }.start().map { it.value }
+                    .doOnSubscribe {
+                        view?.handleApprovalDepositInProgress(paymentData.orderValue)
                     }
-                }
+                    .subscribeBy(
+                        onSuccess = {
+                            bankLinkingPrefs.setBankLinkingState(
+                                deepLinkState.copy(
+                                    bankAuthFlow = BankAuthFlowState.BANK_APPROVAL_COMPLETE
+                                ).toPreferencesValue()
+                            )
+
+                            handleTransferStatus(it, paymentData)
+                        },
+                        onError = {
+                            bankLinkingPrefs.setBankLinkingState(
+                                deepLinkState.copy(bankAuthFlow = BankAuthFlowState.NONE).toPreferencesValue()
+                            )
+
+                            view?.handleApprovalDepositError(paymentData.orderValue.currencyCode)
+                        }
+                    )
+            } ?: handleSimpleBuyApproval()
+        }
+    }
+
+    private fun handleSimpleBuyApproval() {
+        simpleBuySync.currentState()?.let {
+            if (it.orderState == OrderState.AWAITING_FUNDS) {
+                view?.launchSimpleBuyFromDeepLinkApproval()
+            } else {
+                view?.handlePaymentForCancelledOrder(it)
+            }
+        }
+    }
+
+    private fun handleTransferStatus(
+        it: BankTransferDetails,
+        paymentData: BankPaymentApproval
+    ) {
+        when (it.status) {
+            BankTransferStatus.COMPLETE -> {
+                view?.handleApprovalDepositComplete(it.amount, getEstimatedDepositCompletionTime())
+            }
+            BankTransferStatus.PENDING -> {
+                view?.handleApprovalDepositTimeout(paymentData.orderValue.currencyCode)
+            }
+            BankTransferStatus.ERROR,
+            BankTransferStatus.UNKNOWN -> {
+                view?.handleApprovalDepositError(paymentData.orderValue.currencyCode)
             }
         }
     }

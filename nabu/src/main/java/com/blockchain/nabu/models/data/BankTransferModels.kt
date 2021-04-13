@@ -136,3 +136,17 @@ data class WithdrawalFeeAndLimit(
     val minLimit: FiatValue,
     val fee: FiatValue
 )
+
+data class BankTransferDetails(
+    val id: String,
+    val amount: FiatValue,
+    val authorisationUrl: String?,
+    val status: BankTransferStatus
+)
+
+enum class BankTransferStatus {
+    UNKNOWN,
+    PENDING,
+    ERROR,
+    COMPLETE
+}
