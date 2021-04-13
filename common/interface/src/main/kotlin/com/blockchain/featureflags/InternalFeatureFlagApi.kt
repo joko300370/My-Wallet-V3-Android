@@ -9,7 +9,5 @@ interface InternalFeatureFlagApi {
 }
 
 enum class GatedFeature(val readableName: String) {
-    OB_SB_SETT("OB Simple buy & Settings"),
-    SEGWIT("Segwit"),
-    OB_DEPO_WITH("OB Deposit & Withdraw")
+    SEGWIT("Segwit")
 }

@@ -53,8 +53,7 @@ class DashboardInteractorTest {
             assetOrdering = mock(),
             crashLogger = mock(),
             analytics = mock(),
-            simpleBuyPrefs = mock(),
-            internalFlags = internalFlags
+            simpleBuyPrefs = mock()
         )
     }
 

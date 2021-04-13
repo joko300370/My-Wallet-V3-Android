@@ -1,7 +1,5 @@
 package piuk.blockchain.android.ui.dashboard
 
-import com.blockchain.featureflags.GatedFeature
-import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
@@ -58,8 +56,7 @@ class DashboardInteractor(
     private val analytics: Analytics,
     private val crashLogger: CrashLogger,
     private val linkedBanksFactory: LinkedBanksFactory,
-    private val assetOrdering: AssetOrdering,
-    private val internalFlags: InternalFeatureFlagApi
+    private val assetOrdering: AssetOrdering
 ) {
 
     // We have a problem here, in that pax init depends on ETH init
@@ -275,14 +272,14 @@ class DashboardInteractor(
         targetAccount: InterestAccount
     ): Disposable? {
         require(targetAccount is CryptoAccount)
-            model.process(
-                UpdateLaunchDialogFlow(
-                    TransactionFlow(
-                        target = targetAccount,
-                        action = AssetAction.InterestDeposit
-                    )
+        model.process(
+            UpdateLaunchDialogFlow(
+                TransactionFlow(
+                    target = targetAccount,
+                    action = AssetAction.InterestDeposit
                 )
             )
+        )
         return null
     }
 
@@ -293,14 +290,7 @@ class DashboardInteractor(
         shouldLaunchBankLinkTransfer: Boolean
     ): Disposable {
         require(targetAccount is FiatAccount)
-        return if (targetAccount.isOpenBankingCurrency() && !internalFlags.isFeatureEnabled(
-                GatedFeature.OB_DEPO_WITH
-            )
-        ) {
-            handleDepositForOpenBanking(targetAccount, model, action)
-        } else {
-            handleFiatDeposit(targetAccount, shouldLaunchBankLinkTransfer, model, action)
-        }
+        return handleFiatDeposit(targetAccount, shouldLaunchBankLinkTransfer, model, action)
     }
 
     private fun handleFiatDeposit(
@@ -341,32 +331,7 @@ class DashboardInteractor(
             handlePaymentMethodsUpdate(it, model, targetAccount, action)
         },
         onError = {
-            // TODO Add error state to Dashboard
-        }
-    )
-
-    private fun handleDepositForOpenBanking(
-        targetAccount: FiatAccount,
-        model: DashboardModel,
-        action: AssetAction
-    ) = linkedBanksFactory.eligibleBankPaymentMethods(targetAccount.fiatCurrency).map { paymentMethods ->
-        paymentMethods.filter { it == PaymentMethodType.BANK_ACCOUNT }
-    }.flatMap {
-        handleNoLinkedBanks(
-            targetAccount,
-            LinkablePaymentMethodsForAction.LinkablePaymentMethodsForDeposit(
-                linkablePaymentMethods = LinkablePaymentMethods(
-                    targetAccount.fiatCurrency,
-                    it
-                )
-            )
-        )
-    }.subscribeBy(
-        onSuccess = {
-            handlePaymentMethodsUpdate(it, model, targetAccount, action)
-        },
-        onError = {
-            // TODO Add error state to Dashboard
+            Timber.e("Error loading bank transfer info $it")
         }
     )
 
@@ -495,22 +460,15 @@ class DashboardInteractor(
         ).flatMap { (paymentMethods, linkedBanks) ->
             when {
                 linkedBanks.isEmpty() -> {
-                    if (sourceAccount.isOpenBankingCurrency() && !internalFlags.isFeatureEnabled(
-                            GatedFeature.OB_DEPO_WITH
-                        )
-                    ) {
-                        handleNoLinkedBanksWithdrawalForOpenBanking(sourceAccount)
-                    } else {
-                        handleNoLinkedBanks(
-                            sourceAccount,
-                            LinkablePaymentMethodsForAction.LinkablePaymentMethodsForWithdraw(
-                                LinkablePaymentMethods(
-                                    sourceAccount.fiatCurrency,
-                                    paymentMethods
-                                )
+                    handleNoLinkedBanks(
+                        sourceAccount,
+                        LinkablePaymentMethodsForAction.LinkablePaymentMethodsForWithdraw(
+                            LinkablePaymentMethods(
+                                sourceAccount.fiatCurrency,
+                                paymentMethods
                             )
                         )
-                    }
+                    )
                 }
                 linkedBanks.size == 1 -> {
                     Single.just(FiatTransactionRequestResult.LaunchWithdrawalFlow(linkedBanks[0]))
@@ -528,22 +486,6 @@ class DashboardInteractor(
             }
         )
     }
-
-    private fun handleNoLinkedBanksWithdrawalForOpenBanking(sourceAccount: FiatAccount) =
-        linkedBanksFactory.eligibleBankPaymentMethods(sourceAccount.fiatCurrency)
-            .map { pM ->
-                pM.filter { it == PaymentMethodType.BANK_ACCOUNT }
-            }.flatMap {
-                handleNoLinkedBanks(
-                    sourceAccount,
-                    LinkablePaymentMethodsForAction.LinkablePaymentMethodsForWithdraw(
-                        LinkablePaymentMethods(
-                            sourceAccount.fiatCurrency,
-                            it
-                        )
-                    )
-                )
-            }
 
     companion object {
         private val FLATLINE_CHART = listOf(

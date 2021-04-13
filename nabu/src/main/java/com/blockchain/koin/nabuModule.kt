@@ -11,7 +11,6 @@ import com.blockchain.nabu.datamanagers.BalanceProviderImpl
 import com.blockchain.nabu.datamanagers.BalancesProvider
 import com.blockchain.nabu.datamanagers.CreateNabuTokenAdapter
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.nabu.datamanagers.NabuAuthenticator
 import com.blockchain.nabu.datamanagers.NabuCachedEligibilityProvider
 import com.blockchain.nabu.datamanagers.NabuDataManager
@@ -20,6 +19,7 @@ import com.blockchain.nabu.datamanagers.NabuDataUserProvider
 import com.blockchain.nabu.datamanagers.NabuDataUserProviderNabuDataManagerAdapter
 import com.blockchain.nabu.datamanagers.NabuUserReporter
 import com.blockchain.nabu.datamanagers.NabuUserSyncUpdateUserWalletInfoWithJWT
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.nabu.datamanagers.TransactionErrorMapper
 import com.blockchain.nabu.datamanagers.UniqueAnalyticsNabuUserReporter
 import com.blockchain.nabu.datamanagers.UniqueAnalyticsWalletReporter
@@ -119,8 +119,7 @@ val nabuModule = module {
 
         factory {
             BankLinkingEnabledProviderImpl(
-                obFF = get(obFeatureFlag),
-                internalFlags = get()
+                obFF = get(obFeatureFlag)
             )
         }.bind(BankLinkingEnabledProvider::class)
 

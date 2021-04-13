@@ -1,8 +1,6 @@
 package com.blockchain.nabu.datamanagers.featureflags
 
 import android.os.Build
-import com.blockchain.featureflags.GatedFeature
-import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.models.data.BankPartner
 import com.blockchain.remoteconfig.FeatureFlag
 import io.reactivex.Single
@@ -13,8 +11,7 @@ interface BankLinkingEnabledProvider {
 }
 
 class BankLinkingEnabledProviderImpl(
-    private val obFF: FeatureFlag,
-    private val internalFlags: InternalFeatureFlagApi
+    private val obFF: FeatureFlag
 ) : BankLinkingEnabledProvider {
     override fun supportedBankPartners(): Single<List<BankPartner>> =
         obFF.enabled.map { ob ->
@@ -22,7 +19,7 @@ class BankLinkingEnabledProviderImpl(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 supportedPartners.add(BankPartner.YODLEE)
             }
-            if (ob && internalFlags.isFeatureEnabled(GatedFeature.OB_SB_SETT)) {
+            if (ob) {
                 supportedPartners.add(BankPartner.YAPILY)
             }
             supportedPartners
@@ -30,9 +27,7 @@ class BankLinkingEnabledProviderImpl(
 
     override fun bankLinkingEnabled(fiatCurrency: String): Single<Boolean> =
         if (fiatCurrency == "EUR" || fiatCurrency == "GBP") {
-            obFF.enabled.map { obEnabled ->
-                obEnabled && internalFlags.isFeatureEnabled(GatedFeature.OB_SB_SETT)
-            }
+            obFF.enabled
         } else {
             Single.just(true)
         }

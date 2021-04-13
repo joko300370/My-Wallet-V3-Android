@@ -422,8 +422,7 @@ val applicationModule = module {
                 analytics = get(),
                 crashLogger = get(),
                 assetOrdering = get(),
-                linkedBanksFactory = get(),
-                internalFlags = get()
+                linkedBanksFactory = get()
             )
         }
 
