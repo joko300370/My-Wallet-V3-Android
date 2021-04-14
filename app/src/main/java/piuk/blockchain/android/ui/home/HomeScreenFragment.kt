@@ -6,9 +6,6 @@ import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.simplebuy.SimpleBuyState
-import piuk.blockchain.android.ui.base.MvpFragment
-import piuk.blockchain.android.ui.base.MvpPresenter
-import piuk.blockchain.android.ui.base.MvpView
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 import piuk.blockchain.android.ui.base.mvi.MviModel
@@ -55,12 +52,6 @@ interface HomeNavigator {
     fun resumeSimpleBuyKyc()
     fun startSimpleBuy(cryptoCurrency: CryptoCurrency)
     fun startInterestDashboard()
-}
-
-abstract class HomeScreenMvpFragment<V : MvpView, P : MvpPresenter<V>> : MvpFragment<V, P>(), HomeScreenFragment {
-
-    override fun navigator(): HomeNavigator =
-        (activity as? HomeNavigator) ?: throw IllegalStateException("Parent must implement HomeNavigator")
 }
 
 abstract class HomeScreenMviFragment<M : MviModel<S, I>, I : MviIntent<S>, S : MviState> : MviFragment<M, I, S>(),

@@ -129,7 +129,8 @@ data class DashboardState(
     val selectedCryptoAccount: SingleAccount? = null,
     val selectedAsset: CryptoCurrency? = null,
     val backupSheetDetails: BackupDetails? = null,
-    val linkablePaymentMethodsForAction: LinkablePaymentMethodsForAction? = null
+    val linkablePaymentMethodsForAction: LinkablePaymentMethodsForAction? = null,
+    val hasLongCallInProgress: Boolean = false
 ) : MviState, BalanceState, KoinComponent {
 
     // If ALL the assets are refreshing, then report true. Else false
@@ -289,7 +290,9 @@ class DashboardModel(
             is UpdateDashboardCurrencies,
             is LaunchBankLinkFlow,
             is ResetDashboardNavigation,
-            is ShowLinkablePaymentMethodsSheet -> null
+            is ShowLinkablePaymentMethodsSheet,
+            is LongCallStarted,
+            is LongCallEnded -> null
         }
     }
 

@@ -306,7 +306,9 @@ class DashboardInteractor(
         linkedBanksFactory.getNonWireTransferBanks().map {
             it.filter { bank -> bank.currency == targetAccount.fiatCurrency }
         }
-    ).flatMap { (paymentMethods, linkedBanks) ->
+    ).doOnSubscribe {
+        model.process(LongCallStarted)
+    }.flatMap { (paymentMethods, linkedBanks) ->
         when {
             linkedBanks.isEmpty() -> {
                 handleNoLinkedBanks(
@@ -326,6 +328,8 @@ class DashboardInteractor(
                 Single.just(FiatTransactionRequestResult.LaunchDepositFlowWithMultipleAccounts)
             }
         }
+    }.doOnTerminate {
+        model.process(LongCallEnded)
     }.subscribeBy(
         onSuccess = {
             handlePaymentMethodsUpdate(it, model, targetAccount, action)

@@ -5,6 +5,7 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.Bank
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
@@ -15,6 +16,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.RemoveBankBottomSheetBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
@@ -80,11 +82,17 @@ class RemoveLinkedBankBottomSheet : SlidingModalBottomDialog<RemoveBankBottomShe
             .doFinally {
                 updateUi(false)
             }
-            .subscribeBy(onComplete = {
-                analytics.logEvent(SimpleBuyAnalytics.REMOVE_BANK)
-                (parentFragment as? RemovePaymentMethodBottomSheetHost)?.onLinkedBankRemoved(bank.id)
-                dismiss()
-            }, onError = {})
+            .subscribeBy(
+                onComplete = {
+                    analytics.logEvent(SimpleBuyAnalytics.REMOVE_BANK)
+                    (parentFragment as? RemovePaymentMethodBottomSheetHost)?.onLinkedBankRemoved(bank.id)
+                    dismiss()
+                }, onError = {
+                    ToastCustom.makeText(
+                        requireContext(), getString(R.string.settings_bank_remove_error), Toast.LENGTH_LONG,
+                        ToastCustom.TYPE_ERROR
+                    )
+                })
     }
 
     private fun updateUi(isLoading: Boolean) {

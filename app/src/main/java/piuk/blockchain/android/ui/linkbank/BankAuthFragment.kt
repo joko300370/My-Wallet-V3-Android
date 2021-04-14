@@ -317,6 +317,8 @@ class BankAuthFragment : MviFragment<BankAuthModel, BankAuthIntent, BankAuthStat
     }
 
     private fun showErrorState(state: ErrorState, partner: BankPartner?) {
+        showErrorUI(state, partner)
+
         when (state) {
             ErrorState.BankLinkingTimeout -> {
                 logAnalytics(BankAuthAnalytics.GENERIC_ERROR, partner)
@@ -325,7 +327,10 @@ class BankAuthFragment : MviFragment<BankAuthModel, BankAuthIntent, BankAuthStat
                     getString(R.string.bank_linking_timeout_error_subtitle)
                 )
 
-                binding.linkBankBtn.text = getString(R.string.common_try_again)
+                with(binding) {
+                    linkBankCancel.gone()
+                    linkBankRetry.gone()
+                }
             }
             ErrorState.LinkedBankAlreadyLinked -> {
                 logAnalytics(BankAuthAnalytics.ALREADY_LINKED, partner)
@@ -397,7 +402,12 @@ class BankAuthFragment : MviFragment<BankAuthModel, BankAuthIntent, BankAuthStat
                 binding.linkBankBtn.text = getString(R.string.common_try_again)
             }
         }
+    }
 
+    private fun showErrorUI(
+        state: ErrorState,
+        partner: BankPartner?
+    ) {
         with(binding) {
             linkBankIcon.setImageResource(
                 if (state == ErrorState.LinkedBankNamesMismatched) {

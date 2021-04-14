@@ -20,7 +20,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.fragment_dashboard.*
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
@@ -36,6 +35,7 @@ import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
+import piuk.blockchain.android.databinding.FragmentDashboardBinding
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import piuk.blockchain.android.simplebuy.SimpleBuyCancelOrderBottomSheet
 import piuk.blockchain.android.ui.airdrops.AirdropStatusSheet
@@ -64,8 +64,8 @@ import piuk.blockchain.android.ui.settings.BankLinkingHost
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.transfer.receive.activity.ReceiveActivity
-import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.launchUrlInBrowser
+import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -102,6 +102,11 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         )
     }
 
+    private var _binding: FragmentDashboardBinding? = null
+
+    private val binding: FragmentDashboardBinding
+        get() = _binding!!
+
     private lateinit var theLayoutManager: RecyclerView.LayoutManager
 
     private val displayList = mutableListOf<DashboardItem>()
@@ -136,7 +141,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     @UiThread
     private fun doRender(newState: DashboardState) {
 
-        swipe.isRefreshing = false
+        binding.swipe.isRefreshing = false
 
         if (newState.assets.isNotEmpty()) {
             if (displayList.isEmpty()) {
@@ -167,6 +172,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
 
         updateAnalytics(this.state, newState)
+
+        binding.dashboardProgress.visibleIf { newState.hasLongCallInProgress }
 
         this.state = newState
     }
@@ -339,7 +346,10 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_dashboard)
+    ): View {
+        _binding = FragmentDashboardBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -380,7 +390,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     private fun setupRecycler() {
         theLayoutManager = SafeLayoutManager(requireContext())
 
-        recycler_view.apply {
+        binding.recyclerView.apply {
             layoutManager = theLayoutManager
             adapter = theAdapter
 
@@ -396,16 +406,17 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     }
 
     private fun setupSwipeRefresh() {
+        with(binding) {
+            swipe.setOnRefreshListener { model.process(RefreshAllIntent) }
 
-        swipe.setOnRefreshListener { model.process(RefreshAllIntent) }
-
-        // Configure the refreshing colors
-        swipe.setColorSchemeResources(
-            R.color.blue_800,
-            R.color.blue_600,
-            R.color.blue_400,
-            R.color.blue_200
-        )
+            // Configure the refreshing colors
+            swipe.setColorSchemeResources(
+                R.color.blue_800,
+                R.color.blue_600,
+                R.color.blue_400,
+                R.color.blue_200
+            )
+        }
     }
 
     override fun onResume() {

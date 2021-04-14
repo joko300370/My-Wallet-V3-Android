@@ -331,6 +331,20 @@ class UpdateLaunchDialogFlow(
         )
 }
 
+object LongCallStarted : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState =
+        oldState.copy(
+            hasLongCallInProgress = true
+        )
+}
+
+object LongCallEnded : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState =
+        oldState.copy(
+            hasLongCallInProgress = false
+        )
+}
+
 data class LaunchBankLinkFlow(
     val linkBankTransfer: LinkBankTransfer,
     val assetAction: AssetAction
