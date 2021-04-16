@@ -121,7 +121,7 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
                 selectedTarget = target,
                 errorState = TransactionErrorState.NONE,
                 passwordRequired = passwordRequired,
-                nextEnabled = true,
+                nextEnabled = false,
                 stepsBackStack = Stack()
             )
     }
