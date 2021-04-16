@@ -1630,7 +1630,7 @@
     <string name="send_enter_unexpected_error">An unexpected error has occurred. Please try again.</string>
     <string name="send_enter_insufficient_gas">You do not have enough ETH to process this transaction.</string>
     <string name="send_select_a_wallet_title">or Select a Wallet</string>
-    <string name="send_internal_transfer_message">At this time, you can only transfer %1$s from your %2$s Trading Wallet to your %2$s Wallets. Once %1$s is in your %2$s Wallet you can transfer to external addresses.</string>
+    <string name="send_internal_transfer_message_1">At this time you can transfer  %1$s from you  %2$s Trading Account to your  %2$s Private Key Wallets or Interest Account. If you want to transfer to external addresses you can do so from your Private Key Wallet.</string>
     <string name="send_to_exchange_xlm_title">Sending to an exchange?</string>
     <string name="send_to_exchange_xlm_blurb">&#160;Add a Memo to avoid losing funds.&#160;</string>
     <string name="send_to_exchange_xlm_link"><annotation link="send_memo_link">Learn more about balance requirements.</annotation></string>
@@ -1649,7 +1649,7 @@
     <string name="tx_confirmation_fee_learn_more_2">fees are set by the %1$s network.&#160;</string>
     <string name="tx_confirmation_fee_learn_more_3"><annotation link="send_tx_fees">Learn more about fees</annotation>.</string>
     <string name="tx_confirmation_free_fee_learn_more_1">Network fees when using</string>
-    <string name="tx_confirmation_free_fee_learn_more_2">&#160;Trading Wallets&#160;</string>
+    <string name="tx_confirmation_free_fee_learn_more_2_1">&#160;Trading Accounts&#160;</string>
     <string name="tx_confirmation_free_fee_learn_more_3">are FREE! <annotation link="send_tx_fees">Learn more about fees</annotation>.</string>
 
     <!-- Interest -->

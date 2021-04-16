@@ -1200,7 +1200,6 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
     <string name="send_enter_unexpected_error">Beklenmedik bir hata oldu. Lütfen daha sonra tekrar deneyin.</string>
     <string name="send_enter_insufficient_gas">Bu işlemi gerçekleştirmek içinsize ait yeterli ETH bulunmuyor.</string>
     <string name="send_select_a_wallet_title">veya Bir Cüzdan Seçin</string>
-    <string name="send_internal_transfer_message">Şu anda, %1$s Ticari Cüzdanınızdan Kasa Cüzdanlarınıza yalnızca %2$s tutarında bir aktarım yapabilirsiniz. %1$s Kasa Cüzdanınıza geldiğinde harici adreslere aktarabilirsiniz.</string>
     <string name="purchase_funds_note">Nihai tutar, piyasa hareketliliğinden dolayı değişebilir.</string>
     <string name="common_linked_learn_more">
     <annotation link="learn_more_link"> Daha fazla bilgi edinin. </annotation>

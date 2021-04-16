@@ -87,7 +87,7 @@ class TransactionFlowCustomiserImpl(
     override fun selectTargetNoAddressMessageText(state: TransactionState): String? =
         when (state.action) {
             AssetAction.Send -> resources.getString(
-                R.string.send_internal_transfer_message,
+                R.string.send_internal_transfer_message_1,
                 assetResources.assetName(state.sendingAsset),
                 state.sendingAsset.displayTicker
             )

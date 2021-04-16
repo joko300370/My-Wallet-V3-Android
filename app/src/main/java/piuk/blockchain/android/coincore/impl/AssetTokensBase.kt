@@ -250,7 +250,14 @@ internal abstract class CryptoAssetBase(
         require(account.asset == asset)
 
         return when (account) {
-            is TradingAccount -> getNonCustodialTargets().toSingle(emptyList())
+            is TradingAccount -> Maybe.concat(
+                listOf(
+                    getNonCustodialTargets(),
+                    getInterestTargets()
+                )
+            ).toList()
+                .map { ll -> ll.flatten() }
+                .onErrorReturnItem(emptyList())
             is NonCustodialAccount ->
                 Maybe.concat(
                     listOf(

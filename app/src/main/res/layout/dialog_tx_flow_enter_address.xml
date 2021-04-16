@@ -203,7 +203,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/miniscule_margin"
-                android:text="@string/send_internal_transfer_message"
+                android:text="@string/send_internal_transfer_message_1"
                 app:layout_constraintTop_toBottomOf="@id/internal_send_title" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
