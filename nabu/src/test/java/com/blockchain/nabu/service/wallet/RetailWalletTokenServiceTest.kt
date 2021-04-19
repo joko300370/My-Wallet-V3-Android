@@ -12,11 +12,9 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.`should equal to`
 import org.amshove.kluent.`should equal`
-import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 
 class RetailWalletTokenServiceTest {
 
@@ -26,7 +24,6 @@ class RetailWalletTokenServiceTest {
         .add(KycStateAdapter())
         .build()
     private val server: MockWebServer = MockWebServer()
-    private val environmentConfig: EnvironmentConfig = mock()
     private val apiKey = "API_KEY"
 
     @get:Rule
@@ -35,7 +32,7 @@ class RetailWalletTokenServiceTest {
     @Before
     fun setUp() {
         subject = RetailWalletTokenService(
-            environmentConfig,
+            "explorer_api",
             apiKey,
             MockedRetrofitTest(moshi, server).retrofit
         )

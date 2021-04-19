@@ -22,15 +22,13 @@ import piuk.blockchain.android.coincore.impl.txEngine.PricedQuote
 import piuk.blockchain.android.coincore.impl.txEngine.QuotedEngine
 import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.android.coincore.updateTxValidity
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import java.math.RoundingMode
 
 abstract class SellTxEngineBase(
     private val walletManager: CustodialWalletManager,
     kycTierService: TierService,
-    quotesEngine: TransferQuotesEngine,
-    environmentConfig: EnvironmentConfig
-) : QuotedEngine(quotesEngine, kycTierService, walletManager, environmentConfig) {
+    quotesEngine: TransferQuotesEngine
+) : QuotedEngine(quotesEngine, kycTierService, walletManager) {
 
     val target: FiatAccount
         get() = txTarget as FiatAccount

@@ -15,7 +15,6 @@ dependencies {
     testImplementation project(':testutils')
     testImplementation Libraries.junit
     testImplementation Libraries.mockito
-    testImplementation Libraries.json
     testImplementation Libraries.kluent
     testImplementation(Libraries.mockitoKotlin) {
         ['kotlin-stdlib', 'kotlin-reflect'].each { exclude module: it }

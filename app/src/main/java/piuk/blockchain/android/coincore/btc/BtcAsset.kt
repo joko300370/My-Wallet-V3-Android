@@ -7,6 +7,7 @@ import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.wallet.keys.SigningKey
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.ImportedAddress
 import info.blockchain.wallet.util.FormatsUtil
@@ -14,11 +15,6 @@ import info.blockchain.wallet.util.PrivateKeyFactory
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import org.bitcoinj.core.Address
-import org.bitcoinj.core.Coin
-import org.bitcoinj.core.ECKey
-import org.bitcoinj.core.NetworkParameters
-import org.bitcoinj.uri.BitcoinURI
 import piuk.blockchain.android.coincore.CachedAddress
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
@@ -30,14 +26,11 @@ import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
 import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.thepit.PitLinking
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.payments.SendDataManager
-
-private const val BTC_URL_PREFIX = "bitcoin:"
 
 internal class BtcAsset(
     payloadManager: PayloadDataManager,
@@ -51,7 +44,6 @@ internal class BtcAsset(
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
-    environmentConfig: EnvironmentConfig,
     private val walletPreferences: WalletStatus,
     offlineAccounts: OfflineAccountUpdater,
     private val identity: UserIdentity
@@ -64,7 +56,6 @@ internal class BtcAsset(
     custodialManager,
     pitLinking,
     crashLogger,
-    environmentConfig,
     offlineAccounts,
     identity
 ) {
@@ -106,7 +97,7 @@ internal class BtcAsset(
                     account.getReceiveAddressAtPosition(i)?.let {
                         result += CachedAddress(
                             address = it,
-                            addressUri = "$BTC_URL_PREFIX$it"
+                            addressUri = FormatsUtil.toDisambiguatedBtcAddress(it)
                         )
                     }
                 }
@@ -120,22 +111,16 @@ internal class BtcAsset(
 
     override fun parseAddress(address: String): Maybe<ReceiveAddress> =
         Maybe.fromCallable {
-            val normalisedAddress = address.removePrefix(BTC_URL_PREFIX)
+            val normalisedAddress = address.removePrefix(FormatsUtil.BTC_PREFIX)
             if (isValidAddress(normalisedAddress)) {
-                BtcAddress(
-                    address = normalisedAddress,
-                    networkParams = environmentConfig.bitcoinNetworkParameters
-                )
+                BtcAddress(address = normalisedAddress)
             } else {
                 null
             }
         }
 
     override fun isValidAddress(address: String): Boolean =
-        FormatsUtil.isValidBitcoinAddress(
-            environmentConfig.bitcoinNetworkParameters,
-            address
-        )
+        FormatsUtil.isValidBitcoinAddress(address)
 
     fun createAccount(label: String, secondPassword: String?): Single<BtcCryptoWalletAccount> =
         payloadManager.createNewAccount(label, secondPassword)
@@ -157,7 +142,7 @@ internal class BtcAsset(
             PrivateKeyFactory.BIP38 -> extractBip38Key(keyData, keyPassword!!)
             else -> extractKey(keyData, keyFormat)
         }.map { key ->
-            if (!key.hasPrivKey())
+            if (!key.hasPrivKey)
                 throw Exception()
             key
         }.flatMap { key ->
@@ -171,10 +156,10 @@ internal class BtcAsset(
         }
     }
 
-    private fun extractBip38Key(keyData: String, keyPassword: String): Single<ECKey> =
+    private fun extractBip38Key(keyData: String, keyPassword: String): Single<SigningKey> =
         payloadManager.getBip38KeyFromImportedData(keyData, keyPassword)
 
-    private fun extractKey(keyData: String, keyFormat: String): Single<ECKey> =
+    private fun extractKey(keyData: String, keyFormat: String): Single<SigningKey> =
         payloadManager.getKeyFromImportedData(keyFormat, keyData)
 
     private fun btcAccountFromPayloadAccount(index: Int, payloadAccount: Account): BtcCryptoWalletAccount =
@@ -185,7 +170,6 @@ internal class BtcAsset(
             sendDataManager = sendDataManager,
             feeDataManager = feeDataManager,
             exchangeRates = exchangeRates,
-            networkParameters = environmentConfig.bitcoinNetworkParameters,
             walletPreferences = walletPreferences,
             custodialWalletManager = custodialManager,
             refreshTrigger = this,
@@ -199,7 +183,6 @@ internal class BtcAsset(
             sendDataManager = sendDataManager,
             feeDataManager = feeDataManager,
             exchangeRates = exchangeRates,
-            networkParameters = environmentConfig.bitcoinNetworkParameters,
             walletPreferences = walletPreferences,
             custodialWalletManager = custodialManager,
             refreshTrigger = this,
@@ -214,21 +197,11 @@ internal class BtcAsset(
 internal class BtcAddress(
     override val address: String,
     override val label: String = address,
-    private val networkParams: NetworkParameters,
     override val onTxCompleted: (TxResult) -> Completable = { Completable.complete() }
 ) : CryptoAddress {
     override val asset: CryptoCurrency = CryptoCurrency.BTC
 
     override fun toUrl(amount: CryptoValue): String {
-        return if (amount.isPositive) {
-            BitcoinURI.convertToBitcoinURI(
-                Address.fromBase58(networkParams, address),
-                Coin.valueOf(amount.toBigInteger().toLong()),
-                "",
-                ""
-            )
-        } else {
-            return "$BTC_URL_PREFIX$address"
-        }
+        return FormatsUtil.toBtcUri(address, amount.toBigInteger())
     }
 }

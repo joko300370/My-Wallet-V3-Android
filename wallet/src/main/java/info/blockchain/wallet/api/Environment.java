@@ -4,10 +4,9 @@ public enum Environment {
 
     PRODUCTION(PersistentUrls.KEY_ENV_PROD),
     STAGING(PersistentUrls.KEY_ENV_STAGING),
-    DEV(PersistentUrls.KEY_ENV_DEV),
-    TESTNET(PersistentUrls.KEY_ENV_TESTNET);
+    DEV(PersistentUrls.KEY_ENV_DEV);
 
-    private String name;
+    private final String name;
 
     Environment(String name) {
         this.name = name;

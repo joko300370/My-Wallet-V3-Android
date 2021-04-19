@@ -3,7 +3,7 @@ package com.blockchain.koin.modules
 import com.blockchain.koin.payloadScope
 import com.blockchain.koin.walletModule
 import com.nhaarman.mockito_kotlin.mock
-import info.blockchain.api.blockexplorer.BlockExplorer
+import info.blockchain.api.BitcoinApi
 import info.blockchain.wallet.api.WalletApi
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.payload.PayloadManagerWiper
@@ -23,7 +23,7 @@ class PayloadManagerWipingTest : AutoCloseKoinTest() {
                 walletModule,
                 module {
                     single { mock<WalletApi>() }
-                    single { mock<BlockExplorer>() }
+                    single { mock<BitcoinApi>() }
                 }
             ))
         }

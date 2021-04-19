@@ -40,7 +40,6 @@ val coincoreModule = module {
                 crashLogger = get(),
                 pitLinking = get(),
                 labels = get(),
-                environmentConfig = get(),
                 identity = get(),
                 offlineAccounts = get()
             )
@@ -51,7 +50,6 @@ val coincoreModule = module {
                 exchangeRates = get(),
                 sendDataManager = get(),
                 feeDataManager = get(),
-                environmentConfig = get(),
                 historicRates = get(),
                 currencyPrefs = get(),
                 payloadManager = get(),
@@ -75,7 +73,6 @@ val coincoreModule = module {
                 currencyPrefs = get(),
                 crashLogger = get(),
                 custodialManager = get(),
-                environmentSettings = get(),
                 feeDataManager = get(),
                 sendDataManager = get(),
                 pitLinking = get(),
@@ -99,7 +96,6 @@ val coincoreModule = module {
                 pitLinking = get(),
                 crashLogger = get(),
                 labels = get(),
-                environmentConfig = get(),
                 walletPreferences = get(),
                 offlineAccounts = get(),
                 identity = get()
@@ -120,7 +116,6 @@ val coincoreModule = module {
                 pitLinking = get(),
                 labels = get(),
                 offlineAccounts = get(),
-                environmentConfig = get(),
                 identity = get()
             )
         }.bind(CryptoAsset::class)
@@ -135,7 +130,6 @@ val coincoreModule = module {
                 pitLinking = get(),
                 crashLogger = get(),
                 labels = get(),
-                environmentConfig = get(),
                 identity = get(),
                 offlineAccounts = get()
             )
@@ -162,7 +156,6 @@ val coincoreModule = module {
                 labels = get(),
                 pitLinking = get(),
                 offlineAccounts = get(),
-                environmentConfig = get(),
                 identity = get(),
                 dotFeatureFlag = get(dotFeatureFlag)
             )
@@ -200,7 +193,6 @@ val coincoreModule = module {
                     labels = get(),
                     pitLinking = get(),
                     offlineAccounts = get(),
-                    environmentConfig = get(),
                     walletPreferences = get(),
                     identity = get()
                 )
@@ -225,8 +217,7 @@ val coincoreModule = module {
                 walletPrefs = get(),
                 quotesEngine = get(),
                 analytics = get(),
-                kycTierService = get(),
-                environmentConfig = get()
+                kycTierService = get()
             )
         }
 

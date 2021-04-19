@@ -6,13 +6,13 @@ import com.blockchain.serialization.JsonSerializableAccount
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
+import info.blockchain.wallet.keys.SigningKey
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.ImportedAddress
+import info.blockchain.wallet.payload.data.XPubs
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import io.reactivex.Completable
 import io.reactivex.Single
-import org.bitcoinj.core.ECKey
-import org.bitcoinj.core.NetworkParameters
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
@@ -39,7 +39,6 @@ internal class BtcCryptoWalletAccount(
     // Used to lookup the account in payloadDataManager to fetch receive address
     private val hdAccountIndex: Int,
     override val exchangeRates: ExchangeRateDataManager,
-    private val networkParameters: NetworkParameters,
     private val internalAccount: JsonSerializableAccount,
     val isHDAccount: Boolean,
     private val walletPreferences: WalletStatus,
@@ -70,7 +69,7 @@ internal class BtcCryptoWalletAccount(
         get() = getAccountBalance(false)
 
     private fun getAccountBalance(forceRefresh: Boolean): Single<Money> =
-        payloadDataManager.getAddressBalanceRefresh(xpubAddress, forceRefresh)
+        payloadDataManager.getAddressBalanceRefresh(xpubs, forceRefresh)
             .doOnSuccess {
                 hasFunds.set(it > CryptoValue.zero(asset))
             }
@@ -80,15 +79,16 @@ internal class BtcCryptoWalletAccount(
         get() = accountBalance
 
     override val receiveAddress: Single<ReceiveAddress>
-        get() = if (!isHDAccount) {
-            Single.error(IllegalStateException("Cannot receive to Imported Account"))
-        } else {
-            payloadDataManager.getNextReceiveAddress(
-                payloadDataManager.getAccount(hdAccountIndex)
-            ).singleOrError()
-                .map {
-                    BtcAddress(address = it, label = label, networkParams = networkParameters)
-                }
+        get() = when (internalAccount) {
+            is Account -> {
+                payloadDataManager.getNextReceiveAddress(
+                    internalAccount
+                ).singleOrError()
+                    .map {
+                        BtcAddress(address = it, label = label)
+                    }
+            }
+            else -> Single.error(IllegalStateException("Cannot receive to Imported Account"))
         }
 
     override val activity: Single<ActivitySummaryList>
@@ -97,27 +97,26 @@ internal class BtcCryptoWalletAccount(
             transactionFetchCount,
             transactionFetchOffset
         ).onErrorReturn { emptyList() }
-            .mapList {
-                BtcActivitySummaryItem(
-                    it,
-                    payloadDataManager,
-                    exchangeRates,
-                    this
-                )
-            }
-            .flatMap {
-                appendTradeActivity(custodialWalletManager, asset, it)
-            }
-            .doOnSuccess {
-                setHasTransactions(it.isNotEmpty())
-            }
+        .mapList {
+            BtcActivitySummaryItem(
+                it,
+                payloadDataManager,
+                exchangeRates,
+                this
+            )
+        }
+        .flatMap {
+            appendTradeActivity(custodialWalletManager, asset, it)
+        }
+        .doOnSuccess {
+            setHasTransactions(it.isNotEmpty())
+        }
 
     override fun createTxEngine(): TxEngine =
         BtcOnChainTxEngine(
             btcDataManager = payloadDataManager,
             sendDataManager = sendDataManager,
             feeManager = feeDataManager,
-            btcNetworkParams = networkParameters,
             requireSecondPassword = payloadDataManager.isDoubleEncrypted,
             walletPreferences = walletPreferences
         )
@@ -160,12 +159,15 @@ internal class BtcCryptoWalletAccount(
     }
 
     private fun setArchivedBits(newIsArchived: Boolean) {
-        if (isHDAccount) {
-            (internalAccount as Account).isArchived = newIsArchived
-        } else {
-            with(internalAccount as ImportedAddress) {
-                tag = if (newIsArchived) ImportedAddress.ARCHIVED_ADDRESS else ImportedAddress.NORMAL_ADDRESS
+        when (internalAccount) {
+            is Account -> internalAccount.isArchived = newIsArchived
+            is ImportedAddress -> {
+                internalAccount.tag = if (newIsArchived)
+                    ImportedAddress.ARCHIVED_ADDRESS
+                else
+                    ImportedAddress.NORMAL_ADDRESS
             }
+            else -> throw java.lang.IllegalStateException("Unknown account type")
         }
     }
 
@@ -178,16 +180,23 @@ internal class BtcCryptoWalletAccount(
         return payloadDataManager.syncPayloadWithServer()
             .doOnError { payloadDataManager.setDefaultIndex(revertDefault) }
             .doOnComplete { forceRefresh() }
-    }
+        }
 
     override val xpubAddress: String
         get() = when (internalAccount) {
-            is Account -> internalAccount.xpub
+            is Account -> internalAccount.xpubs.default.address
             is ImportedAddress -> internalAccount.address
             else -> throw java.lang.IllegalStateException("Unknown wallet type")
         }
 
-    fun getSigningKeys(utxo: SpendableUnspentOutputs, secondPassword: String): Single<List<ECKey>> {
+    val xpubs: XPubs
+        get() = when (internalAccount) {
+            is Account -> internalAccount.xpubs
+            is ImportedAddress -> internalAccount.xpubs()
+            else -> throw java.lang.IllegalStateException("Unknown wallet type")
+        }
+
+    fun getSigningKeys(utxo: SpendableUnspentOutputs, secondPassword: String): Single<List<SigningKey>> {
         if (isHDAccount) {
             if (payloadDataManager.isDoubleEncrypted) {
                 payloadDataManager.decryptHDWallet(secondPassword)
@@ -203,7 +212,7 @@ internal class BtcCryptoWalletAccount(
             val password = if (payloadDataManager.isDoubleEncrypted) secondPassword else null
             return Single.just(
                 listOf(
-                    payloadDataManager.getAddressECKey(
+                    payloadDataManager.getAddressSigningKey(
                         importedAddress = internalAccount as ImportedAddress,
                         secondPassword = password
                     ) ?: throw IllegalStateException("Private key not found for legacy BTC address")
@@ -249,7 +258,6 @@ internal class BtcCryptoWalletAccount(
             sendDataManager: SendDataManager,
             feeDataManager: FeeDataManager,
             exchangeRates: ExchangeRateDataManager,
-            networkParameters: NetworkParameters,
             walletPreferences: WalletStatus,
             custodialWalletManager: CustodialWalletManager,
             refreshTrigger: AccountRefreshTrigger,
@@ -260,7 +268,6 @@ internal class BtcCryptoWalletAccount(
             sendDataManager = sendDataManager,
             feeDataManager = feeDataManager,
             exchangeRates = exchangeRates,
-            networkParameters = networkParameters,
             internalAccount = jsonAccount,
             isHDAccount = true,
             walletPreferences = walletPreferences,
@@ -275,7 +282,6 @@ internal class BtcCryptoWalletAccount(
             sendDataManager: SendDataManager,
             feeDataManager: FeeDataManager,
             exchangeRates: ExchangeRateDataManager,
-            networkParameters: NetworkParameters,
             walletPreferences: WalletStatus,
             custodialWalletManager: CustodialWalletManager,
             refreshTrigger: AccountRefreshTrigger,
@@ -286,7 +292,6 @@ internal class BtcCryptoWalletAccount(
             sendDataManager = sendDataManager,
             feeDataManager = feeDataManager,
             exchangeRates = exchangeRates,
-            networkParameters = networkParameters,
             internalAccount = importedAccount,
             isHDAccount = false,
             walletPreferences = walletPreferences,

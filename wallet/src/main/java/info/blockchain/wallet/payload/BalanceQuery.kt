@@ -1,7 +1,11 @@
 package info.blockchain.wallet.payload
 
+import info.blockchain.wallet.payload.data.XPubs
 import java.math.BigInteger
 
 interface BalanceQuery {
-    fun getBalancesFor(addressesAndXpubs: Set<String>): Map<String, BigInteger>
+    fun getBalancesFor(
+        xpubs: List<XPubs>,
+        legacyImported: List<String> = emptyList()
+    ): Map<String, BigInteger>
 }

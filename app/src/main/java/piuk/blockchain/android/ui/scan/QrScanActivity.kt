@@ -56,7 +56,6 @@ import piuk.blockchain.android.util.windowRect
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.toast
-import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 import java.io.IOException
 import java.util.EnumSet

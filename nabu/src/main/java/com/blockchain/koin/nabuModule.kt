@@ -273,7 +273,7 @@ val nabuModule = module {
 
     single {
         RetailWalletTokenService(
-            environmentConfig = get(),
+            explorerPath = getProperty("explorer-api"),
             apiCode = getProperty("api-code"),
             retrofit = get(moshiExplorerRetrofit)
         )

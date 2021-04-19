@@ -72,8 +72,7 @@ class TradingSellTxEngineTest {
     private val subject = TradingSellTxEngine(
         walletManager = walletManager,
         quotesEngine = quotesEngine,
-        kycTierService = kycTierService,
-        environmentConfig = environmentConfig
+        kycTierService = kycTierService
     )
 
     @Before

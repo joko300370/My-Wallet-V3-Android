@@ -127,11 +127,9 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
                 when (infoType.transactionType) {
                     TransactionSummary.TransactionType.SENT -> parent.context.getString(
                         R.string.activity_details_transaction_fee_send,
-                        infoType.cryptoValue.toStringWithSymbol()
-                    )
+                        infoType.cryptoValue.toStringWithSymbol())
                     else -> parent.context.getString(
-                        R.string.activity_details_transaction_fee_unknown
-                    )
+                        R.string.activity_details_transaction_fee_unknown)
                 }
             }
             is BuyFee -> infoType.feeValue.toStringWithSymbol()
@@ -148,7 +146,6 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
                 when {
                     infoType.paymentDetails.endDigits != null &&
                         infoType.paymentDetails.label != null -> {
-
                         with(parent.context) {
                             infoType.paymentDetails.accountType?.let {
                                 val accType = getString(

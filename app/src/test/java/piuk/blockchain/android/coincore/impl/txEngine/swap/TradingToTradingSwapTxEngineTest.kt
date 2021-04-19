@@ -72,8 +72,7 @@ class TradingToTradingSwapTxEngineTest {
     private val subject = TradingToTradingSwapTxEngine(
         walletManager = walletManager,
         quotesEngine = quotesEngine,
-        kycTierService = kycTierService,
-        environmentConfig = environmentConfig
+        kycTierService = kycTierService
     )
 
     @Before

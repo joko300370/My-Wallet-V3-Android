@@ -100,7 +100,7 @@ class CoinsWebSocketStrategyTest {
     }
 
     private val prefs: PersistentPrefs = mock {
-        on { getValue(PersistentPrefs.KEY_WALLET_GUID, "") } `it returns` "1234"
+        on { walletGuid } `it returns` "1234"
     }
 
     private val assetResources: AssetResources = mock {

@@ -1205,6 +1205,7 @@
 
     <string name="dashboard_total_balance">Total Balance</string>
     <string name="asset_card_rate_period">24hrs</string>
+    <string name="upgrading_wallet">Upgrading Wallet</string>
 
     <string-array name="mnemonic_word_requests">
         <item>first word</item>

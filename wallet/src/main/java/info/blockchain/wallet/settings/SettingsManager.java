@@ -7,7 +7,6 @@ import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings("WeakerAccess")
 public class SettingsManager {
 
     private static final Logger log = LoggerFactory.getLogger(SettingsManager.class);

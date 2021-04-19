@@ -16,16 +16,14 @@ import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.android.coincore.updateTxValidity
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 
 class OnChainSellTxEngine(
     private val engine: OnChainTxEngineBase,
-    environmentConfig: EnvironmentConfig,
     walletManager: CustodialWalletManager,
     kycTierService: TierService,
     quotesEngine: TransferQuotesEngine
 ) : SellTxEngineBase(
-    walletManager, kycTierService, quotesEngine, environmentConfig
+    walletManager, kycTierService, quotesEngine
 ) {
     override val direction: TransferDirection
         get() = TransferDirection.FROM_USERKEY

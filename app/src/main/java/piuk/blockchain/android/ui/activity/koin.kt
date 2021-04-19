@@ -62,7 +62,6 @@ val activitiesModule = module {
                 stringUtils = get(),
                 bchDataManager = get(),
                 xlmDataManager = get(),
-                environmentSettings = get(),
                 coincore = get()
             )
         }

@@ -10,12 +10,14 @@ import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.verifyZeroInteractions
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.wallet.payload.data.Wallet
-import io.reactivex.Observable
+import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito
 import piuk.blockchain.android.R
 import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.android.util.FormatChecker
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -25,15 +27,16 @@ import piuk.blockchain.androidcore.utils.PrngFixer
 class CreateWalletPresenterTest {
 
     private lateinit var subject: CreateWalletPresenter
-    private var view: CreateWalletView = mock()
-    private var appUtil: AppUtil = mock()
-    private var accessState: AccessState = mock()
-    private var payloadDataManager: PayloadDataManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
-    private var prefsUtil: PersistentPrefs = mock()
-    private var prngFixer: PrngFixer = mock()
-    private var analytics: Analytics = mock()
-    private var walletPrefs: WalletStatus = mock()
-    private var environmentConfig: EnvironmentConfig = mock()
+    private val view: CreateWalletView = mock()
+    private val appUtil: AppUtil = mock()
+    private val accessState: AccessState = mock()
+    private val payloadDataManager: PayloadDataManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
+    private val prefsUtil: PersistentPrefs = mock()
+    private val prngFixer: PrngFixer = mock()
+    private val analytics: Analytics = mock()
+    private val walletPrefs: WalletStatus = mock()
+    private val environmentConfig: EnvironmentConfig = mock()
+    private val formatChecker: FormatChecker = mock()
 
     @Before
     fun setUp() {
@@ -45,7 +48,8 @@ class CreateWalletPresenterTest {
             prngFixer = prngFixer,
             analytics = analytics,
             walletPrefs = walletPrefs,
-            environmentConfig = environmentConfig
+            environmentConfig = environmentConfig,
+            formatChecker = formatChecker
         )
         subject.initView(view)
     }
@@ -115,12 +119,13 @@ class CreateWalletPresenterTest {
 
         whenever(view.getDefaultAccountName()).thenReturn(accountName)
         whenever(payloadDataManager.createHdWallet(any(), any(), any())).thenReturn(
-            Observable.just(
+            Single.just(
                 Wallet()
             )
         )
         whenever(payloadDataManager.wallet!!.guid).thenReturn(guid)
         whenever(payloadDataManager.wallet!!.sharedKey).thenReturn(sharedKey)
+
         // Act
         subject.passwordStrength = 80
         subject.createOrRestoreWallet(email, pw1, recoveryPhrase)
@@ -132,9 +137,9 @@ class CreateWalletPresenterTest {
 
         verify(view).showProgressDialog(any())
         verify(prefsUtil).setValue(PersistentPrefs.KEY_EMAIL, email)
-        verify(prefsUtil).setValue(PersistentPrefs.KEY_WALLET_GUID, guid)
+        verify(prefsUtil).walletGuid = guid
+        verify(prefsUtil).sharedKey = sharedKey
         verify(accessState).isNewlyCreated = true
-        verify(appUtil).sharedKey = sharedKey
         verify(view).startPinEntryActivity()
         verify(view).dismissProgressDialog()
         verify(analytics).logEvent(AnalyticsEvents.WalletCreation)
@@ -152,7 +157,7 @@ class CreateWalletPresenterTest {
 
         whenever(view.getDefaultAccountName()).thenReturn(accountName)
         whenever(payloadDataManager.restoreHdWallet(any(), any(), any(), any()))
-            .thenReturn(Observable.just(Wallet()))
+            .thenReturn(Single.just(Wallet()))
         whenever(payloadDataManager.wallet!!.guid).thenReturn(guid)
         whenever(payloadDataManager.wallet!!.sharedKey).thenReturn(sharedKey)
 
@@ -168,9 +173,9 @@ class CreateWalletPresenterTest {
         verify(view).showProgressDialog(any())
         verify(prefsUtil).setValue(PersistentPrefs.KEY_EMAIL, email)
         verify(prefsUtil).setValue(PersistentPrefs.KEY_ONBOARDING_COMPLETE, true)
-        verify(prefsUtil).setValue(PersistentPrefs.KEY_WALLET_GUID, guid)
+        verify(prefsUtil).walletGuid = guid
+        verify(prefsUtil).sharedKey = sharedKey
         verify(accessState).isNewlyCreated = true
-        verify(appUtil).sharedKey = sharedKey
         verify(view).startPinEntryActivity()
         verify(view).dismissProgressDialog()
     }
@@ -181,6 +186,8 @@ class CreateWalletPresenterTest {
         val email = "john@snow.com"
         val pw1 = "MyTestWallet"
         val pw2 = "MyTestWallet"
+        whenever(formatChecker.isValidEmailAddress(anyString())).thenReturn(true)
+
         // Act
         subject.passwordStrength = 80
         val result = subject.validateCredentials(email, pw1, pw2)
@@ -192,6 +199,7 @@ class CreateWalletPresenterTest {
     @Test
     fun `validateCredentials invalid email`() {
         // Arrange
+        whenever(formatChecker.isValidEmailAddress(anyString())).thenReturn(false)
 
         // Act
         subject.passwordStrength = 80
@@ -205,6 +213,7 @@ class CreateWalletPresenterTest {
     @Test
     fun `validateCredentials short password`() {
         // Arrange
+        whenever(formatChecker.isValidEmailAddress(anyString())).thenReturn(true)
 
         // Act
         subject.passwordStrength = 80
@@ -216,8 +225,9 @@ class CreateWalletPresenterTest {
     }
 
     @Test
-    fun `validateCredentials password missmatch`() {
+    fun `validateCredentials password mismatch`() {
         // Arrange
+        whenever(formatChecker.isValidEmailAddress(anyString())).thenReturn(true)
 
         // Act
         subject.passwordStrength = 80
@@ -229,8 +239,9 @@ class CreateWalletPresenterTest {
     }
 
     @Test
-    fun `validateCredentials weak password running on non debug modde`() {
+    fun `validateCredentials weak password running on non debug mode`() {
         // Arrange
+        whenever(formatChecker.isValidEmailAddress(anyString())).thenReturn(true)
         whenever(environmentConfig.isRunningInDebugMode()).thenReturn(false)
         // Act
         subject.passwordStrength = 20
@@ -242,8 +253,9 @@ class CreateWalletPresenterTest {
     }
 
     @Test
-    fun `validateCredentials weak password running on  debug modde`() {
+    fun `validateCredentials weak password running on  debug mode`() {
         // Arrange
+        whenever(formatChecker.isValidEmailAddress(anyString())).thenReturn(true)
         whenever(environmentConfig.isRunningInDebugMode()).thenReturn(true)
         // Act
         subject.passwordStrength = 5

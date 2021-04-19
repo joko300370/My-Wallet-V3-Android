@@ -29,7 +29,6 @@ import com.blockchain.notifications.analytics.TransactionsAnalyticsEvents
 import com.blockchain.notifications.analytics.activityShown
 import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_SUPPORT_PORTAL
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.snackbar.Snackbar
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import io.reactivex.Observable
@@ -120,9 +119,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     private val tabSelectedListener =
         AHBottomNavigation.OnTabSelectedListener { position, wasSelected ->
-
-            presenter.doTestnetCheck()
-
             if (!wasSelected) {
                 when (position) {
                     ITEM_HOME -> {
@@ -483,17 +479,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         if (AndroidUtils.is25orHigher()) {
             getSystemService(ShortcutManager::class.java)!!.removeAllDynamicShortcuts()
         }
-    }
-
-    override fun showTestnetWarning() {
-        val snack = Snackbar.make(
-            parent_constraint_layout,
-            R.string.testnet_warning,
-            Snackbar.LENGTH_SHORT
-        )
-        val view = snack.view
-        view.setBackgroundColor(ContextCompat.getColor(this, R.color.product_red_medium))
-        snack.show()
     }
 
     override fun enableSwapButton(isEnabled: Boolean) {

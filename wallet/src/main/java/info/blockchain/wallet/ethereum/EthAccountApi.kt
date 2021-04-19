@@ -12,7 +12,6 @@ import info.blockchain.wallet.ethereum.data.EthTransaction
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
-import org.apache.commons.lang3.StringUtils
 
 class EthAccountApi(private val apiCode: ApiCode) {
 
@@ -41,20 +40,21 @@ class EthAccountApi(private val apiCode: ApiCode) {
      * @return An [Observable] wrapping an [EthAddressResponse]
      */
     fun getEthAddress(addresses: List<String>): Observable<EthAddressResponseMap> {
-        return apiInstance.getEthAccount(StringUtils.join(addresses, ","))
+        return apiInstance.getEthAccount(addresses.joinToString(","))
     }
 
     fun getEthTransactions(addresses: List<String>): Single<List<EthTransaction>> {
-        return apiInstance.getTransactions(StringUtils.join(addresses, ",")).map { it.transactions }
+        return apiInstance.getTransactions(addresses.joinToString(",")).map { it.transactions }
     }
 
     fun getLastEthTransaction(addresses: List<String>): Maybe<EthTransaction> {
-        return apiInstance.getTransactions(StringUtils.join(addresses, ","), 1).flatMapMaybe {
-            if (it.transactions.isNotEmpty())
-                Maybe.just(it.transactions[0])
-            else Maybe.empty()
+        return apiInstance.getTransactions(addresses.joinToString(","), 1)
+            .flatMapMaybe {
+                if (it.transactions.isNotEmpty())
+                    Maybe.just(it.transactions[0])
+                else Maybe.empty()
+            }
         }
-    }
 
     /**
      * Returns true if a given ETH address is associated with an Ethereum contract, which is

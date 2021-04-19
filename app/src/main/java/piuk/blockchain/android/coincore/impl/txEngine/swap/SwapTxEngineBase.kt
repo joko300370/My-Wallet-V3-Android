@@ -27,7 +27,6 @@ import piuk.blockchain.android.coincore.impl.txEngine.PricedQuote
 import piuk.blockchain.android.coincore.impl.txEngine.QuotedEngine
 import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.android.coincore.updateTxValidity
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -40,9 +39,8 @@ private val PendingTx.userTier: KycTiers
 abstract class SwapTxEngineBase(
     quotesEngine: TransferQuotesEngine,
     private val walletManager: CustodialWalletManager,
-    kycTierService: TierService,
-    environmentConfig: EnvironmentConfig
-) : QuotedEngine(quotesEngine, kycTierService, walletManager, environmentConfig) {
+    kycTierService: TierService
+) : QuotedEngine(quotesEngine, kycTierService, walletManager) {
 
     private lateinit var minApiLimit: Money
 

@@ -30,7 +30,6 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import org.amshove.kluent.itReturns
 import org.amshove.kluent.shouldEqual
-import org.bitcoinj.core.NetworkParameters
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -52,7 +51,6 @@ import piuk.blockchain.android.coincore.impl.injectMocks
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.impl.txEngine.PricedQuote
 import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 class OnChainSellTxEngineTest {
@@ -67,10 +65,6 @@ class OnChainSellTxEngineTest {
     private val walletManager: CustodialWalletManager = mock()
     private val quotesEngine: TransferQuotesEngine = mock()
     private val kycTierService: TierService = mock()
-    private val btcNetworkParams: NetworkParameters = mock()
-    private val environmentConfig: EnvironmentConfig = mock {
-        on { bitcoinNetworkParameters } itReturns btcNetworkParams
-    }
 
     private val exchangeRates: ExchangeRateDataManager = mock {
         on { getLastPrice(SRC_ASSET, TGT_ASSET) } itReturns EXCHANGE_RATE
@@ -88,8 +82,7 @@ class OnChainSellTxEngineTest {
         engine = onChainEngine,
         walletManager = walletManager,
         quotesEngine = quotesEngine,
-        kycTierService = kycTierService,
-        environmentConfig = environmentConfig
+        kycTierService = kycTierService
     )
 
     @Before
@@ -273,7 +266,6 @@ class OnChainSellTxEngineTest {
         verifyLimitsFetched()
         verify(quotesEngine).pricedQuote
         verify(exchangeRates).getLastPrice(SRC_ASSET, TGT_ASSET)
-        verify(environmentConfig).bitcoinNetworkParameters
         verify(onChainEngine).doInitialiseTx()
         // todo fix once start engine returns completable
         // verify(onChainEngine).assertInputsValid()
@@ -338,7 +330,6 @@ class OnChainSellTxEngineTest {
         verifyLimitsFetched()
         verify(quotesEngine).pricedQuote
         verify(exchangeRates).getLastPrice(SRC_ASSET, TGT_ASSET)
-        verify(environmentConfig).bitcoinNetworkParameters
         verify(onChainEngine).doInitialiseTx()
         // todo fix once start engine returns completable
         // verify(onChainEngine).assertInputsValid()
@@ -624,7 +615,6 @@ class OnChainSellTxEngineTest {
         verifyNoMoreInteractions(exchangeRates)
         verifyNoMoreInteractions(quotesEngine)
         verifyNoMoreInteractions(kycTierService)
-        verifyNoMoreInteractions(environmentConfig)
         verifyNoMoreInteractions(onChainEngine)
         verifyNoMoreInteractions(sourceAccount)
     }

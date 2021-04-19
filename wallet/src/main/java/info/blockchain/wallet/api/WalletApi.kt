@@ -11,11 +11,12 @@ import okhttp3.ResponseBody
 import org.spongycastle.util.encoders.Hex
 import retrofit2.Call
 import retrofit2.Response
-import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 
-class WalletApi(private val explorerInstance: WalletExplorerEndpoints, private val apiCode: ApiCode) {
-
+class WalletApi(
+    private val explorerInstance: WalletExplorerEndpoints,
+    private val apiCode: ApiCode
+) {
     fun updateFirebaseNotificationToken(
         token: String,
         guid: String?,
@@ -26,7 +27,8 @@ class WalletApi(private val explorerInstance: WalletExplorerEndpoints, private v
             sharedKey,
             token,
             token.length,
-            getApiCode())
+            getApiCode()
+        )
     }
 
     fun setAccess(key: String?, value: String, pin: String?): Observable<Response<Status>> {
@@ -38,25 +40,30 @@ class WalletApi(private val explorerInstance: WalletExplorerEndpoints, private v
         return explorerInstance.pinStore(key, pin, null, "get", getApiCode())
     }
 
-    @Throws(UnsupportedEncodingException::class)
     fun insertWallet(
         guid: String?,
         sharedKey: String?,
+        activeAddressList: List<String>?,
         encryptedPayload: String,
         newChecksum: String?,
         email: String?,
         device: String?
     ): Call<ResponseBody> {
-        return explorerInstance.syncWalletCall("insert",
+        val pipedAddresses = activeAddressList?.joinToString("|")
+
+        return explorerInstance.syncWalletCall(
+            "insert",
             guid,
             sharedKey,
             encryptedPayload,
             encryptedPayload.length,
             URLEncoder.encode(newChecksum, "utf-8"),
+            pipedAddresses,
             email,
             device,
             null,
-            getApiCode())
+            getApiCode()
+        )
     }
 
     fun submitCoinReceiveAddresses(guid: String, sharedKey: String, coinAddresses: String): Observable<ResponseBody> =
@@ -67,34 +74,41 @@ class WalletApi(private val explorerInstance: WalletExplorerEndpoints, private v
             coinAddresses
         )
 
-    @Throws(UnsupportedEncodingException::class)
     fun updateWallet(
         guid: String?,
         sharedKey: String?,
+        activeAddressList: List<String>?,
         encryptedPayload: String,
         newChecksum: String?,
         oldChecksum: String?,
         device: String?
     ): Call<ResponseBody> {
 
-        return explorerInstance.syncWalletCall("update",
+        val pipedAddresses = activeAddressList?.joinToString("|") ?: ""
+
+        return explorerInstance.syncWalletCall(
+            "update",
             guid,
             sharedKey,
             encryptedPayload,
             encryptedPayload.length,
             URLEncoder.encode(newChecksum, "utf-8"),
+            pipedAddresses,
             null,
             device,
             oldChecksum,
-            getApiCode())
+            getApiCode()
+        )
     }
 
     fun fetchWalletData(guid: String?, sharedKey: String?): Call<ResponseBody> {
-        return explorerInstance.fetchWalletData("wallet.aes.json",
+        return explorerInstance.fetchWalletData(
+            "wallet.aes.json",
             guid,
             sharedKey,
             "json",
-            getApiCode())
+            getApiCode()
+        )
     }
 
     fun submitTwoFactorCode(sessionId: String, guid: String?, twoFactorCode: String): Observable<ResponseBody> {
@@ -108,7 +122,8 @@ class WalletApi(private val explorerInstance: WalletExplorerEndpoints, private v
             twoFactorCode,
             twoFactorCode.length,
             "plain",
-            getApiCode())
+            getApiCode()
+        )
     }
 
     fun getSessionId(guid: String?): Observable<Response<ResponseBody>> {
@@ -116,31 +131,39 @@ class WalletApi(private val explorerInstance: WalletExplorerEndpoints, private v
     }
 
     fun fetchEncryptedPayload(guid: String?, sessionId: String): Observable<Response<ResponseBody>> {
-        return explorerInstance.fetchEncryptedPayload(guid,
+        return explorerInstance.fetchEncryptedPayload(
+            guid,
             "SID=$sessionId",
             "json",
             true,
-            getApiCode())
+            getApiCode()
+        )
     }
 
     fun fetchPairingEncryptionPasswordCall(guid: String?): Call<ResponseBody> {
-        return explorerInstance.fetchPairingEncryptionPasswordCall("pairing-encryption-password",
+        return explorerInstance.fetchPairingEncryptionPasswordCall(
+            "pairing-encryption-password",
             guid,
-            getApiCode())
+            getApiCode()
+        )
     }
 
     fun fetchPairingEncryptionPassword(guid: String?): Observable<ResponseBody> {
-        return explorerInstance.fetchPairingEncryptionPassword("pairing-encryption-password",
+        return explorerInstance.fetchPairingEncryptionPassword(
+            "pairing-encryption-password",
             guid,
-            getApiCode())
+            getApiCode()
+        )
     }
 
     fun fetchSettings(method: String?, guid: String?, sharedKey: String?): Observable<Settings> {
-        return explorerInstance.fetchSettings(method,
+        return explorerInstance.fetchSettings(
+            method,
             guid,
             sharedKey,
             "plain",
-            getApiCode())
+            getApiCode()
+        )
     }
 
     fun updateSettings(
@@ -150,25 +173,29 @@ class WalletApi(private val explorerInstance: WalletExplorerEndpoints, private v
         payload: String,
         context: String?
     ): Observable<ResponseBody> {
-        return explorerInstance.updateSettings(method,
+        return explorerInstance.updateSettings(
+            method,
             guid,
             sharedKey,
             payload,
             payload.length,
             "plain",
             context,
-            getApiCode())
+            getApiCode()
+        )
     }
 
     val walletOptions: Observable<WalletOptions>
         get() = explorerInstance.getWalletOptions(getApiCode())
 
     fun getSignedJsonToken(guid: String?, sharedKey: String?, partner: String?): Single<String> {
-        return explorerInstance.getSignedJsonToken(guid,
+        return explorerInstance.getSignedJsonToken(
+            guid,
             sharedKey,
             "email%7Cwallet_age",
             partner,
-            getApiCode())
+            getApiCode()
+        )
             .map { signedToken ->
                 if (!signedToken.isSuccessful) {
                     throw ApiException(signedToken.error)

@@ -40,10 +40,10 @@ class LoginPresenter(
 
         compositeDisposable += dataManager.handleQrCode(raw!!)
             .doOnSubscribe { view?.showProgressDialog(R.string.please_wait) }
-            .doOnComplete { appUtil.sharedKey = dataManager.wallet!!.sharedKey }
+            .doOnComplete { prefs.sharedKey = dataManager.wallet!!.sharedKey }
             .doAfterTerminate { view?.dismissProgressDialog() }
             .subscribe({
-                prefs.setValue(PersistentPrefs.KEY_WALLET_GUID, dataManager.wallet!!.guid)
+                prefs.walletGuid = dataManager.wallet!!.guid
                 prefs.setValue(PersistentPrefs.KEY_EMAIL_VERIFIED, true)
                 prefs.setValue(PersistentPrefs.KEY_ONBOARDING_COMPLETE, true)
                 view?.startPinEntryActivity()

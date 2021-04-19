@@ -57,7 +57,6 @@ class XlmAssetUriParseTest {
         labels = labels,
         pitLinking = pitLinking,
         crashLogger = crashLogger,
-        environmentConfig = environmentConfig,
         walletPreferences = walletPreferences,
         offlineAccounts = offlineCache,
         identity = mock()

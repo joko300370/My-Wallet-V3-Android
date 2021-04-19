@@ -105,14 +105,14 @@ class ActivityDetailsModel(
                 interactor.updateItemDescription(
                     intent.txId, intent.cryptoCurrency,
                     intent.description
+                ).subscribeBy(
+                    onComplete = {
+                        process(DescriptionUpdatedIntent)
+                    },
+                    onError = {
+                        process(DescriptionUpdateFailedIntent)
+                    }
                 )
-                    .subscribeBy(
-                        onComplete = {
-                            process(DescriptionUpdatedIntent)
-                        },
-                        onError = {
-                            process(DescriptionUpdateFailedIntent)
-                        })
             is LoadNonCustodialCreationDateIntent -> {
                 val activityDate =
                     interactor.loadCreationDate(intent.summaryItem)

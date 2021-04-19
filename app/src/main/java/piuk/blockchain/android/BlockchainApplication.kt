@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.blockchain.koin.KoinStarter
 import com.blockchain.koin.apiRetrofit
-import com.blockchain.koin.explorerRetrofit
 import com.blockchain.logging.CrashLogger
 import com.facebook.stetho.Stetho
 import com.google.android.gms.common.ConnectionResult
@@ -26,7 +25,6 @@ import info.blockchain.wallet.api.Environment
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.rxkotlin.subscribeBy
-import org.bitcoinj.core.NetworkParameters
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService
@@ -53,7 +51,6 @@ import timber.log.Timber
 open class BlockchainApplication : Application(), FrameworkInterface {
 
     private val retrofitApi: Retrofit by inject(apiRetrofit)
-    private val retrofitExplorer: Retrofit by inject(explorerRetrofit)
     private val environmentSettings: EnvironmentConfig by inject()
     private val loginState: AccessState by inject()
     private val lifeCycleInterestedComponent: LifecycleInterestedComponent by inject()
@@ -192,20 +189,8 @@ open class BlockchainApplication : Application(), FrameworkInterface {
         return retrofitApi
     }
 
-    override fun getRetrofitExplorerInstance(): Retrofit {
-        return retrofitExplorer
-    }
-
     override fun getEnvironment(): Environment {
         return environmentSettings.environment
-    }
-
-    override fun getBitcoinParams(): NetworkParameters {
-        return environmentSettings.bitcoinNetworkParameters
-    }
-
-    override fun getBitcoinCashParams(): NetworkParameters {
-        return environmentSettings.bitcoinCashNetworkParameters
     }
 
     override fun getDevice(): String {

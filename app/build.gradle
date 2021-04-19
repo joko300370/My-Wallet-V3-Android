@@ -276,9 +276,10 @@ dependencies {
     implementation project(':sunriver')
     implementation project(':core')
 
-    api project(':coreui')
-    api project(':notifications')
+    implementation project(':coreui')
+    implementation project(':notifications')
     implementation project(':veriff')
+    implementation project(':blockchainApi')
 
     implementation Libraries.multidex
 
@@ -302,8 +303,8 @@ dependencies {
     implementation Libraries.navigationControllerCore
     implementation Libraries.navigationControllerFragments
 
-    api Libraries.lifecycleViewModel
-    api Libraries.lifecycleExtensions
+    implementation Libraries.lifecycleViewModel
+    implementation Libraries.lifecycleExtensions
 
     implementation(Libraries.googlePlayServicesBase) {
         exclude group: 'com.android.support'
@@ -313,6 +314,7 @@ dependencies {
 
     implementation Libraries.gson
     implementation Libraries.kotlinJson
+    implementation Libraries.json
 
     // Utils
     implementation Libraries.libPhoneNumber
@@ -349,6 +351,7 @@ dependencies {
     testImplementation Libraries.hamcrestJunit
     testImplementation Libraries.kotlinJunit
     testImplementation Libraries.kluent
+    testImplementation Libraries.jacksonKotlin
     testImplementation(Libraries.mockitoKotlin) {
         ['kotlin-stdlib', 'kotlin-reflect'].each { exclude module: it }
     }
@@ -362,7 +365,6 @@ dependencies {
     androidTestImplementation Libraries.testRunner
     androidTestImplementation Libraries.testRules
 
-    testImplementation Libraries.json
     testImplementation project(':testutils-android')
 
     debugImplementation Libraries.chuckerDebug

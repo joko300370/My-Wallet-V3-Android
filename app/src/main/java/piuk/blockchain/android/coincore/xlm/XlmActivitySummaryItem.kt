@@ -21,7 +21,7 @@ class XlmActivitySummaryItem(
     override val cryptoCurrency = CryptoCurrency.XLM
 
     override val transactionType: TransactionSummary.TransactionType
-        get() = if (xlmTransaction.value > CryptoValue.ZeroXlm) {
+        get() = if (xlmTransaction.value > CryptoValue.zero(CryptoCurrency.XLM)) {
             TransactionSummary.TransactionType.RECEIVED
         } else {
             TransactionSummary.TransactionType.SENT
@@ -45,7 +45,7 @@ class XlmActivitySummaryItem(
         get() = xlmTransaction.hash
 
     override val inputsMap: Map<String, CryptoValue>
-        get() = hashMapOf(xlmTransaction.from.accountId to CryptoValue.ZeroXlm)
+        get() = hashMapOf(xlmTransaction.from.accountId to CryptoValue.zero(CryptoCurrency.XLM))
 
     override val outputsMap: Map<String, CryptoValue>
         get() = hashMapOf(

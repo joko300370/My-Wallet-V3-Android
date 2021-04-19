@@ -7,6 +7,8 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.wallet.payload.data.XPub
+import info.blockchain.wallet.payload.data.XPubs
 import org.amshove.kluent.`it returns`
 import org.amshove.kluent.`should equal`
 import org.amshove.kluent.`should throw the Exception`
@@ -21,11 +23,11 @@ class CryptoBalanceMapTest {
         calculateCryptoBalanceMap(
             CryptoCurrency.BTC,
             { emptyMap<String, Long>() }.toBalanceQuery(),
-            emptySet(),
-            emptySet()
+            emptyList(),
+            emptyList()
         ).apply {
-            totalSpendable `should equal` CryptoValue.ZeroBtc
-            totalSpendableImported `should equal` CryptoValue.ZeroBtc
+            totalSpendable `should equal` CryptoValue.zero(CryptoCurrency.BTC)
+            totalSpendableImported `should equal` CryptoValue.zero(CryptoCurrency.BTC)
         }
     }
 
@@ -34,11 +36,15 @@ class CryptoBalanceMapTest {
         calculateCryptoBalanceMap(
             CryptoCurrency.ETHER,
             { mapOf("A" to 123L) }.toBalanceQuery(),
-            xpubs = setOf("A"),
-            imported = emptySet()
+            xpubs = listOf(
+                XPubs(
+                    XPub(address = "A", derivation = XPub.Format.LEGACY)
+                )
+            ),
+            imported = emptyList()
         ).apply {
             totalSpendable `should equal` CryptoValue(CryptoCurrency.ETHER, 123L.toBigInteger())
-            totalSpendableImported `should equal` CryptoValue.ZeroEth
+            totalSpendableImported `should equal` CryptoValue.zero(CryptoCurrency.ETHER)
         }
     }
 
@@ -47,11 +53,15 @@ class CryptoBalanceMapTest {
         calculateCryptoBalanceMap(
             CryptoCurrency.BTC,
             { mapOf("A" to 123L) }.toBalanceQuery(),
-            xpubs = setOf("A"),
-            imported = emptySet()
+            xpubs = listOf(
+                XPubs(
+                    XPub(address = "A", derivation = XPub.Format.LEGACY)
+                )
+            ),
+            imported = emptyList()
         ).apply {
             totalSpendable `should equal` 123.satoshi()
-            totalSpendableImported `should equal` CryptoValue.ZeroBtc
+            totalSpendableImported `should equal` CryptoValue.zero(CryptoCurrency.BTC)
         }
     }
 
@@ -60,11 +70,14 @@ class CryptoBalanceMapTest {
         calculateCryptoBalanceMap(
             CryptoCurrency.BTC,
             { mapOf("A" to 123L, "B" to 456L) }.toBalanceQuery(),
-            xpubs = setOf("A", "B"),
-            imported = emptySet()
+            xpubs = listOf(
+                XPubs(XPub(address = "A", derivation = XPub.Format.LEGACY)),
+                XPubs(XPub(address = "B", derivation = XPub.Format.LEGACY))
+            ),
+            imported = emptyList()
         ).apply {
             totalSpendable `should equal` 579.satoshi()
-            totalSpendableImported `should equal` CryptoValue.ZeroBtc
+            totalSpendableImported `should equal` CryptoValue.zero(CryptoCurrency.BTC)
         }
     }
 
@@ -73,8 +86,8 @@ class CryptoBalanceMapTest {
         calculateCryptoBalanceMap(
             CryptoCurrency.BTC,
             { mapOf("A" to 123L) }.toBalanceQuery(),
-            xpubs = emptySet(),
-            imported = setOf("A")
+            xpubs = emptyList(),
+            imported = listOf("A")
         ).apply {
             totalSpendable `should equal` 123L.satoshi()
             totalSpendableImported `should equal` 123L.satoshi()
@@ -82,70 +95,73 @@ class CryptoBalanceMapTest {
     }
 
     @Test
-    fun `watch only imported appears in watch only total but not total`() {
-        calculateCryptoBalanceMap(
-            CryptoCurrency.BTC,
-            { mapOf("A" to 123L) }.toBalanceQuery(),
-            xpubs = emptySet(),
-            imported = emptySet()
-        ).apply {
-            totalSpendable `should equal` CryptoValue.ZeroBtc
-            totalSpendableImported `should equal` CryptoValue.ZeroBtc
-        }
-    }
-
-    @Test
-    fun `if address appears in watch only, it is not in either spendable total`() {
-        calculateCryptoBalanceMap(
-            CryptoCurrency.BTC,
-            { mapOf("A" to 10L, "B" to 20L, "C" to 30L) }.toBalanceQuery(),
-            xpubs = setOf("A", "B"),
-            imported = setOf("A", "C")
-        ).apply {
-            totalSpendable `should equal` 60.satoshi()
-            totalSpendableImported `should equal` 40.satoshi()
-        }
-    }
-
-    @Test
     fun `all addresses are queried`() {
         val getBalances: BalanceQuery = mock {
-            on { getBalancesFor(any()) } `it returns` emptyMap()
+            on { getBalancesFor(any(), any()) } `it returns` emptyMap()
         }
+
+        val xpubs = listOf(
+            XPubs(XPub(address = "A", derivation = XPub.Format.LEGACY)),
+            XPubs(XPub(address = "B", derivation = XPub.Format.LEGACY)),
+            XPubs(XPub(address = "G", derivation = XPub.Format.SEGWIT)),
+            XPubs(XPub(address = "H", derivation = XPub.Format.SEGWIT))
+        )
+
+        val imported = listOf("C", "D")
+
         calculateCryptoBalanceMap(
             CryptoCurrency.BTC,
             getBalances,
-            xpubs = setOf("A", "B"),
-            imported = setOf("C", "D")
+            xpubs = xpubs,
+            imported = imported
         ).apply {
-            totalSpendable `should equal` CryptoValue.ZeroBtc
-            totalSpendableImported `should equal` CryptoValue.ZeroBtc
+            totalSpendable `should equal` CryptoValue.zero(CryptoCurrency.BTC)
+            totalSpendableImported `should equal` CryptoValue.zero(CryptoCurrency.BTC)
         }
-        verify(getBalances).getBalancesFor(setOf("A", "B", "C", "D"))
+
+        verify(getBalances).getBalancesFor(xpubs, imported)
     }
 
     @Test
     fun `can look up individual balances`() {
+        val xpubs = listOf(
+            XPubs(XPub(address = "A", derivation = XPub.Format.LEGACY)),
+            XPubs(XPub(address = "D", derivation = XPub.Format.SEGWIT))
+        )
+
         calculateCryptoBalanceMap(
             CryptoCurrency.BCH,
-            { mapOf("A" to 100L, "B" to 200L, "Not listed" to 400L) }.toBalanceQuery(),
-            xpubs = setOf("A"),
-            imported = setOf("B")
+            { mapOf(
+                "A" to 100L,
+                "B" to 200L,
+                "C" to 300L,
+                "D" to 400L,
+                "Not listed" to 500L
+            ) }.toBalanceQuery(),
+            xpubs = xpubs,
+            imported = listOf("B")
         ).apply {
-            get("A") `should equal` 100.satoshiCash()
-            get("B") `should equal` 200.satoshiCash()
-            get("Not listed") `should equal` 400.satoshiCash()
-            get("Missing") `should equal` CryptoValue.ZeroBch
+            get("A") `should equal` 100L.satoshiCash()
+            get("B") `should equal` 200L.satoshiCash()
+            get("C") `should equal` 300L.satoshiCash()
+            get("D") `should equal` 400L.satoshiCash()
+            get("Not listed") `should equal` 500L.satoshiCash()
+            get("Missing") `should equal` 0L.satoshiCash()
         }
     }
 
     @Test
     fun `can adjust an xpub balance`() {
+        val xpubs = listOf(
+            XPubs(XPub(address = "A", derivation = XPub.Format.LEGACY)),
+            XPubs(XPub(address = "D", derivation = XPub.Format.SEGWIT))
+        )
+
         calculateCryptoBalanceMap(
             CryptoCurrency.BTC,
             { mapOf("A" to 100L, "B" to 200L) }.toBalanceQuery(),
-            xpubs = setOf("A"),
-            imported = setOf("B")
+            xpubs = xpubs,
+            imported = listOf("B")
         ).apply {
             totalSpendable `should equal` 300L.satoshi()
             totalSpendableImported `should equal` 200L.satoshi()
@@ -161,11 +177,16 @@ class CryptoBalanceMapTest {
 
     @Test
     fun `can adjust a imported balance`() {
+        val xpubs = listOf(
+            XPubs(XPub(address = "A", derivation = XPub.Format.LEGACY)),
+            XPubs(XPub(address = "D", derivation = XPub.Format.SEGWIT))
+        )
+
         calculateCryptoBalanceMap(
             CryptoCurrency.BCH,
             { mapOf("A" to 100L, "B" to 200L) }.toBalanceQuery(),
-            xpubs = setOf("A"),
-            imported = setOf("B")
+            xpubs = xpubs,
+            imported = listOf("B")
         ).apply {
             totalSpendable `should equal` 300.satoshiCash()
             totalSpendableImported `should equal` 200.satoshiCash()
@@ -181,11 +202,16 @@ class CryptoBalanceMapTest {
 
     @Test
     fun `can adjust a watch only balance`() {
+        val xpubs = listOf(
+            XPubs(XPub(address = "A", derivation = XPub.Format.LEGACY)),
+            XPubs(XPub(address = "E", derivation = XPub.Format.SEGWIT))
+        )
+
         calculateCryptoBalanceMap(
             CryptoCurrency.BCH,
             { mapOf("A" to 100L, "B" to 200L) }.toBalanceQuery(),
-            xpubs = setOf("A"),
-            imported = setOf("B")
+            xpubs = xpubs,
+            imported = listOf("B")
         ).apply {
             totalSpendable `should equal` 300.satoshiCash()
             totalSpendableImported `should equal` 200.satoshiCash()
@@ -199,23 +225,32 @@ class CryptoBalanceMapTest {
 
     @Test
     fun `can't adjust a missing balance`() {
+
+        val xpubs = listOf(
+            XPubs(XPub(address = "A", derivation = XPub.Format.LEGACY)),
+            XPubs(XPub(address = "D", derivation = XPub.Format.SEGWIT))
+        )
+
         calculateCryptoBalanceMap(
             CryptoCurrency.BCH,
             { mapOf("A" to 100L, "B" to 200L) }.toBalanceQuery(),
-            xpubs = setOf("A"),
-            imported = setOf("B")
+            xpubs = xpubs,
+            imported = listOf("B")
         ).apply {
             {
                 subtractAmountFromAddress("Missing", 500L.satoshi())
             } `should throw the Exception` Exception::class `with message`
-                "No info for this address. updateAllBalances should be called first."
+                    "No info for this address. updateAllBalances should be called first."
         }
     }
 }
 
 private fun (() -> Map<String, Long>).toBalanceQuery() =
     object : BalanceQuery {
-        override fun getBalancesFor(addressesAndXpubs: Set<String>): Map<String, BigInteger> {
+        override fun getBalancesFor(
+            xpubs: List<XPubs>,
+            legacyImported: List<String>
+        ): Map<String, BigInteger> {
             return this@toBalanceQuery().toBigIntegerMap()
         }
     }

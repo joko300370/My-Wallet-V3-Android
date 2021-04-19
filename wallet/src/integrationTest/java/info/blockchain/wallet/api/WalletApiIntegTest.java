@@ -31,15 +31,11 @@ public final class WalletApiIntegTest extends BaseIntegTest {
     private String sharedKey = "b4ff6bf5-17a9-4905-b54b-a526816aa100";
 
     private WalletApi walletApi = new WalletApi(
-            BlockchainFramework.getRetrofitExplorerInstance()
-                    .create(WalletExplorerEndpoints.class),
-            new ApiCode() {
-                @NotNull
-                @Override
-                public String getApiCode() {
-                    return BlockchainFramework.getApiCode();
-                }
-            }
+        getRetrofit(
+            "https://explorer.staging.blockchain.info/",
+            getOkHttpClient()
+        ).create(WalletExplorerEndpoints.class),
+        BlockchainFramework::getApiCode
     );
 
     @Test

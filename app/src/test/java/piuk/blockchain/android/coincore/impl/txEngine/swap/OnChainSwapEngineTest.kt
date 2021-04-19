@@ -30,7 +30,6 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import org.amshove.kluent.itReturns
 import org.amshove.kluent.shouldEqual
-import org.bitcoinj.core.NetworkParameters
 import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
@@ -53,7 +52,6 @@ import piuk.blockchain.android.coincore.impl.injectMocks
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.impl.txEngine.PricedQuote
 import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 class OnChainSwapEngineTest {
@@ -68,10 +66,6 @@ class OnChainSwapEngineTest {
     private val walletManager: CustodialWalletManager = mock()
     private val quotesEngine: TransferQuotesEngine = mock()
     private val kycTierService: TierService = mock()
-    private val btcNetworkParams: NetworkParameters = mock()
-    private val environmentConfig: EnvironmentConfig = mock {
-        on { bitcoinNetworkParameters } itReturns btcNetworkParams
-    }
 
     private val exchangeRates: ExchangeRateDataManager = mock {
         on { getLastPrice(SRC_ASSET, SELECTED_FIAT) } itReturns EXCHANGE_RATE
@@ -89,8 +83,7 @@ class OnChainSwapEngineTest {
         engine = onChainEngine,
         walletManager = walletManager,
         quotesEngine = quotesEngine,
-        kycTierService = kycTierService,
-        environmentConfig = environmentConfig
+        kycTierService = kycTierService
     )
 
     @Before
@@ -328,7 +321,6 @@ class OnChainSwapEngineTest {
         verify(quotesEngine).pricedQuote
         verify(quotesEngine, atLeastOnce()).getLatestQuote()
         verify(exchangeRates).getLastPrice(SRC_ASSET, SELECTED_FIAT)
-        verify(environmentConfig).bitcoinNetworkParameters
         verify(onChainEngine).doInitialiseTx()
 
         noMoreInteractions(sourceAccount, txTarget)
@@ -398,7 +390,6 @@ class OnChainSwapEngineTest {
         verify(quotesEngine).pricedQuote
         verify(quotesEngine, atLeastOnce()).getLatestQuote()
         verify(exchangeRates).getLastPrice(SRC_ASSET, SELECTED_FIAT)
-        verify(environmentConfig).bitcoinNetworkParameters
         verify(onChainEngine).doInitialiseTx()
 
         noMoreInteractions(sourceAccount, txTarget)
@@ -686,7 +677,6 @@ class OnChainSwapEngineTest {
         verifyNoMoreInteractions(exchangeRates)
         verifyNoMoreInteractions(quotesEngine)
         verifyNoMoreInteractions(kycTierService)
-        verifyNoMoreInteractions(environmentConfig)
         verifyNoMoreInteractions(onChainEngine)
     }
 

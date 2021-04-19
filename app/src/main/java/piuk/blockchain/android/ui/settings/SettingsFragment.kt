@@ -51,7 +51,6 @@ import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.mukesh.countrypicker.CountryPicker
 import info.blockchain.wallet.api.data.Settings
-import info.blockchain.wallet.util.FormatsUtil
 import info.blockchain.wallet.util.PasswordUtil
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -97,6 +96,7 @@ import piuk.blockchain.android.ui.thepit.PitLaunchBottomDialog
 import piuk.blockchain.android.ui.thepit.PitPermissionsActivity
 import piuk.blockchain.android.util.AfterTextChangedWatcher
 import piuk.blockchain.android.util.AndroidUtils
+import piuk.blockchain.android.util.FormatChecker
 import piuk.blockchain.android.util.RootUtil
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.androidcore.data.events.ActionEvent
@@ -176,6 +176,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
     private val currencyPrefs: CurrencyPrefs by inject()
     private val analytics: Analytics by inject()
     private val rxBus: RxBus by inject()
+    private val formatChecker: FormatChecker by inject()
 
     private var pwStrength = 0
     private var progressDialog: MaterialProgressDialog? = null
@@ -363,7 +364,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
 
     override fun showEmailDialog(currentEmail: String, emailVerified: Boolean) {
-        showUpdateEmailDialog(settingsActivity, settingsPresenter, currentEmail, emailVerified)
+        showUpdateEmailDialog(settingsActivity, settingsPresenter, currentEmail, emailVerified, formatChecker)
     }
 
     override fun hideProgress() {
@@ -851,7 +852,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
                 positive.setOnClickListener {
                     val sms = countryTextView.text.toString() + mobileNumber.text.toString()
 
-                    if (!FormatsUtil.isValidMobileNumber(sms)) {
+                    if (!formatChecker.isValidMobileNumber(sms)) {
                         showCustomToast(R.string.invalid_mobile)
                     } else {
                         settingsPresenter.updateSms(sms)

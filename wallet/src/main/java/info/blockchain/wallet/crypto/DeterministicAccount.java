@@ -13,8 +13,8 @@ import java.util.List;
 
 public class DeterministicAccount implements DeterministicNode {
 
-    private DeterministicKey deterministicAccountKey;
-    private List<DeterministicChain> chains;
+    private final DeterministicKey deterministicAccountKey;
+    private final List<DeterministicChain> chains;
 
     DeterministicAccount(DeterministicKey deterministicWalletKey, int accountIndex) {
         // L0PRV & STDVx: private derivation.
@@ -41,7 +41,7 @@ public class DeterministicAccount implements DeterministicNode {
         ByteBuffer bb = ByteBuffer.wrap(xpubBytes);
 
         int version = bb.getInt();
-        if (version != params.getBip32HeaderPub()) {
+        if (version != params.getBip32HeaderP2PKHpub()) { //.getBip32HeaderPub()) {
             throw new AddressFormatException("invalid xpub version");
         }
 

@@ -13,6 +13,7 @@ import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
+import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -182,6 +183,8 @@ class XlmOnChainTxEngineTest {
             on { address } itReturns TARGET_ADDRESS
             on { memo } itReturns MEMO_TEXT
         }
+
+        whenever(sourceAccount.asset).thenReturn(ASSET)
 
         subject.start(
             sourceAccount,

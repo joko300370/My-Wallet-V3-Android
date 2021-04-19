@@ -23,7 +23,6 @@ import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.thepit.PitLinking
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.exchangerate.PriceSeries
@@ -47,7 +46,6 @@ internal abstract class CryptoAssetBase(
     protected val custodialManager: CustodialWalletManager,
     private val pitLinking: PitLinking,
     protected val crashLogger: CrashLogger,
-    protected val environmentConfig: EnvironmentConfig,
     protected val offlineAccounts: OfflineAccountUpdater,
     private val identity: UserIdentity
 ) : CryptoAsset, AccountRefreshTrigger {
@@ -134,8 +132,7 @@ internal abstract class CryptoAssetBase(
                             asset,
                             labels.getDefaultInterestWalletLabel(asset),
                             custodialManager,
-                            exchangeRates,
-                            environmentConfig
+                            exchangeRates
                         )
                     )
                 } else {
@@ -153,7 +150,6 @@ internal abstract class CryptoAssetBase(
                     label = labels.getDefaultCustodialWalletLabel(asset),
                     exchangeRates = exchangeRates,
                     custodialWalletManager = custodialManager,
-                    environmentConfig = environmentConfig,
                     identity = identity
                 )
             )
@@ -209,8 +205,7 @@ internal abstract class CryptoAssetBase(
                         asset = asset,
                         label = labels.getDefaultExchangeWalletLabel(),
                         address = address,
-                        exchangeRates = exchangeRates,
-                        environmentConfig = environmentConfig
+                        exchangeRates = exchangeRates
                     )
                 )
             }

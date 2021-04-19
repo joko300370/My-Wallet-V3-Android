@@ -17,17 +17,15 @@ import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.android.coincore.updateTxValidity
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 
 class OnChainSwapTxEngine(
     quotesEngine: TransferQuotesEngine,
     walletManager: CustodialWalletManager,
     kycTierService: TierService,
-    private val engine: OnChainTxEngineBase,
-    environmentConfig: EnvironmentConfig
+    private val engine: OnChainTxEngineBase
 ) : SwapTxEngineBase(
-    quotesEngine, walletManager, kycTierService, environmentConfig
+    quotesEngine, walletManager, kycTierService
 ) {
     override val direction: TransferDirection by unsafeLazy {
         when (txTarget) {

@@ -46,7 +46,7 @@ internal class EthCryptoWalletAccount(
             .singleOrError()
             .map { CryptoValue(CryptoCurrency.ETHER, it.getTotalBalance()) }
             .doOnSuccess {
-                hasFunds.set(it > CryptoValue.ZeroEth)
+                hasFunds.set(it > CryptoValue.zero(CryptoCurrency.ETHER))
             }
             .map { it }
 

@@ -52,7 +52,10 @@ class PromptingSeedAccessAdapterTest {
         val secondPasswordHandler: SecondPasswordHandler = mock {
             on { secondPassword() } itReturns Maybe.empty()
         }
-        val seedAccess: SeedAccess = PromptingSeedAccessAdapter(seedAccessWithoutPrompt, secondPasswordHandler)
+        val seedAccess: SeedAccess = PromptingSeedAccessAdapter(
+            seedAccessWithoutPrompt,
+            secondPasswordHandler
+        )
 
         seedAccess.seedPromptIfRequired
             .test()

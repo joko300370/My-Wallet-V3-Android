@@ -6,17 +6,15 @@ import android.content.Intent
 import android.content.pm.ResolveInfo
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import android.util.Pair
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
-import com.blockchain.extensions.exhaustive
 import com.blockchain.sunriver.StellarPayment
 import com.blockchain.sunriver.fromStellarUri
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.wallet.util.FormatsUtil
 import org.bitcoinj.uri.BitcoinURI
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetResources
-import piuk.blockchain.android.util.BitcoinLinkGenerator
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.io.File
@@ -26,7 +24,10 @@ import java.io.IOException
 import java.util.ArrayList
 import java.util.HashMap
 
-class ReceiveIntentHelper(private val context: Context, private val assetResources: AssetResources) {
+class ReceiveIntentHelper(
+    private val context: Context,
+    private val assetResources: AssetResources
+) {
 
     internal fun getIntentDataList(
         uri: String,
@@ -72,7 +73,7 @@ class ReceiveIntentHelper(private val context: Context, private val assetResourc
                         uri = uri
                     )
                 else -> throw NotImplementedError("${cryptoCurrency.displayTicker} is not fully supported yet")
-            }.exhaustive
+            }
 
             val imageIntent = Intent().apply { setupIntentForImage(type, file) }
 
@@ -160,7 +161,8 @@ class ReceiveIntentHelper(private val context: Context, private val assetResourc
             }
         val body = String.format(context.getString(R.string.email_request_body_btc), amount, address)
 
-        putExtra(Intent.EXTRA_TEXT, "$body\n\n ${BitcoinLinkGenerator.getLink(addressUri)}")
+        val text = "$body\n\n ${FormatsUtil.toBtcUri(address)}"
+        putExtra(Intent.EXTRA_TEXT, text)
         putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_request_subject, displayName))
     }
 

@@ -22,7 +22,6 @@ dependencies {
     // Testing
     testImplementation Libraries.junit
     testImplementation Libraries.mockito
-    testImplementation Libraries.json
     testImplementation Libraries.kluent
     testImplementation Libraries.mockWebServer
     testImplementation Libraries.okHttpMock

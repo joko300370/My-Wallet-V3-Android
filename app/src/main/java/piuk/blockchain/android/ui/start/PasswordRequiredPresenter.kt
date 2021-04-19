@@ -25,7 +25,7 @@ class PasswordRequiredPresenter(
 
     fun onContinueClicked(password: String) {
         if (password.length > 1) {
-            val guid = prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, "")
+            val guid = prefs.walletGuid
             verifyPassword(password, guid)
         } else {
             view?.apply {
@@ -42,9 +42,7 @@ class PasswordRequiredPresenter(
     }
 
     fun loadWalletGuid() {
-        view?.showWalletGuid(
-            prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, "")
-        )
+        view?.showWalletGuid(prefs.walletGuid)
     }
 
     override fun onAuthFailed() {

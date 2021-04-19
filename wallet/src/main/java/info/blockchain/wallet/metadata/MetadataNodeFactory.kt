@@ -1,5 +1,6 @@
 package info.blockchain.wallet.metadata
 
+import info.blockchain.wallet.keys.MasterKey
 import info.blockchain.wallet.metadata.data.RemoteMetadataNodes
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.crypto.DeterministicKey
@@ -18,7 +19,7 @@ class MetadataNodeFactory(
 
     val secondPwNode = deriveSecondPasswordNode(guid, sharedKey, walletPassword)
 
-    fun remoteMetadataHdNodes(masterKey: DeterministicKey): RemoteMetadataNodes { // Derive nodes
+    fun remoteMetadataHdNodes(masterKey: MasterKey): RemoteMetadataNodes { // Derive nodes
         // Save nodes hex on 2nd pw metadata
         return RemoteMetadataNodes().apply {
             mdid = metadataDerivation.deriveSharedMetadataNode(masterKey)

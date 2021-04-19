@@ -1,26 +1,14 @@
 package info.blockchain.wallet.payload.data
 
 fun Wallet.nonArchivedImportedAddressStrings() =
-    nonArchivedImportedAddresses()
-        .addressSet()
-
-fun Wallet.spendableImportedAddressStrings() =
-    nonArchivedImportedAddresses()
-        .addressSet()
-
-fun Wallet.allSpendableAccountsAndAddresses() =
-    activeXpubs() + spendableImportedAddressStrings()
+    nonArchivedImportedAddresses().distinct()
 
 fun Wallet.allNonArchivedAccountsAndAddresses() =
-    activeXpubs() + nonArchivedImportedAddressStrings()
+    ((activeXpubs().allAddresses() + nonArchivedImportedAddressStrings().toSet())).distinct()
 
 private fun Wallet.nonArchivedImportedAddresses() =
     importedAddressList
-        .filterNot { it.isArchived }
-
-private fun Iterable<ImportedAddress>.addressSet() =
-    map { it.address }
-        .toSet()
+        .filterNot { it.isArchived }.map { it.address }
 
 fun Wallet.activeXpubs() =
-    hdWallets?.get(0)?.activeXpubs?.toSet() ?: emptySet()
+    walletBody?.activeXpubs ?: emptyList()

@@ -3,18 +3,18 @@ package piuk.blockchain.android.coincore.btc
 import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
-import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import info.blockchain.wallet.api.data.FeeOptions
+import info.blockchain.wallet.payload.data.XPubs
+import info.blockchain.wallet.payload.model.Utxo
 import info.blockchain.wallet.payment.Payment
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
-import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.core.Transaction
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -65,7 +65,6 @@ class BtcOnChainTxEngine(
     private val btcDataManager: PayloadDataManager,
     private val sendDataManager: SendDataManager,
     private val feeManager: FeeDataManager,
-    private val btcNetworkParams: NetworkParameters,
     walletPreferences: WalletStatus,
     requireSecondPassword: Boolean
 ) : OnChainTxEngineBase(
@@ -85,10 +84,6 @@ class BtcOnChainTxEngine(
 
     private val btcSource: BtcCryptoWalletAccount by unsafeLazy {
         sourceAccount as BtcCryptoWalletAccount
-    }
-
-    private val sourceAddress: String by unsafeLazy {
-        btcSource.xpubAddress
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
@@ -112,7 +107,7 @@ class BtcOnChainTxEngine(
         Singles.zip(
             sourceAccount.accountBalance.map { it as CryptoValue },
             getDynamicFeePerKb(pendingTx),
-            getUnspentApiResponse(sourceAddress)
+            getUnspentApiResponse(btcSource.xpubs)
         ) { total, optionsAndFeePerKb, coins ->
             updatePendingTxFromAmount(
                 amount as CryptoValue,
@@ -128,22 +123,23 @@ class BtcOnChainTxEngine(
             )
         )
 
-    private fun getUnspentApiResponse(address: String): Single<UnspentOutputs> =
-        if (btcDataManager.getAddressBalance(address) > CryptoValue.zero(sourceAsset)) {
-            sendDataManager.getUnspentBtcOutputs(address)
-                // If we get here, we should have balance... but if we have no UTXOs then we have
-                // a problem:
+    private fun getUnspentApiResponse(xpubs: XPubs): Single<List<Utxo>> {
+        val balance = btcDataManager.getAddressBalance(xpubs)
+        return if (balance.isPositive) {
+            sendDataManager.getUnspentBtcOutputs(xpubs)
+                // If we get here, we should have balance...
+                // but if we have no UTXOs then we have a problem:
                 .map { utxo ->
-                    if (utxo.unspentOutputs.isEmpty()) {
+                    if (utxo.isEmpty()) {
                         throw fatalError(IllegalStateException("No BTC UTXOs found for non-zero balance"))
                     } else {
                         utxo
                     }
                 }
-                .singleOrError()
         } else {
             Single.error(Throwable("No BTC funds"))
         }
+    }
 
     private fun getDynamicFeePerKb(pendingTx: PendingTx): Single<Pair<FeeOptions, CryptoValue>> =
         feeManager.btcFeeOptions
@@ -165,16 +161,22 @@ class BtcOnChainTxEngine(
         pendingTx: PendingTx,
         feePerKb: CryptoValue,
         feeOptions: FeeOptions,
-        coins: UnspentOutputs
+        coins: List<Utxo>
     ): PendingTx {
+        val targetOutputType = btcDataManager.getAddressOutputType(btcTarget.address)
+        val changeOutputType = btcDataManager.getXpubFormatOutputType(btcSource.xpubs.default.derivation)
+
         val available = sendDataManager.getMaximumAvailable(
             cryptoCurrency = sourceAsset,
+            targetOutputType = targetOutputType,
             unspentCoins = coins,
             feePerKb = feePerKb
         ) // This is total balance, with fees deducted
 
         val utxoBundle = sendDataManager.getSpendableCoins(
             unspentCoins = coins,
+            targetOutputType = targetOutputType,
+            changeOutputType = changeOutputType,
             paymentAmount = amount,
             feePerKb = feePerKb
         )
@@ -251,9 +253,14 @@ class BtcOnChainTxEngine(
     private fun isLargeTransaction(pendingTx: PendingTx): Boolean {
         val fiatValue = pendingTx.feeAmount.toFiat(exchangeRates, LARGE_TX_FIAT)
 
+        val outputs = listOf(
+            btcDataManager.getAddressOutputType(btcTarget.address),
+            btcDataManager.getXpubFormatOutputType(btcSource.xpubs.default.derivation)
+        )
+
         val txSize = sendDataManager.estimateSize(
-            inputs = pendingTx.utxoBundle.spendableOutputs.size,
-            outputs = 2 // assumes change required
+            inputs = pendingTx.utxoBundle.spendableOutputs,
+            outputs = outputs // assumes change required
         )
 
         val relativeFee = BigDecimal(100) * (pendingTx.feeAmount.toBigDecimal() / pendingTx.amount.toBigDecimal())
@@ -272,7 +279,7 @@ class BtcOnChainTxEngine(
 
     private fun validateAddress(): Completable =
         Completable.fromCallable {
-            if (!FormatsUtil.isValidBitcoinAddress(btcNetworkParams, btcTarget.address)) {
+            if (!FormatsUtil.isValidBitcoinAddress(btcTarget.address)) {
                 throw TxValidationFailure(ValidationState.INVALID_ADDRESS)
             }
         }

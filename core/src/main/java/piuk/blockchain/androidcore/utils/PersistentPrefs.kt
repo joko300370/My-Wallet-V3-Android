@@ -62,8 +62,6 @@ interface PersistentPrefs :
 
     companion object {
         const val KEY_ENCRYPTED_PASSWORD = "encrypted_password"
-        const val KEY_WALLET_GUID = "guid"
-        const val KEY_SHARED_KEY = "sharedKey"
         const val KEY_PIN_FAILS = "pin_fails"
 
         const val KEY_EMAIL = "email"

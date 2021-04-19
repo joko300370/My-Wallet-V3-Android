@@ -1,17 +1,16 @@
 package info.blockchain.wallet.payment
 
-import info.blockchain.api.data.UnspentOutput
+import info.blockchain.wallet.payload.model.Utxo
 import org.amshove.kluent.`should equal`
 import org.junit.Test
 import java.math.BigInteger
 
 class CoinSelectionTest {
-    private fun unspent(value: Int) =
-        UnspentOutput().apply { this.value = value.toBigInteger() }
+    private fun unspent(value: Int) = Utxo(value = value.toBigInteger())
 
     private fun unspents(vararg unspents: Int) = unspents.map { unspent(it) }
 
-    private fun List<UnspentOutput>.values() = map { it.value }
+    private fun List<Utxo>.values() = map { it.value }
 
     private val feePerByte = 55.toBigInteger()
 
@@ -20,11 +19,13 @@ class CoinSelectionTest {
         val coins = unspents(1, 20000, 0, 0, 300000, 50000, 30000)
         val outputAmount = 100000.toBigInteger()
 
-        CoinSelection(coins, feePerByte).select(outputAmount, AscentDraw).also {
-            it.spendableOutputs.values() `should equal` unspents(20000, 30000, 50000, 300000).values()
-            it.absoluteFee `should equal` 37070.toBigInteger()
-            it.consumedAmount `should equal` BigInteger.ZERO
-        }
+        CoinSelection(coins, feePerByte)
+            .select(outputAmount, AscentDraw)
+            .also {
+                it.spendableOutputs.values() `should equal` unspents(20000, 30000, 50000, 300000).values()
+                it.absoluteFee `should equal` 37070.toBigInteger()
+                it.consumedAmount `should equal` BigInteger.ZERO
+            }
     }
 
     @Test

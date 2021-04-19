@@ -292,7 +292,7 @@ class PrefsUtil(
             .putString(
                 KEY_ENCRYPTED_GUID,
                 aes.encrypt(
-                    getValue(PersistentPrefs.KEY_WALLET_GUID, ""),
+                    getValue(KEY_WALLET_GUID, ""),
                     encryptionKey,
                     AESUtil.PIN_PBKDF2_ITERATIONS_GUID
                 )
@@ -300,7 +300,7 @@ class PrefsUtil(
             .putString(
                 KEY_ENCRYPTED_SHARED_KEY,
                 aes.encrypt(
-                    getValue(PersistentPrefs.KEY_SHARED_KEY, ""),
+                    getValue(KEY_SHARED_KEY, ""),
                     encryptionKey,
                     AESUtil.PIN_PBKDF2_ITERATIONS_SHAREDKEY
                 )
@@ -321,7 +321,7 @@ class PrefsUtil(
             backupStore.getString(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, "") ?: ""
         )
         setValue(
-            PersistentPrefs.KEY_WALLET_GUID,
+            KEY_WALLET_GUID,
             aes.decrypt(
                 backupStore.getString(KEY_ENCRYPTED_GUID, ""),
                 decryptionKey,
@@ -329,7 +329,7 @@ class PrefsUtil(
             )
         )
         setValue(
-            PersistentPrefs.KEY_SHARED_KEY,
+            KEY_SHARED_KEY,
             aes.decrypt(
                 backupStore.getString(KEY_ENCRYPTED_SHARED_KEY, ""),
                 decryptionKey,
@@ -391,6 +391,14 @@ class PrefsUtil(
 
     override val encodedKeyName: String
         get() = KEY_ENCRYPTED_PIN_CODE
+
+    override var sharedKey: String
+        get() = getValue(KEY_SHARED_KEY, "")
+        set(v) = setValue(KEY_SHARED_KEY, v)
+
+    override var walletGuid: String
+        get() = getValue(KEY_WALLET_GUID, "")
+        set(v) = setValue(KEY_WALLET_GUID, v)
 
     override fun clearEncodedPin() {
         removeValue(KEY_ENCRYPTED_PIN_CODE)
@@ -480,13 +488,13 @@ class PrefsUtil(
      * Clears everything but the GUID for logging back in and the deviceId - for pre-IDV checking
      */
     override fun logOut() {
-        val guid = getValue(PersistentPrefs.KEY_WALLET_GUID, "")
+        val guid = getValue(KEY_WALLET_GUID, "")
         val deviceId = getValue(KEY_PRE_IDV_DEVICE_ID, "")
 
         clear()
 
         setValue(KEY_LOGGED_OUT, true)
-        setValue(PersistentPrefs.KEY_WALLET_GUID, guid)
+        setValue(KEY_WALLET_GUID, guid)
         setValue(KEY_PRE_IDV_DEVICE_ID, deviceId)
     }
 
@@ -572,12 +580,13 @@ class PrefsUtil(
         private const val KEY_SWIPE_RECEIVE_XLM_ADDRESS = "key_swipe_receive_xlm_address"
         private const val KEY_SWIPE_RECEIVE_BTC_ACCOUNT_NAME = "swipe_receive_account_name"
         private const val KEY_SWIPE_RECEIVE_BCH_ACCOUNT_NAME = "swipe_receive_bch_account_name"
-
         // New key
         private const val OFFLINE_CACHE_KEY = "key_offline_address_cache"
-
         // Auth prefs
         private const val KEY_ENCRYPTED_PIN_CODE = "encrypted_pin_code"
         private const val KEY_FINGERPRINT_ENABLED = "fingerprint_enabled"
+
+        private const val KEY_WALLET_GUID = "guid"
+        private const val KEY_SHARED_KEY = "sharedKey"
     }
 }

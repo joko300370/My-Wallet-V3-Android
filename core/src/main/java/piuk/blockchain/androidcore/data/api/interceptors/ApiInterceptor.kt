@@ -3,7 +3,7 @@ package piuk.blockchain.androidcore.data.api.interceptors
 import okhttp3.Interceptor
 import okhttp3.RequestBody
 import okhttp3.Response
-import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import okio.Buffer
 import timber.log.Timber
 import java.io.IOException
@@ -50,7 +50,7 @@ class ApiInterceptor : Interceptor {
         }
 
         return response.newBuilder()
-            .body(ResponseBody.create(response.body!!.contentType(), bodyString))
+            .body(bodyString.toResponseBody(response.body!!.contentType()))
             .build()
     }
 

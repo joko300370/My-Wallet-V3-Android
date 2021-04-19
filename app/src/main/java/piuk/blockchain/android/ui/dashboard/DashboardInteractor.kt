@@ -11,7 +11,6 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.Money
-import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.prices.TimeAgo
 import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.prices.data.PriceDatum
@@ -39,6 +38,7 @@ import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsFlow
 import piuk.blockchain.android.ui.settings.LinkablePaymentMethods
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -48,7 +48,7 @@ private class DashboardBalanceLoadFailure(msg: String, e: Throwable) : Exception
 
 class DashboardInteractor(
     private val coincore: Coincore,
-    private val payloadManager: PayloadManager,
+    private val payloadManager: PayloadDataManager,
     private val exchangeRates: ExchangeRates,
     private val currencyPrefs: CurrencyPrefs,
     private val custodialWalletManager: CustodialWalletManager,
@@ -224,7 +224,7 @@ class DashboardInteractor(
             )
     }
 
-    fun hasUserBackedUp(): Single<Boolean> = Single.just(payloadManager.isWalletBackedUp)
+    fun hasUserBackedUp(): Single<Boolean> = Single.just(payloadManager.isBackedUp)
 
     fun cancelSimpleBuyOrder(orderId: String): Disposable {
         return custodialWalletManager.deleteBuyOrder(orderId)

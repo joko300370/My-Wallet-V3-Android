@@ -203,7 +203,7 @@ class AuthDataManager(
             return
         }
 
-        if (prefs.hasBackup() && prefs.getValue(PersistentPrefs.KEY_WALLET_GUID) == null) {
+        if (prefs.hasBackup() && prefs.walletGuid.isEmpty()) {
             prefs.restoreFromBackup(decryptionKey, aesUtilWrapper)
         } else {
             prefs.backupCurrentPrefs(decryptionKey, aesUtilWrapper)

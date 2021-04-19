@@ -12,10 +12,6 @@ public class Hash implements Serializable {
         this.hash = null;
     }
 
-    public Hash(String hex) {
-        this.hash = Hex.decode(hex);
-    }
-
     public Hash(byte[] bytes) {
         this.hash = bytes;
     }
@@ -38,21 +34,6 @@ public class Hash implements Serializable {
 
     public byte[] getBytes() {
         return hash;
-    }
-
-    public int nLeadingZeros() {
-        int n = 0;
-
-        for (byte b : hash) {
-            if (b == 0)
-                n += 8;
-            else {
-                n += Math.max(0, Integer.numberOfLeadingZeros(b) - (3 * 8));
-                break;
-            }
-        }
-
-        return n;
     }
 
     public boolean isNull() {

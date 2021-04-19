@@ -91,6 +91,7 @@ public interface WalletExplorerEndpoints {
             @Field("payload") String payload,
             @Field("length") int length,
             @Field("checksum") String checksum,
+            @Field("active") String active,
             @Field("email") String email,
             @Field("device") String device,
             @Field("old_checksum") String old_checksum,

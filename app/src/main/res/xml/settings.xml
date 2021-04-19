@@ -72,10 +72,12 @@
             android:key="fingerprint"
             android:title="@string/enable_fingerprint"
             app:iconSpaceReserved="false" />
+
         <piuk.blockchain.android.ui.settings.preferences.CustomPreference
             android:key="backup"
             android:title="@string/backup_subtitle"
             app:iconSpaceReserved="false" />
+
         <piuk.blockchain.android.ui.settings.preferences.CustomSwitchPreference
             android:key="2fa"
             android:summary="@string/two_fa_summary"

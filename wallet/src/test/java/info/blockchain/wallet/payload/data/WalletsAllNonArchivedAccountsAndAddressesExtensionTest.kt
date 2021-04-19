@@ -13,21 +13,24 @@ class WalletsAllNonArchivedAccountsAndAddressesExtensionTest {
 
     @Test
     fun `empty list`() {
-        Wallet().allNonArchivedAccountsAndAddresses() `should equal` emptySet()
+        Wallet().allNonArchivedAccountsAndAddresses() `should equal` emptyList()
     }
 
     @Test
     fun `one spendable`() {
-        Wallet().apply {
+        val wallet = Wallet().apply {
             importedAddressList.add(importedAddressWithPrivateKey("Address1"))
-        }.allNonArchivedAccountsAndAddresses() `should equal` setOf("Address1")
+        }
+
+        val result = wallet.allNonArchivedAccountsAndAddresses()
+        result `should equal` listOf("Address1")
     }
 
     @Test
     fun `one archived`() {
         Wallet().apply {
             importedAddressList.add(importedAddressWithPrivateKey("Address1").apply { archive() })
-        }.allNonArchivedAccountsAndAddresses() `should equal` emptySet()
+        }.allNonArchivedAccountsAndAddresses() `should equal` emptyList()
     }
 
     @Test
@@ -36,7 +39,7 @@ class WalletsAllNonArchivedAccountsAndAddressesExtensionTest {
             importedAddressList.add(ImportedAddress().apply {
                 address = "Address1"
             })
-        }.allNonArchivedAccountsAndAddresses() `should equal` setOf("Address1")
+        }.allNonArchivedAccountsAndAddresses() `should equal` listOf("Address1")
     }
 
     @Test
@@ -44,7 +47,7 @@ class WalletsAllNonArchivedAccountsAndAddressesExtensionTest {
         Wallet().apply {
             importedAddressList.add(importedAddressWithPrivateKey("Address1"))
             importedAddressList.add(importedAddressWithPrivateKey("Address2"))
-        }.allNonArchivedAccountsAndAddresses() `should equal` setOf("Address1", "Address2")
+        }.allNonArchivedAccountsAndAddresses() `should equal` listOf("Address1", "Address2")
     }
 
     @Test
@@ -52,40 +55,40 @@ class WalletsAllNonArchivedAccountsAndAddressesExtensionTest {
         Wallet().apply {
             importedAddressList.add(importedAddressWithPrivateKey("Address1"))
             importedAddressList.add(importedAddressWithPrivateKey("Address1"))
-        }.allNonArchivedAccountsAndAddresses() `should equal` setOf("Address1")
+        }.allNonArchivedAccountsAndAddresses() `should equal` listOf("Address1")
     }
 
     @Test
     fun `one xpub`() {
         Wallet().apply {
-            hdWallets = listOf(hdWallet("XPub1"))
-        }.allNonArchivedAccountsAndAddresses() `should equal` setOf("XPub1")
+            walletBody = walletBody("XPub1")
+        }.allNonArchivedAccountsAndAddresses() `should equal` listOf("XPub1")
     }
 
     @Test
     fun `two xpubs`() {
         Wallet().apply {
-            hdWallets = listOf(hdWallet("XPub1", "XPub2"))
-        }.allNonArchivedAccountsAndAddresses() `should equal` setOf("XPub1", "XPub2")
+            walletBody = walletBody("XPub1", "XPub2")
+        }.allNonArchivedAccountsAndAddresses() `should equal` listOf("XPub1", "XPub2")
     }
 
     @Test
     fun `repeated xpubs`() {
         Wallet().apply {
-            hdWallets = listOf(hdWallet("XPub1", "XPub1"))
-        }.allNonArchivedAccountsAndAddresses() `should equal` setOf("XPub1")
+            walletBody = walletBody("XPub1", "XPub1")
+        }.allNonArchivedAccountsAndAddresses() `should equal` listOf("XPub1")
     }
 
     @Test
     fun `two xpubs, two spendable address and two non-spendable`() {
         Wallet().apply {
-            hdWallets = listOf(hdWallet("XPub1", "XPub2"))
+            walletBody = walletBody("XPub1", "XPub2")
             importedAddressList.add(importedAddressWithPrivateKey("Address1"))
             importedAddressList.add(importedAddressWithPrivateKey("Address2"))
             importedAddressList.add(
                 ImportedAddress().also { it.address = "Address3" })
             importedAddressList.add(importedAddressWithPrivateKey("Address4").apply { archive() })
-        }.allNonArchivedAccountsAndAddresses() `should equal` setOf(
+        }.allNonArchivedAccountsAndAddresses() `should equal` listOf(
             "XPub1",
             "XPub2",
             "Address1",
@@ -94,12 +97,12 @@ class WalletsAllNonArchivedAccountsAndAddressesExtensionTest {
         )
     }
 
-    private fun hdWallet(vararg xpubs: String) =
-        HDWallet().apply {
+    private fun walletBody(vararg xpubs: String) =
+        WalletBody().apply {
             accounts = xpubs.map {
-                Account().apply {
-                    xpub = it
-                }
+                AccountV3(
+                    legacyXpub = it
+                )
             }
         }
 }

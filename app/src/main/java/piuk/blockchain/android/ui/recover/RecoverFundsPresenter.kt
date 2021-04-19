@@ -13,7 +13,6 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import org.bitcoinj.crypto.MnemonicCode
 import org.bitcoinj.crypto.MnemonicException
-import org.bitcoinj.params.BitcoinMainNetParams
 import java.util.Locale
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.createwallet.WalletCreationEvent
@@ -73,8 +72,7 @@ class RecoverFundsPresenter(
     private fun recoverCredentials(recoveryPhrase: String): Single<WalletCredentialsMetadata> {
         require(recoveryPhrase.isNotEmpty())
 
-        val params = BitcoinMainNetParams.get()
-        val masterKey = payloadDataManager.generateMasterKeyFromSeed(recoveryPhrase, params)
+        val masterKey = payloadDataManager.generateMasterKeyFromSeed(recoveryPhrase)
         val metadataNode = metadataDerivation.deriveMetadataNode(masterKey)
 
         return metadataInteractor.loadRemoteMetadata(
@@ -107,8 +105,8 @@ class RecoverFundsPresenter(
             view.dismissProgressDialog()
         }.subscribeBy(
             onComplete = {
-                prefs.setValue(PersistentPrefs.KEY_SHARED_KEY, payloadDataManager.wallet!!.sharedKey)
-                prefs.setValue(PersistentPrefs.KEY_WALLET_GUID, payloadDataManager.wallet!!.guid)
+                prefs.sharedKey = payloadDataManager.wallet!!.sharedKey
+                prefs.walletGuid = payloadDataManager.wallet!!.guid
                 prefs.isOnboardingComplete = true
                 analytics.logEvent(WalletCreationEvent.RecoverWalletEvent(true))
                 view.startPinEntryActivity()

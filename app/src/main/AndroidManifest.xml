@@ -127,9 +127,6 @@
             android:name=".ui.backup.BackupWalletActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.upgrade.UpgradeWalletActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
             android:name=".ui.start.ManualPairingActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity

@@ -1,11 +1,10 @@
 package info.blockchain.wallet.payload.data;
 
 import java.net.URI;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import org.bitcoinj.params.BitcoinMainNetParams;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -16,9 +15,9 @@ public class ImportedAddressTest {
     public void fromJson_1() throws Exception {
 
         URI uri = getClass().getClassLoader().getResource("wallet_body_1.txt").toURI();
-        String body = new String(Files.readAllBytes(Paths.get(uri)), Charset.forName("utf-8"));
+        String body = new String(Files.readAllBytes(Paths.get(uri)), StandardCharsets.UTF_8);
 
-        Wallet wallet = Wallet.fromJson(BitcoinMainNetParams.get(), body);
+        Wallet wallet = Wallet.fromJson(body);
         Assert.assertEquals(19, wallet.getImportedAddressList().size());
 
         ImportedAddress addressBody = wallet.getImportedAddressList().get(0);
@@ -45,9 +44,9 @@ public class ImportedAddressTest {
 
         //Ensure toJson doesn't write any unintended fields
         URI uri = getClass().getClassLoader().getResource("wallet_body_1.txt").toURI();
-        String body = new String(Files.readAllBytes(Paths.get(uri)), Charset.forName("utf-8"));
+        String body = new String(Files.readAllBytes(Paths.get(uri)), StandardCharsets.UTF_8);
 
-        Wallet wallet = Wallet.fromJson(BitcoinMainNetParams.get(), body);
+        Wallet wallet = Wallet.fromJson(body);
         ImportedAddress addressBody = wallet.getImportedAddressList().get(0);
 
         String jsonString = addressBody.toJson();

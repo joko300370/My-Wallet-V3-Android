@@ -13,25 +13,9 @@ public interface FrameworkInterface extends ApiCode {
     Retrofit getRetrofitApiInstance();
 
     /**
-     * Provides an instance of Retrofit with it's base URL set to {@link
-     * info.blockchain.wallet.api.PersistentUrls#EXPLORER_URL} or its debug/staging/testnet equivalent
-     */
-    Retrofit getRetrofitExplorerInstance();
-
-    /**
      * Provides the currently chosen environment, as dictated by the top-level app
      */
     Environment getEnvironment();
-
-    /**
-     * Provides the currently chosen Network Parameters for Bitcoin, as dictated by the top-level app
-     */
-    NetworkParameters getBitcoinParams();
-
-    /**
-     * Provides the currently chosen Network Parameters for Bitcoin Cash, as dictated by the top-level app
-     */
-    NetworkParameters getBitcoinCashParams();
 
     /*
      * Provides device/platform name for analytical use in wallet payload.
@@ -44,5 +28,4 @@ public interface FrameworkInterface extends ApiCode {
      * Flags wallets and addresses as created on a certain app version - for issue debugging.
      */
     String getAppVersion();
-
 }

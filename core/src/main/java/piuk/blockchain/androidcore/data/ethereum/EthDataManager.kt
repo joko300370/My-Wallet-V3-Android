@@ -4,13 +4,10 @@ import com.blockchain.logging.LastTxUpdater
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoCurrency.Companion.IS_ERC20
 import info.blockchain.balance.CryptoValue
-import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.ethereum.Erc20TokenData
 import info.blockchain.wallet.ethereum.EthAccountApi
-import info.blockchain.wallet.ethereum.EthereumAccount
 import info.blockchain.wallet.ethereum.EthereumWallet
 import info.blockchain.wallet.ethereum.data.Erc20AddressResponse
-import info.blockchain.wallet.ethereum.data.EthAddressResponseMap
 import info.blockchain.wallet.ethereum.data.EthLatestBlockNumber
 import info.blockchain.wallet.ethereum.data.EthTransaction
 import info.blockchain.wallet.ethereum.data.TransactionState
@@ -20,12 +17,10 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
-import org.bitcoinj.core.ECKey
 import org.spongycastle.util.encoders.Hex
 import org.web3j.abi.TypeEncoder
 import org.web3j.abi.datatypes.Address
 import org.web3j.crypto.RawTransaction
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.erc20.Erc20DataModel
 import piuk.blockchain.androidcore.data.erc20.Erc20Transfer
 import piuk.blockchain.androidcore.data.erc20.datastores.Erc20DataStore
@@ -48,7 +43,6 @@ class EthDataManager(
     private val erc20DataStore: Erc20DataStore,
     private val walletOptionsDataManager: WalletOptionsDataManager,
     private val metadataManager: MetadataManager,
-    private val environmentSettings: EnvironmentConfig,
     private val lastTxUpdater: LastTxUpdater,
     rxBus: RxBus
 ) {
@@ -71,17 +65,11 @@ class EthDataManager(
      * @return An [Observable] wrapping an [CombinedEthModel]
      */
     fun fetchEthAddress(): Observable<CombinedEthModel> =
-        if (environmentSettings.environment == Environment.TESTNET) {
-            // TODO(eth testnet explorer coming soon)
-            Observable.just(CombinedEthModel(EthAddressResponseMap()))
-                .doOnNext { ethDataStore.ethAddressResponse = null }
-        } else {
-            rxPinning.call<CombinedEthModel> {
-                ethAccountApi.getEthAddress(listOf(ethDataStore.ethWallet!!.account.address))
-                    .map(::CombinedEthModel)
-                    .doOnNext { ethDataStore.ethAddressResponse = it }
-                    .subscribeOn(Schedulers.io())
-            }
+        rxPinning.call<CombinedEthModel> {
+            ethAccountApi.getEthAddress(listOf(ethDataStore.ethWallet!!.account.address))
+                .map(::CombinedEthModel)
+                .doOnNext { ethDataStore.ethAddressResponse = it }
+                .subscribeOn(Schedulers.io())
         }
 
     fun fetchErc20DataModel(asset: CryptoCurrency): Observable<Erc20DataModel> {
@@ -212,32 +200,7 @@ class EthDataManager(
      * @return An [Observable] wrapping a [Number]
      */
     fun getLatestBlockNumber(): Single<EthLatestBlockNumber> =
-        if (environmentSettings.environment == Environment.TESTNET) {
-            // TODO(eth testnet explorer coming soon)
-            Single.just(EthLatestBlockNumber())
-        } else {
-            ethAccountApi.latestBlockNumber.applySchedulers()
-        }
-
-    /**
-     * Returns true if a given ETH address is associated with an Ethereum contract.
-     * This should be used to validate any proposed destination address for
-     * funds.
-     *
-     * @param address The ETH address to be queried
-     * @return An [Observable] returning true or false based on the address's contract status
-     */
-    @Deprecated(message = "Use the Single<> version")
-    fun getIfContract(address: String): Observable<Boolean> =
-        if (environmentSettings.environment == Environment.TESTNET) {
-            // TODO(eth testnet explorer coming soon)
-            Observable.just(false)
-        } else {
-            rxPinning.call<Boolean> {
-                ethAccountApi.getIfContract(address)
-                    .applySchedulers()
-            }
-        }
+        ethAccountApi.latestBlockNumber.applySchedulers()
 
     fun isContractAddress(address: String): Single<Boolean> =
         rxPinning.call<Boolean> {
@@ -362,34 +325,24 @@ class EthDataManager(
                 it.getNonce()
             }
 
-    @Deprecated("Why pass the key in when we can derive it here? Use the other overload")
-    fun signEthTransaction(rawTransaction: RawTransaction, ecKey: ECKey): Observable<ByteArray> =
-        Observable.fromCallable {
-            ethDataStore.ethWallet!!.account!!.signTransaction(rawTransaction, ecKey)
-        }
-
     fun signEthTransaction(rawTransaction: RawTransaction, secondPassword: String = ""): Single<ByteArray> =
         Single.fromCallable {
             if (payloadDataManager.isDoubleEncrypted) {
                 payloadDataManager.decryptHDWallet(secondPassword)
             }
-            val ecKey = EthereumAccount.deriveECKey(payloadDataManager.masterKey, 0)
-            ethDataStore.ethWallet!!.account!!.signTransaction(rawTransaction, ecKey)
+            val account = ethDataStore.ethWallet?.account ?: throw IllegalStateException("No Eth wallet defined")
+            account.signTransaction(rawTransaction, payloadDataManager.masterKey)
         }
 
     fun pushEthTx(signedTxBytes: ByteArray): Observable<String> =
-        if (environmentSettings.environment == Environment.TESTNET) {
-            Observable.error(NotImplementedError("ETH Testnet not implemented"))
-        } else {
-            rxPinning.call<String> {
-                ethAccountApi.pushTx("0x" + String(Hex.encode(signedTxBytes)))
-                    .flatMap {
-                        lastTxUpdater.updateLastTxTime()
-                            .onErrorComplete()
-                            .andThen(Observable.just(it))
-                    }
-                    .applySchedulers()
-            }
+        rxPinning.call<String> {
+            ethAccountApi.pushTx("0x" + String(Hex.encode(signedTxBytes)))
+                .flatMap {
+                    lastTxUpdater.updateLastTxTime()
+                        .onErrorComplete()
+                        .andThen(Observable.just(it))
+                }
+                .applySchedulers()
         }
 
     fun pushTx(signedTxBytes: ByteArray): Single<String> =

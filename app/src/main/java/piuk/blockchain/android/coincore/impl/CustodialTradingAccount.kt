@@ -28,7 +28,6 @@ import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.identity.Feature
 import piuk.blockchain.android.identity.UserIdentity
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import timber.log.Timber
@@ -40,7 +39,6 @@ open class CustodialTradingAccount(
     override val exchangeRates: ExchangeRateDataManager,
     val custodialWalletManager: CustodialWalletManager,
     val isNoteSupported: Boolean = false,
-    private val environmentConfig: EnvironmentConfig,
     private val identity: UserIdentity
 ) : CryptoAccountBase(), TradingAccount {
 
@@ -52,7 +50,6 @@ open class CustodialTradingAccount(
                 asset = asset,
                 address = it,
                 label = label,
-                environmentConfig = environmentConfig,
                 postTransactions = onTxCompleted
             )
         }

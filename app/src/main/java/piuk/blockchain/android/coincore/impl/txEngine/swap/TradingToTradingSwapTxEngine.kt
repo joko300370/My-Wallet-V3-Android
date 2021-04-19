@@ -12,14 +12,12 @@ import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 
 class TradingToTradingSwapTxEngine(
     walletManager: CustodialWalletManager,
     quotesEngine: TransferQuotesEngine,
-    kycTierService: TierService,
-    environmentConfig: EnvironmentConfig
-) : SwapTxEngineBase(quotesEngine, walletManager, kycTierService, environmentConfig) {
+    kycTierService: TierService
+) : SwapTxEngineBase(quotesEngine, walletManager, kycTierService) {
 
     override val availableBalance: Single<Money>
         get() = sourceAccount.accountBalance

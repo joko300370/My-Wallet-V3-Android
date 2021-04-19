@@ -38,6 +38,7 @@ import piuk.blockchain.androidcore.utils.PrefsUtil
 import java.security.Signature
 import javax.crypto.Cipher
 
+@Suppress("PrivatePropertyName")
 @Config(sdk = [23], application = BlockchainTestApplication::class) @RunWith(
     RobolectricTestRunner::class
 )

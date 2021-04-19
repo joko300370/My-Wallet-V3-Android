@@ -1,21 +1,13 @@
 package info.blockchain.wallet.payment;
 
-import info.blockchain.api.data.UnspentOutput;
-import info.blockchain.api.pushtx.PushTx;
-import info.blockchain.balance.CryptoCurrency;
-import info.blockchain.wallet.BlockchainFramework;
-import info.blockchain.wallet.api.dust.data.DustInput;
-import info.blockchain.wallet.util.FormatsUtil;
-import info.blockchain.wallet.util.Hash;
-import info.blockchain.wallet.util.Tools;
-import okhttp3.ResponseBody;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.AddressFormatException;
-import org.bitcoinj.core.CashAddress;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.LegacyAddress;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.core.ProtocolException;
+import org.bitcoinj.core.SegwitAddress;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionInput;
@@ -33,14 +25,23 @@ import org.bitcoinj.wallet.RedeemData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
-import retrofit2.Call;
 
-import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import javax.annotation.Nullable;
+
+import info.blockchain.wallet.api.dust.data.DustInput;
+import info.blockchain.wallet.bch.BchLocalTransactionSigner;
+import info.blockchain.wallet.bch.CashAddress;
+import info.blockchain.wallet.payload.model.Utxo;
+import info.blockchain.wallet.util.FormatsUtil;
+import info.blockchain.wallet.util.Hash;
+import info.blockchain.wallet.util.Tools;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -51,32 +52,49 @@ class PaymentTx {
 
     public static synchronized Transaction makeSimpleTransaction(
             NetworkParameters networkParameters,
-            List<UnspentOutput> unspentCoins,
+            List<Utxo> unspentCoins,
             HashMap<String, BigInteger> receivingAddresses,
             BigInteger fee,
-            @Nullable String changeAddress) throws InsufficientMoneyException, AddressFormatException {
-
-        Transaction transaction = new Transaction(networkParameters);
+            @Nullable String changeAddress
+    ) throws InsufficientMoneyException, AddressFormatException {
+        Transaction transaction = Tools.makeTxObject(networkParameters);
 
         // Outputs
-        BigInteger outputValueSum = addTransactionOutputs(networkParameters, transaction,
-                receivingAddresses);
+        BigInteger outputValueSum = addTransactionOutputs(
+            networkParameters,
+            transaction,
+            receivingAddresses
+        );
         BigInteger valueNeeded = outputValueSum.add(fee);
 
         // Inputs
-        BigInteger inputValueSum = addTransactionInputList(networkParameters, transaction, unspentCoins, valueNeeded);
+        BigInteger inputValueSum = addTransactionInputList(
+            networkParameters,
+            transaction,
+            unspentCoins,
+            valueNeeded
+        );
 
         // Add Change
         if (changeAddress != null) {
-            addChange(networkParameters, transaction, fee, changeAddress, outputValueSum, inputValueSum);
+            addChange(
+                networkParameters,
+                transaction,
+                fee,
+                changeAddress,
+                outputValueSum,
+                inputValueSum
+            );
         }
 
         return Tools.applyBip69(transaction);
     }
 
-    private static BigInteger addTransactionOutputs(NetworkParameters networkParameters,
-                                                    Transaction transaction,
-                                                    HashMap<String, BigInteger> receivingAddresses) throws AddressFormatException {
+    private static BigInteger addTransactionOutputs(
+        NetworkParameters networkParameters,
+        Transaction transaction,
+        Map<String, BigInteger> receivingAddresses
+    ) throws AddressFormatException {
 
         BigInteger outputValueSum = BigInteger.ZERO;
 
@@ -89,17 +107,13 @@ class PaymentTx {
             //Don't allow less than dust value
             if (amount == null
                     || amount.compareTo(BigInteger.ZERO) <= 0
-                    || amount.compareTo(Payment.DUST) < 0) {
+                    || amount.compareTo(Payment.Companion.getDUST()) < 0) {
                 continue;
             }
 
             Coin coin = Coin.valueOf(amount.longValue());
 
-            if (FormatsUtil.isValidBCHAddress(networkParameters, toAddress)) {
-                toAddress = CashAddress.toLegacy(networkParameters, toAddress);
-            }
-
-            Address address = Address.fromBase58(networkParameters, toAddress);
+            Address address = toInternalAddress(networkParameters, toAddress);
             transaction.addOutput(coin, address);
 
             outputValueSum = outputValueSum.add(amount);
@@ -108,35 +122,58 @@ class PaymentTx {
         return outputValueSum;
     }
 
-    private static BigInteger addTransactionInputList(NetworkParameters networkParameters,
-                                                      Transaction transaction,
-                                                      List<UnspentOutput> unspentCoins,
-                                                      BigInteger valueNeeded) throws InsufficientMoneyException {
+    private static Address toInternalAddress(NetworkParameters networkParams, String toAddress) {
+        if (FormatsUtil.isValidBCHAddress(toAddress)) {
+            toAddress = CashAddress.toLegacy(networkParams, toAddress);
+            return LegacyAddress.fromBase58(networkParams, toAddress);
+        }
+
+        try {
+            return SegwitAddress.fromBech32(networkParams, toAddress);
+        } catch(Exception e) {
+            return LegacyAddress.fromBase58(networkParams, toAddress);
+        }
+    }
+
+    private static BigInteger addTransactionInputList(
+        NetworkParameters networkParameters,
+        Transaction transaction,
+        List<Utxo> unspentCoins,
+        BigInteger valueNeeded
+    ) throws InsufficientMoneyException {
 
         BigInteger inputValueSum = BigInteger.ZERO;
         BigInteger minFreeOutputSize = BigInteger.valueOf(1000000);
 
-        for (UnspentOutput unspentCoin : unspentCoins) {
+        for (Utxo unspentCoin : unspentCoins) {
 
             Hash hash = new Hash(Hex.decode(unspentCoin.getTxHash()));
             hash.reverse();
             Sha256Hash txHash = Sha256Hash.wrap(hash.getBytes());
 
-            TransactionOutPointConnected outPoint = new TransactionOutPointConnected(networkParameters,
-                    unspentCoin.getTxOutputCount(),
-                    txHash);
+            TransactionOutPointConnected outPoint = new TransactionOutPointConnected(
+                networkParameters,
+                unspentCoin.getTxOutputCount(),
+                txHash
+            );
 
+            Coin inputVal = Coin.valueOf(unspentCoin.getValue().longValue());
             //outPoint needs connected output here
-            TransactionOutput output = new TransactionOutput(networkParameters,
-                    null,
-                    Coin.valueOf(unspentCoin.getValue().longValue()),
-                    Hex.decode(unspentCoin.getScript()));
+            TransactionOutput output = new TransactionOutput(
+                networkParameters,
+                null,
+                inputVal,
+                Hex.decode(unspentCoin.getScript())
+            );
             outPoint.setConnectedOutput(output);
 
-            TransactionInput input = new TransactionInput(networkParameters,
-                    null,
-                    new byte[0],
-                    outPoint);
+            TransactionInput input = new TransactionInput(
+                networkParameters,
+                null,
+                new byte[0],
+                outPoint,
+                inputVal
+            );
 
             transaction.addInput(input);
             inputValueSum = inputValueSum.add(unspentCoin.getValue());
@@ -158,44 +195,46 @@ class PaymentTx {
         return inputValueSum;
     }
 
-    private static void addChange(NetworkParameters networkParameters,
-                                  Transaction transaction,
-                                  BigInteger fee,
-                                  String changeAddress,
-                                  BigInteger outputValueSum,
-                                  BigInteger inputValueSum) throws AddressFormatException {
+    private static void addChange(
+        NetworkParameters networkParameters,
+        Transaction transaction,
+        BigInteger fee,
+        String changeAddress,
+        BigInteger outputValueSum,
+        BigInteger inputValueSum
+    ) throws AddressFormatException {
 
         BigInteger change = inputValueSum.subtract(outputValueSum).subtract(fee);
-        String base58Change;
-        if (FormatsUtil.isValidBCHAddress(networkParameters, changeAddress)) {
-            base58Change = CashAddress.toLegacy(networkParameters, changeAddress);
-        } else {
-            base58Change = changeAddress;
-        }
+
+        Address internalAddress = toInternalAddress(networkParameters, changeAddress);
+        Coin val = Coin.valueOf(change.longValue());
 
         // Consume dust if needed
-        if (change.compareTo(BigInteger.ZERO) > 0 && (change.compareTo(Payment.DUST) > 0)) {
+        if (change.compareTo(BigInteger.ZERO) > 0 && (change.compareTo(Payment.Companion.getDUST()) > 0)) {
 
-            Script changeScript = ScriptBuilder
-                    .createOutputScript(Address.fromBase58(networkParameters, base58Change));
+            Script changeScript = ScriptBuilder.createOutputScript(internalAddress);
 
-            TransactionOutput change_output = new TransactionOutput(networkParameters,
-                    null,
-                    Coin.valueOf(change.longValue()),
-                    changeScript.getProgram());
+            TransactionOutput change_output = new TransactionOutput(
+                networkParameters,
+                null,
+                val,
+                changeScript.getProgram()
+            );
             transaction.addOutput(change_output);
         }
     }
 
-    public static synchronized void signSimpleTransaction(NetworkParameters networkParameters,
-                                                          Transaction tx,
-                                                          List<ECKey> keys,
-                                                          boolean useForkId) {
+    public static synchronized void signSimpleTransaction(
+        NetworkParameters networkParameters,
+        Transaction tx,
+        List<ECKey> keys,
+        boolean useForkId
+    ) {
 
-        KeyChainGroup keybag = new KeyChainGroup(networkParameters);
+        KeyChainGroup keybag = KeyChainGroup.createBasic(networkParameters);
         keybag.importKeys(keys);
 
-        KeyBag maybeDecryptingKeyBag = new DecryptingKeyBag(keybag);
+        KeyBag maybeDecryptingKeyBag = new DecryptingKeyBag(keybag, null);
 
         List<TransactionInput> inputs = tx.getInputs();
         List<TransactionOutput> outputs = tx.getOutputs();
@@ -203,6 +242,7 @@ class PaymentTx {
         checkState(outputs.size() > 0);
 
         int numInputs = tx.getInputs().size();
+
         for (int i = 0; i < numInputs; i++) {
             TransactionInput txIn = tx.getInput(i);
             if (txIn.getConnectedOutput() == null) {
@@ -219,14 +259,18 @@ class PaymentTx {
                             .correctlySpends(
                                     tx,
                                     i,
-                                    txIn.getConnectedOutput().getScriptPubKey(),
+                                    null,
                                     txIn.getConnectedOutput().getValue(),
-                                    Script.ALL_VERIFY_FLAGS);
+                                    txIn.getConnectedOutput().getScriptPubKey(),
+                                    Script.ALL_VERIFY_FLAGS
+                            );
                 } else {
                     txIn.getScriptSig()
                             .correctlySpends(
                                     tx,
                                     i,
+                                    txIn.getWitness(),
+                                    txIn.getValue(),
                                     txIn.getConnectedOutput().getScriptPubKey(),
                                     Script.ALL_VERIFY_FLAGS);
                 }
@@ -242,46 +286,51 @@ class PaymentTx {
 
             Script scriptPubKey = txIn.getConnectedOutput().getScriptPubKey();
             RedeemData redeemData = txIn.getConnectedRedeemData(maybeDecryptingKeyBag);
-            checkNotNull(redeemData, "Transaction exists in wallet that we cannot redeem: %s",
-                    txIn.getOutpoint().getHash());
-            txIn.setScriptSig(scriptPubKey
-                    .createEmptyInputScript(redeemData.keys.get(0), redeemData.redeemScript));
+            checkNotNull(
+                redeemData,
+                "Transaction exists in wallet that we cannot redeem: %s",
+                txIn.getOutpoint().getHash()
+            );
+            txIn.setScriptSig(
+                scriptPubKey.createEmptyInputScript(
+                    redeemData.keys.get(0),
+                    redeemData.redeemScript)
+            );
         }
 
-        TransactionSigner.ProposedTransaction proposal = new TransactionSigner.ProposedTransaction(tx, useForkId);
-        LocalTransactionSigner signer = new LocalTransactionSigner();
+        TransactionSigner.ProposedTransaction proposal = new TransactionSigner.ProposedTransaction(tx);
+        LocalTransactionSigner signer;
+        if (useForkId) {
+            signer = new BchLocalTransactionSigner();
+        } else {
+            signer = new LocalTransactionSigner();
+        }
+
         if (!signer.signInputs(proposal, maybeDecryptingKeyBag)) {
             log.info("{} returned false for the tx", signer.getClass().getName());
         }
     }
 
-    public static synchronized Call<ResponseBody> publishSimpleBtcTransaction(Transaction transaction, String apiCode) {
-        PushTx pushTx = new PushTx(BlockchainFramework.getRetrofitExplorerInstance(),
-                BlockchainFramework.getRetrofitApiInstance(),
-                apiCode);
-        return pushTx.pushTx("btc", new String(Hex.encode(transaction.bitcoinSerialize())));
-    }
-
-    static Transaction makeNonReplayableTransaction(NetworkParameters networkParameters,
-                                                    List<UnspentOutput> unspentCoins,
-                                                    HashMap<String, BigInteger> receivingAddresses,
-                                                    BigInteger fee,
-                                                    @Nullable String changeAddress,
-                                                    DustInput dustServiceInput)
-            throws InsufficientMoneyException, AddressFormatException {
-
+    static Transaction makeNonReplayableTransaction(
+        NetworkParameters networkParameters,
+        List<Utxo> unspentCoins,
+        HashMap<String, BigInteger> receivingAddresses,
+        BigInteger fee,
+        @Nullable String changeAddress,
+        DustInput dustServiceInput
+    ) throws InsufficientMoneyException, AddressFormatException {
         log.info("Making transaction");
-        Transaction transaction = new Transaction(networkParameters);
+        Transaction transaction = Tools.makeTxObject(networkParameters);
 
         // Outputs
         BigInteger outputValueSum = addTransactionOutputs(networkParameters, transaction, receivingAddresses);
         BigInteger valueNeeded = outputValueSum.add(fee);
 
-        if (unspentCoins.get(0).getValue().compareTo(Payment.DUST) == 0
+        if (unspentCoins.get(0).getValue().compareTo(Payment.Companion.getDUST()) == 0
                 && unspentCoins.get(0).isForceInclude()) {
             log.info("Remove forced dust input");
             unspentCoins.remove(0);
-            valueNeeded = valueNeeded.subtract(Payment.DUST);
+            valueNeeded = valueNeeded.subtract(Payment.Companion.getDUST());
         }
 
         // Inputs
@@ -301,18 +350,5 @@ class PaymentTx {
         transaction.addOutput(dustCoin, dustOutput);
 
         return Tools.applyBip69(transaction);
-    }
-
-    static Call<ResponseBody> publishTransactionWithSecret(CryptoCurrency cryptoCurrency,
-                                                           Transaction transaction,
-                                                           String lockSecret,
-                                                           String apiCode) {
-        String currencyCode = cryptoCurrency.getNetworkTicker().toLowerCase();
-
-        return new PushTx(
-                BlockchainFramework.getRetrofitExplorerInstance(),
-                BlockchainFramework.getRetrofitApiInstance(),
-                apiCode
-        ).pushTxWithSecret(currencyCode, new String(Hex.encode(transaction.bitcoinSerialize())), lockSecret);
     }
 }

@@ -30,7 +30,6 @@ import piuk.blockchain.android.coincore.impl.txEngine.sell.TradingSellTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.swap.OnChainSwapTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.swap.TradingToTradingSwapTxEngine
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 class TxProcessorFactory(
@@ -40,8 +39,7 @@ class TxProcessorFactory(
     private val walletPrefs: WalletStatus,
     private val quotesEngine: TransferQuotesEngine,
     private val analytics: Analytics,
-    private val kycTierService: TierService,
-    private val environmentConfig: EnvironmentConfig
+    private val kycTierService: TierService
 ) {
     fun createProcessor(
         source: BlockchainAccount,
@@ -163,8 +161,7 @@ class TxProcessorFactory(
                                 quotesEngine = quotesEngine,
                                 walletManager = walletManager,
                                 kycTierService = kycTierService,
-                                engine = engine,
-                                environmentConfig = environmentConfig
+                                engine = engine
                             )
                         )
                     )
@@ -178,8 +175,7 @@ class TxProcessorFactory(
                         quotesEngine = quotesEngine,
                         walletManager = walletManager,
                         kycTierService = kycTierService,
-                        engine = engine,
-                        environmentConfig = environmentConfig
+                        engine = engine
                     )
                 )
             )
@@ -224,8 +220,7 @@ class TxProcessorFactory(
                     engine = TradingToTradingSwapTxEngine(
                         walletManager = walletManager,
                         quotesEngine = quotesEngine,
-                        kycTierService = kycTierService,
-                        environmentConfig = environmentConfig
+                        kycTierService = kycTierService
                     )
                 )
             )
@@ -250,8 +245,7 @@ class TxProcessorFactory(
                     engine = TradingSellTxEngine(
                         walletManager = walletManager,
                         quotesEngine = quotesEngine,
-                        kycTierService = kycTierService,
-                        environmentConfig = environmentConfig
+                        kycTierService = kycTierService
                     )
                 )
             )

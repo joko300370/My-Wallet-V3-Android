@@ -9,5 +9,6 @@ interface InternalFeatureFlagApi {
 }
 
 enum class GatedFeature(val readableName: String) {
-    SEGWIT("Segwit")
+    SEGWIT_GLOBAL_ENABLE("Segwit enable"), // If false, segwit totally disabled
+    SEGWIT_UPGRADE_WALLET("Segwit upgrade wallet") // If true, enable upgrade even in not in the get_info cohirt
 }

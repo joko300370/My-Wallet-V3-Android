@@ -68,10 +68,7 @@ class LauncherPresenter(
         }
 
         // Store incoming Contacts URI if needed
-        if (action != null && Intent.ACTION_VIEW == action && intentData != null && intentData.contains(
-                "blockchain"
-            )
-        ) {
+        if (action != null && Intent.ACTION_VIEW == action && intentData?.contains("blockchain") == true) {
             prefs.setValue(PersistentPrefs.KEY_METADATA_URI, intentData)
         }
 
@@ -90,17 +87,15 @@ class LauncherPresenter(
 
         when {
             // No GUID and no backup? Treat as new installation
-            prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, "").isEmpty() && !hasBackup -> view.onNoGuid()
+            prefs.walletGuid.isEmpty() && !hasBackup -> view.onNoGuid()
             // No GUID but a backup. Show PIN entry page to populate other values
-            prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, "").isEmpty() && hasBackup -> view.onRequestPin()
+            prefs.walletGuid.isEmpty() && hasBackup -> view.onRequestPin()
             // User has logged out recently. Show password reentry page
             hasLoggedOut -> view.onReEnterPassword()
             // No PIN ID? Treat as installed app without confirmed PIN
             pin.isEmpty() -> view.onRequestPin()
             // Installed app, check sanity
             !appUtil.isSane -> view.onCorruptPayload()
-            // Legacy app has not been prompted for upgrade
-            isPinValidated && upgradeNeeded() -> promptUpgrade()
             // App has been PIN validated
             isPinValidated || accessState.isLoggedIn -> initSettings()
             // Something odd has happened, re-request PIN
@@ -108,20 +103,8 @@ class LauncherPresenter(
         }
     }
 
-    private fun upgradeNeeded(): Boolean =
-        payloadDataManager.wallet?.isUpgraded == false
-
     fun clearCredentialsAndRestart() =
         appUtil.clearCredentialsAndRestart(LauncherActivity::class.java)
-
-    private fun promptUpgrade() {
-        accessState.isLoggedIn = true
-        view.onRequestUpgrade()
-    }
-
-    fun clearLoginState() {
-        accessState.logout()
-    }
 
     /**
      * Init of the [SettingsDataManager] must complete here so that we can access the [Settings]

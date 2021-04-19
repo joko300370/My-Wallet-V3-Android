@@ -55,6 +55,7 @@ object Versions {
     const val gson = "2.8.5"
     const val jacksonCore = "2.9.6"
     const val kotlinJson = "1.0.1"
+    const val kotlinJsonConverter = "0.8.0"
     const val koin = "2.1.5"
     const val rxJava = "2.2.20"
     const val rxKotlin = "2.4.0"
@@ -64,7 +65,8 @@ object Versions {
     const val rxRelay = "2.1.1"
     const val glide = "4.12.0"
 
-    // Utils, Ethereum
+    // Utils, BTC, Ethereum
+    const val bitcoinj = "0.15.10"
     const val web3j = "3.3.1-android"
     const val spongycastle = "1.54.0.0"
     const val jjwt = "0.9.0"
@@ -133,10 +135,8 @@ object Libraries {
     const val kotlin = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.kotlin}"
     const val kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}"
     const val coveralls = "org.kt3k.gradle.plugin:coveralls-gradle-plugin:${Versions.coveralls}"
-    const val googleServicesPlugin =
-        "com.google.gms:google-services:${Versions.googleServicesPlugin}"
-    const val buildProperties =
-        "com.novoda:gradle-build-properties-plugin:${Versions.buildProperties}"
+    const val googleServicesPlugin ="com.google.gms:google-services:${Versions.googleServicesPlugin}"
+    const val buildProperties ="com.novoda:gradle-build-properties-plugin:${Versions.buildProperties}"
     const val ktlint = "com.github.shyiko:ktlint:${Versions.ktlint}"
 
     // Support Libraries
@@ -146,16 +146,13 @@ object Libraries {
     const val gridLayout = "androidx.gridlayout:gridlayout:${Versions.gridlayout}"
     const val design = "com.google.android.material:material:${Versions.design}"
     const val v14 = "androidx.preference:preference:${Versions.preference}"
-    const val dynamicAnims =
-        "androidx.dynamicanimation:dynamicanimation:${Versions.dynamicanimation}"
+    const val dynamicAnims ="androidx.dynamicanimation:dynamicanimation:${Versions.dynamicanimation}"
     const val annotations = "androidx.annotations:annotations:${Versions.annotations}"
-    const val constraintLayout =
-        "androidx.constraintlayout:constraintlayout:${Versions.constraintLayout}"
+    const val constraintLayout ="androidx.constraintlayout:constraintlayout:${Versions.constraintLayout}"
     const val multidex = "androidx.multidex:multidex:${Versions.multidex}"
 
     const val navigationControllerCore = "androidx.navigation:navigation-ui:${Versions.navigation}"
-    const val navigationControllerFragments =
-        "androidx.navigation:navigation-fragment:${Versions.navigation}"
+    const val navigationControllerFragments ="androidx.navigation:navigation-fragment:${Versions.navigation}"
     const val navigationControllerSafeArgsPlugin =
         "androidx.navigation:navigation-safe-args-gradle-plugin:${Versions.navigation}"
     const val lifecycleViewModel = "androidx.lifecycle:lifecycle-viewmodel:${Versions.lifecycle}"
@@ -181,6 +178,8 @@ object Libraries {
     const val retrofitRxMoshiConverter = "com.squareup.retrofit2:converter-moshi:${Versions.retrofit}"
     const val retrofitRxJavaAdapter = "com.squareup.retrofit2:adapter-rxjava2:${Versions.retrofit}"
     const val retrofitGsonConverter = "com.squareup.retrofit2:converter-gson:2.5.0"
+    const val retrofitKotlinJsonConverter =
+        "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:${Versions.kotlinJsonConverter}"
     const val okHttp = "com.squareup.okhttp3:okhttp:${Versions.okHttp}"
     const val okHttpSse = "com.squareup.okhttp3:okhttp-sse:${Versions.okHttp}"
     const val okHttpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.okHttp}"
@@ -208,7 +207,8 @@ object Libraries {
     const val rxReplayShare = "com.jakewharton.rx2:replaying-share-kotlin:${Versions.rxReplayShare}"
     const val rxRelay = "com.jakewharton.rxrelay2:rxrelay:${Versions.rxRelay}"
 
-    // Utils, Ethereum
+    // Utils, BTC, Ethereum
+    const val bitcoinj = "org.bitcoinj:bitcoinj-core:${Versions.bitcoinj}"
     const val web3j = "org.web3j:core:${Versions.web3j}"
     const val spongyCastle = "com.madgag.spongycastle:prov:${Versions.spongycastle}"
     const val jjwt = "io.jsonwebtoken:jjwt:${Versions.jjwt}"
