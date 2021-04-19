@@ -9,6 +9,7 @@ import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.LinkedBank
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -42,7 +43,8 @@ class ActivityDetailsInteractor(
     private val assetActivityRepository: AssetActivityRepository,
     private val custodialWalletManager: CustodialWalletManager,
     private val stringUtils: StringUtils,
-    private val coincore: Coincore
+    private val coincore: Coincore,
+    private val defaultLabels: DefaultLabels
 ) {
 
     fun loadCustodialTradingItems(
@@ -87,8 +89,11 @@ class ActivityDetailsInteractor(
             }
 
             else -> {
-                list.add(BuyPaymentMethod(
-                    PaymentDetails(summaryItem.paymentMethodId)))
+                list.add(
+                    BuyPaymentMethod(
+                        PaymentDetails(summaryItem.paymentMethodId)
+                    )
+                )
                 Single.just(list.toList())
             }
         }
@@ -117,13 +122,19 @@ class ActivityDetailsInteractor(
             }
         }
         return if (summaryItem.type == TransactionSummary.TransactionType.WITHDRAW) {
-            coincore.findAccountByAddress(summaryItem.account.asset,
-                summaryItem.accountRef).map {
-                list.add(To(if (it !is NullCryptoAccount) {
-                    it.label
-                } else {
-                    summaryItem.accountRef
-                }))
+            coincore.findAccountByAddress(
+                summaryItem.account.asset,
+                summaryItem.accountRef
+            ).map {
+                list.add(
+                    To(
+                        if (it !is NullCryptoAccount) {
+                            it.label
+                        } else {
+                            summaryItem.accountRef
+                        }
+                    )
+                )
                 list.toList()
             }.toSingle()
         } else {
@@ -137,7 +148,7 @@ class ActivityDetailsInteractor(
         val list = mutableListOf(
             TransactionId(item.txId),
             Created(Date(item.timeStampMs)),
-            From(item.sendingAccount.label),
+            getFromField(item),
             Amount(item.sendingValue)
         )
 
@@ -153,6 +164,11 @@ class ActivityDetailsInteractor(
             }
             list.toList()
         }
+    }
+
+    private fun getFromField(tradeActivity: TradeActivitySummaryItem): From {
+        require(tradeActivity.currencyPair is CurrencyPair.CryptoCurrencyPair)
+        return From("${tradeActivity.currencyPair.source.displayTicker} ${tradeActivity.sendingAccount.label}")
     }
 
     fun loadSellItems(
@@ -177,13 +193,20 @@ class ActivityDetailsInteractor(
         return when (item.direction) {
             TransferDirection.ON_CHAIN -> coincore.findAccountByAddress(cryptoPair.destination, item.receivingAddress!!)
                 .toSingle().map {
-                    To(it.label)
+                    val defaultLabel = defaultLabels.getDefaultNonCustodialWalletLabel(cryptoPair.destination)
+                    To(
+                        if (it.label.isEmpty() || it.label == defaultLabel) {
+                            "${cryptoPair.destination.displayTicker} $defaultLabel"
+                        } else {
+                            it.label
+                        }
+                    )
                 }
             TransferDirection.INTERNAL,
             TransferDirection.FROM_USERKEY -> coincore[cryptoPair.destination].accountGroup(AssetFilter.Custodial)
                 .toSingle()
                 .map {
-                    To(it.selectFirstAccount().label)
+                    To("${cryptoPair.destination.displayTicker} ${it.selectFirstAccount().label}")
                 }
             TransferDirection.TO_USERKEY -> throw IllegalStateException("TO_USERKEY swap direction not supported")
         }
@@ -195,9 +218,13 @@ class ActivityDetailsInteractor(
         summaryItem: CustodialTradingActivitySummaryItem
     ) {
         paymentMethod?.let {
-            list.add(BuyPaymentMethod(PaymentDetails(
-                it.id, it.label(), it.endDigits(), it.accountType()
-            )))
+            list.add(
+                BuyPaymentMethod(
+                    PaymentDetails(
+                        it.id, it.label(), it.endDigits(), it.accountType()
+                    )
+                )
+            )
         } ?: list.add(BuyPaymentMethod(PaymentDetails(summaryItem.paymentMethodId)))
     }
 
@@ -205,15 +232,19 @@ class ActivityDetailsInteractor(
         cryptoCurrency: CryptoCurrency,
         txHash: String
     ): CustodialTradingActivitySummaryItem? =
-        assetActivityRepository.findCachedItem(cryptoCurrency,
-            txHash) as? CustodialTradingActivitySummaryItem
+        assetActivityRepository.findCachedItem(
+            cryptoCurrency,
+            txHash
+        ) as? CustodialTradingActivitySummaryItem
 
     fun getCustodialInterestActivityDetails(
         cryptoCurrency: CryptoCurrency,
         txHash: String
     ): CustodialInterestActivitySummaryItem? =
-        assetActivityRepository.findCachedItem(cryptoCurrency,
-            txHash) as? CustodialInterestActivitySummaryItem
+        assetActivityRepository.findCachedItem(
+            cryptoCurrency,
+            txHash
+        ) as? CustodialInterestActivitySummaryItem
 
     fun getTradeActivityDetails(
         cryptoCurrency: CryptoCurrency,
@@ -231,8 +262,10 @@ class ActivityDetailsInteractor(
         cryptoCurrency: CryptoCurrency,
         txHash: String
     ): NonCustodialActivitySummaryItem? =
-        assetActivityRepository.findCachedItem(cryptoCurrency,
-            txHash) as? NonCustodialActivitySummaryItem
+        assetActivityRepository.findCachedItem(
+            cryptoCurrency,
+            txHash
+        ) as? NonCustodialActivitySummaryItem
 
     fun loadCreationDate(
         activitySummaryItem: ActivitySummaryItem
@@ -428,8 +461,11 @@ class ActivityDetailsInteractor(
             is EthActivitySummaryItem -> activityItem.updateDescription(description)
             is Erc20ActivitySummaryItem -> activityItem.updateDescription(description)
             else -> {
-                Completable.error(UnsupportedOperationException(
-                    "This type of currency doesn't support descriptions"))
+                Completable.error(
+                    UnsupportedOperationException(
+                        "This type of currency doesn't support descriptions"
+                    )
+                )
             }
         }
     }

@@ -50,7 +50,8 @@ val activitiesModule = module {
                 assetActivityRepository = get(),
                 custodialWalletManager = get(),
                 stringUtils = get(),
-                coincore = get()
+                coincore = get(),
+                defaultLabels = get()
             )
         }
 
