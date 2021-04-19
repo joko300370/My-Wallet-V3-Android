@@ -1066,7 +1066,6 @@
     <string name="by_depositing_funds_terms_and_conds">Ao depositar fundos nesta conta, concorda com os <annotation link="modular_terms_and_conditions">Termos e Condições do Modulr</annotation>, o nosso parceiro bancário.</string>
     <string name="add_bank_with_currency">Adicionar um banco %1s </string>
     <string name="deposit_currency">Depositar %1s</string>
-    <string name="common_payment">Pagamento</string>
     <string name="buy_now_1">Comprar %1s</string>
     <string name="simple_buy_transfer_details_error">Ocorreu um erro ao carregar os detalhes da transferência.
 
@@ -1482,17 +1481,6 @@ Nota: Não poderá enviar ou retirar estes fundos da sua carteira durante os pr�
     <string name="yodlee_connection_subtitle">Isto pode demorar até 30 segundos.</string>
     <string name="yodlee_linking_title">A levá-lo de volta à sua carteira...</string>
     <string name="yodlee_linking_subtitle">Isto pode demorar até 30 segundos. Não volte atrás ou feche a aplicação.</string>
-    <string name="bank_linking_generic_error_title">Ups! Ocorreu um erro</string>
-    <string name="bank_linking_is_this_your_bank">Este é o seu banco?</string>
-    <string name="bank_linking_generic_error_subtitle">Tente vincular o seu banco novamente. Se isto continuar a acontecer, entre em contacto com o suporte.</string>
-    <string name="bank_linking_timeout_error_subtitle">Está a demorar demasiado para vincular o seu banco, tente novamente.</string>
-    <string name="bank_linking_already_linked_error_subtitle">Reparámos que <annotation font="bold">os nomes não correspondem.</annotation> O banco que vincular deve ter um primeiro e último nome legal correspondente com a sua conta Blockchain.com. <annotation link="yodlee_names_dont_match_learn_more">Saiba mais →</annotation></string>
-    <string name="bank_linking_checking_error_title">Vincule uma conta-corrente.</string>
-    <string name="bank_linking_checking_error_subtitle">O seu banco pode cobrar taxas extras se comprar criptomoedas sem uma conta-corrente.</string>
-    <string name="bank_linking_success_title">Banco vinculado!</string>
-    <string name="bank_linking_success_subtitle">A sua conta %1$s está agora vinculada à sua carteira do Blockchain.com.</string>
-    <string name="bank_linking_try_different_bank">Experimente um banco diferente</string>
-    <string name="bank_linking_try_different_account">Experimente uma conta diferente</string>
     <string name="yodlee_parsing_error">Ocorreu um erro ao vincular-se à Yodlee, tente novamente ou entre em contacto com o suporte.</string>
     <string name="yodlee_flow_exited">A vinculação à Yodlee foi encerrada. Gostaria de tentar novamente?</string>
     <string name="yodlee_unexpected_error">Ups, ocorreu um erro ao vincular-se à Yodlee, tente novamente.</string>
@@ -1659,4 +1647,113 @@ Anote estas 12 palavras por ordem e guarde-as num lugar seguro. Nunca as partilh
     <string name="increase_your_limits">Aumente os seus limites</string>
     <string name="increase_your_limits_body">Continue a sua verificação para se tornar o nível Gold e aumente os seus limites e métodos de pagamento.</string>
     <string name="continue_to_gold">Continue para Gold</string>
+    <string name="common_search">Pesquisar</string>
+    <string name="common_approve">Aprovar</string>
+    <string name="common_deny">Recusar</string>
+    <string name="common_payment">Pagamento</string>
+    <string name="settings_bank_remove_check_title">Tem a certeza?</string>
+    <string name="settings_bank_remove_check_subtitle">Está prestes a remover a sua Conta %1$s</string>
+    <string name="settings_bank_remove_error">Ocorreu um problema ao remover o seu banco. Tente novamente ou contacte o apoio ao cliente se o problema continuar.</string>
+    <string name="email_request_subject">Pedido de pagamento %1$s</string>
+    <string name="email_request_body_erc20">Envie %1$s para o %2$s endereço %3$s.</string>
+    <string name="onboarding_fingerprint_title_1">Início de sessão com dados biométricos</string>
+    <string name="onboarding_fingerprint_summary_1">Utilize o início de sessão com dados biométricos em vez do seu PIN para
+        fazer a autenticação e aceder à sua carteira.
+    </string>
+    <string name="onboarding_fingerprint_enable_1">Ativar biometria</string>
+    <string name="register_fingerprint_card_title_1">Início de sessão com dados biométricos</string>
+    <string name="register_fingerprint_card_body_1">Permita a autenticação biométrica para iniciar sessão rapidamente na sua carteira em vez de utilizar o seu PIN.</string>
+    <string name="aave_yfi_dot_available_card_title">Aave, YFI e DOT estão agora disponíveis!</string>
+    <string name="aave_yfi_dot_available_card_body">Os tokens Aave, YFI e Polkadot estão agora disponíveis para Comprar, Vender, Trocar e Enviar na sua Carteira.</string>
+    <string name="aave_yfi_dot_available_card_cta">Comprar agora</string>
+    <string name="default_crypto_non_custodial_wallet_label">Carteira de chave privada</string>
+    <string name="old_default_non_custodial_wallet_label">A minha Carteira %1s</string>
+    <string name="default_label_interest_wallet_1">Conta de juros</string>
+    <string name="exchange_default_account_label_1">Conta de troca</string>
+    <string name="custodial_wallet_default_label_1">Conta de negociação</string>
+    <string name="bank_transfer_in_progress_ob_blurb">A sua encomenda está a ser processada, avisá-lo-emos quando estiver pronta. Pode fechar esta janela em segurança enquanto atualizamos a encomenda em segundo plano.</string>
+    <string name="fiat_currency_funds_wallet_name_1">Conta %1s</string>
+    <string name="polkadot_asset_label">A funcionalidade para levantar DOT da sua carteira de negociação não está atualmente disponível, mas estará brevemente.</string>
+    <string name="sell_enter_amount_error_insufficient_funds_for_fees">Não há %1$s suficiente na sua carteira para vender com as taxas de rede atuais.</string>
+    <string name="send_enter_amount_network_fees">Taxas de rede</string>
+    <string name="send_enter_amount_total">Total</string>
+    <string name="send_enter_amount_max_fee">Taxa de rede máxima</string>
+    <string name="send_confirmation_insufficient_funds_for_fee">Não há fundos suficientes para o nível de taxas atual.</string>
+    <string name="deposit_confirmation_pending_title">Estamos à espera do seu banco</string>
+    <string name="deposit_confirmation_pending_subtitle">Aguarde enquanto confirmamos a transação. Pode fechar em segurança e verificar o progresso no separador Atividade.</string>
+    <string name="deposit_confirmation_timeout_title">Ups, demorou demasiado tempo a confirmar a transação!</string>
+    <string name="deposit_confirmation_timeout_subtitle">Por vezes, os pagamentos podem demorar algum tempo a ser efetuados. Se tiver aprovado a transação, pode fechar em segurança e verificar o progresso do Depósito no separador Atividade.</string>
+    <string name="deposit_confirmation_error_title">Ups, parece que ocorreu um erro!</string>
+    <string name="deposit_confirmation_error_subtitle">Ocorreu um problema no seu Depósito. Tente novamente ou contacte o apoio ao cliente se o problema continuar.</string>
+    <string name="interest_enter_amount_error_insufficient_funds_for_fees">Não há %1$s suficiente na sua carteira para transferir com as taxas de rede atuais.</string>
+    <string name="send_enter_amount_error_insufficient_funds_for_fees">Não há %1$s suficiente na sua carteira para enviar com as taxas de rede atuais.</string>
+    <string name="swap_enter_amount_error_insufficient_funds_for_fees">Não há %1$s suficiente na sua carteira para trocar com as taxas de rede atuais.</string>
+    <string name="approve_payment">Aprovar o seu pagamento</string>
+    <string name="yapily_empty_blurb">Não foi possível encontrar o seu banco. Envie fundos do seu banco para a sua Blockchain Wallet através de uma transferência manual.</string>
+    <string name="yapily_empty_cta">Mostrar detalhes de transferência</string>
+    <string name="yapily_find_bank_title">Encontre o seu banco</string>
+    <string name="yapily_agreement_title_1">Partilha de dados</string>
+    <string name="yapily_agreement_blurb_1">A SafeConnect vai obter os seus dados bancários com base no seu pedido e fornecerá esta informação à Blockchain.</string>
+    <string name="yapily_agreement_title_2">Ligação segura</string>
+    <string name="yapily_agreement_blurb_2">Os dados são obtidos com segurança em formato só de leitura e apenas durante a duração acordada consigo. Tem o direito de retirar o seu consentimento em qualquer altura.</string>
+    <string name="yapily_agreement_title_3">Autorização FCA</string>
+    <string name="yapily_agreement_blurb_3">A Blockchain é um agente da SafeConnect Ltd. A SafeConnect Ltd é autorizada e regulamentada pela Autoridade de Conduta Financeira ao abrigo do Regulamento de Serviços de Pagamento de 2017 [827001] para o fornecimento de informações de conta e serviços de iniciação de pagamentos.</string>
+    <string name="yapily_agreement_title_4">Sobre o acesso</string>
+    <string name="yapily_agreement_blurb_4">A SafeConnect utilizará então estes detalhes com a Blockchain apenas para efeitos de compra de criptomoedas. Este acesso é válido até 24 de janeiro de 2021. Pode revogar o consentimento em qualquer altura através das definições da Blockchain ou através do seu banco. Este pedido não é único. Continuará a receber pedidos de consentimento à medida que as versões mais antigas expiram.</string>
+    <string name="yapily_agreement_blurb_5">Para partilhar os seus dados %1$s com a Blockchain, vai ser redirecionado em segurança para o seu banco para confirmar o seu consentimento para que a SafeConnect leia as seguintes informações:
+
+• Detalhes de identificação
+
+• Detalhes da(s) conta(s)</string>
+    <string name="yapily_linking_pending_title">A levá-lo para %1$s</string>
+    <string name="yapily_linking_pending_subtitle">Isto pode demorar até 30 segundos. Não volte atrás ou feche a aplicação.</string>
+    <string name="yapily_linking_in_progress_title">A aguardar informações de %1$s</string>
+    <string name="yapily_linking_in_progress_subtitle">Conclua a aprovação de emparelhamento com o seu banco para continuar.</string>
+    <string name="yapily_approval_in_progress_subtitle">Conclua a aprovação da transação com o seu banco para continuar.</string>
+    <string name="yapily_activating_title">A atualizar a sua Carteira…</string>
+    <string name="yapily_activating_subtitle">Isto pode demorar até 30 segundos. Não volte atrás nem feche a aplicação.</string>
+    <string name="yapily_approving_title">A levá-lo para %1$s</string>
+    <string name="yapily_approving_subtitle">Isto pode demorar até 30 segundos. Não volte atrás nem feche a aplicação.</string>
+    <string name="yapily_linking_default_bank">o seu Banco</string>
+    <string name="yapily_bank_link_choice_error_title">Ups, vamos tentar novamente</string>
+    <string name="yapily_bank_link_choice_error_subtitle">Tem de escolher um método para iniciar a sua autenticação de banco</string>
+    <string name="yapily_bank_link_app_choice_title">Escolha uma aplicação com a qual abrir</string>
+    <string name="yapily_bank_link_no_apps">Ups! Parece que não tem aplicações que o possam ajudar a realizar a autenticação. Instale uma aplicação de navegação na Internet e tente novamente.</string>
+    <string name="open_banking_deeplink_error">Ups! Houve um erro ao vincular o seu banco, tente novamente.</string>
+    <string name="yapily_approval_header">Aprovar o seu pagamento</string>
+    <string name="yapily_approval_title">Informações de pagamento</string>
+    <string name="yapily_approval_subtitle_1">Nome de conta</string>
+    <string name="yapily_approval_subtitle_2_uk">Código de ordenação</string>
+    <string name="yapily_approval_subtitle_2_eu">IBAN</string>
+    <string name="yapily_approval_subtitle_3_uk">Número de conta</string>
+    <string name="yapily_approval_subtitle_3_eu">SWIFT/BIC</string>
+    <string name="yapily_approval_blurb">Para facilitar a configuração de pagamentos do seu banco à Blockchain, estamos prestes a reencaminhá-lo com segurança para o seu banco, onde lhe será pedido para confirmar o pagamento através da SafeConnect, um fornecedor de iniciação de pagamentos regulado pela FCA para a Blockchain.
+
+A SafeConnect partilhará estes detalhes com o seu banco, onde lhe será então pedido que confirme a seguinte configuração de pagamento.</string>
+    <string name="yapily_payment_to_fiat_wallet_title">Valor da compra cancelada adicionado à Carteira %1$s</string>
+    <string name="yapily_payment_to_fiat_wallet_subtitle">Recentemente aprovou uma compra de %1$s com o seu banco e cancelou a encomenda aqui. Como fez a aprovação com o seu banco, depositámos o montante da sua compra na sua Carteira %2$s.</string>
+    <string name="yapily_payment_to_fiat_wallet_default">criptomoedas</string>
+    <string name="yapily_fiat_deposit_success_subtitle">Enquanto esperamos que o seu banco envie o dinheiro, aqui está o acesso antecipado a %1$s na sua Conta a Dinheiro %2$s para que possa comprar criptomoedas imediatamente.
+
+Os seus fundos estarão disponíveis para levantamento quando a transferência bancária esteja concluída em %3$s.</string>
+    <string name="bank_linking_generic_error_title">Ups! Ocorreu um erro</string>
+    <string name="bank_linking_is_this_your_bank">Este é o seu banco?</string>
+    <string name="bank_linking_generic_error_subtitle">Tente vincular o seu banco novamente. Se isto continuar a acontecer, entre em contacto com o apoio ao cliente.</string>
+    <string name="bank_linking_timeout_error_title">Ups! Está a demorar demasiado tempo</string>
+    <string name="bank_linking_timeout_error_subtitle">A vinculação do seu banco está a demorar mais tempo do que o esperado. Feche esta janela e verifique o estado em Definições.</string>
+    <string name="bank_linking_already_linked_error_subtitle">Reparámos que <annotation font="bold">os nomes não correspondem.</annotation> O banco que vinvular deve ter um primeiro e último nome legal correspondente como a sua Conta Blockchain.com. <annotation link="yodlee_names_dont_match_learn_more">Saiba mais→</annotation></string>
+    <string name="bank_linking_checking_error_title">Vincule uma conta corrente.</string>
+    <string name="bank_linking_checking_error_subtitle">O seu banco pode cobrar-lhe taxas adicionais se comprar criptomoedas sem conta corrente.</string>
+    <string name="bank_linking_success_title">Banco vinculado!</string>
+    <string name="bank_linking_success_subtitle">A sua conta %1$s está agora vinculada à sua Blockchain.com Wallet.</string>
+    <string name="bank_linking_try_different_bank">Tente um banco diferente</string>
+    <string name="bank_linking_try_different_account">Tente uma conta diferente</string>
+    <string name="bank_linking_expired_title">Acesso à conta expirado</string>
+    <string name="bank_linking_expired_subtitle">Tente vincular o seu banco novamente. Se isto continuar a acontecer, entre em contacto com o apoio ao cliente.</string>
+    <string name="bank_linking_rejected_title">Ligação rejeitada</string>
+    <string name="bank_linking_rejected_subtitle">Tente vincular novamente o seu banco e aprove a ligação. Se isto continuar a acontecer, contacte o apoio ao cliente.</string>
+    <string name="bank_linking_failure_title">Pedido de ligação com falha</string>
+    <string name="bank_linking_failure_subtitle">Tente novamente. Se isto continuar a acontecer, contacte o apoio ao cliente.</string>
+    <string name="bank_linking_declined_title">Acesso à conta negado</string>
+    <string name="bank_linking_declined_subtitle">Parece que houve um problema com a aprovação do pagamento, tente novamente. Se o problema continuar a acontecer, contacte o apoio ao cliente.</string>
 </resources>

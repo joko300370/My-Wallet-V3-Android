@@ -1063,7 +1063,6 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
     <string name="by_depositing_funds_terms_and_conds">Bu hesaba para yatırarak, bankacılık ortağımız olan <annotation link="modular_terms_and_conditions">Modulr Şartlar ve Koşullar</annotation> belgesini kabul etmiş olursunuz.</string>
     <string name="add_bank_with_currency">%1s Bankası Ekleyin</string>
     <string name="deposit_currency">%1s Yatırın</string>
-    <string name="common_payment">Ödeme</string>
     <string name="buy_now_1">%1s satın al</string>
     <string name="simple_buy_transfer_details_error">Transfer bilgileri yüklenirken bir hata oluştu.
 
@@ -1480,17 +1479,6 @@ Not: Önümüzdeki %1$s gün boyunca Bu tutarı cüzdanınızdan gönderemeyecek
     <string name="yodlee_connection_subtitle">Bu işlem 30 saniye kadar sürebilir.</string>
     <string name="yodlee_linking_title">Sizi Cüzdanınıza geri götürüyoruz…</string>
     <string name="yodlee_linking_subtitle">Bu işlem 30 saniye kadar sürebilir. Lütfen geri dönmeyin veya uygulamayı kapatmayın.</string>
-    <string name="bank_linking_generic_error_title">Hay aksi! Ters giden bir şeyler var</string>
-    <string name="bank_linking_is_this_your_bank">Bu sizin bankanız mı?</string>
-    <string name="bank_linking_generic_error_subtitle">Lütfen bankanızı tekrar bağlamayı deneyin. Hata devam ederse lütfen desteğe başvurun.</string>
-    <string name="bank_linking_timeout_error_subtitle">Bankanızın bağlanması çok uzun sürüyor, lütfen tekrar deneyin.</string>
-    <string name="bank_linking_already_linked_error_subtitle">Adların eşleşmediğini <annotation font="bold"> fark ettik. </annotation> Bağladığınız bankanın, Blockchain.com Hesabınızdaki ile eşleşen yasal bir adı ve soyadı olmalıdır. <annotation link="yodlee_names_dont_match_learn_more"> Daha fazla bilgi edinin →</annotation></string>
-    <string name="bank_linking_checking_error_title">LÜtfen bir Çek Hesabı bağlayın</string>
-    <string name="bank_linking_checking_error_subtitle">Çek hesabı olmadan kripto satın alırsanız, bankanız sizden ekstra ücret talep edebilir.</string>
-    <string name="bank_linking_success_title">Banka Bağlandı!</string>
-    <string name="bank_linking_success_subtitle">%1$s hesabınız artık Blockchain.com Cüzdanınıza bağlı.</string>
-    <string name="bank_linking_try_different_bank">Farklı Bir Banka Deneyin</string>
-    <string name="bank_linking_try_different_account">Farklı Bir Hesap Deneyin</string>
     <string name="yodlee_parsing_error">Yodlee ile bağlantı kurulurken bir sorun oldu, lütfen tekrar deneyin veya destek ile iletişime geçin.</string>
     <string name="yodlee_flow_exited">Yodlee bağlantısından çıkıldı, tekrar denemek ister misiniz?</string>
     <string name="yodlee_unexpected_error">Hay aksi, Yodlee ile bağlantı kurulurken bir şeyler ters gitti, lütfen tekrar deneyin.</string>
@@ -1683,4 +1671,111 @@ Banka transferiniz %3$s tarihinde tamamlandıktan sonra para çekme işlemi ger�
     <string name="increase_your_limits">Limitlerinizi artırın</string>
     <string name="increase_your_limits_body">Gold seviyesi olmak, limitlerinizi ve ödeme yöntemlerinizi artırmak için doğrulamanıza devam edin.</string>
     <string name="continue_to_gold">Gold seviyeye devam edin</string>
+    <string name="common_search">Arama</string>
+    <string name="common_approve">Onayla</string>
+    <string name="common_deny">Reddet</string>
+    <string name="common_payment">Ödeme</string>
+    <string name="settings_bank_remove_check_title">Emin misiniz?</string>
+    <string name="settings_bank_remove_check_subtitle">%1$s Hesabınızı kaldırmak üzeresiniz</string>
+    <string name="settings_bank_remove_error">Bankanızı kaldırma ile ilgili bir sorun oldu. Lütfen tekrar deneyin veya sorun devam ederse destek ekibiyle iletişime geçin.</string>
+    <string name="email_request_subject">%1$s ödeme talebi</string>
+    <string name="email_request_body_erc20">Lütfen %1$s\'i %2$s adresine %3$s gönder.</string>
+    <string name="onboarding_fingerprint_title_1">Biyometrik Oturum Açma</string>
+    <string name="onboarding_fingerprint_summary_1">Cüzdanınıza erişmek ve kimliğiniz doğrulamk için PIN yerine biyometrik oturum açmayı kullanın.</string>
+    <string name="onboarding_fingerprint_enable_1">Biyometrik bilgileri etkinleştir</string>
+    <string name="register_fingerprint_card_title_1">Biyometrik Oturum Açma</string>
+    <string name="register_fingerprint_card_body_1">PIN\'inizi kullanmak yerine cüzdanınızda hızla oturum açmak için biyometriyi etkinleştirin.</string>
+    <string name="aave_yfi_dot_available_card_title">Aave, YFI ve DOT artık mevcut!</string>
+    <string name="aave_yfi_dot_available_card_body">Aave, YFI ve Polkadot tokenleri artık Cüzdanınızda Satın Alma, Satma, Takas Etme ve Gönderme için kullanılabilir.</string>
+    <string name="aave_yfi_dot_available_card_cta">Şimdi al</string>
+    <string name="default_crypto_non_custodial_wallet_label">Özel Anahtar Cüzdanı</string>
+    <string name="old_default_non_custodial_wallet_label">%1s Cüzdanım</string>
+    <string name="default_label_interest_wallet_1">Faiz Hesabı</string>
+    <string name="exchange_default_account_label_1">Exchange Hesabı</string>
+    <string name="custodial_wallet_default_label_1">Ticaret Hesabı</string>
+    <string name="bank_transfer_in_progress_ob_blurb">Siparişiniz işleniyor, bu işlem bittiğinde sizi bilgilendireceğiz. Biz arkaplanda ödemeyi güncellerken bu sayfayı güvenle kapatabilirsiniz.</string>
+    <string name="fiat_currency_funds_wallet_name_1">%1s Hesabı</string>
+    <string name="polkadot_asset_label">DOT\'un ticari cüzdanınızdan çekilme işlevi şu anda kullanılamıyor, ancak kullanıma sunulacak.</string>
+    <string name="sell_enter_amount_error_insufficient_funds_for_fees">Cüzdanınızda mevcut ağ ücretleriyle satmak için yeterli %1$s yok.</string>
+    <string name="send_enter_amount_network_fees">Ağ Ücretleri</string>
+    <string name="send_enter_amount_total">Toplam</string>
+    <string name="send_enter_amount_max_fee">Maks Ağ Ücreti</string>
+    <string name="send_confirmation_insufficient_funds_for_fee">Mevcut ücret seviyesi için yetersiz para.</string>
+    <string name="deposit_confirmation_pending_title">Bankanızın onayını bekliyoruz</string>
+    <string name="deposit_confirmation_pending_subtitle">Ödemeyi onaylarken lütfen biraz bekleyin. Bu sayfayı güvenle kapatabilir ve Etkinlik sekmesinden ilerlemeyi kontrol edebilirsiniz.</string>
+    <string name="deposit_confirmation_timeout_title">Hay aksi, transferi tamamlamak çok uzun sürdü!</string>
+    <string name="deposit_confirmation_timeout_subtitle">Ödemelerin gerçekleştirilmesi bazen biraz zaman alabilir. İşlemi onayladıysanız bu sayfayı güvenle kapatabilir ve Etkinlik sekmesi altındaki Para Yatırma ilerlemesini kontrol edebilirsiniz.</string>
+    <string name="deposit_confirmation_error_title">Hay aksi, bir sorun var gibi görünüyor!</string>
+    <string name="deposit_confirmation_error_subtitle">Para Yatırma işleminizle ilgili bir sorun oldu. Lütfen tekrar deneyin veya sorun devam ederse destek ekibiyle iletişime geçin.</string>
+    <string name="interest_enter_amount_error_insufficient_funds_for_fees">Cüzdanınızda mevcut ağ ücretleriyle transfer etmek için yeterli %1$s yok.</string>
+    <string name="send_enter_amount_error_insufficient_funds_for_fees">Cüzdanınızda mevcut ağ ücretleriyle göndermek için yeterli %1$s yok.</string>
+    <string name="swap_enter_amount_error_insufficient_funds_for_fees">Cüzdanınızda mevcut ağ ücretleriyle değiş tokuş için yeterli %1$s yok.</string>
+    <string name="approve_payment">Ödemeyi Onayla</string>
+    <string name="yapily_empty_blurb">Bankanızı bulamadık. Parayı Manuel Transfer ile doğrudan bankanızdan Blockchain.com Cüzdanınıza gönderin.</string>
+    <string name="yapily_empty_cta">Transfer Bilgilerini Göster</string>
+    <string name="yapily_find_bank_title">Bankanızı Bulun</string>
+    <string name="yapily_agreement_title_1">Veri Paylaşma</string>
+    <string name="yapily_agreement_blurb_1">SafeConnect, talebinize göre banka verilerinizi alır ve bu bilgileri Blockchain\'e sağlar.</string>
+    <string name="yapily_agreement_title_2">Güvenli Bağlantı</string>
+    <string name="yapily_agreement_blurb_2">Veriler, salt okunur biçimde ve yalnızca sizinle kararlaştırılan süre boyunca güvenli bir şekilde alınır. Onayınızı istediğiniz zaman geri çekme hakkına sahipsiniz.</string>
+    <string name="yapily_agreement_title_3">FCA Yetkisi</string>
+    <string name="yapily_agreement_blurb_3">Blockchain, SafeConnect Ltd.\'nin bir temsilcisidir. SafeConnect Ltd, Hesap Bilgileri ve Ödeme Başlatma hizmetlerinin sağlanması için 2017 Ödeme Hizmeti Düzenlemeleri [827001] kapsamında Mali Davranış Otoritesi tarafından yetkilendirilmiş ve düzenlenmiştir.</string>
+    <string name="yapily_agreement_title_4">Erişim hakkında</string>
+    <string name="yapily_agreement_blurb_4">SafeConnect, bu bilgileri Blockchain ile yalnızca Kripto Para satın almak amacıyla kullanır. Bu erişim 24 Ocak 2021 tarihine kadar geçerlidir. İstediğiniz zaman Blockchain ayarları veya bankanız aracılığıyla onayı iptal edebilirsiniz. Bu istek tek seferlik değildir, eski sürümlerin süresi doldukça izin istekleri almaya devam edeceksiniz.</string>
+    <string name="yapily_agreement_blurb_5">%1$s verilerinizi Blockchain ile paylaşmak adına SafeConnect\'in aşağıdaki bilgileri okumasına izin verdiğinizi onaylamak için şimdi güvenli şekilde bankanıza yönlendirileceksiniz:
+
+• Kimlik bilgileri
+
+• Hesap bilgileri</string>
+    <string name="yapily_linking_pending_title">%1$s sayfasına yönlendiriliyorsunuz</string>
+    <string name="yapily_linking_pending_subtitle">Bu işlem 30 saniye kadar sürebilir. Lütfen geri dönmeyin veya uygulamayı kapatmayın.</string>
+    <string name="yapily_linking_in_progress_title">%1$s adlı kişinin kabul etmesi bekleniyor</string>
+    <string name="yapily_linking_in_progress_subtitle">Devam etmek için bankanızla eşleştirme onayını tamamlayın.</string>
+    <string name="yapily_approval_in_progress_subtitle">Devam etmek için bankanızla işlem onayını tamamlayın.</string>
+    <string name="yapily_activating_title">Cüzdanınız Güncelleniyor...</string>
+    <string name="yapily_activating_subtitle">Bu işlem 30 saniye kadar sürebilir. Lütfen geri dönmeyin veya uygulamayı kapatmayın.</string>
+    <string name="yapily_approving_title">%1$s sayfasına yönlendiriliyorsunuz</string>
+    <string name="yapily_approving_subtitle">Bu işlem 30 saniye kadar sürebilir. Lütfen geri dönmeyin veya uygulamayı kapatmayın.</string>
+    <string name="yapily_linking_default_bank">Bankanız</string>
+    <string name="yapily_bank_link_choice_error_title">Hay aksi, tekrar deneyelim</string>
+    <string name="yapily_bank_link_choice_error_subtitle">Banka kimlik doğrulamanızı başlatmak için bir yöntem seçmeniz gerekiyor</string>
+    <string name="yapily_bank_link_app_choice_title">Lütfen birlikte açmak için uygulama seçin</string>
+    <string name="yapily_bank_link_no_apps">Hay aksi! Kimliğinizi doğrulamanıza yardımcı olabilecek hiçbir uygulamanız yok gibi görünüyor. Lütfen bir internet tarayıcı uygulaması yükleyin ve tekrar deneyin.</string>
+    <string name="open_banking_deeplink_error">Hay aksi! Bankanıza bağlanırken bir sorun oluştu. Lütfen tekrar deneyin.</string>
+    <string name="yapily_approval_header">Ödemenizi Onaylayın</string>
+    <string name="yapily_approval_title">Ödeme Bilgisi</string>
+    <string name="yapily_approval_subtitle_1">Hesap adı</string>
+    <string name="yapily_approval_subtitle_2_uk">Şube Kodu</string>
+    <string name="yapily_approval_subtitle_2_eu">IBAN</string>
+    <string name="yapily_approval_subtitle_3_uk">Hesap Numarası</string>
+    <string name="yapily_approval_subtitle_3_eu">SWIFT/BIC</string>
+    <string name="yapily_approval_blurb">Bankanızdan Blockchain\'e kolayca ödeme yapmak üzere Blockchain için FCA tarafından düzenlenen bir ödeme başlatma sağlayıcısı olan SafeConnect aracılığıyla ödemeyi onaylamanızın isteneceği bankanıza güvenli bir şekilde yeniden yönlendirmek üzereyiz.
+
+SafeConnect bu ayrıntıları bankanızla paylaşacak ve sizden aşağıdaki ödeme kurulumunu onaylamanız istenecektir.</string>
+    <string name="yapily_payment_to_fiat_wallet_title">İptal edilen satın alma miktarı %1$s Cüzdanına eklendi</string>
+    <string name="yapily_payment_to_fiat_wallet_subtitle">Kısa süre önce bankanızla  %1$s değerinde satın alma işlemini onayladınız ve siparişi buradan iptal ettiniz. Bankanızla onayladığınız için satın alma tutarınızı %2$s Cüzdanınıza yatırdık.</string>
+    <string name="yapily_payment_to_fiat_wallet_default">kripto</string>
+    <string name="yapily_fiat_deposit_success_subtitle">Bankanızın parayı göndermesini beklerken hemen kripto para satın alabilmeniz için %2$s Nakit Hesabınızdan %1$s tutara erken erişim sağlayabilirsiniz.
+
+Banka transferiniz %3$s tarihinde tamamlandıktan sonra para çekme işlemi gerçekleştirebileceksiniz.</string>
+    <string name="bank_linking_generic_error_title">Hay aksi! Ters giden bir şeyler var</string>
+    <string name="bank_linking_is_this_your_bank">Bu sizin bankanız mı?</string>
+    <string name="bank_linking_generic_error_subtitle">Lütfen bankanızı tekrar bağlamayı deneyin. Sorun devam ederse lütfen desteğe başvurun.</string>
+    <string name="bank_linking_timeout_error_title">Hay aksi! Çok uzun sürüyor</string>
+    <string name="bank_linking_timeout_error_subtitle">Bankanızın bağlanması beklenenden uzun sürüyor. Lütfen bu ekranı kapatın ve Ayarlar\'da durumu kontrol edin.</string>
+    <string name="bank_linking_already_linked_error_subtitle">Adların eşleşmediğini <annotation font="bold"> fark ettik.</annotation> Bağladığınız banka ile Blockchain.com Hesabınızdaki bankanın aynı yasal adı ve soyadı olmalıdır. <annotation link="yodlee_names_dont_match_learn_more"> Daha fazla bilgi edinin→</annotation></string>
+    <string name="bank_linking_checking_error_title">Lütfen bir Vadesiz Hesap bağlayın.</string>
+    <string name="bank_linking_checking_error_subtitle">Vadesiz hesabı olmadan kripto satın alırsanız bankanız sizden ekstra ücret talep edebilir.</string>
+    <string name="bank_linking_success_title">Banka Bağlandı!</string>
+    <string name="bank_linking_success_subtitle">%1$s hesabınız artık Blockchain.com Cüzdanınıza bağlı.</string>
+    <string name="bank_linking_try_different_bank">Farklı Bir Banka Deneyin</string>
+    <string name="bank_linking_try_different_account">Farklı Bir Hesap Deneyin</string>
+    <string name="bank_linking_expired_title">Hesap Erişimi Süresi Doldu</string>
+    <string name="bank_linking_expired_subtitle">Lütfen bankanızı yeniden bağlamayı deneyin. Bu devam ederse, lütfen desteğe başvurun.</string>
+    <string name="bank_linking_rejected_title">Bağlantı Reddedildi</string>
+    <string name="bank_linking_rejected_subtitle">Lütfen bankanızı yeniden bağlamayı deneyin ve bağlantıyı onalayın. Sorun devam ederse lütfen destek ile iletişime geçin.</string>
+    <string name="bank_linking_failure_title">Başarısız Bağlantı İsteği</string>
+    <string name="bank_linking_failure_subtitle">Lütfen tekrar deneyin. Sorun devam ederse lütfen destek ile iletişime geçin.</string>
+    <string name="bank_linking_declined_title">Hesap Erişimi Engellendi</string>
+    <string name="bank_linking_declined_subtitle">Ödemenin onaylanmasıyla ilgili bir oluştu. Lütfen tekrar deneyin. Sorun devam ederse lütfen destek ile iletişime geçin.</string>
 </resources>
