@@ -251,7 +251,7 @@ class LiveCustodialWalletManager(
                     FiatTransaction(
                         id = it.id,
                         amount = it.amount.toFiat(),
-                        date = it.insertedAt.fromIso8601ToUtc() ?: Date(),
+                        date = it.insertedAt.fromIso8601ToUtc()?.toLocalTime() ?: Date(),
                         state = it.state.toTransactionState(),
                         type = it.type.toTransactionType()
                     )
@@ -1168,7 +1168,7 @@ class LiveCustodialWalletManager(
             id = this.id,
             state = this.state.toCustodialOrderState(),
             depositAddress = this.kind.depositAddress,
-            createdAt = this.createdAt.fromIso8601ToUtc() ?: Date(),
+            createdAt = this.createdAt.fromIso8601ToUtc()?.toLocalTime() ?: Date(),
             inputMoney = CryptoValue.fromMinor(
                 CryptoCurrency.fromNetworkTicker(
                     this.pair.toCryptoCurrencyPair()?.source?.networkTicker.toString()
@@ -1302,7 +1302,7 @@ fun String.toCustodialOrderState(): CustodialOrderState =
 
 private fun String.toTransactionType(): TransactionType =
     when (this) {
-        TransactionResponse.DEPOSIT -> TransactionType.DEPOSIT
+        TransactionResponse.DEPOSIT, TransactionResponse.CHARGE -> TransactionType.DEPOSIT
         TransactionResponse.WITHDRAWAL -> TransactionType.WITHDRAWAL
         else -> TransactionType.UNKNOWN
     }
@@ -1372,9 +1372,9 @@ private fun BuySellOrderResponse.toBuySellOrder(): BuySellOrder {
         fiat = FiatValue.fromMinor(fiatCurrency, fiatAmount),
         crypto = CryptoValue.fromMinor(cryptoCurrency, cryptoAmount),
         state = state.toLocalState(),
-        expires = expiresAt.fromIso8601ToUtc() ?: Date(0),
-        updated = updatedAt.fromIso8601ToUtc() ?: Date(0),
-        created = insertedAt.fromIso8601ToUtc() ?: Date(0),
+        expires = expiresAt.fromIso8601ToUtc()?.toLocalTime() ?: Date(),
+        updated = updatedAt.fromIso8601ToUtc()?.toLocalTime() ?: Date(),
+        created = insertedAt.fromIso8601ToUtc()?.toLocalTime() ?: Date(),
         fee = fee?.let {
             FiatValue.fromMinor(fiatCurrency, it.toLongOrDefault(0))
         },
@@ -1421,7 +1421,7 @@ private fun InterestActivityItemResponse.toInterestActivityItem(cryptoCurrency: 
         value = CryptoValue.fromMinor(cryptoCurrency, amountMinor.toBigInteger()),
         cryptoCurrency = cryptoCurrency,
         id = id,
-        insertedAt = insertedAt.fromIso8601ToUtc() ?: Date(0),
+        insertedAt = insertedAt.fromIso8601ToUtc()?.toLocalTime() ?: Date(),
         state = InterestActivityItem.toInterestState(state),
         type = InterestActivityItem.toTransactionType(type),
         extraAttributes = extraAttributes

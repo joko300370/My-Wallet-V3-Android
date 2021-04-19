@@ -364,7 +364,9 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     private fun renderBankPayment(paymentMethod: PaymentMethod.Bank) {
         with(binding) {
             paymentMethodIcon.setImageResource(R.drawable.ic_bank_transfer)
-            Glide.with(requireContext()).load(paymentMethod.iconUrl).into(paymentMethodIcon)
+            if (paymentMethod.iconUrl.isNotEmpty()) {
+                Glide.with(requireContext()).load(paymentMethod.iconUrl).into(paymentMethodIcon)
+            }
 
             paymentMethodTitle.text = paymentMethod.bankName
             paymentMethodBankInfo.text =

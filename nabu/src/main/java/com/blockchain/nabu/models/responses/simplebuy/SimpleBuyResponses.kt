@@ -284,6 +284,7 @@ data class TransactionResponse(
         const val REFUNDED = "REFUNDED"
 
         const val DEPOSIT = "DEPOSIT"
+        const val CHARGE = "CHARGE"
         const val WITHDRAWAL = "WITHDRAWAL"
     }
 }

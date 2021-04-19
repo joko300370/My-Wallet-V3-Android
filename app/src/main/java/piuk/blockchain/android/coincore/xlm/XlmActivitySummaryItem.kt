@@ -11,6 +11,7 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import java.lang.IllegalStateException
 
 class XlmActivitySummaryItem(
     private val xlmTransaction: XlmTransaction,
@@ -27,7 +28,9 @@ class XlmActivitySummaryItem(
         }
 
     override val timeStampMs: Long
-        get() = xlmTransaction.timeStamp.fromIso8601ToUtc()!!.toLocalTime().time
+        get() = xlmTransaction.timeStamp.fromIso8601ToUtc()?.toLocalTime()?.time ?: throw IllegalStateException(
+            "xlm timeStamp not found"
+        )
 
     override val value: CryptoValue by unsafeLazy {
         xlmTransaction.accountDelta.abs()
