@@ -578,11 +578,11 @@ sealed class PaymentMethod(
 
         private const val UNDEFINED_PAYMENT_METHOD_ORDER = 0
         private const val FUNDS_PAYMENT_METHOD_ORDER = 1
+        private const val UNDEFINED_FUNDS_PAYMENT_METHOD_ORDER = 2
         private const val CARD_PAYMENT_METHOD_ORDER = 3
-        private const val BANK_PAYMENT_METHOD_ORDER = 2
         private const val UNDEFINED_CARD_PAYMENT_METHOD_ORDER = 4
-        private const val UNDEFINED_BANK_TRANSFER_METHOD_ORDER = 5
-        private const val UNDEFINED_FUNDS_PAYMENT_METHOD_ORDER = 6
+        private const val BANK_PAYMENT_METHOD_ORDER = 5
+        private const val UNDEFINED_BANK_TRANSFER_METHOD_ORDER = 6
     }
 }
 
