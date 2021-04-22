@@ -44,7 +44,7 @@ sealed class YapilyPermissionItem {
 
     data class YapilyExpandableItem(
         @StringRes val title: Int,
-        @StringRes val blurb: Int,
+        val blurb: String,
         var isExpanded: Boolean = false,
         var playAnimation: Boolean = false
     ) : YapilyPermissionItem()

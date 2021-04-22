@@ -17,7 +17,6 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.isCustodial
-import piuk.blockchain.android.ui.linkbank.BankAuthSource
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.account.AccountInfoBank
 import piuk.blockchain.android.ui.customviews.account.AccountInfoCrypto
@@ -25,6 +24,7 @@ import piuk.blockchain.android.ui.customviews.account.AccountInfoFiat
 import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.customviews.account.DefaultCellDecorator
 import piuk.blockchain.android.ui.customviews.account.StatusDecorator
+import piuk.blockchain.android.ui.linkbank.BankAuthSource
 import piuk.blockchain.android.ui.swap.SwapAccountSelectSheetFeeDecorator
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionErrorState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
@@ -804,10 +804,11 @@ class TransactionFlowCustomiserImpl(
 
     companion object {
         const val MAX_ACCOUNTS_FOR_SHEET = 3
+        private const val FIVE_DAYS = 5
 
-        fun getEstimatedTransactionCompletionTime(): String {
+        fun getEstimatedTransactionCompletionTime(daysInFuture: Int = FIVE_DAYS): String {
             val cal = Calendar.getInstance()
-            cal.add(Calendar.DAY_OF_YEAR, 5)
+            cal.add(Calendar.DAY_OF_YEAR, daysInFuture)
             val sdf = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
             return sdf.format(cal.time)
         }

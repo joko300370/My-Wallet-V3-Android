@@ -20,6 +20,7 @@ import piuk.blockchain.android.ui.linkbank.bankAuthEvent
 import piuk.blockchain.android.ui.linkbank.yapily.adapters.YapilyAgreementDelegateAdapter
 import piuk.blockchain.android.ui.linkbank.yapily.adapters.YapilyApprovalDelegateAdapter
 import piuk.blockchain.android.ui.linkbank.yapily.adapters.YapilyPermissionItem
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionFlowCustomiserImpl.Companion.getEstimatedTransactionCompletionTime
 
 class YapilyPermissionFragment : Fragment() {
 
@@ -146,15 +147,15 @@ class YapilyPermissionFragment : Fragment() {
             ),
             YapilyPermissionItem.YapilyExpandableItem(
                 title = R.string.yapily_agreement_title_1,
-                blurb = R.string.yapily_agreement_blurb_1
+                blurb = getString(R.string.yapily_agreement_blurb_1_1, entity)
             ),
             YapilyPermissionItem.YapilyExpandableItem(
                 title = R.string.yapily_agreement_title_2,
-                blurb = R.string.yapily_agreement_blurb_2
+                blurb = getString(R.string.yapily_agreement_blurb_2)
             ),
             YapilyPermissionItem.YapilyExpandableItem(
                 title = R.string.yapily_agreement_title_3,
-                blurb = R.string.yapily_agreement_blurb_3
+                blurb = getString(R.string.yapily_agreement_blurb_3_1, entity)
             ),
             YapilyPermissionItem.YapilyStaticItem(
                 blurb = R.string.yapily_approval_blurb,
@@ -162,7 +163,7 @@ class YapilyPermissionFragment : Fragment() {
             ),
             YapilyPermissionItem.YapilyExpandableItem(
                 title = R.string.yapily_agreement_title_4,
-                blurb = R.string.yapily_agreement_blurb_4
+                blurb = getString(R.string.yapily_agreement_blurb_4_2, entity)
             )
         )
 
@@ -198,23 +199,25 @@ class YapilyPermissionFragment : Fragment() {
             ),
             YapilyPermissionItem.YapilyExpandableItem(
                 title = R.string.yapily_agreement_title_1,
-                blurb = R.string.yapily_agreement_blurb_1
+                blurb = getString(R.string.yapily_agreement_blurb_1_1, entity)
             ),
             YapilyPermissionItem.YapilyExpandableItem(
                 title = R.string.yapily_agreement_title_2,
-                blurb = R.string.yapily_agreement_blurb_2
+                blurb = getString(R.string.yapily_agreement_blurb_2)
             ),
             YapilyPermissionItem.YapilyExpandableItem(
                 title = R.string.yapily_agreement_title_3,
-                blurb = R.string.yapily_agreement_blurb_3
+                blurb = getString(R.string.yapily_agreement_blurb_3_1, entity)
             ),
             YapilyPermissionItem.YapilyStaticItem(
-                blurb = R.string.yapily_agreement_blurb_5,
+                blurb = R.string.yapily_agreement_blurb_5_1,
                 bankName = institution.name
             ),
             YapilyPermissionItem.YapilyExpandableItem(
                 title = R.string.yapily_agreement_title_4,
-                blurb = R.string.yapily_agreement_blurb_4
+                blurb = getString(
+                    R.string.yapily_agreement_blurb_4_1, entity, getEstimatedTransactionCompletionTime(90)
+                )
             )
         )
 
