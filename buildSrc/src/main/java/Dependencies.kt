@@ -34,6 +34,8 @@ object Versions {
     const val multidex = "2.0.1"
     const val navigation = "2.1.0"
     const val lifecycle = "2.1.0"
+    const val camera = "1.0.0-rc04"
+    const val cameraView = "1.0.0-alpha23"
 
     // Support Libraries
     const val googleServices = "17.1.0"
@@ -157,6 +159,9 @@ object Libraries {
         "androidx.navigation:navigation-safe-args-gradle-plugin:${Versions.navigation}"
     const val lifecycleViewModel = "androidx.lifecycle:lifecycle-viewmodel:${Versions.lifecycle}"
     const val lifecycleExtensions = "androidx.lifecycle:lifecycle-extensions:${Versions.lifecycle}"
+    const val camera = "androidx.camera:camera-camera2:${Versions.camera}"
+    const val cameraView = "androidx.camera:camera-view:${Versions.cameraView}"
+    const val cameraLifecycle = "androidx.camera:camera-lifecycle:${Versions.camera}"
 
     // Google & Firebase
     const val firebaseCore = "com.google.firebase:firebase-core:${Versions.firebaseCore}"

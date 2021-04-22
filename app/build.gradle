@@ -306,6 +306,10 @@ dependencies {
     implementation Libraries.lifecycleViewModel
     implementation Libraries.lifecycleExtensions
 
+    implementation Libraries.camera
+    implementation Libraries.cameraView
+    implementation Libraries.cameraLifecycle
+
     implementation(Libraries.googlePlayServicesBase) {
         exclude group: 'com.android.support'
     }
