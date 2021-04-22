@@ -120,6 +120,7 @@ enum class LinkedBankErrorState {
     REJECTED,
     EXPIRED,
     FAILURE,
+    INVALID,
     UNKNOWN,
     NONE
 }

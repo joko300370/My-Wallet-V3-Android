@@ -392,6 +392,13 @@ class BankAuthFragment : MviFragment<BankAuthModel, BankAuthIntent, BankAuthStat
                 )
                 binding.linkBankBtn.text = getString(R.string.common_try_again)
             }
+            ErrorState.LinkedBankInvalid -> {
+                setTitleAndSubtitle(
+                    getString(R.string.bank_linking_invalid_title),
+                    getString(R.string.bank_linking_invalid_subtitle)
+                )
+                binding.linkBankBtn.text = getString(R.string.common_try_again)
+            }
             else -> {
                 logAnalytics(BankAuthAnalytics.GENERIC_ERROR, partner)
                 setTitleAndSubtitle(

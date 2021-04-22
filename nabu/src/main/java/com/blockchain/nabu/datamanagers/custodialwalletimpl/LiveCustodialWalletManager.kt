@@ -1263,6 +1263,7 @@ private fun String.toLinkedBankErrorState(): LinkedBankErrorState =
         LinkedBankTransferResponse.ERROR_ACCOUNT_EXPIRED -> LinkedBankErrorState.EXPIRED
         LinkedBankTransferResponse.ERROR_ACCOUNT_REJECTED -> LinkedBankErrorState.REJECTED
         LinkedBankTransferResponse.ERROR_ACCOUNT_FAILURE -> LinkedBankErrorState.FAILURE
+        LinkedBankTransferResponse.BANK_TRANSFER_ACCOUNT_INVALID -> LinkedBankErrorState.INVALID
         else -> LinkedBankErrorState.UNKNOWN
     }
 

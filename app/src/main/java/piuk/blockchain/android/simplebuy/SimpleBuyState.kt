@@ -190,6 +190,7 @@ sealed class ErrorState : Serializable {
     object LinkedBankRejected : ErrorState()
     object LinkedBankExpired : ErrorState()
     object LinkedBankFailure : ErrorState()
+    object LinkedBankInvalid : ErrorState()
     object ApprovedBankDeclined : ErrorState()
     object ApprovedBankRejected : ErrorState()
     object ApprovedBankFailed : ErrorState()

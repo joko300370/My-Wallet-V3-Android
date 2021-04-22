@@ -144,6 +144,9 @@ class BankAuthModel(
             LinkedBankErrorState.FAILURE -> process(
                 BankAuthIntent.BankAuthErrorState(ErrorState.LinkedBankFailure)
             )
+            LinkedBankErrorState.INVALID -> process(
+                BankAuthIntent.BankAuthErrorState(ErrorState.LinkedBankInvalid)
+            )
             LinkedBankErrorState.NONE -> {
                 // check the state is not a linking final state
                 if (it.state == LinkedBankState.BLOCKED) {
