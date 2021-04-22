@@ -564,7 +564,7 @@ class OnChainSellTxEngineTest {
         val kycTiers: KycTiers = mock()
         whenever(kycTierService.tiers()).thenReturn(Single.just(kycTiers))
 
-        whenever(walletManager.getProductTransferLimits(TGT_ASSET, Product.TRADE))
+        whenever(walletManager.getProductTransferLimits(TGT_ASSET, Product.SELL, TransferDirection.FROM_USERKEY))
             .itReturns(
                 Single.just(
                     TransferLimits(
@@ -578,7 +578,7 @@ class OnChainSellTxEngineTest {
 
     private fun verifyLimitsFetched() {
         verify(kycTierService).tiers()
-        verify(walletManager).getProductTransferLimits(TGT_ASSET, Product.TRADE)
+        verify(walletManager).getProductTransferLimits(TGT_ASSET, Product.SELL, TransferDirection.FROM_USERKEY)
     }
 
     private fun verifyOnChainEngineStarted(srcAccount: CryptoAccount) {

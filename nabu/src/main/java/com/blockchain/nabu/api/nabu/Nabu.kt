@@ -467,7 +467,9 @@ internal interface Nabu {
         @Header("authorization") authorization: String,
         @Query("currency") currency: String,
         @Query("product") product: String,
-        @Query("minor") useMinor: Boolean = true
+        @Query("minor") useMinor: Boolean = true,
+        @Query("side") side: String?,
+        @Query("orderDirection") orderDirection: String?
     ): Single<SwapLimitsResponse>
 
     @GET(NABU_SWAP_ACTIVITY)

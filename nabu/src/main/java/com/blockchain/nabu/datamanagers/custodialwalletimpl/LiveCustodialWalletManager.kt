@@ -912,12 +912,28 @@ class LiveCustodialWalletManager(
             }
         }
 
-    override fun getProductTransferLimits(currency: String, product: Product): Single<TransferLimits> =
+    override fun getProductTransferLimits(
+        currency: String,
+        product: Product,
+        orderDirection: TransferDirection?
+    ): Single<TransferLimits> =
         authenticator.authenticate {
+            val side = when (product) {
+                Product.BUY,
+                Product.SELL -> product.name
+                else -> null
+            }
+
+            val direction = if (product == Product.TRADE && orderDirection != null) {
+                orderDirection.name
+            } else null
+
             nabuService.fetchProductLimits(
                 it,
                 currency,
-                product.toRequestString()
+                product.toRequestString(),
+                side,
+                direction
             ).map { response ->
                 if (response.maxOrder == null && response.minOrder == null && response.maxPossibleOrder == null) {
                     TransferLimits(currency)
@@ -1232,6 +1248,8 @@ class LiveCustodialWalletManager(
 private fun Product.toRequestString(): String =
     when (this) {
         Product.TRADE -> "SWAP"
+        Product.BUY,
+        Product.SELL -> "SIMPLEBUY"
         else -> this.toString()
     }
 

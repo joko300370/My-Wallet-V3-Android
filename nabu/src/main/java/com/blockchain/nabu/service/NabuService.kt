@@ -268,11 +268,15 @@ class NabuService(retrofit: Retrofit) {
     internal fun fetchProductLimits(
         sessionToken: NabuSessionTokenResponse,
         currency: String,
-        product: String
+        product: String,
+        side: String?,
+        orderDirection: String?
     ): Single<SwapLimitsResponse> = service.fetchLimits(
         authorization = sessionToken.authHeader,
         currency = currency,
-        product = product
+        product = product,
+        side = side,
+        orderDirection = orderDirection
     ).onErrorResumeNext {
         if ((it as? HttpException)?.code() == 409) {
             Single.just(

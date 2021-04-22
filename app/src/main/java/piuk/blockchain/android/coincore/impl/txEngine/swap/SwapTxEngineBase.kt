@@ -3,6 +3,7 @@ package piuk.blockchain.android.coincore.impl.txEngine.swap
 import androidx.annotation.VisibleForTesting
 import com.blockchain.nabu.datamanagers.CustodialOrder
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.Product
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
@@ -40,7 +41,7 @@ abstract class SwapTxEngineBase(
     quotesEngine: TransferQuotesEngine,
     private val walletManager: CustodialWalletManager,
     kycTierService: TierService
-) : QuotedEngine(quotesEngine, kycTierService, walletManager) {
+) : QuotedEngine(quotesEngine, kycTierService, walletManager, Product.TRADE) {
 
     private lateinit var minApiLimit: Money
 

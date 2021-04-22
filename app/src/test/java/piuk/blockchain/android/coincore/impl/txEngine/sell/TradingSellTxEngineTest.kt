@@ -205,7 +205,6 @@ class TradingSellTxEngineTest {
         }
 
         val pricedQuote: PricedQuote = mock()
-
         whenever(quotesEngine.pricedQuote).thenReturn(Observable.just(pricedQuote))
 
         subject.start(
@@ -219,15 +218,15 @@ class TradingSellTxEngineTest {
             .test()
             .assertValue {
                 it.amount == CryptoValue.zero(SRC_ASSET) &&
-                it.totalBalance == totalBalance &&
-                it.availableBalance == totalBalance &&
-                it.feeAmount == CryptoValue.zero(SRC_ASSET) &&
-                it.selectedFiat == TGT_ASSET &&
-                it.confirmations.isEmpty() &&
-                it.minLimit == MIN_GOLD_LIMIT_ASSET &&
-                it.maxLimit == MAX_GOLD_LIMIT_ASSET &&
-                it.validationState == ValidationState.UNINITIALISED &&
-                it.engineState.isEmpty()
+                    it.totalBalance == totalBalance &&
+                    it.availableBalance == totalBalance &&
+                    it.feeAmount == CryptoValue.zero(SRC_ASSET) &&
+                    it.selectedFiat == TGT_ASSET &&
+                    it.confirmations.isEmpty() &&
+                    it.minLimit == MIN_GOLD_LIMIT_ASSET &&
+                    it.maxLimit == MAX_GOLD_LIMIT_ASSET &&
+                    it.validationState == ValidationState.UNINITIALISED &&
+                    it.engineState.isEmpty()
             }
             .assertValue { verifyFeeLevels(it.feeSelection) }
             .assertNoErrors()
@@ -272,16 +271,16 @@ class TradingSellTxEngineTest {
             .test()
             .assertValue {
                 it.amount == CryptoValue.zero(SRC_ASSET) &&
-                it.totalBalance == CryptoValue.zero(SRC_ASSET) &&
-                it.availableBalance == CryptoValue.zero(SRC_ASSET) &&
-                it.feeForFullAvailable == CryptoValue.zero(SRC_ASSET) &&
-                it.feeAmount == CryptoValue.zero(SRC_ASSET) &&
-                it.selectedFiat == TGT_ASSET &&
-                it.confirmations.isEmpty() &&
-                it.minLimit == null &&
-                it.maxLimit == null &&
-                it.validationState == ValidationState.PENDING_ORDERS_LIMIT_REACHED &&
-                it.engineState.isEmpty()
+                    it.totalBalance == CryptoValue.zero(SRC_ASSET) &&
+                    it.availableBalance == CryptoValue.zero(SRC_ASSET) &&
+                    it.feeForFullAvailable == CryptoValue.zero(SRC_ASSET) &&
+                    it.feeAmount == CryptoValue.zero(SRC_ASSET) &&
+                    it.selectedFiat == TGT_ASSET &&
+                    it.confirmations.isEmpty() &&
+                    it.minLimit == null &&
+                    it.maxLimit == null &&
+                    it.validationState == ValidationState.PENDING_ORDERS_LIMIT_REACHED &&
+                    it.engineState.isEmpty()
             }
             .assertValue { verifyFeeLevels(it.feeSelection) }
             .assertNoErrors()
@@ -335,9 +334,9 @@ class TradingSellTxEngineTest {
             .assertNoErrors()
             .assertValue {
                 it.amount == inputAmount &&
-                it.totalBalance == totalBalance &&
-                it.availableBalance == totalBalance &&
-                it.feeAmount == expectedFee
+                    it.totalBalance == totalBalance &&
+                    it.availableBalance == totalBalance &&
+                    it.feeAmount == expectedFee
             }
             .assertValue { verifyFeeLevels(it.feeSelection) }
 
@@ -500,9 +499,9 @@ class TradingSellTxEngineTest {
             .assertNoErrors()
             .assertValue {
                 it.amount == inputAmount &&
-                it.totalBalance == totalBalance &&
-                it.availableBalance == totalBalance &&
-                it.feeAmount == zeroBtc
+                    it.totalBalance == totalBalance &&
+                    it.availableBalance == totalBalance &&
+                    it.feeAmount == zeroBtc
             }
             .assertValue { verifyFeeLevels(it.feeSelection) }
 
@@ -524,7 +523,7 @@ class TradingSellTxEngineTest {
         val kycTiers: KycTiers = mock()
         whenever(kycTierService.tiers()).thenReturn(Single.just(kycTiers))
 
-        whenever(walletManager.getProductTransferLimits(TGT_ASSET, Product.TRADE))
+        whenever(walletManager.getProductTransferLimits(TGT_ASSET, Product.SELL, TransferDirection.INTERNAL))
             .itReturns(
                 Single.just(
                     TransferLimits(
@@ -538,7 +537,7 @@ class TradingSellTxEngineTest {
 
     private fun verifyLimitsFetched() {
         verify(kycTierService).tiers()
-        verify(walletManager).getProductTransferLimits(TGT_ASSET, Product.TRADE)
+        verify(walletManager).getProductTransferLimits(TGT_ASSET, Product.SELL, TransferDirection.INTERNAL)
     }
 
     private fun verifyQuotesEngineStarted() {

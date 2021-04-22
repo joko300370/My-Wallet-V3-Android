@@ -38,7 +38,8 @@ private val PendingTx.quoteSub: Disposable?
 abstract class QuotedEngine(
     protected val quotesEngine: TransferQuotesEngine,
     private val kycTierService: TierService,
-    private val walletManager: CustodialWalletManager
+    private val walletManager: CustodialWalletManager,
+    private val productType: Product
 ) : TxEngine() {
     protected abstract val direction: TransferDirection
 
@@ -47,7 +48,7 @@ abstract class QuotedEngine(
     protected fun updateLimits(pendingTx: PendingTx, pricedQuote: PricedQuote): Single<PendingTx> =
         Singles.zip(
             kycTierService.tiers(),
-            walletManager.getProductTransferLimits(userFiat, Product.TRADE)
+            walletManager.getProductTransferLimits(userFiat, productType, direction)
         ) { tier, limits ->
             onLimitsForTierFetched(tier, limits, pendingTx, pricedQuote)
         }

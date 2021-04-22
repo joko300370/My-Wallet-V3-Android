@@ -119,7 +119,7 @@ class InterestDepositTradingEngine(private val walletManager: CustodialWalletMan
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
         walletManager.executeCustodialTransfer(
             amount = pendingTx.amount,
-            origin = Product.SIMPLEBUY,
+            origin = Product.BUY,
             destination = Product.SAVINGS
         ).toSingle {
             TxResult.UnHashedTxResult(pendingTx.amount)

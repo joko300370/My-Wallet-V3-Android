@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore.impl.txEngine.sell
 
 import com.blockchain.nabu.datamanagers.CustodialOrder
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.Product
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.models.responses.nabu.KycTiers
@@ -28,7 +29,7 @@ abstract class SellTxEngineBase(
     private val walletManager: CustodialWalletManager,
     kycTierService: TierService,
     quotesEngine: TransferQuotesEngine
-) : QuotedEngine(quotesEngine, kycTierService, walletManager) {
+) : QuotedEngine(quotesEngine, kycTierService, walletManager, Product.SELL) {
 
     val target: FiatAccount
         get() = txTarget as FiatAccount

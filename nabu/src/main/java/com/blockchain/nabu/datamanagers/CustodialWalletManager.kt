@@ -222,7 +222,11 @@ interface CustodialWalletManager {
         product: Product
     ): Completable
 
-    fun getProductTransferLimits(currency: String, product: Product): Single<TransferLimits>
+    fun getProductTransferLimits(
+        currency: String,
+        product: Product,
+        orderDirection: TransferDirection? = null
+    ): Single<TransferLimits>
 
     fun getSwapTrades(): Single<List<CustodialOrder>>
 
@@ -598,7 +602,8 @@ data class PaymentLimits(val min: FiatValue, val max: FiatValue) : Serializable 
 }
 
 enum class Product {
-    SIMPLEBUY,
+    BUY,
+    SELL,
     SAVINGS,
     TRADE
 }

@@ -66,7 +66,7 @@ open class CustodialTradingAccount(
                     address = it.address,
                     hash = txResult.txId,
                     amount = txResult.amount,
-                    product = Product.SIMPLEBUY
+                    product = Product.BUY
                 )
             }
         }

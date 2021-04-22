@@ -66,7 +66,7 @@ class SimpleBuyInteractor(
             if (tier.isInInitialState()) {
                 Single.just(pairs to null)
             } else
-                custodialWalletManager.getProductTransferLimits(targetCurrency, product = Product.SIMPLEBUY).map {
+                custodialWalletManager.getProductTransferLimits(targetCurrency, product = Product.BUY).map {
                     pairs to it
                 }
         }.trackProgress(appUtil.activityIndicator)
