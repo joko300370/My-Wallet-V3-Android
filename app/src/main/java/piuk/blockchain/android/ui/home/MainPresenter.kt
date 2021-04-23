@@ -39,6 +39,7 @@ import piuk.blockchain.android.networking.PollService
 import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.android.scan.QrScanResultProcessor
 import piuk.blockchain.android.scan.ScanResult
+import piuk.blockchain.android.simplebuy.SimpleBuyState
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.sunriver.CampaignLinkState
 import piuk.blockchain.android.thepit.PitLinking
@@ -80,11 +81,12 @@ interface MainView : MvpView, HomeNavigator {
 
     fun startTransactionFlowWithTarget(targets: Collection<CryptoTarget>)
     fun showScanTargetError(error: QrScanError)
-    fun handleApprovalDepositComplete(orderValue: FiatValue, estimatedTransactionCompletionTime: String)
 
+    fun handleApprovalDepositComplete(orderValue: FiatValue, estimatedTransactionCompletionTime: String)
     fun handleApprovalDepositInProgress(amount: FiatValue)
     fun handleApprovalDepositError(currency: String)
     fun handleApprovalDepositTimeout(currencyCode: String)
+    fun handleBuyApprovalError()
 }
 
 class MainPresenter internal constructor(
@@ -264,6 +266,8 @@ class MainPresenter internal constructor(
         val deepLinkState = bankLinkingPrefs.getBankLinkingState().fromPreferencesValue()
 
         if (deepLinkState.bankAuthFlow == BankAuthFlowState.BANK_APPROVAL_COMPLETE) {
+            deepLinkState.copy(bankAuthFlow = BankAuthFlowState.NONE, bankPaymentData = null, bankLinkingInfo = null)
+                .toPreferencesValue()
             return
         }
 
@@ -281,7 +285,9 @@ class MainPresenter internal constructor(
                         onSuccess = {
                             bankLinkingPrefs.setBankLinkingState(
                                 deepLinkState.copy(
-                                    bankAuthFlow = BankAuthFlowState.BANK_APPROVAL_COMPLETE
+                                    bankAuthFlow = BankAuthFlowState.BANK_APPROVAL_COMPLETE,
+                                    bankPaymentData = null,
+                                    bankLinkingInfo = null
                                 ).toPreferencesValue()
                             )
 
@@ -301,11 +307,30 @@ class MainPresenter internal constructor(
 
     private fun handleSimpleBuyApproval() {
         simpleBuySync.currentState()?.let {
-            if (it.orderState == OrderState.AWAITING_FUNDS) {
-                view?.launchSimpleBuyFromDeepLinkApproval()
-            } else {
-                view?.handlePaymentForCancelledOrder(it)
-            }
+            handleOrderState(it)
+        } ?: kotlin.run {
+            // try to sync with server once, otherwise fail
+            simpleBuySync.performSync()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onComplete = {
+                        simpleBuySync.currentState()?.let {
+                            handleOrderState(it)
+                        } ?: view?.handleBuyApprovalError()
+                    }, onError = {
+                        Timber.e("Error doing SB sync $it")
+                        view?.handleBuyApprovalError()
+                    }
+                )
+        }
+    }
+
+    private fun handleOrderState(state: SimpleBuyState) {
+        if (state.orderState == OrderState.AWAITING_FUNDS) {
+            view?.launchSimpleBuyFromDeepLinkApproval()
+        } else {
+            view?.handlePaymentForCancelledOrder(state)
         }
     }
 
@@ -338,6 +363,10 @@ class MainPresenter internal constructor(
         val linkingState = bankLinkingPrefs.getBankLinkingState().fromPreferencesValue()
 
         if (linkingState.bankAuthFlow == BankAuthFlowState.BANK_LINK_COMPLETE) {
+            bankLinkingPrefs.setBankLinkingState(
+                linkingState.copy(bankAuthFlow = BankAuthFlowState.NONE, bankPaymentData = null, bankLinkingInfo = null)
+                    .toPreferencesValue()
+            )
             return
         }
 

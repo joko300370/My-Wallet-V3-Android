@@ -849,6 +849,12 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
             )
         )
 
+    override fun handleBuyApprovalError() {
+        ToastCustom.makeText(
+            this, getString(R.string.simple_buy_confirmation_error), Toast.LENGTH_LONG, ToastCustom.TYPE_ERROR
+        )
+    }
+
     override fun handleApprovalDepositInProgress(amount: FiatValue) =
         replaceBottomSheet(
             FiatTransactionBottomSheet.newInstance(

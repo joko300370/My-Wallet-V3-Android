@@ -1589,6 +1589,7 @@
     <string name="deposit_confirmation_timeout_subtitle">Payments can sometimes take a while to go through. If you approved the transaction, you can safely close this, and check the Deposit progress under the Activity tab.</string>
     <string name="deposit_confirmation_error_title">Oops, looks like something went wrong!</string>
     <string name="deposit_confirmation_error_subtitle">There was an issue with your Deposit, please try again or contact support if the problem persists.</string>
+    <string name="simple_buy_confirmation_error">There was an issue with your payment, please try again or contact support if the problem persists.</string>
     <string name="sell_confirmation_cta_button">Sell %1$s</string>
     <string name="sell_confirmation_progress_title">Selling %1$s</string>
     <string name="sell_confirmation_progress_message">We’re completing your sell now.</string>
