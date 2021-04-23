@@ -1465,7 +1465,6 @@
     <string name="security_locked_card_funds_explanation">Per la tua sicurezza, i primi acquisti con carta sono soggetti a un periodo di detenzione di %1$s giorni prima che tu possa inviare o ritirare la criptovaluta acquistata. Ti avviseremo quando la sospensione verrà revocata.
 
  Nel frattempo, puoi vendere in contanti, scambiare e fare trading su Blockchain.com.</string>
-    <string name="security_locked_funds_bank_transfer_explanation">L\'importo finale potrebbe cambiare a causa dell\'attività di mercato. Per la tua sicurezza, gli ordini di acquisto con un conto bancario sono soggetti a un periodo di detenzione fino a %1$s giorni. Durante questo periodo puoi effettuare vendite o scambi. Ti avviseremo non appena i fondi saranno completamente disponibili.</string>
     <string name="security_locked_funds_bank_transfer_payment_screen_explanation">Questi fondi sono ora disponibili per la vendita e lo scambio.
 
  Nota: non potrai inviare o prelevare questi fondi dal tuo portafoglio per i prossimi %1$s giorni. Maggiori informazioni</string>

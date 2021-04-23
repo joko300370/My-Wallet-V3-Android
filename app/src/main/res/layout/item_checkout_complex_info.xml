@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/standard_margin"
+    android:layout_marginEnd="@dimen/standard_margin"
+    android:paddingTop="@dimen/small_margin"
+    android:paddingBottom="@dimen/small_margin">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/complex_item_title"
+        style="@style/Text.Standard.14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="BTC Price" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/complex_item_subtitle"
+        style="@style/Text.Standard.14"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/very_small_margin"
+        android:gravity="end"
+        android:ellipsize="end"
+        android:maxLines="2"
+        app:layout_constraintBottom_toTopOf="@id/complex_item_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toEndOf="@id/complex_item_title"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="£12345.56" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/complex_item_label"
+        style="@style/Text.Light.12"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/very_small_margin"
+        android:ellipsize="end"
+        android:gravity="end"
+        android:maxLines="2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toEndOf="@id/complex_item_title"
+        app:layout_constraintTop_toBottomOf="@id/complex_item_subtitle"
+        tools:text="£12345£12345£12345£12345£12345£12345£12345£12345£12345£12345£12345£12345£12345£12345£12345£12345£12345£12345£12345£12345.56" />
+</androidx.constraintlayout.widget.ConstraintLayout>

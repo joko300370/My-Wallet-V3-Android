@@ -18,10 +18,20 @@
         android:paddingEnd="@dimen/standard_margin"
         android:textColor="@color/grey_800"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="$10000 of BTC" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/amount_fiat"
+        style="@style/Text.Light.20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/tiny_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/amount"
+        tools:text="$100" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/status"
@@ -40,10 +50,10 @@
         style="@style/SeparatorWithoutMargins"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="@dimen/very_small_margin"
+        android:layout_marginTop="@dimen/medium_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/status" />
+        app:layout_constraintTop_toBottomOf="@+id/amount_fiat" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler"
@@ -55,7 +65,7 @@
         app:layout_constraintBottom_toTopOf="@+id/separator_bottom"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/separator_top"
-        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintVertical_bias="1.0"
         tools:itemCount="7"
         tools:listitem="@layout/item_simple_buy_checkout_info" />
 
@@ -78,18 +88,35 @@
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginEnd="@dimen/standard_margin"
         android:layout_marginBottom="@dimen/very_small_margin"
-        app:layout_constraintBottom_toTopOf="@id/button_action"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@id/private_key_explanation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_goneMarginBottom="@dimen/standard_margin"
         tools:text="@string/purchase_card_note_1" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/private_key_explanation"
+        style="@style/Text.Light.12"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/standard_margin"
+        android:layout_marginBottom="@dimen/tiny_margin"
+        android:background="@drawable/bkgd_grey_000_rounded"
+        android:padding="@dimen/small_margin"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/button_action"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="@string/private_key_wallet_explanation"
+        tools:visibility="visible" />
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_action"
         style="@style/CtaButton.Blue"
         android:layout_width="0dp"
-        android:layout_marginBottom="@dimen/tiny_margin"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/tiny_margin"
         app:layout_constraintBottom_toTopOf="@id/button_cancel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

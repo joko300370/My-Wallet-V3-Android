@@ -1464,7 +1464,6 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
     <string name="security_locked_card_funds_explanation">Güvenliğiniz için, ilk kez kart satın alımları, satın aldığınız kriptoyu göndermeden veya çekmeden önce %1$s günlük bir tutma süresine tabidir. Bekletme kaldırıldığında sizi bilgilendireceğiz.
 
 Bu arada, Blockchain.com\'da Nakit karşılığı satış yapabilir, takas ve işlem yapabilirsiniz.</string>
-    <string name="security_locked_funds_bank_transfer_explanation">Nihai tutar, piyasa hareketliliği nedeniyle değişebilir. Güvenliğiniz için banka hesabıyla satın alma emirleri %1$s günlük bekletme süresine tabidir. Bu süre zarfında Takas ve Satış işlemi yapabilirsiniz. Para tam olarak kullanılabilir olduğunda sizi bilgilendireceğiz.</string>
     <string name="security_locked_funds_bank_transfer_payment_screen_explanation">Bu fonlar artık Satış ve Takas işlemleri için kullanılabilir.
 
 Not: Önümüzdeki %1$s gün boyunca Bu tutarı cüzdanınızdan gönderemeyecek veya çekemeyeceksiniz. Daha fazla bilgi edin</string>

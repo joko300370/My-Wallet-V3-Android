@@ -528,6 +528,10 @@ sealed class PaymentMethod(
         override fun detailedLabel() =
             "$bankName $accountEnding"
 
+        override fun methodName() = bankName
+
+        override fun methodDetails() = "$accountType $accountEnding"
+
         @SuppressLint("DefaultLocale") // Yes, lint is broken
         val uiAccountType: String =
             accountType.toLowerCase(Locale.getDefault()).capitalize(Locale.getDefault())
@@ -547,6 +551,10 @@ sealed class PaymentMethod(
 
         override fun detailedLabel() =
             "${uiLabel()} ${dottedEndDigits()}"
+
+        override fun methodName() = label
+
+        override fun methodDetails() = "${cardType.name} $endDigits"
 
         fun uiLabel() =
             label.takeIf { it.isNotEmpty() } ?: cardType.label()
@@ -573,6 +581,10 @@ sealed class PaymentMethod(
         this is UndefinedBankTransfer || this is UndefinedFunds || this is UndefinedCard
 
     open fun detailedLabel(): String = ""
+
+    open fun methodName(): String = ""
+
+    open fun methodDetails(): String = ""
 
     companion object {
         const val UNDEFINED_CARD_PAYMENT_ID = "UNDEFINED_CARD_PAYMENT_ID"

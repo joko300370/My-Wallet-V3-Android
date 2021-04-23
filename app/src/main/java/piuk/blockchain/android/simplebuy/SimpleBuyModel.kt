@@ -157,18 +157,12 @@ class SimpleBuyModel(
                     onError = { process(SimpleBuyIntent.ErrorIntent()) }
                 )
 
-            is SimpleBuyIntent.FetchSuggestedPaymentMethod -> interactor.eligiblePaymentMethods(
-                intent.fiatCurrency,
-                intent.selectedPaymentMethodId
-            )
-                .subscribeBy(
-                    onSuccess = {
-                        process(it)
-                    },
-                    onError = {
-                        process(SimpleBuyIntent.ErrorIntent())
-                    }
-                )
+            is SimpleBuyIntent.FetchSuggestedPaymentMethod ->
+                processGetPaymentMethod(intent.fiatCurrency, intent.selectedPaymentMethodId)
+
+            is SimpleBuyIntent.FetchPaymentDetails ->
+                processGetPaymentMethod(intent.fiatCurrency, intent.selectedPaymentMethodId)
+
             is SimpleBuyIntent.PaymentMethodChangeRequested -> {
                 if (intent.paymentMethod.isEligible && intent.paymentMethod is UndefinedPaymentMethod) {
                     process(SimpleBuyIntent.AddNewPaymentMethodRequested(intent.paymentMethod))
@@ -275,6 +269,20 @@ class SimpleBuyModel(
             }
         }.exhaustive
     }
+
+    private fun processGetPaymentMethod(fiatCurrency: String, selectedPaymentMethodId: String?) =
+        interactor.eligiblePaymentMethods(
+            fiatCurrency,
+            selectedPaymentMethodId
+        )
+            .subscribeBy(
+                onSuccess = {
+                    process(it)
+                },
+                onError = {
+                    process(SimpleBuyIntent.ErrorIntent())
+                }
+            )
 
     private fun handleOrderAttrs(order: BuySellOrder) {
         order.attributes?.everypay?.let {

@@ -165,8 +165,8 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
                 analytics.logEvent(
                     buyConfirmClicked(
                         lastState?.order?.amount?.valueMinor.toString(),
-                        lastState?.fiatCurrency ?: "",
-                        lastState?.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString() ?: ""
+                        lastState?.fiatCurrency.orEmpty(),
+                        lastState?.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString().orEmpty()
                     )
                 )
             }

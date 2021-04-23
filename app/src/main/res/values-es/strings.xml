@@ -1460,7 +1460,6 @@ Mientras tanto, puede vender en efectivo, intercambiar y comerciar dentro de Blo
     <string name="security_locked_card_funds_explanation">Por su seguridad, las compras con tarjeta por primera vez están sujetas a un período de retención de %1$s días antes de que pueda enviar o retirar su criptografía comprada. Le notificaremos cuando se levante la retención.
 
  Mientras tanto, puede vender en efectivo, intercambiar y comerciar dentro de Blockchain.com.</string>
-    <string name="security_locked_funds_bank_transfer_explanation">El monto final podría cambiar según la actividad del mercado. Por su seguridad, las órdenes de compra con una cuenta bancaria están sujetas a un período de retención de hasta %1$s días. Puedes cambiar o vender durante este tiempo. Le notificaremos una vez que los fondos estén completamente disponibles.</string>
     <string name="security_locked_funds_bank_transfer_payment_screen_explanation">Estos fondos están disponibles ahora para su venta y cambio.
 
 Nota: No podrá enviar ni retirar estos fondos de su monedero durante los próximos %1$s días. Más información.</string>

@@ -205,6 +205,8 @@
     <string name="confirm_details">Confirm Payment</string>
 
     <string name="fee">Fee</string>
+    <string name="card_fee">Card fee</string>
+    <string name="purchase">Purchase</string>
     <string name="exit_confirm">Press back button again to exit</string>
 
     <string name="label_address">Your address has been imported successfully. Optionally assign a
@@ -1795,7 +1797,7 @@
     <string name="qr_activity_hint_new_web_login">Log in to web</string>
 
     <string name="security_locked_card_funds_explanation">For your security, first time card purchases are subject to a %1$s day holding period before you can send or withdraw your purchased crypto. We will notify you when the hold is lifted.\n\nIn the meantime, you can sell into Cash, swap, and trade within Blockchain.com.</string>
-    <string name="security_locked_funds_bank_transfer_explanation">Your final amount might change due to market activity. For your security, buy orders with a bank account are subject up to a %1$s day holding period. You can Swap or Sell during this time. We will notify you once the funds are fully available.</string>
+    <string name="security_locked_funds_bank_transfer_explanation">Your final amount might change due to market activity. An initial hold period of %s days will be applied to your funds. You can Buy, Sell, and Swap during this period.</string>
     <string name="security_locked_funds_bank_transfer_payment_screen_explanation">These funds are available now to Sell &amp; Swap.\n\nNote: You will not be able to Send or Withdraw these funds from your Wallet for the next %1$s days.\n</string>
 
     <!-- content descriptor IDs -->
@@ -1983,4 +1985,9 @@
     <string name="increase_your_limits">Increase your limits</string>
     <string name="increase_your_limits_body">Continue your verification to become Gold level and increase your limits and payment methods.</string>
     <string name="continue_to_gold">Continue to Gold</string>
+
+    <!-- New checkout items -->
+    <string name="checkout_item_price_blurb">Blockchain.com provides the best market price we receive and applies a spread. <annotation link="learn_more">Learn more</annotation></string>
+    <string name="checkout_item_price_fee">Blockchain.com requires a fee when paying with a card. <annotation link="learn_more">Learn more</annotation></string>
+    <string name="private_key_wallet_explanation">%s Private Key wallets, send, and receive are not supported at this time.</string>
 </resources>

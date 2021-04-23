@@ -1465,7 +1465,6 @@ Veuillez réessayer plus tard.</string>
     <string name="security_locked_card_funds_explanation">Pour votre sécurité, les premiers achats par carte sont soumis à une période de détention de %1$s jours avant que vous puissiez envoyer ou retirer votre crypto acheté. Nous vous informerons lorsque la suspension sera levée.
 
  En attendant, vous pouvez vendre en espèces, échanger et échanger sur Blockchain.com.</string>
-    <string name="security_locked_funds_bank_transfer_explanation">Votre montant final peut varier en raison de l\'activité du marché. Pour votre sécurité, les ordres d\'achat sur un compte bancaire sont soumis à une période de détention de %1$s jour. Vous pouvez effectuer des échanges ou des ventes pendant cette période. Nous vous informerons lorsque les fonds seront entièrement disponibles.</string>
     <string name="security_locked_funds_bank_transfer_payment_screen_explanation">Ces fonds sont maintenant disponibles pour la vente et l\'échange.
 
 Note : Vous ne pourrez pas envoyer ou retirer ces fonds de votre portefeuille pendant les %1$s prochains jours. En savoir plus</string>
