@@ -85,18 +85,6 @@
         tools:text="@string/purchase_card_note_1" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button_cancel"
-        style="@style/CtaButton.NoBackgroundRedText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/standard_margin"
-        android:text="@string/common_cancel"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:visibility="visible" />
-
-    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_action"
         style="@style/CtaButton.Blue"
         android:layout_width="0dp"
@@ -106,6 +94,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="Buy"
+        tools:visibility="visible" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/button_cancel"
+        style="@style/CtaButton.NoBackgroundRedText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/standard_margin"
+        android:text="@string/common_cancel"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         tools:visibility="visible" />
 
     <ProgressBar

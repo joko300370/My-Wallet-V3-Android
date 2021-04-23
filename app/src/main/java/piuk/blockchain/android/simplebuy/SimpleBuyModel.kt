@@ -249,6 +249,7 @@ class SimpleBuyModel(
                 ratingPrefs.hasSeenRatingDialog = true
                 null
             }
+
             else -> null
         }
 

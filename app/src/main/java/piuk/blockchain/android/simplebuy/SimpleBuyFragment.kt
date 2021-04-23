@@ -10,14 +10,12 @@ interface SimpleBuyScreen : SlidingModalBottomDialog.Host, FlowFragment {
     override fun onSheetClosed() {}
 }
 
-interface SimpleBuyNavigator : SlidingModalBottomDialog.Host {
-    fun exitSimpleBuyFlow()
+interface SimpleBuyNavigator : SlidingModalBottomDialog.Host, SmallSimpleBuyNavigator {
     fun goToBuyCryptoScreen(
         addToBackStack: Boolean = true,
         preselectedCrypto: CryptoCurrency,
         preselectedPaymentMethodId: String?
     )
-
     fun goToCheckOutScreen(addToBackStack: Boolean = true)
     fun goToKycVerificationScreen(addToBackStack: Boolean = true)
     fun goToPendingOrderScreen()
@@ -27,4 +25,7 @@ interface SimpleBuyNavigator : SlidingModalBottomDialog.Host {
     fun goToPaymentScreen(addToBackStack: Boolean = true, isPaymentAuthorised: Boolean = false)
     fun launchIntro()
     fun launchBankAuthWithError(errorState: ErrorState)
+}
+interface SmallSimpleBuyNavigator {
+    fun exitSimpleBuyFlow()
 }

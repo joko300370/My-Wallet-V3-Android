@@ -41,7 +41,7 @@ class BuySellFlowNavigator(
                 if (currencySupported)
                     BuySellIntroAction.DisplayBuySellIntro(
                         isGoldButNotEligible = isGoldButNotEligible,
-                        hasPendingBuy = state.hasPendingBuyThatCannotBeCancelled()
+                        hasPendingBuy = state.hasPendingBuy()
                     )
                 else
                     BuySellIntroAction.NavigateToCurrencySelection(supportedFiats)
@@ -50,7 +50,7 @@ class BuySellFlowNavigator(
     }
 }
 
-private fun SimpleBuyState.hasPendingBuyThatCannotBeCancelled(): Boolean =
+private fun SimpleBuyState.hasPendingBuy(): Boolean =
     orderState > OrderState.PENDING_CONFIRMATION && orderState < OrderState.FINISHED
 
 sealed class BuySellIntroAction {
