@@ -144,7 +144,8 @@ class SimpleBuyModel(
             is SimpleBuyIntent.FetchWithdrawLockTime -> {
                 require(previousState.selectedPaymentMethod != null)
                 interactor.fetchWithdrawLockTime(
-                    previousState.selectedPaymentMethod.paymentMethodType
+                    previousState.selectedPaymentMethod.paymentMethodType,
+                    previousState.fiatCurrency
                 )
                     .subscribeBy(
                         onSuccess = { process(it) },

@@ -357,11 +357,17 @@ class NabuService(retrofit: Retrofit) {
         sessionToken.authHeader, type = paymentMethod
     ).wrapErrorMessage()
 
-    internal fun fetchWithdrawLocksRules(sessionToken: NabuSessionTokenResponse, paymentMethod: PaymentMethodType) =
-        service.getWithdrawalLocksCheck(
-            sessionToken.authHeader,
-            WithdrawLocksCheckRequestBody(paymentMethod.name)
-        ).wrapErrorMessage()
+    internal fun fetchWithdrawLocksRules(
+        sessionToken: NabuSessionTokenResponse,
+        paymentMethod: PaymentMethodType,
+        fiatCurrency: String,
+        productType: String
+    ) = service.getWithdrawalLocksCheck(
+        sessionToken.authHeader,
+        WithdrawLocksCheckRequestBody(
+            paymentMethod = paymentMethod.name, product = productType, currency = fiatCurrency
+        )
+    ).wrapErrorMessage()
 
     internal fun createWithdrawOrder(
         sessionToken: NabuSessionTokenResponse,

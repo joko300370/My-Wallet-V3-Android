@@ -203,9 +203,13 @@ class LiveCustodialWalletManager(
             else -> throw IllegalStateException("map not specified for $this")
         }
 
-    override fun fetchWithdrawLocksTime(paymentMethodType: PaymentMethodType): Single<BigInteger> =
+    override fun fetchWithdrawLocksTime(
+        paymentMethodType: PaymentMethodType,
+        fiatCurrency: String,
+        productType: String
+    ): Single<BigInteger> =
         authenticator.authenticate {
-            nabuService.fetchWithdrawLocksRules(it, paymentMethodType)
+            nabuService.fetchWithdrawLocksRules(it, paymentMethodType, fiatCurrency, productType)
         }.flatMap { response ->
             response.rule?.let {
                 Single.just(it.lockTime.toBigInteger())

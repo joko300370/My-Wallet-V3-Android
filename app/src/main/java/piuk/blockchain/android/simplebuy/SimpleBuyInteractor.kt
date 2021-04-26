@@ -106,8 +106,11 @@ class SimpleBuyInteractor(
             SimpleBuyIntent.OrderCreated(it)
         }
 
-    fun fetchWithdrawLockTime(paymentMethod: PaymentMethodType): Single<SimpleBuyIntent.WithdrawLocksTimeUpdated> =
-        withdrawLocksRepository.getWithdrawLockTypeForPaymentMethod(paymentMethod)
+    fun fetchWithdrawLockTime(
+        paymentMethod: PaymentMethodType,
+        fiatCurrency: String
+    ): Single<SimpleBuyIntent.WithdrawLocksTimeUpdated> =
+        withdrawLocksRepository.getWithdrawLockTypeForPaymentMethod(paymentMethod, fiatCurrency)
             .map {
                 SimpleBuyIntent.WithdrawLocksTimeUpdated(it)
             }.onErrorReturn {

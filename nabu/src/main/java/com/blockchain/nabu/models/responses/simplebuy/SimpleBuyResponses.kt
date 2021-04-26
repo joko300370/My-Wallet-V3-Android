@@ -249,7 +249,9 @@ data class DepositRequestBody(
 )
 
 data class WithdrawLocksCheckRequestBody(
-    private val paymentMethod: String
+    private val paymentMethod: String,
+    private val product: String,
+    private val currency: String
 )
 
 data class WithdrawLocksCheckResponse(
