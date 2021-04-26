@@ -24,7 +24,7 @@ sealed class BankAuthIntent : MviIntent<BankAuthState> {
                 selectedPaymentMethod = SelectedPaymentMethod(
                     id = linkedBank.id,
                     paymentMethodType = PaymentMethodType.BANK_TRANSFER,
-                    label = linkedBank.name,
+                    label = linkedBank.accountName,
                     isEligible = true
                 )
             )

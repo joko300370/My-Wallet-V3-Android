@@ -976,10 +976,10 @@ class LiveCustodialWalletManager(
             state = state.toBankState(),
             currency = currency,
             account = accountNumber ?: "****",
-            accountType = bankAccountType ?: "",
+            accountType = bankAccountType.orEmpty(),
             paymentMethodType = if (this.isBankTransferAccount)
                 PaymentMethodType.BANK_TRANSFER else PaymentMethodType.BANK_ACCOUNT,
-            iconUrl = attributes?.media?.find { it.type == ICON }?.source ?: ""
+            iconUrl = attributes?.media?.find { it.type == ICON }?.source.orEmpty()
         )
 
     private fun LinkedBankTransferResponse.toLinkedBank(): LinkedBank? {
@@ -988,16 +988,17 @@ class LiveCustodialWalletManager(
             currency = currency,
             partner = partner.toLinkingBankPartner(BankPartner.values().toList()) ?: return null,
             state = state.toLinkedBankState(),
-            name = details?.accountName ?: "",
-            accountNumber = details?.accountNumber?.replace("x", "") ?: "",
+            bankName = details?.bankName.orEmpty(),
+            accountName = details?.accountName.orEmpty(),
+            accountNumber = details?.accountNumber?.replace("x", "").orEmpty(),
             errorStatus = error?.toLinkedBankErrorState() ?: LinkedBankErrorState.NONE,
-            accountType = details?.bankAccountType ?: "",
-            authorisationUrl = attributes?.authorisationUrl ?: "",
-            sortCode = details?.sortCode ?: "",
-            accountIban = details?.iban ?: "",
-            bic = details?.bic ?: "",
-            entity = attributes?.entity ?: "",
-            iconUrl = attributes?.media?.find { it.source == ICON }?.source ?: ""
+            accountType = details?.bankAccountType.orEmpty(),
+            authorisationUrl = attributes?.authorisationUrl.orEmpty(),
+            sortCode = details?.sortCode.orEmpty(),
+            accountIban = details?.iban.orEmpty(),
+            bic = details?.bic.orEmpty(),
+            entity = attributes?.entity.orEmpty(),
+            iconUrl = attributes?.media?.find { it.source == ICON }?.source.orEmpty()
         )
     }
 
@@ -1072,8 +1073,8 @@ class LiveCustodialWalletManager(
         PaymentMethod.Card(
             cardId = id,
             limits = cardLimits,
-            label = card?.label ?: "",
-            endDigits = card?.number ?: "",
+            label = card?.label.orEmpty(),
+            endDigits = card?.number.orEmpty(),
             partner = partner.toSupportedPartner(),
             expireDate = card?.let {
                 Calendar.getInstance().apply {
@@ -1395,7 +1396,7 @@ private fun BuySellOrderResponse.toBuySellOrder(): BuySellOrder {
             FiatValue.fromMinor(outputCurrency, outputQuantity.toLongOrDefault(0)),
         attributes = attributes,
         type = type(),
-        depositPaymentId = depositPaymentId ?: "",
+        depositPaymentId = depositPaymentId.orEmpty(),
         approvalErrorStatus = attributes?.status?.toApprovalError() ?: ApprovalErrorStatus.NONE
     )
 }

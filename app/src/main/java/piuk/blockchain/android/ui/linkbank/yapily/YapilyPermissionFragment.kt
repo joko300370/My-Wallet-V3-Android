@@ -139,7 +139,7 @@ class YapilyPermissionFragment : Fragment() {
                 title = R.string.yapily_approval_title,
                 items = listOf(
                     YapilyPermissionItem.YapilyInfoItem(
-                        getString(R.string.yapily_approval_subtitle_1), approvalDetails.linkedBank.name
+                        getString(R.string.yapily_approval_subtitle_1), approvalDetails.linkedBank.accountName
                     ),
                     getSortCodeOrIban(),
                     getAccountNumberOrSwift()
@@ -159,7 +159,7 @@ class YapilyPermissionFragment : Fragment() {
             ),
             YapilyPermissionItem.YapilyStaticItem(
                 blurb = R.string.yapily_approval_blurb,
-                bankName = approvalDetails.linkedBank.name
+                bankName = approvalDetails.linkedBank.accountName
             ),
             YapilyPermissionItem.YapilyExpandableItem(
                 title = R.string.yapily_agreement_title_4,

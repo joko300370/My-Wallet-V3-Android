@@ -84,8 +84,8 @@ data class UpdateProviderAccountBody(
 
 data class LinkedBankDetailsResponse(
     val accountNumber: String,
-    val accountName: String,
-    val bankName: String,
+    val accountName: String?,
+    val bankName: String?,
     val bankAccountType: String,
     val sortCode: String?,
     val iban: String?,
@@ -110,7 +110,7 @@ data class BankTransferPaymentResponse(
 
 data class BankInfoResponse(
     val id: String,
-    val bankName: String,
+    val bankName: String?,
     val accountName: String?,
     val currency: String,
     val state: String,
