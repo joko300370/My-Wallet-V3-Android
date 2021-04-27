@@ -1,4 +1,4 @@
-package com.blockchain.swap.nabu.datamanagers.repositories.interest
+package com.blockchain.nabu.datamanagers.repositories.interest
 
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single

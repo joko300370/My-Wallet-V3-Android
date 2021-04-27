@@ -1,5 +1,6 @@
 package com.blockchain.swap.nabu.datamanagers.repositories.interest
 
+import com.blockchain.nabu.datamanagers.repositories.interest.InterestEnabledProvider
 import com.blockchain.rx.TimedCacheRequest
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single

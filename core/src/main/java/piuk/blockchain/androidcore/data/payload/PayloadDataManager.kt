@@ -590,7 +590,6 @@ class PayloadDataManager(
         Single<List<TransactionSummary>> =
             Single.fromCallable {
                 payloadManager.getAccountTransactions(xpub, limit, offset)
-                    .filter { !it.isWatchOnly }
             }
 
     /**
