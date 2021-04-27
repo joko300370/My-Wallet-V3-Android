@@ -9,11 +9,13 @@ import kotlinx.android.synthetic.main.view_account_crypto_overview_archived.view
 import kotlinx.android.synthetic.main.view_account_crypto_overview_archived.view.icon
 import kotlinx.android.synthetic.main.view_account_crypto_overview_archived.view.wallet_name
 import org.koin.core.KoinComponent
+import org.koin.core.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.TradingAccount
-import piuk.blockchain.android.util.setCoinIcon
 import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.setImageDrawable
 import piuk.blockchain.android.util.visible
 
 class AccountInfoCryptoArchived @JvmOverloads constructor(
@@ -21,6 +23,8 @@ class AccountInfoCryptoArchived @JvmOverloads constructor(
     attr: AttributeSet? = null,
     defStyle: Int = 0
 ) : ConstraintLayout(ctx, attr, defStyle), KoinComponent {
+
+    private val assetResources: AssetResources by inject()
 
     init {
         LayoutInflater.from(context)
@@ -38,11 +42,11 @@ class AccountInfoCryptoArchived @JvmOverloads constructor(
     ) {
         val crypto = account.asset
         wallet_name.text = account.label
-        icon.setCoinIcon(crypto)
+        icon.setImageDrawable(assetResources.drawableResFilled(crypto))
         icon.visible()
 
         if (account is TradingAccount) {
-            asset_account_icon.setImageResource(R.drawable.ic_account_badge_custodial)
+            asset_account_icon.setImageResource(R.drawable.ic_custodial_account_indicator)
             asset_account_icon.visible()
         } else {
             asset_account_icon.gone()

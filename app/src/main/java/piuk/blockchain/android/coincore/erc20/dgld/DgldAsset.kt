@@ -6,7 +6,6 @@ import com.blockchain.preferences.WalletStatus
 import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligibilityProvider
-import com.blockchain.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
@@ -32,7 +31,6 @@ internal class DgldAsset(
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
-    tiersService: TierService,
     environmentConfig: EnvironmentConfig,
     eligibilityProvider: EligibilityProvider,
     offlineAccounts: OfflineAccountUpdater,
@@ -51,7 +49,6 @@ internal class DgldAsset(
     labels,
     pitLinking,
     crashLogger,
-    tiersService,
     environmentConfig,
     eligibilityProvider,
     offlineAccounts

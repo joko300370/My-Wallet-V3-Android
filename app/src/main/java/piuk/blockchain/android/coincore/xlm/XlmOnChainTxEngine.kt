@@ -17,6 +17,7 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
@@ -77,9 +78,13 @@ class XlmOnChainTxEngine(
                 amount = CryptoValue.zero(sourceAsset),
                 totalBalance = CryptoValue.zero(sourceAsset),
                 availableBalance = CryptoValue.zero(sourceAsset),
-                fees = CryptoValue.zero(sourceAsset),
-                feeLevel = FeeLevel.Regular,
-                availableFeeLevels = AVAILABLE_FEE_LEVELS,
+                feeForFullAvailable = CryptoValue.zero(sourceAsset),
+                feeAmount = CryptoValue.zero(sourceAsset),
+                feeSelection = FeeSelection(
+                    selectedLevel = FeeLevel.Regular,
+                    availableLevels = AVAILABLE_FEE_LEVELS,
+                    asset = sourceAsset
+                ),
                 selectedFiat = userFiat
             ).setMemo(
                 TxConfirmationValue.Memo(
@@ -103,7 +108,8 @@ class XlmOnChainTxEngine(
                 amount = amount,
                 totalBalance = total,
                 availableBalance = Money.max(available - fees, CryptoValue.zero(CryptoCurrency.XLM)) as CryptoValue,
-                fees = fees
+                feeForFullAvailable = fees,
+                feeAmount = fees
             )
         }
     }
@@ -144,8 +150,8 @@ class XlmOnChainTxEngine(
                     makeFeeSelectionOption(pendingTx),
                     TxConfirmationValue.FeedTotal(
                         amount = pendingTx.amount,
-                        fee = pendingTx.fees,
-                        exchangeFee = pendingTx.fees.toFiat(exchangeRates, userFiat),
+                        fee = pendingTx.feeAmount,
+                        exchangeFee = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
                         exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
                     ),
                     pendingTx.memo
@@ -164,9 +170,9 @@ class XlmOnChainTxEngine(
 
     override fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
         TxConfirmationValue.FeeSelection(
-            feeDetails = FeeState.FeeDetails(pendingTx.fees),
-            exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
-            selectedLevel = pendingTx.feeLevel,
+            feeDetails = FeeState.FeeDetails(pendingTx.feeAmount),
+            exchange = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+            selectedLevel = pendingTx.feeSelection.selectedLevel,
             availableLevels = AVAILABLE_FEE_LEVELS,
             asset = sourceAsset
         )
@@ -255,7 +261,7 @@ class XlmOnChainTxEngine(
                 value = pendingTx.amount as CryptoValue,
                 toAddress = targetXlmAddress.address,
                 toLabel = "",
-                fee = pendingTx.fees as CryptoValue,
+                fee = pendingTx.feeAmount as CryptoValue,
                 memo = getMemoOption(pendingTx).toXlmMemo()
             )
         }

@@ -98,6 +98,7 @@ data class TransactionState(
     val executionStatus: TxExecutionStatus = TxExecutionStatus.NotStarted,
     val stepsBackStack: Stack<TransactionStep> = Stack(),
     val availableTargets: List<TransactionTarget> = emptyList(),
+    val displayMode: DisplayMode = DisplayMode.Crypto,
     val availableSources: List<BlockchainAccount> = emptyList(),
     val linkBankState: BankLinkingState = BankLinkingState.NotStarted
 ) : MviState {
@@ -202,6 +203,7 @@ class TransactionModel(
             is TransactionIntent.AmountChanged -> processAmountChanged(intent.amount)
             is TransactionIntent.ModifyTxOption -> processModifyTxOptionRequest(intent.confirmation)
             is TransactionIntent.PendingTxUpdated -> null
+            is TransactionIntent.DisplayModeChanged -> null
             is TransactionIntent.UpdateTransactionComplete -> null
             is TransactionIntent.ReturnToPreviousStep -> null
             is TransactionIntent.ShowTargetSelection -> null
@@ -214,6 +216,7 @@ class TransactionModel(
             is TransactionIntent.AvailableAccountsListUpdated -> null
             is TransactionIntent.ShowMoreAccounts -> null
             is TransactionIntent.UseMaxSpendable -> null
+            is TransactionIntent.SetFeeLevel -> processSetFeeLevel(intent)
             is TransactionIntent.InvalidateTransaction -> processInvalidateTransaction()
             is TransactionIntent.InvalidateTransactionKeepingTarget -> processInvalidationAndNavigate(previousState)
             is TransactionIntent.ClearBackStack -> null
@@ -393,6 +396,16 @@ class TransactionModel(
                 }
             )
 
+    private fun processSetFeeLevel(intent: TransactionIntent.SetFeeLevel): Disposable =
+        interactor.updateTransactionFees(intent.feeLevel, intent.customFeeAmount)
+            .subscribeBy(
+                onError = {
+                    Timber.e("!TRANSACTION!> Unable to set TX fee level")
+                    errorLogger.log(TxFlowLogError.FeesFail(it))
+                    process(TransactionIntent.FatalTransactionError(it))
+                }
+            )
+
     private fun processExecuteTransaction(secondPassword: String): Disposable =
         interactor.verifyAndExecute(secondPassword)
             .subscribeBy(
@@ -471,4 +484,8 @@ fun <T> Observable<T>.doOnFirst(onAction: (T) -> Unit): Observable<T> {
             firstCall = false
         }
     }
+}
+
+enum class DisplayMode {
+    Fiat, Crypto
 }

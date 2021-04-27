@@ -23,6 +23,7 @@ import org.koin.dsl.module
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.ValidationState
@@ -163,18 +164,18 @@ class TradingToOnChainTxEngineTest {
             .test()
             .assertValue {
                 it.amount == CryptoValue.zero(ASSET) &&
-                it.totalBalance == CryptoValue.zero(ASSET) &&
-                it.availableBalance == CryptoValue.zero(ASSET) &&
-                it.fees == CryptoValue.zero(ASSET) &&
-                it.selectedFiat == SELECTED_FIAT &&
-                it.customFeeAmount == -1L &&
-                it.confirmations.isEmpty() &&
-                it.minLimit == null &&
-                it.maxLimit == null &&
-                it.validationState == ValidationState.UNINITIALISED &&
-                it.engineState.isEmpty()
+                    it.totalBalance == CryptoValue.zero(ASSET) &&
+                    it.availableBalance == CryptoValue.zero(ASSET) &&
+                    it.feeForFullAvailable == CryptoValue.zero(ASSET) &&
+                    it.feeAmount == CryptoValue.zero(ASSET) &&
+                    it.selectedFiat == SELECTED_FIAT &&
+                    it.confirmations.isEmpty() &&
+                    it.minLimit == CryptoValue.zero(ASSET) &&
+                    it.maxLimit == null &&
+                    it.validationState == ValidationState.UNINITIALISED &&
+                    it.engineState.isEmpty()
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
+            .assertValue { verifyFeeLevels(it.feeSelection) }
             .assertNoErrors()
             .assertComplete()
 
@@ -204,10 +205,10 @@ class TradingToOnChainTxEngineTest {
             amount = CryptoValue.zero(ASSET),
             totalBalance = CryptoValue.zero(ASSET),
             availableBalance = CryptoValue.zero(ASSET),
-            fees = CryptoValue.zero(ASSET),
+            feeForFullAvailable = CryptoValue.zero(ASSET),
+            feeAmount = CryptoValue.zero(ASSET),
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection()
         )
 
         val inputAmount = 2.usdPax()
@@ -220,11 +221,11 @@ class TradingToOnChainTxEngineTest {
         ).test()
             .assertValue {
                 it.amount == inputAmount &&
-                it.totalBalance == totalBalance &&
-                it.availableBalance == actionableBalance &&
-                it.fees == expectedFee
+                    it.totalBalance == totalBalance &&
+                    it.availableBalance == actionableBalance &&
+                    it.feeAmount == expectedFee
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
+            .assertValue { verifyFeeLevels(it.feeSelection) }
             .assertComplete()
             .assertNoErrors()
 
@@ -240,7 +241,7 @@ class TradingToOnChainTxEngineTest {
         val totalBalance = 21.usdPax()
         val actionableBalance = 20.usdPax()
         val inputAmount = 2.usdPax()
-        val initialFee = 0.usdPax()
+        val zeroPax = 0.usdPax()
 
         val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
         val txTarget: CryptoAddress = mock {
@@ -257,10 +258,10 @@ class TradingToOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = actionableBalance,
-            fees = initialFee,
+            feeAmount = zeroPax,
+            feeForFullAvailable = zeroPax,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection()
         )
 
         // Act
@@ -276,7 +277,7 @@ class TradingToOnChainTxEngineTest {
         val totalBalance = 21.usdPax()
         val actionableBalance = 20.usdPax()
         val inputAmount = 2.usdPax()
-        val initialFee = 0.usdPax()
+        val zeroPax = 0.usdPax()
 
         val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
         val txTarget: CryptoAddress = mock {
@@ -293,10 +294,10 @@ class TradingToOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = actionableBalance,
-            fees = initialFee,
+            feeForFullAvailable = zeroPax,
+            feeAmount = zeroPax,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection()
         )
 
         // Act
@@ -312,7 +313,7 @@ class TradingToOnChainTxEngineTest {
         val totalBalance = 21.usdPax()
         val actionableBalance = 20.usdPax()
         val inputAmount = 2.usdPax()
-        val initialFee = 0.usdPax()
+        val zeroPax = 0.usdPax()
 
         val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
         val txTarget: CryptoAddress = mock {
@@ -329,10 +330,10 @@ class TradingToOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = actionableBalance,
-            fees = initialFee,
+            feeForFullAvailable = zeroPax,
+            feeAmount = zeroPax,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection()
         )
 
         // Act
@@ -348,7 +349,7 @@ class TradingToOnChainTxEngineTest {
         val totalBalance = 21.usdPax()
         val actionableBalance = 20.usdPax()
         val inputAmount = 2.usdPax()
-        val initialFee = 0.usdPax()
+        val zeroPax = 0.usdPax()
 
         val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
         val txTarget: CryptoAddress = mock {
@@ -365,10 +366,10 @@ class TradingToOnChainTxEngineTest {
             amount = inputAmount,
             totalBalance = totalBalance,
             availableBalance = actionableBalance,
-            fees = initialFee,
+            feeForFullAvailable = zeroPax,
+            feeAmount = zeroPax,
             selectedFiat = SELECTED_FIAT,
-            feeLevel = FeeLevel.None,
-            availableFeeLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            feeSelection = FeeSelection()
         )
 
         // Act
@@ -379,11 +380,11 @@ class TradingToOnChainTxEngineTest {
         ).test()
             .assertValue {
                 it.amount == inputAmount &&
-                it.totalBalance == totalBalance &&
-                it.availableBalance == actionableBalance &&
-                it.fees == initialFee
+                    it.totalBalance == totalBalance &&
+                    it.availableBalance == actionableBalance &&
+                    it.feeAmount == zeroPax
             }
-            .assertValue { verifyFeeLevels(it, FeeLevel.None) }
+            .assertValue { verifyFeeLevels(it.feeSelection) }
             .assertComplete()
             .assertNoErrors()
 
@@ -399,13 +400,16 @@ class TradingToOnChainTxEngineTest {
         on { actionableBalance } itReturns Single.just(availableBalance)
     }
 
-    private fun verifyFeeLevels(pendingTx: PendingTx, expectedLevel: FeeLevel) =
-        pendingTx.feeLevel == expectedLevel &&
-            pendingTx.availableFeeLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
-            pendingTx.availableFeeLevels.contains(pendingTx.feeLevel)
+    private fun verifyFeeLevels(feeSelection: FeeSelection) =
+        feeSelection.selectedLevel == FeeLevel.None &&
+            feeSelection.availableLevels == setOf(FeeLevel.None) &&
+            feeSelection.availableLevels.contains(feeSelection.selectedLevel) &&
+            feeSelection.asset == null &&
+            feeSelection.customAmount == -1L
 
     private fun noMoreInteractions(sourceAccount: BlockchainAccount, txTarget: TransactionTarget) {
         verifyNoMoreInteractions(txTarget)
+        verifyNoMoreInteractions(sourceAccount)
         verifyNoMoreInteractions(walletManager)
         verifyNoMoreInteractions(currencyPrefs)
         verifyNoMoreInteractions(exchangeRates)
@@ -415,7 +419,5 @@ class TradingToOnChainTxEngineTest {
         private val ASSET = CryptoCurrency.PAX
         private val WRONG_ASSET = CryptoCurrency.BTC
         private const val SELECTED_FIAT = "INR"
-
-        private val EXPECTED_AVAILABLE_FEE_LEVELS = setOf(FeeLevel.None)
     }
 }

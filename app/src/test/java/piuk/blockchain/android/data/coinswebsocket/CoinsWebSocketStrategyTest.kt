@@ -23,9 +23,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.data.coinswebsocket.service.MessagesSocketHandler
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
-import piuk.blockchain.android.util.AssetResourceFactory
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
@@ -57,6 +57,8 @@ class CoinsWebSocketStrategyTest {
         on { getErc20TokenData(CryptoCurrency.PAX) } `it returns` Erc20TokenData.createPaxTokenData("")
         on { getErc20TokenData(CryptoCurrency.USDT) } `it returns` Erc20TokenData.createUsdtTokenData("")
         on { getErc20TokenData(CryptoCurrency.DGLD) } `it returns` Erc20TokenData.createDgldTokenData("")
+        on { getErc20TokenData(CryptoCurrency.AAVE) } `it returns` Erc20TokenData.createAaveTokenData("")
+        on { getErc20TokenData(CryptoCurrency.YFI) } `it returns` Erc20TokenData.createYfiTokenData("")
         on { fetchEthAddress() } `it returns` Observable.just(CombinedEthModel(EthAddressResponseMap()))
         on { getEthWalletAddress() } `it returns` "0x4058a004dd718babab47e14dd0d744742e5b9903"
         on { refreshErc20Model(any()) } `it returns` Completable.complete()
@@ -101,10 +103,12 @@ class CoinsWebSocketStrategyTest {
         on { getValue(PersistentPrefs.KEY_WALLET_GUID, "") } `it returns` "1234"
     }
 
-    private val assetResources: AssetResourceFactory = mock() {
+    private val assetResources: AssetResources = mock {
         on { assetName(CryptoCurrency.USDT) } itReturns "Tether"
         on { assetName(CryptoCurrency.PAX) } itReturns "USD Digital"
         on { assetName(CryptoCurrency.DGLD) } itReturns "Wrapped-DGLD"
+        on { assetName(CryptoCurrency.AAVE) } itReturns "Aave"
+        on { assetName(CryptoCurrency.YFI) } itReturns "YFI"
     }
 
     private val mockWebSocket: WebSocket<String, String> = mock()

@@ -1,6 +1,5 @@
 package piuk.blockchain.android.util
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
@@ -24,7 +23,7 @@ class StringUtils(private val context: Context) {
     fun getStringWithMappedAnnotations(
         @StringRes stringId: Int,
         linksMap: Map<String, Uri?>,
-        launchActivity: Activity,
+        ctx: Context,
         onClick: () -> Unit = {}
     ): CharSequence {
 
@@ -37,7 +36,7 @@ class StringUtils(private val context: Context) {
                 out.setSpan(
                     ClickableSpanWithoutUnderline {
                         linksMap[annotation.value]?.let {
-                            launchActivity.startActivity(Intent(Intent.ACTION_VIEW, it))
+                            ctx.startActivity(Intent(Intent.ACTION_VIEW, it))
                         }
                         onClick()
                     },

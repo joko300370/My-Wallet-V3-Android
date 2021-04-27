@@ -2,59 +2,47 @@ package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import androidx.annotation.VisibleForTesting
 import io.reactivex.Single
-import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
-import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementQueries
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementRule
 import piuk.blockchain.android.ui.dashboard.announcements.DismissRecorder
 import piuk.blockchain.android.ui.dashboard.announcements.DismissRule
-import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.ui.dashboard.announcements.StandardAnnouncementCard
 
-class KycForAirdropsAnnouncement(
-    dismissRecorder: DismissRecorder,
-    private val queries: AnnouncementQueries
+class AaveYfiDotAvailableAnnouncement(
+    dismissRecorder: DismissRecorder
 ) : AnnouncementRule(dismissRecorder) {
 
     override val dismissKey = DISMISS_KEY
 
-    override fun shouldShow(): Single<Boolean> {
-        if (dismissEntry.isDismissed) {
-            return Single.just(false)
-        }
-
-        return Singles.zip(
-            queries.canKyc(),
-            queries.isKycGoldStartedOrComplete()
-        ).map { (kyc, isGold) -> kyc && !isGold }
-    }
+    override fun shouldShow(): Single<Boolean> = Single.just(!dismissEntry.isDismissed)
 
     override fun show(host: AnnouncementHost) {
         host.showAnnouncementCard(
             card = StandardAnnouncementCard(
                 name = name,
-                dismissRule = DismissRule.CardPeriodic,
+                dismissRule = DismissRule.CardOneTime,
                 dismissEntry = dismissEntry,
-                titleText = R.string.kyc_airdrop_card_title,
-                bodyText = R.string.kyc_airdrop_card_body,
-                ctaText = R.string.kyc_airdrop_card_cta,
-                iconImage = R.drawable.ic_announce_kyc_airdrop,
+                titleText = R.string.aave_yfi_dot_available_card_title,
+                bodyText = R.string.aave_yfi_dot_available_card_body,
+                ctaText = R.string.aave_yfi_dot_available_card_cta,
+                iconImage = R.drawable.vector_aave_yfi_dot_announcement,
+                shouldWrapIconWidth = true,
                 dismissFunction = {
                     host.dismissAnnouncementCard()
                 },
                 ctaFunction = {
                     host.dismissAnnouncementCard()
-                    host.startKyc(CampaignType.Sunriver)
+                    host.startBuy()
                 }
             )
         )
     }
 
-    override val name = "kyc_airdrop"
+    override val name = "aave_yfi_dot_available"
 
     companion object {
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-        const val DISMISS_KEY = "KycAirdropAnnouncement_DISMISSED"
+        const val DISMISS_KEY = "AaveYFIDotAvailableAnnouncement_DISMISSED"
     }
 }

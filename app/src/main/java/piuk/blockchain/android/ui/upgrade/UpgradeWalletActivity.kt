@@ -81,8 +81,10 @@ internal class UpgradeWalletActivity : BaseMvpActivity<UpgradeWalletView, Upgrad
                 presenter.submitPasswords(password1, password2)
             }
             .setNegativeButton(R.string.common_no) { dialog, whichButton ->
-                showToast(R.string.password_unchanged,
-                    ToastCustom.TYPE_GENERAL)
+                showToast(
+                    R.string.password_unchanged,
+                    ToastCustom.TYPE_GENERAL
+                )
             }
             .show()
     }

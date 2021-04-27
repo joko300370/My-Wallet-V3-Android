@@ -917,12 +917,6 @@
     <string name="iban">IBAN</string>
     <string name="estonia">Estonya</string>
     <string name="lets_setup_wallet">Cüzdanınızı ayarlayalım. Şimdi hızlı bir şekilde kripto satın alabilir veya daha sonra yapabilirsiniz.</string>
-    <string name="btc_default_wallet_name">Bitcoin Cüzdanım</string>
-    <string name="bch_default_account_label">Bitcoin Nakit Cüzdanım</string>
-    <string name="eth_default_account_label">Ether Cüzdanım</string>
-    <string name="xlm_default_account_label">Yıldız Cüzdanım</string>
-    <string name="pax_default_account_label_1">USD Dijital Cüzdanım</string>
-    <string name="exchange_default_account_label">Değişim %1$s Adresi</string>
     <string name="linked_cards">Bağlantılı Kartlar</string>
     <string name="tx_title_send">%1s gönder</string>
     <string name="tx_title_receive">teslim almak %1s</string>
@@ -959,7 +953,6 @@
     <string name="buy_now">Şimdi al</string>
     <string name="default_label_all_wallets">Tüm Cüzdanlar</string>
     <string name="approximately_symbol">~ %1$s</string>
-    <string name="custodial_wallet_default_label">%1s İşlem Cüzdanı</string>
     <string name="select_account_sheet_title">Bir Cüzdan Seçin</string>
     <string name="activity_state_initialised">başlatıldı</string>
     <string name="activity_state_uninitialised">uninitialised</string>
@@ -1007,7 +1000,6 @@
     <string name="common_spaced_strings">%1$s %2$s</string>
     <string name="server_unreachable_exit">Sunucuya bağlanılamıyor, lütfen daha sonra tekrar deneyin.</string>
     <string name="dashboard_asset_balance_interest">%% %1$.1f %% APY kazanın</string>
-    <string name="default_label_interest_wallet">Faiz Cüzdanı</string>
     <string name="activity_details_created">tarih</string>
     <string name="activity_details_completed">Tamamlandı</string>
     <string name="activity_details_fee">ücret</string>
@@ -1118,7 +1110,6 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
     <string name="transfer_second_pswd_title">2. Şifre</string>
     <string name="transfer_second_pswd_desc">Lütfen 2. şifrenizi girin, daha sonra göndermeye devam edebileceksiniz.</string>
     <string name="transfer_second_pswd_hint">2. şifre</string>
-    <string name="currency_wallet">%1s Cüzdanım</string>
     <string name="dashboard_asset_item_label_title">Lütfen dikkat edin.</string>
     <string name="algorand_asset_label">Algo\'nun ticari cüzdanınızdan çekilme işlevi şu anda kullanılamıyor, ancak yakında hizmetinizde olacak.</string>
     <string name="send_state_no_funds">Para yok</string>
@@ -1220,7 +1211,6 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
     <string name="purchase_card_note_2">Kripto paranız içinde çekilmeye hazır olacak</string>
     <string name="select_send_sheet_title">Gönderen</string>
     <string name="select_send_source_title">Gönderen</string>
-    <string name="currency_funds_wallet">%1s Cüzdanım</string>
     <string name="us_dollars">Amerikan doları</string>
     <string name="fiat_funds_detail_withdraw_details">Bankanıza Para Çekme</string>
     <string name="withdraw_currency">%1$s çek</string>
@@ -1670,4 +1660,28 @@ Banka transferiniz %3$s tarihinde tamamlandıktan sonra para çekme işlemi ger�
     <string name="did_not_get_email">E-postayı almadınız mı?</string>
     <string name="send_again">Tekrar gönderin</string>
 
+    <string name="buy_crypto_card_sdd_body">Satın almak istediğiniz kriptoyu seçin, kimliğinizi doğrulayın ve anında satın alın.</string>
+    <string name="bank_wire_transfer_fee">%1$sÜcret</string>
+    <string name="bank_wire_transfer_min_withdrawal">%1$sMin. Çekim</string>
+    <string name="select_a_bank">Banka Seçin</string>
+    <string name="want_to_buy_more">Daha fazla satın almak ister misiniz?</string>
+    <string name="unlock_gold_level_trading">Gold Seviye Ticaretin kilidini açın</string>
+    <string name="verify_your_identity_limits">Kimliğinizi doğrulayın, faiz kazanın ve günde %1$s miktarına kadar ticaret yapın.</string>
+    <string name="apply_and_unlock">Şimdi Uygula ve Kilidi Aç></string>
+    <string name="cash_accounts">Nakit Hesaplar</string>
+    <string name="cash_accounts_description">Cüzdanınızda USD, GBP veya EUR saklayın. Kripto satın almak için bakiyeyi kullanın. İstediğiniz zaman nakit karşılığında kripto satın.</string>
+    <string name="link_a_bank_description">Cüzdanınızda USD, GBP veya EUR saklayın. Kripto satın almak için bakiyeyi kullanın. İstediğiniz zaman nakit karşılığında kripto satın.</string>
+    <string name="earn_interest_description" formatted="false">Kripto paranızı çalıştırın. Hiçbir şey yapmadan ayda 10% \'a kadar kazanç elde edin. Anında para yatırın ve kazanmaya başlayın.</string>
+    <string name="sb_checkout_daily_limit_title">Günlük limit aşıldı</string>
+    <string name="sb_checkout_daily_limit_blurb">Oops! Satın Alma ve Para Yatırma için günlük işlem limitinizi tüketmiş gözüküyorsunuz, lütfen yarın tekrar deneyin.</string>
+    <string name="sb_checkout_weekly_limit_title">Haftalık limit aşıldı</string>
+    <string name="sb_checkout_weekly_limit_blurb">Oops! Satın Alma ve Para Yatırma için haftalık işlem limitinizi tüketmiş gözüküyorsunuz, lütfen yarın tekrar deneyin.</string>
+    <string name="sb_checkout_yearly_limit_title">Yıllık limit aşıldı</string>
+    <string name="sb_checkout_yearly_limit_blurb">Oops! Satın Alma ve Para Yatırma için yıllık işlem limitinizi tüketmiş gözüküyorsunuz.</string>
+    <string name="sb_checkout_pending_order_title">Talimat sürüyor</string>
+    <string name="sb_checkout_pending_order_blurb">Oops! Zaten devam etmekte olan bir Satın Alma işleminiz var gözüküyor, tekrar satın almadan önce lütfen devam eden işlemin tamamlanmasını bekleyin.</string>
+    <string name="wallet_outage_message">Bir kesinti yaşıyoruz. Paranız güvende, içiniz rahat olsun. <annotation link="learn_more">Daha fazla bilgi</annotation></string>
+    <string name="increase_your_limits">Limitlerinizi artırın</string>
+    <string name="increase_your_limits_body">Gold seviyesi olmak, limitlerinizi ve ödeme yöntemlerinizi artırmak için doğrulamanıza devam edin.</string>
+    <string name="continue_to_gold">Gold seviyeye devam edin</string>
 </resources>

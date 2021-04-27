@@ -11,6 +11,7 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import org.koin.android.ext.android.inject
@@ -18,21 +19,26 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.databinding.DialogTxFlowEnterAmountBinding
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.FiatCryptoInputView
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
 import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
+import piuk.blockchain.android.ui.transactionflow.engine.DisplayMode
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.IssueType
+import piuk.blockchain.android.ui.transactionflow.plugin.ExpandableTxFlowWidget
 import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
 import piuk.blockchain.android.util.gone
 import timber.log.Timber
 import java.math.RoundingMode
+import java.util.concurrent.TimeUnit
 
 class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() {
 
@@ -93,24 +99,43 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
                 lowerSlot?.update(newState)
                 upperSlot?.update(newState)
 
-                customiser.issueFlashMessage(newState, amountSheetInput.configuration.inputCurrency)?.let {
-                    when (customiser.selectIssueType(newState)) {
-                        IssueType.ERROR -> {
-                            amountSheetInput.showError(it, customiser.shouldDisableInput(state.errorState))
-                        }
-                        IssueType.INFO -> {
-                            amountSheetInput.showInfo(it) {
-                                dismiss()
-                                KycNavHostActivity.start(requireActivity(), CampaignType.Swap, true)
-                            }
-                        }
-                    }
-                } ?: binding.amountSheetInput.hideLabels()
+                showFlashMessageIfNeeded(newState)
 
                 if (!newState.canGoBack) {
                     amountSheetBack.gone()
                 }
             }
+        }
+    }
+
+    private fun DialogTxFlowEnterAmountBinding.showFlashMessageIfNeeded(
+        newState: TransactionState
+    ) {
+        customiser.issueFlashMessage(newState, amountSheetInput.configuration.inputCurrency)?.let {
+            when (customiser.selectIssueType(newState)) {
+                IssueType.ERROR -> {
+                    amountSheetInput.showError(it, customiser.shouldDisableInput(state.errorState))
+                }
+                IssueType.INFO -> {
+                    amountSheetInput.showInfo(it) {
+                        dismiss()
+                        KycNavHostActivity.start(requireActivity(), CampaignType.Swap, true)
+                    }
+                }
+            }
+        } ?: showFeesTooHighMessageOrHide(newState)
+    }
+
+    private fun DialogTxFlowEnterAmountBinding.showFeesTooHighMessageOrHide(
+        newState: TransactionState
+    ) {
+        val feesTooHighMsg = customiser.issueFeesTooHighMessage(state)
+        if (newState.pendingTx != null && newState.pendingTx.isLowOnBalance() && feesTooHighMsg != null) {
+            amountSheetInput.showError(
+                errorMessage = feesTooHighMsg
+            )
+        } else {
+            binding.amountSheetInput.hideLabels()
         }
     }
 
@@ -123,7 +148,21 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
             ).apply {
                 initControl(model, customiser, analyticsHooks)
             }
+            (lowerSlot as? ExpandableTxFlowWidget)?.let {
+                it.expanded.observeOn(AndroidSchedulers.mainThread()).subscribe { expanded ->
+                    upperSlot?.setVisible(!expanded)
+                    configureCtaButton(expanded)
+                }
+            }
         }
+    }
+
+    private fun configureCtaButton(expanded: Boolean) {
+        val layoutParams: ViewGroup.MarginLayoutParams =
+            binding.amountSheetCtaButton.layoutParams as ViewGroup.MarginLayoutParams
+        layoutParams.bottomMargin =
+            if (expanded) resources.getDimension(R.dimen.xhuge_margin).toInt() else 0
+        binding.amountSheetCtaButton.layoutParams = layoutParams
     }
 
     private fun DialogTxFlowEnterAmountBinding.initialiseLowerSlotIfNeeded(newState: TransactionState) {
@@ -150,22 +189,24 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
             }
         }
 
-        compositeDisposable += binding.amountSheetInput.amount.subscribe { amount ->
-            state.fiatRate?.let { rate ->
-                check(state.pendingTx != null) { "Px is not initialised yet" }
-                model.process(
-                    TransactionIntent.AmountChanged(
-                        if (!state.allowFiatInput && amount is FiatValue) {
-                            convertFiatToCrypto(amount, rate as ExchangeRate.CryptoToFiat, state).also {
-                                binding.amountSheetInput.fixExchange(it)
+        compositeDisposable += binding.amountSheetInput.amount
+            .debounce(AMOUNT_DEBOUNCE_TIME_MS, TimeUnit.MILLISECONDS)
+            .subscribe { amount ->
+                state.fiatRate?.let { rate ->
+                    check(state.pendingTx != null) { "Px is not initialised yet" }
+                    model.process(
+                        TransactionIntent.AmountChanged(
+                            if (!state.allowFiatInput && amount is FiatValue) {
+                                convertFiatToCrypto(amount, rate as ExchangeRate.CryptoToFiat, state).also {
+                                    binding.amountSheetInput.fixExchange(it)
+                                }
+                            } else {
+                                amount
                             }
-                        } else {
-                            amount
-                        }
+                        )
                     )
-                )
+                }
             }
-        }
 
         compositeDisposable += binding.amountSheetInput
             .onImeAction
@@ -186,10 +227,19 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
                 }
             }
 
-        compositeDisposable += binding.amountSheetInput.onInputToggle.subscribe {
-            analyticsHooks.onCryptoToggle(it, state)
-        }
+        compositeDisposable += binding.amountSheetInput.onInputToggle
+            .subscribe {
+                analyticsHooks.onCryptoToggle(it, state)
+                model.process(TransactionIntent.DisplayModeChanged(it.toDisplayMode()))
+            }
     }
+
+    private fun CurrencyType.toDisplayMode() =
+        when {
+            isCrypto() -> DisplayMode.Crypto
+            isFiat() -> DisplayMode.Fiat
+            else -> throw IllegalStateException("Unknown CurrencyType")
+        }
 
     // in this method we try to convert the fiat value coming out from
     // the view to a crypto which is withing the min and max limits allowed.
@@ -260,12 +310,19 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
             imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
         }
     }
+
+    companion object {
+        private const val AMOUNT_DEBOUNCE_TIME_MS = 300L
+    }
 }
 
-private fun BlockchainAccount.currencyType(): CurrencyType {
-    return when (this) {
+private fun BlockchainAccount.currencyType(): CurrencyType =
+    when (this) {
         is CryptoAccount -> CurrencyType.Crypto(this.asset)
         is FiatAccount -> CurrencyType.Fiat(this.fiatCurrency)
         else -> throw IllegalStateException("Account not supported")
     }
-}
+
+private fun PendingTx.isLowOnBalance() =
+    feeSelection.selectedLevel != FeeLevel.None &&
+        availableBalance.isZero && totalBalance.isPositive

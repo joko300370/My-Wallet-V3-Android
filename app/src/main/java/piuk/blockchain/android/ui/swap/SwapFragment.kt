@@ -29,6 +29,7 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.databinding.FragmentSwapBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
@@ -71,6 +72,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
     private val currencyPrefs: CurrencyPrefs by inject()
     private val walletPrefs: WalletStatus by inject()
     private val analytics: Analytics by inject()
+    private val assetResources: AssetResources by scopedInject()
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -166,7 +168,8 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
 
                             binding.swapTrending.initialise(
                                 pairs = composite.pairs,
-                                onSwapPairClicked = onPairClicked
+                                onSwapPairClicked = onPairClicked,
+                                assetResources = assetResources
                             )
 
                             if (!composite.tiers.isInitialisedFor(KycTierLevel.GOLD)) {
@@ -283,7 +286,8 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
         binding.pendingSwaps.pendingList.apply {
             adapter =
                 PendingSwapsAdapter(
-                    pendingOrders
+                    pendingOrders,
+                    assetResources
                 ) { money: Money ->
                     money.toFiat(exchangeRateDataManager, currencyPrefs.selectedFiatCurrency)
                 }

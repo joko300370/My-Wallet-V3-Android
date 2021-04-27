@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.upgrade
 
 import com.blockchain.logging.CrashLogger
+import com.blockchain.wallet.DefaultLabels
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.times
@@ -12,7 +13,6 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
 import piuk.blockchain.android.ui.launcher.LauncherActivity
-import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -29,7 +29,7 @@ class UpgradeWalletPresenterTest {
     private val mockAccessState: AccessState = mock()
     private val mockAuthDataManager: AuthDataManager = mock()
     private val mockPayloadDataManager: PayloadDataManager = mock()
-    private val mockStringUtils: StringUtils = mock()
+    private val defaultLabels: DefaultLabels = mock()
     private val crashLogger: CrashLogger = mock()
 
     @Before
@@ -41,7 +41,7 @@ class UpgradeWalletPresenterTest {
             mockAccessState,
             mockAuthDataManager,
             mockPayloadDataManager,
-            mockStringUtils,
+            defaultLabels,
             crashLogger
         )
         subject.initView(mockActivity)
@@ -162,14 +162,14 @@ class UpgradeWalletPresenterTest {
         // Arrange
         val secondPassword = "SECOND_PASSWORD"
         val walletName = "WALLET_NAME"
-        whenever(mockStringUtils.getString(any())).thenReturn(walletName)
+        whenever(defaultLabels.getDefaultNonCustodialWalletLabel(any())).thenReturn(walletName)
         whenever(mockPayloadDataManager.upgradeV2toV3(secondPassword, walletName))
             .thenReturn(Completable.complete())
         // Act
         subject.onUpgradeRequested(secondPassword)
         // Assert
-        verify(mockStringUtils).getString(any())
-        verifyNoMoreInteractions(mockStringUtils)
+        verify(defaultLabels).getDefaultNonCustodialWalletLabel(any())
+        verifyNoMoreInteractions(defaultLabels)
         verify(mockPayloadDataManager).upgradeV2toV3(secondPassword, walletName)
         verifyNoMoreInteractions(mockPayloadDataManager)
         verify(mockAccessState).isNewlyCreated = true
@@ -183,14 +183,14 @@ class UpgradeWalletPresenterTest {
         // Arrange
         val secondPassword = "SECOND_PASSWORD"
         val walletName = "WALLET_NAME"
-        whenever(mockStringUtils.getString(any())).thenReturn(walletName)
+        whenever(defaultLabels.getDefaultNonCustodialWalletLabel(any())).thenReturn(walletName)
         whenever(mockPayloadDataManager.upgradeV2toV3(secondPassword, walletName))
             .thenReturn(Completable.error { Throwable() })
         // Act
         subject.onUpgradeRequested(secondPassword)
         // Assert
-        verify(mockStringUtils).getString(any())
-        verifyNoMoreInteractions(mockStringUtils)
+        verify(defaultLabels).getDefaultNonCustodialWalletLabel(any())
+        verifyNoMoreInteractions(defaultLabels)
         verify(mockPayloadDataManager).upgradeV2toV3(secondPassword, walletName)
         verifyNoMoreInteractions(mockPayloadDataManager)
         verify(mockAccessState).isNewlyCreated = false

@@ -30,7 +30,6 @@ class AssetDetailsModelTest {
             labels = mock(),
             pitLinking = mock(),
             crashLogger = mock(),
-            tiersService = mock(),
             environmentConfig = mock(),
             walletPreferences = mock(),
             offlineAccounts = mock(),

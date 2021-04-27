@@ -11,6 +11,7 @@ import com.blockchain.nabu.datamanagers.CurrencyPair
 import info.blockchain.balance.CryptoCurrency
 import kotlinx.android.synthetic.main.dialog_activities_tx_item.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
@@ -21,6 +22,7 @@ import piuk.blockchain.android.util.visible
 import java.util.Date
 
 class SwapActivityItemDelegate<in T>(
+    private val assetResources: AssetResources,
     private val onItemClicked: (CryptoCurrency, String, CryptoActivityType) -> Unit // crypto, txID, type
 ) : AdapterDelegate<T> {
 
@@ -38,6 +40,7 @@ class SwapActivityItemDelegate<in T>(
         holder: RecyclerView.ViewHolder
     ) = (holder as SwapActivityItemViewHolder).bind(
         items[position] as TradeActivitySummaryItem,
+        assetResources,
         onItemClicked
     )
 }
@@ -48,6 +51,7 @@ private class SwapActivityItemViewHolder(
 
     fun bind(
         tx: TradeActivitySummaryItem,
+        assetResources: AssetResources,
         onAccountClicked: (CryptoCurrency, String, CryptoActivityType) -> Unit
     ) {
         with(itemView) {
@@ -63,7 +67,10 @@ private class SwapActivityItemViewHolder(
                     icon.setIsConfirming()
                 } else {
                     icon.setImageResource(R.drawable.ic_tx_swap)
-                    icon.setAssetIconColours(it.source, context)
+                    icon.setAssetIconColours(
+                        tintColor = assetResources.assetTint(it.source),
+                        filterColor = assetResources.assetFilter(it.source)
+                    )
                 }
                 setOnClickListener { onAccountClicked(tx.currencyPair.source, tx.txId, CryptoActivityType.SWAP) }
             }

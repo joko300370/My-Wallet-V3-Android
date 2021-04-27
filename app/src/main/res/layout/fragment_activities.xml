@@ -51,16 +51,17 @@
                     tools:srcCompat="@drawable/ic_all_wallets_white" />
 
                 <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/account_spend_locked"
-                    android:layout_width="@dimen/size_standard"
-                    android:layout_height="@dimen/size_standard"
-                    android:layout_marginStart="23dp"
-                    android:layout_marginTop="21dp"
-                    android:visibility="gone"
-                    app:layout_constraintStart_toStartOf="@id/account_icon"
-                    app:layout_constraintTop_toTopOf="@id/account_icon"
-                    app:srcCompat="@drawable/ic_asset_non_custodial_spend_blue"
-                    tools:visibility="visible" />
+                    android:id="@+id/account_indicator"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintCircle="@+id/account_icon"
+                    app:layout_constraintCircleAngle="135"
+                    android:background="@drawable/white_circle"
+                    android:padding="1dp"
+                    app:layout_constraintCircleRadius="20dp"
+                    app:srcCompat="@drawable/ic_non_custodial_account_indicator"/>
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/account_name"

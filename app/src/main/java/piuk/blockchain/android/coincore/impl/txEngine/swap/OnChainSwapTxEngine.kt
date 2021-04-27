@@ -8,6 +8,7 @@ import info.blockchain.balance.Money
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.ValidationState
@@ -62,24 +63,26 @@ class OnChainSwapTxEngine(
                         updateLimits(it, quote)
                     }
             }.map { px ->
-                px.copy(feeLevel = defaultFeeLevel(px))
+                px.copy(
+                    feeSelection = px.feeSelection.copy(selectedLevel = defaultFeeLevel(px))
+                )
             }.handlePendingOrdersError(
                 PendingTx(
                     amount = CryptoValue.zero(sourceAsset),
                     totalBalance = CryptoValue.zero(sourceAsset),
                     availableBalance = CryptoValue.zero(sourceAsset),
-                    fees = CryptoValue.zero(sourceAsset),
-                    feeLevel = FeeLevel.Regular,
-                    availableFeeLevels = setOf(FeeLevel.Regular),
+                    feeForFullAvailable = CryptoValue.zero(sourceAsset),
+                    feeAmount = CryptoValue.zero(sourceAsset),
+                    feeSelection = FeeSelection(),
                     selectedFiat = userFiat
                 )
             )
 
     private fun defaultFeeLevel(pendingTx: PendingTx): FeeLevel =
-        if (pendingTx.availableFeeLevels.contains(FeeLevel.Priority))
+        if (pendingTx.feeSelection.availableLevels.contains(FeeLevel.Priority))
             FeeLevel.Priority
         else
-            pendingTx.feeLevel
+            pendingTx.feeSelection.selectedLevel
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
         return engine.doUpdateAmount(amount, pendingTx)

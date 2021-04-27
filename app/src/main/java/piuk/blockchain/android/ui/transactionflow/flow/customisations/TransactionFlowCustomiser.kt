@@ -10,6 +10,7 @@ import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
@@ -28,12 +29,10 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionErrorState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TxExecutionStatus
 import piuk.blockchain.android.ui.transactionflow.plugin.AccountLimitsView
+import piuk.blockchain.android.ui.transactionflow.plugin.BalanceAndFeeView
 import piuk.blockchain.android.ui.transactionflow.plugin.FromAndToView
 import piuk.blockchain.android.ui.transactionflow.plugin.SmallBalanceView
 import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
-import piuk.blockchain.android.util.assetName
-import piuk.blockchain.android.util.drawableResFilled
-import piuk.blockchain.android.util.maskedAsset
 import java.math.BigInteger
 import java.math.RoundingMode
 import java.text.SimpleDateFormat
@@ -46,7 +45,8 @@ interface TransactionFlowCustomiser :
     TransactionConfirmationCustomisations, TransactionProgressCustomisations
 
 class TransactionFlowCustomiserImpl(
-    private val resources: Resources
+    private val resources: Resources,
+    private val assetResources: AssetResources
 ) : TransactionFlowCustomiser {
     override fun enterAmountActionIcon(state: TransactionState): Int {
         return when (state.action) {
@@ -77,7 +77,7 @@ class TransactionFlowCustomiserImpl(
         when (state.action) {
             AssetAction.Send -> resources.getString(
                 R.string.send_enter_asset_address_hint,
-                resources.getString(state.sendingAsset.assetName())
+                assetResources.assetName(state.sendingAsset)
             )
             AssetAction.Sell -> ""
             else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
@@ -87,7 +87,7 @@ class TransactionFlowCustomiserImpl(
         when (state.action) {
             AssetAction.Send -> resources.getString(
                 R.string.send_internal_transfer_message,
-                resources.getString(state.sendingAsset.assetName()),
+                assetResources.assetName(state.sendingAsset),
                 state.sendingAsset.displayTicker
             )
             else -> null
@@ -217,7 +217,7 @@ class TransactionFlowCustomiserImpl(
                     else -> R.drawable.ic_funds_usd
                 }
             }
-            else -> state.sendingAsset.drawableResFilled()
+            else -> assetResources.drawableResFilled(state.sendingAsset)
         }
 
     override fun shouldShowMaxLimit(state: TransactionState): Boolean =
@@ -240,6 +240,15 @@ class TransactionFlowCustomiserImpl(
             )
             AssetAction.Withdraw -> state.availableBalance.toStringWithSymbol()
             else -> throw java.lang.IllegalStateException("Limits info view not configured for ${state.action}")
+        }
+
+    override fun enterAmountMaxNetworkFeeLabel(state: TransactionState): String =
+        when (state.action) {
+            AssetAction.InterestDeposit,
+            AssetAction.Sell,
+            AssetAction.Swap,
+            AssetAction.Send -> resources.getString(R.string.send_enter_amount_max_fee)
+            else -> throw java.lang.IllegalStateException("Max network fee label not configured for ${state.action}")
         }
 
     override fun confirmTitle(state: TransactionState): String {
@@ -418,8 +427,8 @@ class TransactionFlowCustomiserImpl(
 
     override fun selectTargetAccountTitle(state: TransactionState): String {
         return when (state.action) {
-            AssetAction.Swap -> resources.getString(R.string.receive)
-            AssetAction.Send -> resources.getString(R.string.send)
+            AssetAction.Swap,
+            AssetAction.Send -> resources.getString(R.string.common_receive)
             AssetAction.Sell -> resources.getString(R.string.sell)
             AssetAction.FiatDeposit -> resources.getString(R.string.common_deposit)
             AssetAction.Withdraw -> resources.getString(R.string.withdraw_target_select_title)
@@ -533,6 +542,32 @@ class TransactionFlowCustomiserImpl(
         }
     }
 
+    override fun issueFeesTooHighMessage(state: TransactionState): String? {
+        return when (state.action) {
+            AssetAction.Send ->
+                resources.getString(
+                    R.string.send_enter_amount_error_insufficient_funds_for_fees,
+                    state.sendingAsset.displayTicker
+                )
+            AssetAction.Swap ->
+                resources.getString(
+                    R.string.swap_enter_amount_error_insufficient_funds_for_fees,
+                    state.sendingAsset.displayTicker
+                )
+            AssetAction.Sell ->
+                resources.getString(
+                    R.string.sell_enter_amount_error_insufficient_funds_for_fees,
+                    state.sendingAsset.displayTicker
+                )
+            AssetAction.InterestDeposit ->
+                resources.getString(
+                    R.string.interest_enter_amount_error_insufficient_funds_for_fees,
+                    state.sendingAsset.displayTicker
+                )
+            else -> null
+        }
+    }
+
     override fun installEnterAmountLowerSlotView(
         ctx: Context,
         frame: FrameLayout,
@@ -542,10 +577,10 @@ class TransactionFlowCustomiserImpl(
             AssetAction.ViewActivity,
             AssetAction.Summary -> throw IllegalStateException()
             AssetAction.Send,
-            AssetAction.Receive,
             AssetAction.InterestDeposit,
             AssetAction.Sell,
-            AssetAction.Swap -> SmallBalanceView(ctx).also { frame.addView(it) }
+            AssetAction.Swap -> BalanceAndFeeView(ctx).also { frame.addView(it) }
+            AssetAction.Receive -> SmallBalanceView(ctx).also { frame.addView(it) }
             AssetAction.Withdraw,
             AssetAction.FiatDeposit -> AccountInfoBank(ctx).also { frame.addView(it) }
         }
@@ -639,7 +674,7 @@ class TransactionFlowCustomiserImpl(
                     else -> R.drawable.ic_funds_usd_masked
                 }
             }
-            else -> state.sendingAsset.maskedAsset()
+            else -> assetResources.maskedAsset(state.sendingAsset)
         }
 
     override fun transactionProgressExceptionMessage(state: TransactionState): String {

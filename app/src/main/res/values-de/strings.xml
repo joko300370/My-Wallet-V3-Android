@@ -917,12 +917,6 @@
     <string name="iban">IBAN</string>
     <string name="estonia">Estland</string>
     <string name="lets_setup_wallet">Lassen Sie uns Ihre Brieftasche einrichten. Sie können Krypto jetzt schnell kaufen oder dies später tun.</string>
-    <string name="btc_default_wallet_name">Meine Bitcoin-Brieftasche</string>
-    <string name="bch_default_account_label">Meine Bitcoin-Geldbörse</string>
-    <string name="eth_default_account_label">Meine Ätherbrieftasche</string>
-    <string name="xlm_default_account_label">Meine hervorragende Brieftasche</string>
-    <string name="pax_default_account_label_1">Mein USD Digital Wallet</string>
-    <string name="exchange_default_account_label">Meine Exchange %1$s Adresse</string>
     <string name="linked_cards">Verknüpfte Karten</string>
     <string name="tx_title_send">%1s senden</string>
     <string name="tx_title_receive">Erhalte %1s</string>
@@ -960,7 +954,6 @@
     <string name="buy_now">Kaufe jetzt</string>
     <string name="default_label_all_wallets">Alle Geldbörsen</string>
     <string name="approximately_symbol">~ %1$s</string>
-    <string name="custodial_wallet_default_label">%1s Trading Wallet</string>
     <string name="select_account_sheet_title">Wählen Sie eine Brieftasche</string>
     <string name="activity_state_initialised">Initialisiert</string>
     <string name="activity_state_uninitialised">Nicht initialisiert</string>
@@ -1008,7 +1001,6 @@
     <string name="common_spaced_strings">%1$s %2$s</string>
     <string name="server_unreachable_exit">Es kann keine Verbindung zum Server hergestellt werden. Versuchen Sie es später erneut.</string>
     <string name="dashboard_asset_balance_interest">Verdiene %1$.1f %% APY</string>
-    <string name="default_label_interest_wallet">Zinsgeldbörse</string>
     <string name="activity_details_created">Datum</string>
     <string name="activity_details_completed">Abgeschlossen</string>
     <string name="activity_details_fee">Gebühr</string>
@@ -1117,7 +1109,6 @@
     <string name="transfer_second_pswd_title">2. Passwort</string>
     <string name="transfer_second_pswd_desc">Bitte geben Sie Ihr 2. Passwort ein, Sie können dann weiter senden.</string>
     <string name="transfer_second_pswd_hint">2. Passwort</string>
-    <string name="currency_wallet">Meine %1s Brieftasche</string>
     <string name="dashboard_asset_item_label_title">Bitte beachten Sie.</string>
     <string name="algorand_asset_label">Die Funktion zum Abheben von ALGO aus Ihrem Handelsportemonnaie ist derzeit nicht verfügbar, wird jedoch in Kürze verfügbar sein.</string>
     <string name="send_state_no_funds">Keine Mittel</string>
@@ -1218,7 +1209,6 @@
     <string name="purchase_card_note_2">Ihre Krypto kann innerhalb von abgerufen werden</string>
     <string name="select_send_sheet_title">Senden von</string>
     <string name="select_send_source_title">Senden von</string>
-    <string name="currency_funds_wallet">Meine %1s Brieftasche</string>
     <string name="us_dollars">US Dollar</string>
     <string name="fiat_funds_detail_withdraw_details">Auszahlung an Ihre Bank</string>
     <string name="withdraw_currency">%1$s abheben</string>
@@ -1654,5 +1644,30 @@ Bitte schreiben Sie diese 12 Wörter der Reihe nach auf und bewahren Sie sie an 
     <string name="check_my_inbox">Überprüfen Sie Ihren Posteingang</string>
     <string name="did_not_get_email">Haben Sie die E-Mail nicht erhalten?</string>
     <string name="send_again">Erneut senden</string>
+
+    <string name="buy_crypto_card_sdd_body">Wähle die Krypto aus, die du kaufen möchtest, überprüfe deine Identität und kaufe sofort.</string>
+    <string name="bank_wire_transfer_fee">%1$s Gebühr</string>
+    <string name="bank_wire_transfer_min_withdrawal">%1$s Mindestauszahlung</string>
+    <string name="select_a_bank">Wähle eine Bank</string>
+    <string name="want_to_buy_more">Mehr kaufen?</string>
+    <string name="unlock_gold_level_trading">Gold-Level-Handel freischalten</string>
+    <string name="verify_your_identity_limits">Überprüfe deine Identität und handle täglich bis zu %1$s.</string>
+    <string name="apply_and_unlock">Jetzt beantragen und freischalten></string>
+    <string name="cash_accounts">Geldkonten</string>
+    <string name="cash_accounts_description">Speichere USD, GBP oder EUR in deinem Wallet. Verwende das Guthaben, um Krypto zu kaufen. Verkaufe jederzeit Krypto für Bargeld.</string>
+    <string name="link_a_bank_description">Speichere USD, GBP oder EUR in deinem Wallet. Verwende das Guthaben, um Krypto zu kaufen. Verkaufe jederzeit Krypto für Bargeld.</string>
+    <string name="earn_interest_description" formatted="false">Lass dein Krypto arbeiten. Verdiene bis zu 10% monatlich, indem du einfach nichts tust. Sofort einzahlen und anfangen zu verdienen.</string>
+    <string name="sb_checkout_daily_limit_title">Tägliches Limit aufgebraucht</string>
+    <string name="sb_checkout_daily_limit_blurb">Ups, es sieht so aus, als hättest du dein tägliches Transaktionslimit für Käufe und Einzahlungen aufgebraucht, bitte versuche es morgen erneut.</string>
+    <string name="sb_checkout_weekly_limit_title">Wöchentliches Limit aufgebraucht</string>
+    <string name="sb_checkout_weekly_limit_blurb">Ups, es sieht so aus, als hättest du dein wöchentliches Transaktionslimit für Käufe und Einzahlungen aufgebraucht, bitte versuche es morgen erneut.</string>
+    <string name="sb_checkout_yearly_limit_title">Jährliches Limit aufgebraucht</string>
+    <string name="sb_checkout_yearly_limit_blurb">Ups, es sieht so aus, als hättest du dein jährliches Transaktionslimit für Käufe und Einzahlungen aufgebraucht.</string>
+    <string name="sb_checkout_pending_order_title">Kauf in Bearbeitung</string>
+    <string name="sb_checkout_pending_order_blurb">Ups, es sieht so aus, als hättest du einen Kauf in Bearbeitung. Bitte warte, bis dieser vervollständigt ist, bevor du einen neuen Kauf startest.</string>
+    <string name="wallet_outage_message">Wir haben derzeit einen Ausfall. Bitte sei versichert, dass deine Gelder sicher sind. <annotation link="learn_more">Mehr erfahren</annotation></string>
+    <string name="increase_your_limits">Erhöhe deine Limits</string>
+    <string name="increase_your_limits_body">Setze deine Überprüfung fort, um Gold zu erreichen, und erhöhe deine Limits und Zahlungsmethoden</string>
+    <string name="continue_to_gold">Weiter zu Gold</string>
 
 </resources>

@@ -921,12 +921,6 @@
     <string name="iban">IBAN</string>
     <string name="estonia">Эстония</string>
     <string name="lets_setup_wallet">Давайте настроим ваш кошелек. Вы можете быстро купить крипто сейчас или сделать это позже.</string>
-    <string name="btc_default_wallet_name">Мой биткойн кошелек</string>
-    <string name="bch_default_account_label">Мой биткойн-кошелек</string>
-    <string name="eth_default_account_label">Мой эфирный кошелек</string>
-    <string name="xlm_default_account_label">Мой звездный кошелек</string>
-    <string name="pax_default_account_label_1">Мой USD Цифровой Кошелек</string>
-    <string name="exchange_default_account_label">Мой обменный %1$s адрес</string>
     <string name="linked_cards">Связанные карты</string>
     <string name="tx_title_send">Отправить %1s</string>
     <string name="tx_title_receive">Получать %1s</string>
@@ -964,7 +958,6 @@
     <string name="buy_now">купить сейчас</string>
     <string name="default_label_all_wallets">Все кошельки</string>
     <string name="approximately_symbol">~ %1$s</string>
-    <string name="custodial_wallet_default_label">%1s Торговый кошелек</string>
     <string name="select_account_sheet_title">Выберите кошелек</string>
     <string name="activity_state_initialised">инициированную</string>
     <string name="activity_state_uninitialised">неиницализированные</string>
@@ -1012,7 +1005,6 @@
     <string name="common_spaced_strings">%1$s %2$s</string>
     <string name="server_unreachable_exit">Невозможно подключиться к серверу, повторите попытку позже.</string>
     <string name="dashboard_asset_balance_interest">Зарабатывай %1$.1f %% APY</string>
-    <string name="default_label_interest_wallet">Интерес кошелек</string>
     <string name="activity_details_created">Свидание</string>
     <string name="activity_details_completed">Завершенный</string>
     <string name="activity_details_fee">плата</string>
@@ -1121,7 +1113,6 @@
     <string name="transfer_second_pswd_title">2-й пароль</string>
     <string name="transfer_second_pswd_desc">Пожалуйста, введите 2-ой пароль, после чего вы сможете продолжить отправку.</string>
     <string name="transfer_second_pswd_hint">2-й пароль</string>
-    <string name="currency_wallet">Мой кошелек %1s</string>
     <string name="dashboard_asset_item_label_title">Пожалуйста, обратите внимание.</string>
     <string name="algorand_asset_label">Функция для вывода ALGO из вашего торгового кошелька в настоящее время недоступна, но скоро появится.</string>
     <string name="send_state_no_funds">Нет средств</string>
@@ -1224,7 +1215,6 @@
     <string name="purchase_card_note_2">Ваша криптовалюта будет доступна для вывода в течение</string>
     <string name="select_send_sheet_title">Отправлено из</string>
     <string name="select_send_source_title">Отправлено из</string>
-    <string name="currency_funds_wallet">Мой %1s кошелек</string>
     <string name="us_dollars">Доллары США</string>
     <string name="fiat_funds_detail_withdraw_details">Вывод в ваш банк</string>
     <string name="withdraw_currency">Вывести %1$s</string>
@@ -1668,4 +1658,28 @@ Blockchain.com никогда не будет просить просмотре�
     <string name="did_not_get_email">Не получили письмо?</string>
     <string name="send_again">Отправить еще раз</string>
 
+    <string name="buy_crypto_card_sdd_body">Выберите криптовалюту, которую хотите купить, подтвердите свою личность и сразу покупайте.</string>
+    <string name="bank_wire_transfer_fee">Комиссия %1$s</string>
+    <string name="bank_wire_transfer_min_withdrawal">Мин. вывод средств %1$s</string>
+    <string name="select_a_bank">Выбрать банк</string>
+    <string name="want_to_buy_more">Хотите купить больше?</string>
+    <string name="unlock_gold_level_trading">Разблокировать торговлю на уровне Gold</string>
+    <string name="verify_your_identity_limits">Подтвердите свою личность, зарабатывайте проценты и торгуйте до %1$s в день.</string>
+    <string name="apply_and_unlock">Подать заявку и разблокировать сейчас</string>
+    <string name="cash_accounts">Счета наличных</string>
+    <string name="cash_accounts_description">Храните USD, GBP или EUR в своем кошельке. Для покупки криптовалюты используйте остаток на счете. Продавайте криптовалюту за наличные в любое время.</string>
+    <string name="link_a_bank_description">Храните USD, GBP или EUR в своем кошельке. Для покупки криптовалюты используйте остаток на счете. Продавайте криптовалюту за наличные в любое время.</string>
+    <string name="earn_interest_description" formatted="false">Заставьте свою криптовалюту работать. Зарабатывайте до 10% в месяц, просто ничего не делая. Сразу вносите депозит и начинайте зарабатывать.</string>
+    <string name="sb_checkout_daily_limit_title">Превышен дневной лимит</string>
+    <string name="sb_checkout_daily_limit_blurb">Похоже, вы исчерпали дневной лимит транзакций для покупок и депозитов. Попробуйте еще раз завтра.</string>
+    <string name="sb_checkout_weekly_limit_title">Превышен еженедельный лимит</string>
+    <string name="sb_checkout_weekly_limit_blurb">Похоже, вы исчерпали недельный лимит транзакций для покупок и депозитов. Попробуйте еще раз завтра.</string>
+    <string name="sb_checkout_yearly_limit_title">Превышен годовой лимит</string>
+    <string name="sb_checkout_yearly_limit_blurb">Похоже, вы исчерпали годовой лимит транзакций для покупок и депозитов.</string>
+    <string name="sb_checkout_pending_order_title">Ордер в процессе выполнения</string>
+    <string name="sb_checkout_pending_order_blurb">Похоже, у вас уже есть ордер на покупку в процессе выполнения. Дождитесь его завершения, прежде чем покупать снова.</string>
+    <string name="wallet_outage_message">У нас произошел сбой. Будьте уверены, ваши средства в полной безопасности. <annotation link="learn_more">Подробнее</annotation></string>
+    <string name="increase_your_limits">Увеличьте свои лимиты</string>
+    <string name="increase_your_limits_body">Продолжайте проверку, чтобы получить уровень Gold и увеличить свои лимиты и способы оплаты.</string>
+    <string name="continue_to_gold">Перейти к Gold</string>
 </resources>

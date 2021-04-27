@@ -20,14 +20,13 @@ import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.databinding.DialogSheetInterestDetailsBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
-import piuk.blockchain.android.util.assetName
-import piuk.blockchain.android.util.drawableResFilled
 import piuk.blockchain.android.util.secondsToDays
 import piuk.blockchain.android.util.gone
 import timber.log.Timber
@@ -62,6 +61,7 @@ class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetails
     private val exchangeRates: ExchangeRates by scopedInject()
     private val currencyPrefs: CurrencyPrefs by scopedInject()
     private val coincore: Coincore by scopedInject()
+    private val assetResources: AssetResources by scopedInject()
 
     private val listAdapter: InterestSummaryAdapter by lazy { InterestSummaryAdapter() }
 
@@ -74,9 +74,9 @@ class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetails
 
         binding.apply {
             interestDetailsTitle.text = account.label
-            interestDetailsSheetHeader.text = getString(cryptoCurrency.assetName())
-            interestDetailsLabel.text = getString(cryptoCurrency.assetName())
-            interestDetailsAssetIcon.setImageResource(cryptoCurrency.drawableResFilled())
+            interestDetailsSheetHeader.text = getString(assetResources.assetNameRes(cryptoCurrency))
+            interestDetailsLabel.text = getString(assetResources.assetNameRes(cryptoCurrency))
+            interestDetailsAssetIcon.setImageResource(assetResources.drawableResFilled(cryptoCurrency))
 
             interestDetailsActivityCta.setOnClickListener {
                 host.gotoActivityFor(account as BlockchainAccount)

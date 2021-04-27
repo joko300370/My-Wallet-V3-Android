@@ -494,18 +494,11 @@
     <string name="pairing_code_show_qr">Show QR code</string>
     <string name="pairing_code_hide_qr">Hide QR code</string>
     <string name="pairing_code_instructions_alert">Never share your mobile pairing QR code with anyone. Anyone who can view this QR code can withdraw funds. Blockchain.com will never ask to view or receive your mobile pairing QR code.</string>
-    <string name="email_request_subject_btc">Bitcoin payment request</string>
 
     <!-- SHARE RECEIVE ADDRESS -->
-    <string name="email_request_subject_eth">Ether payment request</string>
-    <string name="email_request_subject_bch">Bitcoin Cash payment request</string>
-    <string name="email_request_subject_pax_1">USD Digital payment request</string>
-    <string name="email_request_subject_usdt_1">Tether payment request</string>
-    <string name="email_request_subject_xlm">Xlm payment request</string>
+    <string name="email_request_subject">%1$s payment request</string>
+    <string name="email_request_body_erc20">Please send %1$s to the %2$s address %3$s.</string>
     <string name="email_request_body_btc">Please send %1$s BTC to the Bitcoin address %2$s.</string>
-    <string name="email_request_body_eth">Please send ETH to the Ether address %1$s.</string>
-    <string name="email_request_body_pax_1">Please send USD-D to the USD Digital address %1$s.</string>
-    <string name="email_request_body_usdt_1">Please send USDT to the Tether address %1$s.</string>
     <string name="email_request_body_bch">Please send BCH to the Bitcoin Cash address %1$s.</string>
     <string name="email_request_body_xlm">Please send XLM to the Stellar address %1$s.</string>
     <string name="email_request_body_fallback">attached</string>
@@ -791,11 +784,6 @@
     <string name="min_with_value">%1$s Min</string>
     <string name="max_with_value">%1$s Max</string>
 
-    <!-- Exchange announcement -->
-    <string name="the_exchange_announcement_title">Introducing the Exchange</string>
-    <string name="the_exchange_announcement_body">It’s time to Level Up to a better crypto exchange. Buy, sell, and trade more digital assets in the Blockchain.com Exchange.</string>
-    <string name="the_exchange_announcement_cta_text">Checkout the Exchange</string>
-
     <!-- The Pit linking -->
     <string name="the_exchange_slogan_kyc_promo">There’s a new way to trade. Link your Wallet for instant access.</string>
 
@@ -891,11 +879,6 @@
     <string name="register_fingerprint_card_body">Enable fingerprint to quickly log into your wallet instead of using your PIN.</string>
     <string name="register_fingerprint_card_cta">Enable Now</string>
 
-    <!-- Kyc for Airdrops announcement -->
-    <string name="kyc_airdrop_card_title">Want Free Crypto?</string>
-    <string name="kyc_airdrop_card_body">Verify your identity to participate in our Airdrop program and receive free crypto from future Airdrops.</string>
-    <string name="kyc_airdrop_card_cta">Start Verification</string>
-
     <!-- Sell announcement -->
     <string name="sell_announcement_title">Sell Your Crypto for Cash</string>
     <string name="sell_announcement_description">Sell directly from your Trading Wallets to your Cash Wallet.</string>
@@ -910,6 +893,11 @@
     <string name="wdgld_available_card_title">Trade wDGLD Now</string>
     <string name="wdgld_available_card_body">Wrapped Digital Gold (wDGLD) is an ERC-20 tokenized version of DGLD, combining a gold-backed token with the power and flexibility of Ethereum.</string>
     <string name="wdgld_available_card_cta">Trade wDGLD now</string>
+
+    <!-- AAVE/YFI/DOT announcement -->
+    <string name="aave_yfi_dot_available_card_title">Aave, YFI and DOT now available!</string>
+    <string name="aave_yfi_dot_available_card_body">Aave, YFI and Polkadot tokens are now available to Buy, Sell, Swap and Send in your Wallet.</string>
+    <string name="aave_yfi_dot_available_card_cta">Buy Now</string>
 
     <!-- Airdrop Status bottom sheet -->
     <string name="airdrop_received_sheet_heading">Airdrop</string>
@@ -1351,19 +1339,13 @@
     <string name="buy_now_1">Buy %1s</string>
     <string name="simple_buy_transfer_details_error">Something went wrong while loading the transfer details.\n\nPlease try again later.</string>
 
-    <string name="btc_default_wallet_name">My Bitcoin Wallet</string>
-    <string name="bch_default_account_label">My Bitcoin Cash Wallet</string>
-    <string name="eth_default_account_label">My Ether Wallet</string>
-    <string name="xlm_default_account_label">My Stellar Wallet</string>
-    <string name="pax_default_account_label_1">My USD Digital Wallet</string>
-    <string name="algo_default_account_label">My Algorand Wallet</string>
-    <string name="usdt_default_account_label">My Tether Wallet</string>
-    <string name="dgld_default_account_label">My Wrapped-DGLD Wallet</string>
+    <string name="default_crypto_non_custodial_wallet_label">Private Key Wallet</string>
+    <string name="old_default_non_custodial_wallet_label">My %1s Wallet</string>
     <string name="default_label_all_wallets">All Wallets</string>
-    <string name="default_label_interest_wallet">Interest Wallet</string>
-    <string name="exchange_default_account_label">My Exchange %1$s Address</string>
+    <string name="default_label_interest_wallet_1">Interest Account</string>
+    <string name="exchange_default_account_label_1">Exchange Account</string>
     <string name="approximately_symbol">~ %1$s</string>
-    <string name="custodial_wallet_default_label">%1s Trading Wallet</string>
+    <string name="custodial_wallet_default_label_1">Trading Account</string>
     <string name="select_account_sheet_title">Select a Wallet</string>
     <string name="select_account_sheet_empty">You have no eligible Wallets to perform this action.</string>
     <string name="select_send_sheet_title">Send from</string>
@@ -1423,7 +1405,7 @@
     <string name="activity_no_activity_text">All your transactions will show up here.</string>
     <string name="activity_custodial_pending_value">Bank Transfer</string>
     <string name="checkout_bank_transfer_label">Bank Transfer</string>
-    <string name="currency_funds_wallet">My %1s Wallet</string>
+    <string name="fiat_currency_funds_wallet_name_1">%1s Account</string>
     <string name="checkout_funds_label">Funds</string>
     <string name="activity_loading_error">Failed to load activity, please try again later</string>
 
@@ -1553,10 +1535,10 @@
     <string name="withdrawing_amount">Withdrawing %1$s</string>
     <string name="withdrawing_amount_message">We’re completing your withdrawal now.</string>
     <string name="withdrawal_success_message">Success! We’re are withdrawing the cash from your %1$s Wallet now. The funds should be in your bank in 1&#8211;3 business days.</string>
-    <string name="currency_wallet">My %1s Wallet</string>
 
     <string name="dashboard_asset_item_label_title">Please note.</string>
     <string name="algorand_asset_label">Functionality to withdraw ALGO from your trading wallet is currently unavailable, but coming soon.</string>
+    <string name="polkadot_asset_label">Functionality to withdraw DOT from your trading wallet is currently unavailable, but coming soon.</string>
 
     <!-- Transaction flows -->
     <string name="send_enter_amount_from">From: %1$s</string>
@@ -1567,9 +1549,13 @@
     <string name="sell_enter_amount_max">Sell Max</string>
     <string name="sell_enter_amount_min_error">%1$s Min</string>
     <string name="sell_enter_amount_max_error">%1$s Max</string>
+    <string name="sell_enter_amount_error_insufficient_funds_for_fees">Not enough %1$s in your wallet to sell with current network fees.</string>
     <string name="send_enter_amount_deposit_max">Transfer Max</string>
     <string name="send_enter_amount_min_deposit">Minimum transfer of %1$s required</string>
     <string name="send_enter_amount_min_send">Minimum send of %1$s required</string>
+    <string name="send_enter_amount_network_fees">Network Fees</string>
+    <string name="send_enter_amount_total">Total</string>
+    <string name="send_enter_amount_max_fee">Max Network Fee</string>
     <string name="swap_enter_amount_min_swap">Minimum swap of %1$s required</string>
     <string name="deposit_enter_amount_min_swap">Minimum deposit of %1$s required</string>
     <string name="withdraw_enter_amount_min">Minimum withdrawal of %1$s required</string>
@@ -1581,6 +1567,7 @@
     <string name="send_confirmation_tx_fee">Transaction Fee</string>
     <string name="send_confirmation_eta">Funds Will Arrive</string>
     <string name="send_confirmation_insufficient_fee">Not enough funds for priority fee, please adjust your sending amount.</string>
+    <string name="send_confirmation_insufficient_funds_for_fee">Not enough funds for current fee level.</string>
     <string name="send_confirmation_add_note_hint">Add a note</string>
     <string name="send_confirmation_cta_button">Send %1$s</string>
     <string name="swap_confirmation_cta_button">Swap %1$s for %2$s</string>
@@ -1618,6 +1605,7 @@
     <string name="send_progress_complete_title">%1$s Sent</string>
     <string name="sell_progress_complete_title">%1$s Sold</string>
     <string name="swap_progress_complete_title">Swap Complete</string>
+    <string name="interest_enter_amount_error_insufficient_funds_for_fees">Not enough %1$s in your wallet to transfer with current network fees.</string>
     <string name="send_progress_complete_subtitle">Your %1$s has been successfully sent.</string>
     <string name="send_progress_error_title">Oops! Something Went Wrong. Please try again.</string>
     <string name="send_progress_error_subtitle">Don’t worry. Your money is safe. Please try again or contact our Support Team for help.</string>
@@ -1627,6 +1615,7 @@
     <string name="send_error_not_valid_asset_address">Not a valid %1s address</string>
     <string name="send_error_address_is_eth_contract">Address is not a user address</string>
     <string name="send_enter_amount_error_insufficient_funds">Not enough %1$s in your wallet.</string>
+    <string name="send_enter_amount_error_insufficient_funds_for_fees">Not enough %1$s in your wallet to send with current network fees.</string>
     <string name="send_enter_amount_error_invalid_amount">Send 0.00000001 %1$s or more.</string>
     <string name="send_enter_invalid_password">Password is incorrect.</string>
     <string name="send_enter_unexpected_error">An unexpected error has occurred. Please try again.</string>
@@ -1643,6 +1632,7 @@
     <string name="swap_enter_amount_max">Swap Max</string>
     <string name="swap_enter_amount_silver_limit">Tap here to upgrade your profile and swap this amount.</string>
     <string name="swap_enter_amount_over_limit">You can swap up to %1$s today.</string>
+    <string name="swap_enter_amount_error_insufficient_funds_for_fees">Not enough %1$s in your wallet to swap with current network fees.</string>
     <string name="swap_select_target_subtitle">Confirm the wallet you want to Swap from and choose the wallet you want to Receive into.</string>
     <string name="swap_select_target_title">New Swap</string>
     <string name="tx_confirmation_network_fee">%1$s Network Fee</string>
@@ -1909,11 +1899,11 @@
     <string name="want_to_buy_more">Want to buy more?</string>
     <string name="unlock_gold_level_trading">Unlock Gold Level Trading</string>
     <string name="verify_your_identity_limits">Verify your identity, earn interest and trade up to %1$s a day.</string>
-    <string name="apply_and_unlock"><![CDATA[Apply & Unlock Now]]></string>
+    <string name="apply_and_unlock">Apply &amp; Unlock Now></string>
     <string name="cash_accounts">Cash Accounts</string>
     <string name="cash_accounts_description">Store USD, GBP or EUR in your wallet. Use the balance to buy crypto. Sell crypto for cash at anytime.</string>
     <string name="link_a_bank_description">Store USD, GBP or EUR in your wallet. Use the balance to buy crypto. Sell crypto for cash at anytime.</string>
-    <string name="earn_interest_description">Put your crypto to work. Earn up to 10% monthly by simply doing nothing. Instanly deposit and start earning.</string>
+    <string name="earn_interest_description" formatted="false">Put your crypto to work. Earn up to 10% monthly by simply doing nothing. Instantly deposit and start earning.</string>
 
     <string name="sb_checkout_daily_limit_title">Daily limit exceeded</string>
     <string name="sb_checkout_daily_limit_blurb">Oops, looks like you’ve used up your daily transaction limit for Buys and Deposits, please try again tomorrow.</string>

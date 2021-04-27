@@ -20,17 +20,15 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_interest_dashboard_asset_info.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.android.util.assetName
-import piuk.blockchain.android.util.drawableResFilled
 import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 
 class InterestDashboardAssetItem<in T>(
-    private val coincore: Coincore,
+    private val assetResources: AssetResources,
     private val disposable: CompositeDisposable,
     private val custodialWalletManager: CustodialWalletManager,
     private val itemClicked: (CryptoCurrency, Boolean) -> Unit
@@ -50,7 +48,7 @@ class InterestDashboardAssetItem<in T>(
         position: Int,
         holder: RecyclerView.ViewHolder
     ) = (holder as InterestAssetItemViewHolder).bind(
-        coincore,
+        assetResources,
         items[position] as InterestAssetInfoItem,
         disposable,
         custodialWalletManager,
@@ -66,15 +64,15 @@ private class InterestAssetItemViewHolder(val parent: View) :
         get() = itemView
 
     fun bind(
-        coincore: Coincore,
+        assetResources: AssetResources,
         item: InterestAssetInfoItem,
         disposables: CompositeDisposable,
         custodialWalletManager: CustodialWalletManager,
         itemClicked: (CryptoCurrency, Boolean) -> Unit
     ) {
-        itemView.item_interest_asset_icon.setImageResource(item.cryptoCurrency.drawableResFilled())
+        itemView.item_interest_asset_icon.setImageResource(assetResources.drawableResFilled(item.cryptoCurrency))
         itemView.item_interest_asset_title.text =
-            parent.context.getString(item.cryptoCurrency.assetName())
+            parent.context.getString(assetResources.assetNameRes(item.cryptoCurrency))
 
         itemView.item_interest_acc_balance_title.text =
             parent.context.getString(R.string.interest_dashboard_item_balance_title,

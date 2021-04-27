@@ -23,6 +23,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.cards.CardAuthoriseWebViewActivity
 import piuk.blockchain.android.cards.CardVerificationFragment
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.databinding.FragmentSimpleBuyPaymentBinding
 import piuk.blockchain.android.sdd.SDDAnalytics
 import piuk.blockchain.android.ui.base.mvi.MviFragment
@@ -30,8 +31,6 @@ import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionFlowCustomiserImpl.Companion.getEstimatedTransactionCompletionTime
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.assetName
-import piuk.blockchain.android.util.maskedAsset
 import piuk.blockchain.android.util.secondsToDays
 
 class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(),
@@ -40,6 +39,7 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
     override val model: SimpleBuyModel by scopedInject()
     private val stringUtils: StringUtils by inject()
     private val ratingPrefs: RatingPrefs by scopedInject()
+    private val assetResources: AssetResources by scopedInject()
     private var reviewInfo: ReviewInfo? = null
     private var isFirstLoad = false
 
@@ -85,7 +85,11 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
     }
 
     override fun render(newState: SimpleBuyState) {
-        binding.transactionProgressView.setAssetIcon(newState.selectedCryptoCurrency?.maskedAsset() ?: 0)
+        binding.transactionProgressView.setAssetIcon(
+            newState.selectedCryptoCurrency?.let {
+                assetResources.maskedAsset(it)
+            } ?: 0
+        )
 
         if (newState.orderState == OrderState.AWAITING_FUNDS && isFirstLoad) {
             model.process(SimpleBuyIntent.MakePayment(newState.id ?: return))
@@ -135,7 +139,7 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
                         getString(R.string.card_purchased, newState.orderValue.formatOrSymbolForZero()),
                         getString(
                             R.string.card_purchased_available_now,
-                            getString(newState.orderValue.currency.assetName())
+                            getString(assetResources.assetNameRes(newState.orderValue.currency))
                         )
                     )
                 } else {

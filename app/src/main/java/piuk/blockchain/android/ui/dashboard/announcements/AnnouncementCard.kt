@@ -22,6 +22,7 @@ data class StandardAnnouncementCard(
     @DrawableRes val background: Int = 0,
     @DrawableRes val iconImage: Int = 0,
     @ColorRes val buttonColor: Int = R.color.default_announce_button,
+    val shouldWrapIconWidth: Boolean = false,
     private val ctaFunction: () -> Unit = { },
     private val dismissFunction: () -> Unit = { }
 ) : AnnouncementCard {

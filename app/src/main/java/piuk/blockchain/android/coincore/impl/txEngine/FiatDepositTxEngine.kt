@@ -7,6 +7,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.BankAccount
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmationValue
@@ -39,12 +40,12 @@ class FiatDepositTxEngine(
                 amount = zeroFiat,
                 totalBalance = zeroFiat,
                 availableBalance = zeroFiat,
+                feeForFullAvailable = zeroFiat,
                 maxLimit = limits.max,
                 minLimit = limits.min,
-                fees = zeroFiat,
+                feeAmount = zeroFiat,
                 selectedFiat = userFiat,
-                feeLevel = FeeLevel.None,
-                availableFeeLevels = setOf(FeeLevel.None)
+                feeSelection = FeeSelection()
             )
         }
     }
@@ -67,7 +68,7 @@ class FiatDepositTxEngine(
                     TxConfirmationValue.To(txTarget.label),
                     TxConfirmationValue.EstimatedDepositCompletion,
                     TxConfirmationValue.FiatTxFee(
-                        fee = pendingTx.fees
+                        fee = pendingTx.feeAmount
                     ),
                     TxConfirmationValue.Total(
                         total = pendingTx.amount
@@ -78,7 +79,7 @@ class FiatDepositTxEngine(
     }
 
     override fun doUpdateFeeLevel(pendingTx: PendingTx, level: FeeLevel, customFeeAmount: Long): Single<PendingTx> {
-        require(pendingTx.availableFeeLevels.contains(level))
+        require(pendingTx.feeSelection.availableLevels.contains(level))
         // This engine only supports FeeLevel.None, so
         return Single.just(pendingTx)
     }

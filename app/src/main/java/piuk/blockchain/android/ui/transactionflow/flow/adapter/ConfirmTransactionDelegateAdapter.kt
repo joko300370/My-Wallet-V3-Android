@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.transactionflow.flow.adapter
 
 import android.app.Activity
 import info.blockchain.balance.ExchangeRates
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
 import piuk.blockchain.android.ui.adapters.DelegationAdapter
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
@@ -16,7 +17,8 @@ class ConfirmTransactionDelegateAdapter(
     analytics: TxFlowAnalytics,
     mapper: TxConfirmReadOnlyMapper,
     exchangeRates: ExchangeRates,
-    selectedCurrency: String
+    selectedCurrency: String,
+    assetResources: AssetResources
 ) : DelegationAdapter<Any>(AdapterDelegatesManager(), emptyList()) {
     init {
         // Add all necessary AdapterDelegate objects here
@@ -25,12 +27,19 @@ class ConfirmTransactionDelegateAdapter(
             addAdapterDelegate(ConfirmNoteItemDelegate(model))
             addAdapterDelegate(ConfirmXlmMemoItemDelegate(model, stringUtils, activityContext))
             addAdapterDelegate(ConfirmAgreementWithTAndCsItemDelegate(model, stringUtils, activityContext))
-            addAdapterDelegate(ConfirmAgreementToTransferItemDelegate(model, exchangeRates, selectedCurrency))
+            addAdapterDelegate(
+                ConfirmAgreementToTransferItemDelegate(
+                    model,
+                    exchangeRates,
+                    selectedCurrency,
+                    assetResources
+                )
+            )
             addAdapterDelegate(LargeTransactionWarningItemDelegate(model))
             addAdapterDelegate(InvoiceCountdownTimerDelegate())
             addAdapterDelegate(ConfirmInfoItemValidationStatusDelegate())
-            addAdapterDelegate(ConfirmInfoItemFeeOptionDelegate(model, analytics, activityContext, stringUtils))
-            addAdapterDelegate(ConfirmNetworkFeeItemDelegate(activityContext, stringUtils))
+            addAdapterDelegate(ConfirmInfoItemFeeOptionDelegate(model, analytics, stringUtils, assetResources))
+            addAdapterDelegate(ConfirmNetworkFeeItemDelegate(stringUtils, assetResources))
         }
     }
 }

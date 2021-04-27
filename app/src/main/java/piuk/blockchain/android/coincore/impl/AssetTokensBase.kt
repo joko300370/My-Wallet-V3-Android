@@ -4,7 +4,6 @@ import androidx.annotation.VisibleForTesting
 import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligibilityProvider
-import com.blockchain.nabu.service.TierService
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
@@ -48,7 +47,6 @@ internal abstract class CryptoAssetBase(
     protected val custodialManager: CustodialWalletManager,
     private val pitLinking: PitLinking,
     protected val crashLogger: CrashLogger,
-    private val tiersService: TierService,
     protected val environmentConfig: EnvironmentConfig,
     private val eligibilityProvider: EligibilityProvider,
     protected val offlineAccounts: OfflineAccountUpdater
@@ -59,7 +57,29 @@ internal abstract class CryptoAssetBase(
     }
 
     protected val accounts: Single<SingleAccountList>
-        get() = activeAccounts.fetchAccountList(::loadAccounts)
+        get() = activeAccounts.fetchAccountList(::loadAccounts).flatMap {
+            updateLabelsIfNeeded(it).toSingle { it }
+        }
+
+    private fun updateLabelsIfNeeded(list: SingleAccountList): Completable =
+        Completable.concat(
+            list.map {
+                val cryptoNonCustodialAccount = it as? CryptoNonCustodialAccount
+                if (cryptoNonCustodialAccount?.labelNeedsUpdate() == true)
+                    cryptoNonCustodialAccount.updateLabel(
+                        cryptoNonCustodialAccount.label.replace(
+                            labels.getOldDefaultNonCustodialWalletLabel(asset),
+                            labels.getDefaultNonCustodialWalletLabel(asset)
+                        )
+                    )
+                        .doOnError { error ->
+                            crashLogger.logException(error)
+                        }
+                        .onErrorComplete()
+                else
+                    Completable.complete()
+            }
+        )
 
     override val isEnabled: Boolean
         get() = !asset.hasFeature(CryptoCurrency.STUB_ASSET)
@@ -85,6 +105,11 @@ internal abstract class CryptoAssetBase(
             Timber.e("$errorMsg: $it")
             crashLogger.logException(it, errorMsg)
         }
+
+    private fun CryptoNonCustodialAccount.labelNeedsUpdate(): Boolean {
+        val regex = """${labels.getOldDefaultNonCustodialWalletLabel(asset)}(\s?)([\d]*)""".toRegex()
+        return label.matches(regex)
+    }
 
     // Called when the set of account in use bu this asset changes. Update the offline
     // cache and the BE notification addresses here
@@ -182,7 +207,7 @@ internal abstract class CryptoAssetBase(
                 listOf(
                     CryptoExchangeAccount(
                         asset = asset,
-                        label = labels.getDefaultExchangeWalletLabel(asset),
+                        label = labels.getDefaultExchangeWalletLabel(),
                         address = address,
                         exchangeRates = exchangeRates,
                         environmentConfig = environmentConfig

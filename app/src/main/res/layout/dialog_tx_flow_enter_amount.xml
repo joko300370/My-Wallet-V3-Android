@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/amount_sheet_indicator"
@@ -41,51 +42,50 @@
         app:layout_constraintStart_toEndOf="@id/amount_sheet_back"
         app:layout_constraintTop_toBottomOf="@id/amount_sheet_indicator" />
 
-    <FrameLayout
-        android:id="@+id/frame_upper_slot"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/amount_sheet_title" />
-
-    <View
-        android:id="@+id/amount_sheet_separator"
-        style="@style/SeparatorWithoutMargins"
-        android:layout_marginTop="@dimen/very_small_margin"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/frame_upper_slot" />
-
-    <piuk.blockchain.android.ui.customviews.FiatCryptoInputView
-        android:id="@+id/amount_sheet_input"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/standard_margin"
-        android:layout_marginBottom="@dimen/standard_margin"
-        app:layout_constraintBottom_toTopOf="@id/frame_lower_slot"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/amount_sheet_separator" />
-
-    <FrameLayout
-        android:id="@+id/frame_lower_slot"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/small_margin"
-        app:layout_constraintBottom_toTopOf="@id/amount_sheet_cta_button"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/amount_sheet_cta_button"
-        style="@style/CtaButton.Blue"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/very_small_margin"
-        android:contentDescription="@string/next"
-        android:text="@string/next"
+        app:layout_constraintVertical_bias="0"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintVertical_bias="1" />
+        app:layout_constraintTop_toBottomOf="@+id/amount_sheet_title">
+        <LinearLayout
+            android:id="@+id/scroll_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <FrameLayout
+                android:id="@+id/frame_upper_slot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <View
+                android:id="@+id/amount_sheet_separator"
+                style="@style/SeparatorWithoutMargins"
+                android:layout_marginTop="@dimen/very_small_margin" />
+
+            <piuk.blockchain.android.ui.customviews.FiatCryptoInputView
+                android:id="@+id/amount_sheet_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="32dp"
+                android:layout_marginTop="@dimen/standard_margin"
+                android:layout_marginBottom="@dimen/tiny_margin" />
+
+            <FrameLayout
+                android:id="@+id/frame_lower_slot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/amount_sheet_cta_button"
+                style="@style/CtaButton.Blue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="32dp"
+                android:contentDescription="@string/next"
+                android:text="@string/next" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

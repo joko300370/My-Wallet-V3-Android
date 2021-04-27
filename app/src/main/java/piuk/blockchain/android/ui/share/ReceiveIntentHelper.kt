@@ -15,6 +15,7 @@ import com.blockchain.sunriver.fromStellarUri
 import info.blockchain.balance.CryptoCurrency
 import org.bitcoinj.uri.BitcoinURI
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.util.BitcoinLinkGenerator
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
@@ -25,7 +26,7 @@ import java.io.IOException
 import java.util.ArrayList
 import java.util.HashMap
 
-class ReceiveIntentHelper(private val context: Context) {
+class ReceiveIntentHelper(private val context: Context, private val assetResources: AssetResources) {
 
     internal fun getIntentDataList(
         uri: String,
@@ -53,17 +54,24 @@ class ReceiveIntentHelper(private val context: Context) {
             val type = mime.getMimeTypeFromExtension(ext)
 
             val emailIntent = Intent(Intent.ACTION_SENDTO).apply { setupIntentForImage(type, file) }
+            val displayName = assetResources.getDisplayName(cryptoCurrency)
 
-            when (cryptoCurrency) {
-                CryptoCurrency.BTC -> emailIntent.setupIntentForEmailBtc(uri)
-                CryptoCurrency.ETHER -> emailIntent.setupIntentForEmailEth(uri)
-                CryptoCurrency.BCH -> emailIntent.setupIntentForEmailBch(uri)
-                CryptoCurrency.XLM -> emailIntent.setupIntentForEmailXlm(payment = uri.fromStellarUri())
-                CryptoCurrency.PAX -> emailIntent.setupIntentForEmailPax(uri)
-                CryptoCurrency.USDT -> emailIntent.setupIntentForEmailUsdt(uri)
-                CryptoCurrency.DGLD -> emailIntent.setupIntentForEmailDgld(uri)
-                CryptoCurrency.STX,
-                CryptoCurrency.ALGO -> throw NotImplementedError("$cryptoCurrency is not fully supported yet")
+            when {
+                cryptoCurrency == CryptoCurrency.BTC -> emailIntent.setupIntentForEmailBtc(displayName, uri)
+                cryptoCurrency == CryptoCurrency.BCH -> emailIntent.setupIntentForEmailBch(displayName, uri)
+                cryptoCurrency == CryptoCurrency.XLM ->
+                    emailIntent.setupIntentForEmailXlm(
+                        displayName = displayName,
+                        payment = uri.fromStellarUri()
+                    )
+                cryptoCurrency == CryptoCurrency.ETHER ||
+                    cryptoCurrency.hasFeature(CryptoCurrency.IS_ERC20) ->
+                    emailIntent.setupIntentForEmailERC20(
+                        ticker = cryptoCurrency.networkTicker,
+                        displayName = displayName,
+                        uri = uri
+                    )
+                else -> throw NotImplementedError("${cryptoCurrency.displayTicker} is not fully supported yet")
             }.exhaustive
 
             val imageIntent = Intent().apply { setupIntentForImage(type, file) }
@@ -141,7 +149,7 @@ class ReceiveIntentHelper(private val context: Context) {
     // /////////////////////////////////////////////////////////////////////////
     // Intent Extension functions
     // /////////////////////////////////////////////////////////////////////////
-    private fun Intent.setupIntentForEmailBtc(uri: String) {
+    private fun Intent.setupIntentForEmailBtc(displayName: String, uri: String) {
         val addressUri = BitcoinURI(uri)
         val amount = if (addressUri.amount != null) " " + addressUri.amount.toPlainString() else ""
         val address =
@@ -153,54 +161,30 @@ class ReceiveIntentHelper(private val context: Context) {
         val body = String.format(context.getString(R.string.email_request_body_btc), amount, address)
 
         putExtra(Intent.EXTRA_TEXT, "$body\n\n ${BitcoinLinkGenerator.getLink(addressUri)}")
-        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_request_subject_btc))
+        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_request_subject, displayName))
     }
 
-    private fun Intent.setupIntentForEmailEth(uri: String) {
+    private fun Intent.setupIntentForEmailERC20(ticker: String, displayName: String, uri: String) {
         val address = uri.removePrefix("ethereum:")
-        val body = String.format(context.getString(R.string.email_request_body_eth), address)
+        val body = String.format(context.getString(R.string.email_request_body_erc20), ticker, displayName, address)
 
         putExtra(Intent.EXTRA_TEXT, body)
-        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_request_subject_eth))
+        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_request_subject, displayName))
     }
 
-    private fun Intent.setupIntentForEmailPax(uri: String) {
-        val address = uri.removePrefix("ethereum:")
-        val body = String.format(context.getString(R.string.email_request_body_pax_1), address)
-
-        putExtra(Intent.EXTRA_TEXT, body)
-        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_request_subject_pax_1))
-    }
-
-    private fun Intent.setupIntentForEmailUsdt(uri: String) {
-        val address = uri.removePrefix("ethereum:")
-        val body = String.format(context.getString(R.string.email_request_body_usdt_1), address)
-
-        putExtra(Intent.EXTRA_TEXT, body)
-        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_request_subject_usdt_1))
-    }
-
-    private fun Intent.setupIntentForEmailDgld(uri: String) {
-        val address = uri.removePrefix("ethereum:")
-        val body = String.format(context.getString(R.string.email_request_body_usdt_1), address)
-
-        putExtra(Intent.EXTRA_TEXT, body)
-        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_request_subject_usdt_1))
-    }
-
-    private fun Intent.setupIntentForEmailXlm(payment: StellarPayment) {
+    private fun Intent.setupIntentForEmailXlm(displayName: String, payment: StellarPayment) {
         val body = String.format(context.getString(R.string.email_request_body_xlm), payment.public.accountId)
 
         putExtra(Intent.EXTRA_TEXT, body)
-        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_request_subject_xlm))
+        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_request_subject, displayName))
     }
 
-    private fun Intent.setupIntentForEmailBch(uri: String) {
+    private fun Intent.setupIntentForEmailBch(displayName: String, uri: String) {
         val address = uri.removePrefix("bitcoincash:")
         val body = String.format(context.getString(R.string.email_request_body_bch), address)
 
         putExtra(Intent.EXTRA_TEXT, body)
-        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_request_subject_bch))
+        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.email_request_subject, displayName))
     }
 
     private fun Intent.setupIntentForImage(type: String?, file: File) {

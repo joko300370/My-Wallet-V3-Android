@@ -4,6 +4,7 @@ import info.blockchain.wallet.api.data.FeeOptions;
 import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface FeeEndpoints {
 
@@ -21,4 +22,7 @@ public interface FeeEndpoints {
 
     @GET("mempool/fees/{currency}")
     Observable<FeeOptions> getFeeOptions(@Path("currency") String currency);
+
+    @GET("mempool/fees/eth")
+    Observable<FeeOptions> getErc20FeeOptions(@Query("contractAddress") String contractAddress);
 }

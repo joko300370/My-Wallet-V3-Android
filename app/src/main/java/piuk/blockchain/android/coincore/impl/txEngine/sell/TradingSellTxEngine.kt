@@ -8,6 +8,7 @@ import info.blockchain.balance.Money
 import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxResult
@@ -35,16 +36,17 @@ class TradingSellTxEngine(
 
     override fun doInitialiseTx(): Single<PendingTx> =
         quotesEngine.pricedQuote.firstOrError()
-            .zipWith(sourceAccount.accountBalance).flatMap { (quote, balance) ->
+            .zipWith(sourceAccount.accountBalance)
+            .flatMap { (quote, balance) ->
                 Single.just(
                     PendingTx(
                         amount = CryptoValue.zero(sourceAsset),
                         totalBalance = balance,
                         availableBalance = balance,
-                        fees = CryptoValue.zero(sourceAsset),
+                        feeAmount = CryptoValue.zero(sourceAsset),
+                        feeForFullAvailable = CryptoValue.zero(sourceAsset),
                         selectedFiat = userFiat,
-                        feeLevel = FeeLevel.None,
-                        availableFeeLevels = AVAILABLE_FEE_LEVELS
+                        feeSelection = FeeSelection()
                     )
                 ).flatMap {
                     updateLimits(it, quote)
@@ -54,9 +56,10 @@ class TradingSellTxEngine(
                     amount = CryptoValue.zero(sourceAsset),
                     totalBalance = CryptoValue.zero(sourceAsset),
                     availableBalance = CryptoValue.zero(sourceAsset),
-                    fees = CryptoValue.zero(sourceAsset),
+                    feeForFullAvailable = CryptoValue.zero(sourceAsset),
+                    feeAmount = CryptoValue.zero(sourceAsset),
                     selectedFiat = userFiat,
-                    feeLevel = FeeLevel.None
+                    feeSelection = FeeSelection()
                 )
             )
 
@@ -79,7 +82,7 @@ class TradingSellTxEngine(
         level: FeeLevel,
         customFeeAmount: Long
     ): Single<PendingTx> {
-        require(pendingTx.availableFeeLevels.contains(level))
+        require(pendingTx.feeSelection.availableLevels.contains(level))
         // This engine only supports FeeLevel.None, so
         return Single.just(pendingTx)
     }
@@ -91,8 +94,4 @@ class TradingSellTxEngine(
         createSellOrder(pendingTx).map {
             TxResult.UnHashedTxResult(pendingTx.amount)
         }
-
-    companion object {
-        private val AVAILABLE_FEE_LEVELS = setOf(FeeLevel.None)
-    }
 }

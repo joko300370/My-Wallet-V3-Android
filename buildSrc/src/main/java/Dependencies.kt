@@ -7,8 +7,8 @@ object Versions {
     const val targetSdk = 30
     const val compileSdk = 30
 
-    const val versionCode = 625
-    const val versionName = "8.5.3"
+    const val versionCode = 629
+    const val versionName = "8.5.5"
     const val buildTools = "29.0.2"
 
     // Build tools and languages
@@ -94,7 +94,7 @@ object Versions {
     const val sparkline = "1.2.0"
 
     // Third Party SDKs
-    const val veriff = "3.9.0"
+    const val veriff = "3.12.0"
     const val probity = "1.0.0"
     const val sift = "0.11.1"
     const val cardForm = "4.2.0"

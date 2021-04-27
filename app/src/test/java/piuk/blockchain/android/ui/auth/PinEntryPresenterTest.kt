@@ -8,6 +8,7 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.ApiStatus
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.remoteconfig.RemoteConfig
+import com.blockchain.wallet.DefaultLabels
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doAnswer
 import com.nhaarman.mockito_kotlin.eq
@@ -50,7 +51,6 @@ import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.home.CredentialsWiper
 import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.auth.AuthDataManager
@@ -74,7 +74,7 @@ class PinEntryPresenterTest {
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private val payloadManager: PayloadDataManager = mock()
-    private val stringUtils: StringUtils = mock()
+    private val defaultLabels: DefaultLabels = mock()
     private val biometricsController: BiometricsController = mock()
     private val accessState: AccessState = mock()
     private val walletOptionsDataManager: WalletOptionsDataManager = mock()
@@ -96,7 +96,7 @@ class PinEntryPresenterTest {
         val mockImageView = Mockito.mock(ImageView::class.java)
         whenever(activity.pinBoxList)
             .thenReturn(Arrays.asList(mockImageView, mockImageView, mockImageView, mockImageView))
-        whenever(stringUtils.getString(anyInt())).thenReturn("string resource")
+        whenever(defaultLabels.getDefaultNonCustodialWalletLabel(any())).thenReturn("string resource")
 
         subject = PinEntryPresenter(
             analytics,
@@ -104,7 +104,7 @@ class PinEntryPresenterTest {
             appUtil,
             prefsUtil,
             payloadManager,
-            stringUtils,
+            defaultLabels,
             accessState,
             walletOptionsDataManager,
             environmentSettings,
@@ -829,7 +829,7 @@ class PinEntryPresenterTest {
         )
         verify(appUtil).sharedKey = anyString()
         verify(payloadManager, Mockito.atLeastOnce()).wallet
-        verify(stringUtils).getString(anyInt())
+        verify(defaultLabels).getDefaultNonCustodialWalletLabel(any())
         verify(activity).dismissProgressDialog()
         Assert.assertTrue(subject.canShowFingerprintDialog)
     }

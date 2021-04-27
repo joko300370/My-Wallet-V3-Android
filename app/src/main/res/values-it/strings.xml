@@ -921,12 +921,6 @@
     <string name="iban">IBAN</string>
     <string name="estonia">Estonia</string>
     <string name="lets_setup_wallet">Prepariamo il tuo portafoglio. Puoi acquistare rapidamente criptovalute ora o farlo in seguito.</string>
-    <string name="btc_default_wallet_name">Il mio portafoglio Bitcoin</string>
-    <string name="bch_default_account_label">Portafoglio My Bitcoin Cash</string>
-    <string name="eth_default_account_label">Il mio portafoglio Ether</string>
-    <string name="xlm_default_account_label">Il mio portafoglio stellare</string>
-    <string name="pax_default_account_label_1">Il mio portafoglio digitale USD</string>
-    <string name="exchange_default_account_label">Il mio Exchange %1$s Indirizzo</string>
     <string name="linked_cards">Carte collegate</string>
     <string name="tx_title_send">Invia %1s</string>
     <string name="tx_title_receive">Ricevi %1s</string>
@@ -964,7 +958,6 @@
     <string name="buy_now">Acquista ora</string>
     <string name="default_label_all_wallets">Tutti i portafogli</string>
     <string name="approximately_symbol">~ %1$s</string>
-    <string name="custodial_wallet_default_label">%1s Portafoglio di trading</string>
     <string name="select_account_sheet_title">Seleziona un portafoglio</string>
     <string name="activity_state_initialised">inizializzato</string>
     <string name="activity_state_uninitialised">Non inizializzato</string>
@@ -1012,7 +1005,6 @@
     <string name="common_spaced_strings">%1$s %2$s</string>
     <string name="server_unreachable_exit">Impossibile connettersi al server, riprovare più tardi.</string>
     <string name="dashboard_asset_balance_interest">Guadagna %1$.1f %% APY</string>
-    <string name="default_label_interest_wallet">Portafoglio di interessi</string>
     <string name="activity_details_created">Data</string>
     <string name="activity_details_completed">Completato</string>
     <string name="activity_details_fee">tassa</string>
@@ -1121,7 +1113,6 @@
     <string name="transfer_second_pswd_title">2a password</string>
     <string name="transfer_second_pswd_desc">Inserisci la tua seconda password, sarai quindi in grado di continuare a inviare.</string>
     <string name="transfer_second_pswd_hint">2a password</string>
-    <string name="currency_wallet">Il mio portafoglio %1s</string>
     <string name="dashboard_asset_item_label_title">Notare che.</string>
     <string name="algorand_asset_label">La funzionalità per ritirare ALGO dal tuo portafoglio di trading non è al momento disponibile, ma sarà presto disponibile.</string>
     <string name="send_state_no_funds">Senza fondi</string>
@@ -1224,7 +1215,6 @@
     <string name="purchase_card_note_2">La tua crittografia sarà disponibile per essere ritirata all\'interno</string>
     <string name="select_send_sheet_title">Invia da</string>
     <string name="select_send_source_title">Invia da</string>
-    <string name="currency_funds_wallet">Il mio portafoglio %1s</string>
     <string name="us_dollars">Dollari americani</string>
     <string name="fiat_funds_detail_withdraw_details">Cashout sulla tua banca</string>
     <string name="withdraw_currency">Preleva %1$s</string>
@@ -1669,5 +1659,30 @@ I tuoi fondi saranno disponibili per il prelievo una volta che il trasferimento 
     <string name="check_my_inbox">Controlla la tua casella di posta</string>
     <string name="did_not_get_email">Non hai ricevuto l\'e-mail?</string>
     <string name="send_again">Invia di nuovo</string>
+
+    <string name="buy_crypto_card_sdd_body">Seleziona la cripto che desideri acquistare, verifica la tua identità e acquista immediatamente.</string>
+    <string name="bank_wire_transfer_fee">Commissione di %1$s</string>
+    <string name="bank_wire_transfer_min_withdrawal">Ritiro minimo di %1$s</string>
+    <string name="select_a_bank">Seleziona una banca</string>
+    <string name="want_to_buy_more">Vuoi acquistare di più?</string>
+    <string name="unlock_gold_level_trading">Sblocca il trading di livello Gold</string>
+    <string name="verify_your_identity_limits">Verifica la tua identità, guadagna interessi e fai trading fino a %1$s al giorno.</string>
+    <string name="apply_and_unlock">Applica e sblocca ora></string>
+    <string name="cash_accounts">Conti di cassa</string>
+    <string name="cash_accounts_description">Conserva USD, GBP o EUR nel tuo portafogli. Usa il saldo per acquistare cripto. Vendi cripto per contanti in qualsiasi momento.</string>
+    <string name="link_a_bank_description">Conserva USD, GBP o EUR nel tuo portafogli. Usa il saldo per acquistare cripto. Vendi cripto per contanti in qualsiasi momento.</string>
+    <string name="earn_interest_description" formatted="false">Metti la tua cripto al lavoro. Guadagna fino al 10% mensilmente semplicemente non facendo nulla. Deposita istantaneamente e inizia a guadagnare.</string>
+    <string name="sb_checkout_daily_limit_title">Limite giornaliero superato</string>
+    <string name="sb_checkout_daily_limit_blurb">Ops, sembra che tu abbia esaurito il limite di transazione giornaliero per acquisti e depositi, riprova domani.</string>
+    <string name="sb_checkout_weekly_limit_title">Limite settimanale superato</string>
+    <string name="sb_checkout_weekly_limit_blurb">Ops, sembra che tu abbia esaurito il limite di transazione settimanale per acquisti e depositi, riprova domani.</string>
+    <string name="sb_checkout_yearly_limit_title">Limite annuale superato</string>
+    <string name="sb_checkout_yearly_limit_blurb">Ops, sembra che tu abbia esaurito il tuo limite annuale di transazioni per acquisti e depositi.</string>
+    <string name="sb_checkout_pending_order_title">Ordine in corso</string>
+    <string name="sb_checkout_pending_order_blurb">Ops, sembra che tu abbia già un ordine di acquisto in corso, attendi fino al completamento prima di acquistare di nuovo.</string>
+    <string name="wallet_outage_message">Stiamo riscontrando un\'interruzione. Ti assicuriamo che i tuoi fondi sono al sicuro. <annotation link="learn_more">Ulteriori informazioni</annotation></string>
+    <string name="increase_your_limits">Aumenta i tuoi limiti</string>
+    <string name="increase_your_limits_body">Continua la tua verifica per raggiungere il livello Gold e aumentare i tuoi limiti e metodi di pagamento.</string>
+    <string name="continue_to_gold">Prosegui a Gold</string>
 
 </resources>

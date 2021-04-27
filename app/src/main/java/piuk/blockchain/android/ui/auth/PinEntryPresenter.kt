@@ -9,6 +9,8 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.ApiStatus
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
+import com.blockchain.wallet.DefaultLabels
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.api.data.UpdateType
 import info.blockchain.wallet.exceptions.AccountLockedException
@@ -28,7 +30,6 @@ import piuk.blockchain.android.data.biometrics.BiometricsController
 import piuk.blockchain.android.ui.home.CredentialsWiper
 import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.auth.AuthDataManager
@@ -48,7 +49,7 @@ class PinEntryPresenter(
     private val appUtil: AppUtil,
     private val prefs: PersistentPrefs,
     private val payloadDataManager: PayloadDataManager,
-    private val stringUtils: StringUtils,
+    private val defaultLabels: DefaultLabels,
     private val accessState: AccessState,
     private val walletOptionsDataManager: WalletOptionsDataManager,
     private val environmentSettings: EnvironmentConfig,
@@ -467,7 +468,7 @@ class PinEntryPresenter(
             payloadDataManager.getAccount(0).label.isNullOrEmpty()
         ) {
             payloadDataManager.getAccount(0).label =
-                stringUtils.getString(R.string.btc_default_wallet_name)
+                defaultLabels.getDefaultNonCustodialWalletLabel(CryptoCurrency.BTC)
         }
     }
 

@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.transactionflow.flow.adapter
 
-import android.app.Activity
 import android.content.Context
 import android.graphics.Typeface
 import android.net.Uri
@@ -17,37 +16,37 @@ import com.blockchain.ui.urllinks.URL_TX_FEES
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_send_confirm_network_fee.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.assetName
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.visible
 
 class ConfirmNetworkFeeItemDelegate<in T>(
-    private val activityContext: Activity,
-    private val stringUtils: StringUtils
+    private val stringUtils: StringUtils,
+    private val assetResources: AssetResources
 ) : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
         return items[position] is TxConfirmationValue.NetworkFee
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        NetworkFeeItemViewHolder(parent.inflate(R.layout.item_send_confirm_network_fee), activityContext, stringUtils)
+        NetworkFeeItemViewHolder(parent.inflate(R.layout.item_send_confirm_network_fee), stringUtils)
 
     override fun onBindViewHolder(
         items: List<T>,
         position: Int,
         holder: RecyclerView.ViewHolder
     ) = (holder as NetworkFeeItemViewHolder).bind(
-        items[position] as TxConfirmationValue.NetworkFee
+        items[position] as TxConfirmationValue.NetworkFee,
+        assetResources
     )
 }
 
 private class NetworkFeeItemViewHolder(
     val parent: View,
-    val activityContext: Activity,
     val stringUtils: StringUtils
 ) : RecyclerView.ViewHolder(parent), LayoutContainer {
 
@@ -55,7 +54,8 @@ private class NetworkFeeItemViewHolder(
         get() = itemView
 
     fun bind(
-        item: TxConfirmationValue.NetworkFee
+        item: TxConfirmationValue.NetworkFee,
+        assetResources: AssetResources
     ) {
         val linksMap = mapOf<String, Uri>("send_tx_fees" to Uri.parse(URL_TX_FEES))
 
@@ -73,7 +73,12 @@ private class NetworkFeeItemViewHolder(
                 confirmation_fee_value.visible()
                 confirmation_free_label.gone()
 
-                confirmation_learn_more.setText(getFeesText(context, linksMap, item.txFee.asset.assetName()),
+                confirmation_learn_more.setText(
+                    getFeesText(
+                        context,
+                        linksMap,
+                        assetResources.assetNameRes(item.txFee.asset)
+                    ),
                     TextView.BufferType.SPANNABLE)
             }
 
@@ -87,7 +92,7 @@ private class NetworkFeeItemViewHolder(
         val linkedText = stringUtils.getStringWithMappedAnnotations(
             R.string.tx_confirmation_free_fee_learn_more_3,
             linksMap,
-            activityContext
+            itemView.context
         )
         val sb = SpannableStringBuilder()
             .append(introText)
@@ -110,7 +115,7 @@ private class NetworkFeeItemViewHolder(
         val linkedText = stringUtils.getStringWithMappedAnnotations(
             R.string.tx_confirmation_fee_learn_more_3,
             linksMap,
-            activityContext
+            itemView.context
         )
 
         val sb = SpannableStringBuilder()

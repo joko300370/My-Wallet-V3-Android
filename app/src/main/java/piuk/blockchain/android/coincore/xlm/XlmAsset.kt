@@ -10,7 +10,6 @@ import com.blockchain.sunriver.fromStellarUri
 import com.blockchain.sunriver.isValidXlmQr
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.EligibilityProvider
-import com.blockchain.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
@@ -43,7 +42,6 @@ internal class XlmAsset(
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
-    tiersService: TierService,
     environmentConfig: EnvironmentConfig,
     private val walletPreferences: WalletStatus,
     eligibilityProvider: EligibilityProvider,
@@ -57,7 +55,6 @@ internal class XlmAsset(
     custodialManager,
     pitLinking,
     crashLogger,
-    tiersService,
     environmentConfig,
     eligibilityProvider,
     offlineAccounts
@@ -74,7 +71,7 @@ internal class XlmAsset(
             .map {
                 XlmCryptoWalletAccount(
                     payloadManager = payloadManager,
-                    account = it,
+                    xlmAccountReference = it,
                     xlmManager = xlmDataManager,
                     exchangeRates = exchangeRates,
                     xlmFeesFetcher = xlmFeesFetcher,

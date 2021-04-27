@@ -16,9 +16,11 @@ import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
+import info.blockchain.wallet.ethereum.EthereumAccount
 import info.blockchain.wallet.ethereum.data.EthLatestBlockNumber
 import info.blockchain.wallet.ethereum.data.EthTransaction
 import io.reactivex.Single
+import org.amshove.kluent.itReturns
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -40,18 +42,23 @@ class EthAccountActivityTest {
     private val currencyPrefs: CurrencyPrefs = mock()
     private val walletPrefs: WalletStatus = mock()
     private val custodialWalletManager: CustodialWalletManager = mock()
+    private val ethAccount: EthereumAccount = mock {
+        on { address } itReturns ETH_ADDRESS
+        on { label } itReturns "TestEthAccount"
+    }
 
     private val subject =
-        spy(EthCryptoWalletAccount(
-            payloadManager = payloadManager,
-            label = "TestEthAccount",
-            address = ETH_ADDRESS,
-            ethDataManager = ethDataManager,
-            fees = feeDataManager,
-            exchangeRates = exchangeRates,
-            walletPreferences = walletPrefs,
-            custodialWalletManager = custodialWalletManager
-        ))
+        spy(
+            EthCryptoWalletAccount(
+                payloadManager = payloadManager,
+                jsonAccount = ethAccount,
+                ethDataManager = ethDataManager,
+                fees = feeDataManager,
+                exchangeRates = exchangeRates,
+                walletPreferences = walletPrefs,
+                custodialWalletManager = custodialWalletManager
+            )
+        )
 
     @get:Rule
     val rxSchedulers = rxInit {
@@ -113,18 +120,20 @@ class EthAccountActivityTest {
             .assertNoErrors()
             .assertValue {
                 it.size == 1 &&
-                        it[0].run {
-                            this is TradeActivitySummaryItem &&
-                                    txId == swapSummary.txId &&
-                                    direction == swapSummary.direction &&
-                                    currencyPair == CurrencyPair.CryptoCurrencyPair(CryptoCurrency.ETHER,
-                                CryptoCurrency.BTC) &&
-                                    sendingAddress == swapSummary.sendingAddress &&
-                                    receivingAddress == swapSummary.receivingAddress &&
-                                    state == swapSummary.state &&
-                                    fiatValue == swapSummary.fiatValue &&
-                                    fiatCurrency == swapSummary.fiatCurrency
-                        }
+                    it[0].run {
+                        this is TradeActivitySummaryItem &&
+                            txId == swapSummary.txId &&
+                            direction == swapSummary.direction &&
+                            currencyPair == CurrencyPair.CryptoCurrencyPair(
+                            CryptoCurrency.ETHER,
+                            CryptoCurrency.BTC
+                        ) &&
+                            sendingAddress == swapSummary.sendingAddress &&
+                            receivingAddress == swapSummary.receivingAddress &&
+                            state == swapSummary.state &&
+                            fiatValue == swapSummary.fiatValue &&
+                            fiatCurrency == swapSummary.fiatCurrency
+                    }
             }
 
         verify(ethDataManager).getLatestBlockNumber()
@@ -179,9 +188,9 @@ class EthAccountActivityTest {
             .assertNoErrors()
             .assertValue {
                 it.size == 1 &&
-                        it[0].run {
-                            this is EthActivitySummaryItem
-                        }
+                    it[0].run {
+                        this is EthActivitySummaryItem
+                    }
             }
 
         verify(ethDataManager).getLatestBlockNumber()
