@@ -28,7 +28,7 @@ abstract class BaseApiClientTester {
             .addConverterFactory(
                 Json {
                     ignoreUnknownKeys = true
-                    isLenient         = true
+                    isLenient = true
                 }.asConverterFactory("application/json".toMediaType())
             )
             .build()

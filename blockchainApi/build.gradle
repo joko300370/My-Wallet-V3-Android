@@ -1,6 +1,7 @@
 apply plugin: 'kotlin'
 apply plugin: 'java-library'
 apply plugin: 'kotlinx-serialization'
+apply from: '../quality/ktlint.gradle'
 
 java {
     sourceCompatibility JavaVersion.VERSION_1_8

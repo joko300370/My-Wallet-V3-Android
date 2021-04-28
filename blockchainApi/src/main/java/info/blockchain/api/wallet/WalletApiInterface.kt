@@ -1,7 +1,6 @@
 package info.blockchain.api.wallet
 
 import info.blockchain.api.wallet.data.WalletSettingsDto
-import io.reactivex.Observable
 import io.reactivex.Single
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded

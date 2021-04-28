@@ -165,7 +165,7 @@ class BitcoinApiTest : BaseApiClientTester() {
         assertEquals(balance.totalSent.toLong(), 20000)
         assertEquals(balance.finalBalance.toLong(), 20000)
 
-        //Addresses
+        // Addresses
         val firstSummary = multiAddress.addresses[0]
         assertEquals(
             firstSummary.address,
@@ -186,7 +186,7 @@ class BitcoinApiTest : BaseApiClientTester() {
         assertEquals(secondSummary.totalSent.toLong(), 0)
         assertEquals(secondSummary.finalBalance.toLong(), 20000)
 
-        //Txs
+        // Txs
         val firstTx = multiAddress.txs[0]
         assertEquals(
             firstTx.hash,
@@ -216,25 +216,25 @@ class BitcoinApiTest : BaseApiClientTester() {
         )
         assertEquals(firstInput.prevOut?.isSpent, true)
         assertEquals(firstInput.prevOut?.txIndex, 145808878L)
-        assertEquals(firstInput.prevOut?.type,0)
-        assertEquals(firstInput.prevOut?.addr,"1GrYvVX76JMMeU32PCoyndaeYU5odDGAu3")
-        assertEquals(firstInput.prevOut?.value?.toLong(),240240L)
+        assertEquals(firstInput.prevOut?.type, 0)
+        assertEquals(firstInput.prevOut?.addr, "1GrYvVX76JMMeU32PCoyndaeYU5odDGAu3")
+        assertEquals(firstInput.prevOut?.value?.toLong(), 240240L)
         assertEquals(firstInput.prevOut?.count, 1L)
-        assertEquals(firstInput.prevOut?.script,"76a914ade8ea8fa072aafc8caf66af4ea815dd1e3dfe6f88ac")
+        assertEquals(firstInput.prevOut?.script, "76a914ade8ea8fa072aafc8caf66af4ea815dd1e3dfe6f88ac")
 
         val firstOutput = firstTx.out[0]
         assertFalse(firstOutput.isSpent)
         assertEquals(firstOutput.txIndex, 145849898L)
         assertEquals(firstOutput.type.toLong(), 0)
-        assertEquals(firstOutput.addr,"19tEaovasXx75vjuwYqziZSJg7b3u1MTQt")
+        assertEquals(firstOutput.addr, "19tEaovasXx75vjuwYqziZSJg7b3u1MTQt")
         assertEquals(firstOutput.value.toLong(), 20000L)
         assertEquals(firstOutput.count, 0L)
-        assertEquals(firstOutput.script,"76a91461718f0b60dc85dc09c8e59d0ddd6901bab900da88ac")
+        assertEquals(firstOutput.script, "76a91461718f0b60dc85dc09c8e59d0ddd6901bab900da88ac")
         assertEquals(firstOutput.xpub?.address,
             "xpub6CmZamQcHw2TPtbGmJNEvRgfhLwitarvzFn3fBYEEkFTqztus7W7CNbf48Kxuj1b" +
                 "RRBmZPzQocB6qar9ay6buVkQk73ftKE1z4tt9cPHWRn"
         )
-        assertEquals(firstOutput.xpub?.derivationPath,"M/0/0")
+        assertEquals(firstOutput.xpub?.derivationPath, "M/0/0")
     }
 
     @Test
@@ -345,7 +345,7 @@ class BitcoinApiTest : BaseApiClientTester() {
 
     @Test
     fun testPushTx_BCH() {
-        val txHash ="0100000001ba00dc25caab5a3806a5a8d84a07293b9d2fddcbbe75cb2e8c3be5fb9a8f7f3a010000006" +
+        val txHash = "0100000001ba00dc25caab5a3806a5a8d84a07293b9d2fddcbbe75cb2e8c3be5fb9a8f7f3a010000006" +
             "a473044022062533def9654e0fe521750a5334172644d182714792c9d801739ea24bada26eb02202d10f6cfa0a8" +
             "90a6ee0fb0a03a1cd7d7e30b8fc0f8c3a35ed5e2bd70fbcceffa0121028cd0b0633451ea95100c6268650365e82" +
             "9315c941ae82cf0424091a1cf7aa355ffffffff018e850100000000001976a914a3a7c7be8e2b0b209c6347c73a" +

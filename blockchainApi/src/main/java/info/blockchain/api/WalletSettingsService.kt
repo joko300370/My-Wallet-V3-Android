@@ -2,7 +2,6 @@ package info.blockchain.api
 
 import info.blockchain.api.wallet.WalletApiInterface
 import info.blockchain.api.wallet.data.WalletSettingsDto
-import io.reactivex.Observable
 import io.reactivex.Single
 import retrofit2.Retrofit
 
