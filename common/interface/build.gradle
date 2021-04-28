@@ -1,4 +1,5 @@
 apply plugin: 'kotlin'
+apply plugin: 'kotlinx-serialization'
 apply from: '../../quality/jacocoKtLibrary.gradle'
 apply from: '../../quality/ktlint.gradle'
 
@@ -7,6 +8,7 @@ targetCompatibility = Versions.javaCompatibilityVersion
 
 dependencies {
     implementation Libraries.kotlin
+    implementation Libraries.kotlinJson
     implementation project(':balance')
     api Libraries.rxKotlin
     api Libraries.koin

@@ -1,5 +1,9 @@
 package info.blockchain.wallet.api
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
 import info.blockchain.wallet.ApiCode
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.api.data.Status
@@ -29,6 +33,33 @@ class WalletApi(
             token.length,
             getApiCode()
         )
+    }
+
+    fun sendSecureChannel(
+        message: String
+    ): Observable<ResponseBody> {
+        return explorerInstance.postSecureChannel(
+            "send-secure-channel",
+            message,
+            message.length,
+            getApiCode()
+        )
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NONE,
+        getterVisibility = JsonAutoDetect.Visibility.NONE,
+        setterVisibility = JsonAutoDetect.Visibility.NONE,
+        creatorVisibility = JsonAutoDetect.Visibility.NONE,
+        isGetterVisibility = JsonAutoDetect.Visibility.NONE)
+    class IPResponse {
+        @JsonProperty("ip")
+        var ip: String = ""
+    }
+
+    fun getExternalIP(): Single<String> {
+        return explorerInstance.externalIP.map { it.ip }
     }
 
     fun setAccess(key: String?, value: String, pin: String?): Observable<Response<Status>> {

@@ -19,6 +19,7 @@ import com.blockchain.preferences.BankLinkingPrefs
 import com.blockchain.sunriver.XlmDataManager
 import com.google.gson.JsonSyntaxException
 import info.blockchain.balance.FiatValue
+import info.blockchain.wallet.payload.PayloadManager
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
@@ -48,6 +49,7 @@ import piuk.blockchain.android.ui.linkbank.BankAuthFlowState
 import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
 import piuk.blockchain.android.ui.linkbank.fromPreferencesValue
 import piuk.blockchain.android.ui.linkbank.toPreferencesValue
+import piuk.blockchain.android.ui.auth.newlogin.SecureChannelManager
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -100,7 +102,9 @@ class MainPresenter internal constructor(
     private val analytics: Analytics,
     private val credentialsWiper: CredentialsWiper,
     private val bankLinkingPrefs: BankLinkingPrefs,
-    private val custodialWalletManager: CustodialWalletManager
+    private val custodialWalletManager: CustodialWalletManager,
+    val payloadManager: PayloadManager,
+    private val secureChannelManager: SecureChannelManager
 ) : MvpPresenter<MainView>() {
 
     override val alwaysDisableScreenshots: Boolean = false
@@ -440,8 +444,8 @@ class MainPresenter internal constructor(
                         is ScanResult.TxTarget -> {
                             view?.startTransactionFlowWithTarget(it.targets)
                         }
-                        is ScanResult.ImportedWallet -> {
-                        } // TODO: as part of Auth
+                        is ScanResult.ImportedWallet -> { } // TODO: as part of Auth
+                        is ScanResult.SecuredChannelLogin -> secureChannelManager.sendHandshake(it.handshake)
                     }.exhaustive
                 },
                 onError = {

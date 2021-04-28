@@ -10,4 +10,6 @@ interface AuthPrefs {
 
     var sharedKey: String
     var walletGuid: String
+    var encryptedPassword: String
+    var pinFails: Int
 }

@@ -17,7 +17,7 @@ class AppUtil(
     val isSane: Boolean
         get() {
             val guid = prefs.walletGuid
-            val encryptedPassword = prefs.getValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, "")
+            val encryptedPassword = prefs.encryptedPassword
             val pinID = prefs.pinId
 
             return guid.isValidGuid() && encryptedPassword.isNotEmpty() && pinID.isNotEmpty()

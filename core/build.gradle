@@ -53,6 +53,8 @@ dependencies {
     api Libraries.okHttpInterceptor
     api Libraries.koin
 
+    implementation Libraries.kotlinJson
+
     // RxJava
     api Libraries.rxJava
     api Libraries.rxKotlin

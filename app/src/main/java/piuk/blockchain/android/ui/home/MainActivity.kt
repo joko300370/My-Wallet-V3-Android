@@ -55,7 +55,6 @@ import piuk.blockchain.android.ui.addresses.AccountActivity
 import piuk.blockchain.android.ui.airdrops.AirdropCentreActivity
 import piuk.blockchain.android.ui.backup.BackupWalletActivity
 import piuk.blockchain.android.ui.base.MvpActivity
-import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.dashboard.DashboardFragment
 import piuk.blockchain.android.ui.home.analytics.SideNavEvent
@@ -75,6 +74,7 @@ import piuk.blockchain.android.ui.pairingcode.PairingCodeActivity
 import piuk.blockchain.android.ui.scan.QrExpected
 import piuk.blockchain.android.ui.scan.QrScanActivity
 import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
+import piuk.blockchain.android.ui.auth.newlogin.AuthNewLoginSheet
 import piuk.blockchain.android.ui.sell.BuySellFragment
 import piuk.blockchain.android.ui.settings.SettingsActivity
 import piuk.blockchain.android.ui.swap.SwapFragment
@@ -99,7 +99,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     MainView,
     IntroTourHost,
     DialogFlow.FlowHost,
-    SlidingModalBottomDialog.Host,
+    AuthNewLoginSheet.Host,
     SmallSimpleBuyNavigator {
 
     override val presenter: MainPresenter by scopedInject()
@@ -214,6 +214,19 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
         if (intent.hasExtra(SHOW_SWAP) && intent.getBooleanExtra(SHOW_SWAP, false)) {
             startSwapFlow()
+        } else if (intent.hasExtra(LAUNCH_AUTH_FLOW) && intent.getBooleanExtra(LAUNCH_AUTH_FLOW, false)) {
+            intent.extras?.let {
+                showBottomSheet(
+                    AuthNewLoginSheet.newInstance(
+                        pubKeyHash = it.getString(AuthNewLoginSheet.PUB_KEY_HASH),
+                        messageInJson = it.getString(AuthNewLoginSheet.MESSAGE),
+                        forcePin = it.getBoolean(AuthNewLoginSheet.FORCE_PIN),
+                        originIP = it.getString(AuthNewLoginSheet.ORIGIN_IP),
+                        originLocation = it.getString(AuthNewLoginSheet.ORIGIN_LOCATION),
+                        originBrowser = it.getString(AuthNewLoginSheet.ORIGIN_BROWSER)
+                    )
+                )
+            }
         }
     }
 
@@ -566,6 +579,32 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         startTransferFragment()
     }
 
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        if (intent.getBooleanExtra(LAUNCH_AUTH_FLOW, false)) {
+            intent.extras?.let {
+                showBottomSheet(
+                    AuthNewLoginSheet.newInstance(
+                        pubKeyHash = it.getString(AuthNewLoginSheet.PUB_KEY_HASH),
+                        messageInJson = it.getString(AuthNewLoginSheet.MESSAGE),
+                        forcePin = it.getBoolean(AuthNewLoginSheet.FORCE_PIN),
+                        originIP = it.getString(AuthNewLoginSheet.ORIGIN_IP),
+                        originLocation = it.getString(AuthNewLoginSheet.ORIGIN_LOCATION),
+                        originBrowser = it.getString(AuthNewLoginSheet.ORIGIN_BROWSER)
+                    )
+                )
+            }
+        }
+    }
+
+    override fun navigateToBottomSheet(bottomSheet: BottomSheetDialogFragment) {
+        clearBottomSheet()
+        showBottomSheet(bottomSheet)
+    }
+
+    override fun onSheetClosed() {
+    }
+
     private fun startTransferFragment(
         viewToShow: TransferFragment.TransferViewType = TransferFragment.TransferViewType.TYPE_SEND
     ) {
@@ -679,6 +718,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         val TAG: String = MainActivity::class.java.simpleName
         const val START_BUY_SELL_INTRO_KEY = "START_BUY_SELL_INTRO_KEY"
         const val SHOW_SWAP = "SHOW_SWAP"
+        const val LAUNCH_AUTH_FLOW = "LAUNCH_AUTH_FLOW"
         const val ACCOUNT_EDIT = 2008
         const val SETTINGS_EDIT = 2009
         const val KYC_STARTED = 2011
@@ -877,9 +917,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     }
 
     override fun onFlowFinished() {
-    }
-
-    override fun onSheetClosed() {
     }
 
     override fun exitSimpleBuyFlow() {

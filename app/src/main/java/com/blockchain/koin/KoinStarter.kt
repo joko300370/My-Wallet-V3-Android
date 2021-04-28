@@ -29,6 +29,7 @@ import piuk.blockchain.android.ui.activity.activitiesModule
 import piuk.blockchain.android.ui.dashboard.announcements.dashboardAnnouncementsModule
 import piuk.blockchain.android.ui.kyc.koin.kycUiModule
 import piuk.blockchain.android.ui.kyc.koin.kycUiNabuModule
+import piuk.blockchain.android.ui.auth.newlogin.secureChannelModule
 import piuk.blockchain.android.ui.start.startupUiModule
 import piuk.blockchain.android.ui.transactionflow.transactionModule
 import piuk.blockchain.com.internalFeatureFlagsModule
@@ -67,6 +68,7 @@ object KoinStarter {
                 nabuModule,
                 nabuUrlModule,
                 notificationModule,
+                secureChannelModule,
                 serviceModule,
                 startupUiModule,
                 sunriverModule,

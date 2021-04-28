@@ -114,8 +114,7 @@ class AuthDataManagerTest : RxTest() {
 
         status.success = decryptionKey
         whenever(prefsUtil.pinId).thenReturn(key)
-        whenever(prefsUtil.getValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, ""))
-            .thenReturn(encryptedPassword)
+        whenever(prefsUtil.encryptedPassword).thenReturn(encryptedPassword)
         whenever(prefsUtil.backupEnabled).thenReturn(true)
         whenever(prefsUtil.hasBackup()).thenReturn(true)
         whenever(prefsUtil.walletGuid).thenReturn(guid)
@@ -147,7 +146,7 @@ class AuthDataManagerTest : RxTest() {
         verify(prefsUtil).backupEnabled
         verify(prefsUtil).walletGuid
 
-        verify(prefsUtil).getValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, "")
+        verify(prefsUtil).encryptedPassword
 
         verify(prefsUtil).restoreFromBackup(anyString(), eq(aesUtilWrapper))
 
@@ -264,7 +263,7 @@ class AuthDataManagerTest : RxTest() {
             eq(AESUtil.PIN_PBKDF2_ITERATIONS)
         )
         verifyNoMoreInteractions(aesUtilWrapper)
-        verify(prefsUtil).setValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, encryptedPassword)
+        verify(prefsUtil).encryptedPassword = encryptedPassword
         verify(prefsUtil).pinId = anyString()
         verify(prefsUtil).backupEnabled
         verify(prefsUtil).hasBackup()

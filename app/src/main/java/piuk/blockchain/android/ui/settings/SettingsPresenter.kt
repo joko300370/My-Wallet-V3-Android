@@ -488,7 +488,7 @@ class SettingsPresenter(
      * PIN code validated, take user to PIN change page
      */
     fun pinCodeValidatedForChange() {
-        prefs.removeValue(PersistentPrefs.KEY_PIN_FAILS)
+        prefs.pinFails = 0
         prefs.pinId = ""
         view?.goToPinEntryPage()
     }

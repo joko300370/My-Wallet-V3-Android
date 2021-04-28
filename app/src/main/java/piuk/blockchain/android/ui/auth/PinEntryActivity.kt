@@ -73,6 +73,7 @@ class PinEntryActivity : BaseAuthActivity(), PinEntryFragment.OnPinEntryFragment
 
     private fun shouldHideSwipeToReceive(): Boolean {
         return (intent.hasExtra(KEY_VALIDATING_PIN_FOR_RESULT) ||
+                intent.hasExtra(KEY_VALIDATING_PIN_FOR_RESULT_AND_PAYLOAD) ||
                 isCreatingNewPin ||
                 !prefs.offlineCacheEnabled)
     }

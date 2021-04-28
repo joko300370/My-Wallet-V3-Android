@@ -404,6 +404,25 @@
     <string name="logout">Logout</string>
     <string name="update">Update</string>
 
+    <!-- SECURE CHANNEL -->
+    <string name="secure_channel_notif_title">New Login Attempt</string>
+    <string name="secure_channel_notif_summary">A new device is attempting to access your Blockchain.com Wallet. Approve or Deny now.</string>
+    <string name="auth_new_login_browser_ip_header">IP Address</string>
+    <string name="auth_new_login_browser_info_header">Browser</string>
+    <string name="auth_new_login_location_header">Location</string>
+    <string name="auth_new_login_last_used_header">Date</string>
+    <string name="auth_new_login_device_detected_title">New Device Detected</string>
+    <string name="auth_new_login_description">We noticed a login attempt from a device you don’t usually use.</string>
+    <string name="auth_new_login_approve_deny_description">If this was you, approve the device below. If you do not recognize this device, deny &amp; block the device now.</string>
+    <string name="auth_new_login_ip_notice">You cannot approve this request unless both devices are on the same network.</string>
+    <string name="auth_new_login_deny_cta">Deny</string>
+    <string name="auth_new_login_approve_cta">Approve</string>
+    <string name="auth_new_login_denied_title">Device Denied</string>
+    <string name="auth_new_login_denied_description">Your wallet is safe. We have blocked this device from logging into your wallet.</string>
+    <string name="auth_new_login_approved_title">Device Approved</string>
+    <string name="auth_new_login_approved_description">Logging you in on the web now.</string>
+
+
     <!-- SETTINGS -->
     <string name="mobile">Mobile</string>
     <string name="profile">Profile</string>

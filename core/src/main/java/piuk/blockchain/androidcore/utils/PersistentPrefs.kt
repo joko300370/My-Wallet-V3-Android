@@ -8,6 +8,7 @@ import com.blockchain.preferences.InternalFeatureFlagPrefs
 import com.blockchain.preferences.NotificationPrefs
 import com.blockchain.preferences.OfflineCachePrefs
 import com.blockchain.preferences.RatingPrefs
+import com.blockchain.preferences.SecureChannelPrefs
 import com.blockchain.preferences.SecurityPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.preferences.ThePitLinkingPrefs
@@ -18,6 +19,7 @@ interface PersistentPrefs :
     NotificationPrefs,
     DashboardPrefs,
     SecurityPrefs,
+    SecureChannelPrefs,
     ThePitLinkingPrefs,
     SimpleBuyPrefs,
     RatingPrefs,

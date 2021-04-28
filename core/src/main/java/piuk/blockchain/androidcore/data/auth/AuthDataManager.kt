@@ -176,7 +176,7 @@ class AuthDataManager(
                     handleBackup(decryptionKey)
 
                     return@map aesUtilWrapper.decrypt(
-                        prefs.getValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, ""),
+                        prefs.encryptedPassword,
                         decryptionKey,
                         AESUtil.PIN_PBKDF2_ITERATIONS
                     )
@@ -240,7 +240,7 @@ class AuthDataManager(
                             AESUtil.PIN_PBKDF2_ITERATIONS
                         )
 
-                        prefs.setValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, encryptedPassword)
+                        prefs.encryptedPassword = encryptedPassword
                         prefs.pinId = key
 
                         handleBackup(encryptionKey)

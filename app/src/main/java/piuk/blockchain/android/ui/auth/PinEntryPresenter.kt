@@ -68,6 +68,9 @@ class PinEntryPresenter(
     var isForValidatingPinForResult = false
 
     @VisibleForTesting
+    var isForValidatingAndLoadingPayloadResult = false
+
+    @VisibleForTesting
     var userEnteredPin = ""
 
     @VisibleForTesting
@@ -94,6 +97,10 @@ class PinEntryPresenter(
             if (extras != null) {
                 if (extras.containsKey(KEY_VALIDATING_PIN_FOR_RESULT)) {
                     isForValidatingPinForResult = extras.getBoolean(KEY_VALIDATING_PIN_FOR_RESULT)
+                }
+                if (extras.containsKey(KEY_VALIDATING_PIN_FOR_RESULT_AND_PAYLOAD)) {
+                    isForValidatingAndLoadingPayloadResult =
+                        extras.getBoolean(KEY_VALIDATING_PIN_FOR_RESULT_AND_PAYLOAD)
                 }
             }
         }
@@ -395,7 +402,7 @@ class PinEntryPresenter(
             .subscribeBy(
                 onComplete = {
                     biometricsController.setFingerprintUnlockEnabled(false)
-                    prefs.setValue(PersistentPrefs.KEY_PIN_FAILS, 0)
+                    prefs.pinFails = 0
                     updatePayload(tempPassword, true)
                 },
                 onError = {
@@ -418,7 +425,7 @@ class PinEntryPresenter(
                         } else {
                             updatePayload(password)
                         }
-                        prefs.setValue(PersistentPrefs.KEY_PIN_FAILS, 0)
+                        prefs.pinFails = 0
                     } else {
                         handleValidateFailure()
                     }
@@ -444,8 +451,8 @@ class PinEntryPresenter(
     }
 
     private fun incrementFailureCount() {
-        var fails = prefs.getValue(PersistentPrefs.KEY_PIN_FAILS, 0)
-        prefs.setValue(PersistentPrefs.KEY_PIN_FAILS, ++fails)
+        var fails = prefs.pinFails
+        prefs.pinFails = ++fails
         showErrorToast(R.string.invalid_pin)
         userEnteredPin = ""
         for (textView in view.pinBoxList) {
@@ -456,15 +463,15 @@ class PinEntryPresenter(
     }
 
     fun incrementFailureCountAndRestart() {
-        var fails = prefs.getValue(PersistentPrefs.KEY_PIN_FAILS, 0)
-        prefs.setValue(PersistentPrefs.KEY_PIN_FAILS, ++fails)
+        var fails = prefs.pinFails
+        prefs.pinFails = ++fails
         showErrorToast(R.string.invalid_pin)
         view.restartPageAndClearTop()
     }
 
     // Check user's password if PIN fails >= max
     private fun checkPinFails() {
-        val fails = prefs.getValue(PersistentPrefs.KEY_PIN_FAILS, 0)
+        val fails = prefs.pinFails
         getPinRetriesFromRemoteConfig { maxAttempts ->
             if (fails >= maxAttempts) {
                 showParameteredErrorToast(R.string.pin_max_strikes, maxAttempts)

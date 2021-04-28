@@ -2,11 +2,19 @@ package info.blockchain.wallet.keys
 
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.crypto.DeterministicKey
+import org.spongycastle.util.encoders.Hex
 
 interface SigningKey {
     val privateKeyAsHex: String
     val hasPrivKey: Boolean
     fun toECKey(): ECKey
+
+    companion object {
+        fun createSigningKeyFromPrivateKey(privateKeyHex: String): SigningKey {
+            val ecKey = ECKey.fromPrivate(Hex.decode(privateKeyHex))
+            return SigningKeyImpl(ecKey)
+        }
+    }
 }
 
 internal class SigningKeyImpl(private val key: ECKey) : SigningKey {

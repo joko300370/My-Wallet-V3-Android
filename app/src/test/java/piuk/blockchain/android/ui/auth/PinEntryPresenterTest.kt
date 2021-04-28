@@ -141,7 +141,7 @@ class PinEntryPresenterTest {
     fun onViewReadyMaxAttemptsExceeded() {
         // Arrange
         whenever(activity.pageIntent).thenReturn(null)
-        whenever(prefsUtil.getValue(PersistentPrefs.KEY_PIN_FAILS, 0)).thenReturn(4)
+        whenever(prefsUtil.pinFails).thenReturn(4)
         whenever(payloadManager.wallet).thenReturn(mock(Wallet::class))
         whenever(prefsUtil.pinId).thenReturn("")
         whenever(biometricsController.getDecodedData()).thenReturn("")
@@ -369,8 +369,8 @@ class PinEntryPresenterTest {
         verify(activity).setTitleVisibility(View.INVISIBLE)
         verify(activity).showProgressDialog(anyInt())
         verify(authDataManager).validatePin(anyString())
-        verify(prefsUtil).setValue(anyString(), anyInt())
-        verify(prefsUtil).getValue(anyString(), anyInt())
+        verify(prefsUtil).pinFails = anyInt()
+        verify(prefsUtil).pinFails
         verify(activity).showToast(anyInt(), anyString())
         verify(activity).restartPageAndClearTop()
     }
@@ -439,7 +439,7 @@ class PinEntryPresenterTest {
         verify(prefsUtil).sharedKey
         verify(prefsUtil).walletGuid
         verify(prefsUtil, atLeastOnce()).pinId
-        verify(prefsUtil).setValue(eq(PersistentPrefs.KEY_PIN_FAILS), anyInt())
+        verify(prefsUtil).pinFails = anyInt()
 
         verifyNoMoreInteractions(prefsUtil)
     }
@@ -465,7 +465,7 @@ class PinEntryPresenterTest {
         verify(activity, times(2)).dismissProgressDialog()
         verify(authDataManager).validatePin(anyString())
         verify(payloadManager).initializeAndDecrypt(SHARED_KEY, WALLET_GUID, password)
-        verify(prefsUtil).setValue(eq(PersistentPrefs.KEY_PIN_FAILS), anyInt())
+        verify(prefsUtil).pinFails = anyInt()
         verify(prefsUtil, atLeastOnce()).pinId
         verify(prefsUtil).walletGuid
         verify(prefsUtil).sharedKey
@@ -915,8 +915,8 @@ class PinEntryPresenterTest {
         // Act
         subject.incrementFailureCountAndRestart()
         // Assert
-        verify(prefsUtil).getValue(anyString(), anyInt())
-        verify(prefsUtil).setValue(anyString(), anyInt())
+        verify(prefsUtil).pinFails
+        verify(prefsUtil).pinFails = anyInt()
         verify(activity).showToast(anyInt(), anyString())
         verify(activity).restartPageAndClearTop()
     }

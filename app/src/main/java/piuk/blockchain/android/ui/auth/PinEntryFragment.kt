@@ -533,6 +533,12 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         presenter.checkFingerprintStatus()
     }
 
+    override fun finishWithPayloadDecrypted() {
+        val intent = Intent()
+        activity?.setResult(RESULT_OK, intent)
+        activity?.finish()
+    }
+
     override fun finishWithResultOk(pin: String) {
         val bundle = Bundle()
         bundle.putString(KEY_VALIDATED_PIN, pin)
@@ -748,5 +754,7 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
 }
 
 const val KEY_VALIDATING_PIN_FOR_RESULT = "validating_pin"
+const val KEY_VALIDATING_PIN_FOR_RESULT_AND_PAYLOAD = "validating_pin_and_payload"
 const val KEY_VALIDATED_PIN = "validated_pin"
 const val REQUEST_CODE_VALIDATE_PIN = 88
+const val REQUEST_CODE_VALIDATE_PIN_AND_PAYLOAD = 89

@@ -72,7 +72,7 @@ class QrCodeAnalyzer(
             val result = reader.decodeWithState(binaryBitmap)
             onQrCodesDetected(result)
         } catch (notFoundException: NotFoundException) {
-            Timber.e(notFoundException)
+            Timber.d(notFoundException)
         } catch (exception: Exception) {
             Timber.e("Unknown error while processing image: $exception")
         } finally {

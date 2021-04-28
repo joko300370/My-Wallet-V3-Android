@@ -43,6 +43,7 @@ interface PinEntryView : View {
 
     fun goToPasswordRequiredActivity()
 
+    fun finishWithPayloadDecrypted()
     fun finishWithResultOk(pin: String)
 
     fun showFingerprintDialog()

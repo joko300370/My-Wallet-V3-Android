@@ -564,7 +564,7 @@ class SettingsPresenterTest {
         // Act
         subject.pinCodeValidatedForChange()
         // Assert
-        verify(prefsUtil).removeValue(PersistentPrefs.KEY_PIN_FAILS)
+        verify(prefsUtil).pinFails = 0
         verify(prefsUtil).pinId = ""
         verify(activity).goToPinEntryPage()
         verifyNoMoreInteractions(activity)
