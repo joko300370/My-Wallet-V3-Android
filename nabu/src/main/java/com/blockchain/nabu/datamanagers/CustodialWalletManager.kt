@@ -254,6 +254,8 @@ interface CustodialWalletManager {
 
     fun executeCustodialTransfer(amount: Money, origin: Product, destination: Product): Completable
 
+    fun updateOpenBankingConsent(url: String, token: String): Completable
+
     val defaultFiatCurrency: String
 }
 

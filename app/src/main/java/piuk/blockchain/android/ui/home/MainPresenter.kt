@@ -46,6 +46,7 @@ import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.ui.base.MvpPresenter
 import piuk.blockchain.android.ui.base.MvpView
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
+import piuk.blockchain.android.ui.linkbank.BankAuthDeepLinkState
 import piuk.blockchain.android.ui.linkbank.BankAuthFlowState
 import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
 import piuk.blockchain.android.ui.linkbank.fromPreferencesValue
@@ -216,7 +217,7 @@ class MainPresenter internal constructor(
             is LinkState.EmailVerifiedDeepLink -> handleEmailVerifiedDeepLink(linkState)
             is LinkState.KycDeepLink -> handleKycDeepLink(linkState)
             is LinkState.ThePitDeepLink -> handleThePitDeepLink(linkState)
-            is LinkState.OpenBankingLink -> handleOpenBankingDeepLink(linkState.type)
+            is LinkState.OpenBankingLink -> handleOpenBankingDeepLink(linkState)
             else -> {
             }
         }
@@ -255,14 +256,14 @@ class MainPresenter internal constructor(
         view?.launchThePitLinking(linkState.linkId)
     }
 
-    private fun handleOpenBankingDeepLink(type: OpenBankingLinkType) =
-        when (type) {
-            OpenBankingLinkType.LINK_BANK -> handleBankLinking()
-            OpenBankingLinkType.PAYMENT_APPROVAL -> handleBankApproval()
+    private fun handleOpenBankingDeepLink(state: LinkState.OpenBankingLink) =
+        when (state.type) {
+            OpenBankingLinkType.LINK_BANK -> handleBankLinking(state.consentToken)
+            OpenBankingLinkType.PAYMENT_APPROVAL -> handleBankApproval(state.consentToken)
             OpenBankingLinkType.UNKNOWN -> view?.showOpenBankingDeepLinkError()
         }
 
-    private fun handleBankApproval() {
+    private fun handleBankApproval(consentToken: String) {
         val deepLinkState = bankLinkingPrefs.getBankLinkingState().fromPreferencesValue()
 
         if (deepLinkState.bankAuthFlow == BankAuthFlowState.BANK_APPROVAL_COMPLETE) {
@@ -271,38 +272,58 @@ class MainPresenter internal constructor(
             return
         }
 
-        if (deepLinkState.bankAuthFlow == BankAuthFlowState.BANK_APPROVAL_PENDING) {
-            deepLinkState.bankPaymentData?.let { paymentData ->
-                PollService(
-                    custodialWalletManager.getBankTransferCharge(paymentData.paymentId)
-                ) { transferDetails ->
-                    transferDetails.status != BankTransferStatus.PENDING
-                }.start().map { it.value }
-                    .doOnSubscribe {
-                        view?.handleApprovalDepositInProgress(paymentData.orderValue)
+        compositeDisposable += custodialWalletManager.updateOpenBankingConsent(
+            bankLinkingPrefs.getDynamicOneTimeTokenUrl(), consentToken
+        )
+            .subscribeBy(
+                onComplete = {
+                    if (deepLinkState.bankAuthFlow == BankAuthFlowState.BANK_APPROVAL_PENDING) {
+                        deepLinkState.bankPaymentData?.let { paymentData ->
+                            handleDepositApproval(paymentData, deepLinkState)
+                        } ?: handleSimpleBuyApproval()
                     }
-                    .subscribeBy(
-                        onSuccess = {
-                            bankLinkingPrefs.setBankLinkingState(
-                                deepLinkState.copy(
-                                    bankAuthFlow = BankAuthFlowState.BANK_APPROVAL_COMPLETE,
-                                    bankPaymentData = null,
-                                    bankLinkingInfo = null
-                                ).toPreferencesValue()
-                            )
+                },
+                onError = {
+                    Timber.e("Error updating consent token on approval: $it")
 
-                            handleTransferStatus(it, paymentData)
-                        },
-                        onError = {
-                            bankLinkingPrefs.setBankLinkingState(
-                                deepLinkState.copy(bankAuthFlow = BankAuthFlowState.NONE).toPreferencesValue()
-                            )
+                    resetLocalBankAuthState()
 
-                            view?.handleApprovalDepositError(paymentData.orderValue.currencyCode)
-                        }
+                    deepLinkState.bankPaymentData?.let { data ->
+                        view?.handleApprovalDepositError(data.orderValue.currencyCode)
+                    } ?: view?.handleBuyApprovalError()
+                }
+            )
+    }
+
+    private fun handleDepositApproval(
+        paymentData: BankPaymentApproval,
+        deepLinkState: BankAuthDeepLinkState
+    ) {
+        compositeDisposable += PollService(
+            custodialWalletManager.getBankTransferCharge(paymentData.paymentId)
+        ) { transferDetails ->
+            transferDetails.status != BankTransferStatus.PENDING
+        }.start().map { it.value }
+            .doOnSubscribe {
+                view?.handleApprovalDepositInProgress(paymentData.orderValue)
+            }
+            .subscribeBy(
+                onSuccess = {
+                    bankLinkingPrefs.setBankLinkingState(
+                        deepLinkState.copy(
+                            bankAuthFlow = BankAuthFlowState.BANK_APPROVAL_COMPLETE,
+                            bankPaymentData = null,
+                            bankLinkingInfo = null
+                        ).toPreferencesValue()
                     )
-            } ?: handleSimpleBuyApproval()
-        }
+
+                    handleTransferStatus(it, paymentData)
+                },
+                onError = {
+                    resetLocalBankAuthState()
+                    view?.handleApprovalDepositError(paymentData.orderValue.currencyCode)
+                }
+            )
     }
 
     private fun handleSimpleBuyApproval() {
@@ -319,17 +340,25 @@ class MainPresenter internal constructor(
                             handleOrderState(it)
                         } ?: view?.handleBuyApprovalError()
                     }, onError = {
-                        Timber.e("Error doing SB sync $it")
+                        Timber.e("Error doing SB sync for bank linking $it")
+                        resetLocalBankAuthState()
                         view?.handleBuyApprovalError()
                     }
                 )
         }
     }
 
+    private fun resetLocalBankAuthState() =
+        bankLinkingPrefs.setBankLinkingState(
+            BankAuthDeepLinkState(bankAuthFlow = BankAuthFlowState.NONE, bankPaymentData = null, bankLinkingInfo = null)
+                .toPreferencesValue()
+        )
+
     private fun handleOrderState(state: SimpleBuyState) {
         if (state.orderState == OrderState.AWAITING_FUNDS) {
             view?.launchSimpleBuyFromDeepLinkApproval()
         } else {
+            resetLocalBankAuthState()
             view?.handlePaymentForCancelledOrder(state)
         }
     }
@@ -359,28 +388,41 @@ class MainPresenter internal constructor(
         return sdf.format(cal.time)
     }
 
-    private fun handleBankLinking() {
+    private fun handleBankLinking(consentToken: String) {
         val linkingState = bankLinkingPrefs.getBankLinkingState().fromPreferencesValue()
 
         if (linkingState.bankAuthFlow == BankAuthFlowState.BANK_LINK_COMPLETE) {
-            bankLinkingPrefs.setBankLinkingState(
-                linkingState.copy(bankAuthFlow = BankAuthFlowState.NONE, bankPaymentData = null, bankLinkingInfo = null)
-                    .toPreferencesValue()
-            )
+            resetLocalBankAuthState()
             return
         }
 
-        try {
-            bankLinkingPrefs.setBankLinkingState(
-                linkingState.copy(bankAuthFlow = BankAuthFlowState.BANK_LINK_COMPLETE).toPreferencesValue()
-            )
+        compositeDisposable += custodialWalletManager.updateOpenBankingConsent(
+            bankLinkingPrefs.getDynamicOneTimeTokenUrl(), consentToken
+        )
+            .subscribeBy(
+                onComplete = {
+                    try {
+                        bankLinkingPrefs.setBankLinkingState(
+                            linkingState.copy(bankAuthFlow = BankAuthFlowState.BANK_LINK_COMPLETE).toPreferencesValue()
+                        )
 
-            linkingState.bankLinkingInfo?.let {
-                view?.launchOpenBankingLinking(it)
-            }
-        } catch (e: JsonSyntaxException) {
-            view?.showOpenBankingDeepLinkError()
-        }
+                        linkingState.bankLinkingInfo?.let {
+                            view?.launchOpenBankingLinking(it)
+                        }
+                    } catch (e: JsonSyntaxException) {
+                        view?.showOpenBankingDeepLinkError()
+                    }
+                },
+                onError = {
+                    Timber.e("Error updating consent token on new bank link: $it")
+
+                    resetLocalBankAuthState()
+
+                    linkingState.bankLinkingInfo?.let {
+                        view?.launchOpenBankingLinking(it)
+                    } ?: view?.showOpenBankingDeepLinkError()
+                }
+            )
     }
 
     private fun handleEmailVerifiedDeepLink(linkState: LinkState.EmailVerifiedDeepLink) {

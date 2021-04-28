@@ -100,7 +100,8 @@ data class LinkedBank(
     val accountIban: String,
     val bic: String,
     val entity: String,
-    val iconUrl: String
+    val iconUrl: String,
+    val callbackPath: String
 ) : Serializable {
     val account: String
         get() = accountNumber

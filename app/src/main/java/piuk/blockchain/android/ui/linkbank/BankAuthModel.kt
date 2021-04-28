@@ -98,6 +98,8 @@ class BankAuthModel(
         }
     ).subscribeBy(
         onSuccess = {
+            interactor.updateOneTimeTokenPath(it.callbackPath)
+
             when (it.state) {
                 LinkedBankState.ACTIVE -> {
                     process(BankAuthIntent.LinkedBankStateSuccess(it))

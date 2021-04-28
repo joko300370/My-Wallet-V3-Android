@@ -323,6 +323,11 @@ class SimpleBuyInteractor(
         )
     }
 
+    fun updateOneTimeTokenPath(callbackPath: String) {
+        val sanitisedUrl = callbackPath.removePrefix("nabu-gateway/")
+        bankLinkingPrefs.setDynamicOneTimeTokenUrl(sanitisedUrl)
+    }
+
     companion object {
         private const val INTERVAL: Long = 5
         private const val RETRIES_SHORT = 6

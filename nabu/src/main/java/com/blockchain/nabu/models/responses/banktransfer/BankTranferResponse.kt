@@ -68,7 +68,8 @@ data class LinkedBankTransferResponse(
 data class LinkedBankTransferAttributesResponse(
     val authorisationUrl: String?,
     val entity: String?,
-    val media: List<BankMediaResponse>?
+    val media: List<BankMediaResponse>?,
+    val callbackPath: String
 )
 
 data class ProviderAccountAttrs(
@@ -105,7 +106,17 @@ data class BankTransferPaymentAttributes(
 
 data class BankTransferPaymentResponse(
     val paymentId: String,
-    val bankAccountType: String?
+    val bankAccountType: String?,
+    val attributes: BankTransferPaymentResponseAttributes
+)
+
+data class BankTransferPaymentResponseAttributes(
+    val paymentId: String,
+    val callbackPath: String
+)
+
+data class OpenBankingTokenBody(
+    val oneTimeToken: String
 )
 
 data class BankInfoResponse(

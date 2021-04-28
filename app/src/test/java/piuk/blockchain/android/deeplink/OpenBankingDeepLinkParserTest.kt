@@ -20,7 +20,7 @@ class OpenBankingDeepLinkParserTest {
 
         val r = subject.mapUri(uri)
 
-        Assert.assertEquals(r, OpenBankingLinkType.LINK_BANK)
+        Assert.assertEquals(r, LinkState.OpenBankingLink(OpenBankingLinkType.LINK_BANK, ""))
     }
 
     @Test
@@ -29,7 +29,7 @@ class OpenBankingDeepLinkParserTest {
 
         val r = subject.mapUri(uri)
 
-        Assert.assertEquals(r, OpenBankingLinkType.PAYMENT_APPROVAL)
+        Assert.assertEquals(r, LinkState.OpenBankingLink(OpenBankingLinkType.PAYMENT_APPROVAL, ""))
     }
 
     @Test
@@ -38,7 +38,7 @@ class OpenBankingDeepLinkParserTest {
 
         val r = subject.mapUri(uri)
 
-        Assert.assertEquals(r, OpenBankingLinkType.UNKNOWN)
+        Assert.assertEquals(r, LinkState.OpenBankingLink(OpenBankingLinkType.UNKNOWN, ""))
     }
 
     @Test

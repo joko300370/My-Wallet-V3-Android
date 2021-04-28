@@ -61,6 +61,7 @@ import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentAttr
 import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentBody
 import com.blockchain.nabu.models.responses.banktransfer.CreateLinkBankResponse
 import com.blockchain.nabu.models.responses.banktransfer.LinkedBankTransferResponse
+import com.blockchain.nabu.models.responses.banktransfer.OpenBankingTokenBody
 import com.blockchain.nabu.models.responses.banktransfer.ProviderAccountAttrs
 import com.blockchain.nabu.models.responses.banktransfer.UpdateProviderAccountBody
 import com.blockchain.nabu.models.responses.banktransfer.WithdrawFeeRequest
@@ -1002,7 +1003,8 @@ class LiveCustodialWalletManager(
             accountIban = details?.iban.orEmpty(),
             bic = details?.bic.orEmpty(),
             entity = attributes?.entity.orEmpty(),
-            iconUrl = attributes?.media?.find { it.source == ICON }?.source.orEmpty()
+            iconUrl = attributes?.media?.find { it.source == ICON }?.source.orEmpty(),
+            callbackPath = attributes?.callbackPath.orEmpty()
         )
     }
 
@@ -1048,6 +1050,20 @@ class LiveCustodialWalletManager(
             ).map {
                 it.paymentId
             }
+        }
+
+    override fun updateOpenBankingConsent(
+        url: String,
+        token: String
+    ): Completable =
+        authenticator.authenticateCompletable { sessionToken ->
+            nabuService.updateOpenBankingToken(
+                url,
+                sessionToken,
+                OpenBankingTokenBody(
+                    oneTimeToken = token
+                )
+            )
         }
 
     override fun getBankTransferCharge(paymentId: String): Single<BankTransferDetails> =

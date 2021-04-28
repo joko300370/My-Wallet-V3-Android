@@ -167,7 +167,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -212,7 +213,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -257,7 +259,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -296,7 +299,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -334,7 +338,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -373,7 +378,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -412,7 +418,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -451,7 +458,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -490,7 +498,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -529,7 +538,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -568,7 +578,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -601,7 +612,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -665,7 +677,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForLinkedBankState(intent.bankId, BankPartner.YAPILY)).thenReturn(
@@ -714,7 +727,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForLinkedBankState(intent.bankId, BankPartner.YAPILY)).thenReturn(
@@ -757,7 +771,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForLinkedBankState(intent.bankId, BankPartner.YAPILY)).thenReturn(
@@ -799,7 +814,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForLinkedBankState(intent.bankId, BankPartner.YAPILY)).thenReturn(
@@ -842,7 +858,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForLinkedBankState(intent.bankId, BankPartner.YAPILY)).thenReturn(
@@ -885,7 +902,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForLinkedBankState(intent.bankId, BankPartner.YAPILY)).thenReturn(
@@ -928,7 +946,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForLinkedBankState(intent.bankId, BankPartner.YAPILY)).thenReturn(
@@ -971,7 +990,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForLinkedBankState(intent.bankId, BankPartner.YAPILY)).thenReturn(

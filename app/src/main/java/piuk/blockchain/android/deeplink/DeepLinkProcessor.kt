@@ -46,8 +46,8 @@ internal class DeepLinkProcessor(
                 return@fromCallable LinkState.ThePitDeepLink(linkId)
             }
             val openBankingDeepLink = openBankingDeepLinkParser.mapUri(uri)
-            if (openBankingDeepLink != OpenBankingLinkType.UNKNOWN && openBankingDeepLink != null) {
-                return@fromCallable LinkState.OpenBankingLink(openBankingDeepLink)
+            if (openBankingDeepLink != null && openBankingDeepLink.type != OpenBankingLinkType.UNKNOWN) {
+                return@fromCallable openBankingDeepLink
             }
             LinkState.NoUri
         }
@@ -61,7 +61,7 @@ sealed class LinkState {
     data class SunriverDeepLink(val link: CampaignLinkState) : LinkState()
     data class KycDeepLink(val link: KycLinkState) : LinkState()
     data class ThePitDeepLink(val linkId: String) : LinkState()
-    data class OpenBankingLink(val type: OpenBankingLinkType) : LinkState()
+    data class OpenBankingLink(val type: OpenBankingLinkType, val consentToken: String) : LinkState()
 
     object NoUri : LinkState()
 }
