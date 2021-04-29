@@ -50,6 +50,7 @@ import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.android.scan.QrScanResultProcessor
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.simplebuy.SimpleBuyState
+import piuk.blockchain.android.simplebuy.SmallSimpleBuyNavigator
 import piuk.blockchain.android.ui.activity.ActivitiesFragment
 import piuk.blockchain.android.ui.addresses.AccountActivity
 import piuk.blockchain.android.ui.airdrops.AirdropCentreActivity
@@ -99,7 +100,8 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     MainView,
     IntroTourHost,
     DialogFlow.FlowHost,
-    SlidingModalBottomDialog.Host {
+    SlidingModalBottomDialog.Host,
+    SmallSimpleBuyNavigator {
 
     override val presenter: MainPresenter by scopedInject()
     private val qrProcessor: QrScanResultProcessor by scopedInject()
@@ -899,5 +901,9 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     }
 
     override fun onSheetClosed() {
+    }
+
+    override fun exitSimpleBuyFlow() {
+        launchSimpleBuySell()
     }
 }

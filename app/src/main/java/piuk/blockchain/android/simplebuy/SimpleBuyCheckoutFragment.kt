@@ -18,7 +18,6 @@ import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.goneIf
 import piuk.blockchain.android.util.secondsToDays
 import piuk.blockchain.android.util.setOnClickListenerDebounced
 import piuk.blockchain.android.util.visible
@@ -148,8 +147,11 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
                 }
             }
             OrderState.CANCELED -> {
-                model.process(SimpleBuyIntent.ClearState)
-                navigator().exitSimpleBuyFlow()
+                if (activity is SmallSimpleBuyNavigator) {
+                    (activity as SmallSimpleBuyNavigator).exitSimpleBuyFlow()
+                } else {
+                    navigator().exitSimpleBuyFlow()
+                }
             }
             else -> {
                 // do nothing
@@ -233,7 +235,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
                         analytics.logEvent(
                             eventWithPaymentMethod(
                                 SimpleBuyAnalytics.CHECKOUT_SUMMARY_CONFIRMED,
-                                state.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString() ?: ""
+                                state.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString().orEmpty()
                             )
                         )
                     }
@@ -255,7 +257,10 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
             }
 
             buttonAction.isEnabled = !state.isLoading
-            buttonCancel.goneIf { isOrderAwaitingFunds || isForPendingPayment }
+            buttonCancel.visibleIf {
+                isOrderAwaitingFunds && state.selectedPaymentMethod?.isBank() == true && isForPendingPayment ||
+                    !isForPendingPayment
+            }
             buttonCancel.setOnClickListenerDebounced {
                 analytics.logEvent(SimpleBuyAnalytics.CHECKOUT_SUMMARY_PRESS_CANCEL)
                 showBottomSheet(SimpleBuyCancelOrderBottomSheet.newInstance())
@@ -320,8 +325,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
             analytics.logEvent(
                 eventWithPaymentMethod(
                     SimpleBuyAnalytics.CHECKOUT_SUMMARY_CANCELLATION_CONFIRMED,
-                    lastState?.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString()
-                        ?: ""
+                    lastState?.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString().orEmpty()
                 )
             )
         } else {
@@ -335,18 +339,17 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
     }
 
     override fun onSheetClosed() {
-        if (lastState?.errorState != null) {
-            model.process(SimpleBuyIntent.ClearError)
-            model.process(SimpleBuyIntent.ClearState)
-            navigator().exitSimpleBuyFlow()
-        }
+        // do nothing
     }
 
     companion object {
         private const val PENDING_PAYMENT_ORDER_KEY = "PENDING_PAYMENT_KEY"
         private const val SHOW_ONLY_ORDER_DATA = "SHOW_ONLY_ORDER_DATA"
 
-        fun newInstance(isForPending: Boolean = false, showOnlyOrderData: Boolean = false): SimpleBuyCheckoutFragment {
+        fun newInstance(
+            isForPending: Boolean = false,
+            showOnlyOrderData: Boolean = false
+        ): SimpleBuyCheckoutFragment {
             val fragment = SimpleBuyCheckoutFragment()
             fragment.arguments = Bundle().apply {
                 putBoolean(PENDING_PAYMENT_ORDER_KEY, isForPending)
