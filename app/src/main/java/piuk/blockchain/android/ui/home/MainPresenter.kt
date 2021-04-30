@@ -35,6 +35,7 @@ import piuk.blockchain.android.deeplink.EmailVerifiedLinkState
 import piuk.blockchain.android.deeplink.LinkState
 import piuk.blockchain.android.deeplink.OpenBankingLinkType
 import piuk.blockchain.android.kyc.KycLinkState
+import piuk.blockchain.android.networking.PollResult
 import piuk.blockchain.android.networking.PollService
 import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.android.scan.QrScanResultProcessor
@@ -303,21 +304,31 @@ class MainPresenter internal constructor(
             custodialWalletManager.getBankTransferCharge(paymentData.paymentId)
         ) { transferDetails ->
             transferDetails.status != BankTransferStatus.PENDING
-        }.start().map { it.value }
+        }.start()
             .doOnSubscribe {
                 view?.handleApprovalDepositInProgress(paymentData.orderValue)
             }
             .subscribeBy(
                 onSuccess = {
-                    bankLinkingPrefs.setBankLinkingState(
-                        deepLinkState.copy(
-                            bankAuthFlow = BankAuthFlowState.BANK_APPROVAL_COMPLETE,
-                            bankPaymentData = null,
-                            bankLinkingInfo = null
-                        ).toPreferencesValue()
-                    )
+                    when (it) {
+                        is PollResult.FinalResult -> {
+                            bankLinkingPrefs.setBankLinkingState(
+                                deepLinkState.copy(
+                                    bankAuthFlow = BankAuthFlowState.BANK_APPROVAL_COMPLETE,
+                                    bankPaymentData = null,
+                                    bankLinkingInfo = null
+                                ).toPreferencesValue()
+                            )
 
-                    handleTransferStatus(it, paymentData)
+                            handleTransferStatus(it.value, paymentData)
+                        }
+                        is PollResult.TimeOut -> {
+                            view?.handleApprovalDepositTimeout(paymentData.orderValue.currencyCode)
+                        }
+                        is PollResult.Cancel -> {
+                            // do nothing
+                        }
+                    }
                 },
                 onError = {
                     resetLocalBankAuthState()

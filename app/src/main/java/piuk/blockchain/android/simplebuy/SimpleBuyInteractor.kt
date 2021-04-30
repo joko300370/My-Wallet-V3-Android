@@ -34,6 +34,7 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.cards.CardIntent
 import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.networking.PollResult
 import piuk.blockchain.android.networking.PollService
 import piuk.blockchain.android.sdd.SDDAnalytics
 import piuk.blockchain.android.ui.linkbank.BankAuthDeepLinkState
@@ -280,15 +281,12 @@ class SimpleBuyInteractor(
                     it.state == OrderState.CANCELED
             }.lastOrError()
 
-    fun pollForAuthorisationUrl(orderId: String): Single<BuySellOrder> =
+    fun pollForAuthorisationUrl(orderId: String): Single<PollResult<BuySellOrder>> =
         PollService(
             custodialWalletManager.getBuyOrder(orderId)
         ) {
             it.attributes?.authorisationUrl != null
         }.start()
-            .map {
-                it.value
-            }
 
     fun pollForCardStatus(cardId: String): Single<CardIntent.CardUpdated> =
         PollService(
