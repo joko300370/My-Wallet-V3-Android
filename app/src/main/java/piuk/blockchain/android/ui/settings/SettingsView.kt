@@ -5,6 +5,7 @@ import com.blockchain.nabu.datamanagers.Bank
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.responses.nabu.KycTiers
+import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.androidcoreui.ui.base.View
 
 interface SettingsView : View {
@@ -90,4 +91,6 @@ interface SettingsView : View {
     fun linkBankWithPartner(linkBankTransfer: LinkBankTransfer)
 
     fun showRateUsPreference()
+
+    fun showScanTargetError(error: QrScanError)
 }

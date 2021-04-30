@@ -94,9 +94,10 @@ import piuk.blockchain.android.ui.launcher.Prerequisites
 import piuk.blockchain.android.ui.linkbank.BankAuthModel
 import piuk.blockchain.android.ui.linkbank.BankAuthState
 import piuk.blockchain.android.ui.onboarding.OnboardingPresenter
-import piuk.blockchain.android.ui.pairingcode.PairingCodePresenter
 import piuk.blockchain.android.ui.recover.RecoverFundsPresenter
 import piuk.blockchain.android.ui.auth.newlogin.SecureChannelManager
+import piuk.blockchain.android.ui.pairingcode.PairingModel
+import piuk.blockchain.android.ui.pairingcode.PairingState
 import piuk.blockchain.android.ui.sell.BuySellFlowNavigator
 import piuk.blockchain.android.ui.settings.SettingsPresenter
 import piuk.blockchain.android.ui.shortcuts.receive.ReceiveQrPresenter
@@ -277,7 +278,11 @@ val applicationModule = module {
         }
 
         factory {
-            PairingCodePresenter(
+            PairingModel(
+                initialState = PairingState(),
+                mainScheduler = AndroidSchedulers.mainThread(),
+                environmentConfig = get(),
+                crashLogger = get(),
                 qrCodeDataManager = get(),
                 payloadDataManager = get(),
                 authDataManager = get()
@@ -557,7 +562,9 @@ val applicationModule = module {
                 pitLinking = get(),
                 analytics = get(),
                 biometricsController = get(),
-                ratingPrefs = get()
+                ratingPrefs = get(),
+                qrProcessor = get(),
+                secureChannelManager = get()
             )
         }
 

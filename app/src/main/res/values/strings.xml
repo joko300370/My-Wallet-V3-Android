@@ -435,6 +435,8 @@
     <string name="enable">Enable</string>
     <string name="disable">Disable</string>
     <string name="setting_the_exchange">Exchange</string>
+    <string name="settings_pair_wallet">Pair my wallet</string>
+    <string name="web_login">Web Log In</string>
 
     <string name="disable_2fa_first">Please disable 2-step Verification via SMS in the security
         settings first.
@@ -513,13 +515,7 @@
     <string name="rate_no">No, thanks</string>
     <string name="rate_later">Remind me later</string>
     <string name="learn_more">Learn More</string>
-    <string name="pairing_code_log_in">Log in to Web Wallet</string>
-    <string name="pairing_code_instruction_1">Go to %1$s on your computer.</string>
-    <string name="pairing_code_instruction_2">Select Log in via mobile.</string>
-    <string name="pairing_code_instruction_3">Using your computer’s camera, scan the QR code below.</string>
-    <string name="pairing_code_show_qr">Show QR code</string>
-    <string name="pairing_code_hide_qr">Hide QR code</string>
-    <string name="pairing_code_instructions_alert">Never share your mobile pairing QR code with anyone. Anyone who can view this QR code can withdraw funds. Blockchain.com will never ask to view or receive your mobile pairing QR code.</string>
+    <string name="web_wallet_log_in">Log in to Web Wallet</string>
     <string name="email_request_subject_btc">Bitcoin payment request</string>
     <string name="settings_bank_remove_check_title">Are you sure?</string>
     <string name="settings_bank_remove_check_subtitle">You’re about to remove your %1$s Account</string>
@@ -2009,4 +2005,15 @@
     <string name="checkout_item_price_blurb">Blockchain.com provides the best market price we receive and applies a spread. <annotation link="learn_more">Learn more</annotation></string>
     <string name="checkout_item_price_fee">Blockchain.com requires a fee when paying with a card. <annotation link="learn_more">Learn more</annotation></string>
     <string name="private_key_wallet_explanation">%s Private Key wallets, send, and receive are not supported at this time.</string>
+
+    <!-- New pairing -->
+    <string name="pairing_wallet_title">Pair your wallet</string>
+    <string name="pairing_wallet_description">You can pair your Wallet with another Blockchain.com property by using your pairing code. If you are pairing your app to the web portal (on %1$s) you will need to use your computer\'s webcam.</string>
+    <string name="pairing_wallet_qr_code_description">This is your unique QR code.</string>
+    <string name="pairing_wallet_warning">Never share this code with anyone. Anyone who can view this QR code can withdraw funds. Blockchain.com will never ask to view or receive your mobile pairing QR code.</string>
+    <string name="pairing_wallet_instruction_1">Go to %1$s on your computer.</string>
+    <string name="pairing_wallet_instruction_2">Select Login via mobile.</string>
+    <string name="pairing_wallet_instruction_3">Using your computer’s camera, scan the QR code below.</string>
+    <string name="pairing_wallet_show_qr">Show QR code</string>
+    <string name="pairing_wallet_hide_qr">Hide QR code</string>
 </resources>

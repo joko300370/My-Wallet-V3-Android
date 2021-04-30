@@ -18,6 +18,8 @@ import androidx.fragment.app.Fragment
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem
 import com.blockchain.extensions.exhaustive
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.NotificationsUtil
 import com.blockchain.notifications.analytics.AnalyticsEvents
@@ -37,6 +39,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar_general.*
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
@@ -70,11 +73,11 @@ import piuk.blockchain.android.ui.linkbank.BankLinkingInfo
 import piuk.blockchain.android.ui.linkbank.FiatTransactionState
 import piuk.blockchain.android.ui.linkbank.yapily.FiatTransactionBottomSheet
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity
-import piuk.blockchain.android.ui.pairingcode.PairingCodeActivity
 import piuk.blockchain.android.ui.scan.QrExpected
 import piuk.blockchain.android.ui.scan.QrScanActivity
 import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
 import piuk.blockchain.android.ui.auth.newlogin.AuthNewLoginSheet
+import piuk.blockchain.android.ui.pairingcode.PairingBottomSheet
 import piuk.blockchain.android.ui.sell.BuySellFragment
 import piuk.blockchain.android.ui.settings.SettingsActivity
 import piuk.blockchain.android.ui.swap.SwapFragment
@@ -105,6 +108,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     override val presenter: MainPresenter by scopedInject()
     private val qrProcessor: QrScanResultProcessor by scopedInject()
     private val assetResources: AssetResources by scopedInject()
+    private val internalFlags: InternalFeatureFlagApi by inject()
 
     override val view: MainView = this
 
@@ -369,7 +373,13 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 Intent(this, AccountActivity::class.java),
                 ACCOUNT_EDIT
             )
-            R.id.login_web_wallet -> PairingCodeActivity.start(this)
+            R.id.login_web_wallet -> {
+                if (internalFlags.isFeatureEnabled(GatedFeature.MODERN_AUTH_PAIRING)) {
+                    QrScanActivity.start(this, QrExpected.MAIN_ACTIVITY_QR)
+                } else {
+                    showBottomSheet(PairingBottomSheet())
+                }
+            }
             R.id.nav_settings -> startActivityForResult(
                 Intent(this, SettingsActivity::class.java),
                 SETTINGS_EDIT

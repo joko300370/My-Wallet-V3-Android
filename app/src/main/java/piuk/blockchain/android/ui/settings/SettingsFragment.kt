@@ -33,6 +33,8 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.Bank
 import com.blockchain.nabu.datamanagers.PaymentMethod
@@ -69,6 +71,7 @@ import piuk.blockchain.android.data.biometrics.BiometricKeysInvalidated
 import piuk.blockchain.android.data.biometrics.BiometricsCallback
 import piuk.blockchain.android.data.biometrics.BiometricsController
 import piuk.blockchain.android.data.biometrics.BiometricsNoSuitableMethods
+import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.android.simplebuy.RemoveLinkedBankBottomSheet
 import piuk.blockchain.android.simplebuy.RemovePaymentMethodBottomSheetHost
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
@@ -88,6 +91,9 @@ import piuk.blockchain.android.ui.dashboard.sheets.LinkBankMethodChooserBottomSh
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.linkbank.BankAuthActivity
 import piuk.blockchain.android.ui.linkbank.BankAuthSource
+import piuk.blockchain.android.ui.pairingcode.PairingBottomSheet
+import piuk.blockchain.android.ui.scan.QrScanActivity
+import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
 import piuk.blockchain.android.ui.settings.preferences.BankPreference
 import piuk.blockchain.android.ui.settings.preferences.CardPreference
 import piuk.blockchain.android.ui.settings.preferences.KycStatusPreference
@@ -129,6 +135,9 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
     private val thePit by lazy {
         findPreference<ThePitStatusPreference>("the_pit")
+    }
+    private val qrConnectPref by lazy {
+        findPreference<Preference>("qr_connect")
     }
     private val banksPref by lazy {
         findPreference<PreferenceCategory>("banks")
@@ -177,6 +186,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
     private val analytics: Analytics by inject()
     private val rxBus: RxBus by inject()
     private val formatChecker: FormatChecker by inject()
+    private val internalFlags: InternalFeatureFlagApi by inject()
 
     private var pwStrength = 0
     private var progressDialog: MaterialProgressDialog? = null
@@ -232,6 +242,9 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
         thePit.onClick { settingsPresenter.onThePitClicked() }
         thePit?.isVisible = true
+
+        qrConnectPref?.isVisible = internalFlags.isFeatureEnabled(GatedFeature.MODERN_AUTH_PAIRING)
+        qrConnectPref.onClick { PairingBottomSheet().show(childFragmentManager, BOTTOM_SHEET) }
 
         // Preferences
         fiatPref.onClick { showDialogFiatUnits() }
@@ -378,6 +391,15 @@ class SettingsFragment : PreferenceFragmentCompat(),
             getString(message),
             ToastCustom.LENGTH_SHORT,
             ToastCustom.TYPE_ERROR
+        )
+    }
+
+    override fun showScanTargetError(error: QrScanError) {
+        showError(
+            message = when (error.errorCode) {
+                QrScanError.ErrorCode.ScanFailed -> R.string.error_scan_failed_general
+                QrScanError.ErrorCode.BitPayScanFailed -> R.string.error_scan_failed_bitpay
+            }
         )
     }
 
@@ -962,6 +984,11 @@ class SettingsFragment : PreferenceFragmentCompat(),
                 }
                 REQUEST_CODE_BIOMETRIC_ENROLLMENT -> {
                     settingsPresenter.onFingerprintClicked()
+                }
+                QrScanActivity.SCAN_URI_RESULT -> {
+                    data.getRawScanData()?.let { scanData ->
+                        settingsPresenter.processScanResult(scanData)
+                    }
                 }
             }
         } else if (resultCode == RESULT_FIRST_USER || resultCode == RESULT_CANCELED) {
