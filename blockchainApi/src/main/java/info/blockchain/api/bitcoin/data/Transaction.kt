@@ -16,7 +16,7 @@ data class Transaction(
     @SerialName("lock_time")
     val lockTime: Long = 0,
     @SerialName("block_height")
-    val blockHeight: Long = 0,
+    val blockHeight: Long? = 0,
     @SerialName("relayed_by")
     val relayedBy: String? = null,
     @SerialName("result")

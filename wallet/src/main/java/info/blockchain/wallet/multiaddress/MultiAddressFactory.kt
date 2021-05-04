@@ -185,7 +185,8 @@ open class MultiAddressFactory(
         val txs = multiAddress.txs ?: return summaryList // Address might not contain transactions
 
         for (tx in txs) {
-            if (tx.blockHeight != 0L && tx.blockHeight < startingBlockHeight) {
+            val blockHeight = tx.blockHeight
+            if (blockHeight != null && blockHeight != 0L && blockHeight < startingBlockHeight) {
                 // Filter out txs before blockHeight (mainly for BCH)
                 // Block height will be 0 until included in a block
                 continue
@@ -348,11 +349,13 @@ open class MultiAddressFactory(
             // Set confirmations
             val latestBlock = multiAddress.info.latestBlock.height
             val txBlockHeight = tx.blockHeight
-            if (latestBlock > 0 && txBlockHeight > 0) {
-                txSummary.confirmations = (latestBlock - txBlockHeight + 1).toInt()
-            } else {
-                txSummary.confirmations = 0
-            }
+            txBlockHeight?.let {
+                if (latestBlock > 0 && it > 0) {
+                    txSummary.confirmations = (latestBlock - it + 1).toInt()
+                } else {
+                    txSummary.confirmations = 0
+                }
+            } ?: kotlin.run { txSummary.confirmations = 0 }
 
             addressToXpubMap.putAll(txSummary.getInputsXpubMap())
             addressToXpubMap.putAll(txSummary.getOutputsXpubMap())
