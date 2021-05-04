@@ -27,6 +27,7 @@ import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.TradeActivitySummaryItem
+import piuk.blockchain.android.coincore.bch.BchActivitySummaryItem
 import piuk.blockchain.android.coincore.btc.BtcActivitySummaryItem
 import piuk.blockchain.android.coincore.erc20.Erc20ActivitySummaryItem
 import piuk.blockchain.android.coincore.eth.EthActivitySummaryItem
@@ -472,8 +473,10 @@ class ActivityDetailsInteractor(
         return when (val activityItem =
             assetActivityRepository.findCachedItem(cryptoCurrency, txId)) {
             is BtcActivitySummaryItem -> activityItem.updateDescription(description)
+            is BchActivitySummaryItem -> activityItem.updateDescription(description)
             is EthActivitySummaryItem -> activityItem.updateDescription(description)
             is Erc20ActivitySummaryItem -> activityItem.updateDescription(description)
+            is XlmActivitySummaryItem -> activityItem.updateDescription(description)
             else -> {
                 Completable.error(
                     UnsupportedOperationException(
@@ -527,8 +530,10 @@ class ActivityDetailsInteractor(
         item: NonCustodialActivitySummaryItem
     ): Description? = when (item) {
         is BtcActivitySummaryItem,
+        is BchActivitySummaryItem,
         is EthActivitySummaryItem,
-        is Erc20ActivitySummaryItem -> Description(item.description)
+        is Erc20ActivitySummaryItem,
+        is XlmActivitySummaryItem -> Description(item.description)
         else -> null
     }
 

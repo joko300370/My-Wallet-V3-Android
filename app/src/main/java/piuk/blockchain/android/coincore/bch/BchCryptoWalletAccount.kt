@@ -91,7 +91,8 @@ internal class BchCryptoWalletAccount private constructor(
                 BchActivitySummaryItem(
                     it,
                     exchangeRates,
-                    account = this
+                    account = this,
+                    payloadDataManager = payloadDataManager
                 )
             }.flatMap {
                 appendTradeActivity(custodialWalletManager, asset, it)

@@ -6,17 +6,19 @@ import com.blockchain.utils.toLocalTime
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.multiaddress.TransactionSummary
+import io.reactivex.Completable
 import io.reactivex.Observable
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import java.lang.IllegalStateException
 
 class XlmActivitySummaryItem(
     private val xlmTransaction: XlmTransaction,
     override val exchangeRates: ExchangeRateDataManager,
-    override val account: CryptoAccount
+    override val account: CryptoAccount,
+    private val payloadDataManager: PayloadDataManager
 ) : NonCustodialActivitySummaryItem() {
     override val cryptoCurrency = CryptoCurrency.XLM
 
@@ -36,7 +38,8 @@ class XlmActivitySummaryItem(
         xlmTransaction.accountDelta.abs()
     }
 
-    override val description: String? = null
+    override val description: String?
+        get() = payloadDataManager.getTransactionNotes(txId)
 
     override val fee: Observable<CryptoValue>
         get() = Observable.just(xlmTransaction.fee)
@@ -57,4 +60,7 @@ class XlmActivitySummaryItem(
 
     val xlmMemo: String
         get() = xlmTransaction.memo.value
+
+    override fun updateDescription(description: String): Completable =
+        payloadDataManager.updateTransactionNotes(txId, description)
 }

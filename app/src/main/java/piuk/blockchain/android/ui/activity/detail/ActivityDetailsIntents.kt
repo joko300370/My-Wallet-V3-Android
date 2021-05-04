@@ -173,8 +173,7 @@ class UpdateDescriptionIntent(
     val txId: String,
     val cryptoCurrency: CryptoCurrency,
     val description: String
-) :
-    ActivityDetailsIntents() {
+) : ActivityDetailsIntents() {
     override fun reduce(oldState: ActivityDetailState): ActivityDetailState {
         return oldState
     }
