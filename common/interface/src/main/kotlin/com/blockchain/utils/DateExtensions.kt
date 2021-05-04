@@ -1,9 +1,12 @@
-package com.blockchain.nabu.extensions
+package com.blockchain.utils
 
 import org.apache.commons.lang3.time.DateUtils
 import java.text.ParseException
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 /**
  * Converts a [String] from an ISO 8601 date to a [Date] object. The receiving [String] can specify
@@ -26,6 +29,12 @@ fun String.fromIso8601ToUtc(): Date? {
         e.printStackTrace()
         null
     }
+}
+
+fun Date.toUtcIso8601(): String {
+    val s = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+    s.timeZone = TimeZone.getTimeZone("UTC")
+    return s.format(Date())
 }
 
 fun Date.toLocalTime(): Date {

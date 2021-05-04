@@ -5,8 +5,8 @@ import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.PriceTier
 import com.blockchain.nabu.datamanagers.TransferQuote
-import com.blockchain.nabu.extensions.fromIso8601ToUtc
-import com.blockchain.nabu.extensions.toLocalTime
+import com.blockchain.utils.fromIso8601ToUtc
+import com.blockchain.utils.toLocalTime
 import com.blockchain.nabu.models.responses.swap.QuoteRequest
 import com.blockchain.nabu.service.NabuService
 import java.util.Date

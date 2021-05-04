@@ -58,6 +58,11 @@ val blockchainApiModule = module {
             getProperty("api-code")
         )
     }
+    factory {
+        AnalyticsService(
+            get(blockchainApi)
+        )
+    }
 }
 
 fun Scope.getBaseUrl(propName: String): String = getProperty(propName)

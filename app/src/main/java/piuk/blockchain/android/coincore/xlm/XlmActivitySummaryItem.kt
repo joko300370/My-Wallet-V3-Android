@@ -1,8 +1,8 @@
 package piuk.blockchain.android.coincore.xlm
 
 import com.blockchain.sunriver.models.XlmTransaction
-import com.blockchain.nabu.extensions.fromIso8601ToUtc
-import com.blockchain.nabu.extensions.toLocalTime
+import com.blockchain.utils.fromIso8601ToUtc
+import com.blockchain.utils.toLocalTime
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.multiaddress.TransactionSummary

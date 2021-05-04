@@ -137,8 +137,8 @@ object Libraries {
     const val kotlin = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.kotlin}"
     const val kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}"
     const val coveralls = "org.kt3k.gradle.plugin:coveralls-gradle-plugin:${Versions.coveralls}"
-    const val googleServicesPlugin ="com.google.gms:google-services:${Versions.googleServicesPlugin}"
-    const val buildProperties ="com.novoda:gradle-build-properties-plugin:${Versions.buildProperties}"
+    const val googleServicesPlugin = "com.google.gms:google-services:${Versions.googleServicesPlugin}"
+    const val buildProperties = "com.novoda:gradle-build-properties-plugin:${Versions.buildProperties}"
     const val ktlint = "com.github.shyiko:ktlint:${Versions.ktlint}"
 
     // Support Libraries
@@ -148,13 +148,13 @@ object Libraries {
     const val gridLayout = "androidx.gridlayout:gridlayout:${Versions.gridlayout}"
     const val design = "com.google.android.material:material:${Versions.design}"
     const val v14 = "androidx.preference:preference:${Versions.preference}"
-    const val dynamicAnims ="androidx.dynamicanimation:dynamicanimation:${Versions.dynamicanimation}"
+    const val dynamicAnims = "androidx.dynamicanimation:dynamicanimation:${Versions.dynamicanimation}"
     const val annotations = "androidx.annotations:annotations:${Versions.annotations}"
-    const val constraintLayout ="androidx.constraintlayout:constraintlayout:${Versions.constraintLayout}"
+    const val constraintLayout = "androidx.constraintlayout:constraintlayout:${Versions.constraintLayout}"
     const val multidex = "androidx.multidex:multidex:${Versions.multidex}"
 
     const val navigationControllerCore = "androidx.navigation:navigation-ui:${Versions.navigation}"
-    const val navigationControllerFragments ="androidx.navigation:navigation-fragment:${Versions.navigation}"
+    const val navigationControllerFragments = "androidx.navigation:navigation-fragment:${Versions.navigation}"
     const val navigationControllerSafeArgsPlugin =
         "androidx.navigation:navigation-safe-args-gradle-plugin:${Versions.navigation}"
     const val lifecycleViewModel = "androidx.lifecycle:lifecycle-viewmodel:${Versions.lifecycle}"

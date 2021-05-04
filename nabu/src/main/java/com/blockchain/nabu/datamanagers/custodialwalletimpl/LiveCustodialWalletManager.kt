@@ -43,8 +43,8 @@ import com.blockchain.nabu.datamanagers.repositories.interest.InterestLimits
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestRepository
 import com.blockchain.nabu.datamanagers.repositories.swap.CustodialRepository
 import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
-import com.blockchain.nabu.extensions.fromIso8601ToUtc
-import com.blockchain.nabu.extensions.toLocalTime
+import com.blockchain.utils.fromIso8601ToUtc
+import com.blockchain.utils.toLocalTime
 import com.blockchain.nabu.models.data.BankPartner
 import com.blockchain.nabu.models.data.BankTransferDetails
 import com.blockchain.nabu.models.data.BankTransferStatus

@@ -9,6 +9,7 @@ targetCompatibility = Versions.javaCompatibilityVersion
 dependencies {
     implementation Libraries.kotlin
     implementation Libraries.kotlinJson
+    implementation Libraries.commonsLang
     implementation project(':balance')
     api Libraries.rxKotlin
     api Libraries.koin
