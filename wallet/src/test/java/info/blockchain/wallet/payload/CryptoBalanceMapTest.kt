@@ -97,7 +97,7 @@ class CryptoBalanceMapTest {
     @Test
     fun `all addresses are queried`() {
         val getBalances: BalanceQuery = mock {
-            on { getBalancesFor(any(), any()) } `it returns` emptyMap()
+            on { getBalancesForXPubs(any(), any()) } `it returns` emptyMap()
         }
 
         val xpubs = listOf(
@@ -119,7 +119,7 @@ class CryptoBalanceMapTest {
             totalSpendableImported `should equal` CryptoValue.zero(CryptoCurrency.BTC)
         }
 
-        verify(getBalances).getBalancesFor(xpubs, imported)
+        verify(getBalances).getBalancesForXPubs(xpubs, imported)
     }
 
     @Test
@@ -247,12 +247,17 @@ class CryptoBalanceMapTest {
 
 private fun (() -> Map<String, Long>).toBalanceQuery() =
     object : BalanceQuery {
-        override fun getBalancesFor(
+        override fun getBalancesForXPubs(
             xpubs: List<XPubs>,
             legacyImported: List<String>
         ): Map<String, BigInteger> {
             return this@toBalanceQuery().toBigIntegerMap()
         }
+
+        override fun getBalancesForAddresses(
+            addresses: List<String>,
+            legacyImported: List<String>
+        ): Map<String, BigInteger> = emptyMap()
     }
 
 private fun <K> Map<K, Long>.toBigIntegerMap() =

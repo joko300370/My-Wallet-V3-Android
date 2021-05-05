@@ -53,7 +53,7 @@ fun calculateCryptoBalanceMap(
         cryptoCurrency,
         xpubs,
         imported,
-        balanceQuery.getBalancesFor(xpubs, imported)
+        balanceQuery.getBalancesForXPubs(xpubs, imported)
     )
 }
 

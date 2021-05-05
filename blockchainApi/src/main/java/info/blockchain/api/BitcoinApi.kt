@@ -26,7 +26,9 @@ class BitcoinApi(
      * Returns the address balance summary for each address provided
      *
      * @param coin The code of the coin to be returned, ie "btc" or "bch"
-     * @param addressList base58 or xpub addresses
+     * @param addressAndXpubListLegacy List of addresses and legacy xpubs.
+     * All addresses should be passed through this parameter. In base58, bech32 or xpub format.
+     * @param xpubListBech32 Segwit xpub addresses. Do not pass normal addresses here.
      * @param filter the filter for transactions selection, use null to indicate default
      * @return [Call] object which can be executed synchronously or asynchronously to return a
      * response object
@@ -34,35 +36,44 @@ class BitcoinApi(
     @Deprecated("Use the Rx version")
     fun getBalance(
         coin: String,
-        addressListLegacy: List<String>,
-        addressListBech32: List<String>,
+        addressAndXpubListLegacy: List<String>,
+        xpubListBech32: List<String>,
         filter: BalanceFilter
     ): Call<BalanceResponseDto> {
-        val legacyAddresses = addressListLegacy.joinToString("|")
-        val bech32Addresses = addressListBech32.joinToString("|")
+        val legacyAddrAndXpubs = addressAndXpubListLegacy.joinToString(",")
+        val bech32Xpubs = xpubListBech32.joinToString(",")
 
         return bitcoinApiInterface.getBalance(
             coin,
-            legacyAddresses,
-            bech32Addresses,
+            legacyAddrAndXpubs,
+            bech32Xpubs,
             filter.filterInt,
             apiCode
         )
     }
 
+    /**
+     * Returns the address balance summary for each address provided
+     *
+     * @param coin The code of the coin to be returned, ie "btc" or "bch"
+     * @param addressAndXpubListLegacy List of addresses and legacy xpubs.
+     * All addresses should be passed through this parameter. In base58, bech32 or xpub format.
+     * @param xpubListBech32 Segwit xpub addresses. Do not pass normal addresses here.
+     * @param filter the filter for transactions selection, use null to indicate default
+     */
     fun getBalanceRx(
         coin: String,
-        addressListLegacy: List<String>,
-        addressListBech32: List<String>,
+        addressAndXpubListLegacy: List<String>,
+        xpubListBech32: List<String>,
         filter: BalanceFilter
     ): Single<BalanceResponseDto> {
-        val legacyAddresses = addressListLegacy.joinToString("|")
-        val bech32Addresses = addressListBech32.joinToString("|")
+        val legacyAddressesAndXpubs = addressAndXpubListLegacy.joinToString(",")
+        val bech32Xpubs = xpubListBech32.joinToString("|")
 
         return bitcoinApiInterface.getBalanceRx(
             coin,
-            legacyAddresses,
-            bech32Addresses,
+            legacyAddressesAndXpubs,
+            bech32Xpubs,
             filter.filterInt,
             apiCode
         )

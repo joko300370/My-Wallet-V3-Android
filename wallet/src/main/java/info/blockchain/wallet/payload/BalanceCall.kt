@@ -1,6 +1,7 @@
 package info.blockchain.wallet.payload
 
 import info.blockchain.api.BitcoinApi
+import info.blockchain.api.bitcoin.data.BalanceResponseDto
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.exceptions.ServerConnectionException
 import info.blockchain.wallet.payload.data.XPubs
@@ -8,6 +9,7 @@ import info.blockchain.wallet.payload.data.legacyXpubAddresses
 import info.blockchain.wallet.payload.data.segwitXpubAddresses
 import info.blockchain.wallet.payload.model.Balance
 import info.blockchain.wallet.payload.model.toBalanceMap
+import retrofit2.Response
 import java.math.BigInteger
 
 class BalanceCall(
@@ -15,25 +17,43 @@ class BalanceCall(
     private val cryptoCurrency: CryptoCurrency
 ) : BalanceQuery {
 
-    override fun getBalancesFor(xpubs: List<XPubs>, legacyImported: List<String>): Map<String, BigInteger> =
-        getBalanceOfAddresses(
+    override fun getBalancesForXPubs(xpubs: List<XPubs>, legacyImported: List<String>): Map<String, BigInteger> =
+        getBalanceOfXpubs(
             legacyAddresses = xpubs.legacyXpubAddresses() + legacyImported,
             segwitAddresses = xpubs.segwitXpubAddresses()
         ).execute()
-            .let {
-                if (!it.isSuccessful) {
-                    throw ServerConnectionException(it.errorBody()?.string() ?: "Unknown, no error body")
-                }
-                it.body()?.toBalanceMap()?.finalBalanceMap() ?: throw Exception("No balances returned")
-            }
+            .let { buildBalanceMap(it) }
 
-    private fun getBalanceOfAddresses(legacyAddresses: List<String>, segwitAddresses: List<String>) =
+    override fun getBalancesForAddresses(
+        addresses: List<String>,
+        legacyImported: List<String>
+    ): Map<String, BigInteger> =
+        getBalanceOfAddresses(addresses + legacyImported)
+            .execute()
+            .let { buildBalanceMap(it) }
+
+    private fun getBalanceOfAddresses(addresses: List<String>) =
+        bitcoinApi.getBalance(
+            cryptoCurrency.networkTicker.toLowerCase(),
+            addresses,
+            emptyList(),
+            BitcoinApi.BalanceFilter.RemoveUnspendable
+        )
+
+    private fun getBalanceOfXpubs(legacyAddresses: List<String>, segwitAddresses: List<String>) =
         bitcoinApi.getBalance(
             cryptoCurrency.networkTicker.toLowerCase(),
             legacyAddresses,
             segwitAddresses,
             BitcoinApi.BalanceFilter.RemoveUnspendable
         )
+
+    private fun buildBalanceMap(response: Response<BalanceResponseDto>): Map<String, BigInteger> {
+        if (!response.isSuccessful) {
+            throw ServerConnectionException(response.errorBody()?.string() ?: "Unknown, no error body")
+        }
+        return response.body()?.toBalanceMap()?.finalBalanceMap() ?: throw Exception("No balances returned")
+    }
 }
 
 private fun <K> Map<K, Balance>.finalBalanceMap() =

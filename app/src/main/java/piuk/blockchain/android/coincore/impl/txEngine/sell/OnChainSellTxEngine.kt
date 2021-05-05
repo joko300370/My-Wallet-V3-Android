@@ -48,9 +48,7 @@ class OnChainSellTxEngine(
                     }
             }.map { px ->
                 px.copy(
-                    feeSelection = px.feeSelection.copy(
-                        selectedLevel = defaultFeeLevel(px)
-                    ),
+                    feeSelection = defaultFeeSelection(px),
                     selectedFiat = userFiat
                 )
             }.handlePendingOrdersError(
@@ -65,11 +63,22 @@ class OnChainSellTxEngine(
                 )
             )
 
-    private fun defaultFeeLevel(pendingTx: PendingTx): FeeLevel =
-        if (pendingTx.feeSelection.availableLevels.contains(FeeLevel.Priority))
-            FeeLevel.Priority
-        else
-            pendingTx.feeSelection.selectedLevel
+    private fun defaultFeeSelection(pendingTx: PendingTx): FeeSelection =
+        when {
+            pendingTx.feeSelection.availableLevels.contains(FeeLevel.Priority) -> {
+                pendingTx.feeSelection.copy(
+                    selectedLevel = FeeLevel.Priority,
+                    availableLevels = setOf(FeeLevel.Priority)
+                )
+            }
+            pendingTx.feeSelection.availableLevels.contains(FeeLevel.Regular) -> {
+                pendingTx.feeSelection.copy(
+                    selectedLevel = FeeLevel.Regular,
+                    availableLevels = setOf(FeeLevel.Regular)
+                )
+            }
+            else -> throw Exception("Not supported")
+        }
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         engine.doValidateAmount(pendingTx)
@@ -106,9 +115,7 @@ class OnChainSellTxEngine(
         pendingTx: PendingTx,
         level: FeeLevel,
         customFeeAmount: Long
-    ): Single<PendingTx> {
-        return engine.doUpdateFeeLevel(pendingTx, level, customFeeAmount)
-    }
+    ): Single<PendingTx> = Single.just(pendingTx)
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
         createSellOrder(pendingTx)

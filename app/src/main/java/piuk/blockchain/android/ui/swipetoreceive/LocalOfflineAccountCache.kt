@@ -76,7 +76,7 @@ class LocalOfflineAccountCache(
                 json.decodeFromString<Map<String, OfflineCachedAccount>>(it)
             } catch (t: Throwable) {
                 prefs.offlineCacheData = null
-                emptyMap<String, OfflineCachedAccount>()
+                emptyMap()
             }
         } ?: emptyMap()
 }
