@@ -43,8 +43,6 @@ import com.blockchain.nabu.datamanagers.repositories.interest.InterestLimits
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestRepository
 import com.blockchain.nabu.datamanagers.repositories.swap.CustodialRepository
 import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
-import com.blockchain.utils.fromIso8601ToUtc
-import com.blockchain.utils.toLocalTime
 import com.blockchain.nabu.models.data.BankPartner
 import com.blockchain.nabu.models.data.BankTransferDetails
 import com.blockchain.nabu.models.data.BankTransferStatus
@@ -89,6 +87,8 @@ import com.blockchain.nabu.service.NabuService
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.remoteconfig.FeatureFlag
+import com.blockchain.utils.fromIso8601ToUtc
+import com.blockchain.utils.toLocalTime
 import com.braintreepayments.cardform.utils.CardType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -1078,7 +1078,7 @@ class LiveCustodialWalletManager(
                 body = ProductTransferRequestBody(
                     amount = amount.toBigInteger().toString(),
                     currency = amount.currencyCode,
-                    origin = origin.name,
+                    origin = origin.toRequestString(),
                     destination = destination.name
                 )
             )
