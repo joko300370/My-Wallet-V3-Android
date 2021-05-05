@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.impl.txEngine.sell
 
 import com.blockchain.android.testutils.rxInit
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
@@ -57,6 +58,7 @@ class TradingSellTxEngineTest {
     }
 
     private val walletManager: CustodialWalletManager = mock()
+    private val internalFeatureFlagApi: InternalFeatureFlagApi = mock()
     private val quotesEngine: TransferQuotesEngine = mock()
     private val kycTierService: TierService = mock()
     private val environmentConfig: EnvironmentConfig = mock()
@@ -72,7 +74,8 @@ class TradingSellTxEngineTest {
     private val subject = TradingSellTxEngine(
         walletManager = walletManager,
         quotesEngine = quotesEngine,
-        kycTierService = kycTierService
+        kycTierService = kycTierService,
+        internalFeatureFlagApi = internalFeatureFlagApi
     )
 
     @Before

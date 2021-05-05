@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.ItemCheckoutComplexInfoBinding
-import piuk.blockchain.android.databinding.ItemCheckoutExpandableInfoBinding
+import piuk.blockchain.android.databinding.ItemCheckoutSimpleExpandableInfoBinding
 import piuk.blockchain.android.databinding.ItemCheckoutSimpleInfoBinding
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
@@ -112,7 +112,7 @@ class ExpandableCheckoutItemDelegate : AdapterDelegate<SimpleBuyCheckoutItem> {
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
         ExpandableCheckoutItemViewHolder(
-            ItemCheckoutExpandableInfoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ItemCheckoutSimpleExpandableInfoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
 
     override fun onBindViewHolder(
@@ -125,7 +125,7 @@ class ExpandableCheckoutItemDelegate : AdapterDelegate<SimpleBuyCheckoutItem> {
 }
 
 private class ExpandableCheckoutItemViewHolder(
-    val binding: ItemCheckoutExpandableInfoBinding
+    val binding: ItemCheckoutSimpleExpandableInfoBinding
 ) : RecyclerView.ViewHolder(binding.root) {
     private var isExpanded = false
 

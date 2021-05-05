@@ -130,6 +130,10 @@ enum class TxConfirmation {
     AGREEMENT_INTEREST_T_AND_C,
     AGREEMENT_INTEREST_TRANSFER,
     READ_ONLY,
+    SIMPLE_READ_ONLY,
+    COMPLEX_READ_ONLY,
+    EXPANDABLE_SIMPLE_READ_ONLY,
+    EXPANDABLE_COMPLEX_READ_ONLY,
     MEMO,
     LARGE_TRANSACTION_WARNING,
     FEE_SELECTION,
@@ -142,6 +146,9 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
 
     data class ExchangePriceConfirmation(val money: Money, val asset: CryptoCurrency) :
         TxConfirmationValue(TxConfirmation.READ_ONLY)
+
+    data class NewExchangePriceConfirmation(val money: Money, val asset: CryptoCurrency) :
+        TxConfirmationValue(TxConfirmation.EXPANDABLE_SIMPLE_READ_ONLY)
 
     data class FeedTotal(
         val amount: Money,
@@ -161,9 +168,20 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
 
     data class From(val from: String) : TxConfirmationValue(TxConfirmation.READ_ONLY)
 
+    data class NewFrom(val from: Money, val exchange: Money) :
+        TxConfirmationValue(TxConfirmation.SIMPLE_READ_ONLY)
+
+    data class NewSale(val amount: Money, val exchange: Money) :
+        TxConfirmationValue(TxConfirmation.COMPLEX_READ_ONLY)
+
     data class To(val to: String) : TxConfirmationValue(TxConfirmation.READ_ONLY)
 
+    data class NewTo(val to: String) : TxConfirmationValue(TxConfirmation.SIMPLE_READ_ONLY)
+
     data class Total(val total: Money, val exchange: Money? = null) : TxConfirmationValue(TxConfirmation.READ_ONLY)
+
+    data class NewTotal(val totalWithoutFee: Money, val exchange: Money) :
+        TxConfirmationValue(TxConfirmation.COMPLEX_READ_ONLY)
 
     data class FiatTxFee(val fee: Money) : TxConfirmationValue(TxConfirmation.READ_ONLY)
 
@@ -197,6 +215,12 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
     data class NetworkFee(
         val txFee: TxFee
     ) : TxConfirmationValue(TxConfirmation.NETWORK_FEE)
+
+    data class NewNetworkFee(
+        val feeAmount: Money,
+        val exchange: Money,
+        val asset: CryptoCurrency
+    ) : TxConfirmationValue(TxConfirmation.EXPANDABLE_COMPLEX_READ_ONLY)
 
     data class TxBooleanConfirmation<T>(
         override val confirmation: TxConfirmation,

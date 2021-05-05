@@ -6,12 +6,16 @@ import android.graphics.Typeface
 import android.net.Uri
 import android.text.Spannable
 import android.text.SpannableString
+import android.text.SpannableStringBuilder
 import android.text.SpannedString
 import android.text.TextPaint
 import android.text.style.ClickableSpan
+import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.View
+import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 
 class StringUtils(private val context: Context) {
 
@@ -42,19 +46,47 @@ class StringUtils(private val context: Context) {
                     },
                     rawText.getSpanStart(annotation),
                     rawText.getSpanEnd(annotation),
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
             }
-            if (annotation.key == "font") {
-                val fontName = annotation.value
-                if (fontName == "bold") {
-                    out.setSpan(StyleSpan(Typeface.BOLD),
-                        rawText.getSpanStart(annotation),
-                        rawText.getSpanEnd(annotation),
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                }
+            if (annotation.key == "font" && annotation.value == "bold") {
+                out.setSpan(
+                    StyleSpan(Typeface.BOLD),
+                    rawText.getSpanStart(annotation),
+                    rawText.getSpanEnd(annotation),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
             }
         }
         return out
+    }
+
+    fun getResolvedStringWithAppendedMappedLearnMore(
+        staticText: String,
+        @StringRes textToMap: Int,
+        url: String,
+        context: Context,
+        @ColorRes linkColour: Int,
+        onClick: () -> Unit = {}
+    ): SpannableStringBuilder {
+        val map = mapOf("learn_more_link" to Uri.parse(url))
+        val learnMoreLink = getStringWithMappedAnnotations(
+            textToMap,
+            map,
+            context,
+            onClick
+        )
+
+        val sb = SpannableStringBuilder()
+            .append(staticText)
+            .append(learnMoreLink)
+        sb.setSpan(
+            ForegroundColorSpan(ContextCompat.getColor(context, linkColour)),
+            staticText.length, staticText.length + learnMoreLink.length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        return sb
     }
 }
 

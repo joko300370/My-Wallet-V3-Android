@@ -11,27 +11,44 @@
     android:paddingBottom="@dimen/small_margin">
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/simple_item_label"
+        android:id="@+id/expandable_item_label"
         style="@style/Text.Standard.14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:drawableEnd="@drawable/ic_question"
+        android:drawablePadding="@dimen/miniscule_margin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="BTC Price" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/simple_item_title"
+        android:id="@+id/expandable_item_title"
         style="@style/Text.Standard.14"
         android:layout_width="0dp"
-        android:gravity="end"
+        android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/very_small_margin"
         android:ellipsize="end"
+        android:gravity="end"
         android:maxLines="1"
-        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1"
-        app:layout_constraintStart_toEndOf="@id/simple_item_label"
+        app:layout_constraintStart_toEndOf="@id/expandable_item_label"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="£12345.56" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/expandable_item_expansion"
+        style="@style/Text.Light.12"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/tiny_margin"
+        android:background="@drawable/bkgd_grey_000_rounded"
+        android:padding="@dimen/small_margin"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/expandable_item_label"
+        tools:text="@string/checkout_item_price_blurb"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

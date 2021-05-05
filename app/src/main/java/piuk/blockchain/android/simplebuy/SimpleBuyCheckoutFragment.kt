@@ -199,7 +199,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
 
             val sb = SpannableStringBuilder()
             val privateKeyExplanation =
-                getString(R.string.private_key_wallet_explanation, selectedCryptoCurrency.displayTicker)
+                getString(R.string.checkout_item_private_key_wallet_explanation, selectedCryptoCurrency.displayTicker)
             sb.append(privateKeyExplanation)
                 .append(learnMoreLink)
                 .setSpan(

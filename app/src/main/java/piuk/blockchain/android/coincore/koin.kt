@@ -217,7 +217,8 @@ val coincoreModule = module {
                 walletPrefs = get(),
                 quotesEngine = get(),
                 analytics = get(),
-                kycTierService = get()
+                kycTierService = get(),
+                internalFeatureFlagApi = get()
             )
         }
 

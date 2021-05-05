@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.impl.txEngine.sell
 
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.service.TierService
@@ -18,8 +19,9 @@ import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 class TradingSellTxEngine(
     walletManager: CustodialWalletManager,
     quotesEngine: TransferQuotesEngine,
-    kycTierService: TierService
-) : SellTxEngineBase(walletManager, kycTierService, quotesEngine) {
+    kycTierService: TierService,
+    internalFeatureFlagApi: InternalFeatureFlagApi
+) : SellTxEngineBase(walletManager, kycTierService, quotesEngine, internalFeatureFlagApi) {
 
     override val direction: TransferDirection
         get() = TransferDirection.INTERNAL

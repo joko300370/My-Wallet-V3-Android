@@ -49,13 +49,28 @@
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/amount"
         style="@style/Text.Semibold.32"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/standard_margin"
+        android:ellipsize="end"
+        android:paddingStart="@dimen/standard_margin"
+        android:paddingTop="@dimen/standard_margin"
+        android:paddingEnd="@dimen/standard_margin"
+        android:textColor="@color/grey_800"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/confirm_sheet_title"
-        tools:text="0.04129485 BTC" />
+        tools:text="$10000 of BTC" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/amount_fiat"
+        style="@style/Text.Light.20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/tiny_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/amount"
+        tools:text="$100" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/confirm_details_list"
@@ -73,7 +88,7 @@
         app:layout_constraintBottom_toTopOf="@id/confirm_disclaimer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/amount"
+        app:layout_constraintTop_toBottomOf="@id/amount_fiat"
         tools:listitem="@layout/item_send_confirm_details" />
 
     <androidx.appcompat.widget.AppCompatTextView

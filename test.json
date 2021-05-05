@@ -100,15 +100,14 @@
         style="@style/Text.Light.12"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/standard_margin"
-        android:layout_marginBottom="@dimen/tiny_margin"
         android:background="@drawable/bkgd_grey_000_rounded"
         android:padding="@dimen/small_margin"
+        android:layout_margin="@dimen/standard_margin"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/button_action"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:text="@string/checkout_item_private_key_wallet_explanation"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="@string/private_key_wallet_explanation"
         tools:visibility="visible" />
 
     <androidx.appcompat.widget.AppCompatButton

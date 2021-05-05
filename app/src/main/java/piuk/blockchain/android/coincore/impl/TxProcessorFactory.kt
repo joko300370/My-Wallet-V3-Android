@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.impl
 
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.service.TierService
 import com.blockchain.notifications.analytics.Analytics
@@ -39,7 +40,8 @@ class TxProcessorFactory(
     private val walletPrefs: WalletStatus,
     private val quotesEngine: TransferQuotesEngine,
     private val analytics: Analytics,
-    private val kycTierService: TierService
+    private val kycTierService: TierService,
+    private val internalFeatureFlagApi: InternalFeatureFlagApi
 ) {
     fun createProcessor(
         source: BlockchainAccount,
@@ -175,7 +177,8 @@ class TxProcessorFactory(
                         quotesEngine = quotesEngine,
                         walletManager = walletManager,
                         kycTierService = kycTierService,
-                        engine = engine
+                        engine = engine,
+                        internalFeatureFlagApi = internalFeatureFlagApi
                     )
                 )
             )
@@ -245,7 +248,8 @@ class TxProcessorFactory(
                     engine = TradingSellTxEngine(
                         walletManager = walletManager,
                         quotesEngine = quotesEngine,
-                        kycTierService = kycTierService
+                        kycTierService = kycTierService,
+                        internalFeatureFlagApi = internalFeatureFlagApi
                     )
                 )
             )

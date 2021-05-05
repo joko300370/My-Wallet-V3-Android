@@ -26,6 +26,7 @@ class ConfirmTransactionSheet : TransactionFlowSheet<DialogTxFlowConfirmBinding>
     private val exchangeRates: ExchangeRates by scopedInject()
     private val prefs: CurrencyPrefs by scopedInject()
     private val mapper: TxConfirmReadOnlyMapper by scopedInject()
+    private val mapperNewCheckout: TxConfirmReadOnlyMapperNewCheckout by scopedInject()
     private val customiser: TransactionConfirmationCustomisations by inject()
     private val assetResources: AssetResources by scopedInject()
 
@@ -36,6 +37,7 @@ class ConfirmTransactionSheet : TransactionFlowSheet<DialogTxFlowConfirmBinding>
             activityContext = requireActivity(),
             analytics = analyticsHooks,
             mapper = mapper,
+            mapperNewCheckout = mapperNewCheckout,
             selectedCurrency = prefs.selectedFiatCurrency,
             exchangeRates = exchangeRates,
             assetResources = assetResources
@@ -53,8 +55,16 @@ class ConfirmTransactionSheet : TransactionFlowSheet<DialogTxFlowConfirmBinding>
         newState.pendingTx?.let {
             listAdapter.items = newState.pendingTx.confirmations.toList()
             listAdapter.notifyDataSetChanged()
+
+            newState.fiatRate?.let {
+                binding.amountFiat.text = it.convert(newState.pendingTx.amount, false).toStringWithSymbol()
+            }
+
             binding.amount.text = newState.pendingTx.amount.toStringWithSymbol()
-            binding.amount.visibleIf { customiser.amountHeaderConfirmationVisible(newState) }
+
+            val showHeaderAmount = customiser.amountHeaderConfirmationVisible(newState)
+            binding.amount.visibleIf { showHeaderAmount }
+            binding.amountFiat.visibleIf { showHeaderAmount }
         }
 
         with(binding) {
