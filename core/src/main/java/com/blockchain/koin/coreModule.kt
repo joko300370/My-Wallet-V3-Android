@@ -108,8 +108,7 @@ val coreModule = module {
 
         factory {
             PayloadVersionControllerImpl(
-                settingsApi = get(),
-                featureGate = get()
+                settingsApi = get()
             )
         }.bind(PayloadVersionController::class)
 

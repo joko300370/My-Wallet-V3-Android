@@ -1,11 +1,8 @@
 package piuk.blockchain.androidcore.data.payload
 
-import com.blockchain.featureflags.GatedFeature
-import com.blockchain.preferences.InternalFeatureFlagPrefs
 import info.blockchain.api.WalletSettingsService
 import info.blockchain.api.wallet.data.WalletSettingsDto
 import io.reactivex.Single
-import io.reactivex.rxkotlin.Singles
 import java.util.Locale
 
 internal interface PayloadVersionController {
@@ -22,19 +19,14 @@ private const val SEGWIT_UPGRADE = "segwit"
 // correct - so we'll call directly on to the API here, which is nasty but it is what it is and this
 // code will be short lived, with luck.
 internal class PayloadVersionControllerImpl(
-    private val settingsApi: WalletSettingsService,
-    private val featureGate: InternalFeatureFlagPrefs
+    private val settingsApi: WalletSettingsService
 ) : PayloadVersionController {
 
     override fun isV4Enabled(guid: String, sharedKey: String): Single<Boolean> =
-        Singles.zip(
-            Single.just(featureGate.isFeatureEnabled(GatedFeature.SEGWIT_GLOBAL_ENABLE)),
-            Single.just(featureGate.isFeatureEnabled(GatedFeature.SEGWIT_UPGRADE_WALLET)),
-            settingsApi.fetchWalletSettings(guid, sharedKey)
-        ).map { (globalEnable, upgradeEnable, settings) ->
-            val isInvited = settings.isInvitedTo(SEGWIT_UPGRADE)
-            globalEnable && (isInvited || upgradeEnable)
-        }.onErrorReturn { false }
+        settingsApi.fetchWalletSettings(guid, sharedKey)
+            .map {
+                it.isInvitedTo(SEGWIT_UPGRADE)
+            }.onErrorReturn { false }
 }
 
 private fun WalletSettingsDto.isInvitedTo(feature: String) =

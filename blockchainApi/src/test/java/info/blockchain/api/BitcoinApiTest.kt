@@ -194,7 +194,7 @@ class BitcoinApiTest : BaseApiClientTester() {
         )
         assertEquals(firstTx.ver, 1)
         assertEquals(firstTx.lockTime, 0)
-        assertEquals(firstTx.blockHeight, 410371)
+        assertEquals(firstTx.blockHeight, 410371L)
         assertEquals(firstTx.relayedBy, "0.0.0.0")
         assertEquals(firstTx.result.toLong(), 20000)
         assertEquals(firstTx.size, 226)
