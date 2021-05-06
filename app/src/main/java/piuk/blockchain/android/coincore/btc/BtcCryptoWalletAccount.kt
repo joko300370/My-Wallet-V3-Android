@@ -250,6 +250,9 @@ internal class BtcCryptoWalletAccount(
         refreshTrigger.forceAccountsRefresh()
     }
 
+    override fun doesAddressBelongToWallet(address: String): Boolean =
+        payloadDataManager.isOwnHDAddress(address)
+
     companion object {
         fun createHdAccount(
             jsonAccount: Account,

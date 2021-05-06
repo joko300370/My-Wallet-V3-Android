@@ -6,8 +6,8 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import info.blockchain.wallet.bch.BchMainNetParams
-import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.bch.CashAddress
+import info.blockchain.wallet.coin.GenericMetadataAccount
 import io.reactivex.Completable
 import io.reactivex.Single
 import org.bitcoinj.core.LegacyAddress
@@ -159,6 +159,9 @@ internal class BchCryptoWalletAccount private constructor(
     internal fun forceRefresh() {
         refreshTrigger.forceAccountsRefresh()
     }
+
+    override fun doesAddressBelongToWallet(address: String): Boolean =
+        payloadDataManager.isOwnHDAddress(address)
 
     companion object {
         fun createBchAccount(

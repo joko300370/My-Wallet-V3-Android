@@ -159,15 +159,15 @@ class Coincore internal constructor(
         accountGroup.map {
             it.accounts
         }.flattenAsObservable { it }
-            .flatMapSingle { a ->
-                a.receiveAddress
+            .flatMapSingle { account ->
+                account.receiveAddress
                     .map { it as CryptoAddress }
                     .onErrorReturn { NullCryptoAddress }
-                    .map { ca ->
-                        if (ca.address.equals(address, true)) {
-                            a
-                        } else {
-                            NullCryptoAccount()
+                    .map { cryptoAccount ->
+                        when {
+                            cryptoAccount.address.equals(address, true) -> account
+                            account.doesAddressBelongToWallet(address) -> account
+                            else -> NullCryptoAccount()
                         }
                     }
             }.filter { it != NullCryptoAccount() }
