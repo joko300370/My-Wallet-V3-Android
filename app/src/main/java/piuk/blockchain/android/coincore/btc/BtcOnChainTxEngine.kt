@@ -352,19 +352,34 @@ class BtcOnChainTxEngine(
     ): Single<EngineTransaction> =
         Singles.zip(
             btcSource.getChangeAddress(),
+            btcSource.receiveAddress,
             btcSource.getSigningKeys(pendingTx.utxoBundle, secondPassword)
-        ).map { (changeAddress, keys) ->
+        ).map { (changeAddress, receiveAddress, keys) ->
             BtcPreparedTx(
                 sendDataManager.createAndSignBtcTransaction(
                     pendingTx.utxoBundle,
                     keys,
                     btcTarget.address,
-                    changeAddress,
+                    selectAddressForChange(pendingTx.utxoBundle, changeAddress, receiveAddress.address),
                     pendingTx.feeAmount.toBigInteger(),
                     pendingTx.amount.toBigInteger()
                 )
             )
         }
+
+    // Logic to decide on sending change to bech32 xpub change or receive chain.
+    // When moving from legacy to segwit, we should send change to at least one receive address before we start
+    // using change address. The BE cannot determine balances held in change address on a derivation chain without
+    // at least one receive address having a value.
+    // A better way of doing this is to see if we have a +ve change address index, but the routing to have that
+    // information available here is complex, and this will work. We should re-visit this when BTC downstack refactoring
+    // makes it more sensible.
+    private fun selectAddressForChange(
+        inputs: SpendableUnspentOutputs,
+        changeAddress: String,
+        receiveAddress: String
+    ): String =
+        changeAddress.takeIf { inputs.spendableOutputs.firstOrNull { it.isSegwit } != null } ?: receiveAddress
 
     override fun doOnTransactionSuccess(pendingTx: PendingTx) {
         btcSource.incrementReceiveAddress()

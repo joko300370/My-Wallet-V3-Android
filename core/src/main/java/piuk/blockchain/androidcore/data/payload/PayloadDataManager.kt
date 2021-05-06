@@ -424,7 +424,7 @@ class PayloadDataManager internal constructor(
      * should the private key be encrypted.
      *
      * @param importedAddress The [ImportedAddress] to generate an Elliptic Curve Key for
-     * @param secondPassword An optional second password, necessary if the private key is ebcrypted
+     * @param secondPassword An optional second password, necessary if the private key is encrypted
      * @return An Elliptic Curve Key object [SigningKey]
      * @see ImportedAddress.isPrivateKeyEncrypted
      */

@@ -152,19 +152,8 @@ open class MultiAddressFactory(
     }
 
     inner class TxMostRecentDateComparator : Comparator<Transaction> {
-
-        override fun compare(t1: Transaction, t2: Transaction): Int {
-
-            val BEFORE = -1
-            val EQUAL = 0
-            val AFTER = 1
-
-            return when {
-                t1.time > t2.time -> BEFORE
-                t1.time < t2.time -> AFTER
-                else -> EQUAL
-            }
-        }
+        override fun compare(t1: Transaction, t2: Transaction): Int =
+            t2.time.compareTo(t1.time)
     }
 
     private fun summarize(
