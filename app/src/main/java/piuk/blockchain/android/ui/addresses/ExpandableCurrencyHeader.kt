@@ -3,10 +3,12 @@ package piuk.blockchain.android.ui.addresses
 import android.annotation.TargetApi
 import android.content.Context
 import android.graphics.Outline
+import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewOutlineProvider
 import android.view.animation.AlphaAnimation
@@ -234,5 +236,11 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
         }
 
         override fun willChangeBounds(): Boolean = true
+    }
+
+    fun isTouchOutside(event: MotionEvent): Boolean {
+        val viewRect = Rect()
+        getGlobalVisibleRect(viewRect)
+        return !viewRect.contains(event.rawX.toInt(), event.rawY.toInt())
     }
 }

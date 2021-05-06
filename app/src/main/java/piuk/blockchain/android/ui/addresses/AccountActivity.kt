@@ -1,25 +1,25 @@
 package piuk.blockchain.android.ui.addresses
 
 import android.content.Intent
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.MotionEvent
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.scopedInject
 import com.blockchain.ui.password.SecondPasswordHandler
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.activity_accounts.*
-import kotlinx.android.synthetic.main.toolbar_general.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
+import piuk.blockchain.android.databinding.ActivityAccountsBinding
+import piuk.blockchain.android.databinding.ToolbarGeneralBinding
 import piuk.blockchain.android.ui.addresses.adapter.AccountAdapter
 import piuk.blockchain.android.ui.addresses.adapter.AccountListItem
 import piuk.blockchain.android.ui.base.MvpActivity
@@ -45,23 +45,29 @@ class AccountActivity : MvpActivity<AccountView, AccountPresenter>(),
 
     private val rxBus: RxBus by inject()
     private val secondPasswordHandler: SecondPasswordHandler by scopedInject()
+    private val features: InternalFeatureFlagApi by inject()
     private val compositeDisposable = CompositeDisposable()
 
+    private val binding: ActivityAccountsBinding by lazy {
+        ActivityAccountsBinding.inflate(layoutInflater)
+    }
+
     private val accountsAdapter: AccountAdapter by unsafeLazy {
-        AccountAdapter(this)
+        AccountAdapter(this, features)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_accounts)
-        setupToolbar(toolbar_general, R.string.drawer_addresses)
+        setContentView(binding.root)
+        val toolbarBinding = ToolbarGeneralBinding.bind(binding.root)
+        setupToolbar(toolbarBinding.toolbarGeneral, R.string.drawer_addresses)
 
-        with(currency_header) {
+        with(binding.currencyHeader) {
             setCurrentlySelectedCurrency(CryptoCurrency.BTC)
             setSelectionListener { presenter.refresh(it) }
         }
 
-        with(recyclerview_accounts) {
+        with(binding.recyclerviewAccounts) {
             layoutManager = LinearLayoutManager(this@AccountActivity)
             itemAnimator = null
             setHasFixedSize(true)
@@ -78,8 +84,8 @@ class AccountActivity : MvpActivity<AccountView, AccountPresenter>(),
     }
 
     override fun onBackPressed() {
-        if (currency_header.isOpen()) {
-            currency_header.close()
+        if (binding.currencyHeader.isOpen()) {
+            binding.currencyHeader.close()
         } else {
             super.onBackPressed()
         }
@@ -87,15 +93,10 @@ class AccountActivity : MvpActivity<AccountView, AccountPresenter>(),
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         if (event.action == MotionEvent.ACTION_DOWN) {
-            // Notify touchOutsideViewListeners if user tapped outside a given view
-            if (currency_header != null) {
-                val viewRect = Rect()
-                currency_header.getGlobalVisibleRect(viewRect)
-                if (!viewRect.contains(event.rawX.toInt(), event.rawY.toInt())) {
-                    if (currency_header.isOpen()) {
-                        currency_header.close()
-                        return false
-                    }
+            with(binding.currencyHeader) {
+                if (isTouchOutside(event) && isOpen()) {
+                    close()
+                    return false
                 }
             }
         }
@@ -160,8 +161,8 @@ class AccountActivity : MvpActivity<AccountView, AccountPresenter>(),
                 addAll(internal.map { AccountListItem.Account(it) })
             }
 
+            add(AccountListItem.ImportedHeader(enableImport = asset == CryptoCurrency.BTC))
             if (imported.isNotEmpty()) {
-                add(AccountListItem.ImportedHeader(enableImport = asset == CryptoCurrency.BTC))
                 addAll(imported.map { AccountListItem.Account(it) })
             }
         }.toList()
@@ -173,7 +174,7 @@ class AccountActivity : MvpActivity<AccountView, AccountPresenter>(),
 
     override fun onResume() {
         super.onResume()
-        presenter.refresh(currency_header.getSelectedCurrency())
+        presenter.refresh(binding.currencyHeader.getSelectedCurrency())
     }
 
     override fun onPause() {
@@ -208,7 +209,7 @@ class AccountActivity : MvpActivity<AccountView, AccountPresenter>(),
     }
 
     override fun onSheetClosed() {
-        presenter.refresh(currency_header.getSelectedCurrency())
+        presenter.refresh(binding.currencyHeader.getSelectedCurrency())
     }
 
     override fun showRenameImportedAddressDialog(account: CryptoNonCustodialAccount) =
@@ -227,7 +228,7 @@ class AccountActivity : MvpActivity<AccountView, AccountPresenter>(),
 
     override fun showSuccess(@StringRes message: Int) {
         toast(message, ToastCustom.TYPE_OK)
-        presenter.refresh(currency_header.getSelectedCurrency())
+        presenter.refresh(binding.currencyHeader.getSelectedCurrency())
     }
 
     override fun showTransferFunds(account: CryptoNonCustodialAccount) {
@@ -247,7 +248,7 @@ class AccountActivity : MvpActivity<AccountView, AccountPresenter>(),
     }
 
     override fun onFlowFinished() {
-        presenter.refresh(currency_header.getSelectedCurrency())
+        presenter.refresh(binding.currencyHeader.getSelectedCurrency())
     }
 
     override fun onDestroy() {
