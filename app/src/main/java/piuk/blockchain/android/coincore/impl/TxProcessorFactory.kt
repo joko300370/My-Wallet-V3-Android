@@ -163,7 +163,8 @@ class TxProcessorFactory(
                                 quotesEngine = quotesEngine,
                                 walletManager = walletManager,
                                 kycTierService = kycTierService,
-                                engine = engine
+                                engine = engine,
+                                internalFeatureFlagApi = internalFeatureFlagApi
                             )
                         )
                     )
@@ -223,7 +224,8 @@ class TxProcessorFactory(
                     engine = TradingToTradingSwapTxEngine(
                         walletManager = walletManager,
                         quotesEngine = quotesEngine,
-                        kycTierService = kycTierService
+                        kycTierService = kycTierService,
+                        internalFeatureFlagApi = internalFeatureFlagApi
                     )
                 )
             )

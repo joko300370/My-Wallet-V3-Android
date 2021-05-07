@@ -1355,7 +1355,6 @@
     <string name="swap_enter_amount_min_swap">Требуется минимальный своп в размере %1$s</string>
     <string name="too_many_pending_orders_error_message">В вашем %1$s кошельке идет слишком много свопов. Пожалуйста, выберите другой кошелек.</string>
     <string name="swap_confirmation_cta_button">Своп (Swap) %1$s за %2$s</string>
-    <string name="swap_confirmation_disclaimer">Суммы, которые вы отправляете и получаете, могут немного измениться из-за активности на рынке. После запуска ордера мы не можем его остановить.</string>
     <string name="swap_confirmation_progress_message">Сейчас мы завершаем ваш своп.</string>
     <string name="swap_confirmation_success_message">Ваши %1$s теперь доступны в вашем кошельке.</string>
     <string name="swap_progress_title">Своп (Swap) %1$s за %2$s в процессе</string>

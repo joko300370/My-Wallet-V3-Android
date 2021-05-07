@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.impl.txEngine.swap
 
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.service.TierService
@@ -16,8 +17,9 @@ import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 class TradingToTradingSwapTxEngine(
     walletManager: CustodialWalletManager,
     quotesEngine: TransferQuotesEngine,
-    kycTierService: TierService
-) : SwapTxEngineBase(quotesEngine, walletManager, kycTierService) {
+    kycTierService: TierService,
+    private val internalFeatureFlagApi: InternalFeatureFlagApi
+) : SwapTxEngineBase(quotesEngine, walletManager, kycTierService, internalFeatureFlagApi) {
 
     override val availableBalance: Single<Money>
         get() = sourceAccount.accountBalance

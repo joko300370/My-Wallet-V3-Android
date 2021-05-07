@@ -21,6 +21,7 @@ import piuk.blockchain.android.ui.transactionflow.flow.NewExchangePriceFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.NewFromPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.NewNetworkFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.NewSalePropertyFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.NewSwapExchangeRateFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.NewToPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.NewTotalFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.SwapDestinationPropertyFormatter
@@ -48,7 +49,8 @@ val transactionModule = module {
     factory {
         TransactionFlowCustomiserImpl(
             resources = get<Context>().resources,
-            assetResources = get()
+            assetResources = get(),
+            stringUtils = get()
         )
     }.bind(TransactionFlowCustomiser::class)
         .bind(EnterAmountCustomisations::class)
@@ -66,13 +68,15 @@ val transactionModule = module {
 
     factory {
         NewToPropertyFormatter(
-            context = get()
+            context = get(),
+            defaultLabel = get()
         )
     }.bind(TxOptionsFormatterNewCheckout::class)
 
     factory {
         NewFromPropertyFormatter(
-            context = get()
+            context = get(),
+            defaultLabel = get()
         )
     }.bind(TxOptionsFormatterNewCheckout::class)
 
@@ -83,9 +87,17 @@ val transactionModule = module {
     }.bind(TxOptionsFormatterNewCheckout::class)
 
     factory {
-        NewNetworkFormatter(
+        NewSwapExchangeRateFormatter(
             context = get(),
             stringUtils = get()
+        )
+    }.bind(TxOptionsFormatterNewCheckout::class)
+
+    factory {
+        NewNetworkFormatter(
+            context = get(),
+            stringUtils = get(),
+            assetResources = get()
         )
     }.bind(TxOptionsFormatterNewCheckout::class)
 

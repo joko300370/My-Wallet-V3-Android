@@ -1354,7 +1354,6 @@
     <string name="swap_enter_amount_min_swap">È richiesto uno scambio minimo di %1$s</string>
     <string name="too_many_pending_orders_error_message">Il tuo portafoglio %1$s ha troppi scambi in corso. Seleziona un altro portafoglio.</string>
     <string name="swap_confirmation_cta_button">Scambia %1$s con %2$s</string>
-    <string name="swap_confirmation_disclaimer">Gli importi inviati e ricevuti possono variare leggermente a causa dell\'attività di mercato. Una volta avviato un ordine, non siamo in grado di interromperlo.</string>
     <string name="swap_confirmation_progress_message">Stiamo completando il tuo scambio ora.</string>
     <string name="swap_confirmation_success_message">Il tuo %1$s è ora disponibile nel tuo portafoglio.</string>
     <string name="swap_progress_title">Scambio di %1$s con %2$s</string>

@@ -3,9 +3,14 @@ package piuk.blockchain.android.ui.transactionflow.flow
 import android.content.Context
 import android.content.res.Resources
 import com.blockchain.ui.urllinks.CHECKOUT_PRICE_EXPLANATION
+import com.blockchain.ui.urllinks.EXCHANGE_SWAP_RATE_EXPLANATION
+import com.blockchain.ui.urllinks.NETWORK_ERC20_EXPLANATION
 import com.blockchain.ui.urllinks.NETWORK_FEE_EXPLANATION
+import com.blockchain.wallet.DefaultLabels
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.Money
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionFlowCustomiserImpl
 import piuk.blockchain.android.util.StringUtils
@@ -26,7 +31,9 @@ interface TxOptionsFormatter {
 }
 
 // New checkout screens
-class TxConfirmReadOnlyMapperNewCheckout(private val formatters: List<TxOptionsFormatterNewCheckout>) {
+class TxConfirmReadOnlyMapperNewCheckout(
+    private val formatters: List<TxOptionsFormatterNewCheckout>
+) {
     fun map(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
         return when (property) {
             is TxConfirmationValue.NewTo -> formatters.first { it is NewToPropertyFormatter }.format(property)
@@ -36,6 +43,8 @@ class TxConfirmReadOnlyMapperNewCheckout(private val formatters: List<TxOptionsF
             is TxConfirmationValue.NewNetworkFee -> formatters.first { it is NewNetworkFormatter }.format(property)
             is TxConfirmationValue.NewSale -> formatters.first { it is NewSalePropertyFormatter }.format(property)
             is TxConfirmationValue.NewTotal -> formatters.first { it is NewTotalFormatter }.format(property)
+            is TxConfirmationValue.NewSwapExchange ->
+                formatters.first { it is NewSwapExchangeRateFormatter }.format(property)
             else -> throw IllegalStateException("No formatter found for property: $property")
         }
     }
@@ -72,12 +81,22 @@ class NewExchangePriceFormatter(
     }
 }
 
-class NewToPropertyFormatter(private val context: Context) : TxOptionsFormatterNewCheckout {
+class NewToPropertyFormatter(private val context: Context, val defaultLabel: DefaultLabels) :
+    TxOptionsFormatterNewCheckout {
     override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
         require(property is TxConfirmationValue.NewTo)
         return mapOf(
-            ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.checkout_item_deposit_to),
-            ConfirmationPropertyKey.TITLE to property.to
+            if (property.isSwap) {
+                ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.common_to)
+                ConfirmationPropertyKey.TITLE to getLabel(
+                    property.txTarget.label,
+                    defaultLabel.getDefaultNonCustodialWalletLabel(property.target.asset),
+                    property.target.asset.displayTicker
+                )
+            } else {
+                ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.checkout_item_deposit_to)
+                ConfirmationPropertyKey.TITLE to property.txTarget.label
+            }
         )
     }
 }
@@ -93,30 +112,69 @@ class NewSalePropertyFormatter(private val context: Context) : TxOptionsFormatte
     }
 }
 
-class NewFromPropertyFormatter(private val context: Context) : TxOptionsFormatterNewCheckout {
+class NewFromPropertyFormatter(private val context: Context, private val defaultLabel: DefaultLabels) :
+    TxOptionsFormatterNewCheckout {
     override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
         require(property is TxConfirmationValue.NewFrom)
         return mapOf(
             ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.common_from),
-            ConfirmationPropertyKey.TITLE to property.from
+            ConfirmationPropertyKey.TITLE to getLabel(
+                property.sourceAccount.label,
+                defaultLabel.getDefaultNonCustodialWalletLabel(property.sourceAsset),
+                property.sourceAsset.displayTicker
+            )
         )
     }
 }
 
 class NewNetworkFormatter(
     private val context: Context,
-    private val stringUtils: StringUtils
+    private val stringUtils: StringUtils,
+    private val assetResources: AssetResources
 ) :
     TxOptionsFormatterNewCheckout {
     override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
         require(property is TxConfirmationValue.NewNetworkFee)
         return mapOf(
-            ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.checkout_item_network_fee),
+            ConfirmationPropertyKey.LABEL to context.resources.getString(
+                R.string.checkout_item_network_fee, property.asset.displayTicker
+            ),
             ConfirmationPropertyKey.TITLE to "- " + property.exchange.toStringWithSymbol(),
             ConfirmationPropertyKey.SUBTITLE to property.feeAmount.toStringWithSymbol(),
+            if (property.asset.hasFeature(CryptoCurrency.IS_ERC20)) {
+                ConfirmationPropertyKey.LINKED_NOTE to stringUtils.getResolvedStringWithAppendedMappedLearnMore(
+                    context.resources.getString(R.string.swap_erc_20_tooltip),
+                    R.string.common_linked_learn_more, NETWORK_ERC20_EXPLANATION, context, R.color.blue_600
+                )
+            } else {
+                ConfirmationPropertyKey.LINKED_NOTE to stringUtils.getResolvedStringWithAppendedMappedLearnMore(
+                    context.resources.getString(
+                        R.string.checkout_item_network_fee_note, assetResources.assetName(property.asset)
+                    ),
+                    R.string.common_linked_learn_more, NETWORK_FEE_EXPLANATION, context, R.color.blue_600
+                )
+            }
+
+        )
+    }
+}
+
+class NewSwapExchangeRateFormatter(
+    private val context: Context,
+    private val stringUtils: StringUtils
+) :
+    TxOptionsFormatterNewCheckout {
+    override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
+        require(property is TxConfirmationValue.NewSwapExchange)
+        return mapOf(
+            ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.exchange_rate),
+            ConfirmationPropertyKey.TITLE to property.unitCryptoCurrency.toStringWithSymbol(),
+            ConfirmationPropertyKey.SUBTITLE to property.price.toStringWithSymbol(),
             ConfirmationPropertyKey.LINKED_NOTE to stringUtils.getResolvedStringWithAppendedMappedLearnMore(
-                context.resources.getString(R.string.checkout_item_network_fee_note, property.asset.displayTicker),
-                R.string.common_linked_learn_more, NETWORK_FEE_EXPLANATION, context, R.color.blue_600
+                context.resources.getString(
+                    R.string.checkout_swap_exchange_note, property.price.symbol, property.unitCryptoCurrency.symbol
+                ),
+                R.string.common_linked_learn_more, EXCHANGE_SWAP_RATE_EXPLANATION, context, R.color.blue_600
             )
         )
     }
@@ -247,3 +305,10 @@ fun Money.formatWithExchange(exchange: Money?) =
     exchange?.let {
         "${this.toStringWithSymbol()} (${it.toStringWithSymbol()})"
     } ?: this.toStringWithSymbol()
+
+fun getLabel(label: String, defaultLabel: String, displayTicker: String): String =
+    if (label.isEmpty() || label == defaultLabel) {
+        "$displayTicker $defaultLabel"
+    } else {
+        label
+    }

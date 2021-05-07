@@ -2,6 +2,7 @@ package piuk.blockchain.android.util
 
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.graphics.Typeface
 import android.net.Uri
 import android.text.Spannable
@@ -40,7 +41,8 @@ class StringUtils(private val context: Context) {
                 out.setSpan(
                     ClickableSpanWithoutUnderline {
                         linksMap[annotation.value]?.let {
-                            ctx.startActivity(Intent(Intent.ACTION_VIEW, it))
+                            val intent = Intent(Intent.ACTION_VIEW, it).addFlags(FLAG_ACTIVITY_NEW_TASK)
+                            ctx.startActivity(intent)
                         }
                         onClick()
                     },

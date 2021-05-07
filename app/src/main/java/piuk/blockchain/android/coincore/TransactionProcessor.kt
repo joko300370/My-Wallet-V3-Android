@@ -168,7 +168,7 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
 
     data class From(val from: String) : TxConfirmationValue(TxConfirmation.READ_ONLY)
 
-    data class NewFrom(val from: Money, val exchange: Money) :
+    data class NewFrom(val sourceAccount: BlockchainAccount, val sourceAsset: CryptoCurrency) :
         TxConfirmationValue(TxConfirmation.SIMPLE_READ_ONLY)
 
     data class NewSale(val amount: Money, val exchange: Money) :
@@ -176,7 +176,8 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
 
     data class To(val to: String) : TxConfirmationValue(TxConfirmation.READ_ONLY)
 
-    data class NewTo(val to: String) : TxConfirmationValue(TxConfirmation.SIMPLE_READ_ONLY)
+    data class NewTo(val txTarget: TransactionTarget, val target: CryptoAccount, val isSwap: Boolean = false) :
+        TxConfirmationValue(TxConfirmation.SIMPLE_READ_ONLY)
 
     data class Total(val total: Money, val exchange: Money? = null) : TxConfirmationValue(TxConfirmation.READ_ONLY)
 
@@ -220,6 +221,11 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
         val feeAmount: Money,
         val exchange: Money,
         val asset: CryptoCurrency
+    ) : TxConfirmationValue(TxConfirmation.EXPANDABLE_COMPLEX_READ_ONLY)
+
+    data class NewSwapExchange(
+        val unitCryptoCurrency: Money,
+        val price: Money
     ) : TxConfirmationValue(TxConfirmation.EXPANDABLE_COMPLEX_READ_ONLY)
 
     data class TxBooleanConfirmation<T>(

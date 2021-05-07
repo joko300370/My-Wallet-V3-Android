@@ -1354,7 +1354,6 @@ se disponível. Isso permite que restaure a sua carteira e perder este dispositi
     <string name="swap_enter_amount_min_swap">Troca mínima de %1$s necessária</string>
     <string name="too_many_pending_orders_error_message">A sua Wallet %1$s tem demasiadas trocas em curso. Selecione uma carteira diferente.</string>
     <string name="swap_confirmation_cta_button">Trocar %1$s por %2$s</string>
-    <string name="swap_confirmation_disclaimer">Os valores que envia e recebe podem mudar um pouco devido à atividade do mercado. Quando um pedido começa, não poderemos pará-lo.</string>
     <string name="swap_confirmation_progress_message">Estamos a concluir a sua troca neste momento.</string>
     <string name="swap_confirmation_success_message">O seu %1$s está agora disponível na sua Wallet.</string>
     <string name="swap_progress_title">A trocar %1$s por %2$s</string>

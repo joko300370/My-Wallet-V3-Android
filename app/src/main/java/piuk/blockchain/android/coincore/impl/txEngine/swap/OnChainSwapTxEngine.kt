@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.impl.txEngine.swap
 
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.service.TierService
@@ -23,9 +24,10 @@ class OnChainSwapTxEngine(
     quotesEngine: TransferQuotesEngine,
     walletManager: CustodialWalletManager,
     kycTierService: TierService,
-    private val engine: OnChainTxEngineBase
+    private val engine: OnChainTxEngineBase,
+    internalFeatureFlagApi: InternalFeatureFlagApi
 ) : SwapTxEngineBase(
-    quotesEngine, walletManager, kycTierService
+    quotesEngine, walletManager, kycTierService, internalFeatureFlagApi
 ) {
     override val direction: TransferDirection by unsafeLazy {
         when (txTarget) {

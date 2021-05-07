@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.impl.txEngine.swap
 
 import com.blockchain.android.testutils.rxInit
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
@@ -60,6 +61,7 @@ class TradingToTradingSwapTxEngineTest {
     private val quotesEngine: TransferQuotesEngine = mock()
     private val kycTierService: TierService = mock()
     private val environmentConfig: EnvironmentConfig = mock()
+    private val internalFeatureFlagApi: InternalFeatureFlagApi = mock()
 
     private val exchangeRates: ExchangeRateDataManager = mock {
         on { getLastPrice(SRC_ASSET, SELECTED_FIAT) } itReturns EXCHANGE_RATE
@@ -72,7 +74,8 @@ class TradingToTradingSwapTxEngineTest {
     private val subject = TradingToTradingSwapTxEngine(
         walletManager = walletManager,
         quotesEngine = quotesEngine,
-        kycTierService = kycTierService
+        kycTierService = kycTierService,
+        internalFeatureFlagApi = internalFeatureFlagApi
     )
 
     @Before

@@ -12,11 +12,13 @@ import com.blockchain.nabu.service.TierService
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
+import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NullAddress
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxFee
@@ -86,15 +88,19 @@ abstract class SellTxEngineBase(
         }
     }
 
-    private fun buildNewFee(pendingTx: PendingTx, latestQuoteExchangeRate: ExchangeRate): TxConfirmationValue? {
-        return if (!pendingTx.feeAmount.isZero) {
+    private fun buildNewFee(feeAmount: Money, exchangeAmount: Money): TxConfirmationValue? {
+        return if (!feeAmount.isZero) {
             TxConfirmationValue.NewNetworkFee(
-                feeAmount = pendingTx.feeAmount as CryptoValue,
-                exchange = latestQuoteExchangeRate.convert(pendingTx.feeAmount),
+                feeAmount = feeAmount as CryptoValue,
+                exchange = exchangeAmount,
                 asset = sourceAsset.disambiguateERC20()
             )
         } else null
     }
+
+    private fun CryptoCurrency.disambiguateERC20() = if (this.hasFeature(CryptoCurrency.IS_ERC20)) {
+        CryptoCurrency.ETHER
+    } else this
 
     private fun buildNewConfirmations(
         pendingTx: PendingTx,
@@ -104,12 +110,12 @@ abstract class SellTxEngineBase(
         pendingTx.copy(
             confirmations = listOfNotNull(
                 TxConfirmationValue.NewExchangePriceConfirmation(pricedQuote.price, sourceAsset),
-                TxConfirmationValue.NewTo(txTarget.label),
+                TxConfirmationValue.NewTo(txTarget, NullCryptoAccount()),
                 TxConfirmationValue.NewSale(
                     amount = pendingTx.amount,
                     exchange = latestQuoteExchangeRate.convert(pendingTx.amount)
                 ),
-                buildNewFee(pendingTx, latestQuoteExchangeRate),
+                buildNewFee(pendingTx.feeAmount, latestQuoteExchangeRate.convert(pendingTx.feeAmount)),
                 TxConfirmationValue.NewTotal(
                     totalWithoutFee = (pendingTx.amount as CryptoValue).minus(
                         pendingTx.feeAmount as CryptoValue
@@ -144,10 +150,6 @@ abstract class SellTxEngineBase(
                 )
             )
         )
-
-    private fun CryptoCurrency.disambiguateERC20() = if (this.hasFeature(CryptoCurrency.IS_ERC20)) {
-        CryptoCurrency.ETHER
-    } else this
 
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         quotesEngine.pricedQuote

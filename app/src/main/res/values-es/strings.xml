@@ -1348,7 +1348,6 @@ Verifique su conexión a Internet y vuelva a intentarlo o comuníquese con el so
     <string name="swap_enter_amount_min_swap">Se requiere un intercambio mínimo de %1$s</string>
     <string name="too_many_pending_orders_error_message">Su monedero %1$s tiene demasiados intercambios en curso. Seleccione un monedero diferente.</string>
     <string name="swap_confirmation_cta_button">Intercambio %1$s por %2$s</string>
-    <string name="swap_confirmation_disclaimer">Las cantidades que envíe y reciba pueden variar ligeramente debido a la actividad del mercado. Una vez se inicia un pedido, no podemos detenerlo</string>
     <string name="swap_confirmation_progress_message">Estamos completando su intercambio.</string>
     <string name="swap_confirmation_success_message">Ahora tiene %1$s disponible en su monedero.</string>
     <string name="swap_progress_title">Cambiando %1$s por %2$s</string>

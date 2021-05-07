@@ -2,8 +2,10 @@ package piuk.blockchain.android.ui.transactionflow.flow.customisations
 
 import android.content.Context
 import android.content.res.Resources
+import android.net.Uri
 import android.widget.FrameLayout
 import com.blockchain.nabu.datamanagers.TransactionError
+import com.blockchain.ui.urllinks.CHECKOUT_REFUND_POLICY
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
@@ -14,26 +16,31 @@ import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.isCustodial
-import piuk.blockchain.android.ui.linkbank.BankAuthSource
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.account.AccountInfoBank
 import piuk.blockchain.android.ui.customviews.account.AccountInfoCrypto
 import piuk.blockchain.android.ui.customviews.account.AccountInfoFiat
-import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.customviews.account.DefaultCellDecorator
 import piuk.blockchain.android.ui.customviews.account.StatusDecorator
+import piuk.blockchain.android.ui.linkbank.BankAuthSource
 import piuk.blockchain.android.ui.swap.SwapAccountSelectSheetFeeDecorator
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionErrorState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TxExecutionStatus
 import piuk.blockchain.android.ui.transactionflow.plugin.AccountLimitsView
 import piuk.blockchain.android.ui.transactionflow.plugin.BalanceAndFeeView
+import piuk.blockchain.android.ui.transactionflow.plugin.ConfirmSheetWidget
+import piuk.blockchain.android.ui.transactionflow.plugin.EnterAmountWidget
 import piuk.blockchain.android.ui.transactionflow.plugin.FromAndToView
+import piuk.blockchain.android.ui.transactionflow.plugin.SimpleInfoHeaderView
 import piuk.blockchain.android.ui.transactionflow.plugin.SmallBalanceView
+import piuk.blockchain.android.ui.transactionflow.plugin.SwapInfoHeaderView
 import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
+import piuk.blockchain.android.util.StringUtils
 import java.math.BigInteger
 import java.math.RoundingMode
 import java.text.SimpleDateFormat
@@ -47,7 +54,8 @@ interface TransactionFlowCustomiser :
 
 class TransactionFlowCustomiserImpl(
     private val resources: Resources,
-    private val assetResources: AssetResources
+    private val assetResources: AssetResources,
+    private val stringUtils: StringUtils
 ) : TransactionFlowCustomiser {
     override fun enterAmountActionIcon(state: TransactionState): Int {
         return when (state.action) {
@@ -118,6 +126,12 @@ class TransactionFlowCustomiserImpl(
             }
         )
 
+    override fun shouldShowCustodialUpsell(state: TransactionState): Boolean =
+        when (state.action) {
+            AssetAction.Swap -> state.selectedTarget is NonCustodialAccount
+            else -> false
+        }
+
     override fun selectTargetAddressWalletsCta(state: TransactionState) =
         resources.getString(
             when (state.action) {
@@ -138,10 +152,18 @@ class TransactionFlowCustomiserImpl(
             else -> resources.getString(R.string.common_to)
         }
 
-    override fun selectTargetStatusDecorator(state: TransactionState, account: BlockchainAccount): CellDecorator =
+    override fun selectTargetStatusDecorator(state: TransactionState): StatusDecorator =
         when (state.action) {
-            AssetAction.Swap -> SwapAccountSelectSheetFeeDecorator(account)
-            else -> DefaultCellDecorator()
+            AssetAction.Swap -> {
+                {
+                    SwapAccountSelectSheetFeeDecorator(it)
+                }
+            }
+            else -> {
+                {
+                    DefaultCellDecorator()
+                }
+            }
         }
 
     override fun selectTargetShowManualEnterAddress(state: TransactionState): Boolean =
@@ -309,9 +331,16 @@ class TransactionFlowCustomiserImpl(
         }
     }
 
-    override fun confirmDisclaimerBlurb(assetAction: AssetAction): String =
+    override fun confirmDisclaimerBlurb(assetAction: AssetAction, context: Context): CharSequence =
         when (assetAction) {
-            AssetAction.Swap -> resources.getString(R.string.swap_confirmation_disclaimer)
+            AssetAction.Swap -> {
+                val map = mapOf("refund_policy" to Uri.parse(CHECKOUT_REFUND_POLICY))
+                stringUtils.getStringWithMappedAnnotations(
+                    R.string.swap_confirmation_disclaimer_1,
+                    map,
+                    context
+                )
+            }
             else -> throw IllegalStateException("Disclaimer not set for asset action $assetAction")
         }
 
@@ -576,7 +605,7 @@ class TransactionFlowCustomiserImpl(
         ctx: Context,
         frame: FrameLayout,
         state: TransactionState
-    ): TxFlowWidget =
+    ): EnterAmountWidget =
         when (state.action) {
             AssetAction.ViewActivity,
             AssetAction.Summary -> throw IllegalStateException()
@@ -593,7 +622,7 @@ class TransactionFlowCustomiserImpl(
         ctx: Context,
         frame: FrameLayout,
         state: TransactionState
-    ): TxFlowWidget =
+    ): EnterAmountWidget =
         when (state.action) {
             AssetAction.Withdraw,
             AssetAction.FiatDeposit -> AccountLimitsView(ctx).also {
@@ -762,6 +791,16 @@ class TransactionFlowCustomiserImpl(
 
     override fun amountHeaderConfirmationVisible(state: TransactionState): Boolean =
         state.action != AssetAction.Swap
+
+    override fun confirmInstallHeaderView(
+        ctx: Context,
+        frame: FrameLayout,
+        state: TransactionState
+    ): ConfirmSheetWidget =
+        when (state.action) {
+            AssetAction.Swap -> SwapInfoHeaderView(ctx).also { frame.addView(it) }
+            else -> SimpleInfoHeaderView(ctx).also { frame.addView(it) }
+        }
 
     override fun defInputType(state: TransactionState, fiatCurrency: String): CurrencyType =
         when (state.action) {

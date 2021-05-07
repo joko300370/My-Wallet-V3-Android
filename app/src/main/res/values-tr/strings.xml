@@ -1351,7 +1351,6 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
     <string name="swap_enter_amount_min_swap">Minimum %1$s takas gerekli</string>
     <string name="too_many_pending_orders_error_message">%1$s Cüzdanınızda işlemde olan çok fazla takas var. Lütfen farklı bir cüzdan seçin.</string>
     <string name="swap_confirmation_cta_button">%2$s için %1$s takas et</string>
-    <string name="swap_confirmation_disclaimer">Gönderdiğiniz ve aldığınız miktar piyasa faaliyeti nedeniyle biraz değişiklik gösteebilir. Emre ait işlem başladığında durdurulamaz.</string>
     <string name="swap_confirmation_progress_message">Şimdi takas işleminizi tamamlıyoruz.</string>
     <string name="swap_confirmation_success_message">%1$s artık Cüzdanınızda kullanılabilir.</string>
     <string name="swap_progress_title">%2$s için %1$s takas ediliyor</string>

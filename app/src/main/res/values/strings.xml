@@ -1594,7 +1594,6 @@
     <string name="send_confirmation_add_note_hint">Add a note</string>
     <string name="send_confirmation_cta_button">Send %1$s</string>
     <string name="swap_confirmation_cta_button">Swap %1$s for %2$s</string>
-    <string name="swap_confirmation_disclaimer">The amounts you send and receive may change slightly due to market activity. Once an order starts, we are unable to stop it.</string>
     <string name="deposit_source_select_title">Linked Banks</string>
     <string name="deposit_confirmation_cta_button">Deposit %1$s</string>
     <string name="deposit_enter_amount_limit_title">Daily Limit</string>
@@ -2007,9 +2006,14 @@
     <string name="checkout_item_private_key_wallet_explanation">%s Private Key wallets, send, and receive are not supported at this time.</string>
     <string name="checkout_item_deposit_to">Deposit to</string>
     <string name="checkout_item_sale">Sale</string>
-    <string name="checkout_item_network_fee">Network fee</string>
+    <string name="checkout_item_network_fee">%s Network fee</string>
     <string name="checkout_item_price_note">Blockchain.com provides the best market price we receive and applies a spread.&#160;</string>
     <string name="checkout_item_network_fee_note">Pays for %1$s miners to confirm your transaction on the blockchain network.&#160;</string>
+    <string name="swap_confirmation_disclaimer_1">Final amount may change due to market activity. By approving this Swap you agree to Blockchain.com’s\n<annotation link="refund_policy">Refund Policy</annotation></string>
+    <string name="checkout_swap_exchange_note">The exchange rate is the best price available for %1$s in terms of 1 %2$s&#160;</string>
+    <string name="upsell_message">Get lower fees and double the transaction speed when you Swap crypto to any Trading Account. Just look for these badges to reduce fees by up to 50%.</string>
+    <string name="upsell_title">Reduce fees. Swap to Trading Account.</string>
+    <string name="swap_erc_20_tooltip">This token is an ERC-20. The network fees are set by the Ethereum Network.&#160;</string>
     <string name="private_key_wallet_explanation">%s Private Key wallets, send, and receive are not supported at this time.</string>
 
     <!-- New pairing -->

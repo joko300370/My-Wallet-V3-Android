@@ -1353,7 +1353,6 @@ Veuillez réessayer plus tard.</string>
     <string name="swap_enter_amount_min_swap">Échange minimum de %1$s requis</string>
     <string name="too_many_pending_orders_error_message">Votre portefeuille %1$s a trop d\'échanges en cours. Veuillez sélectionner un autre portefeuille.</string>
     <string name="swap_confirmation_cta_button">Échangez %1$s contre %2$s</string>
-    <string name="swap_confirmation_disclaimer">Les montants que vous envoyez et recevez peuvent varier légèrement en raison de l’activité du marché. Une fois qu\'un ordre est initié, nous ne pouvons pas l\'arrêter.</string>
     <string name="swap_confirmation_progress_message">Nous finalisons votre échange en ce moment.</string>
     <string name="swap_confirmation_success_message">Votre %1$s est maintenant disponible dans votre portefeuille.</string>
     <string name="swap_progress_title">Échange de %1$s contre %2$s</string>

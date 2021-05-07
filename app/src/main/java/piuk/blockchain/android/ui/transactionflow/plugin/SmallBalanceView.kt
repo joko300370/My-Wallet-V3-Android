@@ -18,8 +18,7 @@ class SmallBalanceView @JvmOverloads constructor(
     ctx: Context,
     attr: AttributeSet? = null,
     defStyle: Int = 0
-) : ConstraintLayout(ctx, attr, defStyle),
-    TxFlowWidget {
+) : ConstraintLayout(ctx, attr, defStyle), EnterAmountWidget {
 
     private lateinit var model: TransactionModel
     private lateinit var customiser: EnterAmountCustomisations

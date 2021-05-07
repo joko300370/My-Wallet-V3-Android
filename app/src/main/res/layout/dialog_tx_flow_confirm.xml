@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -46,31 +47,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/confirm_sheet_title" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/amount"
-        style="@style/Text.Semibold.32"
-        android:layout_width="wrap_content"
+    <FrameLayout
+        android:id="@+id/confirm_header_slot"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:paddingStart="@dimen/standard_margin"
-        android:paddingTop="@dimen/standard_margin"
-        android:paddingEnd="@dimen/standard_margin"
-        android:textColor="@color/grey_800"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/confirm_sheet_title"
-        tools:text="$10000 of BTC" />
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/amount_fiat"
-        style="@style/Text.Light.20"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/tiny_margin"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/amount"
-        tools:text="$100" />
+        app:layout_constraintTop_toBottomOf="@+id/confirm_sheet_title" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/confirm_details_list"
@@ -88,7 +71,7 @@
         app:layout_constraintBottom_toTopOf="@id/confirm_disclaimer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/amount_fiat"
+        app:layout_constraintTop_toBottomOf="@id/confirm_header_slot"
         tools:listitem="@layout/item_send_confirm_details" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -99,10 +82,11 @@
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginEnd="@dimen/standard_margin"
         android:layout_marginBottom="@dimen/tiny_margin"
+        android:gravity="center"
         android:visibility="gone"
-        tools:visibility="visible"
         app:layout_constraintBottom_toTopOf="@id/confirm_cta_button"
-        tools:text="Disclaimer blurb that spans several lines that spans several lines" />
+        tools:text="Disclaimer blurb that spans several lines that spans several lines"
+        tools:visibility="visible" />
 
     <Button
         android:id="@+id/confirm_cta_button"
