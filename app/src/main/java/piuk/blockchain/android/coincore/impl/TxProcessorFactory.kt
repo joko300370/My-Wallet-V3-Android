@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.impl
 
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.service.TierService
 import com.blockchain.notifications.analytics.Analytics
@@ -30,7 +31,6 @@ import piuk.blockchain.android.coincore.impl.txEngine.sell.TradingSellTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.swap.OnChainSwapTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.swap.TradingToTradingSwapTxEngine
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 class TxProcessorFactory(
@@ -41,7 +41,7 @@ class TxProcessorFactory(
     private val quotesEngine: TransferQuotesEngine,
     private val analytics: Analytics,
     private val kycTierService: TierService,
-    private val environmentConfig: EnvironmentConfig
+    private val internalFeatureFlagApi: InternalFeatureFlagApi
 ) {
     fun createProcessor(
         source: BlockchainAccount,
@@ -164,7 +164,7 @@ class TxProcessorFactory(
                                 walletManager = walletManager,
                                 kycTierService = kycTierService,
                                 engine = engine,
-                                environmentConfig = environmentConfig
+                                internalFeatureFlagApi = internalFeatureFlagApi
                             )
                         )
                     )
@@ -179,7 +179,7 @@ class TxProcessorFactory(
                         walletManager = walletManager,
                         kycTierService = kycTierService,
                         engine = engine,
-                        environmentConfig = environmentConfig
+                        internalFeatureFlagApi = internalFeatureFlagApi
                     )
                 )
             )
@@ -225,7 +225,7 @@ class TxProcessorFactory(
                         walletManager = walletManager,
                         quotesEngine = quotesEngine,
                         kycTierService = kycTierService,
-                        environmentConfig = environmentConfig
+                        internalFeatureFlagApi = internalFeatureFlagApi
                     )
                 )
             )
@@ -251,7 +251,7 @@ class TxProcessorFactory(
                         walletManager = walletManager,
                         quotesEngine = quotesEngine,
                         kycTierService = kycTierService,
-                        environmentConfig = environmentConfig
+                        internalFeatureFlagApi = internalFeatureFlagApi
                     )
                 )
             )

@@ -1,13 +1,17 @@
 package piuk.blockchain.android.coincore.impl.txEngine.swap
 
 import androidx.annotation.VisibleForTesting
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.CustodialOrder
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.Product
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.nabu.service.TierService
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
@@ -27,7 +31,6 @@ import piuk.blockchain.android.coincore.impl.txEngine.PricedQuote
 import piuk.blockchain.android.coincore.impl.txEngine.QuotedEngine
 import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.android.coincore.updateTxValidity
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -41,8 +44,8 @@ abstract class SwapTxEngineBase(
     quotesEngine: TransferQuotesEngine,
     private val walletManager: CustodialWalletManager,
     kycTierService: TierService,
-    environmentConfig: EnvironmentConfig
-) : QuotedEngine(quotesEngine, kycTierService, walletManager, environmentConfig) {
+    private val internalFeatureFlagApi: InternalFeatureFlagApi
+) : QuotedEngine(quotesEngine, kycTierService, walletManager, Product.TRADE) {
 
     private lateinit var minApiLimit: Money
 
@@ -90,7 +93,8 @@ abstract class SwapTxEngineBase(
                 if (pendingTx.maxLimit != null && pendingTx.minLimit != null) {
                     when {
                         pendingTx.amount < pendingTx.minLimit -> throw TxValidationFailure(
-                            ValidationState.UNDER_MIN_LIMIT)
+                            ValidationState.UNDER_MIN_LIMIT
+                        )
                         pendingTx.amount > pendingTx.maxLimit -> throw validationFailureForTier(pendingTx)
                         else -> Completable.complete()
                     }
@@ -113,45 +117,111 @@ abstract class SwapTxEngineBase(
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =
         validateAmount(pendingTx).updateTxValidity(pendingTx)
 
-    override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> {
-        return quotesEngine.pricedQuote.firstOrError().flatMap { pricedQuote ->
-            Single.just(
-                pendingTx.copy(
-                    confirmations = listOf(
-                        TxConfirmationValue.SwapSourceValue(swappingAssetValue = pendingTx.amount as CryptoValue),
-                        TxConfirmationValue.SwapReceiveValue(receiveAmount = CryptoValue.fromMajor(target.asset,
-                            pendingTx.amount.toBigDecimal().times(pricedQuote.price.toBigDecimal()))),
-                        TxConfirmationValue.SwapExchangeRate(CryptoValue.fromMajor(sourceAsset, BigDecimal.ONE),
-                            CryptoValue.fromMajor(target.asset, pricedQuote.price.toBigDecimal())),
-                        TxConfirmationValue.From(from = sourceAccount.label),
-                        TxConfirmationValue.To(to = txTarget.label),
-                        TxConfirmationValue.NetworkFee(
-                            txFee = TxFee(
-                            fee = pricedQuote.transferQuote.networkFee,
-                            type = TxFee.FeeType.WITHDRAWAL_FEE,
-                            asset = target.asset
-                            )
-                        ),
-                        TxConfirmationValue.NetworkFee(
-                            txFee = TxFee(
-                                fee = pendingTx.feeAmount,
-                                type = TxFee.FeeType.DEPOSIT_FEE,
-                                asset = sourceAsset
-                            )
-                        )
-                    ),
-                    minLimit = minLimit(pricedQuote.price)
-                )
+    private fun buildNewFee(feeAmount: Money, exchangeAmount: Money, asset: CryptoCurrency): TxConfirmationValue? {
+        return if (!feeAmount.isZero) {
+            TxConfirmationValue.NewNetworkFee(
+                feeAmount = feeAmount as CryptoValue,
+                exchange = exchangeAmount,
+                asset = asset
             )
-        }
+        } else null
     }
+
+    private fun buildConfirmationTotal(pendingTx: PendingTx, pricedQuote: PricedQuote): TxConfirmationValue.NewTotal {
+        val receivingValue = CryptoValue.fromMajor(
+            target.asset,
+            pendingTx.amount.toBigDecimal().times(pricedQuote.price.toBigDecimal())
+        )
+
+        val sendingFeeAsReceivingCurrency = CryptoValue.fromMajor(
+            target.asset,
+            pendingTx.feeAmount.toBigDecimal().times(pricedQuote.price.toBigDecimal())
+        )
+
+        val totalWithoutFee =
+            receivingValue.minus(sendingFeeAsReceivingCurrency).minus(pricedQuote.transferQuote.networkFee)
+
+        return TxConfirmationValue.NewTotal(
+            totalWithoutFee = totalWithoutFee,
+            exchange = totalWithoutFee.toFiat(exchangeRates, userFiat)
+        )
+    }
+
+    private fun buildNewConfirmations(pendingTx: PendingTx, pricedQuote: PricedQuote): PendingTx =
+        pendingTx.copy(
+            confirmations = listOfNotNull(
+                TxConfirmationValue.NewSwapExchange(
+                    CryptoValue.fromMajor(sourceAsset, BigDecimal.ONE),
+                    CryptoValue.fromMajor(target.asset, pricedQuote.price.toBigDecimal())
+                ),
+                TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
+                TxConfirmationValue.NewTo(txTarget, target, true),
+                buildNewFee(
+                    pendingTx.feeAmount,
+                    pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+                    sourceAsset
+                ),
+                buildNewFee(
+                    pricedQuote.transferQuote.networkFee,
+                    pricedQuote.transferQuote.networkFee.toFiat(exchangeRates, userFiat),
+                    target.asset
+                ),
+                buildConfirmationTotal(pendingTx, pricedQuote)
+            )
+        )
+
+    private fun buildOldConfirmations(pendingTx: PendingTx, pricedQuote: PricedQuote): PendingTx =
+        pendingTx.copy(
+            confirmations = listOf(
+                TxConfirmationValue.SwapSourceValue(
+                    swappingAssetValue = pendingTx.amount as CryptoValue
+                ),
+                TxConfirmationValue.SwapReceiveValue(
+                    receiveAmount = CryptoValue.fromMajor(
+                        target.asset,
+                        pendingTx.amount.toBigDecimal().times(pricedQuote.price.toBigDecimal())
+                    )
+                ),
+                TxConfirmationValue.SwapExchangeRate(
+                    CryptoValue.fromMajor(sourceAsset, BigDecimal.ONE),
+                    CryptoValue.fromMajor(target.asset, pricedQuote.price.toBigDecimal())
+                ),
+                TxConfirmationValue.From(from = sourceAccount.label),
+                TxConfirmationValue.To(to = txTarget.label),
+                TxConfirmationValue.NetworkFee(
+                    txFee = TxFee(
+                        fee = pricedQuote.transferQuote.networkFee,
+                        type = TxFee.FeeType.WITHDRAWAL_FEE,
+                        asset = target.asset
+                    )
+                ),
+                TxConfirmationValue.NetworkFee(
+                    txFee = TxFee(
+                        fee = pendingTx.feeAmount,
+                        type = TxFee.FeeType.DEPOSIT_FEE,
+                        asset = sourceAsset
+                    )
+                )
+            ),
+            minLimit = minLimit(pricedQuote.price)
+        )
+
+    override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
+        quotesEngine.pricedQuote
+            .firstOrError()
+            .map { pricedQuote ->
+                if (internalFeatureFlagApi.isFeatureEnabled(GatedFeature.CHECKOUT)) {
+                    buildNewConfirmations(pendingTx, pricedQuote)
+                } else {
+                    buildOldConfirmations(pendingTx, pricedQuote)
+                }
+            }
 
     private fun minLimit(price: Money): Money {
         val minAmountToPayFees = minAmountToPayNetworkFees(
             price,
             quotesEngine.getLatestQuote().transferQuote.networkFee
         )
-
         return minApiLimit.plus(minAmountToPayFees).withUserDpRounding(RoundingMode.CEILING)
     }
 
@@ -176,8 +246,12 @@ abstract class SwapTxEngineBase(
                     )
                 )
                 addOrReplaceOption(
-                    TxConfirmationValue.SwapReceiveValue(receiveAmount = CryptoValue.fromMajor(target.asset,
-                        pendingTx.amount.toBigDecimal().times(pricedQuote.price.toBigDecimal())))
+                    TxConfirmationValue.SwapReceiveValue(
+                        receiveAmount = CryptoValue.fromMajor(
+                            target.asset,
+                            pendingTx.amount.toBigDecimal().times(pricedQuote.price.toBigDecimal())
+                        )
+                    )
                 )
             }
         }
@@ -206,6 +280,7 @@ abstract class SwapTxEngineBase(
     private fun minAmountToPayNetworkFees(price: Money, networkFee: Money): Money =
         CryptoValue.fromMajor(
             sourceAsset,
-            networkFee.toBigDecimal().divide(price.toBigDecimal(), sourceAsset.dp, RoundingMode.HALF_UP)
+            networkFee.toBigDecimal()
+                .divide(price.toBigDecimal(), sourceAsset.dp, RoundingMode.HALF_UP)
         )
 }

@@ -3,7 +3,9 @@ package info.blockchain.wallet.bip44;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bitcoinj.core.Address;
 import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.LegacyAddress;
 import org.bitcoinj.core.NetworkParameters;
+import org.bitcoinj.core.SegwitAddress;
 import org.bitcoinj.core.Utils;
 import org.bitcoinj.crypto.ChildNumber;
 import org.bitcoinj.crypto.DeterministicKey;
@@ -11,18 +13,22 @@ import org.bitcoinj.crypto.HDKeyDerivation;
 
 import java.math.BigInteger;
 
+import info.blockchain.wallet.payload.data.Derivation;
+
 /**
  * HDAddress.java : an address in a BIP44 wallet account chain
  */
 public class HDAddress {
 
-    private int childNum;
-    private String strPath;
-    private ECKey ecKey;
-    private byte[] pubKey;
-    private byte[] pubKeyHash;
+    private final int childNum;
+    private final String strPath;
 
-    private NetworkParameters params;
+    private final ECKey ecKey;
+    private final byte[] pubKey;
+    private final byte[] pubKeyHash;
+    private final int purpose;
+
+    private final NetworkParameters params;
 
     /**
      * Constructor an HD address.
@@ -31,11 +37,13 @@ public class HDAddress {
      * @param cKey   deterministic key for this address
      * @param child  index of this address in its chain
      */
-    public HDAddress(NetworkParameters params, DeterministicKey cKey, int child) {
+    public HDAddress(NetworkParameters params, DeterministicKey cKey, int child, int purpose) {
         this.params = params;
         childNum = child;
 
-        DeterministicKey dk = HDKeyDerivation.deriveChildKey(cKey, new ChildNumber(childNum, false));
+        DeterministicKey dk = HDKeyDerivation.deriveChildKey(
+            cKey, new ChildNumber(childNum, false)
+        );
         // compressed WIF private key format
         if (dk.hasPrivKey()) {
             byte[] prepended0Byte = ArrayUtils.addAll(new byte[1], dk.getPrivKeyBytes());
@@ -49,8 +57,8 @@ public class HDAddress {
 
         pubKey = ecKey.getPubKey();
         pubKeyHash = ecKey.getPubKeyHash();
-
         strPath = dk.getPathAsString();
+        this.purpose = purpose;
     }
 
     /**
@@ -75,18 +83,12 @@ public class HDAddress {
      * Return public address for this instance.
      *
      * @return String
-     *
      */
-    /**
-     * @deprecated Use {@link #getAddressBase58()}
-     */
-    @Deprecated
-    public String getAddressString() {
-        return getAddressBase58();
-    }
-
-    public String getAddressBase58() {
-        return ecKey.toAddress(params).toBase58();
+    public String getFormattedAddress() {
+        if (purpose == Derivation.SEGWIT_BECH32_PURPOSE) {
+            return SegwitAddress.fromHash(params, ecKey.getPubKeyHash()).toBech32();
+        }
+        return LegacyAddress.fromKey(params, ecKey).toBase58();
     }
 
     /**
@@ -95,22 +97,11 @@ public class HDAddress {
      * @return String
      */
     public String getPrivateKeyString() {
-
         if (ecKey.hasPrivKey()) {
             return ecKey.getPrivateKeyEncoded(params).toString();
         } else {
             return null;
         }
-
-    }
-
-    /**
-     * Return Bitcoinj address instance for this HDAddress.
-     *
-     * @return org.bitcoinj.core.HDAddress
-     */
-    public Address getAddress() {
-        return ecKey.toAddress(params);
     }
 
     /**
@@ -126,5 +117,4 @@ public class HDAddress {
     public int getChildNum() {
         return childNum;
     }
-
 }

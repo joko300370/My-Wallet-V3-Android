@@ -67,6 +67,10 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState
     }
 
+    class FetchPaymentDetails(val fiatCurrency: String, val selectedPaymentMethodId: String) : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState.copy(isLoading = true)
+    }
+
     class PaymentMethodsUpdated(
         val availablePaymentMethods: List<PaymentMethod>,
         private val canAddCard: Boolean,
@@ -89,6 +93,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
             }
 
             return oldState.copy(
+                isLoading = false,
                 selectedPaymentMethod = selectedPaymentMethod?.let {
                     SelectedPaymentMethod(
                         selectedPaymentMethod.id,

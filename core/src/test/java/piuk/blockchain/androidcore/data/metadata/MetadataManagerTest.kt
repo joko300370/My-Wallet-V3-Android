@@ -6,13 +6,14 @@ import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.wallet.exceptions.InvalidCredentialsException
+import info.blockchain.wallet.keys.MasterKey
 import info.blockchain.wallet.metadata.MetadataDerivation
 import info.blockchain.wallet.metadata.MetadataInteractor
 import info.blockchain.wallet.metadata.data.RemoteMetadataNodes
 import io.reactivex.Completable
 import io.reactivex.Maybe
+import org.amshove.kluent.itReturns
 import org.bitcoinj.crypto.HDKeyDerivation
-import org.bitcoinj.params.BitcoinMainNetParams
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -27,11 +28,13 @@ class MetadataManagerTest {
     private lateinit var subject: MetadataManager
     private val payloadDataManager: PayloadDataManager = mock()
     private val metadataInteractor: MetadataInteractor = mock()
-    private val metadataDerivation: MetadataDerivation = MetadataDerivation(BitcoinMainNetParams.get())
+    private val metadataDerivation: MetadataDerivation = MetadataDerivation()
 
     private val seed = "15e23aa73d25994f1921a1256f93f72c"
-    private val fakeMasterKey = HDKeyDerivation.createMasterPrivateKey(
-        seed.toByteArray())
+    private val mockMasterKey: MasterKey = mock {
+        on { toDeterministicKey() } itReturns HDKeyDerivation.createMasterPrivateKey(seed.toByteArray())
+    }
+
     private val fakeRemoteMetadata = RemoteMetadataNodes().apply {
         mdid =
             "xprv9vM7oGsyw3AdQdzPjRvPAHCC7hEzUhENoeq59qPxjxL5XsMos78qEd3P6dkPpNt8xgvQTiUXcTjbU" +
@@ -78,7 +81,7 @@ class MetadataManagerTest {
         // Arrange
         whenever(metadataInteractor.loadRemoteMetadata(any())).thenReturn(Maybe.empty())
         whenever(payloadDataManager.isDoubleEncrypted).thenReturn(false)
-        whenever(payloadDataManager.masterKey).thenReturn(fakeMasterKey)
+        whenever(payloadDataManager.masterKey).thenReturn(mockMasterKey)
         whenever(metadataInteractor.putMetadata(any(), any())).thenReturn(Completable.complete())
 
         // Act
@@ -99,7 +102,7 @@ class MetadataManagerTest {
         // Arrange
         whenever(metadataInteractor.loadRemoteMetadata(any())).thenReturn(Maybe.empty())
         whenever(payloadDataManager.isDoubleEncrypted).thenReturn(true)
-        whenever(payloadDataManager.masterKey).thenReturn(fakeMasterKey)
+        whenever(payloadDataManager.masterKey).thenReturn(mockMasterKey)
         whenever(metadataInteractor.putMetadata(any(), any())).thenReturn(Completable.complete())
         // Act
         val testObserver = subject.attemptMetadataSetup().test()

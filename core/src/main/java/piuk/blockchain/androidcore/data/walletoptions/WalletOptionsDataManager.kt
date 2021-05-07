@@ -54,25 +54,14 @@ class WalletOptionsDataManager(
     fun isInUsa(): Observable<Boolean> =
         walletOptionsState.walletSettingsSource.map { it.countryCode == "US" }
 
-    fun getCoinifyPartnerId(): Observable<Int> =
-        walletOptionsState.walletOptionsSource.map { it.partners.coinify.partnerId }
-
     fun getBuyWebviewWalletLink(): String {
         initWalletOptionsReplaySubjects()
         return (walletOptionsState.walletOptionsSource.value!!.buyWebviewWalletLink
             ?: "${explorerUrl}wallet") + "/#/intermediate"
     }
 
-    fun getComRootLink(): String {
-        return walletOptionsState.walletOptionsSource.value!!.comRootLink
-    }
-
     private fun xlmExchangeAddresses(): List<String> {
         return walletOptionsState.walletOptionsSource.value?.xmlExchangeAddresses ?: emptyList()
-    }
-
-    fun getWalletLink(): String {
-        return walletOptionsState.walletOptionsSource.value!!.walletLink
     }
 
     /**
@@ -114,7 +103,7 @@ class WalletOptionsDataManager(
         }
     }
 
-    fun getLocalisedMessage(locale: Locale, map: Map<String, String>): String {
+    private fun getLocalisedMessage(locale: Locale, map: Map<String, String>): String {
         var result = ""
 
         if (map.isNotEmpty()) {

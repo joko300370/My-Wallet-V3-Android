@@ -63,5 +63,6 @@ class AllWalletsAccount(
             }
             .reduce { a, l -> a + l }
             .toSingle(emptyList())
+            .map { it.distinct() }
             .map { it.sorted() }
 }

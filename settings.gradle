@@ -1,6 +1,7 @@
 include ':app',
         ':notifications',
         ':wallet',
+        ':blockchainApi',
         ':balance',
         ':common:interface',
         ':common:network',

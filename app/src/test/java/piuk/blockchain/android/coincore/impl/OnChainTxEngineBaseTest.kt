@@ -76,7 +76,6 @@ class OnChainTxEngineBaseTest {
         override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
             STUB_THIS()
         }
-
         override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> {
             STUB_THIS()
         }
@@ -86,7 +85,6 @@ class OnChainTxEngineBaseTest {
         override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> {
             STUB_THIS()
         }
-
         override fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection {
             TODO("Not yet implemented")
         }

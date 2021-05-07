@@ -7,7 +7,6 @@ import org.koin.android.ext.android.inject
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.databinding.DialogSheetAccountSelectorBinding
-import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.TargetSelectionCustomisations
@@ -23,7 +22,7 @@ class SelectTargetAccountSheet : TransactionFlowSheet<DialogSheetAccountSelector
         with(binding) {
             accountList.initialise(
                 source = Single.just(newState.availableTargets.map { it as SingleAccount }),
-                status = ::statusDecorator
+                status = customiser.selectTargetStatusDecorator(newState)
             )
             accountListTitle.text = customiser.selectTargetAccountTitle(newState)
             accountListSubtitle.text = customiser.selectTargetAccountDescription(newState)
@@ -31,9 +30,6 @@ class SelectTargetAccountSheet : TransactionFlowSheet<DialogSheetAccountSelector
             accountListBack.visibleIf { newState.canGoBack }
         }
     }
-
-    private fun statusDecorator(account: BlockchainAccount): CellDecorator =
-        customiser.selectTargetStatusDecorator(state, account)
 
     override fun initControls(binding: DialogSheetAccountSelectorBinding) {
         binding.apply {

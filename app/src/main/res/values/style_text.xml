@@ -149,6 +149,10 @@
         <item name="android:textSize">16sp</item>
     </style>
 
+    <style name="Text.Light.20">
+        <item name="android:textSize">20sp</item>
+    </style>
+
     <style name="Text.Standard.Centered.20">
         <item name="android:textSize">20sp</item>
     </style>

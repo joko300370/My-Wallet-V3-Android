@@ -7,6 +7,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.ethereum.Erc20TokenData
 import info.blockchain.wallet.exceptions.DecryptionException
+import info.blockchain.wallet.payload.data.allAddresses
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -217,7 +218,8 @@ class CoinsWebSocketStrategy(
 
         val (inAddr, totalValue) =
             handleTransactionInputsAndOutputs(
-                transaction.inputs, transaction.outputs,
+                transaction.inputs,
+                transaction.outputs,
                 transaction.hash
             ) { x ->
                 bchDataManager.getImportedAddressStringList().contains(x)
@@ -448,46 +450,26 @@ class CoinsWebSocketStrategy(
         )
     }
 
-    private fun guid(): String = prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, "")
+    private fun guid(): String = prefs.walletGuid
 
     private fun xPubsBch(): List<String> {
-        val nbAccounts: Int
-        return if (payloadDataManager.wallet?.isUpgraded == true) {
-            nbAccounts = bchDataManager.getActiveXpubs().size
-            val xpubs = mutableListOf<String>()
-            for (i in 0 until nbAccounts) {
-                val activeXpubs = bchDataManager.getActiveXpubs()
-                if (activeXpubs[i].isNotEmpty()) {
-                    xpubs.add(bchDataManager.getActiveXpubs()[i])
-                }
-            }
-            xpubs
+        return if (payloadDataManager.wallet?.isUpgradedToV3 == true) {
+            bchDataManager.getActiveXpubs().allAddresses()
         } else {
             emptyList()
         }
     }
 
-    private fun xPubsBtc(): List<String> {
-        val nbAccounts: Int
-        if (payloadDataManager.wallet?.isUpgraded == true) {
-            nbAccounts = try {
-                payloadDataManager.totalAccounts()
-            } catch (e: IndexOutOfBoundsException) {
-                0
-            }
-
-            val xpubs = mutableListOf<String>()
-            for (i in 0 until nbAccounts) {
-                val xPub = payloadDataManager.wallet!!.hdWallets[0].accounts[i].xpub
-                if (xPub != null && xPub.isNotEmpty()) {
-                    xpubs.add(xPub)
-                }
-            }
-            return xpubs
+    private fun xPubsBtc(): List<String> =
+        if (payloadDataManager.wallet?.isUpgradedToV3 == true) {
+            payloadDataManager.wallet
+                ?.walletBody
+                ?.accounts
+                ?.map { a -> a.xpubs.allAddresses() }
+                ?.flatten() ?: emptyList()
         } else {
-            return emptyList()
+            emptyList()
         }
-    }
 
     private fun btcReceiveAddresses(): List<String> =
         payloadDataManager.wallet?.let {
@@ -649,7 +631,4 @@ class CoinsWebSocketStrategy(
 
     private fun EthResponse.isErc20TransactionType(cryptoCurrency: CryptoCurrency) =
         transaction?.to.equals(ethDataManager.getErc20TokenData(cryptoCurrency).contractAddress, true)
-
-    private fun PayloadDataManager.totalAccounts(): Int =
-        wallet?.hdWallets?.get(0)?.accounts?.size ?: 0
 }

@@ -8,12 +8,22 @@ import android.util.Base64
 import androidx.annotation.VisibleForTesting
 import com.blockchain.featureflags.GatedFeature
 import com.blockchain.logging.CrashLogger
+import com.blockchain.preferences.Authorization
+import com.blockchain.preferences.BrowserIdentity
+import com.blockchain.preferences.BrowserIdentityMapping
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.data.Settings.Companion.UNIT_FIAT
 import info.blockchain.wallet.crypto.AESUtil
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import org.bitcoinj.core.ECKey
+import org.bitcoinj.core.Sha256Hash
+import org.spongycastle.util.encoders.Hex
 import piuk.blockchain.androidcore.utils.PersistentPrefs.Companion.KEY_SWIPE_TO_RECEIVE_ENABLED
 import java.util.Currency
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 interface UUIDGenerator {
     fun generateUUID(): String
@@ -301,7 +311,7 @@ class PrefsUtil(
             .putString(
                 KEY_ENCRYPTED_GUID,
                 aes.encrypt(
-                    getValue(PersistentPrefs.KEY_WALLET_GUID, ""),
+                    getValue(KEY_WALLET_GUID, ""),
                     encryptionKey,
                     AESUtil.PIN_PBKDF2_ITERATIONS_GUID
                 )
@@ -309,7 +319,7 @@ class PrefsUtil(
             .putString(
                 KEY_ENCRYPTED_SHARED_KEY,
                 aes.encrypt(
-                    getValue(PersistentPrefs.KEY_SHARED_KEY, ""),
+                    getValue(KEY_SHARED_KEY, ""),
                     encryptionKey,
                     AESUtil.PIN_PBKDF2_ITERATIONS_SHAREDKEY
                 )
@@ -330,7 +340,7 @@ class PrefsUtil(
             backupStore.getString(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, "") ?: ""
         )
         setValue(
-            PersistentPrefs.KEY_WALLET_GUID,
+            KEY_WALLET_GUID,
             aes.decrypt(
                 backupStore.getString(KEY_ENCRYPTED_GUID, ""),
                 decryptionKey,
@@ -338,7 +348,7 @@ class PrefsUtil(
             )
         )
         setValue(
-            PersistentPrefs.KEY_SHARED_KEY,
+            KEY_SHARED_KEY,
             aes.decrypt(
                 backupStore.getString(KEY_ENCRYPTED_SHARED_KEY, ""),
                 decryptionKey,
@@ -400,6 +410,22 @@ class PrefsUtil(
 
     override val encodedKeyName: String
         get() = KEY_ENCRYPTED_PIN_CODE
+
+    override var sharedKey: String
+        get() = getValue(KEY_SHARED_KEY, "")
+        set(value) = setValue(KEY_SHARED_KEY, value)
+
+    override var walletGuid: String
+        get() = getValue(KEY_WALLET_GUID, "")
+        set(value) = setValue(KEY_WALLET_GUID, value)
+
+    override var encryptedPassword: String
+        get() = getValue(KEY_ENCRYPTED_PASSWORD, "")
+        set(value) = setValue(KEY_ENCRYPTED_PASSWORD, value)
+
+    override var pinFails: Int
+        get() = getValue(KEY_PIN_FAILS, 0)
+        set(value) = setValue(KEY_PIN_FAILS, value)
 
     override fun clearEncodedPin() {
         removeValue(KEY_ENCRYPTED_PIN_CODE)
@@ -485,17 +511,70 @@ class PrefsUtil(
         clearBackup()
     }
 
+    // Secure Channel Prefs
+    override val deviceKey: String
+        get() = if (has(KEY_SECURE_CHANNEL_IDENTITY_KEY)) {
+            getValue(KEY_SECURE_CHANNEL_IDENTITY_KEY, "")
+        } else {
+            val key = ECKey()
+            setValue(KEY_SECURE_CHANNEL_IDENTITY_KEY, key.privateKeyAsHex)
+            getValue(KEY_SECURE_CHANNEL_IDENTITY_KEY, "")
+        }
+
+    private fun getBrowserIdentityMapping() =
+        Json.decodeFromString<BrowserIdentityMapping>(
+            getValue(KEY_SECURE_CHANNEL_BROWSER_MAPPINGS, """{ "mapping": {} }""")
+        )
+
+    private fun setBrowserIdentityMapping(browserIdentity: BrowserIdentityMapping) =
+        setValue(KEY_SECURE_CHANNEL_BROWSER_MAPPINGS, Json.encodeToString(browserIdentity))
+
+    override fun getBrowserIdentity(pubkeyHash: String): BrowserIdentity? {
+        val browserIdentityMapping = getBrowserIdentityMapping()
+        val mapping = browserIdentityMapping.mapping
+        return mapping.get(pubkeyHash)
+    }
+    override fun addBrowserIdentity(browserIdentity: BrowserIdentity) {
+        getBrowserIdentityMapping().mapping
+            .also { it.put(browserIdentity.pubKeyHash(), browserIdentity) }
+            .also { setBrowserIdentityMapping(BrowserIdentityMapping(it)) }
+    }
+
+    override fun removeBrowserIdentity(pubkeyHash: String) {
+        getBrowserIdentityMapping().mapping
+            .also { it.remove(pubkeyHash) }
+            .also { setBrowserIdentityMapping(BrowserIdentityMapping(it)) }
+    }
+
+    override fun updateBrowserIdentityUsedTimestamp(pubkeyHash: String) {
+        getBrowserIdentityMapping().mapping
+            .also { it.get(pubkeyHash)?.lastUsed = System.currentTimeMillis() }
+            .also { setBrowserIdentityMapping(BrowserIdentityMapping(it)) }
+    }
+    override fun addBrowserIdentityAuthorization(pubkeyHash: String, authorization: Authorization) {
+        getBrowserIdentityMapping().mapping
+            .also { it.get(pubkeyHash)?.authorized?.add(authorization) }
+            .also { setBrowserIdentityMapping(BrowserIdentityMapping(it)) }
+    }
+    override fun pruneBrowserIdentities() {
+        getBrowserIdentityMapping().mapping
+            .filterNot { it.value.lastUsed == 0L &&
+                (System.currentTimeMillis() - it.value.scanned) > TimeUnit.MINUTES.toMillis(2) }
+            .toMutableMap()
+            .also { setBrowserIdentityMapping(BrowserIdentityMapping(it)) }
+    }
+
     /**
      * Clears everything but the GUID for logging back in and the deviceId - for pre-IDV checking
      */
     override fun logOut() {
-        val guid = getValue(PersistentPrefs.KEY_WALLET_GUID, "")
+        val guid = getValue(KEY_WALLET_GUID, "")
         val deviceId = getValue(KEY_PRE_IDV_DEVICE_ID, "")
 
         clear()
 
         setValue(KEY_LOGGED_OUT, true)
-        setValue(PersistentPrefs.KEY_WALLET_GUID, guid)
+        setValue(KEY_WALLET_GUID, guid)
         setValue(KEY_PRE_IDV_DEVICE_ID, deviceId)
     }
 
@@ -569,6 +648,8 @@ class PrefsUtil(
         private const val KEY_ENCRYPTED_GUID = "encrypted_guid"
         private const val KEY_ENCRYPTED_SHARED_KEY = "encrypted_shared_key"
         private const val KEY_CLOUD_BACKUP_ENABLED = "backup_enabled"
+        private const val KEY_SECURE_CHANNEL_IDENTITY_KEY = "secure_channel_identity"
+        private const val KEY_SECURE_CHANNEL_BROWSER_MAPPINGS = "secure_channel_browsers"
 
         // Rating
         private const val HAS_SEEN_RATING = "has_seen_rating"
@@ -582,12 +663,17 @@ class PrefsUtil(
         private const val KEY_SWIPE_RECEIVE_XLM_ADDRESS = "key_swipe_receive_xlm_address"
         private const val KEY_SWIPE_RECEIVE_BTC_ACCOUNT_NAME = "swipe_receive_account_name"
         private const val KEY_SWIPE_RECEIVE_BCH_ACCOUNT_NAME = "swipe_receive_bch_account_name"
-
         // New key
         private const val OFFLINE_CACHE_KEY = "key_offline_address_cache"
-
         // Auth prefs
         private const val KEY_ENCRYPTED_PIN_CODE = "encrypted_pin_code"
         private const val KEY_FINGERPRINT_ENABLED = "fingerprint_enabled"
+
+        private const val KEY_WALLET_GUID = "guid"
+        private const val KEY_SHARED_KEY = "sharedKey"
+        private const val KEY_ENCRYPTED_PASSWORD = "encrypted_password"
+        const val KEY_PIN_FAILS = "pin_fails"
     }
 }
+
+fun BrowserIdentity.pubKeyHash() = Sha256Hash.of(Hex.decode(this.pubkey)).toString()

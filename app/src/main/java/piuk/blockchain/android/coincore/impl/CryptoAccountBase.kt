@@ -30,7 +30,6 @@ import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.identity.Feature
 import piuk.blockchain.android.identity.UserIdentity
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import java.math.BigInteger
@@ -116,8 +115,7 @@ internal class CryptoExchangeAccount(
     override val asset: CryptoCurrency,
     override val label: String,
     private val address: String,
-    override val exchangeRates: ExchangeRateDataManager,
-    val environmentConfig: EnvironmentConfig
+    override val exchangeRates: ExchangeRateDataManager
 ) : CryptoAccountBase() {
 
     override fun requireSecondPassword(): Single<Boolean> =
@@ -138,7 +136,6 @@ internal class CryptoExchangeAccount(
                 asset = asset,
                 label = label,
                 address = address,
-                environmentConfig = environmentConfig,
                 postTransactions = onTxCompleted
             )
         )

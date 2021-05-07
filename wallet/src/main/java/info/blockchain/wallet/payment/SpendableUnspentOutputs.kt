@@ -1,11 +1,11 @@
 package info.blockchain.wallet.payment
 
-import info.blockchain.api.data.UnspentOutput
+import info.blockchain.wallet.payload.model.Utxo
 
 import java.math.BigInteger
 
 class SpendableUnspentOutputs(
-    var spendableOutputs: List<UnspentOutput> = emptyList(),
+    var spendableOutputs: List<Utxo> = emptyList(),
     var absoluteFee: BigInteger = BigInteger.ZERO,
     var consumedAmount: BigInteger = BigInteger.ZERO,
     var isReplayProtected: Boolean = false

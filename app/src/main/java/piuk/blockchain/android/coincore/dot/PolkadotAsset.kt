@@ -16,7 +16,6 @@ import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.thepit.PitLinking
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -31,7 +30,6 @@ internal class PolkadotAsset(
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
-    environmentConfig: EnvironmentConfig,
     private val identity: UserIdentity,
     offlineAccounts: OfflineAccountUpdater,
     private val dotFeatureFlag: FeatureFlag
@@ -44,7 +42,6 @@ internal class PolkadotAsset(
     custodialManager,
     pitLinking,
     crashLogger,
-    environmentConfig,
     offlineAccounts,
     identity
 ) {
@@ -76,7 +73,6 @@ internal class PolkadotAsset(
                     labels.getDefaultCustodialWalletLabel(asset),
                     exchangeRates,
                     custodialManager,
-                    environmentConfig,
                     identity
                 )
             )

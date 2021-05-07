@@ -15,7 +15,7 @@ class XlmCryptoValueTest {
 
     @Test
     fun `format zero`() {
-        CryptoValue.ZeroXlm
+        CryptoValue.zero(CryptoCurrency.XLM)
             .toStringWithSymbol() `should equal` "0 XLM"
     }
 

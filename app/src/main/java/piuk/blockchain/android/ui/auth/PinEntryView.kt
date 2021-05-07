@@ -13,7 +13,7 @@ interface PinEntryView : View {
 
     val pinBoxList: List<ImageView>
 
-    fun showProgressDialog(@StringRes messageId: Int, suffix: String?)
+    fun showProgressDialog(@StringRes messageId: Int)
 
     fun showToast(@StringRes message: Int, @ToastCustom.ToastType toastType: String)
 
@@ -29,7 +29,9 @@ interface PinEntryView : View {
 
     fun showWalletVersionNotSupportedDialog(walletVersion: String?)
 
-    fun goToUpgradeWalletActivity()
+    fun walletUpgradeRequired(passwordTriesRemaining: Int)
+
+    fun onWalletUpgradeFailed()
 
     fun restartPageAndClearTop()
 
@@ -41,6 +43,7 @@ interface PinEntryView : View {
 
     fun goToPasswordRequiredActivity()
 
+    fun finishWithPayloadDecrypted()
     fun finishWithResultOk(pin: String)
 
     fun showFingerprintDialog()
@@ -52,8 +55,6 @@ interface PinEntryView : View {
     fun showMobileNotice(mobileNoticeDialog: MobileNoticeDialog)
 
     fun appNeedsUpgrade(isForced: Boolean)
-
-    fun showTestnetWarning()
 
     fun restartAppWithVerifiedPin()
 

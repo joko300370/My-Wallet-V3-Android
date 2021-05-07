@@ -107,10 +107,8 @@ android {
             buildConfigString "EXPLORER_URL", buildProperties.secrets['prodExplorer']
             buildConfigString "API_URL", buildProperties.secrets['prodApiServer']
             buildConfigString "EVERYPAY_HOST_URL", buildProperties.secrets['prodEverypayHost']
-            buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['prodBtcWebsocket']
             buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['prodEthWebsocket']
             buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['prodBchWebsocket']
-            buildConfigString "XLM_WEBSOCKET_URL", buildProperties.secrets['prodXlmWebsocket']
             buildConfigString "STATUS_API_URL", buildProperties.secrets['prodApiStatus']
             buildConfigString "NABU_WEBSOCKET_URL", buildProperties.secrets['prodNabuWebsocket']
             buildConfigString "HORIZON_URL", buildProperties.secrets['prodHorizonUrl']
@@ -133,10 +131,8 @@ android {
             buildConfigString "EXPLORER_URL", buildProperties.secrets['devExplorer']
             buildConfigString "API_URL", buildProperties.secrets['devApiServer']
             buildConfigString "EVERYPAY_HOST_URL", buildProperties.secrets['stagingEverypayHost']
-            buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['devBtcWebsocket']
             buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['devEthWebsocket']
             buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['devBchWebsocket']
-            buildConfigString "XLM_WEBSOCKET_URL", buildProperties.secrets['devXlmWebsocket']
             buildConfigString "NABU_WEBSOCKET_URL", buildProperties.secrets['devNabuWebsocket']
             buildConfigString "HORIZON_URL", buildProperties.secrets['devHorizonUrl']
             buildConfigString "PIT_LINKING_URL", buildProperties.secrets['devPitDoLink']
@@ -163,11 +159,9 @@ android {
             buildConfigString "EXPLORER_URL", buildProperties.secrets['stagingExplorer']
             buildConfigString "API_URL", buildProperties.secrets['stagingApiServer']
             buildConfigString "EVERYPAY_HOST_URL", buildProperties.secrets['stagingEverypayHost']
-            buildConfigString "BITCOIN_WEBSOCKET_URL", buildProperties.secrets['stagingBtcWebsocket']
             buildConfigString "STATUS_API_URL", buildProperties.secrets['stagingApiStatus']
             buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['stagingEthWebsocket']
             buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['stagingBchWebsocket']
-            buildConfigString "XLM_WEBSOCKET_URL", buildProperties.secrets['stagingXlmWebsocket']
             buildConfigString "NABU_WEBSOCKET_URL", buildProperties.secrets['stagingNabuWebsocket']
             buildConfigString "HORIZON_URL", buildProperties.secrets['stagingHorizonUrl']
             buildConfigString "PIT_LINKING_URL", buildProperties.secrets['stagingPitDoLink']
@@ -182,27 +176,6 @@ android {
             versionNameSuffix '-staging'
             applicationId "piuk.blockchain.android.staging"
             resValue "string", "app_name", "BlockStaging"
-        }
-        envTestnet {
-            dimension "environment"
-            manifestPlaceholders = [
-                    DYNAMIC_LINK_HOST  : buildProperties.secrets['testnetDynamicLink'].string,
-                    DYNAMIC_LINK_HOST_2: buildProperties.secrets['testnetDynamicLink2'].string
-            ]
-            buildConfigString "EXPLORER_URL", buildProperties.secrets['testnetExplorer']
-            buildConfigString "API_URL", buildProperties.secrets['testnetApiServer']
-            buildConfigString "EVERYPAY_HOST_URL", buildProperties.secrets['stagingEverypayHost']
-            buildConfigString "NABU_WEBSOCKET_URL", buildProperties.secrets['testnetNabuWebsocket']
-            buildConfigString "HORIZON_URL", buildProperties.secrets['testnetHorizonUrl']
-            buildConfigString "PIT_LINKING_URL", buildProperties.secrets['testnetPitDoLink']
-            buildConfigString "STATUS_API_URL", buildProperties.secrets['testnetApiStatus']
-            buildConfigString "PIT_LAUNCHING_URL", buildProperties.secrets['testnetPitLaunch']
-            buildConfigString "COINS_WEBSOCKET_URL", buildProperties.secrets['testnetCoinsWebsocket']
-            buildConfigString "SIFT_ACCOUNT_ID", buildProperties.secrets['stagingSiftAccount']
-            buildConfigString "SIFT_BEACON_KEY", buildProperties.secrets['stagingSiftBeaconId']
-            buildConfigField "String", "ENVIRONMENT", '"env_testnet"'
-            buildConfigField "String", "COMMIT_HASH", "\"${getGitCommitHash()}\""
-            versionNameSuffix '-testnet'
         }
     }
 
@@ -276,9 +249,10 @@ dependencies {
     implementation project(':sunriver')
     implementation project(':core')
 
-    api project(':coreui')
-    api project(':notifications')
+    implementation project(':coreui')
+    implementation project(':notifications')
     implementation project(':veriff')
+    implementation project(':blockchainApi')
 
     implementation Libraries.multidex
 
@@ -302,8 +276,12 @@ dependencies {
     implementation Libraries.navigationControllerCore
     implementation Libraries.navigationControllerFragments
 
-    api Libraries.lifecycleViewModel
-    api Libraries.lifecycleExtensions
+    implementation Libraries.lifecycleViewModel
+    implementation Libraries.lifecycleExtensions
+
+    implementation Libraries.camera
+    implementation Libraries.cameraView
+    implementation Libraries.cameraLifecycle
 
     implementation(Libraries.googlePlayServicesBase) {
         exclude group: 'com.android.support'
@@ -313,6 +291,7 @@ dependencies {
 
     implementation Libraries.gson
     implementation Libraries.kotlinJson
+    implementation Libraries.json
 
     // Utils
     implementation Libraries.libPhoneNumber
@@ -349,6 +328,7 @@ dependencies {
     testImplementation Libraries.hamcrestJunit
     testImplementation Libraries.kotlinJunit
     testImplementation Libraries.kluent
+    testImplementation Libraries.jacksonKotlin
     testImplementation(Libraries.mockitoKotlin) {
         ['kotlin-stdlib', 'kotlin-reflect'].each { exclude module: it }
     }
@@ -362,7 +342,6 @@ dependencies {
     androidTestImplementation Libraries.testRunner
     androidTestImplementation Libraries.testRules
 
-    testImplementation Libraries.json
     testImplementation project(':testutils-android')
 
     debugImplementation Libraries.chuckerDebug

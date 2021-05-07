@@ -81,6 +81,8 @@ class EnterTargetAddressSheet : TransactionFlowSheet<DialogTxFlowEnterAddressBin
                 setupLabels(newState)
             }
 
+            upsellGroup.visibleIf { customiser.shouldShowCustodialUpsell(newState) }
+
             if (customiser.enterTargetAddressSheetState(newState) is
                     TargetAddressSheetState.SelectAccountWhenOverMaxLimitSurpassed
             ) {

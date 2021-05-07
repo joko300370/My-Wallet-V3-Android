@@ -1,6 +1,6 @@
 package info.blockchain.wallet.payment
 
-import info.blockchain.api.data.UnspentOutput
+import info.blockchain.wallet.payload.model.Utxo
 import java.math.BigInteger
 
 private val COST_BASE: BigInteger = BigInteger.valueOf(10)
@@ -8,7 +8,7 @@ private val COST_PER_INPUT: BigInteger = BigInteger.valueOf(149)
 private val COST_PER_OUTPUT: BigInteger = BigInteger.valueOf(34)
 
 class CoinSelection(
-    private val coins: List<UnspentOutput>,
+    private val coins: List<Utxo>,
     private val feePerByte: BigInteger
 ) {
     fun select(
@@ -17,7 +17,7 @@ class CoinSelection(
     ): SpendableUnspentOutputs {
         val effectiveCoins = coinSortingMethod.sort(coins).effective(feePerByte)
 
-        val selected = mutableListOf<UnspentOutput>()
+        val selected = mutableListOf<Utxo>()
         var accumulatedValue = BigInteger.ZERO
         var accumulatedFee = BigInteger.ZERO
 
@@ -64,22 +64,22 @@ class CoinSelection(
     }
 }
 
-fun List<UnspentOutput>.sum(): BigInteger {
+fun List<Utxo>.sum(): BigInteger {
     if (isEmpty()) {
         return BigInteger.ZERO
     }
     return this.map { it.value }.reduce { value, acc -> value + acc }
 }
 
-private fun List<UnspentOutput>.effective(feePerByte: BigInteger): List<UnspentOutput> {
+private fun List<Utxo>.effective(feePerByte: BigInteger): List<Utxo> {
     return this.filter { it.isForceInclude || effectiveValue(it, feePerByte) > BigInteger.ZERO }
 }
 
-private fun List<UnspentOutput>.balance(feePerByte: BigInteger, outputs: Int): BigInteger {
+private fun List<Utxo>.balance(feePerByte: BigInteger, outputs: Int): BigInteger {
     return this.sum() - transactionBytes(this.size, outputs) * feePerByte
 }
 
-private val List<UnspentOutput>.replayProtected get(): Boolean {
+private val List<Utxo>.replayProtected get(): Boolean {
     return this.firstOrNull()?.isReplayable != true
 }
 
@@ -93,6 +93,6 @@ private fun transactionBytes(inputs: Int, outputs: Int): BigInteger {
             COST_PER_OUTPUT.multiply(outputs.toBigInteger())
 }
 
-private fun effectiveValue(coin: UnspentOutput, feePerByte: BigInteger): BigInteger {
+private fun effectiveValue(coin: Utxo, feePerByte: BigInteger): BigInteger {
     return (coin.value - feePerByte.multiply(COST_PER_INPUT)).max(BigInteger.ZERO)
 }

@@ -1,0 +1,30 @@
+apply plugin: 'kotlin'
+apply plugin: 'java-library'
+apply plugin: 'kotlinx-serialization'
+apply from: '../quality/ktlint.gradle'
+
+java {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+}
+
+dependencies {
+    implementation project(':common:network')
+    implementation Libraries.kotlin
+    implementation Libraries.retrofit
+    implementation Libraries.okHttpInterceptor
+    implementation Libraries.retrofitRxJavaAdapter
+    implementation Libraries.kotlinJson
+    implementation Libraries.retrofitKotlinJsonConverter
+
+    implementation Libraries.koin
+
+    testImplementation Libraries.junit
+    testImplementation Libraries.mockito
+    testImplementation Libraries.hamcrestJunit
+    testImplementation Libraries.kotlinJunit
+    testImplementation Libraries.kluent
+    testImplementation(Libraries.mockitoKotlin) {
+        ['kotlin-stdlib', 'kotlin-reflect'].each { exclude module: it }
+    }
+}

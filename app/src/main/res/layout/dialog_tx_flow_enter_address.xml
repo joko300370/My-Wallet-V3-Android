@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -258,8 +259,8 @@
             app:srcCompat="@drawable/ic_select_account" />
 
         <androidx.appcompat.widget.AppCompatTextView
-            style="@style/Text.Semibold.16"
             android:id="@+id/select_account_cta"
+            style="@style/Text.Semibold.16"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.8"
@@ -282,12 +283,70 @@
         android:layout_marginBottom="@dimen/small_margin"
         android:visibility="gone"
         app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toTopOf="@id/cta_button"
+        app:layout_constraintBottom_toTopOf="@id/upsell_title"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title_pick"
         app:layout_goneMarginBottom="@dimen/standard_margin"
         tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/upsell_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="upsell_title,upsell_message,swap_low_fees_badge,swap_faster_badge"
+        tools:visibility="visible" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/upsell_title"
+        style="@style/Text.Semibold.16"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/grid_6"
+        android:layout_marginEnd="@dimen/grid_6"
+        android:text="@string/upsell_title"
+        app:layout_constraintBottom_toTopOf="@+id/upsell_message"
+        app:layout_constraintTop_toBottomOf="@id/wallet_select"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/upsell_message"
+        style="@style/Text.Light.12"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/grid_1"
+        android:text="@string/upsell_message"
+        app:layout_constraintBottom_toTopOf="@id/swap_low_fees_badge"
+        app:layout_constraintEnd_toEndOf="@+id/upsell_title"
+        app:layout_constraintStart_toStartOf="@+id/upsell_title"
+        app:layout_constraintTop_toBottomOf="@+id/upsell_title"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <piuk.blockchain.android.ui.customviews.StatusPill
+        android:id="@+id/swap_low_fees_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/grid_1"
+        android:layout_marginBottom="@dimen/grid_4"
+        android:text="@string/swap_low_fees"
+        app:layout_constraintBottom_toTopOf="@+id/cta_button"
+        app:layout_constraintStart_toStartOf="@id/upsell_title"
+        app:layout_constraintTop_toBottomOf="@+id/upsell_message"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:status_type="upsell" />
+
+    <piuk.blockchain.android.ui.customviews.StatusPill
+        android:id="@+id/swap_faster_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/very_small_margin"
+        android:text="@string/swap_faster"
+        app:layout_constraintStart_toEndOf="@id/swap_low_fees_badge"
+        app:layout_constraintTop_toBottomOf="@+id/upsell_message"
+        app:layout_constraintTop_toTopOf="@id/swap_low_fees_badge"
+        app:status_type="upsell" />
 
     <Button
         android:id="@+id/cta_button"

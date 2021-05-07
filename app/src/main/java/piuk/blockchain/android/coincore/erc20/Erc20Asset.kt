@@ -21,7 +21,6 @@ import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.thepit.PitLinking
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
@@ -43,7 +42,6 @@ internal class Erc20Asset(
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
-    environmentConfig: EnvironmentConfig,
     offlineAccounts: OfflineAccountUpdater,
     private val identity: UserIdentity
 ) : CryptoAssetBase(
@@ -55,7 +53,6 @@ internal class Erc20Asset(
     custodialManager,
     pitLinking,
     crashLogger,
-    environmentConfig,
     offlineAccounts,
     identity
 ) {

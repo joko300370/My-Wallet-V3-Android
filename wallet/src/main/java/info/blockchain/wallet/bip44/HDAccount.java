@@ -6,7 +6,7 @@ import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.crypto.ChildNumber;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.HDKeyDerivation;
-import org.bitcoinj.params.BitcoinMainNetParams;
+import org.bitcoinj.params.MainNetParams;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -17,14 +17,14 @@ import java.util.List;
  */
 public class HDAccount {
 
-    private DeterministicKey aKey;
+    private final DeterministicKey aKey;
     private int aID;
-    private List<HDChain> chains;
+    private final List<HDChain> chains;
 
-    private String strXPUB;
+    private final String strXPUB;
     private String strPath = null;
 
-    private NetworkParameters params;
+    private final NetworkParameters params;
 
     /**
      * Constructor for account.
@@ -49,7 +49,6 @@ public class HDAccount {
         chains.add(new HDChain(params, aKey, false));
 
         strPath = aKey.getPathAsString();
-
     }
 
     /**
@@ -71,7 +70,6 @@ public class HDAccount {
         chains = new ArrayList<>();
         chains.add(new HDChain(params, aKey, true));
         chains.add(new HDChain(params, aKey, false));
-
     }
 
     /**
@@ -91,7 +89,6 @@ public class HDAccount {
         chains = new ArrayList<>();
         chains.add(new HDChain(params, aKey, true));
         chains.add(new HDChain(params, aKey, false));
-
     }
 
     /**
@@ -101,7 +98,7 @@ public class HDAccount {
      */
     private DeterministicKey createMasterPubKeyFromXPub(String xpubstr) throws AddressFormatException {
 
-        boolean isTestnet = !(this.params instanceof BitcoinMainNetParams);
+        boolean isTestnet = !(this.params instanceof MainNetParams);
 
         byte[] xpubBytes = Base58.decodeChecked(xpubstr);
 
@@ -189,7 +186,6 @@ public class HDAccount {
         if (idx < 0 || idx > 1) {
             return null;
         }
-
         return chains.get(idx);
     }
 
@@ -201,5 +197,4 @@ public class HDAccount {
     public String getPath() {
         return strPath;
     }
-
 }

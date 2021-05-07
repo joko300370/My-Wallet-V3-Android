@@ -4,12 +4,12 @@ import android.app.LauncherActivity
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.preferences.WalletStatus
-import info.blockchain.wallet.util.FormatsUtil
 import info.blockchain.wallet.util.PasswordUtil
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
 import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.android.util.FormatChecker
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -28,7 +28,8 @@ class CreateWalletPresenter(
     private val prngFixer: PrngFixer,
     private val analytics: Analytics,
     private val walletPrefs: WalletStatus,
-    private val environmentConfig: EnvironmentConfig
+    private val environmentConfig: EnvironmentConfig,
+    private val formatChecker: FormatChecker
 ) : BasePresenter<CreateWalletView>() {
 
     var passwordStrength = 0
@@ -51,7 +52,7 @@ class CreateWalletPresenter(
 
     fun validateCredentials(email: String, password1: String, password2: String): Boolean =
         when {
-            !FormatsUtil.isValidEmailAddress(email) -> {
+            !formatChecker.isValidEmailAddress(email) -> {
                 view.showError(R.string.invalid_email); false
             }
             password1.length < 4 -> {
@@ -80,10 +81,10 @@ class CreateWalletPresenter(
         prngFixer.applyPRNGFixes()
 
         compositeDisposable += payloadDataManager.createHdWallet(password, view.getDefaultAccountName(), email)
-            .doOnNext {
+            .doOnSuccess {
                 accessState.isNewlyCreated = true
-                prefs.setValue(PersistentPrefs.KEY_WALLET_GUID, payloadDataManager.wallet!!.guid)
-                appUtil.sharedKey = payloadDataManager.wallet!!.sharedKey
+                prefs.walletGuid = payloadDataManager.wallet!!.guid
+                prefs.sharedKey = payloadDataManager.wallet!!.sharedKey
             }
             .doOnSubscribe { view.showProgressDialog(R.string.creating_wallet) }
             .doOnTerminate { view.dismissProgressDialog() }
@@ -110,17 +111,17 @@ class CreateWalletPresenter(
             view.getDefaultAccountName(),
             email,
             password
-        ).doOnNext {
+        ).doOnSuccess {
             accessState.isNewlyCreated = true
             accessState.isRestored = true
-            prefs.setValue(PersistentPrefs.KEY_WALLET_GUID, payloadDataManager.wallet!!.guid)
-            appUtil.sharedKey = payloadDataManager.wallet!!.sharedKey
+            prefs.walletGuid = payloadDataManager.wallet!!.guid
+            prefs.sharedKey = payloadDataManager.wallet!!.sharedKey
         }.doOnSubscribe {
             view.showProgressDialog(R.string.restoring_wallet)
         }.doOnTerminate {
             view.dismissProgressDialog()
         }.subscribeBy(
-            onComplete = {
+            onSuccess = {
                 prefs.setValue(PersistentPrefs.KEY_EMAIL, email)
                 prefs.setValue(PersistentPrefs.KEY_ONBOARDING_COMPLETE, true)
                 view.startPinEntryActivity()

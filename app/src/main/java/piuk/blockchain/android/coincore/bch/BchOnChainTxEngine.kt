@@ -2,19 +2,20 @@ package piuk.blockchain.android.coincore.bch
 
 import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
-import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import info.blockchain.wallet.exceptions.HDWalletException
+import info.blockchain.wallet.payload.model.Utxo
 import info.blockchain.wallet.payment.Payment
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import info.blockchain.wallet.util.FormatsUtil
+import info.blockchain.wallet.bch.BchMainNetParams
+import info.blockchain.wallet.keys.SigningKey
+import info.blockchain.wallet.payload.data.XPub
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
-import org.bitcoinj.core.ECKey
-import org.bitcoinj.core.NetworkParameters
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FeeSelection
@@ -45,7 +46,6 @@ class BchOnChainTxEngine(
     private val payloadDataManager: PayloadDataManager,
     private val sendDataManager: SendDataManager,
     private val feeManager: FeeDataManager,
-    private val networkParams: NetworkParameters,
     walletPreferences: WalletStatus,
     requireSecondPassword: Boolean
 ) : OnChainTxEngineBase(
@@ -100,18 +100,18 @@ class BchOnChainTxEngine(
         }
     }
 
-    private fun getUnspentApiResponse(address: String): Single<UnspentOutputs> =
+    private fun getUnspentApiResponse(address: String): Single<List<Utxo>> =
         if (bchDataManager.getAddressBalance(address) > CryptoValue.zero(sourceAsset)) {
             sendDataManager.getUnspentBchOutputs(address)
                 // If we get here, we should have balance and valid UTXOs. IF we don't, then, um... we'd best fail hard
                 .map { utxo ->
-                    if (utxo.unspentOutputs.isEmpty()) {
+                    if (utxo.isEmpty()) {
                         Timber.e("No BTC UTXOs found for non-zero balance!")
                         throw IllegalStateException("No BTC UTXOs found for non-zero balance")
                     } else {
                         utxo
                     }
-                }.singleOrError()
+                }
         } else {
             Single.error(Throwable("No BCH funds"))
         }
@@ -121,16 +121,22 @@ class BchOnChainTxEngine(
         balance: CryptoValue,
         pendingTx: PendingTx,
         feePerKb: CryptoValue,
-        coins: UnspentOutputs
+        coins: List<Utxo>
     ): PendingTx {
+        val targetOutputType = payloadDataManager.getAddressOutputType(bchTarget.address)
+        val changeOutputType = payloadDataManager.getXpubFormatOutputType(XPub.Format.LEGACY)
+
         val available = sendDataManager.getMaximumAvailable(
             cryptoCurrency = sourceAsset,
+            targetOutputType = targetOutputType,
             unspentCoins = coins,
             feePerKb = feePerKb
         )
 
         val unspentOutputs = sendDataManager.getSpendableCoins(
             unspentCoins = coins,
+            targetOutputType = targetOutputType,
+            changeOutputType = changeOutputType,
             paymentAmount = amount,
             feePerKb = feePerKb
         )
@@ -214,8 +220,8 @@ class BchOnChainTxEngine(
 
     private fun validateAddress() =
         Completable.fromCallable {
-            if (!FormatsUtil.isValidBCHAddress(networkParams, bchTarget.address) &&
-                !FormatsUtil.isValidBitcoinAddress(networkParams, bchTarget.address)
+            if (!FormatsUtil.isValidBCHAddress(bchTarget.address) &&
+                !FormatsUtil.isValidBitcoinAddress(bchTarget.address)
             ) {
                 throw TxValidationFailure(ValidationState.INVALID_ADDRESS)
             }
@@ -229,40 +235,30 @@ class BchOnChainTxEngine(
             sendDataManager.submitBchPayment(
                 pendingTx.unspentOutputBundle,
                 keys,
-                getFullBitcoinCashAddressFormat(bchTarget.address),
+                FormatsUtil.makeFullBitcoinCashAddress(bchTarget.address),
                 changeAddress,
                 pendingTx.feeAmount.toBigInteger(),
                 pendingTx.amount.toBigInteger()
             ).singleOrError()
         }.doOnSuccess {
-            // logPaymentSentEvent(true, CryptoCurrency.BCH, pendingTransaction.bigIntAmount)
             incrementBchReceiveAddress(pendingTx)
         }.doOnError { e ->
             Timber.e("BCH Send failed: $e")
-            // logPaymentSentEvent(false, BCH.BTC, pendingTransaction.bigIntAmount)
         }.onErrorResumeNext {
             Single.error(TransactionError.ExecutionFailed)
         }.map {
             TxResult.HashedTxResult(it, pendingTx.amount)
         }
 
-    private fun getFullBitcoinCashAddressFormat(cashAddress: String): String {
-        return if (!cashAddress.startsWith(networkParams.bech32AddressPrefix) &&
-            FormatsUtil.isValidBCHAddress(networkParams, cashAddress)
-        ) {
-            networkParams.bech32AddressPrefix + networkParams.bech32AddressSeparator.toChar() + cashAddress
-        } else {
-            cashAddress
-        }
-    }
-
     private fun getBchChangeAddress(): Single<String> {
-        val position =
-            bchDataManager.getAccountMetadataList().indexOfFirst { it.xpub == bchSource.xpubAddress }
+        val position = bchDataManager.getAccountMetadataList()
+            .indexOfFirst {
+                it.xpubs().default.address == bchSource.xpubAddress
+            }
         return bchDataManager.getNextChangeCashAddress(position).singleOrError()
     }
 
-    private fun getBchKeys(pendingTx: PendingTx, secondPassword: String): Single<List<ECKey>> {
+    private fun getBchKeys(pendingTx: PendingTx, secondPassword: String): Single<List<SigningKey>> {
         if (payloadDataManager.isDoubleEncrypted) {
             payloadDataManager.decryptHDWallet(secondPassword)
             bchDataManager.decryptWatchOnlyWallet(payloadDataManager.mnemonic)
@@ -270,7 +266,10 @@ class BchOnChainTxEngine(
 
         val hdAccountList = bchDataManager.getAccountList()
         val acc = hdAccountList.find {
-            it.node.serializePubB58(networkParams) == bchSource.xpubAddress
+            val networkParams = BchMainNetParams.get()
+            val xpub = bchSource.xpubAddress
+            val node = it.node.serializePubB58(networkParams)
+            node == xpub
         } ?: throw HDWalletException("No matching private key found for ${bchSource.xpubAddress}")
 
         return Single.just(

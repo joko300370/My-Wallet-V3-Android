@@ -91,7 +91,8 @@ internal class ReceiveQrActivity :
     }
 
     private fun logShortcutUse() {
-        LauncherShortcutHelper(this).logShortcutUsed(LauncherShortcutHelper.SHORTCUT_ID_QR)
+        LauncherShortcutHelper(this)
+            .logShortcutUsed(LauncherShortcutHelper.SHORTCUT_ID_QR)
     }
 
     companion object {

@@ -8,7 +8,7 @@ public class DeterministicChain implements DeterministicNode {
     public static final int RECEIVE_CHAIN = 0;
     public static final int CHANGE_CHAIN = 1;
 
-    private DeterministicKey deterministicChainKey;
+    private final DeterministicKey deterministicChainKey;
 
     public DeterministicChain(DeterministicKey deterministicAccountKey, int chainIndex) {
         this.deterministicChainKey = HDKeyDerivation.deriveChildKey(deterministicAccountKey, chainIndex);

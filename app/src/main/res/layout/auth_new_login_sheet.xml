@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:id="@+id/new_login_header_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_info_banner_background"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/new_login_sheet_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/tiny_margin"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/vector_sheet_indicator_small" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/new_login_header_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_margin="@dimen/standard_margin"
+            app:srcCompat="@drawable/ic_new_device" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/new_login_header_title"
+            style="@style/Text.Semibold.20"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:text="@string/auth_new_login_device_detected_title" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/new_login_header_label"
+            style="@style/Text.Light.14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/large_margin"
+            android:layout_marginBottom="@dimen/small_margin"
+            android:text="@string/auth_new_login_description" />
+
+        <View
+            android:id="@+id/intro_header_separator"
+            style="@style/Separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="0dp" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/new_login_info_list"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/new_login_header_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/approve_deny_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/approve_deny_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/secure_login_ip_notice"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:paddingBottom="@dimen/standard_margin"
+        android:text="@string/auth_new_login_approve_deny_description"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/secure_login_ip_notice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/deny_button"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:paddingBottom="@dimen/standard_margin"
+        android:text="@string/auth_new_login_ip_notice"
+        android:textColor="@color/red_800"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/deny_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/approve_button"
+        android:layout_marginTop="@dimen/tiny_margin"
+        android:layout_marginBottom="@dimen/small_margin"
+        android:textColor="@color/red_400"
+        style="@style/CtaButton.White"
+        android:text="@string/auth_new_login_deny_cta"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/approve_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="1"
+        android:layout_marginTop="@dimen/tiny_margin"
+        android:layout_marginBottom="@dimen/small_margin"
+        style="@style/CtaButton.Blue"
+        android:text="@string/auth_new_login_approve_cta"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

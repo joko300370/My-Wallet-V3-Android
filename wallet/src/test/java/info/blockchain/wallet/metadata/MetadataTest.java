@@ -4,17 +4,15 @@ import info.blockchain.wallet.BlockchainFramework;
 import info.blockchain.wallet.FrameworkInterface;
 import info.blockchain.wallet.MockInterceptor;
 import info.blockchain.wallet.api.Environment;
-import info.blockchain.wallet.api.PersistentUrls;
 import info.blockchain.wallet.bip44.HDWallet;
 import info.blockchain.wallet.bip44.HDWalletFactory;
 import info.blockchain.wallet.bip44.HDWalletFactory.Language;
+import info.blockchain.wallet.payload.data.Derivation;
 import info.blockchain.wallet.util.MetadataUtil;
 import info.blockchain.wallet.util.RestClient;
 
-import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.crypto.DeterministicKey;
-import org.bitcoinj.params.BitcoinCashMainNetParams;
-import org.bitcoinj.params.BitcoinMainNetParams;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,11 +23,9 @@ import retrofit2.Retrofit;
 
 public final class MetadataTest {
 
-    private boolean isEncrypted = false;
-
     private MockInterceptor mockInterceptor;
 
-    private MetadataDerivation metadataDerivation = new MetadataDerivation(BitcoinMainNetParams.get());
+    private final MetadataDerivation metadataDerivation = new MetadataDerivation();
 
     @Before
     public void setup() {
@@ -53,28 +49,14 @@ public final class MetadataTest {
             }
 
             @Override
-            public Retrofit getRetrofitExplorerInstance() {
-                return null;
-            }
-
-            @Override
             public Environment getEnvironment() {
                 return Environment.PRODUCTION;
             }
 
-            @Override
-            public NetworkParameters getBitcoinParams() {
-                return BitcoinMainNetParams.get();
-            }
-
-            @Override
-            public NetworkParameters getBitcoinCashParams() {
-                return BitcoinCashMainNetParams.get();
-            }
-
+            @NotNull
             @Override
             public String getApiCode() {
-                return null;
+                return "API_CODE";
             }
 
             @Override
@@ -89,11 +71,15 @@ public final class MetadataTest {
         });
     }
 
-    private HDWallet getWallet() throws Exception {
-
+    private HDWallet getWallet() {
         return HDWalletFactory
-                .restoreWallet(PersistentUrls.getInstance().getBitcoinParams(), Language.US,
-                        "15e23aa73d25994f1921a1256f93f72c", "", 1);
+            .restoreWallet(
+                Language.US,
+                "15e23aa73d25994f1921a1256f93f72c",
+                "",
+                1,
+                Derivation.LEGACY_PURPOSE
+            );
     }
 
     @Test
@@ -104,8 +90,11 @@ public final class MetadataTest {
         mockInterceptor.setResponseString("{\"message\":\"Not Found\"}");
         mockInterceptor.setResponseCode(404);
 
-        DeterministicKey metaDataHDNode = MetadataUtil.INSTANCE.deriveMetadataNode(getWallet().getMasterKey());
+        DeterministicKey metaDataHDNode = MetadataUtil.INSTANCE.deriveMetadataNode(
+            getWallet().getMasterKey().toDeterministicKey()
+        );
 
+        boolean isEncrypted = false;
         Metadata metadata = Metadata.Companion.newInstance(metaDataHDNode, 2, isEncrypted, null, metadataDerivation);
 
         Assert.assertEquals(metadata.getAddress(), address);

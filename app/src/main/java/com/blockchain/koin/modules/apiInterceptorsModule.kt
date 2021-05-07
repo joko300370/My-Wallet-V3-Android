@@ -12,6 +12,7 @@ import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.api.interceptors.ApiInterceptor
 import piuk.blockchain.androidcore.data.api.interceptors.DeviceIdInterceptor
 import piuk.blockchain.androidcore.data.api.interceptors.UserAgentInterceptor
+import piuk.blockchain.androidcore.utils.PersistentPrefs
 
 val apiInterceptorsModule = module {
 
@@ -27,7 +28,7 @@ val apiInterceptorsModule = module {
                     ApiInterceptor(),
                     // Add header in all requests
                     UserAgentInterceptor(versionName, Build.VERSION.RELEASE),
-                    DeviceIdInterceptor(get(), get()),
+                    DeviceIdInterceptor(prefs = lazy { get<PersistentPrefs>() }, get()),
                     if (env.environment != Environment.PRODUCTION) {
                             ChuckerInterceptor.Builder(androidContext())
                                 .build()
@@ -39,7 +40,7 @@ val apiInterceptorsModule = module {
                 listOf(
                     // Add header in all requests
                     UserAgentInterceptor(versionName, Build.VERSION.RELEASE),
-                    DeviceIdInterceptor(get(), get())
+                    DeviceIdInterceptor(prefs = lazy { get<PersistentPrefs>() }, get())
                 )
             })
     }

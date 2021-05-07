@@ -1354,7 +1354,6 @@ se disponível. Isso permite que restaure a sua carteira e perder este dispositi
     <string name="swap_enter_amount_min_swap">Troca mínima de %1$s necessária</string>
     <string name="too_many_pending_orders_error_message">A sua Wallet %1$s tem demasiadas trocas em curso. Selecione uma carteira diferente.</string>
     <string name="swap_confirmation_cta_button">Trocar %1$s por %2$s</string>
-    <string name="swap_confirmation_disclaimer">Os valores que envia e recebe podem mudar um pouco devido à atividade do mercado. Quando um pedido começa, não poderemos pará-lo.</string>
     <string name="swap_confirmation_progress_message">Estamos a concluir a sua troca neste momento.</string>
     <string name="swap_confirmation_success_message">O seu %1$s está agora disponível na sua Wallet.</string>
     <string name="swap_progress_title">A trocar %1$s por %2$s</string>
@@ -1466,7 +1465,6 @@ se disponível. Isso permite que restaure a sua carteira e perder este dispositi
     <string name="security_locked_card_funds_explanation">Para sua segurança, as primeiras compras com cartão estão sujeitas a um período de retenção de %1$s dias antes que possa enviar ou retirar a sua criptomoeda comprada. Iremos notificá-lo quando a retenção for levantada.
 
 Enquanto isso, pode vender em dinheiro, trocar e negociar em Blockchain.com.</string>
-    <string name="security_locked_funds_bank_transfer_explanation">O seu montante final pode mudar devido à atividade do mercado. Para o seu título, os pedidos de compra com conta bancária estão sujeitas a um período de retenção de até %1$s dia. Pode trocar ou vender durante esse período. Iremos notificá-lo assim que os fundos estiverem totalmente disponíveis.</string>
     <string name="security_locked_funds_bank_transfer_payment_screen_explanation">Estes fundos já estão disponíveis para Vender e Trocar.
 
 Nota: Não poderá enviar ou retirar estes fundos da sua carteira durante os próximos %1$s dias. Saiba mais</string>

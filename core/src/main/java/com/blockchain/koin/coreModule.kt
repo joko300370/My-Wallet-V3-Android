@@ -16,6 +16,7 @@ import com.blockchain.preferences.InternalFeatureFlagPrefs
 import com.blockchain.preferences.NotificationPrefs
 import com.blockchain.preferences.OfflineCachePrefs
 import com.blockchain.preferences.RatingPrefs
+import com.blockchain.preferences.SecureChannelPrefs
 import com.blockchain.preferences.SecurityPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.preferences.ThePitLinkingPrefs
@@ -24,11 +25,9 @@ import com.blockchain.sunriver.XlmHorizonUrlFetcher
 import com.blockchain.sunriver.XlmTransactionTimeoutFetcher
 import com.blockchain.wallet.SeedAccess
 import com.blockchain.wallet.SeedAccessWithoutPrompt
-import info.blockchain.api.blockexplorer.BlockExplorer
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.wallet.metadata.MetadataDerivation
 import info.blockchain.wallet.util.PrivateKeyFactory
-import org.bitcoinj.params.BitcoinMainNetParams
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import piuk.blockchain.androidcore.BuildConfig
@@ -49,6 +48,8 @@ import piuk.blockchain.androidcore.data.metadata.MoshiMetadataRepositoryAdapter
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManagerSeedAccessAdapter
 import piuk.blockchain.androidcore.data.payload.PayloadService
+import piuk.blockchain.androidcore.data.payload.PayloadVersionController
+import piuk.blockchain.androidcore.data.payload.PayloadVersionControllerImpl
 import piuk.blockchain.androidcore.data.payload.PromptingSeedAccessAdapter
 import piuk.blockchain.androidcore.data.payments.PaymentService
 import piuk.blockchain.androidcore.data.payments.SendDataManager
@@ -77,15 +78,39 @@ val coreModule = module {
 
     single { RxBus() }
 
-    factory { AuthService(get(), get()) }
+    factory {
+        AuthService(
+            walletApi = get(),
+            rxBus = get()
+        )
+    }
 
     factory { PrivateKeyFactory() }
 
     scope(payloadScopeQualifier) {
 
-        factory { PayloadService(get()) }
+        factory {
+            PayloadService(
+                payloadManager = get(),
+                versionController = get()
+            )
+        }
 
-        factory { PayloadDataManager(get(), get(), get(), get(), get()) }
+        factory {
+            PayloadDataManager(
+                payloadService = get(),
+                privateKeyFactory = get(),
+                bitcoinApi = get(),
+                payloadManager = get(),
+                rxBus = get()
+            )
+        }
+
+        factory {
+            PayloadVersionControllerImpl(
+                settingsApi = get()
+            )
+        }.bind(PayloadVersionController::class)
 
         factory {
             DataManagerPayloadDecrypt(
@@ -102,7 +127,7 @@ val coreModule = module {
             MetadataManager(
                 payloadDataManager = get(),
                 metadataInteractor = get(),
-                metadataDerivation = MetadataDerivation(BitcoinMainNetParams.get()),
+                metadataDerivation = MetadataDerivation(),
                 crashLogger = get()
             )
         }
@@ -119,7 +144,12 @@ val coreModule = module {
 
         scoped { WalletOptionsState() }
 
-        scoped { SettingsDataManager(get(), get(), get(), get()) }
+        scoped { SettingsDataManager(
+            settingsService = get(),
+            settingsDataStore = get(),
+            currencyPrefs = get(),
+            rxBus = get()
+        ) }
 
         scoped { SettingsService(get()) }
 
@@ -132,16 +162,26 @@ val coreModule = module {
                 authService = get(),
                 walletOptionsState = get(),
                 settingsDataManager = get(),
-                explorerUrl = get(explorerUrl)
+                explorerUrl = getProperty("explorer-api")
             )
         }.bind(XlmTransactionTimeoutFetcher::class)
-        .bind(XlmHorizonUrlFetcher::class)
+            .bind(XlmHorizonUrlFetcher::class)
 
-        factory { ExchangeRateDataManager(get(), get()) }.bind(ExchangeRates::class)
+        factory {
+            ExchangeRateDataManager(
+                exchangeRateDataStore = get(),
+                rxBus = get()
+            )
+        }.bind(ExchangeRates::class)
 
-        scoped { ExchangeRateDataStore(get(), get()) }
+        scoped {
+            ExchangeRateDataStore(
+                exchangeRateService = get(),
+                prefs = get()
+            )
+        }
 
-        scoped { FeeDataManager(get(), get(), get()) }
+        scoped { FeeDataManager(get(), get()) }
 
         factory {
             AuthDataManager(
@@ -156,19 +196,17 @@ val coreModule = module {
 
         factory { LastTxUpdateDateOnSettingsService(get()) }.bind(LastTxUpdater::class)
 
-        factory { SendDataManager(get(), get(), get()) }
+        factory {
+            SendDataManager(
+                paymentService = get(),
+                lastTxUpdater = get(),
+                rxBus = get()
+            )
+        }
 
         factory { SettingsPhoneNumberUpdater(get()) }.bind(PhoneNumberUpdater::class)
 
         factory { SettingsEmailAndSyncUpdater(get(), get()) }.bind(EmailSyncUpdater::class)
-    }
-
-    single {
-        BlockExplorer(
-            get(explorerRetrofit),
-            get(apiRetrofit),
-            getProperty("api-code")
-        )
     }
 
     factory {
@@ -214,8 +252,14 @@ val coreModule = module {
         .bind(AuthPrefs::class)
         .bind(BankLinkingPrefs::class)
         .bind(InternalFeatureFlagPrefs::class)
+        .bind(SecureChannelPrefs::class)
 
-    factory { PaymentService(get(), get(), get()) }
+    factory {
+        PaymentService(
+            payment = get(),
+            dustService = get()
+        )
+    }
 
     factory {
         PreferenceManager.getDefaultSharedPreferences(

@@ -19,7 +19,7 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
-import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
+import piuk.blockchain.android.ui.transactionflow.plugin.EnterAmountWidget
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.invisible
 import piuk.blockchain.android.util.visible
@@ -30,7 +30,7 @@ class AccountInfoBank @JvmOverloads constructor(
     ctx: Context,
     attr: AttributeSet? = null,
     defStyle: Int = 0
-) : ConstraintLayout(ctx, attr, defStyle), TxFlowWidget {
+) : ConstraintLayout(ctx, attr, defStyle), EnterAmountWidget {
 
     private lateinit var model: TransactionModel
     private val compositeDisposable = CompositeDisposable()

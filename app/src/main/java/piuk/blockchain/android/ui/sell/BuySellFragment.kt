@@ -165,17 +165,11 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
         TYPE_SELL
     }
 
-    override fun onSheetClosed() {
-        subscribeForNavigation()
-    }
+    override fun onSheetClosed() = subscribeForNavigation()
 
-    override fun onSellFinished() {
-        subscribeForNavigation()
-    }
+    override fun onSellFinished() = subscribeForNavigation()
 
-    override fun onSellInfoClicked() {
-        navigator().goToTransfer()
-    }
+    override fun onSellInfoClicked() = navigator().goToTransfer()
 
     override fun onSellListEmptyCta() {
         pager.setCurrentItem(BuySellViewType.TYPE_BUY.ordinal, true)
@@ -198,6 +192,7 @@ internal class ViewPagerAdapter(
 ) : FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     override fun getCount(): Int = titlesList.size
+
     override fun getPageTitle(position: Int): CharSequence =
         titlesList[position]
 

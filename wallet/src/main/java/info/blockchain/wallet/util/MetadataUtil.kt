@@ -1,16 +1,18 @@
 package info.blockchain.wallet.util
 
+import com.google.common.base.Charsets
+import org.bitcoinj.core.Sha256Hash
+import org.bitcoinj.core.Utils
+import org.bitcoinj.core.VarInt
+import org.bitcoinj.crypto.ChildNumber
+import org.bitcoinj.crypto.DeterministicKey
+import org.bitcoinj.crypto.HDKeyDerivation
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.UnsupportedEncodingException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.util.Arrays
-import org.bitcoinj.core.Sha256Hash
-import org.bitcoinj.core.Utils
-import org.bitcoinj.crypto.ChildNumber
-import org.bitcoinj.crypto.DeterministicKey
-import org.bitcoinj.crypto.HDKeyDerivation
 
 object MetadataUtil {
 
@@ -37,15 +39,38 @@ object MetadataUtil {
         }
     }
 
-    @Throws(IOException::class)
     fun magic(payload: ByteArray, prevMagicHash: ByteArray?): ByteArray {
         val msg = message(payload, prevMagicHash)
         return magicHash(msg)
     }
 
     private fun magicHash(message: ByteArray): ByteArray {
-        val messageBytes = Utils.formatMessageForSigning(Base64Util.encodeBase64String(message))
+        val messageBytes = formatMessageForSigning(Base64Util.encodeBase64String(message))
         return Sha256Hash.hashTwice(messageBytes)
+    }
+
+    /** The string that prefixes all text messages signed using Bitcoin keys.  */
+    private const val BITCOIN_SIGNED_MESSAGE_HEADER = "Bitcoin Signed Message:\n"
+    private val BITCOIN_SIGNED_MESSAGE_HEADER_BYTES = BITCOIN_SIGNED_MESSAGE_HEADER.toByteArray(Charsets.UTF_8)
+
+    // public static byte[] formatMessageForSigning(String message)
+    // Given a textual message, returns a byte buffer formatted as follows:
+    //
+    // [24] "Bitcoin Signed Message:\n" [message.length as a varint] message
+    // (This maybe exists in the newer bitcoinj lib, but I can't find it so:
+    private fun formatMessageForSigning(message: String): ByteArray? {
+        return try {
+            val bos = ByteArrayOutputStream()
+            bos.write(BITCOIN_SIGNED_MESSAGE_HEADER_BYTES.size)
+            bos.write(BITCOIN_SIGNED_MESSAGE_HEADER_BYTES)
+            val messageBytes = message.toByteArray(Charsets.UTF_8)
+            val size = VarInt(messageBytes.size.toLong())
+            bos.write(size.encode())
+            bos.write(messageBytes)
+            bos.toByteArray()
+        } catch (e: IOException) {
+            throw RuntimeException(e) // Cannot happen.
+        }
     }
 
     fun deriveHardened(node: DeterministicKey, type: Int): DeterministicKey {

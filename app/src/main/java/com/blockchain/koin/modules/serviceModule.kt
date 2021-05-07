@@ -8,7 +8,6 @@ import com.blockchain.nabu.api.status.ApiStatusService
 import com.blockchain.nabu.datamanagers.ApiStatus
 import com.blockchain.nabu.datamanagers.BlockchainApiStatus
 import info.blockchain.wallet.ApiCode
-import info.blockchain.wallet.BlockchainFramework
 import info.blockchain.wallet.api.FeeApi
 import info.blockchain.wallet.api.FeeEndpoints
 import info.blockchain.wallet.api.WalletApi
@@ -31,9 +30,18 @@ val serviceModule = module {
 
     single { get<Retrofit>(everypayRetrofit).create(EveryPayService::class.java) }
 
-    factory { WalletApi(get(), get()) }
+    factory {
+        WalletApi(
+            explorerInstance = get(),
+            apiCode = get()
+        )
+    }
 
-    factory { Payment() }
+    factory {
+        Payment(
+            bitcoinApi = get()
+        )
+    }
 
     factory { FeeApi(get()) }
 
@@ -46,7 +54,7 @@ val serviceModule = module {
     factory {
         object : ApiCode {
             override val apiCode: String
-                get() = BlockchainFramework.getApiCode()
+                get() = getProperty("api-code")
         }
     }.bind(ApiCode::class)
 

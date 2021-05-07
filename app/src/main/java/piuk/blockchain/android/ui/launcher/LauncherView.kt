@@ -16,8 +16,6 @@ interface LauncherView : View {
 
     fun onCorruptPayload()
 
-    fun onRequestUpgrade()
-
     fun onStartMainActivity(uri: Uri?, launchBuySellIntro: Boolean = false)
 
     fun launchEmailVerification()

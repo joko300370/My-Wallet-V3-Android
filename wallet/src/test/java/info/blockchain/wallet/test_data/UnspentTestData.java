@@ -89,4 +89,43 @@ public class UnspentTestData {
             "\t}],\n" +
             "\"notice\": \"Some funds are pending confirmation and cannot be spent yet (Value 0.001 BTC)\"\n" +
             "}";
+
+
+    public static String singleInput = "{\n" +
+        "\t\"unspent_outputs\": [{\n" +
+        "\t\t\"tx_hash\": \"8b024eb5446a31c058cb75c33d05e4f6412d83596692c3fb977ce01f6bee4540\",\n" +
+        "\t\t\"tx_hash_big_endian\": \"4045ee6b1fe07c97fbc3926659832d41f6e4053dc375cb58c0316a44b54e028b\",\n" +
+        "\t\t\"tx_index\": 136339683,\n" +
+        "\t\t\"tx_output_n\": 0,\n" +
+        "\t\t\"script\": \"76a91459a3602f1dc9fd3ff771e21883dedf18e11107cf88ac\",\n" +
+        "\t\t\"value\": 80200,\n" +
+        "\t\t\"value_hex\": \"4e20\",\n" +
+        "\t\t\"confirmations\": 4228\n" +
+        "\t}],\n" +
+        "\"notice\": \"Some funds are pending confirmation and cannot be spent yet (Value 0.001 BTC)\"\n" +
+        "}";
+
+    public static String doubleInput = "{\n" +
+         "\t\"unspent_outputs\": [{\n" +
+         "\t\t\"tx_hash\": \"8b024eb5446a31c058cb75c33d05e4f6412d83596692c3fb977ce01f6bee4540\",\n" +
+         "\t\t\"tx_hash_big_endian\": \"4045ee6b1fe07c97fbc3926659832d41f6e4053dc375cb58c0316a44b54e028b\",\n" +
+         "\t\t\"tx_index\": 136339683,\n" +
+         "\t\t\"tx_output_n\": 0,\n" +
+         "\t\t\"script\": \"76a91459a3602f1dc9fd3ff771e21883dedf18e11107cf88ac\",\n" +
+         "\t\t\"value\": 80200,\n" +
+         "\t\t\"value_hex\": \"4e20\",\n" +
+         "\t\t\"confirmations\": 4228\n" +
+         "\t}, {\n" +
+         "\t\t\"tx_hash\": \"e6e8df9ab5cbf8eb8f0586e8f15db1ad0049a1b080e9dd2a4c2191ee33f1f0e6\",\n" +
+         "\t\t\"tx_hash_big_endian\": \"e6f0f133ee91214c2adde980b0a14900adb15df1e886058febf8cbb59adfe8e6\",\n" +
+         "\t\t\"tx_index\": 138429831,\n" +
+         "\t\t\"tx_output_n\": 0,\n" +
+         "\t\t\"script\": \"76a91459a3602f1dc9fd3ff771e21883dedf18e11107cf88ac\",\n" +
+         "\t\t\"value\": 70000,\n" +
+         "\t\t\"value_hex\": \"7530\",\n" +
+         "\t\t\"confirmations\": 2607\n" +
+         "\t}],\n" +
+         "\"notice\": \"Some funds are pending confirmation and cannot be spent yet (Value 0.001 BTC)\"\n" +
+         "}";
+
 }

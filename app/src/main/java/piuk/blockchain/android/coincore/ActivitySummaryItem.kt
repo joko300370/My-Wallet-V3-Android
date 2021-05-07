@@ -46,6 +46,12 @@ class FiatActivitySummaryItem(
 ) : ActivitySummaryItem() {
     override fun totalFiatWhenExecuted(selectedFiat: String): Single<Money> =
         Single.just(value)
+
+    override fun toString(): String = "currency = $currency " +
+        "transactionType  = $type " +
+        "timeStamp  = $timeStampMs " +
+        "total  = ${value.toStringWithSymbol()} " +
+        "txId (hash)  = $txId "
 }
 
 abstract class ActivitySummaryItem : Comparable<ActivitySummaryItem> {
@@ -61,7 +67,7 @@ abstract class ActivitySummaryItem : Comparable<ActivitySummaryItem> {
 
     abstract fun totalFiatWhenExecuted(selectedFiat: String): Single<Money>
 
-    override operator fun compareTo(
+    final override operator fun compareTo(
         other: ActivitySummaryItem
     ) = (other.timeStampMs - timeStampMs).sign
 

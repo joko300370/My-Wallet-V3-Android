@@ -234,8 +234,8 @@ abstract class PasswordAuthPresenter<T : PasswordAuthView> : MvpPresenter<T>() {
     private fun attemptDecryptPayload(password: String, payload: String) {
         compositeDisposable += payloadDataManager.initializeFromPayload(payload, password)
             .doOnComplete {
-                appUtil.sharedKey = payloadDataManager.wallet!!.sharedKey
-                prefs.setValue(PersistentPrefs.KEY_WALLET_GUID, payloadDataManager.wallet!!.guid)
+                prefs.sharedKey = payloadDataManager.wallet!!.sharedKey
+                prefs.walletGuid = payloadDataManager.wallet!!.guid
                 prefs.setValue(PersistentPrefs.KEY_EMAIL_VERIFIED, true)
                 prefs.pinId = ""
             }

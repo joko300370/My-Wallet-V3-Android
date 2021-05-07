@@ -1,7 +1,5 @@
 package info.blockchain.wallet;
 
-import info.blockchain.wallet.api.Environment;
-import org.bitcoinj.core.NetworkParameters;
 import retrofit2.Retrofit;
 
 /**
@@ -9,6 +7,7 @@ import retrofit2.Retrofit;
  *
  * TODO: Remove me and replace with Injection framework
  */
+@Deprecated
 public final class BlockchainFramework {
 
     private static FrameworkInterface blockchainInterface;
@@ -20,26 +19,6 @@ public final class BlockchainFramework {
     @Deprecated
     public static Retrofit getRetrofitApiInstance() {
         return blockchainInterface.getRetrofitApiInstance();
-    }
-
-    @Deprecated
-    public static Retrofit getRetrofitExplorerInstance() {
-        return blockchainInterface.getRetrofitExplorerInstance();
-    }
-
-    @Deprecated
-    public static Environment getEnvironment() {
-        return blockchainInterface.getEnvironment();
-    }
-
-    @Deprecated
-    public static NetworkParameters getBitcoinParams() {
-        return blockchainInterface.getBitcoinParams();
-    }
-
-    @Deprecated
-    public static NetworkParameters getBitcoinCashParams() {
-        return blockchainInterface.getBitcoinCashParams();
     }
 
     public static String getApiCode() {

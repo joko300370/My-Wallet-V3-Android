@@ -8,10 +8,10 @@ import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.util.FormatsUtil
+import info.blockchain.wallet.bch.CashAddress
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
-import org.bitcoinj.core.Address
 import piuk.blockchain.android.coincore.CachedAddress
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
@@ -22,7 +22,6 @@ import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.thepit.PitLinking
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
@@ -37,7 +36,6 @@ internal class BchAsset(
     payloadManager: PayloadDataManager,
     private val bchDataManager: BchDataManager,
     custodialManager: CustodialWalletManager,
-    private val environmentSettings: EnvironmentConfig,
     private val feeDataManager: FeeDataManager,
     private val sendDataManager: SendDataManager,
     exchangeRates: ExchangeRateDataManager,
@@ -58,7 +56,6 @@ internal class BchAsset(
     custodialManager,
     pitLinking,
     crashLogger,
-    environmentSettings,
     offlineAccounts,
     identity
 ) {
@@ -81,7 +78,6 @@ internal class BchAsset(
                             bchManager = bchDataManager,
                             addressIndex = i,
                             exchangeRates = exchangeRates,
-                            networkParams = environmentSettings.bitcoinCashNetworkParameters,
                             feeDataManager = feeDataManager,
                             sendDataManager = sendDataManager,
                             walletPreferences = walletPreferences,
@@ -108,9 +104,7 @@ internal class BchAsset(
 
                 for (i in 0 until OFFLINE_CACHE_ITEM_COUNT) {
                     account.getReceiveAddressAtPosition(i)?.let {
-                        val address = Address.fromBase58(environmentSettings.bitcoinCashNetworkParameters, it)
-                        val bech32 = address.toCashAddress()
-
+                        val bech32 = CashAddress.toBech32Url(it)
                         result += CachedAddress(
                             address = it,
                             addressUri = bech32
@@ -136,10 +130,7 @@ internal class BchAsset(
         }
 
     override fun isValidAddress(address: String): Boolean =
-        FormatsUtil.isValidBCHAddress(
-            environmentSettings.bitcoinCashNetworkParameters,
-            address
-        )
+        FormatsUtil.isValidBCHAddress(address)
 
     fun createAccount(xpub: String): Completable {
         bchDataManager.createAccount(xpub)

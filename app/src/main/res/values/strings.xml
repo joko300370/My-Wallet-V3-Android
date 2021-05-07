@@ -205,6 +205,8 @@
     <string name="confirm_details">Confirm Payment</string>
 
     <string name="fee">Fee</string>
+    <string name="card_fee">Card fee</string>
+    <string name="purchase">Purchase</string>
     <string name="exit_confirm">Press back button again to exit</string>
 
     <string name="label_address">Your address has been imported successfully. Optionally assign a
@@ -297,6 +299,7 @@
     <string name="camera_unavailable">The camera is currently opened by another application. Please
         close other application and try again.
     </string>
+    <string name="camera_setup_failed">Camera could not be opened. Please check your permissions</string>
     <string name="validating_password">Validating Password…</string>
     <string name="validating_pin">Validating PIN…</string>
     <string name="creating_pin">Creating PIN…</string>
@@ -401,6 +404,25 @@
     <string name="logout">Logout</string>
     <string name="update">Update</string>
 
+    <!-- SECURE CHANNEL -->
+    <string name="secure_channel_notif_title">New Login Attempt</string>
+    <string name="secure_channel_notif_summary">A new device is attempting to access your Blockchain.com Wallet. Approve or Deny now.</string>
+    <string name="auth_new_login_browser_ip_header">IP Address</string>
+    <string name="auth_new_login_browser_info_header">Browser</string>
+    <string name="auth_new_login_location_header">Location</string>
+    <string name="auth_new_login_last_used_header">Date</string>
+    <string name="auth_new_login_device_detected_title">New Device Detected</string>
+    <string name="auth_new_login_description">We noticed a login attempt from a device you don’t usually use.</string>
+    <string name="auth_new_login_approve_deny_description">If this was you, approve the device below. If you do not recognize this device, deny &amp; block the device now.</string>
+    <string name="auth_new_login_ip_notice">You cannot approve this request unless both devices are on the same network.</string>
+    <string name="auth_new_login_deny_cta">Deny</string>
+    <string name="auth_new_login_approve_cta">Approve</string>
+    <string name="auth_new_login_denied_title">Device Denied</string>
+    <string name="auth_new_login_denied_description">Your wallet is safe. We have blocked this device from logging into your wallet.</string>
+    <string name="auth_new_login_approved_title">Device Approved</string>
+    <string name="auth_new_login_approved_description">Logging you in on the web now.</string>
+
+
     <!-- SETTINGS -->
     <string name="mobile">Mobile</string>
     <string name="profile">Profile</string>
@@ -413,6 +435,8 @@
     <string name="enable">Enable</string>
     <string name="disable">Disable</string>
     <string name="setting_the_exchange">Exchange</string>
+    <string name="settings_pair_wallet">Pair my wallet</string>
+    <string name="web_login">Web Log In</string>
 
     <string name="disable_2fa_first">Please disable 2-step Verification via SMS in the security
         settings first.
@@ -491,13 +515,7 @@
     <string name="rate_no">No, thanks</string>
     <string name="rate_later">Remind me later</string>
     <string name="learn_more">Learn More</string>
-    <string name="pairing_code_log_in">Log in to Web Wallet</string>
-    <string name="pairing_code_instruction_1">Go to %1$s on your computer.</string>
-    <string name="pairing_code_instruction_2">Select Log in via mobile.</string>
-    <string name="pairing_code_instruction_3">Using your computer’s camera, scan the QR code below.</string>
-    <string name="pairing_code_show_qr">Show QR code</string>
-    <string name="pairing_code_hide_qr">Hide QR code</string>
-    <string name="pairing_code_instructions_alert">Never share your mobile pairing QR code with anyone. Anyone who can view this QR code can withdraw funds. Blockchain.com will never ask to view or receive your mobile pairing QR code.</string>
+    <string name="web_wallet_log_in">Log in to Web Wallet</string>
     <string name="email_request_subject_btc">Bitcoin payment request</string>
     <string name="settings_bank_remove_check_title">Are you sure?</string>
     <string name="settings_bank_remove_check_subtitle">You’re about to remove your %1$s Account</string>
@@ -1205,6 +1223,7 @@
 
     <string name="dashboard_total_balance">Total Balance</string>
     <string name="asset_card_rate_period">24hrs</string>
+    <string name="upgrading_wallet">Upgrading Wallet</string>
 
     <string-array name="mnemonic_word_requests">
         <item>first word</item>
@@ -1348,6 +1367,7 @@
     <string name="exchange_default_account_label_1">Exchange Account</string>
     <string name="approximately_symbol">~ %1$s</string>
     <string name="custodial_wallet_default_label_1">Trading Account</string>
+    <string name="custodial_wallet_default_label_2">%s Trading Account</string>
     <string name="select_account_sheet_title">Select a Wallet</string>
     <string name="select_account_sheet_empty">You have no eligible Wallets to perform this action.</string>
     <string name="select_send_sheet_title">Send from</string>
@@ -1574,7 +1594,6 @@
     <string name="send_confirmation_add_note_hint">Add a note</string>
     <string name="send_confirmation_cta_button">Send %1$s</string>
     <string name="swap_confirmation_cta_button">Swap %1$s for %2$s</string>
-    <string name="swap_confirmation_disclaimer">The amounts you send and receive may change slightly due to market activity. Once an order starts, we are unable to stop it.</string>
     <string name="deposit_source_select_title">Linked Banks</string>
     <string name="deposit_confirmation_cta_button">Deposit %1$s</string>
     <string name="deposit_enter_amount_limit_title">Daily Limit</string>
@@ -1793,7 +1812,7 @@
     <string name="qr_activity_hint_new_web_login">Log in to web</string>
 
     <string name="security_locked_card_funds_explanation">For your security, first time card purchases are subject to a %1$s day holding period before you can send or withdraw your purchased crypto. We will notify you when the hold is lifted.\n\nIn the meantime, you can sell into Cash, swap, and trade within Blockchain.com.</string>
-    <string name="security_locked_funds_bank_transfer_explanation">Your final amount might change due to market activity. For your security, buy orders with a bank account are subject up to a %1$s day holding period. You can Swap or Sell during this time. We will notify you once the funds are fully available.</string>
+    <string name="security_locked_funds_bank_transfer_explanation">Your final amount might change due to market activity. An initial hold period of %s days will be applied to your funds. You can Buy, Sell, and Swap during this period.</string>
     <string name="security_locked_funds_bank_transfer_payment_screen_explanation">These funds are available now to Sell &amp; Swap.\n\nNote: You will not be able to Send or Withdraw these funds from your Wallet for the next %1$s days.\n</string>
 
     <!-- content descriptor IDs -->
@@ -1986,4 +2005,31 @@
     <string name="increase_your_limits">Increase your limits</string>
     <string name="increase_your_limits_body">Continue your verification to become Gold level and increase your limits and payment methods.</string>
     <string name="continue_to_gold">Continue to Gold</string>
+
+    <!-- New checkout items -->
+    <string name="checkout_item_price_blurb">Blockchain.com provides the best market price we receive and applies a spread. <annotation link="learn_more">Learn more</annotation></string>
+    <string name="checkout_item_price_fee">Blockchain.com requires a fee when paying with a card. <annotation link="learn_more">Learn more</annotation></string>
+    <string name="checkout_item_private_key_wallet_explanation">%s Private Key wallets, send, and receive are not supported at this time.</string>
+    <string name="checkout_item_deposit_to">Deposit to</string>
+    <string name="checkout_item_sale">Sale</string>
+    <string name="checkout_item_network_fee">%s Network fee</string>
+    <string name="checkout_item_price_note">Blockchain.com provides the best market price we receive and applies a spread.&#160;</string>
+    <string name="checkout_item_network_fee_note">Pays for %1$s miners to confirm your transaction on the blockchain network.&#160;</string>
+    <string name="swap_confirmation_disclaimer_1">Final amount may change due to market activity. By approving this Swap you agree to Blockchain.com’s\n<annotation link="refund_policy">Refund Policy</annotation></string>
+    <string name="checkout_swap_exchange_note">The exchange rate is the best price available for %1$s in terms of 1 %2$s&#160;</string>
+    <string name="upsell_message">Get lower fees and double the transaction speed when you Swap crypto to any Trading Account. Just look for these badges to reduce fees by up to 50%.</string>
+    <string name="upsell_title">Reduce fees. Swap to Trading Account.</string>
+    <string name="swap_erc_20_tooltip">This token is an ERC-20. The network fees are set by the Ethereum Network.&#160;</string>
+    <string name="private_key_wallet_explanation">%s Private Key wallets, send, and receive are not supported at this time.</string>
+
+    <!-- New pairing -->
+    <string name="pairing_wallet_title">Pair your wallet</string>
+    <string name="pairing_wallet_description">You can pair your Wallet with another Blockchain.com property by using your pairing code. If you are pairing your app to the web portal (on %1$s) you will need to use your computer\'s webcam.</string>
+    <string name="pairing_wallet_qr_code_description">This is your unique QR code.</string>
+    <string name="pairing_wallet_warning">Never share this code with anyone. Anyone who can view this QR code can withdraw funds. Blockchain.com will never ask to view or receive your mobile pairing QR code.</string>
+    <string name="pairing_wallet_instruction_1">Go to %1$s on your computer.</string>
+    <string name="pairing_wallet_instruction_2">Select Login via mobile.</string>
+    <string name="pairing_wallet_instruction_3">Using your computer’s camera, scan the QR code below.</string>
+    <string name="pairing_wallet_show_qr">Show QR code</string>
+    <string name="pairing_wallet_hide_qr">Hide QR code</string>
 </resources>

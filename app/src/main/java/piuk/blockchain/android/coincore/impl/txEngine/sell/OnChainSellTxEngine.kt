@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.impl.txEngine.sell
 
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.service.TierService
@@ -16,16 +17,15 @@ import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.android.coincore.updateTxValidity
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 
 class OnChainSellTxEngine(
     private val engine: OnChainTxEngineBase,
-    environmentConfig: EnvironmentConfig,
     walletManager: CustodialWalletManager,
     kycTierService: TierService,
-    quotesEngine: TransferQuotesEngine
+    quotesEngine: TransferQuotesEngine,
+    internalFeatureFlagApi: InternalFeatureFlagApi
 ) : SellTxEngineBase(
-    walletManager, kycTierService, quotesEngine, environmentConfig
+    walletManager, kycTierService, quotesEngine, internalFeatureFlagApi
 ) {
     override val direction: TransferDirection
         get() = TransferDirection.FROM_USERKEY
@@ -50,9 +50,7 @@ class OnChainSellTxEngine(
                     }
             }.map { px ->
                 px.copy(
-                    feeSelection = px.feeSelection.copy(
-                        selectedLevel = defaultFeeLevel(px)
-                    ),
+                    feeSelection = defaultFeeSelection(px),
                     selectedFiat = userFiat
                 )
             }.handlePendingOrdersError(
@@ -67,11 +65,22 @@ class OnChainSellTxEngine(
                 )
             )
 
-    private fun defaultFeeLevel(pendingTx: PendingTx): FeeLevel =
-        if (pendingTx.feeSelection.availableLevels.contains(FeeLevel.Priority))
-            FeeLevel.Priority
-        else
-            pendingTx.feeSelection.selectedLevel
+    private fun defaultFeeSelection(pendingTx: PendingTx): FeeSelection =
+        when {
+            pendingTx.feeSelection.availableLevels.contains(FeeLevel.Priority) -> {
+                pendingTx.feeSelection.copy(
+                    selectedLevel = FeeLevel.Priority,
+                    availableLevels = setOf(FeeLevel.Priority)
+                )
+            }
+            pendingTx.feeSelection.availableLevels.contains(FeeLevel.Regular) -> {
+                pendingTx.feeSelection.copy(
+                    selectedLevel = FeeLevel.Regular,
+                    availableLevels = setOf(FeeLevel.Regular)
+                )
+            }
+            else -> throw Exception("Not supported")
+        }
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         engine.doValidateAmount(pendingTx)
@@ -108,9 +117,7 @@ class OnChainSellTxEngine(
         pendingTx: PendingTx,
         level: FeeLevel,
         customFeeAmount: Long
-    ): Single<PendingTx> {
-        return engine.doUpdateFeeLevel(pendingTx, level, customFeeAmount)
-    }
+    ): Single<PendingTx> = Single.just(pendingTx)
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
         createSellOrder(pendingTx)

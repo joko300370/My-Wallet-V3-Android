@@ -17,50 +17,53 @@ package piuk.blockchain.android.ui.scan
 
 import android.Manifest
 import android.app.Activity
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.graphics.Point
-import android.hardware.Camera
-import android.os.BatteryManager
+import android.graphics.Rect
 import android.os.Bundle
-import android.os.Handler
 import android.os.Parcelable
+import android.preference.PreferenceManager
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.Surface
-import android.view.SurfaceHolder
-import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.widget.Toolbar
+import androidx.camera.core.AspectRatio
+import androidx.camera.core.Camera
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.DecodeHintType
 import com.google.zxing.Result
 import com.karumi.dexter.Dexter
 import info.blockchain.balance.CryptoCurrency
-import io.reactivex.Single
-import io.reactivex.disposables.Disposable
-import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.parcel.Parcelize
-import kotlinx.android.synthetic.main.activity_scan.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.ActivityScanBinding
 import piuk.blockchain.android.ui.base.BlockchainActivity
-import piuk.blockchain.android.ui.scan.camera.CameraManager
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.toast
+import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.android.util.windowRect
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.ui.customviews.toast
-import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
-import java.io.IOException
+import java.util.EnumMap
 import java.util.EnumSet
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * This activity opens the camera and does the actual scanning on a background thread. It draws a viewfinder to help the
@@ -95,29 +98,32 @@ sealed class QrExpected : Parcelable {
     }
 }
 
-class QrScanActivity : BlockchainActivity(), SurfaceHolder.Callback {
+class QrScanActivity : BlockchainActivity() {
 
-    val cameraManager: CameraManager by unsafeLazy {
-        CameraManager(this)
-    }
+    private var cameraProvider: ProcessCameraProvider? = null
+    private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
+    private var preview: Preview? = null
+    private var camera: Camera? = null
+    var targetRect: Rect? = null
+    var framingViewSize = Point()
+    /** Blocking camera operations are performed using this executor */
+    private lateinit var cameraExecutor: ExecutorService
 
-    var handler: Handler? = null
-        private set
-
-    private var hasSurface = false
     private val decodeFormats: Collection<BarcodeFormat>? by unsafeLazy {
-        intent?.let { DecodeFormatManager.parseDecodeFormats(it) }
+        intent?.let { parseDecodeFormats(it, productBarcodeFormats, oneDBarcodeFormats) }
     }
 
     private val decodeHints: Map<DecodeHintType, *>? by unsafeLazy {
-        intent?.let { DecodeHintManager.parseDecodeHints(it) }
+        intent?.let { parseDecodeHints(it) }
     }
 
     private val characterSet: String? by unsafeLazy {
-        intent?.getStringExtra(Intents.Scan.CHARACTER_SET)
+        intent?.getStringExtra(QrScanIntents.CHARACTER_SET)
     }
 
-    private val inactivityTimer = InactivityTimer()
+    private lateinit var binding: ActivityScanBinding
+
+    private val inactivityTimer = InactivityTimer(this)
 
     private var flashStatus = false
     private val hasFlashLight: Boolean by unsafeLazy {
@@ -126,8 +132,8 @@ class QrScanActivity : BlockchainActivity(), SurfaceHolder.Callback {
 
     private val expectedSet: Set<QrExpected>
         get() = intent?.getParcelableArrayExtra(PARAM_EXPECTED_QR)
-                    ?.filterIsInstance<QrExpected>()
-                    ?.toSet() ?: emptySet()
+            ?.filterIsInstance<QrExpected>()
+            ?.toSet() ?: emptySet()
 
     override val alwaysDisableScreenshots: Boolean = true
 
@@ -137,12 +143,17 @@ class QrScanActivity : BlockchainActivity(), SurfaceHolder.Callback {
 
         val window = window
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        setContentView(R.layout.activity_scan)
+        binding = ActivityScanBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar_general)
         setupToolbar(toolbar, R.string.scan_qr)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        supportActionBar!!.setHomeButtonEnabled(true)
+        supportActionBar?.let {
+            it.setDisplayHomeAsUpEnabled(true)
+            it.setHomeButtonEnabled(true)
+        }
+
+        cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
     // handle reverse-mounted cameras on devices like the Nexus 5X
@@ -163,19 +174,16 @@ class QrScanActivity : BlockchainActivity(), SurfaceHolder.Callback {
 
         // CameraManager must be initialized here, not in onCreate()
         // because possible bugs with setting view when not yet measured
-
-        handler = null
-        resetStatusView()
-        val surfaceView = preview_view
-        val surfaceHolder = surfaceView.holder
-        if (hasSurface) {
-            // The activity was paused but not stopped, so the surface still exists. Therefore
-            // surfaceCreated() won't be called, so init the camera here.
-            initCamera(surfaceHolder)
-        } else {
-            // Install the callback and wait for surfaceCreated() to init the camera.
-            surfaceHolder.addCallback(this)
+        binding.previewView.post {
+            try {
+                setUpCamera()
+            } catch (e: IllegalStateException) {
+                toast(resources.getString(R.string.camera_setup_failed), ToastCustom.TYPE_ERROR)
+                setResult(RESULT_CAMERA_ERROR)
+                finish()
+            }
         }
+
         inactivityTimer.onActivityResumed()
 
         doConfigureUiElements()
@@ -183,9 +191,8 @@ class QrScanActivity : BlockchainActivity(), SurfaceHolder.Callback {
 
     private fun doConfigureUiElements() {
         require(expectedSet.isNotEmpty())
-
-        feedback_block.visibleIf { QrExpected.WebLoginQr in expectedSet }
-        instructions.text = if (expectedSet.size > 1) {
+        binding.feedbackBlock.visibleIf { QrExpected.WebLoginQr in expectedSet }
+        binding.instructions.text = if (expectedSet.size > 1) {
             ""
         } else {
             when (val expect = expectedSet.first()) {
@@ -200,16 +207,7 @@ class QrScanActivity : BlockchainActivity(), SurfaceHolder.Callback {
     }
 
     override fun onPause() {
-        (handler as? CaptureActivityHandler)?.quitSynchronously()
-        handler = null
-
         inactivityTimer.onActivityPaused()
-        cameraManager.closeDriver()
-        if (!hasSurface) {
-            val surfaceView = preview_view
-            val surfaceHolder = surfaceView.holder
-            surfaceHolder.removeCallback(this)
-        }
 
         // Close scanner when going to background
         finish()
@@ -232,39 +230,19 @@ class QrScanActivity : BlockchainActivity(), SurfaceHolder.Callback {
                 // Handle these events so they don't launch the Camera app
                 return true
             KeyEvent.KEYCODE_VOLUME_DOWN -> {
-                cameraManager.setTorch(false)
+                camera?.cameraControl?.enableTorch(false)
                 return true
             }
             KeyEvent.KEYCODE_VOLUME_UP -> {
-                cameraManager.setTorch(true)
+                camera?.cameraControl?.enableTorch(true)
                 return true
             }
         }
         return super.onKeyDown(keyCode, event)
     }
 
-    override fun surfaceCreated(holder: SurfaceHolder) {
-        if (holder == null) {
-            Timber.e("*** WARNING *** surfaceCreated() gave us a null surface!")
-        }
-        if (!hasSurface) {
-            hasSurface = true
-            initCamera(holder)
-        }
-    }
-
-    override fun surfaceDestroyed(holder: SurfaceHolder) {
-        hasSurface = false
-    }
-
-    override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) { }
-
-    fun handleDecode(rawResult: Result) {
+    private fun handleDecode(rawResult: Result) {
         inactivityTimer.onActivityEvent()
-        handleDecodeExternally(rawResult)
-    }
-
-    private fun handleDecodeExternally(rawResult: Result) {
         setResult(
             Activity.RESULT_OK,
             Intent(intent.action).apply {
@@ -274,56 +252,11 @@ class QrScanActivity : BlockchainActivity(), SurfaceHolder.Callback {
         finish()
     }
 
-    private fun initCamera(surfaceHolder: SurfaceHolder?) {
-        checkNotNull(surfaceHolder) { "No SurfaceHolder provided" }
-        require(!cameraManager.isOpen)
-
-        try {
-            cameraManager.openDriver(this, surfaceHolder)
-            // Creating the handler starts the preview, which can also throw a RuntimeException.
-            if (handler == null) {
-                handler = CaptureActivityHandler(
-                    this,
-                    decodeFormats,
-                    decodeHints,
-                    characterSet,
-                    cameraManager
-                )
-            }
-
-            val targetRect = viewfinder_guide.windowRect
-            viewfinder_view.let {
-                cameraManager.framingViewSize = Point(it.width, it.height)
-                cameraManager.targetRect = targetRect
-                it.setTargetRect(targetRect)
-            }
-        } catch (e: IOException) {
-            Timber.e(e)
-            finish(RESULT_CAMERA_ERROR)
-        } catch (e: RuntimeException) {
-            // Barcode Scanner has seen crashes in the wild of this variety:
-            // java.?lang.?RuntimeException: Fail to connect to camera service
-            Timber.e("Unexpected error initializing camera: $e")
-            finish(RESULT_CAMERA_ERROR)
-        }
-    }
-
-    private fun finish(error: Int) {
-        setResult(error)
-        finish()
-    }
-
-    private fun resetStatusView() {
-        viewfinder_view.visibility = View.VISIBLE
-    }
-
-    fun drawViewfinder() {
-        viewfinder_view.invalidate()
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean =
         when (item.itemId) {
-            R.id.action_flash_light -> { toggleTorch(); true }
+            R.id.action_flash_light -> {
+                toggleTorch(); true
+            }
             else -> super.onOptionsItemSelected(item)
         }
 
@@ -338,20 +271,180 @@ class QrScanActivity : BlockchainActivity(), SurfaceHolder.Callback {
     private fun toggleTorch() {
         try {
             flashStatus = !flashStatus
-            cameraManager.setTorch(flashStatus)
+            camera?.cameraControl?.enableTorch(flashStatus)
         } catch (e: Exception) {
+            Timber.e(e)
+        }
+    }
+
+    /** Initialize CameraX, and prepare to bind the camera use cases  */
+    private fun setUpCamera() {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+        cameraProviderFuture.addListener({
+
+            // CameraProvider
+            cameraProvider = cameraProviderFuture.get()
+
+            // Select lensFacing depending on the available cameras. The exception is caught in onResume().
+            lensFacing = when {
+                hasCamera(CameraSelector.DEFAULT_BACK_CAMERA) -> CameraSelector.LENS_FACING_BACK
+                hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA) -> CameraSelector.LENS_FACING_FRONT
+                else -> throw IllegalStateException("Back and front camera are unavailable")
+            }
+
+            // Build and bind the camera use cases
+            bindCameraUseCases()
+        }, ContextCompat.getMainExecutor(this))
+    }
+
+    /** Returns true if the device has the specified camera available. False otherwise */
+    private fun hasCamera(cameraSelector: CameraSelector): Boolean {
+        return cameraProvider?.hasCamera(cameraSelector) ?: false
+    }
+
+    /** Declare and bind preview, capture and analysis use cases */
+    private fun bindCameraUseCases() {
+
+        // Get screen metrics used to setup camera for full screen resolution
+        val targetWindowRect = binding.viewfinderGuide.windowRect
+        binding.viewfinderView.let {
+            framingViewSize = Point(it.width, it.height)
+            targetRect = targetWindowRect
+            it.setTargetRect(targetWindowRect)
+        }
+
+        val screenResolution = Point(windowManager.defaultDisplay.width, windowManager.defaultDisplay.height)
+
+        val screenAspectRatio = aspectRatio(screenResolution.x, screenResolution.y)
+
+        val rotation = windowManager.defaultDisplay.rotation
+
+        // CameraProvider, the exception is caught in onResume() where this method is called via setUpCamera().
+        val cameraProvider = cameraProvider
+            ?: throw IllegalStateException("Camera initialization failed.")
+
+        // CameraSelector
+        val cameraSelector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
+
+        // Preview
+        preview = Preview.Builder()
+            // We request aspect ratio but no resolution
+            .setTargetAspectRatio(screenAspectRatio)
+            // Set initial target rotation
+            .setTargetRotation(rotation)
+            .build()
+
+        val imageAnalysis = ImageAnalysis.Builder()
+            .setBackpressureStrategy(ImageAnalysis.STRATEGY_BLOCK_PRODUCER)
+            .build()
+            .also {
+                it.setAnalyzer(cameraExecutor, QrCodeAnalyzer(
+                    targetRect = targetWindowRect,
+                    framingViewSize = framingViewSize,
+                    screenResolution = screenResolution,
+                    hints = buildsHintsMap(),
+                    orientation = resources.configuration.orientation
+                ) { qrResult ->
+                    handleDecode(qrResult)
+                    binding.previewView.post {
+                        finish()
+                    }
+                })
+            }
+
+        // Must unbind the use-cases before rebinding them
+        cameraProvider.unbindAll()
+
+        try {
+            // A variable number of use-cases can be passed here -
+            // camera provides access to CameraControl & CameraInfo
+            camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis)
+            // Attach the viewfinder's surface provider to preview use case
+            preview?.setSurfaceProvider(binding.previewView.surfaceProvider)
+            binding.viewfinderView.invalidate()
+            binding.viewfinderView.visible()
+        } catch (exception: Exception) {
+            Timber.e("Unexpected error initializing camera: $exception")
+            setResult(RESULT_CAMERA_ERROR)
+            finish()
+        }
+    }
+
+    private fun aspectRatio(width: Int, height: Int): Int {
+        val previewRatio = max(width, height).toDouble() / min(width, height)
+        if (abs(previewRatio - RATIO_4_3_VALUE) <= abs(previewRatio - RATIO_16_9_VALUE)) {
+            return AspectRatio.RATIO_4_3
+        }
+        return AspectRatio.RATIO_16_9
+    }
+
+    private fun buildsHintsMap(): EnumMap<DecodeHintType, Any> {
+        val hints = EnumMap<DecodeHintType, Any>(DecodeHintType::class.java)
+        decodeHints?.let {
+            hints.putAll(it)
+        }
+
+        // The prefs can't change while the thread is running, so pick them up once here.
+        hints[DecodeHintType.POSSIBLE_FORMATS] =
+            if (decodeFormats.isNullOrEmpty()) {
+                buildFormatSet()
+            } else {
+                decodeFormats
+            }
+
+        characterSet?.let {
+            hints[DecodeHintType.CHARACTER_SET] = characterSet
+        }
+
+        return hints
+    }
+
+    private fun buildFormatSet(): EnumSet<BarcodeFormat> {
+        return EnumSet.noneOf(BarcodeFormat::class.java).apply {
+            val prefs = PreferenceManager.getDefaultSharedPreferences(this@QrScanActivity)
+            if (prefs.getBoolean(KEY_DECODE_1D, false)) {
+                addAll(oneDBarcodeFormats)
+            }
+            if (prefs.getBoolean(KEY_DECODE_QR, false)) {
+                add(BarcodeFormat.QR_CODE)
+            }
+            if (prefs.getBoolean(KEY_DECODE_DATA_MATRIX, false)) {
+                add(BarcodeFormat.DATA_MATRIX)
+            }
         }
     }
 
     companion object {
+        private const val RATIO_4_3_VALUE = 4.0 / 3.0
+        private const val RATIO_16_9_VALUE = 16.0 / 9.0
         private const val EXTRA_SCAN_RESULT = "EXTRA_SCAN_RESULT"
-        private const val TIMEOUT_MILLIS = 5 * 60 * 1000L
 
         const val RESULT_CAMERA_ERROR = 10
 
         private const val PARAM_EXPECTED_QR = "PARAM_EXPECTED_QR"
 
         const val SCAN_URI_RESULT = 12007
+
+        const val KEY_DECODE_1D = "preferences_decode_1D"
+        const val KEY_DECODE_QR = "preferences_decode_QR"
+        const val KEY_DECODE_DATA_MATRIX = "preferences_decode_Data_Matrix"
+
+        private val productBarcodeFormats: Collection<BarcodeFormat> =
+            EnumSet.of(
+                BarcodeFormat.UPC_A,
+                BarcodeFormat.UPC_E,
+                BarcodeFormat.EAN_13,
+                BarcodeFormat.EAN_8,
+                BarcodeFormat.RSS_14
+            )
+        private val oneDBarcodeFormats: Collection<BarcodeFormat> =
+            EnumSet.of(
+                BarcodeFormat.CODE_39,
+                BarcodeFormat.CODE_93,
+                BarcodeFormat.CODE_128,
+                BarcodeFormat.ITF,
+                BarcodeFormat.CODABAR
+            ) + productBarcodeFormats
 
         fun start(ctx: Activity, expect: Set<QrExpected>) {
             requestScanPermissions(
@@ -371,7 +464,7 @@ class QrScanActivity : BlockchainActivity(), SurfaceHolder.Callback {
         }
 
         private fun doStart(fragment: Fragment, expect: Set<QrExpected>) =
-            if (canOpenScan()) {
+            if (canOpenScan(fragment.requireContext())) {
                 fragment.startActivityForResult(
                     prepIntent(fragment.requireContext(), expect),
                     SCAN_URI_RESULT
@@ -381,7 +474,7 @@ class QrScanActivity : BlockchainActivity(), SurfaceHolder.Callback {
             }
 
         private fun doStart(activity: Activity, expect: Set<QrExpected>) =
-            if (canOpenScan()) {
+            if (canOpenScan(activity)) {
                 activity.startActivityForResult(
                     prepIntent(activity, expect),
                     SCAN_URI_RESULT
@@ -396,24 +489,14 @@ class QrScanActivity : BlockchainActivity(), SurfaceHolder.Callback {
 
         private fun prepIntent(ctx: Context, expect: Set<QrExpected>) =
             Intent(ctx, QrScanActivity::class.java).apply {
-                action = Intents.Scan.ACTION
-                putExtra(Intents.Scan.FORMATS, EnumSet.allOf(BarcodeFormat::class.java))
-                putExtra(Intents.Scan.MODE, Intents.Scan.QR_CODE_MODE)
+                action = QrScanIntents.ACTION
+                putExtra(QrScanIntents.FORMATS, EnumSet.allOf(BarcodeFormat::class.java))
+                putExtra(QrScanIntents.MODE, QrScanIntents.QR_CODE_MODE)
                 putExtra(PARAM_EXPECTED_QR, expect.toTypedArray())
             }
 
-        private fun canOpenScan(): Boolean {
-            var camera: Camera? = null
-
-            return try {
-                camera = Camera.open()
-                true
-            } catch (e: RuntimeException) {
-                false
-            } finally {
-                camera?.release()
-            }
-        }
+        private fun canOpenScan(ctx: Context): Boolean =
+            ActivityCompat.checkSelfPermission(ctx, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
 
         private fun requestScanPermissions(
             ctx: Context,
@@ -435,52 +518,5 @@ class QrScanActivity : BlockchainActivity(), SurfaceHolder.Callback {
 
         fun Intent?.getRawScanData(): String? =
             this?.getStringExtra(EXTRA_SCAN_RESULT)
-    }
-
-    private inner class InactivityTimer {
-
-        private var disposable: Disposable? = null
-
-        fun onActivityEvent() {
-            stop()
-            start()
-        }
-
-        fun onActivityPaused() {
-            stop()
-            unregisterReceiver(powerStatusReceiver)
-        }
-
-        fun onActivityResumed() {
-            registerReceiver(powerStatusReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-            onActivityEvent()
-        }
-
-        fun stop() {
-            disposable?.dispose()
-            disposable = null
-        }
-
-        private fun start() {
-            require(disposable == null)
-
-            disposable = Single.timer(TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
-                .subscribeBy(
-                    onSuccess = { finish() }
-                )
-        }
-
-        private val powerStatusReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                if (Intent.ACTION_BATTERY_CHANGED == intent?.action) {
-                    // 0 indicates that we're on battery
-                    if (intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) <= 0) {
-                        onActivityEvent()
-                    } else {
-                        stop()
-                    }
-                }
-            }
-        }
     }
 }

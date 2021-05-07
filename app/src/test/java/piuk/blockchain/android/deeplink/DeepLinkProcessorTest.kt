@@ -25,10 +25,7 @@ class DeepLinkProcessorTest {
 
     @Test
     fun `unknown uri`() {
-        givenUriExpect(
-            "https://login.blockchain.com/",
-            LinkState.NoUri
-        )
+        givenUriExpect("https://login.blockchain.com/", LinkState.NoUri)
     }
 
     @Test

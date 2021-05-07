@@ -11,13 +11,11 @@ import piuk.blockchain.android.coincore.dot.PolkadotAddress
 import piuk.blockchain.android.coincore.erc20.Erc20Address
 import piuk.blockchain.android.coincore.eth.EthAddress
 import piuk.blockchain.android.coincore.xlm.XlmAddress
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 
 internal fun makeExternalAssetAddress(
     asset: CryptoCurrency,
     address: String,
     label: String = address,
-    environmentConfig: EnvironmentConfig,
     postTransactions: (TxResult) -> Completable = { Completable.complete() }
 ): CryptoAddress =
     when {
@@ -40,7 +38,6 @@ internal fun makeExternalAssetAddress(
             BtcAddress(
                 address = address,
                 label = label,
-                networkParams = environmentConfig.bitcoinNetworkParameters,
                 onTxCompleted = postTransactions
             )
         }

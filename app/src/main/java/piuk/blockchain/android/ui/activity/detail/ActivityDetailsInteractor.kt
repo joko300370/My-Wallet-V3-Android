@@ -27,6 +27,7 @@ import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.TradeActivitySummaryItem
+import piuk.blockchain.android.coincore.bch.BchActivitySummaryItem
 import piuk.blockchain.android.coincore.btc.BtcActivitySummaryItem
 import piuk.blockchain.android.coincore.erc20.Erc20ActivitySummaryItem
 import piuk.blockchain.android.coincore.eth.EthActivitySummaryItem
@@ -108,14 +109,22 @@ class ActivityDetailsInteractor(
         )
         when (summaryItem.type) {
             TransactionSummary.TransactionType.DEPOSIT -> {
-                list.add(To(summaryItem.account.label))
+                list.add(
+                    getToField(
+                        summaryItem.account.label, summaryItem.account.label, summaryItem.cryptoCurrency.displayTicker
+                    )
+                )
             }
             TransactionSummary.TransactionType.WITHDRAW -> {
                 list.add(From(stringUtils.getString(R.string.common_company_name)))
             }
             TransactionSummary.TransactionType.INTEREST_EARNED -> {
                 list.add(From(stringUtils.getString(R.string.common_company_name)))
-                list.add(To(summaryItem.account.label))
+                list.add(
+                    getToField(
+                        summaryItem.account.label, summaryItem.account.label, summaryItem.cryptoCurrency.displayTicker
+                    )
+                )
             }
             else -> {
                 // do nothing
@@ -127,13 +136,11 @@ class ActivityDetailsInteractor(
                 summaryItem.accountRef
             ).map {
                 list.add(
-                    To(
-                        if (it !is NullCryptoAccount) {
-                            it.label
-                        } else {
-                            summaryItem.accountRef
-                        }
-                    )
+                    if (it !is NullCryptoAccount) {
+                        getToField(it.label, it.label, summaryItem.cryptoCurrency.displayTicker)
+                    } else {
+                        To(summaryItem.accountRef)
+                    }
                 )
                 list.toList()
             }.toSingle()
@@ -148,7 +155,7 @@ class ActivityDetailsInteractor(
         val list = mutableListOf(
             TransactionId(item.txId),
             Created(Date(item.timeStampMs)),
-            getFromField(item),
+            getSwapFromField(item),
             Amount(item.sendingValue)
         )
 
@@ -166,8 +173,13 @@ class ActivityDetailsInteractor(
         }
     }
 
-    private fun getFromField(tradeActivity: TradeActivitySummaryItem): From {
+    private fun getSwapFromField(tradeActivity: TradeActivitySummaryItem): From {
         require(tradeActivity.currencyPair is CurrencyPair.CryptoCurrencyPair)
+        return From("${tradeActivity.currencyPair.source.displayTicker} ${tradeActivity.sendingAccount.label}")
+    }
+
+    private fun getSellFromField(tradeActivity: TradeActivitySummaryItem): From {
+        require(tradeActivity.currencyPair is CurrencyPair.CryptoToFiatCurrencyPair)
         return From("${tradeActivity.currencyPair.source.displayTicker} ${tradeActivity.sendingAccount.label}")
     }
 
@@ -178,14 +190,22 @@ class ActivityDetailsInteractor(
             listOf(
                 TransactionId(item.txId),
                 Created(Date(item.timeStampMs)),
-                From(item.sendingAccount.label),
+                getSellFromField(item),
                 Amount(item.sendingValue),
-                From(item.sendingAccount.label),
                 NetworkFee(fee),
                 SellPurchaseAmount(item.receivingValue)
             )
         }
     }
+
+    private fun getToField(label: String, defaultLabel: String, displayTicker: String): To =
+        To(
+            if (label.isEmpty() || label == defaultLabel) {
+                "$displayTicker $defaultLabel"
+            } else {
+                label
+            }
+        )
 
     private fun buildReceivingLabel(item: TradeActivitySummaryItem): Single<To> {
         require(item.currencyPair is CurrencyPair.CryptoCurrencyPair)
@@ -194,19 +214,14 @@ class ActivityDetailsInteractor(
             TransferDirection.ON_CHAIN -> coincore.findAccountByAddress(cryptoPair.destination, item.receivingAddress!!)
                 .toSingle().map {
                     val defaultLabel = defaultLabels.getDefaultNonCustodialWalletLabel(cryptoPair.destination)
-                    To(
-                        if (it.label.isEmpty() || it.label == defaultLabel) {
-                            "${cryptoPair.destination.displayTicker} $defaultLabel"
-                        } else {
-                            it.label
-                        }
-                    )
+                    getToField(it.label, defaultLabel, cryptoPair.destination.displayTicker)
                 }
             TransferDirection.INTERNAL,
             TransferDirection.FROM_USERKEY -> coincore[cryptoPair.destination].accountGroup(AssetFilter.Custodial)
                 .toSingle()
                 .map {
-                    To("${cryptoPair.destination.displayTicker} ${it.selectFirstAccount().label}")
+                    val defaultLabel = it.selectFirstAccount().label
+                    getToField(defaultLabel, defaultLabel, cryptoPair.destination.displayTicker)
                 }
             TransferDirection.TO_USERKEY -> throw IllegalStateException("TO_USERKEY swap direction not supported")
         }
@@ -458,8 +473,10 @@ class ActivityDetailsInteractor(
         return when (val activityItem =
             assetActivityRepository.findCachedItem(cryptoCurrency, txId)) {
             is BtcActivitySummaryItem -> activityItem.updateDescription(description)
+            is BchActivitySummaryItem -> activityItem.updateDescription(description)
             is EthActivitySummaryItem -> activityItem.updateDescription(description)
             is Erc20ActivitySummaryItem -> activityItem.updateDescription(description)
+            is XlmActivitySummaryItem -> activityItem.updateDescription(description)
             else -> {
                 Completable.error(
                     UnsupportedOperationException(
@@ -513,8 +530,10 @@ class ActivityDetailsInteractor(
         item: NonCustodialActivitySummaryItem
     ): Description? = when (item) {
         is BtcActivitySummaryItem,
+        is BchActivitySummaryItem,
         is EthActivitySummaryItem,
-        is Erc20ActivitySummaryItem -> Description(item.description)
+        is Erc20ActivitySummaryItem,
+        is XlmActivitySummaryItem -> Description(item.description)
         else -> null
     }
 

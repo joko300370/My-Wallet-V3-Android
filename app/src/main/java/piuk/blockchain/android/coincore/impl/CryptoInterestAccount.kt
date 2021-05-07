@@ -22,7 +22,6 @@ import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxSourceState
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import java.util.concurrent.atomic.AtomicBoolean
@@ -31,8 +30,7 @@ internal class CryptoInterestAccount(
     override val asset: CryptoCurrency,
     override val label: String,
     val custodialWalletManager: CustodialWalletManager,
-    override val exchangeRates: ExchangeRateDataManager,
-    private val environmentConfig: EnvironmentConfig
+    override val exchangeRates: ExchangeRateDataManager
 ) : CryptoAccountBase(), InterestAccount {
 
     private val hasFunds = AtomicBoolean(false)
@@ -43,7 +41,6 @@ internal class CryptoInterestAccount(
                 asset = asset,
                 address = it,
                 label = label,
-                environmentConfig = environmentConfig,
                 postTransactions = onTxCompleted
             )
         }

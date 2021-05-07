@@ -1351,7 +1351,6 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
     <string name="swap_enter_amount_min_swap">Minimum %1$s takas gerekli</string>
     <string name="too_many_pending_orders_error_message">%1$s Cüzdanınızda işlemde olan çok fazla takas var. Lütfen farklı bir cüzdan seçin.</string>
     <string name="swap_confirmation_cta_button">%2$s için %1$s takas et</string>
-    <string name="swap_confirmation_disclaimer">Gönderdiğiniz ve aldığınız miktar piyasa faaliyeti nedeniyle biraz değişiklik gösteebilir. Emre ait işlem başladığında durdurulamaz.</string>
     <string name="swap_confirmation_progress_message">Şimdi takas işleminizi tamamlıyoruz.</string>
     <string name="swap_confirmation_success_message">%1$s artık Cüzdanınızda kullanılabilir.</string>
     <string name="swap_progress_title">%2$s için %1$s takas ediliyor</string>
@@ -1464,7 +1463,6 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
     <string name="security_locked_card_funds_explanation">Güvenliğiniz için, ilk kez kart satın alımları, satın aldığınız kriptoyu göndermeden veya çekmeden önce %1$s günlük bir tutma süresine tabidir. Bekletme kaldırıldığında sizi bilgilendireceğiz.
 
 Bu arada, Blockchain.com\'da Nakit karşılığı satış yapabilir, takas ve işlem yapabilirsiniz.</string>
-    <string name="security_locked_funds_bank_transfer_explanation">Nihai tutar, piyasa hareketliliği nedeniyle değişebilir. Güvenliğiniz için banka hesabıyla satın alma emirleri %1$s günlük bekletme süresine tabidir. Bu süre zarfında Takas ve Satış işlemi yapabilirsiniz. Para tam olarak kullanılabilir olduğunda sizi bilgilendireceğiz.</string>
     <string name="security_locked_funds_bank_transfer_payment_screen_explanation">Bu fonlar artık Satış ve Takas işlemleri için kullanılabilir.
 
 Not: Önümüzdeki %1$s gün boyunca Bu tutarı cüzdanınızdan gönderemeyecek veya çekemeyeceksiniz. Daha fazla bilgi edin</string>

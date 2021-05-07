@@ -49,3 +49,13 @@ const val APP_STORE_URL = "https://play.google.com/store/apps/details?id="
 const val WEB_WALLET_LOGIN_URI = "login.blockchain.com"
 
 const val WALLET_STATUS_URL = "https://www.blockchain-status.com"
+
+// updated checkouts TODO update with real urls
+const val ORDER_PRICE_EXPLANATION = "https://www.blockchain-status.com"
+const val CARD_FEE_EXPLANATION = "https://www.blockchain-status.com"
+const val PRIVATE_KEY_EXPLANATION = "https://www.blockchain-status.com"
+const val NETWORK_FEE_EXPLANATION = "https://www.blockchain-status.com"
+const val NETWORK_ERC20_EXPLANATION = "https://www.blockchain-status.com"
+const val EXCHANGE_SWAP_RATE_EXPLANATION = "https://www.blockchain-status.com"
+const val CHECKOUT_PRICE_EXPLANATION = "https://www.blockchain-status.com"
+const val CHECKOUT_REFUND_POLICY = "https://www.blockchain-status.com"

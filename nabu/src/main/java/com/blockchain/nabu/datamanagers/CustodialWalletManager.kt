@@ -226,7 +226,11 @@ interface CustodialWalletManager {
         product: Product
     ): Completable
 
-    fun getProductTransferLimits(currency: String, product: Product): Single<TransferLimits>
+    fun getProductTransferLimits(
+        currency: String,
+        product: Product,
+        orderDirection: TransferDirection? = null
+    ): Single<TransferLimits>
 
     fun getSwapTrades(): Single<List<CustodialOrder>>
 
@@ -530,6 +534,10 @@ sealed class PaymentMethod(
         override fun detailedLabel() =
             "$bankName $accountEnding"
 
+        override fun methodName() = bankName
+
+        override fun methodDetails() = "$accountType $accountEnding"
+
         @SuppressLint("DefaultLocale") // Yes, lint is broken
         val uiAccountType: String =
             accountType.toLowerCase(Locale.getDefault()).capitalize(Locale.getDefault())
@@ -549,6 +557,10 @@ sealed class PaymentMethod(
 
         override fun detailedLabel() =
             "${uiLabel()} ${dottedEndDigits()}"
+
+        override fun methodName() = label
+
+        override fun methodDetails() = "${cardType.name} $endDigits"
 
         fun uiLabel() =
             label.takeIf { it.isNotEmpty() } ?: cardType.label()
@@ -576,6 +588,10 @@ sealed class PaymentMethod(
 
     open fun detailedLabel(): String = ""
 
+    open fun methodName(): String = ""
+
+    open fun methodDetails(): String = ""
+
     companion object {
         const val UNDEFINED_CARD_PAYMENT_ID = "UNDEFINED_CARD_PAYMENT_ID"
         const val FUNDS_PAYMENT_ID = "FUNDS_PAYMENT_ID"
@@ -584,11 +600,11 @@ sealed class PaymentMethod(
 
         private const val UNDEFINED_PAYMENT_METHOD_ORDER = 0
         private const val FUNDS_PAYMENT_METHOD_ORDER = 1
+        private const val UNDEFINED_FUNDS_PAYMENT_METHOD_ORDER = 2
         private const val CARD_PAYMENT_METHOD_ORDER = 3
-        private const val BANK_PAYMENT_METHOD_ORDER = 2
         private const val UNDEFINED_CARD_PAYMENT_METHOD_ORDER = 4
-        private const val UNDEFINED_BANK_TRANSFER_METHOD_ORDER = 5
-        private const val UNDEFINED_FUNDS_PAYMENT_METHOD_ORDER = 6
+        private const val BANK_PAYMENT_METHOD_ORDER = 5
+        private const val UNDEFINED_BANK_TRANSFER_METHOD_ORDER = 6
     }
 }
 
@@ -604,7 +620,8 @@ data class PaymentLimits(val min: FiatValue, val max: FiatValue) : Serializable 
 }
 
 enum class Product {
-    SIMPLEBUY,
+    BUY,
+    SELL,
     SAVINGS,
     TRADE
 }

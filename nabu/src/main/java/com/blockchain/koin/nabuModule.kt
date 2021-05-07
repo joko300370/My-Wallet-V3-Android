@@ -24,6 +24,7 @@ import com.blockchain.nabu.datamanagers.TransactionErrorMapper
 import com.blockchain.nabu.datamanagers.UniqueAnalyticsNabuUserReporter
 import com.blockchain.nabu.datamanagers.UniqueAnalyticsWalletReporter
 import com.blockchain.nabu.datamanagers.WalletReporter
+import com.blockchain.nabu.datamanagers.analytics.NabuAnalytics
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.LiveCustodialWalletManager
 import com.blockchain.nabu.datamanagers.featureflags.BankLinkingEnabledProvider
 import com.blockchain.nabu.datamanagers.featureflags.BankLinkingEnabledProviderImpl
@@ -62,6 +63,7 @@ import com.blockchain.nabu.service.TierService
 import com.blockchain.nabu.service.TierUpdater
 import com.blockchain.nabu.status.KycTiersQueries
 import com.blockchain.nabu.stores.NabuSessionTokenStore
+import com.blockchain.notifications.analytics.Analytics
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -273,7 +275,7 @@ val nabuModule = module {
 
     single {
         RetailWalletTokenService(
-            environmentConfig = get(),
+            explorerPath = getProperty("explorer-api"),
             apiCode = getProperty("api-code"),
             retrofit = get(moshiExplorerRetrofit)
         )
@@ -289,6 +291,10 @@ val nabuModule = module {
             .add(CampaignStateMoshiAdapter())
             .add(CampaignTransactionStateMoshiAdapter())
     }
+
+    single(nabu) {
+        NabuAnalytics(analyticsService = get(), prefs = lazy { get() })
+    }.bind(Analytics::class)
 }
 
 val authenticationModule = module {

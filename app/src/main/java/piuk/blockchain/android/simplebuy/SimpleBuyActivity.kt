@@ -73,9 +73,7 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
         }
     }
 
-    override fun onSheetClosed() {
-        subscribeForNavigation()
-    }
+    override fun onSheetClosed() = subscribeForNavigation()
 
     private fun subscribeForNavigation() {
         compositeDisposable += simpleBuyFlowNavigator.navigateTo(
@@ -184,9 +182,7 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
         KycNavHostActivity.startForResult(this, CampaignType.SimpleBuy, KYC_STARTED)
     }
 
-    override fun pop() {
-        onBackPressed()
-    }
+    override fun pop() = onBackPressed()
 
     override fun hasMoreThanOneFragmentInTheStack(): Boolean =
         supportFragmentManager.backStackEntryCount > 1
@@ -211,17 +207,11 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
             .commitAllowingStateLoss()
     }
 
-    override fun onSupportNavigateUp(): Boolean = consume {
-        onBackPressed()
-    }
+    override fun onSupportNavigateUp(): Boolean = consume { onBackPressed() }
 
-    override fun showLoading() {
-        progress.visible()
-    }
+    override fun showLoading() = progress.visible()
 
-    override fun hideLoading() {
-        progress.gone()
-    }
+    override fun hideLoading() = progress.gone()
 
     override fun launchBankAuthWithError(errorState: ErrorState) {
         startActivity(BankAuthActivity.newInstance(errorState, BankAuthSource.SIMPLE_BUY, this))

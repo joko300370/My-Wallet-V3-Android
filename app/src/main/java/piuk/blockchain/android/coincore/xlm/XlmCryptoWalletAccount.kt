@@ -1,10 +1,10 @@
 package piuk.blockchain.android.coincore.xlm
 
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.preferences.WalletStatus
+import com.blockchain.sunriver.XlmAccountReference
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.XlmFeesFetcher
-import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.sunriver.XlmAccountReference
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -22,7 +22,7 @@ import piuk.blockchain.androidcore.utils.extensions.mapList
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal class XlmCryptoWalletAccount(
-    payloadManager: PayloadDataManager,
+    private val payloadManager: PayloadDataManager,
     private var xlmAccountReference: XlmAccountReference,
     private val xlmManager: XlmDataManager,
     override val exchangeRates: ExchangeRateDataManager,
@@ -70,7 +70,8 @@ internal class XlmCryptoWalletAccount(
                 XlmActivitySummaryItem(
                     it,
                     exchangeRates,
-                    account = this
+                    account = this,
+                    payloadDataManager
                 )
             }.flatMap {
                 appendTradeActivity(custodialWalletManager, asset, it)

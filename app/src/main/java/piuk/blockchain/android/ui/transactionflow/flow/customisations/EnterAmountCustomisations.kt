@@ -5,7 +5,7 @@ import android.widget.FrameLayout
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionErrorState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
-import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
+import piuk.blockchain.android.ui.transactionflow.plugin.EnterAmountWidget
 
 interface EnterAmountCustomisations {
     fun enterAmountTitle(state: TransactionState): String
@@ -21,8 +21,8 @@ interface EnterAmountCustomisations {
     fun shouldDisableInput(errorState: TransactionErrorState): Boolean
     fun issueFlashMessage(state: TransactionState, input: CurrencyType?): String?
     fun issueFeesTooHighMessage(state: TransactionState): String?
-    fun installEnterAmountLowerSlotView(ctx: Context, frame: FrameLayout, state: TransactionState): TxFlowWidget
-    fun installEnterAmountUpperSlotView(ctx: Context, frame: FrameLayout, state: TransactionState): TxFlowWidget
+    fun installEnterAmountLowerSlotView(ctx: Context, frame: FrameLayout, state: TransactionState): EnterAmountWidget
+    fun installEnterAmountUpperSlotView(ctx: Context, frame: FrameLayout, state: TransactionState): EnterAmountWidget
     fun shouldShowMaxLimit(state: TransactionState): Boolean
     fun enterAmountLimitsViewTitle(state: TransactionState): String
     fun enterAmountLimitsViewInfo(state: TransactionState): String

@@ -136,10 +136,6 @@ class MetadataManager(
      * Generates the nodes for the shared metadata service and saves them on the service. Takes an
      * optional second password if set by the user. this#loadNodes(String, String, String)
      * must be called first to avoid a {@link NullPointerException}.
-     *
-     * @param secondPassword An optional second password, if applicable
-     * @throws Exception Can throw a {@link DecryptionException} if the second password is wrong, or
-     *                   a generic Exception if saving the nodes fails
      */
     private fun generateNodes(): Completable {
         val remoteMetadataNodes = metadataNodeFactory.remoteMetadataHdNodes(payloadDataManager.masterKey)

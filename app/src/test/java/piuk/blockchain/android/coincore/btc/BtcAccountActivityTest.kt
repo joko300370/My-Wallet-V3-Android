@@ -17,9 +17,10 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import info.blockchain.wallet.payload.data.Account
+import info.blockchain.wallet.payload.data.XPub
+import info.blockchain.wallet.payload.data.XPubs
 import io.reactivex.Single
 import org.amshove.kluent.itReturns
-import org.bitcoinj.core.NetworkParameters
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -38,14 +39,13 @@ class BtcAccountActivityTest {
     private val feeDataManager: FeeDataManager = mock()
     private val exchangeRates: ExchangeRateDataManager = mock()
     private val currencyPrefs: CurrencyPrefs = mock()
-    private val networkParameters: NetworkParameters = mock()
     private val walletPrefs: WalletStatus = mock()
     private val custodialWalletManager: CustodialWalletManager = mock()
     private val refreshTrigger: AccountRefreshTrigger = mock()
 
     private val jsonAccount: Account = mock {
         on { isArchived } itReturns false
-        on { xpub } itReturns ACCOUNT_XPUB
+        on { xpubs } itReturns XPubs(listOf(XPub(ACCOUNT_XPUB, XPub.Format.LEGACY)))
     }
 
     private val subject =
@@ -55,7 +55,6 @@ class BtcAccountActivityTest {
             sendDataManager = sendDataManager,
             feeDataManager = feeDataManager,
             exchangeRates = exchangeRates,
-            networkParameters = networkParameters,
             internalAccount = jsonAccount,
             isHDAccount = true,
             walletPreferences = walletPrefs,
@@ -156,9 +155,9 @@ class BtcAccountActivityTest {
             "sendingAddress",
             "receivingAddress",
             CustodialOrderState.FINISHED,
-            CryptoValue.ZeroBtc,
-            CryptoValue.ZeroEth,
-            CryptoValue.ZeroEth,
+            CryptoValue.zero(CryptoCurrency.BTC),
+            CryptoValue.zero(CryptoCurrency.ETHER),
+            CryptoValue.zero(CryptoCurrency.ETHER),
             CurrencyPair.CryptoCurrencyPair(CryptoCurrency.BTC, CryptoCurrency.ETHER),
             FiatValue.zero("USD"),
             "USD"
@@ -218,9 +217,9 @@ class BtcAccountActivityTest {
             "sendingAddress",
             "receivingAddress",
             CustodialOrderState.FINISHED,
-            CryptoValue.ZeroBtc,
-            CryptoValue.ZeroEth,
-            CryptoValue.ZeroEth,
+            CryptoValue.zero(CryptoCurrency.BTC),
+            CryptoValue.zero(CryptoCurrency.ETHER),
+            CryptoValue.zero(CryptoCurrency.ETHER),
             CurrencyPair.CryptoCurrencyPair(CryptoCurrency.BTC, CryptoCurrency.ETHER),
             FiatValue.zero("USD"),
             "USD"

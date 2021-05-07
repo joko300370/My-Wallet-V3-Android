@@ -3,13 +3,13 @@ package piuk.blockchain.androidcore.data.ethereum
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.logging.LastTxUpdater
 import com.nhaarman.mockito_kotlin.atLeastOnce
+import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.verifyZeroInteractions
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.ethereum.Erc20TokenData
 import info.blockchain.wallet.ethereum.EthAccountApi
 import info.blockchain.wallet.ethereum.EthereumWallet
@@ -19,23 +19,22 @@ import info.blockchain.wallet.ethereum.data.EthAddressResponse
 import info.blockchain.wallet.ethereum.data.EthAddressResponseMap
 import info.blockchain.wallet.ethereum.data.EthLatestBlockNumber
 import info.blockchain.wallet.ethereum.data.EthTransaction
+import info.blockchain.wallet.keys.MasterKey
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
-import junit.framework.Assert
 import org.amshove.kluent.`should contain`
 import org.amshove.kluent.`should equal to`
 import org.amshove.kluent.`should equal`
 import org.amshove.kluent.any
 import org.amshove.kluent.itReturns
 import org.amshove.kluent.mock
-import org.bitcoinj.core.ECKey
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito
 import org.web3j.crypto.RawTransaction
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.erc20.Erc20DataModel
 import piuk.blockchain.androidcore.data.erc20.Erc20Transfer
 import piuk.blockchain.androidcore.data.erc20.datastores.Erc20DataStore
@@ -61,7 +60,6 @@ class EthDataManagerTest {
     private val erc20DataStore: Erc20DataStore = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val walletOptionsDataManager: WalletOptionsDataManager = mock()
     private val metadataManager: MetadataManager = mock()
-    private val environmentSettings: EnvironmentConfig = mock()
     private val lastTxUpdater: LastTxUpdater = mock()
     private val rxBus = RxBus()
 
@@ -72,7 +70,6 @@ class EthDataManagerTest {
             erc20DataStore,
             walletOptionsDataManager,
             metadataManager,
-            environmentSettings,
             lastTxUpdater,
             rxBus
         )
@@ -95,7 +92,6 @@ class EthDataManagerTest {
     fun fetchEthAddress() {
         // Arrange
         val ethAddress = "ADDRESS"
-        whenever(environmentSettings.environment).thenReturn(Environment.PRODUCTION)
         whenever(ethDataStore.ethWallet!!.account.address).thenReturn(ethAddress)
         val ethAddressResponseMap: EthAddressResponseMap = mock()
         whenever(ethAccountApi.getEthAddress(listOf(ethAddress)))
@@ -109,20 +105,6 @@ class EthDataManagerTest {
         verify(ethDataStore).ethAddressResponse = any(CombinedEthModel::class)
         verifyZeroInteractions(ethDataStore)
         verify(ethAccountApi).getEthAddress(listOf(ethAddress))
-        verifyNoMoreInteractions(ethAccountApi)
-    }
-
-    @Test
-    fun fetchEthAddressTestnet() {
-        // Arrange
-        whenever(environmentSettings.environment).thenReturn(Environment.TESTNET)
-        // Act
-        val testObserver = subject.fetchEthAddress().test()
-        // Assert
-        testObserver.assertComplete()
-        testObserver.assertNoErrors()
-        verify(ethDataStore).ethAddressResponse = null
-        verifyZeroInteractions(ethDataStore)
         verifyNoMoreInteractions(ethAccountApi)
     }
 
@@ -264,7 +246,6 @@ class EthDataManagerTest {
     fun getLatestBlock() {
         // Arrange
         val latestBlock = EthLatestBlockNumber()
-        whenever(environmentSettings.environment).thenReturn(Environment.PRODUCTION)
         whenever(ethAccountApi.latestBlockNumber).thenReturn(Single.just(latestBlock))
         // Act
         val testObserver = subject.getLatestBlockNumber().test()
@@ -277,44 +258,18 @@ class EthDataManagerTest {
     }
 
     @Test
-    fun getLatestBlockTestnet() {
-        // Arrange
-        whenever(environmentSettings.environment).thenReturn(Environment.TESTNET)
-        // Act
-        val testObserver = subject.getLatestBlockNumber().test()
-        // Assert
-        testObserver.assertComplete()
-        testObserver.assertNoErrors()
-        verifyNoMoreInteractions(ethAccountApi)
-    }
-
-    @Test
     fun getIfContract() {
         // Arrange
         val address = "ADDRESS"
-        whenever(environmentSettings.environment).thenReturn(Environment.PRODUCTION)
         whenever(ethAccountApi.getIfContract(address)).thenReturn(Observable.just(true))
         // Act
-        val testObserver = subject.getIfContract(address).test()
+        val testObserver = subject.isContractAddress(address).test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         testObserver.assertValue(true)
         verify(ethAccountApi).getIfContract(address)
         verifyNoMoreInteractions(ethAccountApi)
-    }
-
-    @Test
-    fun getIfContractTestnet() {
-        // Arrange
-        val address = "ADDRESS"
-        whenever(environmentSettings.environment).thenReturn(Environment.TESTNET)
-        // Act
-        val testObserver = subject.getIfContract(address).test()
-        // Assert
-        testObserver.assertComplete()
-        testObserver.assertNoErrors()
-        testObserver.assertValue(false)
     }
 
     @Test
@@ -383,12 +338,18 @@ class EthDataManagerTest {
     fun signEthTransaction() {
         // Arrange
         val rawTransaction: RawTransaction = mock()
-        val ecKey: ECKey = mock()
         val byteArray = ByteArray(32)
-        whenever(ethDataStore.ethWallet!!.account!!.signTransaction(rawTransaction, ecKey))
-            .thenReturn(byteArray)
+        val masterKey: MasterKey = mock()
+
+        whenever(ethDataStore.ethWallet!!.account!!.signTransaction(
+            eq(rawTransaction),
+            eq(masterKey)
+        )).thenReturn(byteArray)
+
+        whenever(payloadManager.masterKey).thenReturn(masterKey)
+
         // Act
-        val testObserver = subject.signEthTransaction(rawTransaction, ecKey).test()
+        val testObserver = subject.signEthTransaction(rawTransaction, "").test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
@@ -402,7 +363,6 @@ class EthDataManagerTest {
         // Arrange
         val byteArray = ByteArray(32)
         val hash = "HASH"
-        whenever(environmentSettings.environment).thenReturn(Environment.PRODUCTION)
         whenever(ethAccountApi.pushTx(any(String::class))).thenReturn(Observable.just(hash))
         whenever(lastTxUpdater.updateLastTxTime()).thenReturn(Completable.complete())
         // Act
@@ -420,7 +380,6 @@ class EthDataManagerTest {
         // Arrange
         val byteArray = ByteArray(32)
         val hash = "HASH"
-        whenever(environmentSettings.environment).thenReturn(Environment.PRODUCTION)
         whenever(ethAccountApi.pushTx(any(String::class))).thenReturn(Observable.just(hash))
         whenever(lastTxUpdater.updateLastTxTime()).thenReturn(Completable.error(Exception()))
         // Act
@@ -475,7 +434,6 @@ class EthDataManagerTest {
         whenever(ethDataStore.ethWallet!!.account.address).thenReturn(ethAddress)
         whenever(ethDataStore.ethWallet!!.getErc20TokenData(any()))
             .thenReturn(tokenData)
-        whenever(environmentSettings.environment).thenReturn(Environment.PRODUCTION)
         whenever(ethAccountApi.getErc20Address("ADDRESS", "CONTRACT_ADDRESS"))
             .thenReturn(Observable.just(erc20AddressResponsePax))
         ethDataStore.ethWallet
@@ -555,12 +513,12 @@ class EthDataManagerTest {
         val rawTransaction =
             subject.createErc20Transaction(nonce, to, contractAddress, gasPrice, gasLimit, amount)
 
-        Assert.assertEquals(nonce, rawTransaction!!.nonce)
-        Assert.assertEquals(gasPrice, rawTransaction.gasPrice)
-        Assert.assertEquals(gasLimit, rawTransaction.gasLimit)
-        Assert.assertEquals("0x8E870D67F660D95d5be530380D0eC0bd388289E1", rawTransaction.to)
-        Assert.assertEquals(0.toBigInteger(), rawTransaction.value)
-        Assert.assertEquals(
+        assertEquals(nonce, rawTransaction!!.nonce)
+        assertEquals(gasPrice, rawTransaction.gasPrice)
+        assertEquals(gasLimit, rawTransaction.gasLimit)
+        assertEquals("0x8E870D67F660D95d5be530380D0eC0bd388289E1", rawTransaction.to)
+        assertEquals(0.toBigInteger(), rawTransaction.value)
+        assertEquals(
             "a9059cbb000000000000000000000000d1220a0cf47c7b9be7a2e63a89f429762e7b" +
             "9adb0000000000000000000000000000000000000000000000000000000000000007",
             rawTransaction.data

@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.impl.txEngine.swap
 
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.service.TierService
@@ -12,14 +13,13 @@ import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 
 class TradingToTradingSwapTxEngine(
     walletManager: CustodialWalletManager,
     quotesEngine: TransferQuotesEngine,
     kycTierService: TierService,
-    environmentConfig: EnvironmentConfig
-) : SwapTxEngineBase(quotesEngine, walletManager, kycTierService, environmentConfig) {
+    private val internalFeatureFlagApi: InternalFeatureFlagApi
+) : SwapTxEngineBase(quotesEngine, walletManager, kycTierService, internalFeatureFlagApi) {
 
     override val availableBalance: Single<Money>
         get() = sourceAccount.accountBalance

@@ -34,8 +34,8 @@
         <item
             android:id="@+id/login_web_wallet"
             android:icon="@drawable/ic_nav_web_login"
-            android:title="@string/pairing_code_log_in"
-            app:contentDescription="@string/pairing_code_log_in" />
+            android:title="@string/web_wallet_log_in"
+            app:contentDescription="@string/web_wallet_log_in" />
 
         <item
             android:id="@+id/nav_settings"

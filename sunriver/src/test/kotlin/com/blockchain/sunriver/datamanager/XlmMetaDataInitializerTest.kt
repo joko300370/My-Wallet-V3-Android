@@ -636,8 +636,7 @@ private fun givenSeedPresentOnlyWithSecondPasswordFor(mnemonic: String): SeedAcc
 private fun String.toSeed() =
     Maybe.just(
         Seed(
-            hdSeed = SeedCalculator().calculateSeed(this, ""),
-            masterKey = ByteArray(0)
+            hdSeed = SeedCalculator().calculateSeed(this, "")
         )
     )
 

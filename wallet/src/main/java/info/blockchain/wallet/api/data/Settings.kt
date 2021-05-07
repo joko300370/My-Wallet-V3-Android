@@ -78,7 +78,7 @@ data class Settings(
     val guid: String = "",
 
     @JsonProperty("invited")
-    private val invited: HashMap<String, Boolean>? = null
+    private val invited: HashMap<String, Boolean> = HashMap()
 
 ) {
 
@@ -93,6 +93,11 @@ data class Settings(
 
     val isBlockTorIps: Boolean
         get() = blockTorIps.toBoolean()
+
+    fun isInvitedTo(feature: String) =
+        feature.toLowerCase().let { f ->
+            invited.filterValues { it }.filterKeys { it.equals(f, ignoreCase = true) }.isNotEmpty()
+        }
 
     private fun Int.toBoolean(): Boolean {
         return this != 0

@@ -1,20 +1,24 @@
 package info.blockchain.wallet.payload
 
-import info.blockchain.api.blockexplorer.BlockExplorer
-import info.blockchain.api.blockexplorer.FilterType
-import info.blockchain.api.data.Balance
+import info.blockchain.api.BitcoinApi
+import info.blockchain.api.bitcoin.data.BalanceResponseDto
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.wallet.payload.data.XPubs
+import info.blockchain.wallet.payload.data.legacyXpubAddresses
 import retrofit2.Call
 
-import java.util.HashMap
-
 class BalanceManagerBch(
-    blockExplorer: BlockExplorer
+    bitcoinApi: BitcoinApi
 ) : BalanceManager(
-    blockExplorer,
+    bitcoinApi,
     CryptoCurrency.BCH
 ) {
-    override fun getBalanceOfAddresses(addresses: List<String>): Call<HashMap<String, Balance>> {
-        return blockExplorer.getBalance("bch", addresses, FilterType.RemoveUnspendable)
+    override fun getBalanceOfAddresses(xpubs: List<XPubs>): Call<BalanceResponseDto> {
+        return bitcoinApi.getBalance(
+            BitcoinApi.BITCOIN_CASH,
+            xpubs.legacyXpubAddresses(),
+            emptyList(),
+            BitcoinApi.BalanceFilter.RemoveUnspendable
+        )
     }
 }

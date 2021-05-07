@@ -22,7 +22,6 @@ import piuk.blockchain.android.ui.kyc.email.entry.EmailEntryHost
 import piuk.blockchain.android.ui.kyc.email.entry.KycEmailEntryFragment
 import piuk.blockchain.android.ui.start.LandingActivity
 import piuk.blockchain.android.ui.start.PasswordRequiredActivity
-import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.gone
@@ -72,11 +71,6 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
                 presenter.clearCredentialsAndRestart()
             }
             .show()
-    }
-
-    override fun onRequestUpgrade() {
-        startActivity(Intent(this, UpgradeWalletActivity::class.java))
-        finish()
     }
 
     override fun onStartMainActivity(uri: Uri?, launchBuySellIntro: Boolean) {
