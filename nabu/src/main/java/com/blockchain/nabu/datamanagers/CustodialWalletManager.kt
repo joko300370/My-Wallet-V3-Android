@@ -83,7 +83,11 @@ interface CustodialWalletManager {
         paymentMethodType: PaymentMethodType
     ): Single<WithdrawalFeeAndLimit>
 
-    fun fetchWithdrawLocksTime(paymentMethodType: PaymentMethodType): Single<BigInteger>
+    fun fetchWithdrawLocksTime(
+        paymentMethodType: PaymentMethodType,
+        fiatCurrency: String,
+        productType: String
+    ): Single<BigInteger>
 
     fun createOrder(
         custodialWalletOrder: CustodialWalletOrder,
@@ -253,6 +257,8 @@ interface CustodialWalletManager {
     fun getBankTransferCharge(paymentId: String): Single<BankTransferDetails>
 
     fun executeCustodialTransfer(amount: Money, origin: Product, destination: Product): Completable
+
+    fun updateOpenBankingConsent(url: String, token: String): Completable
 
     val defaultFiatCurrency: String
 }

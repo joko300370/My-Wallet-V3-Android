@@ -1608,6 +1608,7 @@
     <string name="deposit_confirmation_timeout_subtitle">Payments can sometimes take a while to go through. If you approved the transaction, you can safely close this, and check the Deposit progress under the Activity tab.</string>
     <string name="deposit_confirmation_error_title">Oops, looks like something went wrong!</string>
     <string name="deposit_confirmation_error_subtitle">There was an issue with your Deposit, please try again or contact support if the problem persists.</string>
+    <string name="simple_buy_confirmation_error">There was an issue with your payment, please try again or contact support if the problem persists.</string>
     <string name="sell_confirmation_cta_button">Sell %1$s</string>
     <string name="sell_confirmation_progress_title">Selling %1$s</string>
     <string name="sell_confirmation_progress_message">We’re completing your sell now.</string>
@@ -1649,7 +1650,7 @@
     <string name="send_enter_unexpected_error">An unexpected error has occurred. Please try again.</string>
     <string name="send_enter_insufficient_gas">You do not have enough ETH to process this transaction.</string>
     <string name="send_select_a_wallet_title">or Select a Wallet</string>
-    <string name="send_internal_transfer_message_1">At this time you can transfer  %1$s from you  %2$s Trading Account to your  %2$s Private Key Wallets or Interest Account. If you want to transfer to external addresses you can do so from your Private Key Wallet.</string>
+    <string name="send_internal_transfer_message_1">At this time you can transfer %1$s from your %2$s Trading Account to your %2$s Private Key Wallets or Interest Account. If you want to transfer to external addresses you can do so from your Private Key Wallet.</string>
     <string name="send_to_exchange_xlm_title">Sending to an exchange?</string>
     <string name="send_to_exchange_xlm_blurb">&#160;Add a Memo to avoid losing funds.&#160;</string>
     <string name="send_to_exchange_xlm_link"><annotation link="send_memo_link">Learn more about balance requirements.</annotation></string>
@@ -1937,14 +1938,17 @@
     <string name="yapily_empty_cta">Show Transfer Details</string>
     <string name="yapily_find_bank_title">Find Your Bank</string>
     <string name="yapily_agreement_title_1">Data Sharing</string>
-    <string name="yapily_agreement_blurb_1">SafeConnect will retrieve your bank data based on your request and provide this information to Blockchain.</string>
+    <string name="yapily_agreement_blurb_1_1">%1$s will retrieve your bank data based on your request and provide this information to Blockchain.</string>
     <string name="yapily_agreement_title_2">Secure Connection</string>
     <string name="yapily_agreement_blurb_2">Data is securely retrieved in read-only format and only for the duration agreed with you. You have the right to withdraw your consent at any time.</string>
     <string name="yapily_agreement_title_3">FCA Authorisation</string>
     <string name="yapily_agreement_blurb_3">Blockchain is an agent of SafeConnect Ltd. SafeConnect Ltd is authorised and regulated by the Financial Conduct Authority under the Payment Service Regulations 2017 [827001] for the provision of Account Information and Payment Initiation services.</string>
+    <string name="yapily_agreement_blurb_3_1">Blockchain.com is an agent of %1$s Ltd. %1$s Ltd is authorised and regulated by the Financial Conduct Authority under the Payment Service Regulations 2017 [827001] for the provision of Account Information and Payment Initiation services.</string>
     <string name="yapily_agreement_title_4">About the access</string>
-    <string name="yapily_agreement_blurb_4">SafeConnect will then use these details with Blockchain solely for the purposes of buying Cryptocurrency. This access is valid until 24th of January 2021, you can cancel consent at any time via the Blockchain settings or via your bank. This request is not a one-off, you will continue to receive consent requests as older versions expire.</string>
+    <string name="yapily_agreement_blurb_4_1">%1$s will then use these details with Blockchain solely for the purposes of buying cryptocurrencies. This access is valid until %2$s, you can cancel consent at any time via the Blockchain settings or via your bank. This request is not a one-off, you will continue to receive consent requests as older versions expire.</string>
+    <string name="yapily_agreement_blurb_4_2">%1$s will then use these details with Blockchain.com solely for the purposes of buying cryptocurrencies. This consent request is a one-off, you will not receive additional requests once completed.</string>
     <string name="yapily_agreement_blurb_5">In order to share your %1$s data with Blockchain, you will now be securely redirected to your bank to confirm your consent for SafeConnect to read the following information:\n\n• Identification details\n\n• Account(s) details</string>
+    <string name="yapily_agreement_blurb_5_1">In order to share your %1$s data with Blockchain.com, you will now be securely redirected to your bank to confirm your consent for SafeConnect to read the following information:\n\n• Identification details\n\n• Account(s) details</string>
     <string name="yapily_linking_pending_title">Taking you to %1$s</string>
     <string name="yapily_linking_pending_subtitle">This could take up to 30 seconds. Please do not go back or close the app.</string>
     <string name="yapily_linking_in_progress_title">Waiting to hear from %1$s</string>
@@ -1990,6 +1994,8 @@
     <string name="bank_linking_expired_subtitle">Please try linking your bank again. If this keeps happening, please contact support.</string>
     <string name="bank_linking_rejected_title">Connection Rejected</string>
     <string name="bank_linking_rejected_subtitle">Please try linking your bank again and approve the connection. If this keeps happening, please contact support.</string>
+    <string name="bank_linking_invalid_title">Invalid bank</string>
+    <string name="bank_linking_invalid_subtitle">You’ve tried to link an account which is not valid. Please check again or contact support.</string>
     <string name="bank_linking_failure_title">Failed Connection Request</string>
     <string name="bank_linking_failure_subtitle">Please try again. If this keeps happening, please contact support.</string>
     <string name="bank_linking_declined_title">Account Access Denied</string>

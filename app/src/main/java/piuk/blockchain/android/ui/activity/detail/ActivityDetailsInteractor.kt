@@ -569,7 +569,7 @@ private fun LinkedBank.toPaymentMethod() =
     PaymentMethod.Bank(
         bankId = id,
         limits = PaymentLimits(0, 0, currency),
-        bankName = name,
+        bankName = accountName,
         accountEnding = accountNumber,
         accountType = accountType,
         isEligible = true,

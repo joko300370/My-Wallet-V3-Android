@@ -156,7 +156,8 @@ class BankAuthModelTest {
             id = linkingBankId,
             currency = "GBP",
             partner = BankPartner.YAPILY,
-            name = "name",
+            accountName = "name",
+            bankName = "bankName",
             accountNumber = "123",
             state = LinkedBankState.ACTIVE,
             errorStatus = LinkedBankErrorState.NONE,
@@ -166,7 +167,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -186,7 +188,7 @@ class BankAuthModelTest {
                 selectedPaymentMethod = SelectedPaymentMethod(
                     id = expectedBank.id,
                     paymentMethodType = PaymentMethodType.BANK_TRANSFER,
-                    label = expectedBank.name,
+                    label = expectedBank.accountName,
                     isEligible = true
                 )
             )
@@ -200,7 +202,8 @@ class BankAuthModelTest {
             id = linkingBankId,
             currency = "GBP",
             partner = BankPartner.YAPILY,
-            name = "name",
+            accountName = "name",
+            bankName = "bankName",
             accountNumber = "123",
             state = LinkedBankState.ACTIVE,
             errorStatus = LinkedBankErrorState.NONE,
@@ -210,7 +213,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -230,7 +234,7 @@ class BankAuthModelTest {
                 selectedPaymentMethod = SelectedPaymentMethod(
                     id = expectedBank.id,
                     paymentMethodType = PaymentMethodType.BANK_TRANSFER,
-                    label = expectedBank.name,
+                    label = expectedBank.accountName,
                     isEligible = true
                 )
             )
@@ -244,7 +248,8 @@ class BankAuthModelTest {
             id = linkingBankId,
             currency = "GBP",
             partner = BankPartner.YAPILY,
-            name = "name",
+            accountName = "name",
+            bankName = "bankName",
             accountNumber = "123",
             state = LinkedBankState.BLOCKED,
             errorStatus = LinkedBankErrorState.ACCOUNT_ALREADY_LINKED,
@@ -254,7 +259,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -282,7 +288,8 @@ class BankAuthModelTest {
             id = linkingBankId,
             currency = "GBP",
             partner = BankPartner.YAPILY,
-            name = "name",
+            accountName = "name",
+            bankName = "bankName",
             accountNumber = "123",
             state = LinkedBankState.BLOCKED,
             errorStatus = LinkedBankErrorState.UNKNOWN,
@@ -292,7 +299,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -320,7 +328,7 @@ class BankAuthModelTest {
             id = linkingBankId,
             currency = "GBP",
             partner = BankPartner.YAPILY,
-            name = "name",
+            accountName = "name", bankName = "bankName",
             accountNumber = "123",
             state = LinkedBankState.BLOCKED,
             errorStatus = LinkedBankErrorState.ACCOUNT_TYPE_UNSUPPORTED,
@@ -330,7 +338,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -358,7 +367,8 @@ class BankAuthModelTest {
             id = linkingBankId,
             currency = "GBP",
             partner = BankPartner.YAPILY,
-            name = "name",
+            accountName = "name",
+            bankName = "bankName",
             accountNumber = "123",
             state = LinkedBankState.BLOCKED,
             errorStatus = LinkedBankErrorState.NAMES_MISMATCHED,
@@ -368,7 +378,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -396,7 +407,8 @@ class BankAuthModelTest {
             id = linkingBankId,
             currency = "GBP",
             partner = BankPartner.YAPILY,
-            name = "name",
+            accountName = "name",
+            bankName = "bankName",
             accountNumber = "123",
             state = LinkedBankState.BLOCKED,
             errorStatus = LinkedBankErrorState.REJECTED,
@@ -406,7 +418,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -434,7 +447,8 @@ class BankAuthModelTest {
             id = linkingBankId,
             currency = "GBP",
             partner = BankPartner.YAPILY,
-            name = "name",
+            accountName = "name",
+            bankName = "bankName",
             accountNumber = "123",
             state = LinkedBankState.BLOCKED,
             errorStatus = LinkedBankErrorState.EXPIRED,
@@ -444,7 +458,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -472,7 +487,8 @@ class BankAuthModelTest {
             id = linkingBankId,
             currency = "GBP",
             partner = BankPartner.YAPILY,
-            name = "name",
+            accountName = "name",
+            bankName = "bankName",
             accountNumber = "123",
             state = LinkedBankState.BLOCKED,
             errorStatus = LinkedBankErrorState.FAILURE,
@@ -482,7 +498,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -510,7 +527,8 @@ class BankAuthModelTest {
             id = linkingBankId,
             currency = "GBP",
             partner = BankPartner.YAPILY,
-            name = "name",
+            accountName = "name",
+            bankName = "bankName",
             accountNumber = "123",
             state = LinkedBankState.BLOCKED,
             errorStatus = LinkedBankErrorState.NONE,
@@ -520,7 +538,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -548,7 +567,8 @@ class BankAuthModelTest {
             id = linkingBankId,
             currency = "GBP",
             partner = BankPartner.YAPILY,
-            name = "name",
+            accountName = "name",
+            bankName = "bankName",
             accountNumber = "123",
             state = LinkedBankState.ACTIVE,
             errorStatus = LinkedBankErrorState.NONE,
@@ -558,7 +578,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -580,7 +601,8 @@ class BankAuthModelTest {
             id = linkingBankId,
             currency = "GBP",
             partner = BankPartner.YAPILY,
-            name = "name",
+            accountName = "name",
+            bankName = "bankName",
             accountNumber = "123",
             state = LinkedBankState.PENDING,
             errorStatus = LinkedBankErrorState.NONE,
@@ -590,7 +612,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForBankLinkingCompleted(linkingBankId)).thenReturn(Single.just(expectedBank))
@@ -644,7 +667,7 @@ class BankAuthModelTest {
             id = linkingBankId,
             currency = "GBP",
             partner = BankPartner.YAPILY,
-            name = "name",
+            accountName = "name", bankName = "bankName",
             accountNumber = "123",
             state = LinkedBankState.ACTIVE,
             errorStatus = LinkedBankErrorState.NONE,
@@ -654,7 +677,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForLinkedBankState(intent.bankId, BankPartner.YAPILY)).thenReturn(
@@ -676,7 +700,7 @@ class BankAuthModelTest {
                 selectedPaymentMethod = SelectedPaymentMethod(
                     id = expectedBank.id,
                     paymentMethodType = PaymentMethodType.BANK_TRANSFER,
-                    label = expectedBank.name,
+                    label = expectedBank.accountName,
                     isEligible = true
                 )
             )
@@ -692,7 +716,8 @@ class BankAuthModelTest {
             id = linkingBankId,
             currency = "GBP",
             partner = BankPartner.YAPILY,
-            name = "name",
+            accountName = "name",
+            bankName = "bankName",
             accountNumber = "123",
             state = LinkedBankState.BLOCKED,
             errorStatus = LinkedBankErrorState.ACCOUNT_ALREADY_LINKED,
@@ -702,7 +727,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForLinkedBankState(intent.bankId, BankPartner.YAPILY)).thenReturn(
@@ -734,7 +760,8 @@ class BankAuthModelTest {
             id = linkingBankId,
             currency = "GBP",
             partner = BankPartner.YAPILY,
-            name = "name",
+            accountName = "name",
+            bankName = "bankName",
             accountNumber = "123",
             state = LinkedBankState.BLOCKED,
             errorStatus = LinkedBankErrorState.UNKNOWN,
@@ -744,7 +771,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForLinkedBankState(intent.bankId, BankPartner.YAPILY)).thenReturn(
@@ -776,7 +804,7 @@ class BankAuthModelTest {
             id = linkingBankId,
             currency = "GBP",
             partner = BankPartner.YAPILY,
-            name = "name",
+            accountName = "name", bankName = "bankName",
             accountNumber = "123",
             state = LinkedBankState.BLOCKED,
             errorStatus = LinkedBankErrorState.ACCOUNT_TYPE_UNSUPPORTED,
@@ -786,7 +814,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForLinkedBankState(intent.bankId, BankPartner.YAPILY)).thenReturn(
@@ -818,7 +847,8 @@ class BankAuthModelTest {
             id = linkingBankId,
             currency = "GBP",
             partner = BankPartner.YAPILY,
-            name = "name",
+            accountName = "name",
+            bankName = "bankName",
             accountNumber = "123",
             state = LinkedBankState.BLOCKED,
             errorStatus = LinkedBankErrorState.NAMES_MISMATCHED,
@@ -828,7 +858,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForLinkedBankState(intent.bankId, BankPartner.YAPILY)).thenReturn(
@@ -860,7 +891,8 @@ class BankAuthModelTest {
             id = linkingBankId,
             currency = "GBP",
             partner = BankPartner.YAPILY,
-            name = "name",
+            accountName = "name",
+            bankName = "bankName",
             accountNumber = "123",
             state = LinkedBankState.BLOCKED,
             errorStatus = LinkedBankErrorState.REJECTED,
@@ -870,7 +902,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForLinkedBankState(intent.bankId, BankPartner.YAPILY)).thenReturn(
@@ -902,7 +935,8 @@ class BankAuthModelTest {
             id = linkingBankId,
             currency = "GBP",
             partner = BankPartner.YAPILY,
-            name = "name",
+            accountName = "name",
+            bankName = "bankName",
             accountNumber = "123",
             state = LinkedBankState.BLOCKED,
             errorStatus = LinkedBankErrorState.EXPIRED,
@@ -912,7 +946,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForLinkedBankState(intent.bankId, BankPartner.YAPILY)).thenReturn(
@@ -944,7 +979,8 @@ class BankAuthModelTest {
             id = linkingBankId,
             currency = "GBP",
             partner = BankPartner.YAPILY,
-            name = "name",
+            accountName = "name",
+            bankName = "bankName",
             accountNumber = "123",
             state = LinkedBankState.BLOCKED,
             errorStatus = LinkedBankErrorState.FAILURE,
@@ -954,7 +990,8 @@ class BankAuthModelTest {
             accountIban = "123",
             bic = "123",
             entity = "entity",
-            iconUrl = "iconUrl"
+            iconUrl = "iconUrl",
+            callbackPath = ""
         )
 
         whenever(interactor.pollForLinkedBankState(intent.bankId, BankPartner.YAPILY)).thenReturn(

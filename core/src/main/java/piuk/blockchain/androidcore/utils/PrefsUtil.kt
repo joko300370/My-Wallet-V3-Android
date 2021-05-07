@@ -185,6 +185,15 @@ class PrefsUtil(
 
     override fun setBankLinkingState(state: String) = setValue(KEY_BANK_LINKING, state)
 
+    override fun getDynamicOneTimeTokenUrl(): String = getValue(KEY_ONE_TIME_TOKEN_PATH, "")
+
+    override fun setDynamicOneTimeTokenUrl(path: String) {
+        val previousValue = getDynamicOneTimeTokenUrl()
+        if (path.isNotEmpty() && previousValue != path) {
+            setValue(KEY_ONE_TIME_TOKEN_PATH, path)
+        }
+    }
+
     override fun clearState() = removeValue(KEY_SIMPLE_BUY_STATE)
 
     override var addCardInfoDismissed: Boolean
@@ -606,6 +615,7 @@ class PrefsUtil(
 
         private const val KEY_SUPPORTED_CARDS_STATE = "key_supported_cards"
         private const val KEY_BANK_LINKING = "KEY_BANK_LINKING"
+        private const val KEY_ONE_TIME_TOKEN_PATH = "KEY_ONE_TIME_TOKEN_PATH"
 
         private const val KEY_SWAP_INTRO_COMPLETED = "key_swap_intro_completed"
         private const val KEY_INTRO_TOUR_COMPLETED = "key_intro_tour_complete"

@@ -61,13 +61,15 @@ data class LinkedBankTransferResponse(
         const val ERROR_ACCOUNT_EXPIRED = "BANK_TRANSFER_ACCOUNT_EXPIRED"
         const val ERROR_ACCOUNT_REJECTED = "BANK_TRANSFER_ACCOUNT_REJECTED"
         const val ERROR_ACCOUNT_FAILURE = "BANK_TRANSFER_ACCOUNT_FAILED"
+        const val BANK_TRANSFER_ACCOUNT_INVALID = "BANK_TRANSFER_ACCOUNT_INVALID"
     }
 }
 
 data class LinkedBankTransferAttributesResponse(
     val authorisationUrl: String?,
     val entity: String?,
-    val media: List<BankMediaResponse>?
+    val media: List<BankMediaResponse>?,
+    val callbackPath: String
 )
 
 data class ProviderAccountAttrs(
@@ -83,8 +85,8 @@ data class UpdateProviderAccountBody(
 
 data class LinkedBankDetailsResponse(
     val accountNumber: String,
-    val accountName: String,
-    val bankName: String,
+    val accountName: String?,
+    val bankName: String?,
     val bankAccountType: String,
     val sortCode: String?,
     val iban: String?,
@@ -104,12 +106,22 @@ data class BankTransferPaymentAttributes(
 
 data class BankTransferPaymentResponse(
     val paymentId: String,
-    val bankAccountType: String?
+    val bankAccountType: String?,
+    val attributes: BankTransferPaymentResponseAttributes
+)
+
+data class BankTransferPaymentResponseAttributes(
+    val paymentId: String,
+    val callbackPath: String
+)
+
+data class OpenBankingTokenBody(
+    val oneTimeToken: String
 )
 
 data class BankInfoResponse(
     val id: String,
-    val bankName: String,
+    val bankName: String?,
     val accountName: String?,
     val currency: String,
     val state: String,

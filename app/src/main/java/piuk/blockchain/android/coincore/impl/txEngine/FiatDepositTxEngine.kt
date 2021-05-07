@@ -68,10 +68,14 @@ class FiatDepositTxEngine(
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> {
         return Single.just(
             pendingTx.copy(
-                confirmations = listOf(
+                confirmations = listOfNotNull(
                     TxConfirmationValue.From(sourceAccount.label),
                     TxConfirmationValue.To(txTarget.label),
-                    TxConfirmationValue.EstimatedDepositCompletion,
+                    if (!pendingTx.isOpenBankingCurrency()) {
+                        TxConfirmationValue.EstimatedDepositCompletion
+                    } else {
+                        null
+                    },
                     TxConfirmationValue.FiatTxFee(
                         fee = pendingTx.feeAmount
                     ),

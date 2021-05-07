@@ -48,10 +48,10 @@ class YapilyExpandableItemViewHolder(
         updateClickListener(position)
     }
 
-    private fun setInfo(@StringRes title: Int, @StringRes blurb: Int) {
+    private fun setInfo(@StringRes title: Int, blurb: String) {
         with(binding) {
             expandableTitle.text = context.getString(title)
-            expandableBlurb.text = context.getString(blurb)
+            expandableBlurb.text = blurb
         }
     }
 

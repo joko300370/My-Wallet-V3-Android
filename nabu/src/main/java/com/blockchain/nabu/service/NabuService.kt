@@ -6,6 +6,7 @@ import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.extensions.wrapErrorMessage
 import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentBody
 import com.blockchain.nabu.models.responses.banktransfer.CreateLinkBankRequestBody
+import com.blockchain.nabu.models.responses.banktransfer.OpenBankingTokenBody
 import com.blockchain.nabu.models.responses.banktransfer.UpdateProviderAccountBody
 import com.blockchain.nabu.models.responses.interest.InterestAccountDetailsResponse
 import com.blockchain.nabu.models.responses.nabu.AddAddressRequest
@@ -361,11 +362,17 @@ class NabuService(retrofit: Retrofit) {
         sessionToken.authHeader, type = paymentMethod
     ).wrapErrorMessage()
 
-    internal fun fetchWithdrawLocksRules(sessionToken: NabuSessionTokenResponse, paymentMethod: PaymentMethodType) =
-        service.getWithdrawalLocksCheck(
-            sessionToken.authHeader,
-            WithdrawLocksCheckRequestBody(paymentMethod.name)
-        ).wrapErrorMessage()
+    internal fun fetchWithdrawLocksRules(
+        sessionToken: NabuSessionTokenResponse,
+        paymentMethod: PaymentMethodType,
+        fiatCurrency: String,
+        productType: String
+    ) = service.getWithdrawalLocksCheck(
+        sessionToken.authHeader,
+        WithdrawLocksCheckRequestBody(
+            paymentMethod = paymentMethod.name, product = productType, currency = fiatCurrency
+        )
+    ).wrapErrorMessage()
 
     internal fun createWithdrawOrder(
         sessionToken: NabuSessionTokenResponse,
@@ -664,6 +671,16 @@ class NabuService(retrofit: Retrofit) {
     ) = service.getBankTransferCharge(
         authorization = sessionToken.authHeader,
         paymentId = paymentId
+    ).wrapErrorMessage()
+
+    fun updateOpenBankingToken(
+        url: String,
+        sessionToken: NabuSessionTokenResponse,
+        body: OpenBankingTokenBody
+    ) = service.updateOpenBankingToken(
+        url = url,
+        authorization = sessionToken.authHeader,
+        body = body
     ).wrapErrorMessage()
 
     fun executeTransfer(

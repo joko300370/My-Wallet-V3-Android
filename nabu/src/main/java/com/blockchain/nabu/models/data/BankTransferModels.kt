@@ -89,7 +89,8 @@ data class LinkedBank(
     val id: String,
     val currency: String,
     val partner: BankPartner,
-    val name: String,
+    val bankName: String,
+    val accountName: String,
     val accountNumber: String,
     val state: LinkedBankState,
     val errorStatus: LinkedBankErrorState,
@@ -99,7 +100,8 @@ data class LinkedBank(
     val accountIban: String,
     val bic: String,
     val entity: String,
-    val iconUrl: String
+    val iconUrl: String,
+    val callbackPath: String
 ) : Serializable {
     val account: String
         get() = accountNumber
@@ -120,6 +122,7 @@ enum class LinkedBankErrorState {
     REJECTED,
     EXPIRED,
     FAILURE,
+    INVALID,
     UNKNOWN,
     NONE
 }

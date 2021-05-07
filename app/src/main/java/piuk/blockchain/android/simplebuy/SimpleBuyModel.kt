@@ -23,6 +23,7 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.cards.partners.CardActivator
 import piuk.blockchain.android.cards.partners.EverypayCardActivator
+import piuk.blockchain.android.networking.PollResult
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
@@ -144,7 +145,8 @@ class SimpleBuyModel(
             is SimpleBuyIntent.FetchWithdrawLockTime -> {
                 require(previousState.selectedPaymentMethod != null)
                 interactor.fetchWithdrawLockTime(
-                    previousState.selectedPaymentMethod.paymentMethodType
+                    previousState.selectedPaymentMethod.paymentMethodType,
+                    previousState.fiatCurrency
                 )
                     .subscribeBy(
                         onSuccess = { process(it) },
@@ -186,9 +188,19 @@ class SimpleBuyModel(
             is SimpleBuyIntent.GetAuthorisationUrl ->
                 interactor.pollForAuthorisationUrl(intent.orderId)
                     .subscribeBy(
-                        onSuccess = { order ->
-                            order.attributes?.authorisationUrl?.let {
-                                handleBankAuthorisationPayment(order.paymentMethodId, it)
+                        onSuccess = {
+                            when (it) {
+                                is PollResult.FinalResult -> {
+                                    it.value.attributes?.authorisationUrl?.let { url ->
+                                        handleBankAuthorisationPayment(it.value.paymentMethodId, url)
+                                    }
+                                }
+                                is PollResult.TimeOut -> process(
+                                    SimpleBuyIntent.ErrorIntent(
+                                        ErrorState.BankLinkingTimeout
+                                    )
+                                )
+                                is PollResult.Cancel -> process(SimpleBuyIntent.ErrorIntent())
                             }
                         },
                         onError = {

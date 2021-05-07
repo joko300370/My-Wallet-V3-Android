@@ -26,6 +26,7 @@ interface SimpleBuyNavigator : SlidingModalBottomDialog.Host, SmallSimpleBuyNavi
     fun launchIntro()
     fun launchBankAuthWithError(errorState: ErrorState)
 }
+
 interface SmallSimpleBuyNavigator {
     fun exitSimpleBuyFlow()
 }

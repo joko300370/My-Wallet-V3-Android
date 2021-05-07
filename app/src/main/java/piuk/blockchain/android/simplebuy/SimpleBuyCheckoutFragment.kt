@@ -175,7 +175,6 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
                 }
             }
             OrderState.CANCELED -> {
-                model.process(SimpleBuyIntent.ClearState)
                 if (activity is SmallSimpleBuyNavigator) {
                     (activity as SmallSimpleBuyNavigator).exitSimpleBuyFlow()
                 } else {
@@ -481,6 +480,10 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
     override fun onPause() {
         super.onPause()
         model.process(SimpleBuyIntent.NavigationHandled)
+    }
+
+    override fun onSheetClosed() {
+        // do nothing
     }
 
     companion object {

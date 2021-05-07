@@ -77,6 +77,7 @@ import piuk.blockchain.android.ui.scan.QrExpected
 import piuk.blockchain.android.ui.scan.QrScanActivity
 import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
 import piuk.blockchain.android.ui.auth.newlogin.AuthNewLoginSheet
+import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.pairingcode.PairingBottomSheet
 import piuk.blockchain.android.ui.sell.BuySellFragment
 import piuk.blockchain.android.ui.settings.SettingsActivity
@@ -102,6 +103,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     MainView,
     IntroTourHost,
     DialogFlow.FlowHost,
+    SlidingModalBottomDialog.Host,
     AuthNewLoginSheet.Host,
     SmallSimpleBuyNavigator {
 
@@ -885,6 +887,12 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 FiatTransactionState.ERROR
             )
         )
+
+    override fun handleBuyApprovalError() {
+        ToastCustom.makeText(
+            this, getString(R.string.simple_buy_confirmation_error), Toast.LENGTH_LONG, ToastCustom.TYPE_ERROR
+        )
+    }
 
     override fun handleApprovalDepositInProgress(amount: FiatValue) =
         replaceBottomSheet(

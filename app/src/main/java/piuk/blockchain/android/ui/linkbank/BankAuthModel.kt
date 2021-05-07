@@ -98,6 +98,8 @@ class BankAuthModel(
         }
     ).subscribeBy(
         onSuccess = {
+            interactor.updateOneTimeTokenPath(it.callbackPath)
+
             when (it.state) {
                 LinkedBankState.ACTIVE -> {
                     process(BankAuthIntent.LinkedBankStateSuccess(it))
@@ -143,6 +145,9 @@ class BankAuthModel(
             )
             LinkedBankErrorState.FAILURE -> process(
                 BankAuthIntent.BankAuthErrorState(ErrorState.LinkedBankFailure)
+            )
+            LinkedBankErrorState.INVALID -> process(
+                BankAuthIntent.BankAuthErrorState(ErrorState.LinkedBankInvalid)
             )
             LinkedBankErrorState.NONE -> {
                 // check the state is not a linking final state

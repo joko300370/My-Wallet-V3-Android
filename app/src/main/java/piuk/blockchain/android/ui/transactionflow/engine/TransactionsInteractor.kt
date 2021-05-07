@@ -215,13 +215,17 @@ class TransactionInteractor(
 
     fun linkABank(selectedFiat: String): Single<LinkBankTransfer> = custodialWalletManager.linkToABank(selectedFiat)
 
-    fun updateFiatDepositState(bankPaymentData: BankPaymentApproval) =
+    fun updateFiatDepositState(bankPaymentData: BankPaymentApproval) {
         bankLinkingPrefs.setBankLinkingState(
             BankAuthDeepLinkState(
                 bankAuthFlow = BankAuthFlowState.BANK_APPROVAL_PENDING,
                 bankPaymentData = bankPaymentData
             ).toPreferencesValue()
         )
+
+        val sanitisedUrl = bankPaymentData.linkedBank.callbackPath.removePrefix("nabu-gateway/")
+        bankLinkingPrefs.setDynamicOneTimeTokenUrl(sanitisedUrl)
+    }
 }
 
 private fun CryptoAccount.isAvailableToSwapFrom(pairs: List<CurrencyPair.CryptoCurrencyPair>): Boolean =

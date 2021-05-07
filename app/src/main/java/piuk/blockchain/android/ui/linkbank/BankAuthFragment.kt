@@ -176,7 +176,7 @@ class BankAuthFragment : MviFragment<BankAuthModel, BankAuthIntent, BankAuthStat
         if (!isForApproval) {
             state.linkedBank?.let {
                 showLinkingSuccess(
-                    label = it.name,
+                    label = it.accountName,
                     id = it.id,
                     partner = it.partner,
                     currency = it.currency
@@ -251,7 +251,7 @@ class BankAuthFragment : MviFragment<BankAuthModel, BankAuthIntent, BankAuthStat
         setTitleAndSubtitle(
             getString(
                 R.string.yapily_linking_in_progress_title,
-                approvalData?.linkedBank?.name ?: getString(R.string.yapily_linking_default_bank)
+                approvalData?.linkedBank?.accountName ?: getString(R.string.yapily_linking_default_bank)
             ),
             getString(R.string.yapily_approval_in_progress_subtitle)
         )
@@ -282,7 +282,7 @@ class BankAuthFragment : MviFragment<BankAuthModel, BankAuthIntent, BankAuthStat
     private fun showApprovalInProgress(linkedBank: LinkedBank) {
         showLoading()
         setTitleAndSubtitle(
-            getString(R.string.yapily_approving_title, linkedBank.name),
+            getString(R.string.yapily_approving_title, linkedBank.bankName),
             getString(R.string.yapily_approving_subtitle)
         )
         model.process(BankAuthIntent.ClearApprovalState)
@@ -389,6 +389,13 @@ class BankAuthFragment : MviFragment<BankAuthModel, BankAuthIntent, BankAuthStat
                 setTitleAndSubtitle(
                     getString(R.string.bank_linking_failure_title),
                     getString(R.string.bank_linking_failure_subtitle)
+                )
+                binding.linkBankBtn.text = getString(R.string.common_try_again)
+            }
+            ErrorState.LinkedBankInvalid -> {
+                setTitleAndSubtitle(
+                    getString(R.string.bank_linking_invalid_title),
+                    getString(R.string.bank_linking_invalid_subtitle)
                 )
                 binding.linkBankBtn.text = getString(R.string.common_try_again)
             }

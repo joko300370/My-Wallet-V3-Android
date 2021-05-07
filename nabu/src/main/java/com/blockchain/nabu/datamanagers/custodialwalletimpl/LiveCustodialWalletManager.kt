@@ -59,6 +59,7 @@ import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentAttr
 import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentBody
 import com.blockchain.nabu.models.responses.banktransfer.CreateLinkBankResponse
 import com.blockchain.nabu.models.responses.banktransfer.LinkedBankTransferResponse
+import com.blockchain.nabu.models.responses.banktransfer.OpenBankingTokenBody
 import com.blockchain.nabu.models.responses.banktransfer.ProviderAccountAttrs
 import com.blockchain.nabu.models.responses.banktransfer.UpdateProviderAccountBody
 import com.blockchain.nabu.models.responses.banktransfer.WithdrawFeeRequest
@@ -203,9 +204,13 @@ class LiveCustodialWalletManager(
             else -> throw IllegalStateException("map not specified for $this")
         }
 
-    override fun fetchWithdrawLocksTime(paymentMethodType: PaymentMethodType): Single<BigInteger> =
+    override fun fetchWithdrawLocksTime(
+        paymentMethodType: PaymentMethodType,
+        fiatCurrency: String,
+        productType: String
+    ): Single<BigInteger> =
         authenticator.authenticate {
-            nabuService.fetchWithdrawLocksRules(it, paymentMethodType)
+            nabuService.fetchWithdrawLocksRules(it, paymentMethodType, fiatCurrency, productType)
         }.flatMap { response ->
             response.rule?.let {
                 Single.just(it.lockTime.toBigInteger())
@@ -992,10 +997,10 @@ class LiveCustodialWalletManager(
             state = state.toBankState(),
             currency = currency,
             account = accountNumber ?: "****",
-            accountType = bankAccountType ?: "",
+            accountType = bankAccountType.orEmpty(),
             paymentMethodType = if (this.isBankTransferAccount)
                 PaymentMethodType.BANK_TRANSFER else PaymentMethodType.BANK_ACCOUNT,
-            iconUrl = attributes?.media?.find { it.type == ICON }?.source ?: ""
+            iconUrl = attributes?.media?.find { it.type == ICON }?.source.orEmpty()
         )
 
     private fun LinkedBankTransferResponse.toLinkedBank(): LinkedBank? {
@@ -1004,16 +1009,18 @@ class LiveCustodialWalletManager(
             currency = currency,
             partner = partner.toLinkingBankPartner(BankPartner.values().toList()) ?: return null,
             state = state.toLinkedBankState(),
-            name = details?.accountName ?: "",
-            accountNumber = details?.accountNumber?.replace("x", "") ?: "",
+            bankName = details?.bankName.orEmpty(),
+            accountName = details?.accountName.orEmpty(),
+            accountNumber = details?.accountNumber?.replace("x", "").orEmpty(),
             errorStatus = error?.toLinkedBankErrorState() ?: LinkedBankErrorState.NONE,
-            accountType = details?.bankAccountType ?: "",
-            authorisationUrl = attributes?.authorisationUrl ?: "",
-            sortCode = details?.sortCode ?: "",
-            accountIban = details?.iban ?: "",
-            bic = details?.bic ?: "",
-            entity = attributes?.entity ?: "",
-            iconUrl = attributes?.media?.find { it.source == ICON }?.source ?: ""
+            accountType = details?.bankAccountType.orEmpty(),
+            authorisationUrl = attributes?.authorisationUrl.orEmpty(),
+            sortCode = details?.sortCode.orEmpty(),
+            accountIban = details?.iban.orEmpty(),
+            bic = details?.bic.orEmpty(),
+            entity = attributes?.entity.orEmpty(),
+            iconUrl = attributes?.media?.find { it.source == ICON }?.source.orEmpty(),
+            callbackPath = attributes?.callbackPath.orEmpty()
         )
     }
 
@@ -1061,6 +1068,20 @@ class LiveCustodialWalletManager(
             }
         }
 
+    override fun updateOpenBankingConsent(
+        url: String,
+        token: String
+    ): Completable =
+        authenticator.authenticateCompletable { sessionToken ->
+            nabuService.updateOpenBankingToken(
+                url,
+                sessionToken,
+                OpenBankingTokenBody(
+                    oneTimeToken = token
+                )
+            )
+        }
+
     override fun getBankTransferCharge(paymentId: String): Single<BankTransferDetails> =
         authenticator.authenticate { sessionToken ->
             nabuService.getBankTransferCharge(
@@ -1088,8 +1109,8 @@ class LiveCustodialWalletManager(
         PaymentMethod.Card(
             cardId = id,
             limits = cardLimits,
-            label = card?.label ?: "",
-            endDigits = card?.number ?: "",
+            label = card?.label.orEmpty(),
+            endDigits = card?.number.orEmpty(),
             partner = partner.toSupportedPartner(),
             expireDate = card?.let {
                 Calendar.getInstance().apply {
@@ -1281,6 +1302,7 @@ private fun String.toLinkedBankErrorState(): LinkedBankErrorState =
         LinkedBankTransferResponse.ERROR_ACCOUNT_EXPIRED -> LinkedBankErrorState.EXPIRED
         LinkedBankTransferResponse.ERROR_ACCOUNT_REJECTED -> LinkedBankErrorState.REJECTED
         LinkedBankTransferResponse.ERROR_ACCOUNT_FAILURE -> LinkedBankErrorState.FAILURE
+        LinkedBankTransferResponse.BANK_TRANSFER_ACCOUNT_INVALID -> LinkedBankErrorState.INVALID
         else -> LinkedBankErrorState.UNKNOWN
     }
 
@@ -1412,7 +1434,7 @@ private fun BuySellOrderResponse.toBuySellOrder(): BuySellOrder {
             FiatValue.fromMinor(outputCurrency, outputQuantity.toLongOrDefault(0)),
         attributes = attributes,
         type = type(),
-        depositPaymentId = depositPaymentId ?: "",
+        depositPaymentId = depositPaymentId.orEmpty(),
         approvalErrorStatus = attributes?.status?.toApprovalError() ?: ApprovalErrorStatus.NONE
     )
 }

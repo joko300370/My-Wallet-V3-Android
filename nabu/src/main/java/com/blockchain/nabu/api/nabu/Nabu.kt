@@ -7,6 +7,7 @@ import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentResp
 import com.blockchain.nabu.models.responses.banktransfer.CreateLinkBankRequestBody
 import com.blockchain.nabu.models.responses.banktransfer.CreateLinkBankResponse
 import com.blockchain.nabu.models.responses.banktransfer.LinkedBankTransferResponse
+import com.blockchain.nabu.models.responses.banktransfer.OpenBankingTokenBody
 import com.blockchain.nabu.models.responses.banktransfer.UpdateProviderAccountBody
 import com.blockchain.nabu.models.responses.cards.BeneficiariesResponse
 import com.blockchain.nabu.models.responses.cards.CardResponse
@@ -83,6 +84,7 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 internal interface Nabu {
 
@@ -519,5 +521,12 @@ internal interface Nabu {
     fun executeTransfer(
         @Header("authorization") authorization: String,
         @Body body: ProductTransferRequestBody
+    ): Completable
+
+    @POST
+    fun updateOpenBankingToken(
+        @Url url: String,
+        @Header("authorization") authorization: String,
+        @Body body: OpenBankingTokenBody
     ): Completable
 }
