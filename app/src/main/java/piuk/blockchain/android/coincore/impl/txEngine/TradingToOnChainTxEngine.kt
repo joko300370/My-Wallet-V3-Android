@@ -1,14 +1,17 @@
 package piuk.blockchain.android.coincore.impl.txEngine
 
+import com.blockchain.featureflags.GatedFeature
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FeeSelection
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxEngine
@@ -68,17 +71,44 @@ class TradingToOnChainTxEngine(
         return Single.just(pendingTx)
     }
 
+    private fun buildNewConfirmation(pendingTx: PendingTx): PendingTx =
+        pendingTx.copy(
+            confirmations = listOfNotNull(
+                TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
+                TxConfirmationValue.NewTo(
+                    txTarget, NullCryptoAccount(), AssetAction.Send
+                ),
+                TxConfirmationValue.NewTotal(
+                    totalWithoutFee = (pendingTx.amount as CryptoValue).minus(
+                        pendingTx.feeAmount as CryptoValue
+                    ),
+                    exchange = pendingTx.amount.toFiat(exchangeRates, userFiat)
+                        .minus(pendingTx.feeAmount.toFiat(exchangeRates, userFiat))
+                ),
+                if (isNoteSupported) {
+                    TxConfirmationValue.Description()
+                } else null
+            )
+        )
+
+    private fun buildOldConfirmation(pendingTx: PendingTx): PendingTx =
+        pendingTx.copy(confirmations = listOf(
+            TxConfirmationValue.From(from = sourceAccount.label),
+            TxConfirmationValue.To(to = txTarget.label),
+            TxConfirmationValue.FeedTotal(amount = pendingTx.amount, fee = pendingTx.feeAmount)
+        ).apply {
+            if (isNoteSupported) {
+                toMutableList().add(TxConfirmationValue.Description())
+            }
+        })
+
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(
-            pendingTx.copy(confirmations = listOf(
-                TxConfirmationValue.From(from = sourceAccount.label),
-                TxConfirmationValue.To(to = txTarget.label),
-                TxConfirmationValue.FeedTotal(amount = pendingTx.amount, fee = pendingTx.feeAmount)
-            ).apply {
-                if (isNoteSupported) {
-                    toMutableList().add(TxConfirmationValue.Description())
-                }
-            })
+            if (internalFeatureFlagApi.isFeatureEnabled(GatedFeature.CHECKOUT)) {
+                buildNewConfirmation(pendingTx)
+            } else {
+                buildOldConfirmation(pendingTx)
+            }
         )
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =

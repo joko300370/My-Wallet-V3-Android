@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.impl.txEngine.interest
 
+import com.blockchain.featureflags.GatedFeature
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestLimits
 import info.blockchain.balance.Money
@@ -10,24 +11,31 @@ import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxFee
 
-abstract class InterestEngine(private val walletManager: CustodialWalletManager) : TxEngine() {
+abstract class InterestBaseEngine(private val walletManager: CustodialWalletManager) : TxEngine() {
 
     protected fun modifyEngineConfirmations(
         pendingTx: PendingTx,
         termsChecked: Boolean = getTermsOptionValue(pendingTx),
         agreementChecked: Boolean = getTermsOptionValue(pendingTx)
     ): PendingTx =
-        pendingTx.removeOption(TxConfirmation.DESCRIPTION)
-            .removeOption(TxConfirmation.FEE_SELECTION)
-            .addOrReplaceOption(
-                TxConfirmationValue.NetworkFee(
-                    txFee = TxFee(
-                        pendingTx.feeAmount,
-                        TxFee.FeeType.DEPOSIT_FEE,
-                        sourceAsset
+        if (internalFeatureFlagApi.isFeatureEnabled(GatedFeature.CHECKOUT)) {
+            pendingTx.modifyNewCheckout(termsChecked, agreementChecked)
+        } else {
+            pendingTx.modifyNewCheckout(termsChecked, agreementChecked)
+                .removeOption(TxConfirmation.FEE_SELECTION)
+                .addOrReplaceOption(
+                    TxConfirmationValue.NetworkFee(
+                        txFee = TxFee(
+                            pendingTx.feeAmount,
+                            TxFee.FeeType.DEPOSIT_FEE,
+                            sourceAsset
+                        )
                     )
                 )
-            )
+        }
+
+    private fun PendingTx.modifyNewCheckout(termsChecked: Boolean, agreementChecked: Boolean): PendingTx =
+        removeOption(TxConfirmation.DESCRIPTION)
             .addOrReplaceOption(
                 TxConfirmationValue.TxBooleanConfirmation<Unit>(
                     confirmation = TxConfirmation.AGREEMENT_INTEREST_T_AND_C,
@@ -37,7 +45,7 @@ abstract class InterestEngine(private val walletManager: CustodialWalletManager)
             .addOrReplaceOption(
                 TxConfirmationValue.TxBooleanConfirmation(
                     confirmation = TxConfirmation.AGREEMENT_INTEREST_TRANSFER,
-                    data = pendingTx.amount,
+                    data = amount,
                     value = agreementChecked
                 )
             )

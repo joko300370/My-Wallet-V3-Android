@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.xlm
 
 import androidx.annotation.VisibleForTesting
+import com.blockchain.featureflags.GatedFeature
 import com.blockchain.fees.FeeType
 import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
@@ -15,10 +16,12 @@ import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.FeeState
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmationValue
@@ -63,11 +66,13 @@ class XlmOnChainTxEngine(
     override fun restart(txTarget: TransactionTarget, pendingTx: PendingTx): Single<PendingTx> {
         return super.restart(txTarget, pendingTx).map { px ->
             targetXlmAddress.memo?.let {
-                px.setMemo(TxConfirmationValue.Memo(
-                    text = it,
-                    isRequired = isMemoRequired(),
-                    id = null
-                ))
+                px.setMemo(
+                    TxConfirmationValue.Memo(
+                        text = it,
+                        isRequired = isMemoRequired(),
+                        id = null
+                    )
+                )
             }
         }
     }
@@ -141,22 +146,52 @@ class XlmOnChainTxEngine(
             }
         }.ignoreElement()
 
+    private fun buildNewConfirmation(pendingTx: PendingTx): PendingTx =
+        pendingTx.copy(
+            confirmations = listOfNotNull(
+                TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
+                TxConfirmationValue.NewTo(
+                    txTarget, NullCryptoAccount(), AssetAction.Send
+                ),
+                buildNewFee(
+                    pendingTx.feeAmount,
+                    pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+                    sourceAsset
+                ),
+                TxConfirmationValue.NewTotal(
+                    totalWithoutFee = (pendingTx.amount as CryptoValue).minus(
+                        pendingTx.feeAmount as CryptoValue
+                    ),
+                    exchange = pendingTx.amount.toFiat(exchangeRates, userFiat)
+                        .minus(pendingTx.feeAmount.toFiat(exchangeRates, userFiat))
+                ),
+                pendingTx.memo
+            )
+        )
+
+    private fun buildOldConfirmation(pendingTx: PendingTx): PendingTx =
+        pendingTx.copy(
+            confirmations = listOf(
+                TxConfirmationValue.From(from = sourceAccount.label),
+                TxConfirmationValue.To(to = txTarget.label),
+                makeFeeSelectionOption(pendingTx),
+                TxConfirmationValue.FeedTotal(
+                    amount = pendingTx.amount,
+                    fee = pendingTx.feeAmount,
+                    exchangeFee = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+                    exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
+                ),
+                pendingTx.memo
+            )
+        )
+
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(
-            pendingTx.copy(
-                confirmations = listOf(
-                    TxConfirmationValue.From(from = sourceAccount.label),
-                    TxConfirmationValue.To(to = txTarget.label),
-                    makeFeeSelectionOption(pendingTx),
-                    TxConfirmationValue.FeedTotal(
-                        amount = pendingTx.amount,
-                        fee = pendingTx.feeAmount,
-                        exchangeFee = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
-                        exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
-                    ),
-                    pendingTx.memo
-                )
-            )
+            if (internalFeatureFlagApi.isFeatureEnabled(GatedFeature.CHECKOUT)) {
+                buildNewConfirmation(pendingTx)
+            } else {
+                buildOldConfirmation(pendingTx)
+            }
         )
 
     override fun doOptionUpdateRequest(pendingTx: PendingTx, newConfirmation: TxConfirmationValue): Single<PendingTx> {
@@ -185,7 +220,7 @@ class XlmOnChainTxEngine(
             true
         } else {
             !memoConfirmation.text.isNullOrEmpty() && memoConfirmation.text.length in 1..28 ||
-                    memoConfirmation.id != null
+                memoConfirmation.id != null
         }
     }
 
@@ -268,6 +303,7 @@ class XlmOnChainTxEngine(
 
     companion object {
         private val AVAILABLE_FEE_LEVELS = setOf(FeeLevel.Regular)
+
         // These map 1:1 to FailureReason enum class in HorizonProxy
         const val SUCCESS = 0
         const val UNKNOWN_ERROR = 1

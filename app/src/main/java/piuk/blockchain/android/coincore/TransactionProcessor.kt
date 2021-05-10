@@ -4,6 +4,7 @@ import androidx.annotation.CallSuper
 import androidx.annotation.VisibleForTesting
 import com.blockchain.annotations.CommonCode
 import com.blockchain.extensions.replace
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.payloadScope
 import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.CurrencyPrefs
@@ -17,6 +18,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 import org.koin.core.KoinComponent
+import org.koin.core.inject
 import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
@@ -176,7 +178,7 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
 
     data class To(val to: String) : TxConfirmationValue(TxConfirmation.READ_ONLY)
 
-    data class NewTo(val txTarget: TransactionTarget, val target: CryptoAccount, val isSwap: Boolean = false) :
+    data class NewTo(val txTarget: TransactionTarget, val target: CryptoAccount, val assetAction: AssetAction) :
         TxConfirmationValue(TxConfirmation.SIMPLE_READ_ONLY)
 
     data class Total(val total: Money, val exchange: Money? = null) : TxConfirmationValue(TxConfirmation.READ_ONLY)
@@ -271,9 +273,21 @@ abstract class TxEngine : KoinComponent {
     protected val exchangeRates: ExchangeRateDataManager
         get() = _exchangeRates
 
+    protected val internalFeatureFlagApi: InternalFeatureFlagApi by inject()
+
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     fun refreshConfirmations(revalidate: Boolean = false) =
         _refresh.refreshConfirmations(revalidate).emptySubscribe()
+
+    fun buildNewFee(feeAmount: Money, exchangeAmount: Money, asset: CryptoCurrency): TxConfirmationValue? {
+        return if (!feeAmount.isZero) {
+            TxConfirmationValue.NewNetworkFee(
+                feeAmount = feeAmount as CryptoValue,
+                exchange = exchangeAmount,
+                asset = asset
+            )
+        } else null
+    }
 
     @CallSuper
     open fun start(

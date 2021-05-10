@@ -1173,7 +1173,7 @@ se disponível. Isso permite que restaure a sua carteira e perder este dispositi
     <string name="send_enter_amount_max">Enviar Máx</string>
     <string name="send_enter_amount_deposit_max">Transferir máx</string>
     <string name="send_enter_amount_min_deposit">Transferência mínima de %1$s necessária</string>
-    <string name="send_confirmation_title">Envie %1$s</string>
+    <string name="send_confirmation_title">Envie</string>
     <string name="send_confirmation_fee">Taxa - normal</string>
     <string name="send_confirmation_add_note_hint">Adicione uma anotação</string>
     <string name="send_confirmation_cta_button">Envie %1$s</string>

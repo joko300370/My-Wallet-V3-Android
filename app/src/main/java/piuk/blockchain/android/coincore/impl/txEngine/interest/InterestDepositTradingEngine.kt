@@ -19,7 +19,8 @@ import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.updateTxValidity
 
-class InterestDepositTradingEngine(private val walletManager: CustodialWalletManager) : InterestEngine(walletManager) {
+class InterestDepositTradingEngine(private val walletManager: CustodialWalletManager) :
+    InterestBaseEngine(walletManager) {
 
     override fun assertInputsValid() {
         check(sourceAccount is TradingAccount)

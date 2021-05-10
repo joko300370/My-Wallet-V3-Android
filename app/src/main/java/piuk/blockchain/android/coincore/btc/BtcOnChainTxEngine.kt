@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.btc
 
+import com.blockchain.featureflags.GatedFeature
 import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
@@ -19,10 +20,12 @@ import org.bitcoinj.core.Transaction
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import org.spongycastle.util.encoders.Hex
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FeeLevelRates
 import piuk.blockchain.android.coincore.FeeSelection
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
@@ -213,26 +216,65 @@ class BtcOnChainTxEngine(
             .then { validateSufficientFunds(pendingTx) }
             .updateTxValidity(pendingTx)
 
+    private fun buildNewConfirmation(pendingTx: PendingTx): PendingTx =
+        pendingTx.copy(
+            confirmations = listOfNotNull(
+                TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
+                TxConfirmationValue.NewTo(
+                    txTarget, NullCryptoAccount(), AssetAction.Send
+                ),
+                buildNewFee(
+                    pendingTx.feeAmount,
+                    pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+                    sourceAsset
+                ),
+                TxConfirmationValue.NewTotal(
+                    totalWithoutFee = (pendingTx.amount as CryptoValue).minus(
+                        pendingTx.feeAmount as CryptoValue
+                    ),
+                    exchange = pendingTx.amount.toFiat(exchangeRates, userFiat)
+                        .minus(pendingTx.feeAmount.toFiat(exchangeRates, userFiat))
+                ),
+                TxConfirmationValue.Description(),
+                if (isLargeTransaction(pendingTx)) {
+                    TxConfirmationValue.TxBooleanConfirmation<Unit>(
+                        TxConfirmation.LARGE_TRANSACTION_WARNING
+                    )
+                } else null
+            )
+        )
+
+    private fun buildOldConfirmation(pendingTx: PendingTx): PendingTx =
+        pendingTx.copy(
+            confirmations = mutableListOf(
+                TxConfirmationValue.From(from = sourceAccount.label),
+                TxConfirmationValue.To(to = txTarget.label),
+                makeFeeSelectionOption(pendingTx),
+                TxConfirmationValue.FeedTotal(
+                    amount = pendingTx.amount,
+                    fee = pendingTx.feeAmount,
+                    exchangeFee = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+                    exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
+                ),
+                TxConfirmationValue.Description()
+            ).apply {
+                if (isLargeTransaction(pendingTx)) {
+                    add(
+                        TxConfirmationValue.TxBooleanConfirmation<Unit>(
+                            TxConfirmation.LARGE_TRANSACTION_WARNING
+                        )
+                    )
+                }
+            }.toList()
+        )
+
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(
-            pendingTx.copy(
-                confirmations = mutableListOf(
-                    TxConfirmationValue.From(from = sourceAccount.label),
-                    TxConfirmationValue.To(to = txTarget.label),
-                    makeFeeSelectionOption(pendingTx),
-                    TxConfirmationValue.FeedTotal(
-                        amount = pendingTx.amount,
-                        fee = pendingTx.feeAmount,
-                        exchangeFee = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
-                        exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
-                    ),
-                    TxConfirmationValue.Description()
-                ).apply {
-                    if (isLargeTransaction(pendingTx)) {
-                        add(TxConfirmationValue.TxBooleanConfirmation<Unit>(TxConfirmation.LARGE_TRANSACTION_WARNING))
-                    }
-                }.toList()
-            )
+            if (internalFeatureFlagApi.isFeatureEnabled(GatedFeature.CHECKOUT)) {
+                buildNewConfirmation(pendingTx)
+            } else {
+                buildOldConfirmation(pendingTx)
+            }
         )
 
     override fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
@@ -263,7 +305,8 @@ class BtcOnChainTxEngine(
             outputs = outputs // assumes change required
         )
 
-        val relativeFee = BigDecimal(100) * (pendingTx.feeAmount.toBigDecimal() / pendingTx.amount.toBigDecimal())
+        val relativeFee =
+            BigDecimal(100) * (pendingTx.feeAmount.toBigDecimal() / pendingTx.amount.toBigDecimal())
         return fiatValue.toBigDecimal() > BigDecimal(LARGE_TX_FEE) &&
             txSize > LARGE_TX_SIZE &&
             relativeFee > LARGE_TX_PERCENTAGE
@@ -316,7 +359,8 @@ class BtcOnChainTxEngine(
             // If the large_fee warning is present, make sure it's ack'd.
             // If it's not, then there's nothing to do
             if (pendingTx.getOption<TxConfirmationValue.TxBooleanConfirmation<Unit>>(
-                    TxConfirmation.LARGE_TRANSACTION_WARNING)?.value == false
+                    TxConfirmation.LARGE_TRANSACTION_WARNING
+                )?.value == false
             ) {
                 throw TxValidationFailure(ValidationState.OPTION_INVALID)
             }

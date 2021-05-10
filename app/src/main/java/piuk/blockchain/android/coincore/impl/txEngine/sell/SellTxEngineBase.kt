@@ -1,7 +1,6 @@
 package piuk.blockchain.android.coincore.impl.txEngine.sell
 
 import com.blockchain.featureflags.GatedFeature
-import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.CustodialOrder
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.Product
@@ -16,6 +15,7 @@ import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.NullCryptoAccount
@@ -33,8 +33,7 @@ import java.math.RoundingMode
 abstract class SellTxEngineBase(
     private val walletManager: CustodialWalletManager,
     kycTierService: TierService,
-    quotesEngine: TransferQuotesEngine,
-    private val internalFeatureFlagApi: InternalFeatureFlagApi
+    quotesEngine: TransferQuotesEngine
 ) : QuotedEngine(quotesEngine, kycTierService, walletManager, Product.SELL) {
 
     val target: FiatAccount
@@ -110,7 +109,10 @@ abstract class SellTxEngineBase(
         pendingTx.copy(
             confirmations = listOfNotNull(
                 TxConfirmationValue.NewExchangePriceConfirmation(pricedQuote.price, sourceAsset),
-                TxConfirmationValue.NewTo(txTarget, NullCryptoAccount()),
+                TxConfirmationValue.NewTo(
+                    txTarget, NullCryptoAccount(),
+                    AssetAction.Sell
+                ),
                 TxConfirmationValue.NewSale(
                     amount = pendingTx.amount,
                     exchange = latestQuoteExchangeRate.convert(pendingTx.amount)

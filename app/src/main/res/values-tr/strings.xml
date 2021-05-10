@@ -1170,7 +1170,7 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
     <string name="send_enter_amount_max">Maksimumunu Gönder</string>
     <string name="send_enter_amount_deposit_max">Maksimumunu Aktar</string>
     <string name="send_enter_amount_min_deposit">En az %1$s aktarımı gerekli</string>
-    <string name="send_confirmation_title">%1$s gönder</string>
+    <string name="send_confirmation_title">gönder</string>
     <string name="send_confirmation_fee">Ücret - Normal</string>
     <string name="send_confirmation_add_note_hint">Bir not ekle</string>
     <string name="send_confirmation_cta_button">%1$s gönder</string>

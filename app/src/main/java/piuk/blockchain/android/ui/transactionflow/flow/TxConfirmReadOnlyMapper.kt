@@ -10,6 +10,7 @@ import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.Money
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionFlowCustomiserImpl
@@ -86,15 +87,18 @@ class NewToPropertyFormatter(private val context: Context, val defaultLabel: Def
     override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
         require(property is TxConfirmationValue.NewTo)
         return mapOf(
-            if (property.isSwap) {
+            if (property.assetAction == AssetAction.Sell) {
                 ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.common_to)
                 ConfirmationPropertyKey.TITLE to getLabel(
                     property.txTarget.label,
                     defaultLabel.getDefaultNonCustodialWalletLabel(property.target.asset),
                     property.target.asset.displayTicker
                 )
-            } else {
+            } else if (property.assetAction == AssetAction.Swap) {
                 ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.checkout_item_deposit_to)
+                ConfirmationPropertyKey.TITLE to property.txTarget.label
+            } else {
+                ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.checkout_item_send_to)
                 ConfirmationPropertyKey.TITLE to property.txTarget.label
             }
         )

@@ -1169,7 +1169,7 @@ Esto le permitirá restaurar su Wallet si perdiera este dispositivo.</string>
     <string name="send_enter_amount_max">Cantidad máxima para una transferencia</string>
     <string name="send_enter_amount_deposit_max">Cantidad máxima para una transferencia</string>
     <string name="send_enter_amount_min_deposit">Se requiere una transferencia mínima de %1$s</string>
-    <string name="send_confirmation_title">Enviar %1$s</string>
+    <string name="send_confirmation_title">Enviar</string>
     <string name="send_confirmation_fee">Tarifa - Regular</string>
     <string name="send_confirmation_add_note_hint">Añadir una nota</string>
     <string name="send_confirmation_cta_button">Enviar %1$s</string>

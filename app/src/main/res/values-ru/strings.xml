@@ -1174,7 +1174,7 @@
     <string name="send_enter_amount_max">Отправить Max</string>
     <string name="send_enter_amount_deposit_max">Перевести Max</string>
     <string name="send_enter_amount_min_deposit">Требуется минимальный перевод в размере %1$s</string>
-    <string name="send_confirmation_title">Отправить %1$s</string>
+    <string name="send_confirmation_title">Отправить</string>
     <string name="send_confirmation_fee">Комиссия - регулярная</string>
     <string name="send_confirmation_add_note_hint">Добавить заметку</string>
     <string name="send_confirmation_cta_button">Отправить %1$s</string>

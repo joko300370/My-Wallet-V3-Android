@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.eth
 
+import com.blockchain.featureflags.GatedFeature
 import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
@@ -12,9 +13,11 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import org.web3j.crypto.RawTransaction
 import org.web3j.utils.Convert
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FeeSelection
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
@@ -38,6 +41,7 @@ open class EthOnChainTxEngine(
     requireSecondPassword,
     walletPreferences
 ) {
+
     override fun assertInputsValid() {
         check(txTarget is CryptoAddress)
         check((txTarget as CryptoAddress).asset == CryptoCurrency.ETHER)
@@ -61,22 +65,52 @@ open class EthOnChainTxEngine(
             )
         )
 
+    private fun buildNewConfirmation(pendingTx: PendingTx): PendingTx =
+        pendingTx.copy(
+            confirmations = listOfNotNull(
+                TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
+                TxConfirmationValue.NewTo(
+                    txTarget, NullCryptoAccount(), AssetAction.Send
+                ),
+                buildNewFee(
+                    pendingTx.feeAmount,
+                    pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+                    sourceAsset
+                ),
+                TxConfirmationValue.NewTotal(
+                    totalWithoutFee = (pendingTx.amount as CryptoValue).minus(
+                        pendingTx.feeAmount as CryptoValue
+                    ),
+                    exchange = pendingTx.amount.toFiat(exchangeRates, userFiat)
+                        .minus(pendingTx.feeAmount.toFiat(exchangeRates, userFiat))
+                ),
+                TxConfirmationValue.Description()
+            )
+        )
+
+    private fun buildOldConfirmation(pendingTx: PendingTx): PendingTx =
+        pendingTx.copy(
+            confirmations = listOf(
+                TxConfirmationValue.From(from = sourceAccount.label),
+                TxConfirmationValue.To(to = txTarget.label),
+                makeFeeSelectionOption(pendingTx),
+                TxConfirmationValue.FeedTotal(
+                    amount = pendingTx.amount,
+                    fee = pendingTx.feeAmount,
+                    exchangeFee = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+                    exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
+                ),
+                TxConfirmationValue.Description()
+            )
+        )
+
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(
-            pendingTx.copy(
-                confirmations = listOf(
-                    TxConfirmationValue.From(from = sourceAccount.label),
-                    TxConfirmationValue.To(to = txTarget.label),
-                    makeFeeSelectionOption(pendingTx),
-                    TxConfirmationValue.FeedTotal(
-                        amount = pendingTx.amount,
-                        fee = pendingTx.feeAmount,
-                        exchangeFee = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
-                        exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
-                    ),
-                    TxConfirmationValue.Description()
-                )
-            )
+            if (internalFeatureFlagApi.isFeatureEnabled(GatedFeature.CHECKOUT)) {
+                buildNewConfirmation(pendingTx)
+            } else {
+                buildOldConfirmation(pendingTx)
+            }
         )
 
     private fun absoluteFee(feeLevel: FeeLevel): Single<CryptoValue> =

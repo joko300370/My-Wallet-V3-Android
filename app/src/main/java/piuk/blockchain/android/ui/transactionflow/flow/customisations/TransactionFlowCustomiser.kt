@@ -276,13 +276,9 @@ class TransactionFlowCustomiserImpl(
             else -> throw java.lang.IllegalStateException("Max network fee label not configured for ${state.action}")
         }
 
-    override fun confirmTitle(state: TransactionState): String {
-        val amount = state.pendingTx?.amount?.toStringWithSymbol() ?: ""
-
-        return when (state.action) {
-            AssetAction.Send -> resources.getString(
-                R.string.send_confirmation_title, amount
-            )
+    override fun confirmTitle(state: TransactionState): String =
+        when (state.action) {
+            AssetAction.Send -> resources.getString(R.string.send_confirmation_title)
             AssetAction.Swap -> resources.getString(R.string.common_confirm)
             AssetAction.InterestDeposit -> resources.getString(R.string.common_confirm)
             AssetAction.Sell -> resources.getString(R.string.checkout)
@@ -290,7 +286,6 @@ class TransactionFlowCustomiserImpl(
             AssetAction.Withdraw -> resources.getString(R.string.common_withdraw)
             else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
         }
-    }
 
     override fun confirmCtaText(state: TransactionState): String {
         val amount = state.pendingTx?.amount?.toStringWithSymbol() ?: ""

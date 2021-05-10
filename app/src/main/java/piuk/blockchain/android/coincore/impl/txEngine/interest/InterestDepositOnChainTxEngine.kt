@@ -20,7 +20,7 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 class InterestDepositOnChainTxEngine(
     walletManager: CustodialWalletManager,
     private val onChainEngine: OnChainTxEngineBase
-) : InterestEngine(walletManager) {
+) : InterestBaseEngine(walletManager) {
 
     override fun assertInputsValid() {
         check(sourceAccount is CryptoNonCustodialAccount)

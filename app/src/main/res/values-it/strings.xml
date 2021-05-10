@@ -1174,7 +1174,7 @@
     <string name="send_enter_amount_max">Invia Max</string>
     <string name="send_enter_amount_deposit_max">Trasferimento max</string>
     <string name="send_enter_amount_min_deposit">È richiesto un trasferimento minimo di %1$s</string>
-    <string name="send_confirmation_title">Invia %1$s</string>
+    <string name="send_confirmation_title">Invia</string>
     <string name="send_confirmation_fee">Commissione: regolare</string>
     <string name="send_confirmation_add_note_hint">Aggiungi una nota</string>
     <string name="send_confirmation_cta_button">Invia %1$s</string>

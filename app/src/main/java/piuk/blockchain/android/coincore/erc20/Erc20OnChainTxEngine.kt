@@ -1,9 +1,11 @@
 package piuk.blockchain.android.coincore.erc20
 
+import com.blockchain.featureflags.GatedFeature
 import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import info.blockchain.wallet.api.data.FeeOptions
 import io.reactivex.Completable
@@ -11,9 +13,11 @@ import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import org.web3j.crypto.RawTransaction
 import org.web3j.utils.Convert
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FeeSelection
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
@@ -23,6 +27,7 @@ import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
+import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.utils.extensions.then
 import java.math.BigDecimal
@@ -37,6 +42,7 @@ open class Erc20OnChainTxEngine(
     requireSecondPassword,
     walletPreferences
 ) {
+
     override fun doInitialiseTx(): Single<PendingTx> =
         Single.just(
             PendingTx(
@@ -54,9 +60,41 @@ open class Erc20OnChainTxEngine(
             )
         )
 
-    override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
-        Single.just(
-            pendingTx.copy(confirmations = listOf(
+    private fun buildConfirmationTotal(pendingTx: PendingTx): TxConfirmationValue.NewTotal {
+        val amount = pendingTx.amount.toFiat(exchangeRates, userFiat) as FiatValue
+        val amountFee = pendingTx.feeAmount.toFiat(exchangeRates, userFiat) as FiatValue
+
+        val amountFeeToCrypto = amountFee.toCrypto(exchangeRates, sourceAsset)
+
+        val total = amount.minus(amountFee)
+        val exchange = pendingTx.amount.minus(amountFeeToCrypto)
+
+        return TxConfirmationValue.NewTotal(
+            totalWithoutFee = total,
+            exchange = exchange
+        )
+    }
+
+    private fun buildNewConfirmation(pendingTx: PendingTx): PendingTx =
+        pendingTx.copy(
+            confirmations = listOfNotNull(
+                TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
+                TxConfirmationValue.NewTo(
+                    txTarget, NullCryptoAccount(), AssetAction.Send
+                ),
+                buildNewFee(
+                    pendingTx.feeAmount,
+                    pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+                    CryptoCurrency.ETHER
+                ),
+                buildConfirmationTotal(pendingTx),
+                TxConfirmationValue.Description()
+            )
+        )
+
+    private fun buildOldConfirmation(pendingTx: PendingTx): PendingTx =
+        pendingTx.copy(
+            confirmations = listOf(
                 TxConfirmationValue.From(from = sourceAccount.label),
                 TxConfirmationValue.To(to = txTarget.label),
                 makeFeeSelectionOption(pendingTx),
@@ -67,7 +105,17 @@ open class Erc20OnChainTxEngine(
                     exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
                 ),
                 TxConfirmationValue.Description()
-            )))
+            )
+        )
+
+    override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
+        Single.just(
+            if (internalFeatureFlagApi.isFeatureEnabled(GatedFeature.CHECKOUT)) {
+                buildNewConfirmation(pendingTx)
+            } else {
+                buildOldConfirmation(pendingTx)
+            }
+        )
 
     private fun absoluteFee(feeLevel: FeeLevel): Single<CryptoValue> =
         feeOptions().map {
@@ -94,11 +142,12 @@ open class Erc20OnChainTxEngine(
             exchange = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
             availableLevels = AVAILABLE_FEE_LEVELS,
             selectedLevel = pendingTx.feeSelection.selectedLevel,
-                asset = sourceAsset
+            asset = sourceAsset
         )
 
     private fun feeOptions(): Single<FeeOptions> =
-        feeManager.getErc20FeeOptions(ethDataManager.erc20ContractAddress(sourceAsset)).singleOrError()
+        feeManager.getErc20FeeOptions(ethDataManager.erc20ContractAddress(sourceAsset))
+            .singleOrError()
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
         require(amount is CryptoValue)
@@ -167,7 +216,9 @@ open class Erc20OnChainTxEngine(
         sourceAccount.actionableBalance
             .map { balance ->
                 if (pendingTx.amount > balance) {
-                    throw TxValidationFailure(ValidationState.INSUFFICIENT_FUNDS)
+                    throw TxValidationFailure(
+                        ValidationState.INSUFFICIENT_FUNDS
+                    )
                 } else {
                     true
                 }
@@ -189,22 +240,36 @@ open class Erc20OnChainTxEngine(
         ethDataManager.isLastTxPending()
             .flatMapCompletable { hasUnconfirmed: Boolean ->
                 if (hasUnconfirmed) {
-                    Completable.error(TxValidationFailure(ValidationState.HAS_TX_IN_FLIGHT))
+                    Completable.error(
+                        TxValidationFailure(
+                            ValidationState.HAS_TX_IN_FLIGHT
+                        )
+                    )
                 } else {
                     Completable.complete()
                 }
             }
 
-    override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
+    override fun doExecute(
+        pendingTx: PendingTx,
+        secondPassword: String
+    ): Single<TxResult> =
         createTransaction(pendingTx)
             .flatMap {
-                ethDataManager.signEthTransaction(it, secondPassword)
+                ethDataManager.signEthTransaction(
+                    it,
+                    secondPassword
+                )
             }
             .flatMap { ethDataManager.pushTx(it) }
             .flatMap { ethDataManager.setLastTxHashNowSingle(it) }
             .flatMap { hash ->
-                pendingTx.getOption<TxConfirmationValue.Description>(TxConfirmation.DESCRIPTION)?.let { notes ->
-                    ethDataManager.updateErc20TransactionNotes(hash, notes.text, sourceAsset)
+                pendingTx.getOption<TxConfirmationValue.Description>(
+                    TxConfirmation.DESCRIPTION
+                )?.let { notes ->
+                    ethDataManager.updateErc20TransactionNotes(
+                        hash, notes.text, sourceAsset
+                    )
                 }?.toSingle {
                     hash
                 } ?: Single.just(hash)
@@ -224,8 +289,12 @@ open class Erc20OnChainTxEngine(
             ethDataManager.createErc20Transaction(
                 nonce = nonce,
                 to = tgt.address,
-                contractAddress = ethDataManager.erc20ContractAddress(sourceAsset),
-                gasPriceWei = fees.gasPrice(pendingTx.feeSelection.selectedLevel),
+                contractAddress = ethDataManager.erc20ContractAddress(
+                    sourceAsset
+                ),
+                gasPriceWei = fees.gasPrice(
+                    pendingTx.feeSelection.selectedLevel
+                ),
                 gasLimitGwei = fees.gasLimitGwei,
                 amount = pendingTx.amount.toBigInteger()
             )
@@ -238,12 +307,14 @@ open class Erc20OnChainTxEngine(
             Convert.Unit.GWEI
         ).toBigInteger()
 
-    private val FeeOptions.gasLimitGwei: BigInteger
+    private
+    val FeeOptions.gasLimitGwei: BigInteger
         get() = BigInteger.valueOf(
             gasLimitContract
         )
 
     companion object {
-        private val AVAILABLE_FEE_LEVELS = setOf(FeeLevel.Regular, FeeLevel.Priority)
+        private val AVAILABLE_FEE_LEVELS =
+            setOf(FeeLevel.Regular, FeeLevel.Priority)
     }
 }

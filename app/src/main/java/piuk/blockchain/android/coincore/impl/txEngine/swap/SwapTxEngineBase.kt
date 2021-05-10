@@ -2,7 +2,6 @@ package piuk.blockchain.android.coincore.impl.txEngine.swap
 
 import androidx.annotation.VisibleForTesting
 import com.blockchain.featureflags.GatedFeature
-import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.CustodialOrder
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.Product
@@ -11,7 +10,6 @@ import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.nabu.service.TierService
-import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
@@ -19,6 +17,7 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.zipWith
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.PendingTx
@@ -43,8 +42,7 @@ private val PendingTx.userTier: KycTiers
 abstract class SwapTxEngineBase(
     quotesEngine: TransferQuotesEngine,
     private val walletManager: CustodialWalletManager,
-    kycTierService: TierService,
-    private val internalFeatureFlagApi: InternalFeatureFlagApi
+    kycTierService: TierService
 ) : QuotedEngine(quotesEngine, kycTierService, walletManager, Product.TRADE) {
 
     private lateinit var minApiLimit: Money
@@ -117,16 +115,6 @@ abstract class SwapTxEngineBase(
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =
         validateAmount(pendingTx).updateTxValidity(pendingTx)
 
-    private fun buildNewFee(feeAmount: Money, exchangeAmount: Money, asset: CryptoCurrency): TxConfirmationValue? {
-        return if (!feeAmount.isZero) {
-            TxConfirmationValue.NewNetworkFee(
-                feeAmount = feeAmount as CryptoValue,
-                exchange = exchangeAmount,
-                asset = asset
-            )
-        } else null
-    }
-
     private fun buildConfirmationTotal(pendingTx: PendingTx, pricedQuote: PricedQuote): TxConfirmationValue.NewTotal {
         val receivingValue = CryptoValue.fromMajor(
             target.asset,
@@ -155,7 +143,7 @@ abstract class SwapTxEngineBase(
                     CryptoValue.fromMajor(target.asset, pricedQuote.price.toBigDecimal())
                 ),
                 TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
-                TxConfirmationValue.NewTo(txTarget, target, true),
+                TxConfirmationValue.NewTo(txTarget, target, AssetAction.Swap),
                 buildNewFee(
                     pendingTx.feeAmount,
                     pendingTx.feeAmount.toFiat(exchangeRates, userFiat),

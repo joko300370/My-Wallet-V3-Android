@@ -1174,7 +1174,7 @@ Veuillez réessayer plus tard.</string>
     <string name="send_enter_amount_max">Envoi Max</string>
     <string name="send_enter_amount_deposit_max">Transfert max</string>
     <string name="send_enter_amount_min_deposit">Transfert minimum de %1$s requis</string>
-    <string name="send_confirmation_title">Envoyer %1$s</string>
+    <string name="send_confirmation_title">Envoyer</string>
     <string name="send_confirmation_fee">Frais - Standard</string>
     <string name="send_confirmation_add_note_hint">Ajouter une note</string>
     <string name="send_confirmation_cta_button">Envoyer %1$s</string>
