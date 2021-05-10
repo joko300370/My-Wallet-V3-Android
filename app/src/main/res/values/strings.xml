@@ -136,6 +136,9 @@
     <string name="pair_wallet_step_2">Go to Settings / General.</string>
     <string name="landing_title">Welcome to Blockchain</string>
     <string name="landing_body">The easy way to <b>send</b>, <b>receive</b>, <b>store</b> and <b>trade</b> digital currencies.</string>
+    <string name="landing_create_wallet">Create a Wallet</string>
+    <string name="landing_log_in">Log in</string>
+    <string name="landing_version">v%1$s (%2$d) %3$s</string>
 
     <!-- Recover Funds -->
     <string name="pair_wallet_step_3">Click Show Pairing Code to reveal a QR Code, a square black
@@ -2032,4 +2035,16 @@
     <string name="pairing_wallet_instruction_3">Using your computer’s camera, scan the QR code below.</string>
     <string name="pairing_wallet_show_qr">Show QR code</string>
     <string name="pairing_wallet_hide_qr">Hide QR code</string>
+
+    <!-- Login & Verify Email -->
+    <string name="login_title">Login to Blockchain Account</string>
+    <string name="login_email_hint">Enter account email</string>
+    <string name="common_or">OR</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="login_send_email_error">Could not send email</string>
+    <string name="login_google_email_not_found">Email not found</string>
+    <string name="login_google_sign_in_failed">Google Sign in failed</string>
+    <string name="verify_device_title">Verify Device</string>
+    <string name="verify_device_desc">We sent a verification email to %s. Please click the link in the email to continue.</string>
+    <string name="open_email_cta">Open email</string>
 </resources>

@@ -152,4 +152,11 @@ public interface WalletExplorerEndpoints {
 
     @GET("wallet/get-ip")
     Single<WalletApi.IPResponse> getExternalIP();
+
+    @FormUrlEncoded
+    @POST("wallet")
+    Single<ResponseBody> sendEmailForVerification(
+        @Field("method") String method,
+        @Field("email") String email
+    );
 }

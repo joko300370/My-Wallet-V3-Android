@@ -14,5 +14,6 @@ enum class GatedFeature(val readableName: String) {
     MODERN_AUTH_ENABLE_APPROVAL("Enable Approval for Modern Auth"), // If true, the approve button will be
                                                                     // enabled even if the devices are on different WiFi
     SEGMENT_ANALYTICS("Segment Analytics through Nabu API"),
-    ADD_SUB_WALLET_ADDRESSES("Create BTC sub-wallets")
+    ADD_SUB_WALLET_ADDRESSES("Create BTC sub-wallets"),
+    SINGLE_SIGN_ON("Enable New SSO Flow") // If true, the new login flow will be used
 }

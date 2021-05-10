@@ -236,6 +236,10 @@ class WalletApi(
             }
     }
 
+    fun sendEmailForVerification(email: String): Single<ResponseBody> {
+        return explorerInstance.sendEmailForVerification("send-guid-reminder", email)
+    }
+
     private fun getApiCode(): String {
         return apiCode.apiCode
     }

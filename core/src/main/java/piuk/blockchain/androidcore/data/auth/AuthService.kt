@@ -131,4 +131,15 @@ class AuthService(private val walletApi: WalletApi, rxBus: RxBus) {
         rxPinning.callSingle {
             walletApi.getSignedJsonToken(guid, sharedKey, partner)
         }
+
+    /**
+     * Send email to verify device
+     *
+     * @param email The user's email
+     * @return An [Observable] wrapping the result
+     */
+    fun sendEmailForDeviceVerification(email: String): Single<ResponseBody> =
+        rxPinning.callSingle {
+            walletApi.sendEmailForVerification(email)
+        }
 }

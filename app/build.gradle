@@ -286,6 +286,7 @@ dependencies {
     implementation(Libraries.googlePlayServicesBase) {
         exclude group: 'com.android.support'
     }
+    implementation Libraries.googlePlayServicesAuth
     implementation Libraries.googlePlaces
     implementation Libraries.biometricsApi
 

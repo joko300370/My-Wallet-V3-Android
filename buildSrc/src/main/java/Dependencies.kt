@@ -39,6 +39,7 @@ object Versions {
 
     // Support Libraries
     const val googleServices = "17.1.0"
+    const val googleServicesAuth = "19.0.0"
     const val googleServicesPlaces = "17.0.0"
     const val googlePlayCore = "1.8.2"
     const val firebaseMessaging = "20.2.0"
@@ -172,6 +173,8 @@ object Libraries {
         "com.google.firebase:firebase-dynamic-links:${Versions.firebaseDynamicLink}"
     const val googlePlayServicesBase =
         "com.google.android.gms:play-services-base:${Versions.googleServices}"
+    const val googlePlayServicesAuth =
+        "com.google.android.gms:play-services-auth:${Versions.googleServicesAuth}"
     const val googlePlaces =
         "com.google.android.gms:play-services-places:${Versions.googleServicesPlaces}"
     const val googlePlayCore = "com.google.android.play:core:${Versions.googlePlayCore}"
