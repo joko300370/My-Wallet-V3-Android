@@ -147,7 +147,16 @@ class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState>() {
     }
 
     private fun navigateToVerifyDevice(loginEmail: String) {
-        // TODO: Navigate to Verify Device screen
+        parentFragmentManager.run {
+            beginTransaction()
+                .replace(
+                    R.id.content_frame,
+                    VerifyDeviceFragment.newInstance(loginEmail),
+                    VerifyDeviceFragment::class.simpleName
+                )
+                .addToBackStack(VerifyDeviceFragment::class.simpleName)
+                .commitAllowingStateLoss()
+        }
     }
 
     private val emailRegex = Regex(

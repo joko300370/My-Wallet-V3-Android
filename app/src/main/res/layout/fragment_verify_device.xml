@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/back_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small_margin"
+        android:background="@android:color/transparent"
+        android:padding="@dimen/tiny_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/icon_verify_device"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintVertical_bias="0.1"
+        app:srcCompat="@drawable/ic_arrow_back_blue" />
+
+    <ImageView
+        android:id="@+id/icon_verify_device"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:srcCompat="@drawable/ic_mobile_circle" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/verify_device_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/icon_verify_device"
+        android:layout_margin="@dimen/standard_margin"
+        style="@style/Text.Semibold.16"
+        android:text="@string/verify_device_title" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/verify_device_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/verify_device_title"
+        android:layout_margin="@dimen/standard_margin"
+        style="@style/Text.Light.Centered"
+        android:text="@string/verify_device_desc" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/open_email_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        style="@style/CtaButton.Blue"
+        android:layout_marginBottom="@dimen/standard_margin"
+        android:text="@string/open_email_cta"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
