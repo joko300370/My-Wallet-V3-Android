@@ -78,6 +78,7 @@ dependencies {
     implementation Libraries.retrofitRxJavaAdapter
     implementation Libraries.koin
     implementation Libraries.rxKotlin
+    implementation Libraries.kotlinJson
     implementation Libraries.retrofit
     implementation Libraries.cardForm
 

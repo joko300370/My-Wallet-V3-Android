@@ -2,33 +2,33 @@ package com.blockchain.nabu.datamanagers.analytics
 
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvent
-import com.blockchain.utils.toUtcIso8601
 import info.blockchain.api.AnalyticsService
 import info.blockchain.api.NabuAnalyticsEvent
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
-import java.util.Date
 
 class NabuAnalytics(
     private val analyticsService: AnalyticsService,
-    private val prefs: Lazy<PersistentPrefs>
+    private val prefs: Lazy<PersistentPrefs>,
+    private val localAnalyticsPersistence: AnalyticsLocalPersistence
 ) : Analytics {
+    private val compositeDisposable = CompositeDisposable()
 
     private val id: String by lazy {
         prefs.value.deviceId
     }
 
-    // TODO Add local persistence, instead of log to nabu every single event
     override fun logEvent(analyticsEvent: AnalyticsEvent) {
-        analyticsService.postEvent(
-            id = id,
-            events = listOf(
-                analyticsEvent.toNabuAnalyticsEvent()
-            ),
-            timeStamp = Date().toUtcIso8601()
-        )
+        val nabuEvent = analyticsEvent.toNabuAnalyticsEvent()
+        // TODO log failure
+        compositeDisposable += localAnalyticsPersistence.save(nabuEvent)
+            .subscribeOn(Schedulers.computation())
             .onErrorComplete()
             .emptySubscribe()
+        // TODO check condition and batch to the api if condition is met
     }
 
     override fun logEventOnce(analyticsEvent: AnalyticsEvent) {}

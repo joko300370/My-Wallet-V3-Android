@@ -24,6 +24,7 @@ import com.blockchain.nabu.datamanagers.TransactionErrorMapper
 import com.blockchain.nabu.datamanagers.UniqueAnalyticsNabuUserReporter
 import com.blockchain.nabu.datamanagers.UniqueAnalyticsWalletReporter
 import com.blockchain.nabu.datamanagers.WalletReporter
+import com.blockchain.nabu.datamanagers.analytics.AnalyticsLocalPersistence
 import com.blockchain.nabu.datamanagers.analytics.NabuAnalytics
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.LiveCustodialWalletManager
 import com.blockchain.nabu.datamanagers.featureflags.BankLinkingEnabledProvider
@@ -62,6 +63,7 @@ import com.blockchain.nabu.service.RetailWalletTokenService
 import com.blockchain.nabu.service.TierService
 import com.blockchain.nabu.service.TierUpdater
 import com.blockchain.nabu.status.KycTiersQueries
+import com.blockchain.nabu.datamanagers.analytics.AnalyticsFileLocalPersistence
 import com.blockchain.nabu.stores.NabuSessionTokenStore
 import com.blockchain.notifications.analytics.Analytics
 import org.koin.dsl.bind
@@ -293,8 +295,18 @@ val nabuModule = module {
     }
 
     single(nabu) {
-        NabuAnalytics(analyticsService = get(), prefs = lazy { get() })
+        NabuAnalytics(
+            analyticsService = get(),
+            prefs = lazy { get() },
+            localAnalyticsPersistence = get()
+        )
     }.bind(Analytics::class)
+
+    single {
+        AnalyticsFileLocalPersistence(
+            context = get()
+        )
+    }.bind(AnalyticsLocalPersistence::class)
 }
 
 val authenticationModule = module {
