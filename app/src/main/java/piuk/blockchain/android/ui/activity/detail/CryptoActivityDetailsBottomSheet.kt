@@ -10,8 +10,8 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.ActivityAnalytics
 import com.blockchain.nabu.datamanagers.InterestState
+import com.blockchain.notifications.analytics.ActivityAnalytics
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -33,11 +33,6 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
     ActivityDetailsIntents,
     ActivityDetailState,
     DialogSheetActivityDetailsBinding>() {
-
-    override val host: Host by lazy {
-        super.host as? Host
-            ?: throw IllegalStateException("Host fragment is not a ActivityDetailsBottomSheet.Host")
-    }
 
     override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogSheetActivityDetailsBinding =
         DialogSheetActivityDetailsBinding.inflate(inflater, container, false)
