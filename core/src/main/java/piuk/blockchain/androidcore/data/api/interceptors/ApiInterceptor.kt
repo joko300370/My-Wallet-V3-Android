@@ -17,7 +17,7 @@ class ApiInterceptor : Interceptor {
         val startTime = System.nanoTime()
 
         var requestLog = String.format(
-            "Sending request of type %s to %s with headers %s",
+            "Sending request of type %s to %s with headers: %s",
             request.method,
             request.url,
             request.headers
@@ -26,7 +26,7 @@ class ApiInterceptor : Interceptor {
         if (request.method.equals("post", ignoreCase = true) ||
             request.method.equals("put", ignoreCase = true)
         ) {
-            requestLog = "\n$requestLog\n${requestBodyToString(request.body)}"
+            requestLog = "\n$requestLog\nand Body:${requestBodyToString(request.body)}"
         }
 
         Timber.v("Request:\n$requestLog")

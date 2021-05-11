@@ -33,7 +33,8 @@ class AssetDetailsModelTest {
             walletPreferences = mock(),
             offlineAccounts = mock(),
             identity = mock(),
-            coinsWebsocket = mock()
+            coinsWebsocket = mock(),
+            features = mock()
         )
     )
 

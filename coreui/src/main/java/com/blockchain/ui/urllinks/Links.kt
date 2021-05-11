@@ -37,6 +37,7 @@ const val URL_SUPPORT_BALANCE_LOCKED = "https://support.blockchain.com/hc/en-us/
 const val URL_XLM_MIN_BALANCE =
     "https://support.blockchain.com/hc/en-us/articles/360019105471-" +
         "Why-do-Stellar-addresses-have-a-minimum-balance-requirement-"
+const val URL_XLM_MEMO = "https://support.blockchain.com/hc/en-us/articles/360018797312"
 
 const val URL_TX_FEES = "https://support.blockchain.com/hc/en-us/articles/360000939903-Transaction-fees"
 

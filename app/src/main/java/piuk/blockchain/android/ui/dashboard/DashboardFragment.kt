@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import androidx.annotation.UiThread
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.preferences.CurrencyPrefs
@@ -33,7 +32,6 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.SingleAccount
-import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.databinding.FragmentDashboardBinding
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
@@ -63,7 +61,6 @@ import piuk.blockchain.android.ui.sell.BuySellFragment
 import piuk.blockchain.android.ui.settings.BankLinkingHost
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
-import piuk.blockchain.android.ui.transfer.receive.activity.ReceiveActivity
 import piuk.blockchain.android.util.launchUrlInBrowser
 import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.data.events.ActionEvent
@@ -601,7 +598,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         model.process(ClearBottomSheet)
     }
 
-    override fun launchNewSendFor(account: SingleAccount, action: AssetAction) {
+    private fun launchNewSendFor(account: SingleAccount, action: AssetAction) {
         if (account is CustodialTradingAccount) {
             model.process(CheckBackupStatus(account, action))
         } else {
@@ -609,17 +606,16 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
     }
 
-    override fun goToReceiveFor(account: SingleAccount) =
-        when (account) {
-            is CryptoNonCustodialAccount -> {
-                clearBottomSheet()
-                startOldReceiveFor(account)
-            }
-            else -> throw IllegalStateException("The Send action is invalid for account: ${account.label}")
-        }.exhaustive
+    override fun performAssetActionFor(action: AssetAction, account: BlockchainAccount) {
+        clearBottomSheet()
+        when (action) {
+            AssetAction.Send -> launchNewSendFor(account as SingleAccount, action)
+            else -> navigator().performAssetActionFor(action, account)
+        }
+    }
 
     override fun gotoActivityFor(account: BlockchainAccount) =
-        navigator().gotoActivityFor(account)
+        navigator().performAssetActionFor(AssetAction.ViewActivity, account)
 
     override fun goToInterestDeposit(toAccount: InterestAccount) {
         model.process(LaunchInterestDepositFlow(toAccount))
@@ -642,13 +638,6 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
     }
 
-    override fun gotoSwap(account: SingleAccount) {
-        require(account is CryptoAccount)
-
-        clearBottomSheet()
-        navigator().tryTolaunchSwap(sourceAccount = account)
-    }
-
     override fun goToInterestDashboard() {
         navigator().startInterestDashboard()
     }
@@ -659,11 +648,6 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
     override fun startTransferFunds(account: SingleAccount, action: AssetAction) {
         model.process(LaunchSendFlow(account, action))
-    }
-
-    private fun startOldReceiveFor(account: SingleAccount) {
-        require(account is CryptoAccount)
-        ReceiveActivity.start(requireContext(), account)
     }
 
     companion object {

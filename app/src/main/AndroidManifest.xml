@@ -89,9 +89,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.transfer.receive.activity.ReceiveActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
             android:name=".ui.home.MainActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/AppTheme.MainActivity"

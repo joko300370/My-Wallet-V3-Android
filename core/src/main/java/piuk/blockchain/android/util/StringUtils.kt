@@ -25,70 +25,78 @@ class StringUtils(private val context: Context) {
         return context.getString(stringId)
     }
 
+    @Deprecated("Use the companion version")
     fun getStringWithMappedAnnotations(
         @StringRes stringId: Int,
         linksMap: Map<String, Uri?>,
         ctx: Context,
         onClick: () -> Unit = {}
-    ): CharSequence {
+    ): CharSequence = getStringWithMappedAnnotations(ctx, stringId, linksMap, onClick)
 
-        val text = context.getText(stringId)
-        val rawText = text as? SpannedString ?: return text
-        val out = SpannableString(rawText)
+    companion object {
+        fun getStringWithMappedAnnotations(
+            context: Context,
+            @StringRes stringId: Int,
+            linksMap: Map<String, Uri?>,
+            onClick: () -> Unit = {}
+        ): CharSequence {
 
-        for (annotation in rawText.getSpans(0, rawText.length, android.text.Annotation::class.java)) {
-            if (annotation.key == "link") {
-                out.setSpan(
-                    ClickableSpanWithoutUnderline {
-                        linksMap[annotation.value]?.let {
-                            val intent = Intent(Intent.ACTION_VIEW, it).addFlags(FLAG_ACTIVITY_NEW_TASK)
-                            ctx.startActivity(intent)
-                        }
-                        onClick()
-                    },
-                    rawText.getSpanStart(annotation),
-                    rawText.getSpanEnd(annotation),
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
+            val text = context.getText(stringId)
+            val rawText = text as? SpannedString ?: return text
+            val out = SpannableString(rawText)
+            for (annotation in rawText.getSpans(0, rawText.length, android.text.Annotation::class.java)) {
+                if (annotation.key == "link") {
+                    out.setSpan(
+                        ClickableSpanWithoutUnderline {
+                            linksMap[annotation.value]?.let {
+                                val intent = Intent(Intent.ACTION_VIEW, it).addFlags(FLAG_ACTIVITY_NEW_TASK)
+                                context.startActivity(intent)
+                            }
+                            onClick()
+                        },
+                        rawText.getSpanStart(annotation),
+                        rawText.getSpanEnd(annotation),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                }
+                if (annotation.key == "font" && annotation.value == "bold") {
+                    out.setSpan(
+                        StyleSpan(Typeface.BOLD),
+                        rawText.getSpanStart(annotation),
+                        rawText.getSpanEnd(annotation),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                }
             }
-            if (annotation.key == "font" && annotation.value == "bold") {
-                out.setSpan(
-                    StyleSpan(Typeface.BOLD),
-                    rawText.getSpanStart(annotation),
-                    rawText.getSpanEnd(annotation),
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-            }
+            return out
         }
-        return out
-    }
 
-    fun getResolvedStringWithAppendedMappedLearnMore(
-        staticText: String,
-        @StringRes textToMap: Int,
-        url: String,
-        context: Context,
-        @ColorRes linkColour: Int,
-        onClick: () -> Unit = {}
-    ): SpannableStringBuilder {
-        val map = mapOf("learn_more_link" to Uri.parse(url))
-        val learnMoreLink = getStringWithMappedAnnotations(
-            textToMap,
-            map,
-            context,
-            onClick
-        )
+        fun getResolvedStringWithAppendedMappedLearnMore(
+            staticText: String,
+            @StringRes textToMap: Int,
+            url: String,
+            context: Context,
+            @ColorRes linkColour: Int,
+            onClick: () -> Unit = {}
+        ): SpannableStringBuilder {
+            val map = mapOf("learn_more_link" to Uri.parse(url))
+            val learnMoreLink = getStringWithMappedAnnotations(
+                context,
+                textToMap,
+                map,
+                onClick
+            )
 
-        val sb = SpannableStringBuilder()
-            .append(staticText)
-            .append(learnMoreLink)
-        sb.setSpan(
-            ForegroundColorSpan(ContextCompat.getColor(context, linkColour)),
-            staticText.length, staticText.length + learnMoreLink.length,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-
-        return sb
+            val sb = SpannableStringBuilder()
+                .append(staticText)
+                .append(learnMoreLink)
+            sb.setSpan(
+                ForegroundColorSpan(ContextCompat.getColor(context, linkColour)),
+                staticText.length, staticText.length + learnMoreLink.length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            return sb
+        }
     }
 }
 

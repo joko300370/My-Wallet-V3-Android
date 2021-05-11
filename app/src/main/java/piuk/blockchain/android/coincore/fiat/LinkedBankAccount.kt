@@ -2,7 +2,7 @@ package piuk.blockchain.android.coincore.fiat
 
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
-import com.blockchain.nabu.models.data.WithdrawalFeeAndLimit
+import com.blockchain.nabu.models.data.FiatWithdrawalFeeAndLimit
 import com.blockchain.nabu.models.responses.interest.DisabledReason
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.FiatValue
@@ -31,8 +31,8 @@ class LinkedBankAccount(
         }
     }
 
-    fun getWithdrawalFeeAndMinLimit(): Single<WithdrawalFeeAndLimit> =
-        custodialWalletManager.fetchWithdrawFeeAndMinLimit(currency, type)
+    fun getWithdrawalFeeAndMinLimit(): Single<FiatWithdrawalFeeAndLimit> =
+        custodialWalletManager.fetchFiatWithdrawFeeAndMinLimit(currency, type)
 
     override val accountBalance: Single<Money>
         get() = Single.just(FiatValue.fromMinor(currency, 0L))

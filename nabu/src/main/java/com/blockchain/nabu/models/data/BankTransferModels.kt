@@ -6,6 +6,7 @@ import com.blockchain.nabu.models.responses.banktransfer.YapilyMediaResponse
 import info.blockchain.balance.FiatValue
 import om.blockchain.swap.nabu.BuildConfig
 import java.io.Serializable
+import java.math.BigInteger
 import java.net.MalformedURLException
 import java.net.URL
 
@@ -135,9 +136,14 @@ enum class LinkedBankState {
     UNKNOWN
 }
 
-data class WithdrawalFeeAndLimit(
+data class FiatWithdrawalFeeAndLimit(
     val minLimit: FiatValue,
     val fee: FiatValue
+)
+
+data class CryptoWithdrawalFeeAndLimit(
+    val minLimit: BigInteger,
+    val fee: BigInteger
 )
 
 data class BankTransferDetails(

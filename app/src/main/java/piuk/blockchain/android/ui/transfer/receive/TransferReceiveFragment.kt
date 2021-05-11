@@ -2,15 +2,22 @@ package piuk.blockchain.android.ui.transfer.receive
 
 import android.os.Bundle
 import android.view.View
+import com.blockchain.koin.scopedInject
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.ui.customviews.account.DefaultCellDecorator
 import piuk.blockchain.android.ui.transfer.AccountSelectorFragment
-import piuk.blockchain.android.ui.transfer.receive.activity.ReceiveActivity
+import piuk.blockchain.android.ui.upsell.KycUpgradePromptManager
 
 class TransferReceiveFragment : AccountSelectorFragment() {
+
+    private val disposables = CompositeDisposable()
+    private val upsellManager: KycUpgradePromptManager by scopedInject()
 
     override val fragmentAction: AssetAction
         get() = AssetAction.Receive
@@ -34,12 +41,27 @@ class TransferReceiveFragment : AccountSelectorFragment() {
         )
     }
 
+    override fun onDetach() {
+        super.onDetach()
+        disposables.dispose()
+    }
+
     private fun doOnAccountSelected(account: BlockchainAccount) {
         require(account is CryptoAccount)
-        ReceiveActivity.start(requireContext(), account)
+        disposables += upsellManager.queryUpsell(AssetAction.Receive, account)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { type ->
+                if (type == KycUpgradePromptManager.Type.NONE) {
+                    ReceiveSheet.newInstance(account).show(childFragmentManager, BOTTOM_SHEET)
+                } else {
+                    KycUpgradePromptManager.getUpsellSheet(type).show(childFragmentManager, BOTTOM_SHEET)
+                }
+            }
     }
 
     companion object {
+        const val BOTTOM_SHEET = "BOTTOM_SHEET"
+
         fun newInstance() = TransferReceiveFragment()
     }
 }

@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.alg
 
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
@@ -14,13 +15,15 @@ class AlgoCustodialTradingAccount(
     label: String,
     exchangeRates: ExchangeRateDataManager,
     custodialWalletManager: CustodialWalletManager,
-    identity: UserIdentity
+    identity: UserIdentity,
+    features: InternalFeatureFlagApi
 ) : CustodialTradingAccount(
     asset = cryptoCurrency,
     label = label,
     exchangeRates = exchangeRates,
     custodialWalletManager = custodialWalletManager,
-    identity = identity
+    identity = identity,
+    features = features
 ) {
     override val actions: Single<AvailableActions>
         get() = super.actions.map {

@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.alg
 
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
@@ -30,8 +31,9 @@ internal class AlgoAsset(
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
-    private val identity: UserIdentity,
-    offlineAccounts: OfflineAccountUpdater
+    identity: UserIdentity,
+    offlineAccounts: OfflineAccountUpdater,
+    features: InternalFeatureFlagApi
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -42,7 +44,8 @@ internal class AlgoAsset(
     pitLinking,
     crashLogger,
     offlineAccounts,
-    identity
+    identity,
+    features
 ) {
 
     override val asset: CryptoCurrency
@@ -75,12 +78,13 @@ internal class AlgoAsset(
                     labels.getDefaultCustodialWalletLabel(asset),
                     exchangeRates,
                     custodialManager,
-                    identity
+                    identity,
+                    features
                 )
             )
         )
 
-    override fun parseAddress(address: String): Maybe<ReceiveAddress> = Maybe.empty()
+    override fun parseAddress(address: String, label: String?): Maybe<ReceiveAddress> = Maybe.empty()
 }
 
 internal class AlgoAddress(

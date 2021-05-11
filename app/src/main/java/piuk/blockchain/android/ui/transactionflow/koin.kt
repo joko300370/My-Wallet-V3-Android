@@ -50,6 +50,7 @@ val transactionModule = module {
         TransactionFlowCustomiserImpl(
             resources = get<Context>().resources,
             assetResources = get(),
+            features = get(),
             stringUtils = get()
         )
     }.bind(TransactionFlowCustomiser::class)
@@ -61,8 +62,7 @@ val transactionModule = module {
 
     factory {
         NewExchangePriceFormatter(
-            context = get(),
-            stringUtils = get()
+            context = get()
         )
     }.bind(TxOptionsFormatterNewCheckout::class)
 
@@ -88,15 +88,13 @@ val transactionModule = module {
 
     factory {
         NewSwapExchangeRateFormatter(
-            context = get(),
-            stringUtils = get()
+            context = get()
         )
     }.bind(TxOptionsFormatterNewCheckout::class)
 
     factory {
         NewNetworkFormatter(
             context = get(),
-            stringUtils = get(),
             assetResources = get()
         )
     }.bind(TxOptionsFormatterNewCheckout::class)

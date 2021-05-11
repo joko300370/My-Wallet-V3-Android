@@ -1,5 +1,7 @@
 package piuk.blockchain.android.coincore.impl
 
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.BuySellOrder
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialOrderState
@@ -39,7 +41,8 @@ open class CustodialTradingAccount(
     override val exchangeRates: ExchangeRateDataManager,
     val custodialWalletManager: CustodialWalletManager,
     val isNoteSupported: Boolean = false,
-    private val identity: UserIdentity
+    private val identity: UserIdentity,
+    private val features: InternalFeatureFlagApi
 ) : CryptoAccountBase(), TradingAccount {
 
     private val hasFunds = AtomicBoolean(false)
@@ -147,8 +150,11 @@ open class CustodialTradingAccount(
                 val sell = AssetAction.Sell.takeIf {
                     !isArchived && hasFunds && isEligibleForSimpleBuy && fiatAccounts.isNotEmpty()
                 }
+                val receive = AssetAction.Receive.takeIf {
+                    features.isFeatureEnabled(GatedFeature.RECEIVE_TO_CUSTODIAL)
+                }
                 setOfNotNull(
-                    activity, send, swap, sell, interest
+                    activity, send, swap, sell, interest, receive
                 )
             }
 

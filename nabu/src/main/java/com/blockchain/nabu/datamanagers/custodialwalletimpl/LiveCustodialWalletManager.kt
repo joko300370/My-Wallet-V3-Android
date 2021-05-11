@@ -46,11 +46,12 @@ import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.blockchain.nabu.models.data.BankPartner
 import com.blockchain.nabu.models.data.BankTransferDetails
 import com.blockchain.nabu.models.data.BankTransferStatus
+import com.blockchain.nabu.models.data.CryptoWithdrawalFeeAndLimit
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
 import com.blockchain.nabu.models.data.LinkedBankErrorState
 import com.blockchain.nabu.models.data.LinkedBankState
-import com.blockchain.nabu.models.data.WithdrawalFeeAndLimit
+import com.blockchain.nabu.models.data.FiatWithdrawalFeeAndLimit
 import com.blockchain.nabu.models.responses.banktransfer.BankInfoResponse
 import com.blockchain.nabu.models.responses.banktransfer.BankMediaResponse.Companion.ICON
 import com.blockchain.nabu.models.responses.banktransfer.BankTransferChargeAttributes
@@ -179,10 +180,10 @@ class LiveCustodialWalletManager(
             )
         }
 
-    override fun fetchWithdrawFeeAndMinLimit(
+    override fun fetchFiatWithdrawFeeAndMinLimit(
         currency: String,
         paymentMethodType: PaymentMethodType
-    ): Single<WithdrawalFeeAndLimit> =
+    ): Single<FiatWithdrawalFeeAndLimit> =
         authenticator.authenticate {
             nabuService.fetchWithdrawFee(it, paymentMethodType.mapToRequest())
         }.map { response ->
@@ -194,7 +195,7 @@ class LiveCustodialWalletManager(
                 FiatValue.fromMinor(it.symbol, it.minorValue.toLong())
             } ?: FiatValue.zero(currency)
 
-            WithdrawalFeeAndLimit(minLimit, fee)
+            FiatWithdrawalFeeAndLimit(minLimit, fee)
         }
 
     private fun PaymentMethodType.mapToRequest(): String =
@@ -202,6 +203,23 @@ class LiveCustodialWalletManager(
             PaymentMethodType.BANK_TRANSFER -> WithdrawFeeRequest.BANK_TRANSFER
             PaymentMethodType.BANK_ACCOUNT -> WithdrawFeeRequest.BANK_ACCOUNT
             else -> throw IllegalStateException("map not specified for $this")
+        }
+
+    override fun fetchCryptoWithdrawFeeAndMinLimit(
+        currency: CryptoCurrency
+    ): Single<CryptoWithdrawalFeeAndLimit> =
+        authenticator.authenticate {
+            nabuService.fetchWithdrawFee(it, WithdrawFeeRequest.DEFAULT)
+        }.map { response ->
+            val fee = response.fees.firstOrNull {
+                it.symbol == currency.networkTicker
+            }?.minorValue?.toBigInteger() ?: BigInteger.ZERO
+
+            val minLimit = response.minAmounts.firstOrNull {
+                it.symbol == currency.networkTicker
+            }?.minorValue?.toBigInteger() ?: BigInteger.ZERO
+
+            CryptoWithdrawalFeeAndLimit(minLimit, fee)
         }
 
     override fun fetchWithdrawLocksTime(

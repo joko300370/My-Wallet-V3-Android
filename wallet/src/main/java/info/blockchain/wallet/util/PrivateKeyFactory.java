@@ -1,8 +1,8 @@
 package info.blockchain.wallet.util;
 
+import info.blockchain.api.ApiException;
 import info.blockchain.api.BitcoinApi;
 import info.blockchain.api.bitcoin.data.BalanceDto;
-import info.blockchain.wallet.exceptions.ApiException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

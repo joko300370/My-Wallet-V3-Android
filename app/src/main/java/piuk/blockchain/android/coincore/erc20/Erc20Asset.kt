@@ -1,11 +1,11 @@
 package piuk.blockchain.android.coincore.erc20
 
 import com.blockchain.annotations.CommonCode
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.preferences.WalletStatus
-import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.util.FormatsUtil
@@ -26,11 +26,9 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import java.util.concurrent.atomic.AtomicBoolean
 
 internal class Erc20Asset(
     override val asset: CryptoCurrency,
-    private val featureFlag: FeatureFlag = EnabledErc20FeatureFlag(),
     payloadManager: PayloadDataManager,
     private val ethDataManager: EthDataManager,
     private val feeDataManager: FeeDataManager,
@@ -43,7 +41,8 @@ internal class Erc20Asset(
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
     offlineAccounts: OfflineAccountUpdater,
-    private val identity: UserIdentity
+    identity: UserIdentity,
+    features: InternalFeatureFlagApi
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -54,22 +53,12 @@ internal class Erc20Asset(
     pitLinking,
     crashLogger,
     offlineAccounts,
-    identity
+    identity,
+    features
 ) {
-
-    private val isFeatureFlagEnabled = AtomicBoolean(false)
-
-    override val isEnabled: Boolean
-        get() = isFeatureFlagEnabled.get()
-
-    override fun initToken(): Completable {
-        return featureFlag.enabled.doOnSuccess {
-            isFeatureFlagEnabled.set(it)
-        }.flatMapCompletable {
-            ethDataManager.fetchErc20DataModel(asset)
+    override fun initToken(): Completable =
+        ethDataManager.fetchErc20DataModel(asset)
                 .ignoreElements()
-        }
-    }
 
     override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> =
         Single.just(getNonCustodialAccount())
@@ -110,7 +99,7 @@ internal class Erc20Asset(
     }
 
     @CommonCode("Exists in EthAsset")
-    override fun parseAddress(address: String): Maybe<ReceiveAddress> =
+    override fun parseAddress(address: String, label: String?): Maybe<ReceiveAddress> =
         Single.just(isValidAddress(address)).flatMapMaybe { isValid ->
             if (isValid) {
                 ethDataManager.isContractAddress(address)
@@ -118,7 +107,7 @@ internal class Erc20Asset(
                         if (isContract) {
                             throw AddressParseError(AddressParseError.Error.ETH_UNEXPECTED_CONTRACT_ADDRESS)
                         } else {
-                            Maybe.just(Erc20Address(asset, address))
+                            Maybe.just(Erc20Address(asset, address, label ?: address))
                         }
                     }
             } else {

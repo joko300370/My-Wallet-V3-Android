@@ -100,6 +100,7 @@ import piuk.blockchain.android.ui.pairingcode.PairingModel
 import piuk.blockchain.android.ui.pairingcode.PairingState
 import piuk.blockchain.android.ui.sell.BuySellFlowNavigator
 import piuk.blockchain.android.ui.settings.SettingsPresenter
+import piuk.blockchain.android.ui.transfer.receive.ReceiveIntentHelper
 import piuk.blockchain.android.ui.shortcuts.receive.ReceiveQrPresenter
 import piuk.blockchain.android.ui.ssl.SSLVerifyPresenter
 import piuk.blockchain.android.ui.swipetoreceive.LocalOfflineAccountCache
@@ -108,7 +109,9 @@ import piuk.blockchain.android.ui.thepit.PitPermissionsPresenter
 import piuk.blockchain.android.ui.thepit.PitVerifyEmailPresenter
 import piuk.blockchain.android.ui.transfer.AccountsSorting
 import piuk.blockchain.android.ui.transfer.DefaultAccountsSorting
-import piuk.blockchain.android.ui.transfer.receive.activity.ReceivePresenter
+import piuk.blockchain.android.ui.transfer.receive.ReceiveModel
+import piuk.blockchain.android.ui.transfer.receive.ReceiveState
+import piuk.blockchain.android.ui.upsell.KycUpgradePromptManager
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.BackupWalletUtil
 import piuk.blockchain.android.util.CurrentContextAccess
@@ -224,6 +227,7 @@ val applicationModule = module {
                 analytics = get(),
                 bankLinkingPrefs = get(),
                 custodialWalletManager = get(),
+                upsellManager = get(),
                 secureChannelManager = get(),
                 payloadManager = get()
             )
@@ -539,10 +543,19 @@ val applicationModule = module {
         }
 
         factory {
-            ReceivePresenter(
-                prefs = get(),
+            ReceiveModel(
+                initialState = ReceiveState(),
+                observeScheduler = AndroidSchedulers.mainThread(),
+                environmentConfig = get(),
+                crashLogger = get(),
                 qrCodeDataManager = get(),
-                exchangeRates = get()
+                receiveIntentHelper = get()
+            )
+        }
+
+        factory {
+            KycUpgradePromptManager(
+                identity = get()
             )
         }
 
@@ -795,6 +808,13 @@ val applicationModule = module {
             resources = get()
         )
     }.bind(AssetResources::class)
+
+    factory {
+        ReceiveIntentHelper(
+            context = get(),
+            assetResources = get()
+        )
+    }
 
     factory { FormatChecker() }
 }

@@ -1,10 +1,10 @@
 package info.blockchain.wallet.api;
 
+import info.blockchain.api.ApiException;
 import info.blockchain.wallet.ApiCode;
 import info.blockchain.wallet.BaseIntegTest;
 import info.blockchain.wallet.BlockchainFramework;
 import info.blockchain.wallet.api.data.Status;
-import info.blockchain.wallet.exceptions.ApiException;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

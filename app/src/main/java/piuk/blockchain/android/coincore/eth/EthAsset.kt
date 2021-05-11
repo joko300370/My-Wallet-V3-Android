@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.eth
 
 import com.blockchain.annotations.CommonCode
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
@@ -41,8 +42,9 @@ internal class EthAsset(
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
-    private val identity: UserIdentity,
-    offlineAccounts: OfflineAccountUpdater
+    identity: UserIdentity,
+    offlineAccounts: OfflineAccountUpdater,
+    features: InternalFeatureFlagApi
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -53,7 +55,8 @@ internal class EthAsset(
     pitLinking,
     crashLogger,
     offlineAccounts,
-    identity
+    identity,
+    features
 ) {
 
     private val labelList = mapOf(
@@ -106,14 +109,14 @@ internal class EthAsset(
     }
 
     @CommonCode("Exists in UsdtAsset and PaxAsset")
-    override fun parseAddress(address: String): Maybe<ReceiveAddress> =
+    override fun parseAddress(address: String, label: String?): Maybe<ReceiveAddress> =
         Single.just(isValidAddress(address)).flatMapMaybe { isValid ->
             if (isValid) {
                 ethDataManager.isContractAddress(address).flatMapMaybe { isContract ->
                     if (isContract) {
                         throw AddressParseError(ETH_UNEXPECTED_CONTRACT_ADDRESS)
                     } else {
-                        Maybe.just(EthAddress(address))
+                        Maybe.just(EthAddress(address, label ?: address))
                     }
                 }
             } else {

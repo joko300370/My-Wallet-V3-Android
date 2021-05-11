@@ -90,6 +90,9 @@ import piuk.blockchain.android.ui.tour.IntroTourStep
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.transfer.TransferFragment
+import piuk.blockchain.android.ui.transfer.receive.ReceiveSheet
+import piuk.blockchain.android.ui.upsell.UpsellHost
+import piuk.blockchain.android.ui.upsell.KycUpgradePromptManager
 import piuk.blockchain.android.util.AndroidUtils
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
@@ -104,6 +107,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     IntroTourHost,
     DialogFlow.FlowHost,
     SlidingModalBottomDialog.Host,
+    UpsellHost,
     AuthNewLoginSheet.Host,
     SmallSimpleBuyNavigator {
 
@@ -614,9 +618,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         showBottomSheet(bottomSheet)
     }
 
-    override fun onSheetClosed() {
-    }
-
     private fun startTransferFragment(
         viewToShow: TransferFragment.TransferViewType = TransferFragment.TransferViewType.TYPE_SEND
     ) {
@@ -658,9 +659,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         val fragment = DashboardFragment.newInstance()
         replaceContentFragment(fragment)
     }
-
-    override fun gotoActivityFor(account: BlockchainAccount?) =
-        startActivitiesFragment(account)
 
     override fun resumeSimpleBuyKyc() {
         startActivity(
@@ -828,6 +826,25 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         replaceContentFragment(buySellFragment)
     }
 
+    override fun performAssetActionFor(action: AssetAction, account: BlockchainAccount) =
+        presenter.validateAccountAction(action, account)
+
+    override fun launchUpsellAssetAction(
+        upsell: KycUpgradePromptManager.Type,
+        action: AssetAction,
+        account: BlockchainAccount
+    ) = replaceBottomSheet(KycUpgradePromptManager.getUpsellSheet(upsell))
+
+    override fun launchAssetAction(
+        action: AssetAction,
+        account: BlockchainAccount
+    ) = when (action) {
+            AssetAction.Receive -> replaceBottomSheet(ReceiveSheet.newInstance(account as CryptoAccount))
+            AssetAction.Swap -> tryTolaunchSwap(sourceAccount = account as CryptoAccount)
+            AssetAction.ViewActivity -> startActivitiesFragment(account)
+        else -> { }
+    }
+
     override fun launchOpenBankingLinking(bankLinkingInfo: BankLinkingInfo) {
         startActivityForResult(
             BankAuthActivity.newInstance(bankLinkingInfo.linkingId, bankLinkingInfo.bankAuthSource, this),
@@ -935,6 +952,15 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     }
 
     override fun onFlowFinished() {
+        Timber.d("On finished")
+    }
+
+    override fun onSheetClosed() {
+        Timber.d("On closed")
+    }
+
+    override fun startUpsellKyc() {
+        launchKyc(CampaignType.None)
     }
 
     override fun exitSimpleBuyFlow() {

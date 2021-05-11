@@ -1,9 +1,9 @@
 package piuk.blockchain.androidcore.data.auth
 
+import info.blockchain.api.ApiException
 import info.blockchain.wallet.api.WalletApi
 import info.blockchain.wallet.api.data.Status
 import info.blockchain.wallet.api.data.WalletOptions
-import info.blockchain.wallet.exceptions.ApiException
 import info.blockchain.wallet.exceptions.InvalidCredentialsException
 import io.reactivex.Observable
 import io.reactivex.Single

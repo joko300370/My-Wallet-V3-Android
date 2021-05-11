@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.home
 import androidx.fragment.app.Fragment
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.simplebuy.SimpleBuyState
@@ -39,6 +40,8 @@ interface HomeNavigator {
     fun launchVerifyEmail()
     fun launchSetupFingerprintLogin()
     fun launchTransfer()
+    fun performAssetActionFor(action: AssetAction, account: BlockchainAccount)
+
     fun launchIntroTour()
     fun launchSimpleBuySell(viewType: BuySellFragment.BuySellViewType = BuySellFragment.BuySellViewType.TYPE_BUY)
     fun launchOpenBankingLinking(bankLinkingInfo: BankLinkingInfo)
@@ -46,7 +49,6 @@ interface HomeNavigator {
     fun handlePaymentForCancelledOrder(state: SimpleBuyState)
     fun showOpenBankingDeepLinkError()
 
-    fun gotoActivityFor(account: BlockchainAccount?)
     fun goToTransfer()
 
     fun resumeSimpleBuyKyc()

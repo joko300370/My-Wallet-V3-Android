@@ -11,16 +11,17 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.databinding.DialogSheetAccountSelectorBinding
+import piuk.blockchain.android.ui.base.HostedBottomSheet
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 
 class AccountSelectSheet(
-    override val host: Host
+    override val host: HostedBottomSheet.Host
 ) : SlidingModalBottomDialog<DialogSheetAccountSelectorBinding>() {
 
-    interface SelectionHost : Host {
+    interface SelectionHost : HostedBottomSheet.Host {
         fun onAccountSelected(account: BlockchainAccount)
     }
 
@@ -97,7 +98,7 @@ class AccountSelectSheet(
     }
 
     companion object {
-        fun newInstance(host: Host): AccountSelectSheet = AccountSelectSheet(host)
+        fun newInstance(host: HostedBottomSheet.Host): AccountSelectSheet = AccountSelectSheet(host)
 
         fun newInstance(
             host: SelectionHost,
@@ -110,7 +111,7 @@ class AccountSelectSheet(
             }
 
         fun newInstance(
-            host: Host,
+            host: HostedBottomSheet.Host,
             accountList: Single<List<BlockchainAccount>>,
             @StringRes sheetTitle: Int,
             @StringRes sheetSubtitle: Int,

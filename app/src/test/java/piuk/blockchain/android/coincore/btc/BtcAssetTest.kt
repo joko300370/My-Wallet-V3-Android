@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.btc
 
 import com.blockchain.android.testutils.rxInit
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
@@ -55,6 +56,7 @@ class BtcAssetTest {
     private val walletPreferences: WalletStatus = mock()
     private val identity: NabuUserIdentity = mock()
     private val offlineCache: OfflineAccountUpdater = mock()
+    private val features: InternalFeatureFlagApi = mock()
 
     private val subject = BtcAsset(
         payloadManager = payloadManager,
@@ -70,7 +72,8 @@ class BtcAssetTest {
         crashLogger = crashLogger,
         offlineAccounts = offlineCache,
         walletPreferences = walletPreferences,
-        identity = identity
+        identity = identity,
+        features = features
     )
 
     @Test

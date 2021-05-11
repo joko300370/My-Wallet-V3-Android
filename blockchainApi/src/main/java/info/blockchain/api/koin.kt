@@ -12,6 +12,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 
 val blockchainApi = StringQualifier("blockchain-api")
 val explorerApi = StringQualifier("explorer-api")
+val addressResolutionApi = StringQualifier("address-resolution-api")
 
 val blockchainApiModule = module {
 
@@ -45,6 +46,21 @@ val blockchainApiModule = module {
             .build()
     }
 
+    single(addressResolutionApi) {
+        Retrofit.Builder()
+            .baseUrl(getBaseUrl("blockchain-api"))
+            .client(get())
+            .addCallAdapterFactory(get<RxJava2CallAdapterFactory>())
+            .addConverterFactory(
+                Json {
+                    ignoreUnknownKeys = true
+                    isLenient = true
+                    classDiscriminator = "typeOf" // Override this?
+                }.asConverterFactory("application/json".toMediaType())
+            )
+            .build()
+    }
+
     factory {
         BitcoinApi(
             get(blockchainApi),
@@ -58,6 +74,14 @@ val blockchainApiModule = module {
             getProperty("api-code")
         )
     }
+
+    factory {
+        AddressMappingService(
+            get(addressResolutionApi),
+            getProperty("api-code")
+        )
+    }
+
     factory {
         AnalyticsService(
             get(blockchainApi)

@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
+import info.blockchain.api.ApiException
 import info.blockchain.wallet.ApiCode
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.api.data.Status
 import info.blockchain.wallet.api.data.WalletOptions
-import info.blockchain.wallet.exceptions.ApiException
 import io.reactivex.Observable
 import io.reactivex.Single
 import okhttp3.ResponseBody

@@ -32,18 +32,19 @@ class TradingToOnChainTxEngine(
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
-        Single.just(
-            PendingTx(
-                amount = CryptoValue.zero(sourceAsset),
-                totalBalance = CryptoValue.zero(sourceAsset),
-                availableBalance = CryptoValue.zero(sourceAsset),
-                feeForFullAvailable = CryptoValue.zero(sourceAsset),
-                feeAmount = CryptoValue.zero(sourceAsset),
-                feeSelection = FeeSelection(),
-                selectedFiat = userFiat,
-                minLimit = CryptoValue.zero(sourceAsset)
-            )
-        )
+        walletManager.fetchCryptoWithdrawFeeAndMinLimit(sourceAsset)
+            .map {
+                PendingTx(
+                    amount = CryptoValue.zero(sourceAsset),
+                    totalBalance = CryptoValue.zero(sourceAsset),
+                    availableBalance = CryptoValue.zero(sourceAsset),
+                    feeForFullAvailable = CryptoValue.zero(sourceAsset),
+                    feeAmount = CryptoValue.fromMinor(sourceAsset, it.fee),
+                    feeSelection = FeeSelection(),
+                    selectedFiat = userFiat,
+                    minLimit = CryptoValue.fromMinor(sourceAsset, it.minLimit)
+                )
+            }
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
         require(amount is CryptoValue)

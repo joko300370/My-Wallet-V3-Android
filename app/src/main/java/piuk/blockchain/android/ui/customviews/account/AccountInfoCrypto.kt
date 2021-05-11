@@ -57,7 +57,7 @@ class AccountInfoCrypto @JvmOverloads constructor(
 
     fun updateAccount(
         account: CryptoAccount,
-        onAccountClicked: (CryptoAccount) -> Unit,
+        onAccountClicked: (CryptoAccount) -> Unit = {},
         cellDecorator: CellDecorator = DefaultCellDecorator()
     ) {
         compositeDisposable.clear()

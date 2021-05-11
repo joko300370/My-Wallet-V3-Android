@@ -1,4 +1,4 @@
-package piuk.blockchain.android.ui.share
+package piuk.blockchain.android.ui.transfer.receive
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -11,6 +11,7 @@ import androidx.core.content.FileProvider
 import com.blockchain.sunriver.StellarPayment
 import com.blockchain.sunriver.fromStellarUri
 import info.blockchain.balance.CryptoCurrency
+import io.reactivex.Single
 import info.blockchain.wallet.util.FormatsUtil
 import org.bitcoinj.uri.BitcoinURI
 import piuk.blockchain.android.R
@@ -33,7 +34,7 @@ class ReceiveIntentHelper(
         uri: String,
         bitmap: Bitmap,
         cryptoCurrency: CryptoCurrency
-    ): List<SendPaymentCodeData> {
+    ): Single<List<SendPaymentCodeData>> {
 
         val file = getQrFile()
         val outputStream = getFileOutputStream(file)
@@ -45,7 +46,7 @@ class ReceiveIntentHelper(
                 outputStream.close()
             } catch (e: IOException) {
                 Timber.e(e)
-                return emptyList()
+                return Single.just(emptyList())
             }
 
             val dataList = ArrayList<SendPaymentCodeData>()
@@ -104,9 +105,9 @@ class ReceiveIntentHelper(
 
             Logging.logShare("QR Code + URI")
 
-            return dataList
+            return Single.just(dataList)
         } else {
-            return emptyList()
+            return Single.just(emptyList())
         }
     }
 

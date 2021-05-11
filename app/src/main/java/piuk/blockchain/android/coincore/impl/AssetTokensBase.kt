@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.impl
 
 import androidx.annotation.VisibleForTesting
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.preferences.CurrencyPrefs
@@ -47,7 +48,8 @@ internal abstract class CryptoAssetBase(
     private val pitLinking: PitLinking,
     protected val crashLogger: CrashLogger,
     protected val offlineAccounts: OfflineAccountUpdater,
-    private val identity: UserIdentity
+    protected val identity: UserIdentity,
+    protected val features: InternalFeatureFlagApi
 ) : CryptoAsset, AccountRefreshTrigger {
 
     private val activeAccounts: ActiveAccountList by unsafeLazy {
@@ -150,7 +152,8 @@ internal abstract class CryptoAssetBase(
                     label = labels.getDefaultCustodialWalletLabel(asset),
                     exchangeRates = exchangeRates,
                     custodialWalletManager = custodialManager,
-                    identity = identity
+                    identity = identity,
+                    features = features
                 )
             )
         )

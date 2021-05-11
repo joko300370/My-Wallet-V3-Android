@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.btc
 
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
@@ -46,7 +47,8 @@ internal class BtcAsset(
     crashLogger: CrashLogger,
     private val walletPreferences: WalletStatus,
     offlineAccounts: OfflineAccountUpdater,
-    private val identity: UserIdentity
+    identity: UserIdentity,
+    features: InternalFeatureFlagApi
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -57,7 +59,8 @@ internal class BtcAsset(
     pitLinking,
     crashLogger,
     offlineAccounts,
-    identity
+    identity,
+    features
 ) {
 
     override val asset: CryptoCurrency
@@ -109,11 +112,11 @@ internal class BtcAsset(
         )
     }
 
-    override fun parseAddress(address: String): Maybe<ReceiveAddress> =
+    override fun parseAddress(address: String, label: String?): Maybe<ReceiveAddress> =
         Maybe.fromCallable {
             val normalisedAddress = address.removePrefix(FormatsUtil.BTC_PREFIX)
             if (isValidAddress(normalisedAddress)) {
-                BtcAddress(address = normalisedAddress)
+                BtcAddress(address = normalisedAddress, label = label ?: address)
             } else {
                 null
             }

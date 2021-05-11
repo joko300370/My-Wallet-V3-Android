@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.res.Resources
 import android.net.Uri
 import android.widget.FrameLayout
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.ui.urllinks.CHECKOUT_REFUND_POLICY
 import info.blockchain.balance.CryptoValue
@@ -55,6 +57,7 @@ interface TransactionFlowCustomiser :
 class TransactionFlowCustomiserImpl(
     private val resources: Resources,
     private val assetResources: AssetResources,
+    private val features: InternalFeatureFlagApi,
     private val stringUtils: StringUtils
 ) : TransactionFlowCustomiser {
     override fun enterAmountActionIcon(state: TransactionState): Int {
@@ -168,7 +171,8 @@ class TransactionFlowCustomiserImpl(
 
     override fun selectTargetShowManualEnterAddress(state: TransactionState): Boolean =
         when (state.action) {
-            AssetAction.Send -> !state.sendingAccount.isCustodial()
+            AssetAction.Send ->
+                !state.sendingAccount.isCustodial() || features.isFeatureEnabled(GatedFeature.SEND_FROM_CUSTODIAL)
             else -> false
         }
 
@@ -519,8 +523,8 @@ class TransactionFlowCustomiserImpl(
                 state.sendingAccount.uiCurrency()
             )
             TransactionErrorState.INVALID_AMOUNT -> resources.getString(
-                R.string.send_enter_amount_error_invalid_amount,
-                state.sendingAccount.uiCurrency()
+                R.string.send_enter_amount_error_invalid_amount_1,
+                state.pendingTx?.minLimit?.formatOrSymbolForZero() ?: throw IllegalStateException("Missing limit")
             )
             TransactionErrorState.INVALID_ADDRESS -> resources.getString(
                 R.string.send_error_not_valid_asset_address,

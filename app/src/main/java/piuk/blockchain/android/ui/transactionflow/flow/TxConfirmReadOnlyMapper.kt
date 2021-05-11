@@ -64,8 +64,7 @@ enum class ConfirmationPropertyKey {
 }
 
 class NewExchangePriceFormatter(
-    private val context: Context,
-    private val stringUtils: StringUtils
+    private val context: Context
 ) : TxOptionsFormatterNewCheckout {
     override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
         require(property is TxConfirmationValue.NewExchangePriceConfirmation)
@@ -74,7 +73,7 @@ class NewExchangePriceFormatter(
                 R.string.quote_price, property.asset.displayTicker
             ),
             ConfirmationPropertyKey.TITLE to property.money.toStringWithSymbol(),
-            ConfirmationPropertyKey.LINKED_NOTE to stringUtils.getResolvedStringWithAppendedMappedLearnMore(
+            ConfirmationPropertyKey.LINKED_NOTE to StringUtils.getResolvedStringWithAppendedMappedLearnMore(
                 context.resources.getString(R.string.checkout_item_price_note), R.string.common_linked_learn_more,
                 CHECKOUT_PRICE_EXPLANATION, context, R.color.blue_600
             )
@@ -133,7 +132,6 @@ class NewFromPropertyFormatter(private val context: Context, private val default
 
 class NewNetworkFormatter(
     private val context: Context,
-    private val stringUtils: StringUtils,
     private val assetResources: AssetResources
 ) :
     TxOptionsFormatterNewCheckout {
@@ -146,12 +144,12 @@ class NewNetworkFormatter(
             ConfirmationPropertyKey.TITLE to "- " + property.exchange.toStringWithSymbol(),
             ConfirmationPropertyKey.SUBTITLE to property.feeAmount.toStringWithSymbol(),
             if (property.asset.hasFeature(CryptoCurrency.IS_ERC20)) {
-                ConfirmationPropertyKey.LINKED_NOTE to stringUtils.getResolvedStringWithAppendedMappedLearnMore(
+                ConfirmationPropertyKey.LINKED_NOTE to StringUtils.getResolvedStringWithAppendedMappedLearnMore(
                     context.resources.getString(R.string.swap_erc_20_tooltip),
                     R.string.common_linked_learn_more, NETWORK_ERC20_EXPLANATION, context, R.color.blue_600
                 )
             } else {
-                ConfirmationPropertyKey.LINKED_NOTE to stringUtils.getResolvedStringWithAppendedMappedLearnMore(
+                ConfirmationPropertyKey.LINKED_NOTE to StringUtils.getResolvedStringWithAppendedMappedLearnMore(
                     context.resources.getString(
                         R.string.checkout_item_network_fee_note, assetResources.assetName(property.asset)
                     ),
@@ -164,8 +162,7 @@ class NewNetworkFormatter(
 }
 
 class NewSwapExchangeRateFormatter(
-    private val context: Context,
-    private val stringUtils: StringUtils
+    private val context: Context
 ) :
     TxOptionsFormatterNewCheckout {
     override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
@@ -174,7 +171,7 @@ class NewSwapExchangeRateFormatter(
             ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.exchange_rate),
             ConfirmationPropertyKey.TITLE to property.unitCryptoCurrency.toStringWithSymbol(),
             ConfirmationPropertyKey.SUBTITLE to property.price.toStringWithSymbol(),
-            ConfirmationPropertyKey.LINKED_NOTE to stringUtils.getResolvedStringWithAppendedMappedLearnMore(
+            ConfirmationPropertyKey.LINKED_NOTE to StringUtils.getResolvedStringWithAppendedMappedLearnMore(
                 context.resources.getString(
                     R.string.checkout_swap_exchange_note, property.price.symbol, property.unitCryptoCurrency.symbol
                 ),

@@ -358,9 +358,9 @@ class NabuService(retrofit: Retrofit) {
         }
     }.wrapErrorMessage()
 
-    internal fun fetchWithdrawFee(sessionToken: NabuSessionTokenResponse, paymentMethod: String) = service.withdrawFee(
-        sessionToken.authHeader, type = paymentMethod
-    ).wrapErrorMessage()
+    internal fun fetchWithdrawFee(sessionToken: NabuSessionTokenResponse, paymentMethod: String) =
+        service.withdrawFee(sessionToken.authHeader, type = paymentMethod)
+            .wrapErrorMessage()
 
     internal fun fetchWithdrawLocksRules(
         sessionToken: NabuSessionTokenResponse,

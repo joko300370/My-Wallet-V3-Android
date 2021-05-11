@@ -1,4 +1,4 @@
-package info.blockchain.wallet.exceptions
+package info.blockchain.api
 
 open class ApiException : Exception {
 

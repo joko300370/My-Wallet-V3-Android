@@ -14,15 +14,20 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.koin.android.ext.android.inject
 
-abstract class SlidingModalBottomDialog<T : ViewBinding> : BottomSheetDialogFragment() {
-
+interface HostedBottomSheet {
     interface Host {
         fun onSheetClosed()
     }
+    val host: Host
+}
 
-    protected open val host: Host by lazy {
-        parentFragment as? Host
-            ?: activity as? Host
+abstract class SlidingModalBottomDialog<T : ViewBinding> : BottomSheetDialogFragment() {
+
+    interface Host : HostedBottomSheet.Host
+
+    protected open val host: HostedBottomSheet.Host by lazy {
+        parentFragment as? HostedBottomSheet.Host
+            ?: activity as? HostedBottomSheet.Host
             ?: throw IllegalStateException("Host is not a SlidingModalBottomDialog.Host")
     }
 
