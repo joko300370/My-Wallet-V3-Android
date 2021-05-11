@@ -49,11 +49,33 @@
         app:layout_constraintVertical_bias="0"
         tools:text="£10,102.32" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/price_delta"
+        style="@style/Text.Light.14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/smallest_margin"
+        android:textColor="@color/green_600"
+        app:layout_constraintStart_toEndOf="@+id/price"
+        app:layout_constraintTop_toTopOf="@+id/price"
+        app:layout_constraintBottom_toBottomOf="@+id/price"
+        tools:text="+12.3" />
+
     <View
         style="@style/Separator"
         android:layout_margin="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:rotation="270"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_arrow_down" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

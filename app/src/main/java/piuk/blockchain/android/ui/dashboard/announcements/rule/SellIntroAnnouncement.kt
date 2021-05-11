@@ -2,9 +2,7 @@ package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import androidx.annotation.VisibleForTesting
 import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.remoteconfig.FeatureFlag
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.R
@@ -20,9 +18,7 @@ import piuk.blockchain.android.ui.sell.SellAnalytics
 
 class SellIntroAnnouncement(
     dismissRecorder: DismissRecorder,
-    private val custodialWalletManager: CustodialWalletManager,
-    private val sellFeatureFlag: FeatureFlag,
-    private val currencyPrefs: CurrencyPrefs,
+    private val eligibilityProvider: SimpleBuyEligibilityProvider,
     private val coincore: Coincore,
     private val analytics: Analytics
 ) : AnnouncementRule(dismissRecorder) {
@@ -35,8 +31,7 @@ class SellIntroAnnouncement(
         }
 
         return Singles.zip(
-            sellFeatureFlag.enabled,
-            custodialWalletManager.isEligibleForSimpleBuy(currencyPrefs.selectedFiatCurrency),
+            eligibilityProvider.isEligibleForSimpleBuy(),
             coincore.allWallets().map { acg ->
                 acg.accounts.filterNot { it is InterestAccount || it is FiatAccount }
             }.map { list ->
@@ -44,8 +39,8 @@ class SellIntroAnnouncement(
                     it.isFunded
                 }
             }
-        ) { sellEnabled, eligible, fundedAccount ->
-            sellEnabled && eligible && fundedAccount
+        ) { eligible, fundedAccount ->
+            eligible && fundedAccount
         }
     }
 

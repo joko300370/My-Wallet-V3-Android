@@ -1,19 +1,18 @@
 package piuk.blockchain.android.ui.start
 
-import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
 import android.os.Bundle
 import com.blockchain.koin.scopedInject
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.toolbar_general.*
-import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.auth.PinEntryActivity
-import piuk.blockchain.android.ui.zxing.CaptureActivity
+import piuk.blockchain.android.ui.scan.QrScanActivity
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.android.ui.base.MvpActivity
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.extensions.toast
+import piuk.blockchain.android.ui.scan.QrExpected
+import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
+import piuk.blockchain.android.ui.customviews.toast
 
 class LoginActivity : MvpActivity<LoginView, LoginPresenter>(), LoginView {
 
@@ -29,16 +28,16 @@ class LoginActivity : MvpActivity<LoginView, LoginPresenter>(), LoginView {
         step_one.text = getString(R.string.pair_wallet_step_1, WEB_WALLET_URL_PROD)
 
         btn_manual_pair.setOnClickListener { onClickManualPair() }
-        btn_scan_qr.setOnClickListener { requestScan() }
+        btn_scan_qr.setOnClickListener { startScanActivity() }
     }
 
     override fun showToast(message: Int, toastType: String) = toast(message, toastType)
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == AppCompatActivity.RESULT_OK && requestCode == PAIRING_QR) {
-            if (data?.getStringExtra(CaptureActivity.SCAN_RESULT) != null) {
-                presenter.pairWithQR(data.getStringExtra(CaptureActivity.SCAN_RESULT))
+        if (resultCode == RESULT_OK && requestCode == QrScanActivity.SCAN_URI_RESULT) {
+            if (data.getRawScanData() != null) {
+                presenter.pairWithQR(data.getRawScanData())
             }
         }
     }
@@ -51,29 +50,15 @@ class LoginActivity : MvpActivity<LoginView, LoginPresenter>(), LoginView {
 
     override fun onSupportNavigateUp() = consume { onBackPressed() }
 
-    private fun requestScan() {
-        QrScanHandler.requestScanPermissions(
-            activity = this,
-            rootView = main_layout
-        ) { startScanActivity() }
-    }
-
     private fun onClickManualPair() {
         startActivity(Intent(this, ManualPairingActivity::class.java))
     }
 
     private fun startScanActivity() {
-        if (!appUtil.isCameraOpen) {
-            val intent = Intent(this, CaptureActivity::class.java)
-            intent.putExtra("SCAN_FORMATS", "QR_CODE")
-            startActivityForResult(intent, PAIRING_QR)
-        } else {
-            showToast(R.string.camera_unavailable, ToastCustom.TYPE_ERROR)
-        }
+        QrScanActivity.start(this, QrExpected.LEGACY_PAIRING_QR)
     }
 
     companion object {
         private const val WEB_WALLET_URL_PROD = "https://login.blockchain.com/"
-        const val PAIRING_QR = 2005
     }
 }

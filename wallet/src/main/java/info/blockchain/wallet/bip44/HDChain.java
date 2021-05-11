@@ -9,15 +9,13 @@ import org.bitcoinj.crypto.HDKeyDerivation;
  */
 public class HDChain {
 
-    private DeterministicKey cKey;
-    private boolean isReceive;
+    private final DeterministicKey cKey;
+    private final boolean isReceive;
 
-    private String strPath;
+    private final String strPath;
 
-    static private final int DESIRED_MARGIN = 32;
-    static private final int ADDRESS_GAP_MAX = 20;
-
-    private NetworkParameters params;
+    private final NetworkParameters params;
+    private final String xPub;
 
     public static final int RECEIVE_CHAIN = 0;
     public static final int CHANGE_CHAIN = 1;
@@ -36,6 +34,8 @@ public class HDChain {
         cKey = HDKeyDerivation.deriveChildKey(aKey, chain);
 
         strPath = cKey.getPathAsString();
+
+        xPub = cKey.serializePubB58(params);
     }
 
     /**
@@ -52,8 +52,8 @@ public class HDChain {
      *
      * @return HDAddress
      */
-    public HDAddress getAddressAt(int addrIdx) {
-        return new HDAddress(params, cKey, addrIdx);
+    public HDAddress getAddressAt(int addrIdx, int purpose) {
+        return new HDAddress(params, cKey, addrIdx, purpose);
     }
 
     /**
@@ -65,4 +65,7 @@ public class HDChain {
         return strPath;
     }
 
+    public String getXpub() {
+        return xPub;
+    }
 }

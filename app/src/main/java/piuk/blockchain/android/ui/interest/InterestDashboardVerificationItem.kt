@@ -8,8 +8,8 @@ import kotlinx.android.synthetic.main.item_interest_dashboard_verification.view.
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.customviews.ButtonOptions
-import piuk.blockchain.android.ui.customviews.VerifyIdentityBenefit
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.ui.customviews.VerifyIdentityNumericBenefitItem
+import piuk.blockchain.android.util.inflate
 
 class InterestDashboardVerificationItem<in T>(
     private val verificationClicked: () -> Unit
@@ -45,13 +45,13 @@ private class InterestAssetVerificationViewHolder(val parent: View) :
     ) {
         itemView.item_verification.initWithBenefits(
             benefits = listOf(
-                VerifyIdentityBenefit(
+                VerifyIdentityNumericBenefitItem(
                     parent.context.getString(R.string.interest_dashboard_verify_point_one_title),
                     parent.context.getString(R.string.interest_dashboard_verify_point_one_label)),
-                VerifyIdentityBenefit(
+                VerifyIdentityNumericBenefitItem(
                     parent.context.getString(R.string.interest_dashboard_verify_point_two_title),
                     parent.context.getString(R.string.interest_dashboard_verify_point_two_label)),
-                VerifyIdentityBenefit(
+                VerifyIdentityNumericBenefitItem(
                     parent.context.getString(R.string.interest_dashboard_verify_point_three_title),
                     parent.context.getString(R.string.interest_dashboard_verify_point_three_label))
             ),

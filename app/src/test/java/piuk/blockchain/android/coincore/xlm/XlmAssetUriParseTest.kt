@@ -3,14 +3,16 @@ package piuk.blockchain.android.coincore.xlm
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.preferences.WalletStatus
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.XlmFeesFetcher
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.service.TierService
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.wallet.DefaultLabels
 import org.amshove.kluent.mock
 import org.junit.Rule
 import org.junit.Test
+import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -38,23 +40,26 @@ class XlmAssetUriParseTest {
     private val labels: DefaultLabels = mock()
     private val pitLinking: PitLinking = mock()
     private val crashLogger: CrashLogger = mock()
-    private val tiersService: TierService = mock()
     private val environmentConfig: EnvironmentConfig = mock()
+    private val walletPreferences: WalletStatus = mock()
+    private val eligibilityProvider: SimpleBuyEligibilityProvider = mock()
+    private val offlineCache: OfflineAccountUpdater = mock()
 
     private val subject = XlmAsset(
-        payloadManager,
-        xlmDataManager,
-        xlmFeesFetcher,
-        walletOptionsDataManager,
-        custodialManager,
-        exchangeRates,
-        historicRates,
-        currencyPrefs,
-        labels,
-        pitLinking,
-        crashLogger,
-        tiersService,
-        environmentConfig
+        payloadManager = payloadManager,
+        xlmDataManager = xlmDataManager,
+        xlmFeesFetcher = xlmFeesFetcher,
+        walletOptionsDataManager = walletOptionsDataManager,
+        custodialManager = custodialManager,
+        exchangeRates = exchangeRates,
+        historicRates = historicRates,
+        currencyPrefs = currencyPrefs,
+        labels = labels,
+        pitLinking = pitLinking,
+        crashLogger = crashLogger,
+        walletPreferences = walletPreferences,
+        offlineAccounts = offlineCache,
+        identity = mock()
     )
 
     @Test

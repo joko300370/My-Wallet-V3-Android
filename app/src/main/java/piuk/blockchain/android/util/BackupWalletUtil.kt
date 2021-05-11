@@ -1,16 +1,12 @@
 package piuk.blockchain.android.util
 
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import timber.log.Timber
 import java.security.SecureRandom
 
 class BackupWalletUtil(
-    private val payloadDataManager: PayloadDataManager,
-    environmentConfig: EnvironmentConfig
+    private val payloadDataManager: PayloadDataManager
 ) {
-
-    private val networkParameters = environmentConfig.bitcoinNetworkParameters
 
     /**
      * Returns an ordered list of [Int], [String] pairs which can be used to confirm mnemonic.
@@ -39,8 +35,8 @@ class BackupWalletUtil(
      * if the mnemonic isn't found.
      */
     fun getMnemonic(secondPassword: String?): List<String>? = try {
-        payloadDataManager.wallet!!.decryptHDWallet(networkParameters, 0, secondPassword)
-        payloadDataManager.wallet!!.hdWallets[0].mnemonic.toList()
+        payloadDataManager.wallet!!.decryptHDWallet(secondPassword)
+        payloadDataManager.wallet!!.walletBody?.mnemonic?.toList()
     } catch (e: Exception) {
         Timber.e(e)
         null

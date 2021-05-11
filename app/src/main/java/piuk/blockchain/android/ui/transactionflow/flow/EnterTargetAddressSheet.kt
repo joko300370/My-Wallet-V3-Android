@@ -3,89 +3,151 @@ package piuk.blockchain.android.ui.transactionflow.flow
 import android.app.Activity
 import android.content.Intent
 import android.text.Editable
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.blockchain.koin.scopedInject
 import info.blockchain.balance.CryptoCurrency
+import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.dialog_tx_flow_enter_address.view.*
 import org.koin.android.ext.android.inject
-import piuk.blockchain.android.scan.QrScanHandler
 import piuk.blockchain.android.R
-import piuk.blockchain.android.accounts.DefaultCellDecorator
 import piuk.blockchain.android.coincore.BlockchainAccount
-import piuk.blockchain.android.coincore.Coincore
-import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.SingleAccount
-import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.databinding.DialogTxFlowEnterAddressBinding
+import piuk.blockchain.android.scan.QrScanResultProcessor
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.scan.QrExpected
+import piuk.blockchain.android.ui.scan.QrScanActivity
+import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
-import piuk.blockchain.android.ui.zxing.CaptureActivity
-import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.extensions.getTextString
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.invisible
-import piuk.blockchain.androidcoreui.utils.extensions.visible
-import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.TargetAddressSheetState
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.TargetSelectionCustomisations
+import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
+import piuk.blockchain.android.util.AfterTextChangedWatcher
+import piuk.blockchain.android.util.getTextString
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.invisible
+import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 
-class EnterTargetAddressSheet(
-    host: SlidingModalBottomDialog.Host
-) : TransactionFlowSheet(host) {
-    override val layoutResource: Int = R.layout.dialog_tx_flow_enter_address
+class EnterTargetAddressSheet : TransactionFlowSheet<DialogTxFlowEnterAddressBinding>() {
 
-    private val appUtil: AppUtil by inject()
-    private val coincore: Coincore by scopedInject()
-    private val customiser: TransactionFlowCustomiser by inject()
+    private val customiser: TargetSelectionCustomisations by inject()
+    private val qrProcessor: QrScanResultProcessor by scopedInject()
+    private var sourceSlot: TxFlowWidget? = null
 
     private val disposables = CompositeDisposable()
-    private var state: TransactionState =
-        TransactionState()
+
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogTxFlowEnterAddressBinding =
+        DialogTxFlowEnterAddressBinding.inflate(inflater, container, false)
+
+    private val addressTextWatcher = object : AfterTextChangedWatcher() {
+        override fun afterTextChanged(s: Editable?) {
+            val address = s.toString()
+
+            if (address.isEmpty()) {
+                model.process(TransactionIntent.EnteredAddressReset)
+            } else {
+                if (customiser.enterTargetAddressSheetState(state) is
+                        TargetAddressSheetState.SelectAccountWhenOverMaxLimitSurpassed
+                ) {
+                    binding.selectAnAccount.visible()
+                } else {
+                    binding.walletSelect.clearSelectedAccount()
+                }
+                addressEntered(address, state.sendingAsset)
+            }
+        }
+    }
 
     override fun render(newState: TransactionState) {
-        Timber.d("!SEND!> Rendering! EnterTargetAddressSheet")
+        Timber.d("!TRANSACTION!> Rendering! EnterTargetAddressSheet")
 
-        with(dialogView) {
+        with(binding) {
             if (state.sendingAccount != newState.sendingAccount) {
-                from_details.updateAccount(
-                    newState.sendingAccount,
-                    {},
-                    disposables,
-                    DefaultCellDecorator()
-                )
-                setupTransferList(newState.sendingAccount, newState)
-            }
-            cta_button.isEnabled = newState.nextEnabled
+                if (sourceSlot == null) {
+                    sourceSlot = customiser.installAddressSheetSource(requireContext(), fromDetails, newState)
+                }
+                sourceSlot?.update(newState)
 
-            state = newState
+                setupTransferList(customiser.enterTargetAddressSheetState(newState))
+                setupLabels(newState)
+            }
+
+            upsellGroup.visibleIf { customiser.shouldShowCustodialUpsell(newState) }
+
+            if (customiser.enterTargetAddressSheetState(newState) is
+                    TargetAddressSheetState.SelectAccountWhenOverMaxLimitSurpassed
+            ) {
+                selectAnAccount.visible()
+            }
+
             if (customiser.selectTargetShowManualEnterAddress(newState)) {
                 showManualAddressEntry(newState)
             } else {
                 hideManualAddressEntry(newState)
             }
 
-            customiser.errorFlashMessage(newState)?.let {
-                address_entry.setBackgroundColor(
-                    ContextCompat.getColor(requireContext(), R.color.red_000))
-                error_msg.apply {
+            customiser.issueFlashMessage(newState, null)?.let {
+                addressEntry.setBackgroundColor(
+                    ContextCompat.getColor(requireContext(), R.color.red_000)
+                )
+                errorMsg.apply {
                     text = it
                     visible()
                 }
             } ?: hideErrorState()
 
-            title.text = customiser.selectTargetAddressTitle(newState)
+            addressSheetBack.visibleIf { newState.canGoBack }
+
+            ctaButton.isEnabled = newState.nextEnabled
+            cacheState(newState)
+        }
+    }
+
+    override fun initControls(binding: DialogTxFlowEnterAddressBinding) {
+        with(binding) {
+            addressEntry.addTextChangedListener(addressTextWatcher)
+            btnScan.setOnClickListener { onLaunchAddressScan() }
+            ctaButton.setOnClickListener { onCtaClick() }
+            selectAnAccount.setOnClickListener { showMoreAccounts() }
+            walletSelect.apply {
+                onLoadError = {
+                    hideTransferList()
+                }
+                onListLoaded = {
+                    if (it) hideTransferList()
+                }
+            }
+            addressSheetBack.setOnClickListener {
+                model.process(TransactionIntent.ReturnToPreviousStep)
+            }
+        }
+    }
+
+    private fun setupLabels(state: TransactionState) {
+        with(binding) {
+            titleFrom.text = customiser.selectTargetSourceLabel(state)
+            titleTo.text = customiser.selectTargetDestinationLabel(state)
+            title.text = customiser.selectTargetAddressTitle(state)
+            subtitle.visibleIf { customiser.selectTargetShouldShowSubtitle(state) }
+            subtitle.text = customiser.selectTargetSubtitle(state)
+            selectAccountCta.text = customiser.selectTargetAddressWalletsCta(state)
         }
     }
 
     private fun hideErrorState() {
-        dialogView.error_msg.invisible()
-        dialogView.address_entry.setBackgroundColor(
-            ContextCompat.getColor(requireContext(), R.color.grey_000))
+        binding.errorMsg.invisible()
+        binding.addressEntry.setBackgroundColor(
+            ContextCompat.getColor(requireContext(), R.color.grey_000)
+        )
     }
 
     private fun showManualAddressEntry(newState: TransactionState) {
@@ -95,121 +157,130 @@ class EnterTargetAddressSheet(
             ""
         }
 
-        with(dialogView) {
-            if (address.isNotEmpty() && address != address_entry.getTextString()) {
-                address_entry.setText(address, TextView.BufferType.EDITABLE)
+        with(binding) {
+            if (address.isNotEmpty() && address != addressEntry.getTextString()) {
+                addressEntry.setText(address, TextView.BufferType.EDITABLE)
             }
-            address_entry.hint = customiser.selectTargetAddressInputHint(newState)
-
-            input_switcher.displayedChild = NONCUSTODIAL_INPUT
+            addressEntry.hint = customiser.selectTargetAddressInputHint(newState)
+            // set visibility of component here so bottom sheet grows to the correct height
+            inputSwitcher.visible()
+            inputSwitcher.displayedChild = NONCUSTODIAL_INPUT
         }
     }
 
     private fun hideManualAddressEntry(newState: TransactionState) {
         val msg = customiser.selectTargetNoAddressMessageText(newState)
 
-        with(dialogView) {
+        with(binding) {
             if (msg != null) {
-                input_switcher.visible()
-                no_manual_enter_msg.text = msg
+                inputSwitcher.visible()
+                noManualEnterMsg.text = msg
 
-                internal_send_close.setOnClickListener {
-                    input_switcher.gone()
+                internalSendClose.setOnClickListener {
+                    inputSwitcher.gone()
                 }
 
-                title_pick.gone()
-                input_switcher.displayedChild = CUSTODIAL_INPUT
+                titlePick.gone()
+                pickSeparator.gone()
+                inputSwitcher.displayedChild = CUSTODIAL_INPUT
             } else {
-                input_switcher.gone()
-                title_pick.gone()
+                inputSwitcher.gone()
+                pickSeparator.gone()
+                titlePick.gone()
             }
         }
     }
 
-    private val addressTextWatcher = object : AfterTextChangedWatcher() {
-        override fun afterTextChanged(s: Editable?) {
-            val address = s.toString()
-
-            if (address.isEmpty()) {
-                model.process(TransactionIntent.EnteredAddressReset)
-            } else {
-                val asset = state.asset
-                addressEntered(address, asset)
-            }
-        }
+    private fun showMoreAccounts() {
+        model.process(TransactionIntent.ShowMoreAccounts)
     }
 
-    override fun initControls(view: View) {
-        with(dialogView) {
-            address_entry.addTextChangedListener(addressTextWatcher)
-            btn_scan.setOnClickListener { onLaunchAddressScan() }
-            cta_button.setOnClickListener { onCtaClick() }
-
-            wallet_select.apply {
-                onLoadError = {
-                    showErrorToast("Failed getting transfer wallets")
-                    hideTransferList()
+    private fun setupTransferList(targetAddressSheetState: TargetAddressSheetState) {
+        with(binding.walletSelect) {
+            initialise(
+                Single.just(targetAddressSheetState.accounts.filterIsInstance<BlockchainAccount>()),
+                shouldShowSelectionStatus = true
+            )
+            // set visibility of component here so bottom sheet grows to the correct height
+            visible()
+            when (targetAddressSheetState) {
+                is TargetAddressSheetState.SelectAccountWhenWithinMaxLimit -> {
+                    onAccountSelected = {
+                        accountSelected(it)
+                    }
                 }
-                onAccountSelected = { accountSelected(it) }
-                onEmptyList = { hideTransferList() }
+                is TargetAddressSheetState.TargetAccountSelected -> {
+                    updatedSelectedAccount(
+                        targetAddressSheetState.accounts.filterIsInstance<BlockchainAccount>().first()
+                    )
+                    onAccountSelected = {
+                        model.process(TransactionIntent.ShowTargetSelection)
+                    }
+                }
+                else -> {
+                    // do nothing
+                }
             }
         }
-    }
-
-    private fun setupTransferList(account: CryptoAccount, state: TransactionState) {
-        dialogView.wallet_select.initialise(
-            coincore.getTransactionTargets(account, state.action)
-                .map { it.map { it as BlockchainAccount } }
-        )
     }
 
     private fun hideTransferList() {
-        dialogView.title_pick.gone()
-        dialogView.wallet_select.gone()
+        binding.titlePick.gone()
+        binding.walletSelect.gone()
     }
 
     private fun accountSelected(account: BlockchainAccount) {
         require(account is SingleAccount)
-        model.process(TransactionIntent.TargetSelectionConfirmed(account))
+        analyticsHooks.onAccountSelected(account, state)
+
+        binding.walletSelect.updatedSelectedAccount(account)
+        // TODO update the selected target (account type) instead so the render method knows what to show  & hide
+        setAddressValue("")
+        model.process(TransactionIntent.TargetSelectionUpdated(account))
     }
 
     private fun onLaunchAddressScan() {
-        QrScanHandler.requestScanPermissions(
-            activity = requireActivity(),
-            rootView = dialogView
-        ) {
-            QrScanHandler.startQrScanActivity(
-                this,
-                appUtil
-                // this::class.simpleName ?: "Unknown"
-            )
-        }
+        analyticsHooks.onScanQrClicked(state)
+        QrScanActivity.start(this, QrExpected.ASSET_ADDRESS_QR(state.sendingAsset))
     }
 
     private fun addressEntered(address: String, asset: CryptoCurrency) {
+        analyticsHooks.onManualAddressEntered(state)
         model.process(TransactionIntent.ValidateInputTargetAddress(address, asset))
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) =
         when (requestCode) {
-            QrScanHandler.SCAN_URI_RESULT -> handleScanResult(resultCode, data)
+            QrScanActivity.SCAN_URI_RESULT -> handleScanResult(resultCode, data)
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
 
+    private fun setAddressValue(value: String) {
+        with(binding.addressEntry) {
+            removeTextChangedListener(addressTextWatcher)
+            setText(value, TextView.BufferType.EDITABLE)
+            setSelection(value.length)
+            addTextChangedListener(addressTextWatcher)
+        }
+    }
+
     private fun handleScanResult(resultCode: Int, data: Intent?) {
         Timber.d("Got QR scan result!")
-        if (resultCode == Activity.RESULT_OK && data != null) {
-            data.getStringExtra(CaptureActivity.SCAN_RESULT)?.let { rawScan ->
-                disposables += QrScanHandler.processScan(rawScan, false)
-                    .flatMapMaybe { QrScanHandler.selectAssetTargetFromScan(state.asset, it) }
+        if (resultCode == Activity.RESULT_OK) {
+            data.getRawScanData()?.let { rawScan ->
+                disposables += qrProcessor.processScan(rawScan, false)
+                    .flatMapMaybe { qrProcessor.selectAssetTargetFromScan(state.sendingAsset, it) }
                     .subscribeBy(
                         onSuccess = {
-                            model.process(TransactionIntent.TargetSelectionConfirmed(it))
+                            // TODO update the selected target (address type) instead so the render method knows what to show  & hide
+                            setAddressValue(it.address)
+                            binding.walletSelect.clearSelectedAccount()
+                            model.process(TransactionIntent.TargetSelectionUpdated(it))
                         },
                         onComplete = {
                             ToastCustom.makeText(
                                 requireContext(),
-                                getString(R.string.scan_mismatch_transaction_target, state.asset.displayTicker),
+                                getString(R.string.scan_mismatch_transaction_target, state.sendingAsset.displayTicker),
                                 ToastCustom.LENGTH_SHORT,
                                 ToastCustom.TYPE_GENERAL
                             )
@@ -227,8 +298,10 @@ class EnterTargetAddressSheet(
         }
     }
 
-    private fun onCtaClick() =
-        model.process(TransactionIntent.TargetSelectionConfirmed(state.selectedTarget))
+    private fun onCtaClick() {
+        analyticsHooks.onEnterAddressCtaClick(state)
+        model.process(TransactionIntent.TargetSelected)
+    }
 
     companion object {
         private const val NONCUSTODIAL_INPUT = 0

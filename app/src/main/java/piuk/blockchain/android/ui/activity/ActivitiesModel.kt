@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.activity
 
+import com.blockchain.logging.CrashLogger
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
@@ -8,20 +9,21 @@ import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import timber.log.Timber
 
 enum class ActivitiesSheet {
     ACCOUNT_SELECTOR,
     CRYPTO_ACTIVITY_DETAILS,
-    FIAT_ACTIVITY_DETAILS,
-    BANK_TRANSFER_DETAILS,
-    BANK_ORDER_CANCEL
+    FIAT_ACTIVITY_DETAILS
 }
 
-enum class CryptoAccountType {
+enum class CryptoActivityType {
     NON_CUSTODIAL,
     CUSTODIAL_TRADING,
     CUSTODIAL_INTEREST,
+    SWAP,
+    SELL,
     UNKNOWN
 }
 
@@ -34,17 +36,24 @@ data class ActivitiesState(
     val selectedTxId: String = "",
     val selectedCryptoCurrency: CryptoCurrency? = null,
     val selectedFiatCurrency: String? = null,
-    val accountType: CryptoAccountType = CryptoAccountType.UNKNOWN
+    val activityType: CryptoActivityType = CryptoActivityType.UNKNOWN
 ) : MviState
 
 class ActivitiesModel(
     initialState: ActivitiesState,
     mainScheduler: Scheduler,
-    private val interactor: ActivitiesInteractor
+    private val interactor: ActivitiesInteractor,
+    environmentConfig: EnvironmentConfig,
+    crashLogger: CrashLogger
 ) : MviModel<ActivitiesState, ActivitiesIntent>(
     initialState,
-    mainScheduler
+    mainScheduler,
+    environmentConfig,
+    crashLogger
 ) {
+
+    private var fetchSubscription: Disposable? = null
+
     override fun performAction(
         previousState: ActivitiesState,
         intent: ActivitiesIntent
@@ -52,8 +61,11 @@ class ActivitiesModel(
         Timber.d("***> performAction: ${intent.javaClass.simpleName}")
 
         return when (intent) {
-            is AccountSelectedIntent ->
-                interactor.getActivityForAccount(intent.account, intent.isRefreshRequested)
+            is AccountSelectedIntent -> {
+
+                fetchSubscription?.dispose()
+
+                fetchSubscription = interactor.getActivityForAccount(intent.account, intent.isRefreshRequested)
                     .subscribeBy(
                         onNext = {
                             process(ActivityListUpdatedIntent(it))
@@ -63,6 +75,9 @@ class ActivitiesModel(
                         },
                         onError = { process(ActivityListUpdatedErrorIntent) }
                     )
+
+                fetchSubscription
+            }
             is SelectDefaultAccountIntent ->
                 interactor.getDefaultAccount()
                     .subscribeBy(
@@ -72,9 +87,5 @@ class ActivitiesModel(
             is CancelSimpleBuyOrderIntent -> interactor.cancelSimpleBuyOrder(intent.orderId)
             else -> null
         }
-    }
-
-    override fun onScanLoopError(t: Throwable) {
-        Timber.e("***> Scan loop failed: $t")
     }
 }

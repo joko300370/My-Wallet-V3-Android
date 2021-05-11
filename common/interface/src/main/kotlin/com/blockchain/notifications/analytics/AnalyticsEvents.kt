@@ -1,5 +1,6 @@
 package com.blockchain.notifications.analytics
 
+@Deprecated("Analytics events should be defined near point of use")
 enum class AnalyticsEvents(
     override val event: String,
     override val params: Map<String, String> = emptyMap()
@@ -34,7 +35,6 @@ enum class AnalyticsEvents(
     KycInterestStart("kyc_interest_start"),
     KycMoreInfo("kyc_more_info"),
     KycTiers("kyc_tiers"),
-    Lockbox("lockbox"),
     Logout("logout"),
     Settings("settings"),
     Support("support"),
@@ -42,16 +42,6 @@ enum class AnalyticsEvents(
     SwapErrorDialog("swap_error_dialog"),
     SwapErrorDialogCtaClicked("swap_error_dialog_cta_clicked"),
     SwapErrorDialogDismissClicked("swap_error_dialog_dismiss_clicked"),
-    SwapInfoDialog("swap_info_dialog"),
-    SwapInfoDialogViewHistory("swap_info_dialog_history_click"),
-    SwapInfoDialogSwapLimits("swap_info_dialog_limits_click"),
-    SwapInfoDialogSupport("swap_info_dialog_support_click"),
-    BitpayAdrressScanned("bitpay_url_scanned"),
-    BitpayUrlPasted("bitpay_url_pasted"),
-    BitpayPaymentExpired("bitpay_payment_expired"),
-    BitpayPaymentFailed("bitpay_payment_failure"),
-    BitpayPaymentSucceed("bitpay_payment_success"),
-    BitpayUrlDeeplink("bitpay_url_deeplink"),
     WalletCreation("wallet_creation"),
     WalletManualLogin("wallet_manual_login"),
     PITDEEPLINK("pit_deeplink"),

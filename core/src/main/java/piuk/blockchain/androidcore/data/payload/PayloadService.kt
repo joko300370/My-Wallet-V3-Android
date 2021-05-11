@@ -1,23 +1,31 @@
 package piuk.blockchain.androidcore.data.payload
 
-import info.blockchain.api.data.Balance
+import com.blockchain.annotations.BurnCandidate
 import info.blockchain.wallet.exceptions.ApiException
 import info.blockchain.wallet.exceptions.DecryptionException
 import info.blockchain.wallet.exceptions.HDWalletException
+import info.blockchain.wallet.keys.SigningKey
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.payload.data.Account
-import info.blockchain.wallet.payload.data.LegacyAddress
+import info.blockchain.wallet.payload.data.ImportedAddress
 import info.blockchain.wallet.payload.data.Wallet
+import info.blockchain.wallet.payload.data.XPubs
+import info.blockchain.wallet.payload.model.Balance
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.exceptions.Exceptions
+import io.reactivex.Single
 import org.bitcoinj.core.ECKey
-import org.bitcoinj.core.NetworkParameters
 import piuk.blockchain.androidcore.utils.annotations.WebRequest
-import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
 import java.util.LinkedHashMap
 
-class PayloadService(private val payloadManager: PayloadManager) {
+@BurnCandidate("Not useful")
+// This class is only used my PayloadDataManager, which also has an instance on PayloadManager, and
+// provides an rx wrapper for some PayloadManager calls. This is, at best, confusing and this can be merged
+// into PayloadManager
+internal class PayloadService(
+    private val payloadManager: PayloadManager,
+    private val versionController: PayloadVersionController
+) {
 
     // /////////////////////////////////////////////////////////////////////////
     // AUTH METHODS
@@ -28,19 +36,17 @@ class PayloadService(private val payloadManager: PayloadManager) {
      * return a [DecryptionException] if the password is incorrect, otherwise can return a
      * [HDWalletException] which should be regarded as fatal.
      *
-     * @param networkParameters The current [NetworkParameters], either MainNet or TestNet
      * @param payload The payload String to be decrypted
      * @param password The user's password
      * @return A [Completable] object
      */
     @WebRequest
     internal fun initializeFromPayload(
-        networkParameters: NetworkParameters,
         payload: String,
         password: String
     ): Completable =
         Completable.fromCallable {
-            payloadManager.initializeAndDecryptFromPayload(networkParameters, payload, password)
+            payloadManager.initializeAndDecryptFromPayload(payload, password)
         }
 
     /**
@@ -59,12 +65,13 @@ class PayloadService(private val payloadManager: PayloadManager) {
         walletName: String,
         email: String,
         password: String
-    ): Observable<Wallet> = Observable.fromCallable {
+    ): Single<Wallet> = Single.fromCallable {
         payloadManager.recoverFromMnemonic(
             mnemonic,
             walletName,
             email,
-            password
+            password,
+            versionController.isFullRolloutV4
         )
     }
 
@@ -81,14 +88,19 @@ class PayloadService(private val payloadManager: PayloadManager) {
         password: String,
         walletName: String,
         email: String
-    ): Observable<Wallet> =
-        Observable.fromCallable { payloadManager.create(walletName, email, password) }
+    ): Single<Wallet> = Single.fromCallable {
+            payloadManager.create(
+            walletName,
+            email,
+            password,
+            versionController.isFullRolloutV4
+        )
+    }
 
     /**
      * Fetches the user's wallet payload, and then initializes and decrypts a payload using the
      * user's password.
      *
-     * @param networkParameters The current [NetworkParameters], either MainNet or TestNet
      * @param sharedKey The shared key as a String
      * @param guid The user's GUID
      * @param password The user's password
@@ -96,44 +108,36 @@ class PayloadService(private val payloadManager: PayloadManager) {
      */
     @WebRequest
     internal fun initializeAndDecrypt(
-        networkParameters: NetworkParameters,
         sharedKey: String,
         guid: String,
         password: String
-    ): Completable = Completable.fromCallable {
-        payloadManager.initializeAndDecrypt(networkParameters, sharedKey, guid, password)
-    }
+    ): Completable = versionController.isV4Enabled(guid, sharedKey)
+        .flatMapCompletable { v4Enabled ->
+            Completable.fromCallable {
+                payloadManager.initializeAndDecrypt(
+                    sharedKey,
+                    guid,
+                    password,
+                    v4Enabled
+                )
+            }
+        }
 
     /**
      * Initializes and decrypts a user's payload given valid QR code scan data.
      *
-     * @param networkParameters The current [NetworkParameters], either MainNet or TestNet
      * @param data A QR's URI for pairing
      * @return A [Completable] object
      */
     @WebRequest
     internal fun handleQrCode(
-        networkParameters: NetworkParameters,
         data: String
     ): Completable = Completable.fromCallable {
-        payloadManager.initializeAndDecryptFromQR(networkParameters, data)
+        payloadManager.initializeAndDecryptFromQR(
+            data,
+            versionController.isFullRolloutV4
+        )
     }
-
-    /**
-     * Upgrades a Wallet from V2 to V3 and saves it with the server. If saving is unsuccessful or
-     * some other part fails, this will propagate an Exception.
-     *
-     * @param secondPassword An optional second password if the user has one
-     * @param defaultAccountName A required name for the default account
-     * @return A [Completable] object
-     */
-    @WebRequest
-    internal fun upgradeV2toV3(secondPassword: String?, defaultAccountName: String): Completable =
-        Completable.fromCallable {
-            if (!payloadManager.upgradeV2PayloadToV3(secondPassword, defaultAccountName)) {
-                throw Exceptions.propagate(Throwable("Upgrade wallet failed"))
-            }
-        }
 
     // /////////////////////////////////////////////////////////////////////////
     // SYNC METHODS
@@ -172,7 +176,6 @@ class PayloadService(private val payloadManager: PayloadManager) {
      * effects.
      *
      * @return A [Completable] object
-     * @see IgnorableDefaultObserver
      */
     @WebRequest
     internal fun updateAllTransactions(): Completable = Completable.fromCallable {
@@ -184,7 +187,6 @@ class PayloadService(private val payloadManager: PayloadManager) {
      * returns no value, and is used to call functions that return void but have side effects.
      *
      * @return A [Completable] object
-     * @see IgnorableDefaultObserver
      */
     @WebRequest
     internal fun updateAllBalances(): Completable = Completable.fromCallable {
@@ -209,44 +211,34 @@ class PayloadService(private val payloadManager: PayloadManager) {
     // /////////////////////////////////////////////////////////////////////////
 
     /**
-     * Returns a [LinkedHashMap] of [Balance] objects keyed to their addresses.
-     *
-     * @param addresses A List of addresses as Strings
-     * @return A [LinkedHashMap]
-     */
-    @WebRequest
-    internal fun getBalanceOfBtcAddresses(addresses: List<String>): Observable<LinkedHashMap<String, Balance>> =
-        Observable.fromCallable { payloadManager.getBalanceOfBtcAddresses(addresses) }
-
-    /**
      * Returns a [LinkedHashMap] of [Balance] objects keyed to their Bitcoin cash
      * addresses.
      *
-     * @param addresses A List of Bitcoin Cash addresses as Strings
+     * @param xpubs A List of Bitcoin Cash addresses as Strings
      * @return A [LinkedHashMap]
      */
     @WebRequest
-    internal fun getBalanceOfBchAddresses(addresses: List<String>): Observable<LinkedHashMap<String, Balance>> =
-        Observable.fromCallable { payloadManager.getBalanceOfBchAddresses(addresses) }
+    internal fun getBalanceOfBchAccounts(xpubs: List<XPubs>): Observable<Map<String, Balance>> =
+        Observable.fromCallable { payloadManager.getBalanceOfBchAccounts(xpubs) }
 
     /**
      * Derives new [Account] from the master seed
      *
-     * @param networkParameters The current [NetworkParameters], either MainNet or TestNet
      * @param accountLabel A label for the account
      * @param secondPassword An optional double encryption password
      * @return An [Observable] wrapping the newly created Account
      */
     @WebRequest
     internal fun createNewAccount(
-        networkParameters: NetworkParameters,
         accountLabel: String,
         secondPassword: String?
     ): Observable<Account> =
-        Observable.fromCallable { payloadManager.addAccount(networkParameters, accountLabel, secondPassword) }
+        Observable.fromCallable {
+            payloadManager.addAccount(accountLabel, secondPassword)
+        }
 
     /**
-     * Sets a private key for an associated [LegacyAddress] which is already in the [Wallet] as a
+     * Sets a private key for an associated [ImportedAddress] which is already in the [Wallet] as a
      * watch only address
      *
      * @param key An [ECKey]
@@ -254,38 +246,34 @@ class PayloadService(private val payloadManager: PayloadManager) {
      * @return An [Observable] representing a successful save
      */
     @WebRequest
-    internal fun setKeyForLegacyAddress(
-        key: ECKey,
+    internal fun setKeyForImportedAddress(
+        key: SigningKey,
         secondPassword: String?
-    ): Observable<LegacyAddress> = Observable.fromCallable {
-        payloadManager.setKeyForLegacyAddress(key, secondPassword)
+    ): Observable<ImportedAddress> = Observable.fromCallable {
+        payloadManager.setKeyForImportedAddress(key, secondPassword)
     }
 
     /**
-     * Allows you to add a [LegacyAddress] to the [Wallet]
+     * Allows you to add a [ImportedAddress] to the [Wallet]
      *
-     * @param legacyAddress The new address
+     * @param importedAddress The new address
      * @return A [Completable] object representing a successful save
      */
     @WebRequest
-    internal fun addLegacyAddress(legacyAddress: LegacyAddress): Completable =
+    internal fun addImportedAddress(importedAddress: ImportedAddress): Completable =
         Completable.fromCallable {
-            payloadManager.addLegacyAddress(legacyAddress)
+            payloadManager.addImportedAddress(importedAddress)
         }
 
     /**
-     * Allows you to propagate changes to a [LegacyAddress] through the [Wallet]
+     * Allows you to propagate changes to a [ImportedAddress] through the [Wallet]
      *
-     * @param legacyAddress The updated address
+     * @param importedAddress The updated address
      * @return A [Completable] object representing a successful save
      */
     @WebRequest
-    internal fun updateLegacyAddress(legacyAddress: LegacyAddress): Completable =
+    internal fun updateImportedAddress(importedAddress: ImportedAddress): Completable =
         Completable.fromCallable {
-            payloadManager.updateLegacyAddress(legacyAddress)
+            payloadManager.updateImportedAddress(importedAddress)
         }
-
-    // /////////////////////////////////////////////////////////////////////////
-    // CONTACTS/METADATA/IWCS/CRYPTO-MATRIX METHODS
-    // /////////////////////////////////////////////////////////////////////////
 }

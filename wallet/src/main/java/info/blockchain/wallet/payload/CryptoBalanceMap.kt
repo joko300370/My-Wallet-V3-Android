@@ -2,16 +2,21 @@ package info.blockchain.wallet.payload
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.wallet.payload.data.XPubs
+import info.blockchain.wallet.payload.data.allAddresses
 import java.math.BigInteger
 
 data class CryptoBalanceMap(
     private val cryptoCurrency: CryptoCurrency,
-    private val xpubs: Set<String>,
-    private val legacy: Set<String>,
+    private val xpubs: List<XPubs>,
+    private val imported: List<String>,
     private val balances: Map<String, BigInteger>
 ) {
-    val totalSpendable = CryptoValue(cryptoCurrency, (xpubs + legacy).sum(balances))
-    val totalSpendableLegacy = CryptoValue(cryptoCurrency, (legacy).sum(balances))
+    val totalSpendable = CryptoValue(cryptoCurrency, (xpubs.allAddresses() + imported).sum(balances))
+    val totalSpendableImported: CryptoValue
+        get() {
+            return CryptoValue(cryptoCurrency, imported.sum(balances))
+        }
 
     fun subtractAmountFromAddress(address: String, cryptoValue: CryptoValue): CryptoBalanceMap {
         val value =
@@ -31,8 +36,8 @@ data class CryptoBalanceMap(
         fun zero(cryptoCurrency: CryptoCurrency) =
             CryptoBalanceMap(
                 cryptoCurrency,
-                emptySet(),
-                emptySet(),
+                emptyList(),
+                emptyList(),
                 emptyMap()
             )
     }
@@ -41,15 +46,14 @@ data class CryptoBalanceMap(
 fun calculateCryptoBalanceMap(
     cryptoCurrency: CryptoCurrency,
     balanceQuery: BalanceQuery,
-    xpubs: Set<String>,
-    legacy: Set<String>
+    xpubs: List<XPubs>,
+    imported: List<String>
 ): CryptoBalanceMap {
-
     return CryptoBalanceMap(
         cryptoCurrency,
         xpubs,
-        legacy,
-        balanceQuery.getBalancesFor(xpubs + legacy)
+        imported,
+        balanceQuery.getBalancesForXPubs(xpubs, imported)
     )
 }
 

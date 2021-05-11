@@ -1,6 +1,5 @@
 package info.blockchain.balance
 
-import org.amshove.kluent.`should be`
 import org.amshove.kluent.`should equal`
 import org.junit.Before
 import org.junit.Test
@@ -15,13 +14,8 @@ class XlmCryptoValueTest {
     }
 
     @Test
-    fun `ZeroXlm is same instance as from zero`() {
-        CryptoValue.ZeroXlm `should be` CryptoValue.zero(CryptoCurrency.XLM)
-    }
-
-    @Test
     fun `format zero`() {
-        CryptoValue.ZeroXlm
+        CryptoValue.zero(CryptoCurrency.XLM)
             .toStringWithSymbol() `should equal` "0 XLM"
     }
 

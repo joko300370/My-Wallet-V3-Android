@@ -1,21 +1,25 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
+import com.blockchain.logging.CrashLogger
 import info.blockchain.balance.Money
 import info.blockchain.wallet.prices.data.PriceDatum
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 import timber.log.Timber
 
 data class AssetDetailsState(
     val asset: CryptoAsset? = null,
     val selectedAccount: BlockchainAccount? = null,
+    val actions: AvailableActions = emptySet(),
     val assetDetailsCurrentStep: AssetDetailsStep = AssetDetailsStep.ZERO,
     val assetDisplayMap: AssetDisplayMap? = null,
     val assetFiatPrice: String = "",
@@ -40,8 +44,10 @@ enum class AssetDetailsError {
 class AssetDetailsModel(
     initialState: AssetDetailsState,
     mainScheduler: Scheduler,
-    private val interactor: AssetDetailsInteractor
-) : MviModel<AssetDetailsState, AssetDetailsIntent>(initialState, mainScheduler) {
+    private val interactor: AssetDetailsInteractor,
+    environmentConfig: EnvironmentConfig,
+    crashLogger: CrashLogger
+) : MviModel<AssetDetailsState, AssetDetailsIntent>(initialState, mainScheduler, environmentConfig, crashLogger) {
     override fun performAction(
         previousState: AssetDetailsState,
         intent: AssetDetailsIntent
@@ -76,8 +82,9 @@ class AssetDetailsModel(
                     onSuccess = {
                         process(AssetExchangeRateLoaded(it))
                     }, onError = {
-                    process(AssetExchangeRateFailed)
-                })
+                        process(AssetExchangeRateFailed)
+                    })
+            is ShowAssetActionsIntent -> accountActions(intent.account)
             is LoadHistoricPrices -> updateChartData(previousState.asset!!, previousState.timeSpan)
             is UpdateTimeSpan -> updateChartData(previousState.asset!!, intent.updatedTimeSpan)
             is HandleActionIntent,
@@ -90,7 +97,6 @@ class AssetDetailsModel(
             is AssetExchangeRateLoaded,
             is AssetExchangeRateFailed,
             is ShowAssetDetailsIntent,
-            is ShowAssetActionsIntent,
             is ShowCustodyIntroSheetIntent,
             is SelectAccount,
             is ReturnToPreviousStep,
@@ -99,6 +105,7 @@ class AssetDetailsModel(
             is TransactionInFlight,
             is ShowInterestDashboard,
             is ClearActionStates -> null
+            is AccountActionsLoaded -> null
         }
     }
 
@@ -114,7 +121,11 @@ class AssetDetailsModel(
             }
         )
 
-    override fun onScanLoopError(t: Throwable) {
-        Timber.e("***> Scan loop failed: $t")
-    }
+    private fun accountActions(account: BlockchainAccount): Disposable =
+        account.actions.subscribeBy(
+            onSuccess = {
+                process(AccountActionsLoaded(account, it))
+            },
+            onError = { Timber.e("***> Error Loading account actions: $it") }
+        )
 }

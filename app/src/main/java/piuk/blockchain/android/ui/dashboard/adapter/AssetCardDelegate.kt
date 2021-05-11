@@ -1,32 +1,31 @@
 package piuk.blockchain.android.ui.dashboard.adapter
 
-import androidx.recyclerview.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
-import piuk.blockchain.android.util.getColor
-import piuk.blockchain.android.util.assetName
-import piuk.blockchain.android.util.setCoinIcon
+import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.preferences.CurrencyPrefs
-import kotlinx.android.synthetic.main.item_dashboard_asset_card.view.*
-import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.android.ui.dashboard.CryptoAssetState
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.invisible
 import com.robinhood.spark.SparkAdapter
 import info.blockchain.balance.CryptoCurrency
-import kotlinx.android.synthetic.main.item_dashboard_asset_card.view.cardLayout
+import kotlinx.android.synthetic.main.item_dashboard_asset_card.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetResources
+import piuk.blockchain.android.ui.adapters.AdapterDelegate
+import piuk.blockchain.android.ui.dashboard.CryptoAssetState
 import piuk.blockchain.android.ui.dashboard.asDeltaPercent
 import piuk.blockchain.android.ui.dashboard.format
 import piuk.blockchain.android.ui.dashboard.showLoading
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.setOnClickListenerDebounced
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.invisible
+import piuk.blockchain.android.util.setImageDrawable
+import piuk.blockchain.android.util.setOnClickListenerDebounced
+import piuk.blockchain.android.util.visible
 
 // Uses sparkline lib from here: https://github.com/robinhood/spark
 
 class AssetCardDelegate<in T>(
     private val prefs: CurrencyPrefs,
+    private val assetResources: AssetResources,
     private val onCardClicked: (CryptoCurrency) -> Unit
 ) : AdapterDelegate<T> {
 
@@ -43,6 +42,7 @@ class AssetCardDelegate<in T>(
     ) = (holder as AssetCardViewHolder).bind(
         items[position] as CryptoAssetState,
         prefs.selectedFiatCurrency,
+        assetResources,
         onCardClicked
     )
 }
@@ -51,16 +51,24 @@ private class AssetCardViewHolder(
     itemView: View
 ) : RecyclerView.ViewHolder(itemView) {
 
-    internal fun bind(state: CryptoAssetState, fiatSymbol: String, onCardClicked: (CryptoCurrency) -> Unit) {
+    fun bind(
+        state: CryptoAssetState,
+        fiatSymbol: String,
+        assetResources: AssetResources,
+        onCardClicked: (CryptoCurrency) -> Unit
+    ) {
         with(itemView) {
-            icon.setCoinIcon(state.currency)
-            currency.setText(state.currency.assetName())
+            fiat_balance.contentDescription = "$FIAT_BALANCE_ID${state.currency.networkTicker}"
+            crypto_balance.contentDescription = "$CRYPTO_BALANCE_ID${state.currency.networkTicker}"
+
+            icon.setImageDrawable(assetResources.drawableResFilled(state.currency))
+            currency.setText(assetResources.assetNameRes(state.currency))
         }
 
         when {
             state.hasBalanceError -> renderError(state)
             state.isLoading -> renderLoading()
-            else -> renderLoaded(state, fiatSymbol, onCardClicked)
+            else -> renderLoaded(state, fiatSymbol, assetResources, onCardClicked)
         }
     }
 
@@ -80,7 +88,12 @@ private class AssetCardViewHolder(
         }
     }
 
-    private fun renderLoaded(state: CryptoAssetState, fiatSymbol: String, onCardClicked: (CryptoCurrency) -> Unit) {
+    private fun renderLoaded(
+        state: CryptoAssetState,
+        fiatSymbol: String,
+        assetResources: AssetResources,
+        onCardClicked: (CryptoCurrency) -> Unit
+    ) {
         with(itemView) {
             cardLayout.isEnabled = true
             setOnClickListenerDebounced { onCardClicked(state.currency) }
@@ -96,7 +109,7 @@ private class AssetCardViewHolder(
             price_delta_interval.text = context.getString(R.string.asset_card_rate_period)
 
             if (state.priceTrend.isNotEmpty()) {
-                sparkview.lineColor = state.currency.getColor(context)
+                sparkview.lineColor = assetResources.chartLineColour(state.currency, context)
                 sparkview.adapter = PriceAdapter(state.priceTrend.toFloatArray())
                 sparkview.visible()
             } else {
@@ -143,6 +156,11 @@ private class AssetCardViewHolder(
 
             error_msg.visible()
         }
+    }
+
+    companion object {
+        private const val FIAT_BALANCE_ID = "DashboardAssetFiatBalance_"
+        private const val CRYPTO_BALANCE_ID = "DashboardAssetCryptoBalance_"
     }
 }
 

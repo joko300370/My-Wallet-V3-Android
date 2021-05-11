@@ -11,27 +11,23 @@ import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.dialog_activities_tx_item.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
-import piuk.blockchain.android.ui.activity.CryptoAccountType
+import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.android.util.extensions.toFormattedDate
+import piuk.blockchain.android.util.toFormattedDate
 import piuk.blockchain.android.util.setAssetIconColours
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.visible
-import timber.log.Timber
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.inflate
 import java.util.Date
 
 class NonCustodialActivityItemDelegate<in T>(
-    private val disposables: CompositeDisposable,
     private val currencyPrefs: CurrencyPrefs,
-    private val onItemClicked: (CryptoCurrency, String, CryptoAccountType) -> Unit // crypto, txID, type
+    private val assetResources: AssetResources,
+    private val onItemClicked: (CryptoCurrency, String, CryptoActivityType) -> Unit // crypto, txID, type
 ) : AdapterDelegate<T> {
 
     override fun isForViewType(items: List<T>, position: Int): Boolean =
@@ -46,8 +42,8 @@ class NonCustodialActivityItemDelegate<in T>(
         holder: RecyclerView.ViewHolder
     ) = (holder as NonCustodialActivityItemViewHolder).bind(
         items[position] as NonCustodialActivitySummaryItem,
-        disposables,
         currencyPrefs.selectedFiatCurrency,
+        assetResources,
         onItemClicked
     )
 }
@@ -56,16 +52,22 @@ private class NonCustodialActivityItemViewHolder(
     itemView: View
 ) : RecyclerView.ViewHolder(itemView) {
 
-    internal fun bind(
+    private val disposables: CompositeDisposable = CompositeDisposable()
+
+    fun bind(
         tx: NonCustodialActivitySummaryItem,
-        disposables: CompositeDisposable,
-        fiatCurrency: String,
-        onAccountClicked: (CryptoCurrency, String, CryptoAccountType) -> Unit
+        selectedFiatCurrency: String,
+        assetResources: AssetResources,
+        onAccountClicked: (CryptoCurrency, String, CryptoActivityType) -> Unit
     ) {
+        disposables.clear()
         with(itemView) {
             if (tx.isConfirmed) {
                 icon.setTransactionTypeIcon(tx.transactionType, tx.isFeeTransaction)
-                icon.setAssetIconColours(tx.cryptoCurrency, context)
+                icon.setAssetIconColours(
+                    tintColor = assetResources.assetTint(tx.cryptoCurrency),
+                    filterColor = assetResources.assetFilter(tx.cryptoCurrency)
+                )
             } else {
                 icon.setIsConfirming()
             }
@@ -78,19 +80,9 @@ private class NonCustodialActivityItemViewHolder(
 
             asset_balance_fiat.gone()
             asset_balance_crypto.text = tx.value.toStringWithSymbol()
-            disposables += tx.totalFiatWhenExecuted(fiatCurrency)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = {
-                        asset_balance_fiat.text = it.toStringWithSymbol()
-                        asset_balance_fiat.visible()
-                    },
-                    onError = {
-                        Timber.e("Cannot convert to fiat")
-                    }
-                )
+            asset_balance_fiat.bindAndConvertFiatBalance(tx, disposables, selectedFiatCurrency)
 
-            setOnClickListener { onAccountClicked(tx.cryptoCurrency, tx.txId, CryptoAccountType.NON_CUSTODIAL) }
+            setOnClickListener { onAccountClicked(tx.cryptoCurrency, tx.txId, CryptoActivityType.NON_CUSTODIAL) }
         }
     }
 

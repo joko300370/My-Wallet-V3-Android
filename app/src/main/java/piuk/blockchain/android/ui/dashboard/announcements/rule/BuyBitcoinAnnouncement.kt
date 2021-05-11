@@ -3,8 +3,8 @@ package piuk.blockchain.android.ui.dashboard.announcements.rule
 import androidx.annotation.VisibleForTesting
 import io.reactivex.Single
 import piuk.blockchain.android.R
-import piuk.blockchain.android.simplebuy.SimpleBuyAvailability
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
+import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementQueries
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementRule
 import piuk.blockchain.android.ui.dashboard.announcements.DismissRecorder
 import piuk.blockchain.android.ui.dashboard.announcements.DismissRule
@@ -12,25 +12,19 @@ import piuk.blockchain.android.ui.dashboard.announcements.StandardAnnouncementCa
 
 class BuyBitcoinAnnouncement(
     dismissRecorder: DismissRecorder,
-    private val simpleBuyAvailability: SimpleBuyAvailability
+    private val announcementQueries: AnnouncementQueries
 ) : AnnouncementRule(dismissRecorder) {
 
-    private var cta: (AnnouncementHost) -> Unit = {}
     override val dismissKey = DISMISS_KEY
+    private var isUserSddEligibleButNotVerified = false
 
     override fun shouldShow(): Single<Boolean> {
-        if (dismissEntry.isDismissed) {
-            return Single.just(false)
-        }
-
-        return simpleBuyAvailability.isAvailable()
-            .doOnSuccess { simpleBuyAvailable ->
-                if (simpleBuyAvailable) {
-                    cta = {
-                        it.startSimpleBuy()
-                    }
-                }
+        return announcementQueries.isSimplifiedDueDiligenceEligibleAndNotVerified()
+            .onErrorReturn { false }
+            .doOnSuccess {
+                isUserSddEligibleButNotVerified = it
             }
+            .flatMap { Single.just(dismissEntry.isDismissed).map { !it } }
     }
 
     override fun show(host: AnnouncementHost) {
@@ -40,7 +34,8 @@ class BuyBitcoinAnnouncement(
                 dismissRule = DismissRule.CardPeriodic,
                 dismissEntry = dismissEntry,
                 titleText = R.string.buy_crypto_card_title,
-                bodyText = R.string.buy_crypto_card_body,
+                bodyText = if (isUserSddEligibleButNotVerified)
+                    R.string.buy_crypto_card_sdd_body else R.string.buy_crypto_card_body,
                 ctaText = R.string.buy_crypto_card_cta,
                 iconImage = R.drawable.ic_announce_buy_btc,
                 dismissFunction = {

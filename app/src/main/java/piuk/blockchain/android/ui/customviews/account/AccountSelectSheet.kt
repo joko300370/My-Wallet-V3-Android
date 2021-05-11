@@ -1,22 +1,24 @@
 package piuk.blockchain.android.ui.customviews.account
 
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.annotation.StringRes
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.activityShown
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.dialog_account_selector_sheet.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.databinding.DialogSheetAccountSelectorBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.visibleIf
 
 class AccountSelectSheet(
     override val host: Host
-) : SlidingModalBottomDialog() {
+) : SlidingModalBottomDialog<DialogSheetAccountSelectorBinding>() {
 
     interface SelectionHost : Host {
         fun onAccountSelected(account: BlockchainAccount)
@@ -26,8 +28,8 @@ class AccountSelectSheet(
         fun onAccountSelectorBack()
     }
 
-    override val layoutResource: Int
-        get() = R.layout.dialog_account_selector_sheet
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogSheetAccountSelectorBinding =
+        DialogSheetAccountSelectorBinding.inflate(inflater, container, false)
 
     private val coincore: Coincore by scopedInject()
     private val disposables = CompositeDisposable()
@@ -38,6 +40,8 @@ class AccountSelectSheet(
             .map { it.filter { a -> a.hasTransactions } }
 
     private var sheetTitle: Int = R.string.select_account_sheet_title
+    private var sheetSubtitle: Int = R.string.empty
+    private var statusDecorator: StatusDecorator = { DefaultCellDecorator() }
 
     private fun doOnAccountSelected(account: BlockchainAccount) {
         analytics.logEvent(activityShown(account.label))
@@ -45,36 +49,44 @@ class AccountSelectSheet(
         dismiss()
     }
 
-    private fun doOnLoadError(t: Throwable) {
+    private fun doOnListLoaded(isEmpty: Boolean) {
+        binding.accountListEmpty.visibleIf { isEmpty }
+        binding.progress.gone()
+    }
+
+    private fun doOnLoadError(it: Throwable) {
+        binding.progress.gone()
         dismiss()
     }
 
-    private fun doOnEmptyList() {
-        dismiss()
+    private fun doOnListLoading() {
+        binding.progress.visible()
     }
 
-    override fun initControls(view: View) {
-        with(view.account_list) {
-
-            onAccountSelected = ::doOnAccountSelected
-            onEmptyList = ::doOnEmptyList
-            onLoadError = ::doOnLoadError
-
-            view.account_list_title.text = getString(sheetTitle)
-
+    override fun initControls(binding: DialogSheetAccountSelectorBinding) {
+        with(binding) {
+            accountList.apply {
+                onAccountSelected = ::doOnAccountSelected
+                onListLoaded = ::doOnListLoaded
+                onLoadError = ::doOnLoadError
+                onListLoading = ::doOnListLoading
+            }
+            accountListTitle.text = getString(sheetTitle)
+            accountListSubtitle.text = getString(sheetSubtitle)
+            accountListSubtitle.visibleIf { getString(sheetSubtitle).isNotEmpty() }
+            }
             if (host is SelectAndBackHost) {
-                showBackArrow(view)
+                showBackArrow()
             } else {
-                view.account_list_back.gone()
+                binding.accountListBack.gone()
             }
 
-            initialise(accountList)
+            binding.accountList.initialise(accountList, statusDecorator)
         }
-    }
 
-    private fun showBackArrow(view: View) {
-        view.account_list_back.visible()
-        view.account_list_back.setOnClickListener {
+    private fun showBackArrow() {
+        binding.accountListBack.visible()
+        binding.accountListBack.setOnClickListener {
             (host as SelectAndBackHost).onAccountSelectorBack()
         }
     }
@@ -95,6 +107,20 @@ class AccountSelectSheet(
             AccountSelectSheet(host).apply {
                 this.accountList = accountList
                 this.sheetTitle = sheetTitle
+            }
+
+        fun newInstance(
+            host: Host,
+            accountList: Single<List<BlockchainAccount>>,
+            @StringRes sheetTitle: Int,
+            @StringRes sheetSubtitle: Int,
+            statusDecorator: StatusDecorator
+        ): AccountSelectSheet =
+            AccountSelectSheet(host).apply {
+                this.accountList = accountList
+                this.sheetTitle = sheetTitle
+                this.sheetSubtitle = sheetSubtitle
+                this.statusDecorator = statusDecorator
             }
     }
 }

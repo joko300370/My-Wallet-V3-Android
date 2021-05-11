@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.activity.detail
 
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import info.blockchain.wallet.multiaddress.TransactionSummary
@@ -12,6 +13,7 @@ import java.util.ArrayList
 import java.util.HashMap
 import java.util.TreeMap
 
+@Deprecated("Switch to coincore")
 class TransactionHelper(
     private val payloadDataManager: PayloadDataManager,
     private val bchDataManager: BchDataManager
@@ -37,7 +39,7 @@ class TransactionHelper(
             inputMap[treeMap.lastKey()] = treeMap.lastEntry().value
         } else {
             for (inputAddress in tx.inputsMap.keys) {
-                val inputValue = tx.inputsMap[inputAddress] ?: CryptoValue.ZeroBtc
+                val inputValue = tx.inputsMap[inputAddress] ?: CryptoValue.zero(CryptoCurrency.BTC)
                 // Move or Send
                 // The address belongs to us
                 val xpub = payloadDataManager.getXpubFromAddress(inputAddress)
@@ -47,7 +49,7 @@ class TransactionHelper(
                         inputMap[inputAddress] = inputValue
                         inputXpubList.add(xpub)
                     }
-                } else { // Legacy Address or someone else's address
+                } else { // Imported Address or someone else's address
                     inputMap[inputAddress] = inputValue
                 }
             }
@@ -55,7 +57,7 @@ class TransactionHelper(
 
         // Outputs / To field
         for (outputAddress in tx.outputsMap.keys) {
-            val outputValue = tx.outputsMap[outputAddress] ?: CryptoValue.ZeroBtc
+            val outputValue = tx.outputsMap[outputAddress] ?: CryptoValue.zero(CryptoCurrency.BTC)
             if (payloadDataManager.isOwnHDAddress(outputAddress)) {
                 // If output address belongs to an xpub we own - we have to check if it's change
                 val xpub = payloadDataManager.getXpubFromAddress(outputAddress)
@@ -70,8 +72,8 @@ class TransactionHelper(
                     outputMap[outputAddress] = outputValue
                 }
             } else if (
-                payloadDataManager.wallet!!.legacyAddressStringList.contains(outputAddress)
-            ) { // If output address belongs to a legacy address we own - we have to check if it's change
+                payloadDataManager.wallet!!.importedAddressStringList.contains(outputAddress)
+            ) { // If output address belongs to a imported address we own - we have to check if it's change
                 // If it goes back to same address AND if it's not the total amount sent
                 // (inputs x and y could send to output y in which case y is not receiving change,
                 // but rather the total amount)
@@ -109,7 +111,7 @@ class TransactionHelper(
             }
         } else {
             for (inputAddress in tx.inputsMap.keys) {
-                val inputValue = tx.inputsMap[inputAddress] ?: CryptoValue.ZeroBch
+                val inputValue = tx.inputsMap[inputAddress] ?: CryptoValue.zero(CryptoCurrency.BCH)
                 // Move or Send
                 // The address belongs to us
                 val xpub = bchDataManager.getXpubFromAddress(inputAddress)
@@ -122,14 +124,14 @@ class TransactionHelper(
                         inputMap[inputAddress] = inputValue
                         inputXpubList.add(xpub)
                     }
-                } else { // Legacy Address or someone else's address
+                } else { // Imported Address or someone else's address
                     inputMap[inputAddress] = inputValue
                 }
             }
         }
         // Outputs / To field
         for (outputAddress in tx.outputsMap.keys) {
-            val outputValue = tx.outputsMap[outputAddress] ?: CryptoValue.ZeroBch
+            val outputValue = tx.outputsMap[outputAddress] ?: CryptoValue.zero(CryptoCurrency.BCH)
             // Skip dust output
             if (outputValue.toBigInteger() == Payment.DUST)
                 continue
@@ -148,8 +150,8 @@ class TransactionHelper(
                     outputMap[outputAddress] = outputValue
                 }
             } else if (
-                bchDataManager.getLegacyAddressStringList().contains(outputAddress)
-            ) { // If output address belongs to a legacy address we own - we have to check if it's
+                bchDataManager.getImportedAddressStringList().contains(outputAddress)
+            ) { // If output address belongs to a imported address we own - we have to check if it's
                 // change
                 // If it goes back to same address AND if it's not the total amount sent
                 // (inputs x and y could send to output y in which case y is not receiving change,

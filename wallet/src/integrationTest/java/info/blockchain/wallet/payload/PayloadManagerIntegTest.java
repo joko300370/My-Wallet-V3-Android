@@ -1,18 +1,15 @@
 package info.blockchain.wallet.payload;
 
-import info.blockchain.api.blockexplorer.BlockExplorer;
-import info.blockchain.wallet.ApiCode;
+import info.blockchain.api.BitcoinApi;
 import info.blockchain.wallet.BaseIntegTest;
 import info.blockchain.wallet.BlockchainFramework;
 import info.blockchain.wallet.api.WalletApi;
 import info.blockchain.wallet.api.WalletExplorerEndpoints;
 import info.blockchain.wallet.multiaddress.MultiAddressFactory;
-import info.blockchain.wallet.payload.data.HDWallet;
-import info.blockchain.wallet.payload.data.LegacyAddress;
+import info.blockchain.wallet.payload.data.WalletBody;
+import info.blockchain.wallet.payload.data.ImportedAddress;
 import info.blockchain.wallet.payload.data.Wallet;
-import org.bitcoinj.core.NetworkParameters;
-import org.bitcoinj.params.BitcoinMainNetParams;
-import org.jetbrains.annotations.NotNull;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,26 +22,22 @@ public final class PayloadManagerIntegTest extends BaseIntegTest {
 
     @Before
     public void setup() {
-        final BlockExplorer blockExplorer = new BlockExplorer(
-                BlockchainFramework.getRetrofitExplorerInstance(),
+        final BitcoinApi bitcoinApi = new BitcoinApi(
                 BlockchainFramework.getRetrofitApiInstance(),
                 BlockchainFramework.getApiCode()
         );
         payloadManager = new PayloadManager(
                 new WalletApi(
-                        BlockchainFramework.getRetrofitExplorerInstance()
-                                .create(WalletExplorerEndpoints.class),
-                        new ApiCode() {
-                            @NotNull
-                            @Override
-                            public String getApiCode() {
-                                return BlockchainFramework.getApiCode();
-                            }
-                        }
+                    getRetrofit(
+                        "https://explorer.staging.blockchain.info/",
+                        getOkHttpClient()
+                    ).create(WalletExplorerEndpoints.class),
+                    BlockchainFramework::getApiCode
                 ),
-                new MultiAddressFactory(blockExplorer),
-                new BalanceManagerBtc(blockExplorer),
-                new BalanceManagerBch(blockExplorer)
+                bitcoinApi,
+                new MultiAddressFactory(bitcoinApi),
+                new BalanceManagerBtc(bitcoinApi),
+                new BalanceManagerBch(bitcoinApi)
         );
     }
 
@@ -52,39 +45,44 @@ public final class PayloadManagerIntegTest extends BaseIntegTest {
     public void upgradeV2PayloadToV3() throws Exception {
 
         //Create a wallet
-        payloadManager.create("My HDWallet", "name@email.com", "MyTestWallet");
+        payloadManager.create(
+            "My HDWallet",
+            "name@email.com",
+            "MyTestWallet",
+            false
+        );
 
         Wallet walletBody = payloadManager.getPayload();
 
         //Remove HD part
-        walletBody.setHdWallets(new ArrayList<HDWallet>());
+        walletBody.setWalletBodies(new ArrayList<WalletBody>());
 
         //Add legacy so we have at least 1 address
-        LegacyAddress address = new LegacyAddress();
+        ImportedAddress address = new ImportedAddress();
         address.setLabel("HDAddress label");
         address.setAddress("1PbCM934wxCoVc2y5dJqWpi2w8eHur1W2T");
-        LegacyAddress newlyAdded = walletBody.addLegacyAddress(address, null);
+        ImportedAddress newlyAdded = walletBody.addImportedAddress(address, null);
 
         final String guidOriginal = walletBody.getGuid();
 
         walletBody.upgradeV2PayloadToV3(null, "HDAccount Name2");
 
         //Check that existing legacy addresses still exist
-        Assert.assertEquals(newlyAdded.getAddress(), walletBody.getLegacyAddressList().get(0).getAddress());
+        Assert.assertEquals(newlyAdded.getAddress(), walletBody.getImportedAddressList().get(0).getAddress());
 
         //Check that Guid is still same
         Assert.assertEquals(walletBody.getGuid(), guidOriginal);
 
         //Check that wallet is flagged as upgraded
-        Assert.assertTrue(walletBody.isUpgraded());
+        Assert.assertTrue(walletBody.isUpgradedToV3());
 
         //Check that 1 account exists with keys
-        String xpriv = walletBody.getHdWallets().get(0).getAccounts().get(0).getXpriv();
+        String xpriv = walletBody.getWalletBody().getAccounts().get(0).getXpriv();
         Assert.assertTrue(xpriv != null && !xpriv.isEmpty());
 
         //Check that mnemonic exists
         try {
-            Assert.assertEquals(walletBody.getHdWallets().get(0).getMnemonic().size(), 12);
+            Assert.assertEquals(walletBody.getWalletBody().getMnemonic().size(), 12);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail("upgradeV2PayloadToV3 failed");
@@ -97,16 +95,22 @@ public final class PayloadManagerIntegTest extends BaseIntegTest {
         String mnemonic = "all all all all all all all all all all all all";
         String seedHex = "0660cc198330660cc198330660cc1983";
 
-        payloadManager.recoverFromMnemonic(mnemonic, "My Bitcoin Wallet", "name@email.com", "SomePassword");
+        payloadManager.recoverFromMnemonic(
+            mnemonic,
+            "My Bitcoin Wallet",
+            "name@email.com",
+            "SomePassword",
+            false
+        );
 
         Wallet walletBody = payloadManager
                 .getPayload();
 
-        Assert.assertEquals(seedHex, walletBody.getHdWallets().get(0).getSeedHex());
-        Assert.assertEquals(10, walletBody.getHdWallets().get(0).getAccounts().size());
-        Assert.assertEquals("My Bitcoin Wallet", walletBody.getHdWallets().get(0).getAccounts().get(0).getLabel());
-        Assert.assertEquals("My Bitcoin Wallet 2", walletBody.getHdWallets().get(0).getAccounts().get(1).getLabel());
-        Assert.assertEquals("My Bitcoin Wallet 3", walletBody.getHdWallets().get(0).getAccounts().get(2).getLabel());
+        Assert.assertEquals(seedHex, walletBody.getWalletBody().getSeedHex());
+        Assert.assertEquals(10, walletBody.getWalletBody().getAccounts().size());
+        Assert.assertEquals("My Bitcoin Wallet", walletBody.getWalletBody().getAccounts().get(0).getLabel());
+        Assert.assertEquals("My Bitcoin Wallet 2", walletBody.getWalletBody().getAccounts().get(1).getLabel());
+        Assert.assertEquals("My Bitcoin Wallet 3", walletBody.getWalletBody().getAccounts().get(2).getLabel());
     }
 
     @Test
@@ -115,11 +119,17 @@ public final class PayloadManagerIntegTest extends BaseIntegTest {
         String mnemonic = "one defy stock very oven junk neutral weather sweet pyramid celery sorry";
         String seedHex = "9aa737587979dcf2a53fc5dbb5e09467";
 
-        payloadManager.recoverFromMnemonic(mnemonic, "My HDWallet", "name@email.com", "SomePassword");
+        payloadManager.recoverFromMnemonic(
+            mnemonic,
+            "My HDWallet",
+            "name@email.com",
+            "SomePassword",
+            false
+        );
 
         Wallet walletBody = payloadManager.getPayload();
 
-        Assert.assertEquals(seedHex, walletBody.getHdWallets().get(0).getSeedHex());
+        Assert.assertEquals(seedHex, walletBody.getWalletBody().getSeedHex());
     }
 
     @Test
@@ -128,15 +138,14 @@ public final class PayloadManagerIntegTest extends BaseIntegTest {
         String guid = "f4c49ecb-ac6e-4b45-add4-21dafb90d804";
         String sharedKey = "ba600158-2216-4166-b40c-ee50b33f1835";
         String pw = "testtesttest";
-        NetworkParameters networkParameters = BitcoinMainNetParams.get();
 
-        payloadManager.initializeAndDecrypt(networkParameters, sharedKey, guid, pw);
+        payloadManager.initializeAndDecrypt(sharedKey, guid, pw, false);
 
         Assert.assertEquals(guid, payloadManager.getPayload().getGuid());
         Assert.assertEquals(sharedKey, payloadManager.getPayload().getSharedKey());
         Assert.assertEquals(pw, payloadManager.getTempPassword());
 
-        payloadManager.getPayload().getHdWallets().get(0).getAccount(0).setLabel("Some Label");
+        payloadManager.getPayload().getWalletBody().getAccount(0).setLabel("Some Label");
         Assert.assertTrue(payloadManager.save());
     }
 }

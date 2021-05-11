@@ -1,11 +1,14 @@
 package piuk.blockchain.android.coincore
 
-import com.blockchain.swap.nabu.datamanagers.InterestState
-import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.TransactionState
-import com.blockchain.swap.nabu.datamanagers.TransactionType
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.datamanagers.CurrencyPair
+import com.blockchain.nabu.datamanagers.InterestState
+import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.datamanagers.TransferDirection
+import com.blockchain.nabu.datamanagers.CustodialOrderState
+import com.blockchain.nabu.datamanagers.TransactionState
+import com.blockchain.nabu.datamanagers.TransactionType
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
@@ -43,6 +46,12 @@ class FiatActivitySummaryItem(
 ) : ActivitySummaryItem() {
     override fun totalFiatWhenExecuted(selectedFiat: String): Single<Money> =
         Single.just(value)
+
+    override fun toString(): String = "currency = $currency " +
+        "transactionType  = $type " +
+        "timeStamp  = $timeStampMs " +
+        "total  = ${value.toStringWithSymbol()} " +
+        "txId (hash)  = $txId "
 }
 
 abstract class ActivitySummaryItem : Comparable<ActivitySummaryItem> {
@@ -58,11 +67,37 @@ abstract class ActivitySummaryItem : Comparable<ActivitySummaryItem> {
 
     abstract fun totalFiatWhenExecuted(selectedFiat: String): Single<Money>
 
-    override operator fun compareTo(
+    final override operator fun compareTo(
         other: ActivitySummaryItem
     ) = (other.timeStampMs - timeStampMs).sign
 
     abstract val account: SingleAccount
+}
+
+data class TradeActivitySummaryItem(
+    override val exchangeRates: ExchangeRateDataManager,
+    override val txId: String,
+    override val timeStampMs: Long,
+    val sendingValue: Money,
+    val sendingAccount: SingleAccount,
+    val sendingAddress: String?,
+    val receivingAddress: String?,
+    val state: CustodialOrderState,
+    val direction: TransferDirection,
+    val receivingValue: Money,
+    val depositNetworkFee: Single<Money>,
+    val withdrawalNetworkFee: Money,
+    val currencyPair: CurrencyPair,
+    val fiatValue: FiatValue,
+    val fiatCurrency: String
+) : ActivitySummaryItem() {
+    override val account: SingleAccount
+        get() = sendingAccount
+
+    override val value: Money
+        get() = sendingValue
+
+    override fun totalFiatWhenExecuted(selectedFiat: String): Single<Money> = Single.just(fiatValue)
 }
 
 data class CustodialInterestActivitySummaryItem(
@@ -96,7 +131,8 @@ data class CustodialTradingActivitySummaryItem(
     val type: OrderType,
     val fee: FiatValue,
     val paymentMethodId: String,
-    val paymentMethodType: PaymentMethodType
+    val paymentMethodType: PaymentMethodType,
+    val depositPaymentId: String
 ) : CryptoActivitySummaryItem()
 
 abstract class NonCustodialActivitySummaryItem : CryptoActivitySummaryItem() {

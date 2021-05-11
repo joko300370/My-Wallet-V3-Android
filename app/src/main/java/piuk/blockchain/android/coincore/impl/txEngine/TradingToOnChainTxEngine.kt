@@ -1,67 +1,85 @@
 package piuk.blockchain.android.coincore.impl.txEngine
 
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.PendingTx
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxEngine
-import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.updateTxValidity
 
 // Transfer from a custodial trading account to an onChain non-custodial account
-open class TradingToOnChainTxEngine(
+class TradingToOnChainTxEngine(
     private val isNoteSupported: Boolean,
     private val walletManager: CustodialWalletManager
 ) : TxEngine() {
 
     override fun assertInputsValid() {
-        require(txTarget is CryptoAddress)
-        require(sourceAccount.asset == (txTarget as CryptoAddress).asset)
+        check(txTarget is CryptoAddress)
+        check(sourceAsset == (txTarget as CryptoAddress).asset)
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
         Single.just(
             PendingTx(
-                amount = CryptoValue.zero(sourceAccount.asset),
-                available = CryptoValue.zero(sourceAccount.asset),
-                fees = CryptoValue.zero(sourceAccount.asset),
-                feeLevel = FeeLevel.None,
-                selectedFiat = userFiat
+                amount = CryptoValue.zero(sourceAsset),
+                totalBalance = CryptoValue.zero(sourceAsset),
+                availableBalance = CryptoValue.zero(sourceAsset),
+                feeForFullAvailable = CryptoValue.zero(sourceAsset),
+                feeAmount = CryptoValue.zero(sourceAsset),
+                feeSelection = FeeSelection(),
+                selectedFiat = userFiat,
+                minLimit = CryptoValue.zero(sourceAsset)
             )
         )
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
         require(amount is CryptoValue)
-        require(amount.currency == asset)
+        require(amount.currency == sourceAsset)
 
-        return sourceAccount.actionableBalance
-            .map { it as CryptoValue }
-            .map { available ->
-                pendingTx.copy(
-                    amount = amount,
-                    available = available
-                )
-            }
+        return Singles.zip(
+            sourceAccount.accountBalance.map { it as CryptoValue },
+            sourceAccount.actionableBalance.map { it as CryptoValue }
+        ) { total, available ->
+            pendingTx.copy(
+                amount = amount,
+                totalBalance = total,
+                availableBalance = available
+            )
+        }
+    }
+
+    override fun doUpdateFeeLevel(
+        pendingTx: PendingTx,
+        level: FeeLevel,
+        customFeeAmount: Long
+    ): Single<PendingTx> {
+        require(pendingTx.feeSelection.availableLevels.contains(level))
+        // This engine only supports FeeLevel.None, so
+        return Single.just(pendingTx)
     }
 
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(
-            pendingTx.copy(options = listOf(
-                TxOptionValue.From(from = sourceAccount.label),
-                TxOptionValue.To(to = txTarget.label),
-                TxOptionValue.FeedTotal(amount = pendingTx.amount, fee = pendingTx.fees)
+            pendingTx.copy(confirmations = listOf(
+                TxConfirmationValue.From(from = sourceAccount.label),
+                TxConfirmationValue.To(to = txTarget.label),
+                TxConfirmationValue.FeedTotal(amount = pendingTx.amount, fee = pendingTx.feeAmount)
             ).apply {
                 if (isNoteSupported) {
-                    toMutableList().add(TxOptionValue.Description())
+                    toMutableList().add(TxConfirmationValue.Description())
                 }
-            }))
+            })
+        )
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         validateAmounts(pendingTx).updateTxValidity(pendingTx)
@@ -72,10 +90,17 @@ open class TradingToOnChainTxEngine(
     private fun validateAmounts(pendingTx: PendingTx): Completable =
         sourceAccount.actionableBalance
             .flatMapCompletable { max ->
-                if (max >= pendingTx.amount) {
+                val min = pendingTx.minLimit ?: CryptoValue.zero(sourceAsset)
+                if (pendingTx.amount.isPositive && max >= pendingTx.amount && min <= pendingTx.amount) {
                     Completable.complete()
                 } else {
-                    throw TxValidationFailure(ValidationState.INVALID_AMOUNT)
+                    throw TxValidationFailure(
+                        if (pendingTx.amount > pendingTx.availableBalance) {
+                            ValidationState.INSUFFICIENT_FUNDS
+                        } else {
+                            ValidationState.INVALID_AMOUNT
+                        }
+                    )
                 }
             }
 

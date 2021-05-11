@@ -7,17 +7,15 @@ import com.blockchain.koin.modules.applicationModule
 import com.blockchain.koin.modules.environmentModule
 import com.blockchain.koin.modules.featureFlagsModule
 import com.blockchain.koin.modules.keys
-import com.blockchain.koin.modules.morphUiModule
 import com.blockchain.koin.modules.moshiModule
 import com.blockchain.koin.modules.nabuUrlModule
 import com.blockchain.koin.modules.serviceModule
 import com.blockchain.koin.modules.urls
 import com.blockchain.koin.modules.xlmModule
-import com.blockchain.lockbox.koin.lockboxModule
 import com.blockchain.network.modules.apiModule
 import com.blockchain.network.modules.okHttpModule
 import com.blockchain.notifications.koin.notificationModule
-import com.blockchain.swap.koin.swapModule
+import info.blockchain.api.blockchainApiModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
@@ -31,8 +29,10 @@ import piuk.blockchain.android.ui.activity.activitiesModule
 import piuk.blockchain.android.ui.dashboard.announcements.dashboardAnnouncementsModule
 import piuk.blockchain.android.ui.kyc.koin.kycUiModule
 import piuk.blockchain.android.ui.kyc.koin.kycUiNabuModule
+import piuk.blockchain.android.ui.auth.newlogin.secureChannelModule
 import piuk.blockchain.android.ui.start.startupUiModule
 import piuk.blockchain.android.ui.transactionflow.transactionModule
+import piuk.blockchain.com.internalFeatureFlagsModule
 import timber.log.Timber
 
 object KoinStarter {
@@ -49,6 +49,7 @@ object KoinStarter {
                 activitiesModule,
                 apiInterceptorsModule,
                 apiModule,
+                blockchainApiModule,
                 applicationModule,
                 campaignModule,
                 coincoreModule,
@@ -59,19 +60,18 @@ object KoinStarter {
                 dashboardAnnouncementsModule,
                 environmentModule,
                 featureFlagsModule,
+                internalFeatureFlagsModule,
                 authenticationModule,
                 kycUiModule,
                 kycUiNabuModule,
-                lockboxModule,
-                morphUiModule,
                 moshiModule,
                 nabuModule,
                 nabuUrlModule,
                 notificationModule,
+                secureChannelModule,
                 serviceModule,
                 startupUiModule,
                 sunriverModule,
-                swapModule,
                 walletModule,
                 xlmModule
             ))

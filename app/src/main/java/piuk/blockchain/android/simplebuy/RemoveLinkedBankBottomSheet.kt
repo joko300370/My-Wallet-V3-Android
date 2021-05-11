@@ -1,63 +1,107 @@
 package piuk.blockchain.android.simplebuy
 
+import android.animation.LayoutTransition
 import android.content.DialogInterface
 import android.os.Bundle
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.Toast
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.LinkedBank
+import com.blockchain.nabu.datamanagers.Bank
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.remove_bank_bottom_sheet.view.*
-import kotlinx.android.synthetic.main.remove_bank_bottom_sheet.view.end_digits
-import kotlinx.android.synthetic.main.remove_bank_bottom_sheet.view.icon
-import kotlinx.android.synthetic.main.remove_bank_bottom_sheet.view.progress
-import kotlinx.android.synthetic.main.remove_bank_bottom_sheet.view.title
-import kotlinx.android.synthetic.main.remove_card_bottom_sheet.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.RemoveBankBottomSheetBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
 
-class RemoveLinkedBankBottomSheet : SlidingModalBottomDialog() {
+class RemoveLinkedBankBottomSheet : SlidingModalBottomDialog<RemoveBankBottomSheetBinding>() {
 
     private val compositeDisposable = CompositeDisposable()
     private val custodialWalletManager: CustodialWalletManager by scopedInject()
 
-    private val bank: LinkedBank by unsafeLazy {
-        arguments?.getSerializable(BANK_KEY) as? LinkedBank ?: throw IllegalStateException("No card provided")
+    private val bank: Bank by unsafeLazy {
+        arguments?.getSerializable(BANK_KEY) as Bank
     }
-    override val layoutResource: Int = R.layout.remove_bank_bottom_sheet
 
-    override fun initControls(view: View) {
-        with(view) {
-            title.text = "${bank.title} (${bank.currency})"
-            end_digits.text = bank.accountDotted
-            rmv_bank_btn.setOnClickListener {
-                compositeDisposable += custodialWalletManager.deleteBank(bank.id)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnSubscribe {
-                        updateUi(true)
-                    }
-                    .doFinally {
-                        updateUi(false)
-                    }
-                    .subscribeBy(onComplete = {
-                        analytics.logEvent(SimpleBuyAnalytics.REMOVE_BANK)
-                        (parentFragment as? RemovePaymentMethodBottomSheetHost)?.onLinkedBankRemoved(bank.id)
-                        dismiss()
-                    }, onError = {})
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): RemoveBankBottomSheetBinding =
+        RemoveBankBottomSheetBinding.inflate(inflater, container, false)
+
+    override fun initControls(binding: RemoveBankBottomSheetBinding) {
+        // setting the transition like this prevents the bottom sheet from
+        // jumping to the top of the screen when animating its contents
+        val transition = LayoutTransition()
+        transition.setAnimateParentHierarchy(false)
+        binding.root.layoutTransition = transition
+
+        with(binding) {
+            title.text = resources.getString(R.string.common_spaced_strings, bank.name, bank.currency)
+            endDigits.text = resources.getString(R.string.dotted_suffixed_string, bank.account)
+            accountInfo.text = getString(R.string.payment_method_type_account_info, bank.toHumanReadableAccount(), "")
+            rmvBankBtn.setOnClickListener {
+                showConfirmation()
+            }
+            rmvBankCancel.setOnClickListener {
+                dismiss()
             }
         }
     }
 
+    private fun showConfirmation() {
+        with(binding) {
+            rmvBankCancel.visible()
+            rmvBankBtn.setOnClickListener {
+                removeBank()
+            }
+
+            val alertIcon = requireContext().getResolvedDrawable(R.drawable.ic_asset_error)
+            alertIcon?.setTint(requireContext().getResolvedColor(R.color.orange_400))
+            icon.setImageDrawable(alertIcon)
+
+            endDigits.gone()
+            title.text = getString(R.string.settings_bank_remove_check_title)
+            accountInfo.text = getString(R.string.settings_bank_remove_check_subtitle, bank.name)
+        }
+    }
+
+    private fun removeBank() {
+        compositeDisposable += custodialWalletManager.removeBank(bank)
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                updateUi(true)
+            }
+            .doFinally {
+                updateUi(false)
+            }
+            .subscribeBy(
+                onComplete = {
+                    analytics.logEvent(SimpleBuyAnalytics.REMOVE_BANK)
+                    (parentFragment as? RemovePaymentMethodBottomSheetHost)?.onLinkedBankRemoved(bank.id)
+                    dismiss()
+                }, onError = {
+                    ToastCustom.makeText(
+                        requireContext(), getString(R.string.settings_bank_remove_error), Toast.LENGTH_LONG,
+                        ToastCustom.TYPE_ERROR
+                    )
+                })
+    }
+
     private fun updateUi(isLoading: Boolean) {
-        view?.progress.visibleIf { isLoading }
-        view?.icon.visibleIf { !isLoading }
-        view?.rmv_card_btn?.isEnabled = !isLoading
+        with(binding) {
+            progress.visibleIf { isLoading }
+            icon.visibleIf { !isLoading }
+            rmvBankBtn.isEnabled = !isLoading
+            rmvBankCancel.isEnabled = !isLoading
+        }
     }
 
     override fun onDismiss(dialog: DialogInterface) {
@@ -68,7 +112,7 @@ class RemoveLinkedBankBottomSheet : SlidingModalBottomDialog() {
     companion object {
         private const val BANK_KEY = "BANK_KEY"
 
-        fun newInstance(bank: LinkedBank) =
+        fun newInstance(bank: Bank) =
             RemoveLinkedBankBottomSheet().apply {
                 arguments = Bundle().apply {
                     putSerializable(BANK_KEY, bank)

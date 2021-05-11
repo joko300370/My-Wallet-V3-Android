@@ -1,12 +1,11 @@
 package info.blockchain.wallet.payment
 
 import com.blockchain.testutils.satoshi
-import info.blockchain.api.data.UnspentOutput
-import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.wallet.payload.model.Utxo
 import org.amshove.kluent.`should equal`
-import org.bitcoinj.params.BitcoinMainNetParams
+import org.amshove.kluent.mock
 import org.junit.Test
 
 private const val useNewCoinSelection = true
@@ -41,9 +40,8 @@ class CoinsTest {
             val absoluteFee = maximumSpendable.second
             val bundle = spendableUnspentOutputs(unspentOutputs, max, fee)
 
-            val payment = Payment()
-            payment.makeSimpleTransaction(
-                BitcoinMainNetParams.get(),
+            val payment = Payment(bitcoinApi = mock())
+            payment.makeBtcSimpleTransaction(
                 bundle.spendableOutputs,
                 hashMapOf("1GYkgRtJmEp355xUtVFfHSFjFdbqjiwKmb" to max.toBigInteger()),
                 absoluteFee.toBigInteger(),
@@ -77,10 +75,17 @@ class CoinsTest {
 }
 
 private fun maximumSpendable(
-    unspentOutputs: UnspentOutputs,
+    unspentOutputs: List<Utxo>,
     fee: Int
-) = Coins.getMaximumAvailable(unspentOutputs, fee.toBigInteger(), useReplayProtection, useNewCoinSelection)
-    .let { (balance, fee) -> CryptoValue(CryptoCurrency.BTC, balance) to CryptoValue(CryptoCurrency.BTC, fee) }
+) = Coins.getMaximumAvailable(
+    unspentOutputs,
+    OutputType.P2PKH,
+    fee.toBigInteger(),
+    useReplayProtection,
+    useNewCoinSelection
+).let { (balance, fee) ->
+    CryptoValue(CryptoCurrency.BTC, balance) to CryptoValue(CryptoCurrency.BTC, fee)
+}
 
 private class MinCoinsResult(
     val coinCount: Int,
@@ -89,7 +94,7 @@ private class MinCoinsResult(
 
 private fun minimumCoinsForPayment(
     value: CryptoValue,
-    unspentOutputs: UnspentOutputs,
+    unspentOutputs: List<Utxo>,
     fee: Int
 ) = spendableUnspentOutputs(unspentOutputs, value, fee)
     .let {
@@ -100,20 +105,25 @@ private fun minimumCoinsForPayment(
     }
 
 private fun spendableUnspentOutputs(
-    unspentOutputs: UnspentOutputs,
+    unspentOutputs: List<Utxo>,
     value: CryptoValue,
     fee: Int
 ) = Coins.getMinimumCoinsForPayment(
-    unspentOutputs, value.toBigInteger(), fee.toBigInteger(), useReplayProtection, useNewCoinSelection)
+    unspentOutputs,
+    OutputType.P2PKH,
+    OutputType.P2PKH,
+    value.toBigInteger(),
+    fee.toBigInteger(),
+    useReplayProtection,
+    useNewCoinSelection
+)
 
-private fun unspentOutputs(vararg values: CryptoValue): UnspentOutputs {
-    return UnspentOutputs().apply {
-        unspentOutputs = ArrayList(values.map {
-            UnspentOutput().apply {
-                value = it.toBigInteger()
-                script = "76a91469dec09e9b32ffd447c80d413d58f0413e99208e88ac"
-                txHash = "0000000000000000000000000000000000000000000000000000000000000000"
-            }
-        })
+private fun unspentOutputs(vararg values: CryptoValue): List<Utxo> {
+    return values.map {
+        Utxo(
+            value = it.toBigInteger(),
+            script = "76a91469dec09e9b32ffd447c80d413d58f0413e99208e88ac",
+            txHash = "0000000000000000000000000000000000000000000000000000000000000000"
+        )
     }
 }

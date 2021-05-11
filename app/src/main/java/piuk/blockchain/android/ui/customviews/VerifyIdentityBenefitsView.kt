@@ -1,14 +1,16 @@
 package piuk.blockchain.android.ui.customviews
 
 import android.content.Context
+import android.os.Parcelable
 import android.util.AttributeSet
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.android.parcel.Parcelize
 import kotlinx.android.synthetic.main.verify_identity_benefits_layout.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visibleIf
 
 class VerifyIdentityBenefitsView(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs) {
 
@@ -17,7 +19,7 @@ class VerifyIdentityBenefitsView(context: Context, attrs: AttributeSet) : Constr
     }
 
     fun initWithBenefits(
-        benefits: List<VerifyIdentityBenefit>,
+        benefits: List<VerifyIdentityItem>,
         title: String,
         description: String,
         @DrawableRes icon: Int,
@@ -48,7 +50,7 @@ class VerifyIdentityBenefitsView(context: Context, attrs: AttributeSet) : Constr
         footer_text.visibleIf { footerText.isNotEmpty() }
         footer_text.text = footerText
 
-        val adapter = BenefitsAdapter().apply {
+        val adapter = BenefitsDelegateAdapter().apply {
             items = benefits
         }
 
@@ -61,5 +63,20 @@ class VerifyIdentityBenefitsView(context: Context, attrs: AttributeSet) : Constr
     }
 }
 
-data class VerifyIdentityBenefit(val title: String, val subtitle: String)
+@Parcelize
+data class VerifyIdentityNumericBenefitItem(override val title: String, override val subtitle: String) :
+    VerifyIdentityItem,
+    Parcelable
+
+data class VerifyIdentityIconedBenefitItem(
+    override val title: String,
+    override val subtitle: String,
+    @DrawableRes val icon: Int
+) : VerifyIdentityItem
+
 data class ButtonOptions(val visible: Boolean, val text: String? = null, val cta: () -> Unit = {})
+
+interface VerifyIdentityItem {
+    val title: String
+    val subtitle: String
+}

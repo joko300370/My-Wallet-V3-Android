@@ -4,8 +4,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.whenever
-
-import io.reactivex.Observable
+import io.reactivex.Single
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
@@ -16,9 +15,10 @@ import org.mockito.Mockito.verifyNoMoreInteractions
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import piuk.blockchain.android.BlockchainTestApplication
-import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
+import piuk.blockchain.android.scan.QrCodeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import kotlin.jvm.Throws
 
 @Config(sdk = [23], application = BlockchainTestApplication::class)
 @RunWith(RobolectricTestRunner::class)
@@ -50,7 +50,7 @@ class ReceiveQrPresenterTest {
         whenever(activity.pageIntent).thenReturn(intent)
         val bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.RGB_565)
         whenever(qrCodeDataManager.generateQrCode(ArgumentMatchers.anyString(), ArgumentMatchers.anyInt())).thenReturn(
-            Observable.just(bitmap))
+            Single.just(bitmap))
         // Act
         subject.onViewReady()
         // Assert
@@ -68,7 +68,7 @@ class ReceiveQrPresenterTest {
         whenever(qrCodeDataManager.generateQrCode(
             ArgumentMatchers.anyString(),
             ArgumentMatchers.anyInt())
-        ).thenReturn(Observable.error(Throwable()))
+        ).thenReturn(Single.error(Throwable()))
         // Act
         subject.onViewReady()
         // Assert

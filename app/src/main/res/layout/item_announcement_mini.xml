@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/AnnounceCardStyle"
-    android:layout_marginTop="16dp"
-    android:layout_marginBottom="8dp">
+    android:layout_marginTop="@dimen/small_margin"
+    android:layout_marginBottom="@dimen/tiny_margin">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mini_card_container"
@@ -14,7 +14,7 @@
         android:clickable="true"
         android:focusable="true">
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -24,7 +24,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:srcCompat="@drawable/ic_airdrop_parachute_green" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/msg_title"
             style="@style/Text.Semibold.16"
             android:layout_width="wrap_content"
@@ -36,7 +36,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Welcome To Blockchain" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/msg_body"
             style="@style/Text.Semibold.12"
             android:layout_width="wrap_content"
@@ -51,7 +51,7 @@
             app:layout_constraintVertical_bias="0"
             tools:text="Welcome To Blockchain" />
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/action_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

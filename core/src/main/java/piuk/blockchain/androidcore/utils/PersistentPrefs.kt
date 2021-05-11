@@ -1,8 +1,14 @@
 package piuk.blockchain.androidcore.utils
 
+import com.blockchain.preferences.AuthPrefs
+import com.blockchain.preferences.BankLinkingPrefs
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.DashboardPrefs
+import com.blockchain.preferences.InternalFeatureFlagPrefs
 import com.blockchain.preferences.NotificationPrefs
+import com.blockchain.preferences.OfflineCachePrefs
+import com.blockchain.preferences.RatingPrefs
+import com.blockchain.preferences.SecureChannelPrefs
 import com.blockchain.preferences.SecurityPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.preferences.ThePitLinkingPrefs
@@ -13,10 +19,16 @@ interface PersistentPrefs :
     NotificationPrefs,
     DashboardPrefs,
     SecurityPrefs,
+    SecureChannelPrefs,
     ThePitLinkingPrefs,
     SimpleBuyPrefs,
+    RatingPrefs,
     WalletStatus,
-    EncryptedPrefs {
+    OfflineCachePrefs,
+    EncryptedPrefs,
+    AuthPrefs,
+    BankLinkingPrefs,
+    InternalFeatureFlagPrefs {
 
     val isLoggedOut: Boolean
 
@@ -24,6 +36,8 @@ interface PersistentPrefs :
     var devicePreIDVCheckFailed: Boolean // Pre-IDV check has failed! Don't show 'gold' announce cards etc
 
     var pinId: String
+
+    var newSwapEnabled: Boolean
 
     fun getValue(name: String): String?
     fun getValue(name: String, defaultValue: String): String
@@ -50,8 +64,6 @@ interface PersistentPrefs :
 
     companion object {
         const val KEY_ENCRYPTED_PASSWORD = "encrypted_password"
-        const val KEY_WALLET_GUID = "guid"
-        const val KEY_SHARED_KEY = "sharedKey"
         const val KEY_PIN_FAILS = "pin_fails"
 
         const val KEY_EMAIL = "email"
@@ -60,17 +72,14 @@ interface PersistentPrefs :
         const val KEY_METADATA_URI = "metadata_uri"
         const val KEY_NEWLY_CREATED_WALLET = "newly_created_wallet"
         const val KEY_RESTORED_WALLET = "restored_wallet"
-        const val KEY_ENCRYPTED_PIN_CODE = "encrypted_pin_code"
-        const val KEY_FINGERPRINT_ENABLED = "fingerprint_enabled"
         const val KEY_RECEIVE_SHORTCUTS_ENABLED = "receive_shortcuts_enabled"
-        const val KEY_SWIPE_TO_RECEIVE_ENABLED = "swipe_to_receive_enabled"
         const val KEY_SCREENSHOTS_ENABLED = "screenshots_enabled"
         const val KEY_ONBOARDING_COMPLETE = "onboarding_complete_1"
         const val KEY_OVERLAY_TRUSTED = "overlay_trusted"
 
         const val KEY_ROOT_WARNING_DISABLED = "disable_root_warning"
 
-        // Send screen
-        const val KEY_WARN_ADVANCED_FEE = "pref_warn_advanced_fee"
+        // Swipe To Receive
+        const val KEY_SWIPE_TO_RECEIVE_ENABLED = "swipe_to_receive_enabled"
     }
 }

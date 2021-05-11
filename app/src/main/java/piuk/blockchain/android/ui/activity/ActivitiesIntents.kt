@@ -63,35 +63,23 @@ object ShowAccountSelectionIntent : ActivitiesIntent() {
     }
 }
 
-object ShowBankTransferDetailsIntent : ActivitiesIntent() {
-    override fun reduce(oldState: ActivitiesState): ActivitiesState {
-        return oldState.copy(bottomSheet = ActivitiesSheet.BANK_TRANSFER_DETAILS)
-    }
-}
-
 class CancelSimpleBuyOrderIntent(
     val orderId: String
 ) : ActivitiesIntent() {
     override fun reduce(oldState: ActivitiesState): ActivitiesState = oldState
 }
 
-object ShowCancelOrderIntent : ActivitiesIntent() {
-    override fun reduce(oldState: ActivitiesState): ActivitiesState {
-        return oldState.copy(bottomSheet = ActivitiesSheet.BANK_ORDER_CANCEL)
-    }
-}
-
 class ShowActivityDetailsIntent(
     private val cryptoCurrency: CryptoCurrency,
     private val txHash: String,
-    private val type: CryptoAccountType
+    private val type: CryptoActivityType
 ) : ActivitiesIntent() {
     override fun reduce(oldState: ActivitiesState): ActivitiesState {
         return oldState.copy(
             bottomSheet = ActivitiesSheet.CRYPTO_ACTIVITY_DETAILS,
             selectedCryptoCurrency = cryptoCurrency,
             selectedTxId = txHash,
-            accountType = type
+            activityType = type
         )
     }
 }
@@ -114,6 +102,6 @@ object ClearBottomSheetIntent : ActivitiesIntent() {
         oldState.copy(bottomSheet = null,
             selectedCryptoCurrency = null,
             selectedTxId = "",
-            accountType = CryptoAccountType.UNKNOWN
+            activityType = CryptoActivityType.UNKNOWN
         )
 }

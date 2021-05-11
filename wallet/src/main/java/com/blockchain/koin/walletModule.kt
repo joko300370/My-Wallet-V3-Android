@@ -22,7 +22,7 @@ val walletModule = module {
 
     scope(payloadScopeQualifier) {
 
-        scoped { PayloadManager(get(), get(), get(), get()) }
+        scoped { PayloadManager(get(), get(), get(), get(), get()) }
 
         factory { MultiAddressFactory(get()) }
 
@@ -31,7 +31,7 @@ val walletModule = module {
         factory { BalanceManagerBch(get()) }
     }
 
-    factory { PriceApi(get(), get()) }
+    factory { PriceApi(get(), get()) }.bind(CurrentPriceApi::class)
 
     factory {
         MetadataInteractor(
@@ -41,15 +41,15 @@ val walletModule = module {
 
     single { get<Retrofit>(apiRetrofit).create(MetadataService::class.java) }
 
-    single { get<Retrofit>(apiRetrofit).create(PriceEndpoints::class.java) }
-
-    factory { get<PriceApi>() as CurrentPriceApi }
+    single { get<Retrofit>(kotlinApiRetrofit).create(PriceEndpoints::class.java) }
 
     factory { get<CurrentPriceApi>().toCachedIndicativeFiatPriceService() }
 
     factory {
-        BchDustService(get<Retrofit>(kotlinApiRetrofit).create(DustApi::class.java),
-            get())
+        BchDustService(
+            get<Retrofit>(kotlinApiRetrofit).create(DustApi::class.java),
+            get()
+        )
     }.bind(DustService::class)
 
     single {

@@ -7,10 +7,10 @@ import io.reactivex.rxkotlin.plusAssign
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.base.MvpPresenter
 import piuk.blockchain.android.ui.base.MvpView
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import piuk.blockchain.android.util.AppUtil
 import javax.net.ssl.SSLPeerUnverifiedException
 
@@ -40,10 +40,10 @@ class LoginPresenter(
 
         compositeDisposable += dataManager.handleQrCode(raw!!)
             .doOnSubscribe { view?.showProgressDialog(R.string.please_wait) }
-            .doOnComplete { appUtil.sharedKey = dataManager.wallet!!.sharedKey }
+            .doOnComplete { prefs.sharedKey = dataManager.wallet!!.sharedKey }
             .doAfterTerminate { view?.dismissProgressDialog() }
             .subscribe({
-                prefs.setValue(PersistentPrefs.KEY_WALLET_GUID, dataManager.wallet!!.guid)
+                prefs.walletGuid = dataManager.wallet!!.guid
                 prefs.setValue(PersistentPrefs.KEY_EMAIL_VERIFIED, true)
                 prefs.setValue(PersistentPrefs.KEY_ONBOARDING_COMPLETE, true)
                 view?.startPinEntryActivity()

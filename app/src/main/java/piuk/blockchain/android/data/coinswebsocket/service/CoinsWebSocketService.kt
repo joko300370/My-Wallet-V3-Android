@@ -13,12 +13,12 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.util.lifecycle.AppState
 import piuk.blockchain.android.util.lifecycle.LifecycleInterestedComponent
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 
 class CoinsWebSocketService(private val applicationContext: Context) : MessagesSocketHandler, KoinComponent {
 

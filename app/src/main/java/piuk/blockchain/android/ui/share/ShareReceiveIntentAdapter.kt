@@ -1,24 +1,22 @@
 package piuk.blockchain.android.ui.share
 
 import android.content.Context
+import android.content.Intent
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import kotlinx.android.synthetic.main.receive_share_row.view.*
-
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.customviews.toast
 
 internal class ShareReceiveIntentAdapter(private val paymentCodeData: List<SendPaymentCodeData>) :
     RecyclerView.Adapter<ShareReceiveIntentAdapter.ViewHolder>() {
 
     internal var itemClickedListener: () -> Unit = {}
-    private var context: Context? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        context = parent.context
-        val inflater = LayoutInflater.from(context)
+        val inflater = LayoutInflater.from(parent.context)
         val row = inflater.inflate(R.layout.receive_share_row, parent, false)
 
         return ViewHolder(row)
@@ -33,8 +31,16 @@ internal class ShareReceiveIntentAdapter(private val paymentCodeData: List<SendP
 
             rootView.setOnClickListener {
                 itemClickedListener()
-                context?.startActivity(data.intent)
+                attemptToStartTargetActivity(itemView.context, data.title, data.intent)
             }
+        }
+    }
+
+    private fun attemptToStartTargetActivity(ctx: Context, appName: String, intent: Intent) {
+        try {
+            ctx.startActivity(intent)
+        } catch (e: SecurityException) {
+            ctx.toast(ctx.getString(R.string.share_failed, appName))
         }
     }
 

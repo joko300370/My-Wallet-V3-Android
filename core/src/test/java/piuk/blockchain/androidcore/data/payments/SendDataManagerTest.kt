@@ -4,18 +4,23 @@ import com.blockchain.android.testutils.rxInit
 import com.blockchain.logging.LastTxUpdater
 import com.blockchain.testutils.bitcoin
 import com.blockchain.testutils.bitcoinCash
+import com.blockchain.testutils.satoshi
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.wallet.payload.data.XPub
+import info.blockchain.wallet.payload.data.XPubs
+import info.blockchain.wallet.payload.model.Utxo
+import info.blockchain.balance.CryptoValue
+import info.blockchain.wallet.keys.SigningKey
+import info.blockchain.wallet.payment.OutputType
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Single
 import org.amshove.kluent.shouldEqual
-import org.apache.commons.lang3.tuple.Pair
-import org.bitcoinj.core.ECKey
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -28,7 +33,8 @@ class SendDataManagerTest {
     private val mockPaymentService: PaymentService = mock()
     private val mockLastTxUpdater: LastTxUpdater = mock()
     private val mockRxBus: RxBus = mock()
-    private val useNewCoinSelection = false
+    private val targetOutputType = OutputType.P2PKH
+    private val changeOutputType = OutputType.P2PKH
 
     @get:Rule
     val initSchedulers = rxInit {
@@ -45,7 +51,7 @@ class SendDataManagerTest {
     fun `submitPayment BTC`() {
         // Arrange
         val mockOutputBundle: SpendableUnspentOutputs = mock()
-        val mockKeys = listOf(mock<ECKey>())
+        val mockKeys = listOf(mock<SigningKey>())
         val toAddress = "TO_ADDRESS"
         val changeAddress = "CHANGE_ADDRESS"
         val mockFee: BigInteger = mock()
@@ -90,7 +96,7 @@ class SendDataManagerTest {
     fun `submitPayment BTC successful even if logging last tx fails`() {
         // Arrange
         val mockOutputBundle: SpendableUnspentOutputs = mock()
-        val mockKeys = listOf(mock<ECKey>())
+        val mockKeys = listOf(mock<SigningKey>())
         val toAddress = "TO_ADDRESS"
         val changeAddress = "CHANGE_ADDRESS"
         val mockFee: BigInteger = mock()
@@ -135,7 +141,7 @@ class SendDataManagerTest {
     fun `submitPayment BCH`() {
         // Arrange
         val mockOutputBundle: SpendableUnspentOutputs = mock()
-        val mockKeys = listOf(mock<ECKey>())
+        val mockKeys = listOf(mock<SigningKey>())
         val toAddress = "TO_ADDRESS"
         val changeAddress = "CHANGE_ADDRESS"
         val mockFee: BigInteger = mock()
@@ -200,16 +206,20 @@ class SendDataManagerTest {
     fun `getUnspentOutputs BTC`() {
         // Arrange
         val address = "ADDRESS"
-        val mockUnspentOutputs: UnspentOutputs = mock()
-        whenever(mockPaymentService.getUnspentBtcOutputs(address))
-            .thenReturn(Observable.just(mockUnspentOutputs))
+        val xpub = XPub(address = address, derivation = XPub.Format.LEGACY)
+        val xpubs = XPubs(xpub)
+
+        val mockUnspentOutputs = listOf(mock<Utxo>())
+        whenever(mockPaymentService.getUnspentBtcOutputs(xpubs))
+            .thenReturn(Single.just(mockUnspentOutputs))
+
         // Act
-        val testObserver = subject.getUnspentBtcOutputs(address).test()
+        val testObserver = subject.getUnspentBtcOutputs(xpubs).test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         testObserver.values()[0] shouldEqual mockUnspentOutputs
-        verify(mockPaymentService).getUnspentBtcOutputs(address)
+        verify(mockPaymentService).getUnspentBtcOutputs(xpubs)
         verifyNoMoreInteractions(mockPaymentService)
     }
 
@@ -217,9 +227,9 @@ class SendDataManagerTest {
     fun `getUnspentOutputs BCH`() {
         // Arrange
         val address = "ADDRESS"
-        val mockUnspentOutputs: UnspentOutputs = mock()
+        val mockUnspentOutputs = listOf(mock<Utxo>())
         whenever(mockPaymentService.getUnspentBchOutputs(address))
-            .thenReturn(Observable.just(mockUnspentOutputs))
+            .thenReturn(Single.just(mockUnspentOutputs))
         // Act
         val testObserver = subject.getUnspentBchOutputs(address).test()
         // Assert
@@ -233,39 +243,45 @@ class SendDataManagerTest {
     @Test
     fun `get spendable coins btc, no replay protection`() {
         // Arrange
-        val unspent = UnspentOutputs()
+        val unspent = listOf(mock<Utxo>())
         val payment = 1.bitcoin()
         val fee = 1.toBigInteger()
         val outputs = SpendableUnspentOutputs()
         whenever(mockPaymentService.getSpendableCoins(
-            unspent, payment.toBigInteger(), fee, false, useNewCoinSelection)
+            unspent,
+            targetOutputType,
+            changeOutputType,
+            payment.toBigInteger(),
+            fee,
+            false)
         ).thenReturn(outputs)
         // Act
-        val result = subject.getSpendableCoins(unspent, payment, fee, useNewCoinSelection)
+        val result = subject
+            .getSpendableCoins(unspent, targetOutputType, changeOutputType, payment, fee.satoshi())
         // Assert
         result shouldEqual outputs
-        verify(mockPaymentService).getSpendableCoins(
-            unspent, payment.toBigInteger(), fee, false, useNewCoinSelection
-        )
+        verify(mockPaymentService)
+            .getSpendableCoins(unspent, targetOutputType, changeOutputType, payment.toBigInteger(), fee, false)
         verifyNoMoreInteractions(mockPaymentService)
     }
 
     @Test
     fun `get spendable coins bch, should add replay protection`() {
         // Arrange
-        val unspent = UnspentOutputs()
+        val unspent = listOf(mock<Utxo>())
         val payment = 1.bitcoinCash()
         val fee = 1.toBigInteger()
         val outputs = SpendableUnspentOutputs()
         whenever(mockPaymentService.getSpendableCoins(
-            unspent, payment.toBigInteger(), fee, true, useNewCoinSelection)
+            unspent, targetOutputType, changeOutputType, payment.toBigInteger(), fee, true)
         ).thenReturn(outputs)
         // Act
-        val result = subject.getSpendableCoins(unspent, payment, fee, useNewCoinSelection)
+        val result = subject
+            .getSpendableCoins(unspent, targetOutputType, changeOutputType, payment, fee.satoshi())
         // Assert
         result shouldEqual outputs
         verify(mockPaymentService).getSpendableCoins(
-            unspent, payment.toBigInteger(), fee, true, useNewCoinSelection
+            unspent, targetOutputType, changeOutputType, payment.toBigInteger(), fee, true
         )
         verifyNoMoreInteractions(mockPaymentService)
     }
@@ -273,40 +289,47 @@ class SendDataManagerTest {
     @Test
     fun `get sweepable btc, no replay protected`() {
         // Arrange
-        val unspent = UnspentOutputs()
+        val unspent = listOf(mock<Utxo>())
         val fee = 1.toBigInteger()
-        val sweepable = Pair.of(1.toBigInteger(), 1.toBigInteger())
-        whenever(mockPaymentService.getMaximumAvailable(unspent, fee, false, useNewCoinSelection))
+        val sweepable = Pair(2.toBigInteger(), 1.toBigInteger())
+        whenever(mockPaymentService.getMaximumAvailable(unspent, targetOutputType, fee, false))
             .thenReturn(sweepable)
         // Act
-        val result = subject.getMaximumAvailable(CryptoCurrency.BTC, unspent, fee, useNewCoinSelection)
+        val result = subject.getMaximumAvailable(CryptoCurrency.BTC, unspent, targetOutputType, fee.satoshi())
         // Assert
-        result shouldEqual sweepable
-        verify(mockPaymentService).getMaximumAvailable(unspent, fee, false, useNewCoinSelection)
+        result shouldEqual SendDataManager.MaxAvailable(
+            maxSpendable = CryptoValue.fromMinor(CryptoCurrency.BTC, sweepable.first),
+            forForMax = CryptoValue.fromMinor(CryptoCurrency.BTC, sweepable.second)
+        )
+
+        verify(mockPaymentService).getMaximumAvailable(unspent, targetOutputType, fee, false)
         verifyNoMoreInteractions(mockPaymentService)
     }
 
     @Test
     fun `get sweepable bch, should add replay protected`() {
         // Arrange
-        val unspent = UnspentOutputs()
+        val unspent = listOf(mock<Utxo>())
         val fee = 1.toBigInteger()
-        val sweepable = Pair.of(1.toBigInteger(), 1.toBigInteger())
-        whenever(mockPaymentService.getMaximumAvailable(unspent, fee, true, useNewCoinSelection))
+        val sweepable = Pair(2.toBigInteger(), 1.toBigInteger())
+        whenever(mockPaymentService.getMaximumAvailable(unspent, targetOutputType, fee, true))
             .thenReturn(sweepable)
         // Act
-        val result = subject.getMaximumAvailable(CryptoCurrency.BCH, unspent, fee, useNewCoinSelection)
+        val result = subject.getMaximumAvailable(CryptoCurrency.BCH, unspent, targetOutputType, fee.satoshi())
         // Assert
-        result shouldEqual sweepable
-        verify(mockPaymentService).getMaximumAvailable(unspent, fee, true, useNewCoinSelection)
+        result shouldEqual SendDataManager.MaxAvailable(
+            maxSpendable = CryptoValue.fromMinor(CryptoCurrency.BCH, sweepable.first),
+            forForMax = CryptoValue.fromMinor(CryptoCurrency.BCH, sweepable.second)
+        )
+        verify(mockPaymentService).getMaximumAvailable(unspent, targetOutputType, fee, true)
         verifyNoMoreInteractions(mockPaymentService)
     }
 
     @Test
     fun isAdequateFee() {
         // Arrange
-        val inputs = 1
-        val outputs = 101
+        val inputs = listOf<Utxo>(mock())
+        val outputs = (0..100).map { OutputType.P2PKH }
         val mockFee: BigInteger = mock()
         whenever(mockPaymentService.isAdequateFee(inputs, outputs, mockFee)).thenReturn(false)
         // Act
@@ -320,9 +343,9 @@ class SendDataManagerTest {
     @Test
     fun estimateSize() {
         // Arrange
-        val inputs = 1
-        val outputs = 101
-        val estimatedSize = 1337
+        val inputs = listOf<Utxo>(mock())
+        val outputs = (0..100).map { OutputType.P2PKH }
+        val estimatedSize = 1337.0
         whenever(mockPaymentService.estimateSize(inputs, outputs)).thenReturn(estimatedSize)
         // Act
         val result = subject.estimateSize(inputs, outputs)
@@ -335,8 +358,8 @@ class SendDataManagerTest {
     @Test
     fun estimateFee() {
         // Arrange
-        val inputs = 1
-        val outputs = 101
+        val inputs = listOf<Utxo>(mock())
+        val outputs = (0..100).map { OutputType.P2PKH }
         val mockFeePerKb: BigInteger = mock()
         val mockAbsoluteFee: BigInteger = mock()
         whenever(mockPaymentService.estimateFee(inputs, outputs, mockFeePerKb))

@@ -5,86 +5,90 @@ import org.junit.Test
 
 class WalletsAllNonArchivedAccountsAndAddressesExtensionTest {
 
-    private fun legacyAddressWithPrivateKey(address: String) =
-        LegacyAddress().also {
+    private fun importedAddressWithPrivateKey(address: String) =
+        ImportedAddress().also {
             it.privateKey = "PRIVATE_KEY"
             it.address = address
         }
 
     @Test
     fun `empty list`() {
-        Wallet().allNonArchivedAccountsAndAddresses() `should equal` emptySet()
+        Wallet().allNonArchivedAccountsAndAddresses() `should equal` emptyList()
     }
 
     @Test
     fun `one spendable`() {
-        Wallet().apply {
-            legacyAddressList.add(legacyAddressWithPrivateKey("Address1"))
-        }.allNonArchivedAccountsAndAddresses() `should equal` setOf("Address1")
+        val wallet = Wallet().apply {
+            importedAddressList.add(importedAddressWithPrivateKey("Address1"))
+        }
+
+        val result = wallet.allNonArchivedAccountsAndAddresses()
+        result `should equal` listOf("Address1")
     }
 
     @Test
     fun `one archived`() {
         Wallet().apply {
-            legacyAddressList.add(legacyAddressWithPrivateKey("Address1").apply { archive() })
-        }.allNonArchivedAccountsAndAddresses() `should equal` emptySet()
+            importedAddressList.add(importedAddressWithPrivateKey("Address1").apply { archive() })
+        }.allNonArchivedAccountsAndAddresses() `should equal` emptyList()
     }
 
     @Test
     fun `one without private key`() {
         Wallet().apply {
-            legacyAddressList.add(LegacyAddress().apply {
+            importedAddressList.add(ImportedAddress().apply {
                 address = "Address1"
             })
-        }.allNonArchivedAccountsAndAddresses() `should equal` setOf("Address1")
+        }.allNonArchivedAccountsAndAddresses() `should equal` listOf("Address1")
     }
 
     @Test
     fun `two spendable`() {
         Wallet().apply {
-            legacyAddressList.add(legacyAddressWithPrivateKey("Address1"))
-            legacyAddressList.add(legacyAddressWithPrivateKey("Address2"))
-        }.allNonArchivedAccountsAndAddresses() `should equal` setOf("Address1", "Address2")
+            importedAddressList.add(importedAddressWithPrivateKey("Address1"))
+            importedAddressList.add(importedAddressWithPrivateKey("Address2"))
+        }.allNonArchivedAccountsAndAddresses() `should equal` listOf("Address1", "Address2")
     }
 
     @Test
     fun `repeated address`() {
         Wallet().apply {
-            legacyAddressList.add(legacyAddressWithPrivateKey("Address1"))
-            legacyAddressList.add(legacyAddressWithPrivateKey("Address1"))
-        }.allNonArchivedAccountsAndAddresses() `should equal` setOf("Address1")
+            importedAddressList.add(importedAddressWithPrivateKey("Address1"))
+            importedAddressList.add(importedAddressWithPrivateKey("Address1"))
+        }.allNonArchivedAccountsAndAddresses() `should equal` listOf("Address1")
     }
 
     @Test
     fun `one xpub`() {
         Wallet().apply {
-            hdWallets = listOf(hdWallet("XPub1"))
-        }.allNonArchivedAccountsAndAddresses() `should equal` setOf("XPub1")
+            walletBody = walletBody("XPub1")
+        }.allNonArchivedAccountsAndAddresses() `should equal` listOf("XPub1")
     }
 
     @Test
     fun `two xpubs`() {
         Wallet().apply {
-            hdWallets = listOf(hdWallet("XPub1", "XPub2"))
-        }.allNonArchivedAccountsAndAddresses() `should equal` setOf("XPub1", "XPub2")
+            walletBody = walletBody("XPub1", "XPub2")
+        }.allNonArchivedAccountsAndAddresses() `should equal` listOf("XPub1", "XPub2")
     }
 
     @Test
     fun `repeated xpubs`() {
         Wallet().apply {
-            hdWallets = listOf(hdWallet("XPub1", "XPub1"))
-        }.allNonArchivedAccountsAndAddresses() `should equal` setOf("XPub1")
+            walletBody = walletBody("XPub1", "XPub1")
+        }.allNonArchivedAccountsAndAddresses() `should equal` listOf("XPub1")
     }
 
     @Test
     fun `two xpubs, two spendable address and two non-spendable`() {
         Wallet().apply {
-            hdWallets = listOf(hdWallet("XPub1", "XPub2"))
-            legacyAddressList.add(legacyAddressWithPrivateKey("Address1"))
-            legacyAddressList.add(legacyAddressWithPrivateKey("Address2"))
-            legacyAddressList.add(LegacyAddress().also { it.address = "Address3" })
-            legacyAddressList.add(legacyAddressWithPrivateKey("Address4").apply { archive() })
-        }.allNonArchivedAccountsAndAddresses() `should equal` setOf(
+            walletBody = walletBody("XPub1", "XPub2")
+            importedAddressList.add(importedAddressWithPrivateKey("Address1"))
+            importedAddressList.add(importedAddressWithPrivateKey("Address2"))
+            importedAddressList.add(
+                ImportedAddress().also { it.address = "Address3" })
+            importedAddressList.add(importedAddressWithPrivateKey("Address4").apply { archive() })
+        }.allNonArchivedAccountsAndAddresses() `should equal` listOf(
             "XPub1",
             "XPub2",
             "Address1",
@@ -93,12 +97,12 @@ class WalletsAllNonArchivedAccountsAndAddressesExtensionTest {
         )
     }
 
-    private fun hdWallet(vararg xpubs: String) =
-        HDWallet().apply {
+    private fun walletBody(vararg xpubs: String) =
+        WalletBody().apply {
             accounts = xpubs.map {
-                Account().apply {
-                    xpub = it
-                }
+                AccountV3(
+                    legacyXpub = it
+                )
             }
         }
 }

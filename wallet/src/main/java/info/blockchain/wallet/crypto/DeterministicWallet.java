@@ -4,11 +4,12 @@ import com.google.common.collect.ImmutableList;
 
 import info.blockchain.wallet.exceptions.DeterministicWalletException;
 import info.blockchain.wallet.util.HexUtils;
+import info.blockchain.wallet.bch.CashAddress;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
-import org.bitcoinj.core.Address;
 import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.LegacyAddress;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.core.Utils;
 import org.bitcoinj.crypto.ChildNumber;
@@ -18,9 +19,6 @@ import org.bitcoinj.crypto.HDUtils;
 import org.bitcoinj.crypto.LinuxSecureRandom;
 import org.bitcoinj.crypto.MnemonicCode;
 import org.bitcoinj.crypto.MnemonicException;
-import org.bitcoinj.crypto.MnemonicException.MnemonicChecksumException;
-import org.bitcoinj.crypto.MnemonicException.MnemonicLengthException;
-import org.bitcoinj.crypto.MnemonicException.MnemonicWordException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,10 +63,6 @@ public abstract class DeterministicWallet implements DeterministicNode {
      *
      * @param coinPath
      * @param passphrase
-     * @throws MnemonicLengthException
-     * @throws MnemonicWordException
-     * @throws MnemonicChecksumException
-     * @throws IOException
      */
     public DeterministicWallet(NetworkParameters params, String coinPath, int mnemonicLength, String passphrase) {
         this.entropy = generateSecureRandomNumber(mnemonicLength);
@@ -81,11 +75,6 @@ public abstract class DeterministicWallet implements DeterministicNode {
      * @param coinPath
      * @param entropyHex
      * @param passphrase
-     * @throws MnemonicLengthException
-     * @throws MnemonicWordException
-     * @throws MnemonicChecksumException
-     * @throws IOException
-     * @throws DecoderException
      */
     public DeterministicWallet(NetworkParameters params, String coinPath, String entropyHex, String passphrase) {
 
@@ -103,10 +92,6 @@ public abstract class DeterministicWallet implements DeterministicNode {
      * @param coinPath
      * @param mnemonic
      * @param passphrase
-     * @throws MnemonicLengthException
-     * @throws MnemonicWordException
-     * @throws MnemonicChecksumException
-     * @throws IOException
      */
     public DeterministicWallet(NetworkParameters params, String coinPath, List<String> mnemonic, String passphrase) {
 
@@ -256,10 +241,6 @@ public abstract class DeterministicWallet implements DeterministicNode {
 
     /**
      * DeterministicAddress corresponding to given account index and address index.
-     *
-     * @param accountIndex
-     * @param addressIndex
-     * @return
      */
     public ECKey getChangeECKeyAt(int accountIndex, int addressIndex) {
         return accounts.get(accountIndex).getChains().get(DeterministicChain.CHANGE_CHAIN)
@@ -274,21 +255,21 @@ public abstract class DeterministicWallet implements DeterministicNode {
     // TODO: 01/02/2018 The below receive/change address strings are coin specific - Consider abstracting
     protected String getReceiveBase58AddressAt(int accountIndex, int addressIndex) {
         ECKey key = getReceiveECKeyAt(accountIndex, addressIndex);
-        return key.toAddress(params).toBase58();
+        return LegacyAddress.fromKey(params, key).toBase58();
     }
 
     protected String getChangeBase58AddressAt(int accountIndex, int addressIndex) {
         ECKey key = getChangeECKeyAt(accountIndex, addressIndex);
-        return key.toAddress(params).toBase58();
+        return LegacyAddress.fromKey(params, key).toBase58();
     }
 
     public String getReceiveCashAddressAt(int accountIndex, int addressIndex) {
         ECKey key = getReceiveECKeyAt(accountIndex, addressIndex);
-        return key.toAddress(params).toCashAddress();
+        return CashAddress.fromLegacyAddress(LegacyAddress.fromKey(params, key));
     }
 
     public String getChangeCashAddressAt(int accountIndex, int addressIndex) {
         ECKey key = getChangeECKeyAt(accountIndex, addressIndex);
-        return key.toAddress(params).toCashAddress();
+        return CashAddress.fromLegacyAddress(LegacyAddress.fromKey(params, key));
     }
 }

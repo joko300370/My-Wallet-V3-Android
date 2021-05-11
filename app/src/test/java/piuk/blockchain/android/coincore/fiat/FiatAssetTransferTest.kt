@@ -2,11 +2,8 @@ package piuk.blockchain.android.coincore.fiat
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.repositories.AssetBalancesRepository
-import com.blockchain.swap.nabu.models.nabu.KycTierLevel
-import com.blockchain.swap.nabu.models.nabu.KycTiers
-import com.blockchain.swap.nabu.service.TierService
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.repositories.AssetBalancesRepository
 import com.blockchain.wallet.DefaultLabels
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
@@ -33,26 +30,19 @@ class FiatAssetTransferTest {
     private val exchangeRateDataManager: ExchangeRateDataManager = mock()
     private val custodialWalletManager: CustodialWalletManager = mock()
     private val currencyPrefs: CurrencyPrefs = mock()
-    private val tier: KycTiers = mock()
-
-    private val tierService: TierService = mock {
-        on { tiers() }.then { Single.just(tier) }
-    }
 
     private val subject = FiatAsset(
         labels,
         assetBalancesRepository,
         exchangeRateDataManager,
         custodialWalletManager,
-        tierService,
         currencyPrefs
     )
 
     @Test
     fun transferListForCustodialSource() {
-        whenever(tier.isApprovedFor(KycTierLevel.GOLD)).thenReturn(true)
         whenever(currencyPrefs.selectedFiatCurrency).thenReturn(SELECTED_FIAT)
-        whenever(custodialWalletManager.getSupportedFundsFiats(any(), any()))
+        whenever(custodialWalletManager.getSupportedFundsFiats(any()))
             .thenReturn(Single.just(FIAT_ACCOUNT_LIST))
 
         whenever(labels.getDefaultCustodialFiatWalletLabel(any())).thenReturn(DEFAULT_LABEL)
@@ -64,7 +54,7 @@ class FiatAssetTransferTest {
             .assertNoErrors()
             .assertComplete()
             .assertValue { list ->
-                list.size == 2
+                list.isEmpty()
             }
     }
 

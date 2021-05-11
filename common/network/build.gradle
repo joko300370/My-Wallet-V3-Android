@@ -17,6 +17,7 @@ dependencies {
     implementation Libraries.retrofitJacksonConverter
     implementation Libraries.retrofitRxJavaAdapter
     implementation Libraries.retrofitRxMoshiConverter
+    implementation Libraries.jacksonKotlin
 
     implementation Libraries.timber
 
@@ -25,7 +26,6 @@ dependencies {
     // Testing
     testImplementation Libraries.junit
     testImplementation Libraries.mockito
-    testImplementation Libraries.json
     testImplementation Libraries.kluent
     testImplementation Libraries.koinTest
     testImplementation Libraries.okHttpMock

@@ -1,18 +1,19 @@
 package piuk.blockchain.android.ui.dashboard.announcements
 
-import com.blockchain.swap.nabu.datamanagers.NabuDataManager
-import com.blockchain.swap.nabu.models.nabu.Scope
-import com.blockchain.swap.nabu.NabuToken
-import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.models.nabu.KycTierLevel
-import com.blockchain.swap.nabu.models.nabu.KycTiers
-import com.blockchain.swap.nabu.models.nabu.UserCampaignState
-import com.blockchain.swap.nabu.service.TierService
+import com.blockchain.nabu.datamanagers.NabuDataManager
+import com.blockchain.nabu.models.responses.nabu.Scope
+import com.blockchain.nabu.NabuToken
+import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.models.responses.nabu.KycTierLevel
+import com.blockchain.nabu.models.responses.nabu.KycTiers
+import com.blockchain.nabu.models.responses.nabu.UserCampaignState
+import com.blockchain.nabu.service.TierService
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.campaign.blockstackCampaignName
+import piuk.blockchain.android.identity.Feature
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 
@@ -21,7 +22,8 @@ class AnnouncementQueries(
     private val settings: SettingsDataManager,
     private val nabu: NabuDataManager,
     private val tierService: TierService,
-    private val sbStateFactory: SimpleBuySyncFactory
+    private val sbStateFactory: SimpleBuySyncFactory,
+    private val userIdentity: UserIdentity
 ) {
     // Attempt to figure out if KYC/swap etc is allowed based on location...
     fun canKyc(): Single<Boolean> {
@@ -59,6 +61,17 @@ class AnnouncementQueries(
             .onErrorReturn { false }
     }
 
+    fun isSimplifiedDueDiligenceEligibleAndNotVerified(): Single<Boolean> =
+        userIdentity.isEligibleFor(Feature.SimplifiedDueDiligence).flatMap {
+            if (!it)
+                Single.just(false)
+            else
+                userIdentity.isVerifiedFor(Feature.SimplifiedDueDiligence).map { verified -> verified.not() }
+        }
+
+    fun isSimplifiedDueDiligenceVerified(): Single<Boolean> =
+        userIdentity.isVerifiedFor(Feature.SimplifiedDueDiligence)
+
     fun hasReceivedStxAirdrop(): Single<Boolean> {
         return nabuToken.fetchNabuToken()
             .flatMap { token -> nabu.getAirdropCampaignStatus(token) }
@@ -76,13 +89,6 @@ class AnnouncementQueries(
         }
     }
 
-    fun isSimpleBuyTransactionPending(): Single<Boolean> {
-        return Single.just(
-            sbStateFactory.currentState()?.order?.orderState == OrderState.AWAITING_FUNDS &&
-                    sbStateFactory.currentState()?.selectedPaymentMethod?.isBank() == true
-        )
-    }
-
     private fun hasSelectedToAddNewCard(): Single<Boolean> =
         Single.defer {
             sbStateFactory.currentState()?.let {
@@ -92,7 +98,8 @@ class AnnouncementQueries(
 
     fun isKycGoldVerifiedAndHasPendingCardToAdd(): Single<Boolean> =
         tierService.tiers().map { it.isApprovedFor(KycTierLevel.GOLD) }.zipWith(
-            hasSelectedToAddNewCard()) { isGold, addNewCard ->
+            hasSelectedToAddNewCard()
+        ) { isGold, addNewCard ->
             isGold && addNewCard
         }
 }

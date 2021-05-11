@@ -39,13 +39,13 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="@dimen/standard_margin"
                     android:layout_marginBottom="16dp"
-                    android:hint="@string/recovery_passphrase">
+                    android:hint="@string/recovery_passphrase_1">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/field_passphrase"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:contentDescription="@string/recovery_passphrase"
+                        android:contentDescription="@string/recovery_passphrase_1"
                         android:imeOptions="actionGo"
                         android:inputType="textNoSuggestions|textVisiblePassword"
                         android:maxLines="1"

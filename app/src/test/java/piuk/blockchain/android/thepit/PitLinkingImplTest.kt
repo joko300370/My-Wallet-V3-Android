@@ -3,10 +3,11 @@ package piuk.blockchain.android.thepit
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.annotations.CommonCode
 import com.blockchain.sunriver.XlmDataManager
-import com.blockchain.swap.nabu.NabuToken
-import com.blockchain.swap.nabu.datamanagers.NabuDataManager
-import com.blockchain.swap.nabu.models.nabu.NabuUser
-import com.blockchain.swap.nabu.models.tokenresponse.NabuOfflineTokenResponse
+import com.blockchain.nabu.NabuToken
+import com.blockchain.nabu.datamanagers.NabuDataManager
+import com.blockchain.nabu.models.responses.nabu.NabuUser
+import com.blockchain.nabu.models.responses.tokenresponse.NabuOfflineTokenResponse
+import com.blockchain.sunriver.XlmAccountReference
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.nhaarman.mockito_kotlin.doAnswer
@@ -15,7 +16,6 @@ import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.balance.AccountReference
 import info.blockchain.wallet.payload.data.Account
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -275,7 +275,7 @@ class PitLinkingImplTest {
     }
 
     private fun xlmManagerReturnsGoodAddress() {
-        val mockXlmAccount: AccountReference.Xlm = mock()
+        val mockXlmAccount: XlmAccountReference = mock()
         whenever(mockXlmAccount.accountId).thenReturn(XLM_ACCOUNT_ADDRESS)
         whenever(xlmDataManager.defaultAccount()).thenReturn(Single.just(mockXlmAccount))
     }
@@ -298,7 +298,7 @@ class PitLinkingImplTest {
     }
 
     private fun xlmManagerFailsWhenReturningAddress() {
-        val mockXlmAccount: AccountReference.Xlm = mock()
+        val mockXlmAccount: XlmAccountReference = mock()
         whenever(mockXlmAccount.accountId).thenReturn(XLM_ACCOUNT_ADDRESS)
         whenever(xlmDataManager.defaultAccount()).thenReturn(Single.error(Throwable("surprise!")))
     }
@@ -320,7 +320,7 @@ class PitLinkingImplTest {
     }
 
     private fun xlmManagerReturnsEmptyAddress() {
-        val mockXlmAccount: AccountReference.Xlm = mock()
+        val mockXlmAccount: XlmAccountReference = mock()
         whenever(mockXlmAccount.accountId).thenReturn("")
         whenever(xlmDataManager.defaultAccount()).thenReturn(Single.just(mockXlmAccount))
     }

@@ -1,5 +1,7 @@
 package info.blockchain.wallet.api;
 
+import java.util.Map;
+
 import info.blockchain.wallet.api.data.Settings;
 import info.blockchain.wallet.api.data.SignedToken;
 import info.blockchain.wallet.api.data.Status;
@@ -18,8 +20,6 @@ import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
-import java.util.Map;
-
 public interface WalletExplorerEndpoints {
 
     @FormUrlEncoded
@@ -28,6 +28,14 @@ public interface WalletExplorerEndpoints {
             @Field("method") String method,
             @Field("guid") String guid,
             @Field("sharedKey") String sharedKey,
+            @Field("payload") String payload,
+            @Field("length") int length,
+            @Field("api_code") String apiCode);
+
+    @FormUrlEncoded
+    @POST("wallet")
+    Observable<ResponseBody> postSecureChannel(
+            @Field("method") String method,
             @Field("payload") String payload,
             @Field("length") int length,
             @Field("api_code") String apiCode);
@@ -91,6 +99,7 @@ public interface WalletExplorerEndpoints {
             @Field("payload") String payload,
             @Field("length") int length,
             @Field("checksum") String checksum,
+            @Field("active") String active,
             @Field("email") String email,
             @Field("device") String device,
             @Field("old_checksum") String old_checksum,
@@ -140,4 +149,7 @@ public interface WalletExplorerEndpoints {
             @Query("fields") String fields,
             @Query("partner") String partner,
             @Query("api_code") String apiCode);
+
+    @GET("wallet/get-ip")
+    Single<WalletApi.IPResponse> getExternalIP();
 }

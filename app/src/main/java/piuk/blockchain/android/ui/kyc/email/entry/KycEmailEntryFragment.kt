@@ -1,154 +1,164 @@
 package piuk.blockchain.android.ui.kyc.email.entry
 
+import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
-import android.text.TextUtils
-import android.util.Patterns
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.notifications.analytics.KYCAnalyticsEvents
-import piuk.blockchain.android.ui.kyc.extensions.skipFirstUnless
-import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
-import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
-import piuk.blockchain.android.ui.kyc.navigate
-import com.blockchain.ui.extensions.throttledClicks
-import com.jakewharton.rxbinding2.widget.afterTextChangeEvents
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.Observables
-import io.reactivex.rxkotlin.plusAssign
 import org.koin.android.ext.android.inject
+import piuk.blockchain.android.EmailVerificationArgs
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcoreui.ui.base.BaseFragment
-import com.blockchain.ui.dialog.MaterialProgressDialog
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.ParentActivityDelegate
-import piuk.blockchain.androidcoreui.utils.extensions.getTextString
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.toast
-import java.util.concurrent.TimeUnit
-import kotlinx.android.synthetic.main.fragment_kyc_add_email.button_kyc_email_next as buttonNext
-import kotlinx.android.synthetic.main.fragment_kyc_add_email.edit_text_kyc_email as editTextEmail
-import kotlinx.android.synthetic.main.fragment_kyc_add_email.input_layout_kyc_email as inputLayoutEmail
+import piuk.blockchain.android.databinding.FragmentKycAddEmailBinding
+import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.base.mvi.MviFragment
+import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
+import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.visibleIf
+import piuk.blockchain.androidcore.data.settings.Email
 
-class KycEmailEntryFragment : BaseFragment<KycEmailEntryView, KycEmailEntryPresenter>(),
-    KycEmailEntryView {
+class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, EmailVeriffState>(),
+    SlidingModalBottomDialog.Host, ResendOrChangeEmailBottomSheet.ResendOrChangeEmailHost {
 
-    private val presenter: KycEmailEntryPresenter by scopedInject()
-    private val analytics: Analytics by inject()
-    private val progressListener: KycProgressListener by ParentActivityDelegate(this)
-    private val compositeDisposable = CompositeDisposable()
-    private val emailObservable
-        get() = editTextEmail.afterTextChangeEvents()
-            .skipInitialValue()
-            .debounce(300, TimeUnit.MILLISECONDS)
-            .observeOn(AndroidSchedulers.mainThread())
-            .map { editTextEmail.getTextString() }
+    private val emailEntryHost: EmailEntryHost by ParentActivityDelegate(
+        this
+    )
+    private val stringUtils: StringUtils by inject()
 
-    override val uiStateObservable: Observable<Pair<String, Unit>>
-        get() = Observables.combineLatest(
-            emailObservable.cache(),
-            buttonNext.throttledClicks()
-        ).doOnNext {
-            analytics.logEvent(KYCAnalyticsEvents.EmailUpdateButtonClicked)
-        }
+    private val emailMustBeValidated by lazy {
+        if (arguments?.containsKey("mustBeValidated") == true)
+            EmailVerificationArgs.fromBundle(arguments ?: Bundle()).mustBeValidated
+        else false
+    }
 
-    private var progressDialog: MaterialProgressDialog? = null
+    private var _binding: FragmentKycAddEmailBinding? = null
+
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = container?.inflate(R.layout.fragment_kyc_add_email)
+    ): View {
+        _binding = FragmentKycAddEmailBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        progressListener.setHostTitle(R.string.kyc_email_title)
-        progressListener.incrementProgress(KycStep.EmailPage)
+        emailEntryHost.onEmailEntryFragmentShown()
 
-        editTextEmail.setOnFocusChangeListener { _, hasFocus ->
-            inputLayoutEmail.hint = if (hasFocus) {
-                getString(R.string.kyc_email_hint_focused)
-            } else {
-                getString(R.string.kyc_email_hint_unfocused)
-            }
+        if (emailMustBeValidated && savedInstanceState == null) {
+            model.process(EmailVeriffIntent.ResendEmail)
         }
-
-        onViewReady()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        compositeDisposable +=
-            editTextEmail
-                .onDelayedChange(KycStep.EmailEntered)
-                .subscribe()
-    }
-
-    override fun onPause() {
-        compositeDisposable.clear()
-        super.onPause()
-    }
-
-    override fun preFillEmail(email: String) {
-        editTextEmail.setText(email)
-    }
-
-    override fun showErrorToast(message: Int) {
-        toast(message, ToastCustom.TYPE_ERROR)
-    }
-
-    override fun continueSignUp(email: String) {
-        navigate(KycEmailEntryFragmentDirections.actionValidateEmail(email))
-    }
-
-    override fun showProgressDialog() {
-        progressDialog = MaterialProgressDialog(requireContext()).apply {
-            setOnCancelListener { presenter.onProgressCancelled() }
-            setMessage(R.string.kyc_country_selection_please_wait)
-            show()
+        model.process(EmailVeriffIntent.StartEmailVerification)
+        binding.skip.setOnClickListener {
+            emailEntryHost.onEmailVerificationSkipped()
         }
     }
 
-    override fun dismissProgressDialog() {
-        progressDialog?.apply { dismiss() }
-        progressDialog = null
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
-    private fun TextView.onDelayedChange(
-        kycStep: KycStep
-    ): Observable<Boolean> =
-        this.afterTextChangeEvents()
-            .debounce(300, TimeUnit.MILLISECONDS)
-            .map { it.editable()?.toString() ?: "" }
-            .skipFirstUnless { it.isNotEmpty() }
-            .observeOn(AndroidSchedulers.mainThread())
-            .map { mapToCompleted(it) }
-            .distinctUntilChanged()
-            .doOnNext {
-                updateProgress(it, kycStep)
-                buttonNext.isEnabled = it
-            }
+    override val model: EmailVeriffModel by scopedInject()
 
-    private fun mapToCompleted(text: String): Boolean = emailIsValid(text)
-
-    private fun updateProgress(stepCompleted: Boolean, kycStep: KycStep) {
-        if (stepCompleted) {
-            progressListener.incrementProgress(kycStep)
+    override fun render(newState: EmailVeriffState) {
+        if (newState.email.verified) {
+            drawVerifiedEmailUi()
         } else {
-            progressListener.decrementProgress(kycStep)
+            drawUnVerifiedEmailUi(newState.email)
         }
     }
 
-    override fun createPresenter(): KycEmailEntryPresenter = presenter
+    private fun drawVerifiedEmailUi() {
+        binding.emailInstructions.text = getString(R.string.success_email_veriff)
+        binding.emailStatusText.text = getString(R.string.email_verified)
+        binding.skip.gone()
+        binding.txStateIndicator.setImageResource(R.drawable.ic_check_circle)
+        binding.txStateIndicator.visible()
+        binding.ctaPrimary.apply {
+            visible()
+            text = getString(R.string.next)
+            setOnClickListener {
+                emailEntryHost.onEmailVerified()
+            }
+        }
+        binding.ctaSecondary.gone()
+    }
 
-    override fun getMvpView(): KycEmailEntryView = this
+    private fun drawUnVerifiedEmailUi(email: Email) {
+        val boldText = email.address.takeIf { it.isNotEmpty() } ?: return
+        val partOne = getString(R.string.email_verification_part_1)
+        val partTwo = getString(R.string.email_verification_part_2)
+        val sb = SpannableStringBuilder()
+            .append(partOne)
+            .append(boldText)
+            .append(partTwo)
+
+        sb.setSpan(
+            StyleSpan(Typeface.BOLD),
+            partOne.length,
+            partOne.length + boldText.length,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        with(binding) {
+            emailInstructions.setText(sb, TextView.BufferType.SPANNABLE)
+            emailStatusText.text = getString(R.string.email_verify)
+            skip.visibleIf { !emailMustBeValidated }
+            txStateIndicator.gone()
+            ctaPrimary.apply {
+                visible()
+                text = getString(R.string.check_my_inbox)
+                setOnClickListener {
+                    openInbox()
+                }
+            }
+            ctaSecondary.apply {
+                visible()
+                text = getString(R.string.did_not_get_email)
+                setOnClickListener {
+                    model.process(EmailVeriffIntent.CancelEmailVerification)
+                    ResendOrChangeEmailBottomSheet().show(childFragmentManager, BOTTOM_SHEET)
+                }
+            }
+        }
+    }
+
+    private fun openInbox() {
+        val intent = Intent(Intent.ACTION_MAIN)
+        intent.addCategory(Intent.CATEGORY_APP_EMAIL)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(Intent.createChooser(intent, getString(R.string.security_centre_email_check)))
+    }
+
+    override fun resendEmail() {
+        model.process(EmailVeriffIntent.ResendEmail)
+    }
+
+    override fun editEmail() {
+        EditEmailAddressBottomSheet().show(childFragmentManager, BOTTOM_SHEET)
+    }
+
+    override fun onSheetClosed() {
+        model.process(EmailVeriffIntent.StartEmailVerification)
+    }
+
+    companion object {
+        const val BOTTOM_SHEET = "BOTTOM_SHEET"
+    }
 }
 
-private fun emailIsValid(target: String) =
-    !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches()
+interface EmailEntryHost {
+    fun onEmailEntryFragmentShown()
+    fun onEmailVerified()
+    fun onEmailVerificationSkipped()
+}

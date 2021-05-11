@@ -36,17 +36,7 @@ private val formatterMap: MutableMap<Locale, CryptoCurrencyFormatter> = Concurre
 private fun getFormatter(locale: Locale) =
     formatterMap.getOrPut(locale) { CryptoCurrencyFormatter(locale) }
 
-internal class CryptoCurrencyFormatter(locale: Locale) {
-    private val btcFormat = createCryptoDecimalFormat(locale, CryptoCurrency.BTC.dp)
-    private val bchFormat = createCryptoDecimalFormat(locale, CryptoCurrency.BCH.dp)
-    private val ethFormat = createCryptoDecimalFormat(locale, CryptoCurrency.ETHER.dp)
-    private val ethShortFormat = createCryptoDecimalFormat(locale, CryptoCurrency.ETHER.userDp)
-    private val xlmFormat = createCryptoDecimalFormat(locale, CryptoCurrency.XLM.dp)
-    private val paxShortFormat = createCryptoDecimalFormat(locale, CryptoCurrency.PAX.userDp)
-    private val paxFormat = createCryptoDecimalFormat(locale, CryptoCurrency.PAX.dp)
-    private val stxFormat = createCryptoDecimalFormat(locale, CryptoCurrency.STX.dp)
-    private val algFormat = createCryptoDecimalFormat(locale, CryptoCurrency.ALGO.dp)
-    private val usdtFormat = createCryptoDecimalFormat(locale, CryptoCurrency.USDT.dp)
+private class CryptoCurrencyFormatter(private val locale: Locale) {
 
     fun format(
         cryptoValue: CryptoValue,
@@ -63,22 +53,8 @@ internal class CryptoCurrencyFormatter(locale: Locale) {
             cryptoValue.currency.displayTicker
         )
 
-    private fun CryptoCurrency.decimalFormat(displayMode: FormatPrecision) = when (this) {
-        CryptoCurrency.BTC -> btcFormat
-        CryptoCurrency.BCH -> bchFormat
-        CryptoCurrency.ETHER -> when (displayMode) {
-            FormatPrecision.Short -> ethShortFormat
-            FormatPrecision.Full -> ethFormat
-        }
-        CryptoCurrency.XLM -> xlmFormat
-        CryptoCurrency.PAX -> when (displayMode) {
-            FormatPrecision.Short -> paxShortFormat
-            FormatPrecision.Full -> paxFormat
-        }
-        CryptoCurrency.STX -> stxFormat
-        CryptoCurrency.ALGO -> algFormat
-        CryptoCurrency.USDT -> usdtFormat
-    }
+    private fun CryptoCurrency.decimalFormat(displayMode: FormatPrecision) =
+        createCryptoDecimalFormat(locale, if (displayMode == FormatPrecision.Short) this.userDp else this.dp)
 
     private fun DecimalFormat.formatWithUnit(value: BigDecimal, symbol: String) =
         "${formatWithoutUnit(value)} $symbol"

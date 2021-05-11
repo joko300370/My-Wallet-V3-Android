@@ -6,11 +6,18 @@ import io.reactivex.functions.Function;
 import io.reactivex.internal.schedulers.TrampolineScheduler;
 import io.reactivex.plugins.RxJavaPlugins;
 import okhttp3.OkHttpClient;
-import org.bitcoinj.core.NetworkParameters;
-import org.bitcoinj.params.BitcoinCashMainNetParams;
-import org.bitcoinj.params.BitcoinMainNetParams;
+
+import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -27,15 +34,9 @@ public abstract class MockedResponseTest {
 
     private FrameworkInterface frameworkInterface(final OkHttpClient okHttpClient) {
         return new FrameworkInterface() {
-
             @Override
             public Retrofit getRetrofitApiInstance() {
                 return getRetrofit("https://api.staging.blockchain.info/", okHttpClient);
-            }
-
-            @Override
-            public Retrofit getRetrofitExplorerInstance() {
-                return getRetrofit("https://explorer.staging.blockchain.info/", okHttpClient);
             }
 
             @Override
@@ -43,20 +44,9 @@ public abstract class MockedResponseTest {
                 return Environment.STAGING;
             }
 
+            @NotNull
             @Override
-            public NetworkParameters getBitcoinParams() {
-                return BitcoinMainNetParams.get();
-            }
-
-            @Override
-            public NetworkParameters getBitcoinCashParams() {
-                return BitcoinCashMainNetParams.get();
-            }
-
-            @Override
-            public String getApiCode() {
-                return null;
-            }
+            public String getApiCode() { return "API_CODE"; }
 
             @Override
             public String getDevice() {
@@ -100,19 +90,28 @@ public abstract class MockedResponseTest {
         BlockchainFramework.init(null);
     }
 
-    private OkHttpClient newOkHttpClient() {
+    OkHttpClient newOkHttpClient() {
         return new OkHttpClient.Builder()
                 .addInterceptor(mockInterceptor)//Mock responses
                 .addInterceptor(new ApiInterceptor())//Extensive logging
                 .build();
     }
 
-    private Retrofit getRetrofit(String url, OkHttpClient client) {
+    Retrofit getRetrofit(String url, OkHttpClient client) {
         return new Retrofit.Builder()
                 .baseUrl(url)
                 .client(client)
                 .addConverterFactory(JacksonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
+    }
+
+    protected String loadResourceContent(String resourceFile) {
+        try {
+            URI uri = getClass().getClassLoader().getResource(resourceFile).toURI();
+            return new String(Files.readAllBytes(Paths.get(uri)), StandardCharsets.UTF_8);
+        } catch (URISyntaxException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

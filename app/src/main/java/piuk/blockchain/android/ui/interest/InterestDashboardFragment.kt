@@ -8,10 +8,10 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.models.nabu.KycTierLevel
-import com.blockchain.swap.nabu.models.nabu.KycTiers
-import com.blockchain.swap.nabu.service.TierService
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.models.responses.nabu.KycTierLevel
+import com.blockchain.nabu.models.responses.nabu.KycTiers
+import com.blockchain.nabu.service.TierService
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -21,13 +21,17 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_interest_dashboard.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.SingleAccount
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.visible
 import timber.log.Timber
 
 class InterestDashboardFragment : Fragment() {
@@ -41,17 +45,19 @@ class InterestDashboardFragment : Fragment() {
 
     val host: InterestDashboardHost by lazy {
         activity as? InterestDashboardHost ?: throw IllegalStateException(
-            "Host fragment is not a InterestDashboardFragment.InterestDashboardHost")
+            "Host fragment is not a InterestDashboardFragment.InterestDashboardHost"
+        )
     }
 
     private val disposables = CompositeDisposable()
     private val custodialWalletManager: CustodialWalletManager by scopedInject()
     private val kycTierService: TierService by scopedInject()
     private val coincore: Coincore by scopedInject()
+    private val assetResources: AssetResources by scopedInject()
 
     private val listAdapter: InterestDashboardAdapter by lazy {
         InterestDashboardAdapter(
-            coincore = coincore,
+            assetResources = assetResources,
             disposables = disposables,
             custodialWalletManager = custodialWalletManager,
             verificationClicked = ::startKyc,
@@ -96,6 +102,11 @@ class InterestDashboardFragment : Fragment() {
                         Timber.e("Error loading interest summary details $it")
                     }
                 )
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        disposables.clear()
     }
 
     private fun renderInterestDetails(
@@ -145,15 +156,10 @@ class InterestDashboardFragment : Fragment() {
             if (hasBalance) {
                 host.showInterestSummarySheet(interestAccount, cryptoCurrency)
             } else {
-                disposables += coincore[cryptoCurrency].accountGroup(AssetFilter.NonCustodial)
-                    .subscribe { ncg ->
-                        if (ncg.accounts.size > 1) {
-                            host.startAccountSelection(Single.just(ncg.accounts), interestAccount)
-                        } else {
-                            val defaultNonCustodial = ncg.accounts.first { acc -> acc.isDefault }
-                            host.startDepositFlow(defaultNonCustodial, interestAccount)
-                        }
-                    }
+                TransactionFlow(
+                    target = it.accounts.first(),
+                    action = AssetAction.InterestDeposit
+                ).startFlow(parentFragmentManager, activity as DialogFlow.FlowHost)
             }
         }
     }

@@ -2,7 +2,7 @@ apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
 
 jacoco {
-    toolVersion = '0.8.1'
+    toolVersion = '0.8.6'
 }
 
 tasks.withType(Test) {
@@ -53,10 +53,10 @@ task testCoverage(type: JacocoReport, dependsOn: "testEnvProdDebugUnitTest") {
             "src/main/java"
     ]
 
-    classDirectories = files([javaDebugTree], [kotlinDebugTree])
-    additionalSourceDirs = files(coverageSourceDirs)
-    sourceDirectories = files(coverageSourceDirs)
-    executionData = fileTree(dir: "$project.buildDir", includes: ["jacoco/*.exec"])
+    getClassDirectories().setFrom(files([javaDebugTree], [kotlinDebugTree]))
+    getAdditionalClassDirs().setFrom(files(coverageSourceDirs))
+    getSourceDirectories().setFrom(files(coverageSourceDirs))
+    getExecutionData().setFrom(fileTree(dir: "$project.buildDir", includes: ["jacoco/*.exec"]))
 
     reports {
         xml.enabled = true

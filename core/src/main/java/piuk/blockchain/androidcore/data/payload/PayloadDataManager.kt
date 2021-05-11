@@ -1,16 +1,23 @@
 package piuk.blockchain.androidcore.data.payload
 
-import info.blockchain.api.data.Balance
-import info.blockchain.balance.CryptoCurrency
+import com.blockchain.annotations.MoveCandidate
+import info.blockchain.api.BitcoinApi
 import info.blockchain.balance.CryptoValue
-import info.blockchain.wallet.exceptions.ApiException
+import info.blockchain.wallet.bip44.HDWalletFactory
 import info.blockchain.wallet.exceptions.DecryptionException
 import info.blockchain.wallet.exceptions.HDWalletException
+import info.blockchain.wallet.keys.MasterKey
+import info.blockchain.wallet.keys.SigningKey
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.payload.data.Account
-import info.blockchain.wallet.payload.data.LegacyAddress
+import info.blockchain.wallet.payload.data.Derivation
+import info.blockchain.wallet.payload.data.ImportedAddress
 import info.blockchain.wallet.payload.data.Wallet
+import info.blockchain.wallet.payload.data.XPub
+import info.blockchain.wallet.payload.data.XPubs
+import info.blockchain.wallet.payload.model.Balance
+import info.blockchain.wallet.payment.OutputType
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import info.blockchain.wallet.stx.STXAccount
 import info.blockchain.wallet.util.PrivateKeyFactory
@@ -18,34 +25,33 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.exceptions.Exceptions
 import io.reactivex.schedulers.Schedulers
-import org.bitcoinj.core.ECKey
+import org.bitcoinj.core.AddressFormatException
+import org.bitcoinj.core.LegacyAddress
 import org.bitcoinj.core.NetworkParameters
-import org.bitcoinj.crypto.DeterministicKey
-import org.spongycastle.crypto.InvalidCipherTextException
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
+import org.bitcoinj.core.SegwitAddress
+import org.bitcoinj.params.MainNetParams
+import org.bitcoinj.script.Script
 import piuk.blockchain.androidcore.data.metadata.MetadataCredentials
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.utils.RefreshUpdater
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
-import piuk.blockchain.androidcore.utils.rxjava.IgnorableDefaultObserver
-import java.io.IOException
-import java.io.UnsupportedEncodingException
 import java.math.BigInteger
-import java.util.ArrayList
 import java.util.LinkedHashMap
 
-class PayloadDataManager(
+class PayloadDataManager internal constructor(
     private val payloadService: PayloadService,
+    private val bitcoinApi: BitcoinApi,
+    @MoveCandidate("Move this down to the PayloadManager layer, with the other crypto tools")
     private val privateKeyFactory: PrivateKeyFactory,
     private val payloadManager: PayloadManager,
-    environmentConfig: EnvironmentConfig,
     rxBus: RxBus
 ) {
 
     private val rxPinning: RxPinning = RxPinning(rxBus)
-    private val networkParameters = environmentConfig.bitcoinNetworkParameters
+
     val metadataCredentials: MetadataCredentials?
         get() = tempPassword?.let {
             MetadataCredentials(guid, sharedKey, it)
@@ -56,29 +62,33 @@ class PayloadDataManager(
     // /////////////////////////////////////////////////////////////////////////
 
     val accounts: List<Account>
-        get() = wallet?.hdWallets?.get(0)?.accounts ?: emptyList()
+        get() = wallet?.walletBody?.accounts ?: emptyList()
 
-    var legacyAddresses: List<LegacyAddress>
-        get() = wallet?.legacyAddressList ?: emptyList()
+    val accountCount: Int
+        get() = wallet?.walletBody?.accounts?.size ?: 0
+
+    var importedAddresses: List<ImportedAddress>
+        get() = wallet?.importedAddressList?.filter { !it.isWatchOnly() } ?: emptyList()
         set(addresses) {
-            wallet!!.legacyAddressList = addresses
+            wallet!!.importedAddressList = addresses
         }
 
-    val legacyAddressStringList: List<String>
-        get() = wallet?.legacyAddressStringList ?: emptyList()
+    val importedAddressStringList: List<String>
+        get() = wallet?.importedAddressStringList ?: emptyList()
 
     val wallet: Wallet?
         get() = payloadManager.payload
 
     val defaultAccountIndex: Int
-        get() = wallet?.hdWallets?.get(0)?.defaultAccountIdx ?: 0
+        get() = wallet?.walletBody?.defaultAccountIdx ?: 0
 
     val defaultAccount: Account
-        get() = wallet!!.hdWallets[0].getAccount(defaultAccountIndex)
+        get() = wallet!!.walletBody?.getAccount(defaultAccountIndex) ?: throw NoSuchElementException()
 
     val payloadChecksum: String?
         get() = payloadManager.payloadChecksum
 
+    // Can be null if the user is not currently logged in and has no pin set
     var tempPassword: String?
         get() = payloadManager.tempPassword
         set(password) {
@@ -93,22 +103,18 @@ class PayloadDataManager(
 
     val stxAccount: STXAccount
         get() {
-            val hdWallets = payloadManager.payload?.hdWallets
+            val hdWallet = payloadManager.payload?.walletBody
                 ?: throw IllegalStateException("Wallet not available")
 
-            return hdWallets[0].stxAccount
+            return hdWallet.stxAccount
                 ?: throw IllegalStateException("Wallet not available")
         }
 
     val isBackedUp: Boolean
-        get() = (
-            payloadManager.payload != null &&
-                payloadManager.payload!!.hdWallets != null &&
-                payloadManager.payload!!.hdWallets[0].isMnemonicVerified
-            )
+        get() = payloadManager.isWalletBackedUp
 
     val mnemonic: List<String>
-        get() = payloadManager.payload!!.hdWallets[0].mnemonic
+        get() = payloadManager.payload!!.walletBody?.mnemonic ?: throw NoSuchElementException()
 
     val guid: String
         get() = wallet!!.guid
@@ -116,8 +122,11 @@ class PayloadDataManager(
     val sharedKey: String
         get() = wallet!!.sharedKey
 
-    val masterKey: DeterministicKey
+    val masterKey: MasterKey
         get() = payloadManager.masterKey()
+
+    val isWalletUpgradeRequired: Boolean
+        get() = payloadManager.isV3UpgradeRequired || payloadManager.isV4UpgradeRequired
 
     // /////////////////////////////////////////////////////////////////////////
     // AUTH METHODS
@@ -134,7 +143,7 @@ class PayloadDataManager(
      */
     fun initializeFromPayload(payload: String, password: String): Completable =
         rxPinning.call {
-            payloadService.initializeFromPayload(networkParameters, payload, password)
+            payloadService.initializeFromPayload(payload, password)
         }.applySchedulers()
 
     /**
@@ -152,14 +161,28 @@ class PayloadDataManager(
         walletName: String,
         email: String,
         password: String
-    ): Observable<Wallet> = rxPinning.call<Wallet> {
-        payloadService.restoreHdWallet(
-            mnemonic,
-            walletName,
-            email,
-            password
-        )
-    }.applySchedulers()
+    ): Single<Wallet> = rxPinning.callSingle {
+            payloadService.restoreHdWallet(
+                mnemonic,
+                walletName,
+                email,
+                password
+            )
+        }.applySchedulers()
+
+    /**
+     * Retrieves a  master key from a 12 word mnemonic
+     */
+    fun generateMasterKeyFromSeed(
+        recoveryPhrase: String
+    ): MasterKey = HDWalletFactory.restoreWallet(
+        HDWalletFactory.Language.US,
+        recoveryPhrase,
+        "",
+        1,
+        // masterKey is independent from the derivation purpose
+        Derivation.SEGWIT_BECH32_PURPOSE
+    ).masterKey
 
     /**
      * Creates a new HD wallet and Blockchain.info account.
@@ -169,9 +192,13 @@ class PayloadDataManager(
      * @param email The user's email address, preferably not associated with another account
      * @return An [Observable] wrapping a [Wallet] object
      */
-    fun createHdWallet(password: String, walletName: String, email: String): Observable<Wallet> =
-        rxPinning.call<Wallet> { payloadService.createHdWallet(password, walletName, email) }
-            .applySchedulers()
+    fun createHdWallet(
+        password: String,
+        walletName: String,
+        email: String
+    ): Single<Wallet> = rxPinning.callSingle {
+        payloadService.createHdWallet(password, walletName, email)
+    }.applySchedulers()
 
     /**
      * Fetches the user's wallet payload, and then initializes and decrypts a payload using the
@@ -184,7 +211,7 @@ class PayloadDataManager(
      */
     fun initializeAndDecrypt(sharedKey: String, guid: String, password: String): Completable =
         rxPinning.call {
-            payloadService.initializeAndDecrypt(networkParameters, sharedKey, guid, password)
+            payloadService.initializeAndDecrypt(sharedKey, guid, password)
         }.applySchedulers()
 
     /**
@@ -194,7 +221,7 @@ class PayloadDataManager(
      * @return A [Completable] object
      */
     fun handleQrCode(data: String): Completable =
-        rxPinning.call { payloadService.handleQrCode(networkParameters, data) }
+        rxPinning.call { payloadService.handleQrCode(data) }
             .applySchedulers()
 
     /**
@@ -205,9 +232,21 @@ class PayloadDataManager(
      * @param defaultAccountName A required name for the default account
      * @return A [Completable] object
      */
-    fun upgradeV2toV3(secondPassword: String?, defaultAccountName: String): Completable =
-        rxPinning.call { payloadService.upgradeV2toV3(secondPassword, defaultAccountName) }
-            .applySchedulers()
+    fun upgradeWalletPayload(secondPassword: String?, defaultAccountName: String): Completable =
+        rxPinning.call {
+            Completable.fromCallable {
+                if (payloadManager.isV3UpgradeRequired) {
+                    if (!payloadManager.upgradeV2PayloadToV3(secondPassword, defaultAccountName)) {
+                        throw Exceptions.propagate(Throwable("Upgrade wallet failed"))
+                    }
+                }
+                if (payloadManager.isV4UpgradeRequired) {
+                    if (!payloadManager.upgradeV3PayloadToV4(secondPassword)) {
+                        throw Exceptions.propagate(Throwable("Upgrade wallet failed"))
+                    }
+                }
+            }
+        }.applySchedulers()
 
     // /////////////////////////////////////////////////////////////////////////
     // SYNC METHODS
@@ -244,7 +283,6 @@ class PayloadDataManager(
      * effects.
      *
      * @return A [Completable] object
-     * @see IgnorableDefaultObserver
      */
     fun updateAllTransactions(): Completable =
         rxPinning.call { payloadService.updateAllTransactions() }
@@ -255,7 +293,6 @@ class PayloadDataManager(
      * returns no value, and is used to call functions that return void but have side effects.
      *
      * @return A [Completable] object
-     * @see IgnorableDefaultObserver
      */
     fun updateAllBalances(): Completable =
         rxPinning.call { payloadService.updateAllBalances() }
@@ -277,36 +314,23 @@ class PayloadDataManager(
     // /////////////////////////////////////////////////////////////////////////
 
     /**
-     * Returns a [LinkedHashMap] of [Balance] objects keyed to their addresses.
-     *
-     * @param addresses A List of addresses as Strings
-     * @return A [LinkedHashMap]
-     */
-    fun getBalanceOfBtcAddresses(
-        addresses: List<String>
-    ): Observable<LinkedHashMap<String, Balance>> =
-        rxPinning.call<LinkedHashMap<String, Balance>> {
-            payloadService.getBalanceOfBtcAddresses(addresses)
-        }.applySchedulers()
-
-    /**
      * Returns a [LinkedHashMap] of [Balance] objects keyed to their Bitcoin Cash
      * addresses.
      *
-     * @param addresses A List of Bitcoin cash addresses as Strings
+     * @param xpubs A List of Bitcoin cash accounts
      * @return A [LinkedHashMap]
      */
-    fun getBalanceOfBchAddresses(
-        addresses: List<String>
-    ): Observable<LinkedHashMap<String, Balance>> =
-        rxPinning.call<LinkedHashMap<String, Balance>> {
-            payloadService.getBalanceOfBchAddresses(addresses)
+    fun getBalanceOfBchAccounts(
+        xpubs: List<XPubs>
+    ): Observable<Map<String, Balance>> =
+        rxPinning.call<Map<String, Balance>> {
+            payloadService.getBalanceOfBchAccounts(xpubs)
         }.applySchedulers()
 
     /**
      * Converts any address to a label.
      *
-     * @param address Accepts account receive or change chain address, as well as legacy address.
+     * @param address Accepts account receive or change chain address, as well as imported address.
      * @return Either the label associated with the address, or the original address
      */
     fun addressToLabel(address: String): String = payloadManager.getLabelFromAddress(address)
@@ -329,18 +353,28 @@ class PayloadDataManager(
      * @return An [Observable] wrapping the receive address
      */
     fun getNextReceiveAddress(account: Account): Observable<String> =
-        Observable.fromCallable { payloadManager.getNextReceiveAddress(account) }
-            .subscribeOn(Schedulers.computation())
-            .observeOn(AndroidSchedulers.mainThread())
+        Observable.fromCallable {
+            payloadManager.getNextReceiveAddress(
+                account
+            )
+        }.subscribeOn(Schedulers.computation())
+        .observeOn(AndroidSchedulers.mainThread())
 
     /**
-     * Returns the position of the next Receive address for a given [Account]
+     * Allows you to generate a receive address at an arbitrary number of positions on the chain
+     * from the next valid unused address. For example, the passing 5 as the position will generate
+     * an address which correlates with the next available address + 5 positions.
      *
-     * @param account The [Account] for which you want an address to be found
-     * @return The position of the next receive address
+     * @param account The [Account] you wish to generate an address from
+     * @param position Represents how many positions on the chain beyond what is already used that
+     * you wish to generate
+     * @return A bitcoin address
      */
-    fun getNextReceiveAddressPosition(account: Account): Int =
-        payloadManager.getPositionOfNextReceiveAddress(account)
+    fun getReceiveAddressAtPosition(account: Account, position: Int): String? =
+        payloadManager.getReceiveAddressAtPosition(
+            account,
+            position
+        )
 
     /**
      * Returns the next Receive address for a given [Account]
@@ -352,23 +386,13 @@ class PayloadDataManager(
     fun getNextReceiveAddressAndReserve(accountIndex: Int, label: String): Observable<String> {
         val account = accounts[accountIndex]
         return Observable.fromCallable {
-            payloadManager.getNextReceiveAddressAndReserve(account, label)
+            payloadManager.getNextReceiveAddressAndReserve(
+                account,
+                label
+            )
         }.subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
     }
-
-    /**
-     * Returns the next Receive address for a given [Account]
-     *
-     * @param account The account for which you want an address to be generated
-     * @param label Label used to reserve address
-     * @return An [Observable] wrapping the receive address
-     */
-    fun getNextReceiveAddressAndReserve(account: Account, label: String): Observable<String> =
-        Observable.fromCallable {
-            payloadManager.getNextReceiveAddressAndReserve(account, label)
-        }.subscribeOn(Schedulers.computation())
-            .observeOn(AndroidSchedulers.mainThread())
 
     /**
      * Returns the next Change address for a given account index.
@@ -388,29 +412,24 @@ class PayloadDataManager(
      * @return An [Observable] wrapping the receive address
      */
     fun getNextChangeAddress(account: Account): Observable<String> =
-        Observable.fromCallable { payloadManager.getNextChangeAddress(account) }
-            .subscribeOn(Schedulers.computation())
-            .observeOn(AndroidSchedulers.mainThread())
+        Observable.fromCallable {
+            payloadManager.getNextChangeAddress(
+                account
+            )
+        }.subscribeOn(Schedulers.computation())
+        .observeOn(AndroidSchedulers.mainThread())
 
     /**
-     * Returns an [ECKey] for a given [LegacyAddress], optionally with a second password
+     * Returns an [SigningKey] for a given [ImportedAddress], optionally with a second password
      * should the private key be encrypted.
      *
-     * @param legacyAddress The [LegacyAddress] to generate an Elliptic Curve Key for
-     * @param secondPassword An optional second password, necessary if the private key is ebcrypted
-     * @return An Elliptic Curve Key object [ECKey]
-     * @throws UnsupportedEncodingException Thrown if the private key is formatted incorrectly
-     * @throws DecryptionException Thrown if the supplied password is wrong
-     * @throws InvalidCipherTextException Thrown if there's an issue decrypting the private key
-     * @see LegacyAddress.isPrivateKeyEncrypted
+     * @param importedAddress The [ImportedAddress] to generate an Elliptic Curve Key for
+     * @param secondPassword An optional second password, necessary if the private key is encrypted
+     * @return An Elliptic Curve Key object [SigningKey]
+     * @see ImportedAddress.isPrivateKeyEncrypted
      */
-    @Throws(
-        UnsupportedEncodingException::class,
-        DecryptionException::class,
-        InvalidCipherTextException::class
-    )
-    fun getAddressECKey(legacyAddress: LegacyAddress, secondPassword: String?): ECKey? =
-        payloadManager.getAddressECKey(legacyAddress, secondPassword)
+    fun getAddressSigningKey(importedAddress: ImportedAddress, secondPassword: String?): SigningKey? =
+        payloadManager.getAddressSigningKey(importedAddress, secondPassword)
 
     /**
      * Derives new [Account] from the master seed
@@ -421,62 +440,60 @@ class PayloadDataManager(
      */
     fun createNewAccount(accountLabel: String, secondPassword: String?): Observable<Account> =
         rxPinning.call<Account> {
-            payloadService.createNewAccount(networkParameters, accountLabel, secondPassword)
+            payloadService.createNewAccount(accountLabel, secondPassword)
         }.applySchedulers()
 
     /**
-     * Sets a private key for an associated [LegacyAddress] which is already in the [ ] as a watch only address
+     * Add a private key for a [ImportedAddress]
      *
-     * @param key An [ECKey]
+     * @param key An [SigningKey]
      * @param secondPassword An optional double encryption password
      * @return An [Observable] representing a successful save
      */
-    fun setKeyForLegacyAddress(key: ECKey, secondPassword: String?): Observable<LegacyAddress> =
-        rxPinning.call<LegacyAddress> {
-            payloadService.setKeyForLegacyAddress(key, secondPassword)
+    fun addImportedAddressFromKey(key: SigningKey, secondPassword: String?): Single<ImportedAddress> =
+        rxPinning.call<ImportedAddress> {
+            payloadService.setKeyForImportedAddress(key, secondPassword)
         }.applySchedulers()
+            .singleOrError()
 
     /**
-     * Allows you to add a [LegacyAddress] to the [Wallet]
+     * Allows you to propagate changes to a [ImportedAddress] through the [Wallet]
      *
-     * @param legacyAddress The new address
+     * @param importedAddress The updated address
      * @return A [Completable] object representing a successful save
      */
-    fun addLegacyAddress(legacyAddress: LegacyAddress): Completable =
-        rxPinning.call { payloadService.addLegacyAddress(legacyAddress) }
-            .applySchedulers()
-
-    /**
-     * Allows you to propagate changes to a [LegacyAddress] through the [Wallet]
-     *
-     * @param legacyAddress The updated address
-     * @return A [Completable] object representing a successful save
-     */
-    fun updateLegacyAddress(legacyAddress: LegacyAddress): Completable =
-        rxPinning.call { payloadService.updateLegacyAddress(legacyAddress) }
+    fun updateImportedAddress(importedAddress: ImportedAddress): Completable =
+        rxPinning.call { payloadService.updateImportedAddress(importedAddress) }
             .applySchedulers()
 
     /**
      * Returns an Elliptic Curve key for a given private key
      *
-     * @param format The format of the private key
-     * @param data The private key from which to derive the ECKey
-     * @return An [ECKey]
+     * @param keyFormat The format of the private key
+     * @param keyData The private key from which to derive the SigningKey
+     * @return An [SigningKey]
      * @see PrivateKeyFactory
      */
-    fun getKeyFromImportedData(format: String, data: String): Observable<ECKey> =
-        Observable.fromCallable { privateKeyFactory.getKey(format, data) }
-            .applySchedulers()
+    fun getKeyFromImportedData(keyFormat: String, keyData: String): Single<SigningKey> =
+        Single.fromCallable {
+            privateKeyFactory.getKeyFromImportedData(keyFormat, keyData, bitcoinApi)
+        }.applySchedulers()
+
+    fun getBip38KeyFromImportedData(keyData: String, keyPassword: String): Single<SigningKey> =
+        Single.fromCallable {
+            privateKeyFactory.getBip38Key(keyData, keyPassword)
+        }.applySchedulers()
 
     /**
      * Returns the balance of an address. If the address isn't found in the address map object, the
-     * method will return [CryptoValue.ZeroBtc] instead of a null object.
+     * method will return CryptoValue.Zero(Btc) instead of a null object.
      *
-     * @param address The address whose balance you wish to query
+     * @param xpub The address whose balance you wish to query
      * @return A [CryptoValue] representing the total funds in the address
      */
-    fun getAddressBalance(address: String): CryptoValue =
-        CryptoValue.fromMinor(CryptoCurrency.BTC, payloadManager.getAddressBalance(address))
+
+    fun getAddressBalance(xpub: XPubs): CryptoValue =
+        payloadManager.getAddressBalance(xpub)
 
     // Update if timeout of forceRefresh, get the balance - pull the code from ActivityCache/BtcCoinLikeToken
     private val balanceUpdater = RefreshUpdater<CryptoValue>(
@@ -484,36 +501,13 @@ class PayloadDataManager(
     )
 
     fun getAddressBalanceRefresh(
-        address: String,
+        address: XPubs,
         forceRefresh: Boolean = false
     ): Single<CryptoValue> =
         balanceUpdater.get(
             fnFetch = { getAddressBalance(address) },
             force = forceRefresh
         )
-
-    /**
-     * Allows you to generate a receive address at an arbitrary number of positions on the chain
-     * from the next valid unused address. For example, the passing 5 as the position will generate
-     * an address which correlates with the next available address + 5 positions.
-     *
-     * @param account The [Account] you wish to generate an address from
-     * @param position Represents how many positions on the chain beyond what is already used that
-     * you wish to generate
-     * @return A bitcoin address
-     */
-    fun getReceiveAddressAtPosition(account: Account, position: Int): String? =
-        payloadManager.getReceiveAddressAtPosition(account, position)
-
-    /**
-     * Allows you to get an address from any given point on the receive chain.
-     *
-     * @param account The [Account] you wish to generate an address from
-     * @param position What position on the chain the address you wish to create is
-     * @return A bitcoin address
-     */
-    fun getReceiveAddressAtArbitraryPosition(account: Account, position: Int): String? =
-        payloadManager.getReceiveAddressAtArbitraryPosition(account, position)
 
     /**
      * Updates the balance of the address as well as that of the entire wallet. To be called after a
@@ -523,7 +517,6 @@ class PayloadDataManager(
      * @param spentAmount The spent amount as a long
      * @throws Exception Thrown if the address isn't found
      */
-    @Throws(Exception::class)
     fun subtractAmountFromAddressBalance(address: String, spentAmount: Long) {
         payloadManager.subtractAmountFromAddressBalance(address, BigInteger.valueOf(spentAmount))
     }
@@ -555,16 +548,6 @@ class PayloadDataManager(
     fun getXpubFromAddress(address: String): String? = payloadManager.getXpubFromAddress(address)
 
     /**
-     * Returns an xPub from a given [Account] index. This call is not index-safe, ie will
-     * throw an [IndexOutOfBoundsException] if you choose an index which is greater than the
-     * size of the Accounts list.
-     *
-     * @param index The index of the Account
-     * @return An xPub as a String
-     */
-    fun getXpubFromIndex(index: Int): String = payloadManager.getXpubFromAccountIndex(index)
-
-    /**
      * Returns true if the supplied address belongs to the user's wallet.
      *
      * @param address The address you want to query as a String
@@ -577,17 +560,7 @@ class PayloadDataManager(
     // /////////////////////////////////////////////////////////////////////////
 
     fun getAccount(accountPosition: Int): Account =
-        wallet!!.hdWallets[0].getAccount(accountPosition)
-
-    fun getAccountForXPub(xPub: String): Account {
-        return accounts.firstOrNull { it.xpub == xPub }
-            ?: throw NullPointerException("Account not found for XPub")
-    }
-
-    @Throws(
-        IOException::class,
-        ApiException::class
-    )
+        wallet!!.walletBody?.getAccount(accountPosition) ?: throw NoSuchElementException()
 
     fun getAccountTransactions(xpub: String?, limit: Int, offset: Int):
         Single<List<TransactionSummary>> =
@@ -604,85 +577,76 @@ class PayloadDataManager(
     fun getTransactionNotes(txHash: String): String? = payloadManager.payload!!.txNotes[txHash]
 
     /**
-     * Returns a list of [ECKey] objects for signing transactions.
+     * Returns a list of [SigningKey] objects for signing transactions.
      *
      * @param account The [Account] that you wish to send funds from
      * @param unspentOutputBundle A [SpendableUnspentOutputs] bundle for a given Account
-     * @return A list of [ECKey] objects
-     * @throws Exception Will be thrown if there are issues with the private keys
+     * @return A list of [SigningKey] objects
      */
-    @Throws(Exception::class)
     fun getHDKeysForSigning(
         account: Account,
         unspentOutputBundle: SpendableUnspentOutputs
-    ): List<ECKey> = wallet!!
-        .hdWallets[0]
-        .getHDKeysForSigning(account, unspentOutputBundle)
+    ): List<SigningKey> =
+        wallet!!.walletBody?.getHDKeysForSigning(
+            account,
+            unspentOutputBundle
+        ) ?: throw NoSuchElementException()
 
     // /////////////////////////////////////////////////////////////////////////
     // HELPER METHODS
     // /////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Returns the index for an [Account], assuming that the supplied position was gotten from
-     * a list of only those Accounts which are active.
-     *
-     * @param position The position of the [Account] that you want to select from a list of
-     * active Accounts
-     * @return The position of the [Account] within the full list of Accounts
-     */
-    fun getPositionOfAccountFromActiveList(position: Int): Int {
-        val accounts = accounts
-        var adjustedPosition = 0
-        for (i in accounts.indices) {
-            val account = accounts[i]
-            if (!account.isArchived) {
-                if (position == adjustedPosition) {
-                    return i
-                }
-                adjustedPosition++
-            }
-        }
-
-        return 0
-    }
-
-    /**
-     * Returns the index for an [Account] in a list of active-only Accounts, where the
-     * supplied `accountIndex` is the position of the Account in the full list of both active
-     * and archived Accounts.
-     *
-     * @param accountIndex The position of an [Account] in the full list of Accounts
-     * @return The Account's position within a list of active-only Accounts. Will be -1 if you
-     * attempt to find the position of an archived Account
-     */
-    fun getPositionOfAccountInActiveList(accountIndex: Int): Int {
-        // Filter accounts by active
-        val activeAccounts = ArrayList<Account>()
-        val accounts = accounts
-        for (i in accounts.indices) {
-            val account = accounts[i]
-            if (!account.isArchived) {
-                activeAccounts.add(account)
-            }
-        }
-
-        // Find corrected position
-        return activeAccounts.indexOf(accounts[accountIndex])
+    fun setDefaultIndex(defaultIndex: Int) {
+        wallet!!.walletBody?.defaultAccountIdx = defaultIndex
     }
 
     fun validateSecondPassword(secondPassword: String?): Boolean =
         payloadManager.validateSecondPassword(secondPassword)
 
-    @Deprecated(
-        "This seems to be always called with bitcoin network parameters, just use other overload")
-    @Throws(Exception::class)
-    fun decryptHDWallet(networkParameters: NetworkParameters, secondPassword: String?) {
-        payloadManager.payload!!.decryptHDWallet(networkParameters, 0, secondPassword)
+    fun decryptHDWallet(secondPassword: String?) {
+        payloadManager.payload!!.decryptHDWallet(secondPassword)
     }
 
-    @Throws(Exception::class)
-    fun decryptHDWallet(secondPassword: String?) {
-        decryptHDWallet(networkParameters, secondPassword)
+    fun getXpubFormatOutputType(format: XPub.Format): OutputType {
+        return when (format == XPub.Format.SEGWIT) {
+            true -> OutputType.P2WPKH
+            else -> OutputType.P2PKH
+        }
+    }
+
+    fun getAddressOutputType(address: String): OutputType {
+        val networkParam = MainNetParams.get()
+
+        // Fallback to legacy type for fee calculation
+        return getSegwitOutputTypeFromAddress(address, networkParam)
+            ?: getLegacyOutputTypeFromAddress(address, networkParam)
+            ?: OutputType.P2PKH
+    }
+
+    private fun getSegwitOutputTypeFromAddress(address: String, networkParam: NetworkParameters): OutputType? {
+        return try {
+            // `SegwitAddress.getOutputScriptType()` returns either P2WPKH or P2WSH
+            val segwitAddress = SegwitAddress.fromBech32(networkParam, address)
+            when (segwitAddress.outputScriptType == Script.ScriptType.P2WSH) {
+                true -> OutputType.P2WSH
+                else -> OutputType.P2WPKH
+            }
+        } catch (ignored: AddressFormatException) {
+            null
+        }
+    }
+
+    private fun getLegacyOutputTypeFromAddress(address: String, networkParam: NetworkParameters): OutputType? {
+        return try {
+            val legacyAddress = LegacyAddress.fromBase58(networkParam, address)
+            when (legacyAddress.p2sh) {
+                true -> OutputType.P2SH
+                else -> OutputType.P2PKH
+            }
+        } catch (ignored: AddressFormatException) {
+            null
+        }
     }
 }
+
+private fun ImportedAddress.isWatchOnly() = privateKey == null

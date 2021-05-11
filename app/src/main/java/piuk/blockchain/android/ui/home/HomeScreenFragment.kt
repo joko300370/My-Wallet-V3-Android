@@ -4,13 +4,14 @@ import androidx.fragment.app.Fragment
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.BlockchainAccount
-import piuk.blockchain.android.ui.base.MvpFragment
-import piuk.blockchain.android.ui.base.MvpPresenter
-import piuk.blockchain.android.ui.base.MvpView
+import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.simplebuy.SimpleBuyState
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
+import piuk.blockchain.android.ui.linkbank.BankLinkingInfo
+import piuk.blockchain.android.ui.sell.BuySellFragment
 
 interface HomeScreenFragment {
     fun navigator(): HomeNavigator
@@ -20,15 +21,17 @@ interface HomeScreenFragment {
 interface HomeNavigator {
     fun gotoDashboard()
 
-    fun launchSwapOrKyc(targetCurrency: CryptoCurrency? = null, fromCryptoCurrency: CryptoCurrency? = null)
+    fun tryTolaunchSwap(
+        sourceAccount: CryptoAccount? = null,
+        targetAccount: CryptoAccount? = null
+    )
+
     fun launchSwap(
-        defCurrency: String,
-        fromCryptoCurrency: CryptoCurrency? = null,
-        toCryptoCurrency: CryptoCurrency? = null
+        sourceAccount: CryptoAccount? = null,
+        targetAccount: CryptoAccount? = null
     )
 
     fun launchKyc(campaignType: CampaignType)
-    fun launchKycIntro()
     fun launchThePitLinking(linkId: String = "")
     fun launchThePit()
     fun launchBackupFunds(fragment: Fragment? = null, requestCode: Int = 0)
@@ -37,21 +40,18 @@ interface HomeNavigator {
     fun launchSetupFingerprintLogin()
     fun launchTransfer()
     fun launchIntroTour()
+    fun launchSimpleBuySell(viewType: BuySellFragment.BuySellViewType = BuySellFragment.BuySellViewType.TYPE_BUY)
+    fun launchOpenBankingLinking(bankLinkingInfo: BankLinkingInfo)
+    fun launchSimpleBuyFromDeepLinkApproval()
+    fun handlePaymentForCancelledOrder(state: SimpleBuyState)
+    fun showOpenBankingDeepLinkError()
 
     fun gotoActivityFor(account: BlockchainAccount?)
-    fun goToWithdraw(currency: String)
     fun goToTransfer()
 
     fun resumeSimpleBuyKyc()
     fun startSimpleBuy(cryptoCurrency: CryptoCurrency)
-    fun startSell()
     fun startInterestDashboard()
-}
-
-abstract class HomeScreenMvpFragment<V : MvpView, P : MvpPresenter<V>> : MvpFragment<V, P>(), HomeScreenFragment {
-
-    override fun navigator(): HomeNavigator =
-        (activity as? HomeNavigator) ?: throw IllegalStateException("Parent must implement HomeNavigator")
 }
 
 abstract class HomeScreenMviFragment<M : MviModel<S, I>, I : MviIntent<S>, S : MviState> : MviFragment<M, I, S>(),

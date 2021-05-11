@@ -1,35 +1,30 @@
 package info.blockchain.wallet.payment;
 
-import info.blockchain.api.data.UnspentOutput;
-import info.blockchain.api.data.UnspentOutputs;
+import info.blockchain.api.BitcoinApi;
 import info.blockchain.wallet.MockedResponseTest;
-import org.apache.commons.lang3.tuple.Pair;
+import info.blockchain.wallet.payload.model.Utxo;
+import info.blockchain.wallet.util.LoaderUtilKt;
+import kotlin.Pair;
+
 import org.junit.Test;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 public final class PaymentReplayProtectionTest extends MockedResponseTest {
 
-    private Payment subject = new Payment();
+    final BitcoinApi mockApi = mock(BitcoinApi.class);
+    private final Payment subject = new Payment(mockApi);
 
-    private boolean addReplayProtection = true;
-    private boolean useNewCoinSelection = true;
-
-    private String getTestData(String file) throws Exception {
-        URI uri = getClass().getClassLoader().getResource(file).toURI();
-        return new String(Files.readAllBytes(Paths.get(uri)), Charset.forName("utf-8"));
-    }
+    private final OutputType targetOutputType = OutputType.P2PKH;
+    private final OutputType changeOutputType = OutputType.P2PKH;
+    private final boolean addReplayProtection = true;
 
     private long calculateFee(int outputs, int inputs, BigInteger feePerKb) {
         // Manually calculated fee
@@ -40,44 +35,52 @@ public final class PaymentReplayProtectionTest extends MockedResponseTest {
 
     @Test
     public void getMaximumAvailable_simple() {
-        UnspentOutputs unspentOutputs = new UnspentOutputs();
-
-        ArrayList<UnspentOutput> list = new ArrayList<>();
-        UnspentOutput coin = new UnspentOutput();
-        coin.setValue(BigInteger.valueOf(1323));
-        list.add(coin);
-        unspentOutputs.setUnspentOutputs(list);
+        ArrayList<Utxo> unspentOutputs = new ArrayList<>();
+        Utxo coin = new Utxo(
+            BigInteger.valueOf(1323),
+            "",
+            "",
+            0,
+            true,
+            null,
+             false,
+            false
+        );
+        unspentOutputs.add(coin);
 
         BigInteger feePerKb = BigInteger.valueOf(1000);
 
-        Pair<BigInteger, BigInteger> sweepBundle = subject
-                .getMaximumAvailable(unspentOutputs, feePerKb, addReplayProtection, useNewCoinSelection);
+        Pair<BigInteger, BigInteger> sweepBundle = subject.getMaximumAvailable(
+            unspentOutputs,
+            targetOutputType,
+            feePerKb,
+            addReplayProtection
+        );
 
         // Added extra input and output for dust-service
         long feeManual = calculateFee(1, 2, feePerKb);
 
-        assertEquals(feeManual, sweepBundle.getRight().longValue());
+        assertEquals(feeManual, sweepBundle.getSecond().longValue());
         // Available would be our amount + fake dust
-        assertEquals(1323 + 546 - feeManual, sweepBundle.getLeft().longValue());
+        assertEquals(1323 + 546 - feeManual, sweepBundle.getFirst().longValue());
     }
 
 
     @Test
-    public void getSpendableCoins_all_replayable() throws Exception {
-        String response = getTestData("unspent/unspent_all_replayable.txt");
-
-        UnspentOutputs unspentOutputs = UnspentOutputs.fromJson(response);
-        subject = new Payment();
+    public void getSpendableCoins_all_replayable() {
+        final String response = loadResourceContent("unspent/unspent_all_replayable.txt");
+        final List<Utxo> unspentOutputs = LoaderUtilKt.parseUnspentOutputsAsUtxoList(response);
 
         long spendAmount = 4134L;
         SpendableUnspentOutputs paymentBundle = subject.getSpendableCoins(
                 unspentOutputs,
+                targetOutputType,
+                changeOutputType,
                 BigInteger.valueOf(spendAmount),
                 BigInteger.valueOf(35000),
-                addReplayProtection,
-                useNewCoinSelection);
+                addReplayProtection);
 
-        List<UnspentOutput> unspentList = paymentBundle.getSpendableOutputs();
+        List<Utxo> unspentList = paymentBundle.getSpendableOutputs();
 
         // Descending values (only spend worthy)
         assertEquals(5, unspentList.size());
@@ -98,21 +101,21 @@ public final class PaymentReplayProtectionTest extends MockedResponseTest {
     }
 
     @Test
-    public void getSpendableCoins_1_non_worthy_non_replayable() throws Exception {
-        String response = getTestData("unspent/unspent_1_replayable.txt");
-
-        UnspentOutputs unspentOutputs = UnspentOutputs.fromJson(response);
-        subject = new Payment();
+    public void getSpendableCoins_1_non_worthy_non_replayable() {
+        final String response = loadResourceContent("unspent/unspent_1_replayable.txt");
+        final List<Utxo> unspentOutputs = LoaderUtilKt.parseUnspentOutputsAsUtxoList(response);
 
         long spendAmount = 34864L;
         SpendableUnspentOutputs paymentBundle = subject.getSpendableCoins(
                 unspentOutputs,
+                targetOutputType,
+                changeOutputType,
                 BigInteger.valueOf(spendAmount),
                 BigInteger.valueOf(7000L),
-                addReplayProtection,
-                useNewCoinSelection);
+                addReplayProtection
+        );
 
-        List<UnspentOutput> unspentList = paymentBundle.getSpendableOutputs();
+        List<Utxo> unspentList = paymentBundle.getSpendableOutputs();
 
         // Descending values (only spend worthy)
         assertEquals(7, unspentList.size());
@@ -137,21 +140,20 @@ public final class PaymentReplayProtectionTest extends MockedResponseTest {
     }
 
     @Test
-    public void getSpendableCoins_3_replayable() throws Exception {
-        String response = getTestData("unspent/unspent_3_replayable.txt");
-
-        UnspentOutputs unspentOutputs = UnspentOutputs.fromJson(response);
-        subject = new Payment();
+    public void getSpendableCoins_3_replayable() {
+        final String response = loadResourceContent("unspent/unspent_3_replayable.txt");
+        final List<Utxo> unspentOutputs = LoaderUtilKt.parseUnspentOutputsAsUtxoList(response);
 
         long spendAmount = 31770L;
         SpendableUnspentOutputs paymentBundle = subject.getSpendableCoins(
                 unspentOutputs,
+                targetOutputType,
+                changeOutputType,
                 BigInteger.valueOf(spendAmount),
                 BigInteger.valueOf(10000L),
-                addReplayProtection,
-                useNewCoinSelection);
+                addReplayProtection);
 
-        List<UnspentOutput> unspentList = paymentBundle.getSpendableOutputs();
+        List<Utxo> unspentList = paymentBundle.getSpendableOutputs();
 
         // Descending values (only spend worthy)
         assertEquals(6, unspentList.size());
@@ -176,17 +178,18 @@ public final class PaymentReplayProtectionTest extends MockedResponseTest {
     }
 
     @Test
-    public void getSpendableCoins_empty_list() throws Exception {
-        UnspentOutputs unspentOutputs = UnspentOutputs.fromJson("{\"unspent_outputs\":[]}");
-        subject = new Payment();
+    public void getSpendableCoins_empty_list() {
+        final List<Utxo> unspentOutputs =
+            LoaderUtilKt.parseUnspentOutputsAsUtxoList("{\"unspent_outputs\":[]}");
 
         long spendAmount = 1500000L;
         SpendableUnspentOutputs paymentBundle = subject.getSpendableCoins(
                 unspentOutputs,
+                targetOutputType,
+                changeOutputType,
                 BigInteger.valueOf(spendAmount),
                 BigInteger.valueOf(30000L),
-                addReplayProtection,
-                useNewCoinSelection
+                addReplayProtection
         );
 
         assertTrue(paymentBundle.getSpendableOutputs().isEmpty());
@@ -195,18 +198,18 @@ public final class PaymentReplayProtectionTest extends MockedResponseTest {
     }
 
     @Test
-    public void getMaximumAvailable_empty_list() throws Exception {
-        UnspentOutputs unspentOutputs = UnspentOutputs.fromJson("{\"unspent_outputs\":[]}");
-        subject = new Payment();
+    public void getMaximumAvailable_empty_list() {
+        final List<Utxo> unspentOutputs =
+            LoaderUtilKt.parseUnspentOutputsAsUtxoList("{\"unspent_outputs\":[]}");
 
         final Pair<BigInteger, BigInteger> pair = subject.getMaximumAvailable(
                 unspentOutputs,
+                targetOutputType,
                 BigInteger.valueOf(1000L),
-                addReplayProtection,
-                useNewCoinSelection
+                addReplayProtection
         );
 
-        assertEquals(BigInteger.ZERO, pair.getLeft());
-        assertEquals(BigInteger.ZERO, pair.getRight());
+        assertEquals(BigInteger.ZERO, pair.getFirst());
+        assertEquals(BigInteger.ZERO, pair.getSecond());
     }
 }

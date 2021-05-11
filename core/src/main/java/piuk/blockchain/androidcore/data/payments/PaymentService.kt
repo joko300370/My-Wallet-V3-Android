@@ -1,25 +1,22 @@
 package piuk.blockchain.androidcore.data.payments
 
-import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.dust.DustService
-import info.blockchain.wallet.exceptions.ApiException
 import info.blockchain.wallet.exceptions.TransactionHashApiException
+import info.blockchain.wallet.keys.SigningKey
+import info.blockchain.wallet.payload.data.XPubs
+import info.blockchain.wallet.payload.model.Utxo
+import info.blockchain.wallet.payment.OutputType
 import info.blockchain.wallet.payment.Payment
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import io.reactivex.Observable
 import io.reactivex.Single
-import org.apache.commons.lang3.tuple.Pair
-import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.Transaction
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.annotations.WebRequest
-import java.io.UnsupportedEncodingException
 import java.math.BigInteger
 import java.util.HashMap
 
 class PaymentService(
-    private val environmentSettings: EnvironmentConfig,
     private val payment: Payment,
     private val dustService: DustService
 ) {
@@ -39,7 +36,7 @@ class PaymentService(
     @WebRequest
     internal fun submitBtcPayment(
         unspentOutputBundle: SpendableUnspentOutputs,
-        keys: List<ECKey>,
+        keys: List<SigningKey>,
         toAddress: String,
         changeAddress: String,
         bigIntFee: BigInteger,
@@ -47,7 +44,7 @@ class PaymentService(
     ): Observable<String> = Observable.fromCallable {
 
         val tx = signAngGetBtcTx(unspentOutputBundle, keys, toAddress, changeAddress, bigIntFee, bigIntAmount)
-        val response = payment.publishSimpleTransaction(tx).execute()
+        val response = payment.publishBtcSimpleTransaction(tx).execute()
 
         when {
             response.isSuccessful -> tx.hashAsString
@@ -59,16 +56,16 @@ class PaymentService(
     internal fun submitBtcPayment(
         signedTx: Transaction
     ): Single<String> = Single.fromCallable {
-        val response = payment.publishSimpleTransaction(signedTx).execute()
+        val response = payment.publishBtcSimpleTransaction(signedTx).execute()
         when {
-            response.isSuccessful -> signedTx.hashAsString
-            else -> throw TransactionHashApiException.fromResponse(signedTx.hashAsString, response)
+            response.isSuccessful -> signedTx.txId.toString()
+            else -> throw TransactionHashApiException.fromResponse(signedTx.txId.toString(), response)
         }
     }
 
     internal fun signAngGetBtcTx(
         unspentOutputBundle: SpendableUnspentOutputs,
-        keys: List<ECKey>,
+        keys: List<SigningKey>,
         toAddress: String,
         changeAddress: String,
         bigIntFee: BigInteger,
@@ -77,15 +74,14 @@ class PaymentService(
         val receivers = HashMap<String, BigInteger>()
         receivers[toAddress] = bigIntAmount
 
-        val tx = payment.makeSimpleTransaction(
-            environmentSettings.bitcoinNetworkParameters,
+        val tx = payment.makeBtcSimpleTransaction(
             unspentOutputBundle.spendableOutputs,
             receivers,
             bigIntFee,
             changeAddress
         )
 
-        payment.signSimpleTransaction(environmentSettings.bitcoinNetworkParameters, tx, keys)
+        payment.signBtcTransaction(tx, keys)
         return tx
     }
 
@@ -104,7 +100,7 @@ class PaymentService(
     @WebRequest
     internal fun submitBchPayment(
         unspentOutputBundle: SpendableUnspentOutputs,
-        keys: List<ECKey>,
+        keys: List<SigningKey>,
         toAddress: String,
         changeAddress: String,
         bigIntFee: BigInteger,
@@ -114,8 +110,7 @@ class PaymentService(
             val receivers = HashMap<String, BigInteger>()
             receivers[toAddress] = bigIntAmount
 
-            val tx = payment.makeNonReplayableTransaction(
-                environmentSettings.bitcoinCashNetworkParameters,
+            val tx = payment.makeBchNonReplayableTransaction(
                 unspentOutputBundle.spendableOutputs,
                 receivers,
                 bigIntFee,
@@ -123,66 +118,52 @@ class PaymentService(
                 it
             )
 
-            payment.signBchTransaction(environmentSettings.bitcoinCashNetworkParameters, tx, keys)
+            payment.signBchTransaction(
+                tx,
+                keys
+            )
 
             return@flatMapObservable Observable.fromCallable {
-                val response = payment.publishTransactionWithSecret(CryptoCurrency.BCH, tx, it.lockSecret).execute()
+                val response = payment.publishBchTransaction(tx, it.lockSecret).execute()
                 when {
-                    response.isSuccessful -> tx.hashAsString
-                    else -> throw TransactionHashApiException.fromResponse(tx.hashAsString, response)
+                    response.isSuccessful -> tx.txId.toString()
+                    else -> throw TransactionHashApiException.fromResponse(tx.txId.toString(), response)
                 }
             }
         }
 
     /**
-     * Returns an [UnspentOutputs] object containing all the unspent outputs for a given
+     * Returns an [Utxo] object containing all the unspent outputs for a given
      * Bitcoin address.
      *
-     * @param address The BTC address you wish to query, as a String
-     * @return An [Observable] wrapping an [UnspentOutputs] object
+     * @param xpubs The BTC address you wish to query, as a String
+     * @return An [Observable] wrapping a list of [Utxo] objects
      */
     @WebRequest
-    internal fun getUnspentBtcOutputs(address: String): Observable<UnspentOutputs> {
-        return Observable.fromCallable {
-            val response = payment.getUnspentCoins(listOf(address)).execute()
-            when {
-                response.isSuccessful -> response.body()
-                response.code() == 500 -> // If no unspent outputs available server responds with 500
-                    UnspentOutputs.fromJson("{\"unspent_outputs\":[]}")
-                else -> throw ApiException(response.code().toString())
-            }
-        }
-    }
+    internal fun getUnspentBtcOutputs(xpubs: XPubs): Single<List<Utxo>> =
+        payment.getUnspentBtcCoins(xpubs)
 
     /**
-     * Returns an [UnspentOutputs] object containing all the unspent outputs for a given
+     * Returns an [Utxo] object containing all the unspent outputs for a given
      * Bitcoin Cash address. Please note that this method only accepts a valid Base58 (ie Legacy)
      * BCH address. BECH32 is not accepted by the endpoint.
      *
      * @param address The BCH address you wish to query, as a Base58 address String
-     * @return An [Observable] wrapping an [UnspentOutputs] object
+     * @return An [Observable] wrapping an [Utxo] object
      */
     @WebRequest
-    internal fun getUnspentBchOutputs(address: String): Observable<UnspentOutputs> {
-        return Observable.fromCallable {
-            val response = payment.getUnspentBchCoins(listOf(address)).execute()
-
-            when {
-                response.isSuccessful -> response.body()
-                response.code() == 500 -> // If no unspent outputs available server responds with 500
-                    UnspentOutputs.fromJson("{\"unspent_outputs\":[]}")
-                else -> throw ApiException(response.code().toString())
-            }
-        }
-    }
+    internal fun getUnspentBchOutputs(address: String): Single<List<Utxo>> =
+        payment.getUnspentBchCoins(listOf(address))
 
     /**
-     * Returns a [SpendableUnspentOutputs] object from a given [UnspentOutputs] object,
+     * Returns a [SpendableUnspentOutputs] object from a given [Utxo] object,
      * given the payment amount and the current fee per kB. This method selects the minimum number
      * of inputs necessary to allow a successful payment by selecting from the largest inputs
      * first.
      *
-     * @param unspentCoins The addresses' [UnspentOutputs]
+     * @param unspentCoins The addresses' [Utxo]
+     * @param targetOutputType Destination output type
+     * @param changeOutputType Change output type
      * @param paymentAmount The amount you wish to send, as a [BigInteger]
      * @param feePerKb The current fee per kB, as a [BigInteger]
      * @param includeReplayProtection Whether or not you intend on adding a dust input for replay protection. This is
@@ -190,22 +171,30 @@ class PaymentService(
      * @return An [SpendableUnspentOutputs] object, which wraps a list of spendable outputs
      * for the given inputs
      */
-    @Throws(UnsupportedEncodingException::class)
     internal fun getSpendableCoins(
-        unspentCoins: UnspentOutputs,
+        unspentCoins: List<Utxo>,
+        targetOutputType: OutputType,
+        changeOutputType: OutputType,
         paymentAmount: BigInteger,
         feePerKb: BigInteger,
-        includeReplayProtection: Boolean,
-        useNewCoinSelection: Boolean
+        includeReplayProtection: Boolean
     ): SpendableUnspentOutputs =
-        payment.getSpendableCoins(unspentCoins, paymentAmount, feePerKb, includeReplayProtection, useNewCoinSelection)
+        payment.getSpendableCoins(
+            unspentCoins,
+            targetOutputType,
+            changeOutputType,
+            paymentAmount,
+            feePerKb,
+            includeReplayProtection
+        )
 
     /**
-     * Calculates the total amount of bitcoin that can be swept from an [UnspentOutputs]
+     * Calculates the total amount of bitcoin that can be swept from an [Utxo]
      * object and returns the amount that can be recovered, along with the fee (in absolute terms)
      * necessary to sweep those coins.
      *
-     * @param unspentCoins An [UnspentOutputs] object that you wish to sweep
+     * @param unspentCoins An [Utxo] object that you wish to sweep
+     * @param targetOutputType Destination output type
      * @param feePerKb The current fee per kB on the network
      * @param includeReplayProtection Whether or not you intend on adding a dust input for replay protection. This is
      * an extra input and therefore affects the transaction fee.
@@ -213,15 +202,15 @@ class PaymentService(
      * right = the absolute fee needed to sweep those coins, also as a [BigInteger]
      */
     internal fun getMaximumAvailable(
-        unspentCoins: UnspentOutputs,
+        unspentCoins: List<Utxo>,
+        targetOutputType: OutputType,
         feePerKb: BigInteger,
-        includeReplayProtection: Boolean,
-        useNewCoinSelection: Boolean
+        includeReplayProtection: Boolean
     ): Pair<BigInteger, BigInteger> = payment.getMaximumAvailable(
         unspentCoins,
+        targetOutputType,
         feePerKb,
-        includeReplayProtection,
-        useNewCoinSelection
+        includeReplayProtection
     )
 
     /**
@@ -229,21 +218,21 @@ class PaymentService(
      * transaction.
      *
      * @param inputs The number of inputs
-     * @param outputs The number of outputs
+     * @param outputs List of output types (P2PKH, P2WPKH)
      * @param absoluteFee The absolute fee as a [BigInteger]
      * @return True if the fee is adequate, false if not
      */
-    internal fun isAdequateFee(inputs: Int, outputs: Int, absoluteFee: BigInteger): Boolean =
+    internal fun isAdequateFee(inputs: List<Utxo>, outputs: List<OutputType>, absoluteFee: BigInteger): Boolean =
         payment.isAdequateFee(inputs, outputs, absoluteFee)
 
     /**
      * Returns the estimated size of the transaction in kB.
      *
      * @param inputs The number of inputs
-     * @param outputs The number of outputs
+     * @param outputs List of output types (P2PKH, P2WPKH)
      * @return The estimated size of the transaction in kB
      */
-    internal fun estimateSize(inputs: Int, outputs: Int): Int =
+    internal fun estimateSize(inputs: List<Utxo>, outputs: List<OutputType>): Double =
         payment.estimatedSize(inputs, outputs)
 
     /**
@@ -251,10 +240,10 @@ class PaymentService(
      * inputs and outputs.
      *
      * @param inputs The number of inputs
-     * @param outputs The number of outputs
+     * @param outputs List of output types (P2PKH, P2WPKH)
      * @param feePerKb The current fee per kB om the network
      * @return A [BigInteger] representing the absolute fee
      */
-    internal fun estimateFee(inputs: Int, outputs: Int, feePerKb: BigInteger): BigInteger =
+    internal fun estimateFee(inputs: List<Utxo>, outputs: List<OutputType>, feePerKb: BigInteger): BigInteger =
         payment.estimatedFee(inputs, outputs, feePerKb)
 }

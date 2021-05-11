@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import info.blockchain.wallet.payload.data.Account;
+
 /**
  * <p> Generic coin data that can be stored in blockchain.info KV store. </p>
  */

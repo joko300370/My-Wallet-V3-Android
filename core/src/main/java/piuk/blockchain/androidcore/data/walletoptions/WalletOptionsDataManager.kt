@@ -54,25 +54,14 @@ class WalletOptionsDataManager(
     fun isInUsa(): Observable<Boolean> =
         walletOptionsState.walletSettingsSource.map { it.countryCode == "US" }
 
-    fun getCoinifyPartnerId(): Observable<Int> =
-        walletOptionsState.walletOptionsSource.map { it.partners.coinify.partnerId }
-
     fun getBuyWebviewWalletLink(): String {
         initWalletOptionsReplaySubjects()
         return (walletOptionsState.walletOptionsSource.value!!.buyWebviewWalletLink
             ?: "${explorerUrl}wallet") + "/#/intermediate"
     }
 
-    fun getComRootLink(): String {
-        return walletOptionsState.walletOptionsSource.value!!.comRootLink
-    }
-
     private fun xlmExchangeAddresses(): List<String> {
         return walletOptionsState.walletOptionsSource.value?.xmlExchangeAddresses ?: emptyList()
-    }
-
-    fun getWalletLink(): String {
-        return walletOptionsState.walletOptionsSource.value!!.walletLink
     }
 
     /**
@@ -109,12 +98,12 @@ class WalletOptionsDataManager(
             val latestApiVersion = SemanticVersion(it.androidUpdate.latestStoreVersion)
             val currentVersion = SemanticVersion(versionName)
             if (latestApiVersion > currentVersion) {
-                return@map it.androidUpdate.updateType
+                return@map it.androidUpdate.updateType.toUpdateType()
             } else return@map UpdateType.NONE
         }
     }
 
-    fun getLocalisedMessage(locale: Locale, map: Map<String, String>): String {
+    private fun getLocalisedMessage(locale: Locale, map: Map<String, String>): String {
         var result = ""
 
         if (map.isNotEmpty()) {
@@ -143,5 +132,12 @@ class WalletOptionsDataManager(
             .map { it.xlmTransactionTimeout }
             .first(WalletOptions.XLM_DEFAULT_TIMEOUT_SECS)
 
-    fun isXlmAddressExchange(it: String): Boolean = xlmExchangeAddresses().contains(it.toUpperCase())
+    fun isXlmAddressExchange(it: String): Boolean = xlmExchangeAddresses().contains(it.toUpperCase(Locale.getDefault()))
 }
+
+private fun String.toUpdateType(): UpdateType =
+    when {
+        equals("RECOMMENDED", true) -> UpdateType.RECOMMENDED
+        equals("FORCE", true) -> UpdateType.FORCE
+        else -> UpdateType.RECOMMENDED
+    }

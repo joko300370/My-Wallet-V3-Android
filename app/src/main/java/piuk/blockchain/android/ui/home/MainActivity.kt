@@ -8,7 +8,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.View.FIND_VIEWS_WITH_TEXT
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -17,8 +17,10 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem
+import com.blockchain.extensions.exhaustive
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.scopedInject
-import com.blockchain.lockbox.ui.LockboxLandingActivity
 import com.blockchain.notifications.NotificationsUtil
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.NotificationAppOpened
@@ -29,68 +31,87 @@ import com.blockchain.notifications.analytics.TransactionsAnalyticsEvents
 import com.blockchain.notifications.analytics.activityShown
 import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_SUPPORT_PORTAL
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.snackbar.Snackbar
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.FiatValue
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar_general.*
-import piuk.blockchain.android.BuildConfig
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoTarget
+import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.scan.QrScanError
-import piuk.blockchain.android.scan.QrScanHandler
+import piuk.blockchain.android.scan.QrScanResultProcessor
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
-import piuk.blockchain.android.ui.account.AccountActivity
+import piuk.blockchain.android.simplebuy.SimpleBuyState
+import piuk.blockchain.android.simplebuy.SmallSimpleBuyNavigator
 import piuk.blockchain.android.ui.activity.ActivitiesFragment
+import piuk.blockchain.android.ui.addresses.AccountActivity
 import piuk.blockchain.android.ui.airdrops.AirdropCentreActivity
 import piuk.blockchain.android.ui.backup.BackupWalletActivity
 import piuk.blockchain.android.ui.base.MvpActivity
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.dashboard.DashboardFragment
 import piuk.blockchain.android.ui.home.analytics.SideNavEvent
 import piuk.blockchain.android.ui.interest.InterestDashboardActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.kyc.status.KycStatusActivity
 import piuk.blockchain.android.ui.launcher.LauncherActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthActivity.Companion.LINKED_BANK_CURRENCY
+import piuk.blockchain.android.ui.linkbank.BankAuthActivity.Companion.LINKED_BANK_ID_KEY
+import piuk.blockchain.android.ui.linkbank.BankAuthSource
+import piuk.blockchain.android.ui.linkbank.BankLinkingInfo
+import piuk.blockchain.android.ui.linkbank.FiatTransactionState
+import piuk.blockchain.android.ui.linkbank.yapily.FiatTransactionBottomSheet
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity
-import piuk.blockchain.android.ui.pairingcode.PairingCodeActivity
+import piuk.blockchain.android.ui.scan.QrExpected
+import piuk.blockchain.android.ui.scan.QrScanActivity
+import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
+import piuk.blockchain.android.ui.auth.newlogin.AuthNewLoginSheet
+import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.pairingcode.PairingBottomSheet
 import piuk.blockchain.android.ui.sell.BuySellFragment
 import piuk.blockchain.android.ui.settings.SettingsActivity
-import piuk.blockchain.android.ui.swap.homebrew.exchange.host.HomebrewNavHostActivity
-import piuk.blockchain.android.ui.swapintro.SwapIntroFragment
+import piuk.blockchain.android.ui.swap.SwapFragment
 import piuk.blockchain.android.ui.thepit.PitLaunchBottomDialog
 import piuk.blockchain.android.ui.thepit.PitPermissionsActivity
 import piuk.blockchain.android.ui.tour.IntroTourAnalyticsEvent
 import piuk.blockchain.android.ui.tour.IntroTourHost
 import piuk.blockchain.android.ui.tour.IntroTourStep
-import piuk.blockchain.android.ui.tour.SwapTourFragment
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.transfer.TransferFragment
-import piuk.blockchain.android.ui.zxing.CaptureActivity
+import piuk.blockchain.android.util.AndroidUtils
+import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.android.util.getAccount
-import piuk.blockchain.android.withdraw.WithdrawActivity
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.AndroidUtils
-import piuk.blockchain.androidcoreui.utils.ViewUtils
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 import timber.log.Timber
-import java.util.ArrayList
 
 class MainActivity : MvpActivity<MainView, MainPresenter>(),
     HomeNavigator,
     MainView,
     IntroTourHost,
-    DialogFlow.FlowHost {
+    DialogFlow.FlowHost,
+    SlidingModalBottomDialog.Host,
+    AuthNewLoginSheet.Host,
+    SmallSimpleBuyNavigator {
 
     override val presenter: MainPresenter by scopedInject()
+    private val qrProcessor: QrScanResultProcessor by scopedInject()
+    private val assetResources: AssetResources by scopedInject()
+    private val internalFlags: InternalFeatureFlagApi by inject()
+
     override val view: MainView = this
 
     var drawerOpen = false
@@ -104,13 +125,8 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     private var activityResultAction: () -> Unit = {}
 
-    private var backPressed: Long = 0
-
     private val tabSelectedListener =
         AHBottomNavigation.OnTabSelectedListener { position, wasSelected ->
-
-            presenter.doTestnetCheck()
-
             if (!wasSelected) {
                 when (position) {
                     ITEM_HOME -> {
@@ -121,11 +137,11 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                         analytics.logEvent(TransactionsAnalyticsEvents.TabItemClick)
                     }
                     ITEM_SWAP -> {
-                        presenter.startSwapOrKyc(null, null)
+                        tryTolaunchSwap()
                         analytics.logEvent(SwapAnalyticsEvents.SwapTabItemClick)
                     }
                     ITEM_BUY_SELL -> {
-                        startBuySellFragment()
+                        launchSimpleBuySell()
                         analytics.logEvent(RequestAnalyticsEvents.TabItemClicked)
                     }
                     ITEM_TRANSFER -> {
@@ -163,9 +179,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
             override fun onDrawerOpened(drawerView: View) {
                 drawerOpen = true
-                if (tour_guide.isActive) {
-                    setTourMenuView()
-                }
                 analytics.logEvent(SideNavEvent.SideMenuOpenEvent)
             }
 
@@ -182,7 +195,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         toolbar_general.navigationIcon = ContextCompat.getDrawable(this, R.drawable.vector_menu)
         toolbar_general.title = ""
         setSupportActionBar(toolbar_general)
-
         // Styling
         bottom_navigation.apply {
             addItems(toolbarNavigationItems())
@@ -199,7 +211,28 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
             // Select Dashboard by default
             setOnTabSelectedListener(tabSelectedListener)
-            currentItem = if (intent.getBooleanExtra(START_BUY_SELL_INTRO_KEY, false)) ITEM_BUY_SELL else ITEM_HOME
+
+            if (savedInstanceState == null) {
+                currentItem = if (intent.getBooleanExtra(START_BUY_SELL_INTRO_KEY, false)) ITEM_BUY_SELL
+                else ITEM_HOME
+            }
+        }
+
+        if (intent.hasExtra(SHOW_SWAP) && intent.getBooleanExtra(SHOW_SWAP, false)) {
+            startSwapFlow()
+        } else if (intent.hasExtra(LAUNCH_AUTH_FLOW) && intent.getBooleanExtra(LAUNCH_AUTH_FLOW, false)) {
+            intent.extras?.let {
+                showBottomSheet(
+                    AuthNewLoginSheet.newInstance(
+                        pubKeyHash = it.getString(AuthNewLoginSheet.PUB_KEY_HASH),
+                        messageInJson = it.getString(AuthNewLoginSheet.MESSAGE),
+                        forcePin = it.getBoolean(AuthNewLoginSheet.FORCE_PIN),
+                        originIP = it.getString(AuthNewLoginSheet.ORIGIN_IP),
+                        originLocation = it.getString(AuthNewLoginSheet.ORIGIN_LOCATION),
+                        originBrowser = it.getString(AuthNewLoginSheet.ORIGIN_BROWSER)
+                    )
+                )
+            }
         }
     }
 
@@ -234,13 +267,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 true
             }
             R.id.action_qr_main -> {
-                val fragment = currentFragment::class.simpleName ?: "unknown"
-                QrScanHandler.requestScanPermissions(
-                    activity = this,
-                    rootView = parent_constraint_layout
-                ) {
-                    QrScanHandler.startQrScanActivity(this, appUtil)
-                }
+                QrScanActivity.start(this, QrExpected.MAIN_ACTIVITY_QR)
                 analytics.logEvent(SendAnalytics.QRButtonClicked)
                 true
             }
@@ -253,8 +280,8 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         // We create a lambda so we handle the result after the view is attached to the presenter (onResume)
         activityResultAction = {
             when (requestCode) {
-                QrScanHandler.SCAN_URI_RESULT -> {
-                    val scanData = data?.getStringExtra(CaptureActivity.SCAN_RESULT)
+                QrScanActivity.SCAN_URI_RESULT -> {
+                    val scanData = data.getRawScanData()
                     if (resultCode == RESULT_OK && scanData != null) {
                         presenter.processScanResult(scanData)
                     }
@@ -281,8 +308,35 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                         }
                     }
                 }
+                BANK_DEEP_LINK_SIMPLE_BUY -> {
+                    if (resultCode == RESULT_OK) {
+                        launchBuy(data?.getStringExtra(LINKED_BANK_ID_KEY))
+                    }
+                }
+                BANK_DEEP_LINK_SETTINGS -> {
+                    if (resultCode == RESULT_OK) {
+                        startActivity(Intent(this, SettingsActivity::class.java))
+                    }
+                }
+                BANK_DEEP_LINK_DEPOSIT -> {
+                    if (resultCode == RESULT_OK) {
+                        launchDashboardFlow(AssetAction.FiatDeposit, data?.getStringExtra(LINKED_BANK_CURRENCY))
+                    }
+                }
+                BANK_DEEP_LINK_WITHDRAW -> {
+                    if (resultCode == RESULT_OK) {
+                        launchDashboardFlow(AssetAction.Withdraw, data?.getStringExtra(LINKED_BANK_CURRENCY))
+                    }
+                }
                 else -> super.onActivityResult(requestCode, resultCode, data)
             }
+        }
+    }
+
+    private fun launchDashboardFlow(action: AssetAction, currency: String?) {
+        currency?.let {
+            val fragment = DashboardFragment.newInstance(action, it)
+            replaceContentFragment(fragment)
         }
     }
 
@@ -296,18 +350,11 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 drawer_layout.closeDrawers()
                 true
             }
-            f is ActivitiesFragment -> f.onBackPressed()
-            f is TransferFragment -> {
-                setCurrentTabItem(ITEM_HOME)
-                startDashboardFragment()
-                true
-            }
+
             f is DashboardFragment -> f.onBackPressed()
-            f is BuySellFragment -> f.onBackPressed()
-            f is SwapIntroFragment -> f.onBackPressed()
+
             else -> {
-                // Switch to dashboard fragment - it's not clear, though,
-                // how we can ever wind up here...
+                // Switch to dashboard fragment
                 setCurrentTabItem(ITEM_HOME)
                 startDashboardFragment()
                 true
@@ -315,47 +362,30 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         }
 
         if (!backHandled) {
-            if (backPressed + BuildConfig.EXIT_APP_COOLDOWN_MILLIS > System.currentTimeMillis()) {
-                presenter.clearLoginState()
-            } else {
-                showExitConfirmToast()
-                backPressed = System.currentTimeMillis()
-            }
+            presenter.clearLoginState()
         }
-    }
-
-    private fun setTourMenuView() {
-        val item = menu.findItem(R.id.nav_backup)
-
-        val out = ArrayList<View>()
-        drawer_layout.findViewsWithText(out, item.title, FIND_VIEWS_WITH_TEXT)
-
-        if (out.isNotEmpty()) {
-            val menuView = out[0]
-            tour_guide.setDeferredTriggerView(menuView, offsetX = -menuView.width / 3)
-        }
-    }
-
-    private fun showExitConfirmToast() {
-        ToastCustom.makeText(this,
-            getString(R.string.exit_confirm),
-            ToastCustom.LENGTH_SHORT,
-            ToastCustom.TYPE_GENERAL)
     }
 
     private fun selectDrawerItem(menuItem: MenuItem) {
         analytics.logEvent(SideNavEvent(menuItem.itemId))
         when (menuItem.itemId) {
-            R.id.nav_lockbox -> LockboxLandingActivity.start(this)
-            R.id.nav_backup -> launchBackupFunds()
-            R.id.nav_debug_swap -> HomebrewNavHostActivity.start(this, presenter.defaultCurrency)
             R.id.nav_the_exchange -> presenter.onThePitMenuClicked()
             R.id.nav_airdrops -> AirdropCentreActivity.start(this)
-            R.id.nav_addresses -> startActivityForResult(Intent(this, AccountActivity::class.java),
-                ACCOUNT_EDIT)
-            R.id.login_web_wallet -> PairingCodeActivity.start(this)
-            R.id.nav_settings -> startActivityForResult(Intent(this, SettingsActivity::class.java),
-                SETTINGS_EDIT)
+            R.id.nav_addresses -> startActivityForResult(
+                Intent(this, AccountActivity::class.java),
+                ACCOUNT_EDIT
+            )
+            R.id.login_web_wallet -> {
+                if (internalFlags.isFeatureEnabled(GatedFeature.MODERN_AUTH_PAIRING)) {
+                    QrScanActivity.start(this, QrExpected.MAIN_ACTIVITY_QR)
+                } else {
+                    showBottomSheet(PairingBottomSheet())
+                }
+            }
+            R.id.nav_settings -> startActivityForResult(
+                Intent(this, SettingsActivity::class.java),
+                SETTINGS_EDIT
+            )
             R.id.nav_support -> onSupportClicked()
             R.id.nav_logout -> showLogoutDialog()
             R.id.nav_interest -> launchInterestDashboard()
@@ -377,10 +407,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     override fun launchThePit() {
         PitLaunchBottomDialog.launch(this)
-    }
-
-    override fun setPitEnabled(enabled: Boolean) {
-        setPitVisible(enabled)
     }
 
     override fun launchBackupFunds(fragment: Fragment?, requestCode: Int) {
@@ -461,45 +487,25 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         KycNavHostActivity.startForResult(this, campaignType, KYC_STARTED)
     }
 
-    override fun launchSwap(
-        defCurrency: String,
-        fromCryptoCurrency: CryptoCurrency?,
-        toCryptoCurrency: CryptoCurrency?
+    override fun tryTolaunchSwap(
+        sourceAccount: CryptoAccount?,
+        targetAccount: CryptoAccount?
     ) {
-        HomebrewNavHostActivity.start(context = this,
-            defaultCurrency = defCurrency,
-            fromCryptoCurrency = fromCryptoCurrency,
-            toCryptoCurrency = toCryptoCurrency)
+        startSwapFlow(sourceAccount, targetAccount)
     }
 
-    override fun launchSwapOrKyc(targetCurrency: CryptoCurrency?, fromCryptoCurrency: CryptoCurrency?) {
-        presenter.startSwapOrKyc(toCurrency = targetCurrency, fromCurrency = fromCryptoCurrency)
+    override fun launchSwap(sourceAccount: CryptoAccount?, targetAccount: CryptoAccount?) {
+        startSwapFlow(sourceAccount, targetAccount)
     }
 
     override fun getStartIntent(): Intent {
         return intent
     }
 
-    private fun setPitVisible(visible: Boolean) {
-        val menu = menu
-        menu.findItem(R.id.nav_the_exchange).isVisible = visible
-    }
-
     override fun clearAllDynamicShortcuts() {
         if (AndroidUtils.is25orHigher()) {
             getSystemService(ShortcutManager::class.java)!!.removeAllDynamicShortcuts()
         }
-    }
-
-    override fun showTestnetWarning() {
-        val snack = Snackbar.make(
-            parent_constraint_layout,
-            R.string.testnet_warning,
-            Snackbar.LENGTH_SHORT
-        )
-        val view = snack.view
-        view.setBackgroundColor(ContextCompat.getColor(this, R.color.product_red_medium))
-        snack.show()
     }
 
     override fun enableSwapButton(isEnabled: Boolean) {
@@ -524,14 +530,14 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
             disambiguateSendScan(targets)
         } else {
             val targetAddress = targets.first()
-            QrScanHandler.selectSourceAccount(this, targetAddress)
+            qrProcessor.selectSourceAccount(this, targetAddress)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onSuccess = { sourceAccount ->
                         TransactionFlow(
                             sourceAccount = sourceAccount,
                             target = targetAddress,
-                            action = AssetAction.NewSend
+                            action = AssetAction.Send
                         ).apply {
                             startFlow(
                                 fragmentManager = currentFragment.childFragmentManager,
@@ -558,18 +564,23 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         )
     }
 
+    private fun launchBuy(linkedBankId: String?) {
+        startActivity(
+            SimpleBuyActivity.newInstance(
+                context = activity,
+                preselectedPaymentMethodId = linkedBankId
+            )
+        )
+    }
+
     @SuppressLint("CheckResult")
     private fun disambiguateSendScan(targets: Collection<CryptoTarget>) {
-        QrScanHandler.disambiguateScan(this, targets)
+        qrProcessor.disambiguateScan(this, targets, assetResources)
             .subscribeBy(
                 onSuccess = {
                     startTransactionFlowWithTarget(listOf(it))
                 }
             )
-    }
-
-    override fun displayLockboxMenu(lockboxAvailable: Boolean) {
-        menu.findItem(R.id.nav_lockbox).isVisible = lockboxAvailable
     }
 
     override fun showHomebrewDebugMenu() {
@@ -578,6 +589,32 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     override fun goToTransfer() {
         startTransferFragment()
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        if (intent.getBooleanExtra(LAUNCH_AUTH_FLOW, false)) {
+            intent.extras?.let {
+                showBottomSheet(
+                    AuthNewLoginSheet.newInstance(
+                        pubKeyHash = it.getString(AuthNewLoginSheet.PUB_KEY_HASH),
+                        messageInJson = it.getString(AuthNewLoginSheet.MESSAGE),
+                        forcePin = it.getBoolean(AuthNewLoginSheet.FORCE_PIN),
+                        originIP = it.getString(AuthNewLoginSheet.ORIGIN_IP),
+                        originLocation = it.getString(AuthNewLoginSheet.ORIGIN_LOCATION),
+                        originBrowser = it.getString(AuthNewLoginSheet.ORIGIN_BROWSER)
+                    )
+                )
+            }
+        }
+    }
+
+    override fun navigateToBottomSheet(bottomSheet: BottomSheetDialogFragment) {
+        clearBottomSheet()
+        showBottomSheet(bottomSheet)
+    }
+
+    override fun onSheetClosed() {
     }
 
     private fun startTransferFragment(
@@ -590,13 +627,27 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         replaceContentFragment(transferFragment)
     }
 
-    private fun startBuySellFragment(
-        viewType: BuySellFragment.BuySellViewType = BuySellFragment.BuySellViewType.TYPE_BUY
-    ) {
-        setCurrentTabItem(ITEM_BUY_SELL)
+    private fun startSwapFlow(sourceAccount: CryptoAccount? = null, destinationAccount: CryptoAccount? = null) {
+        if (sourceAccount == null && destinationAccount == null) {
+            setCurrentTabItem(ITEM_SWAP)
+            toolbar_general.title = getString(R.string.common_swap)
+            val swapFragment = SwapFragment.newInstance()
+            replaceContentFragment(swapFragment)
+        } else if (sourceAccount != null) {
+            val transactionFlow =
+                TransactionFlow(
+                    sourceAccount = sourceAccount,
+                    target = destinationAccount ?: NullCryptoAccount(),
+                    action = AssetAction.Swap
+                )
 
-        val buySellFragment = BuySellFragment.newInstance(viewType)
-        replaceContentFragment(buySellFragment)
+            transactionFlow.apply {
+                startFlow(
+                    fragmentManager = supportFragmentManager,
+                    host = this@MainActivity
+                )
+            }
+        }
     }
 
     override fun gotoDashboard() {
@@ -610,13 +661,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     override fun gotoActivityFor(account: BlockchainAccount?) =
         startActivitiesFragment(account)
-
-    override fun goToWithdraw(currency: String) {
-        startActivity(WithdrawActivity.newInstance(
-            context = this,
-            currency = currency
-        ))
-    }
 
     override fun resumeSimpleBuyKyc() {
         startActivity(
@@ -635,10 +679,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 cryptoCurrency = cryptoCurrency
             )
         )
-    }
-
-    override fun startSell() {
-        startBuySellFragment(BuySellFragment.BuySellViewType.TYPE_SELL)
     }
 
     override fun startInterestDashboard() {
@@ -660,18 +700,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     override fun refreshAnnouncements() {
         _refreshAnnouncements.onNext(Unit)
-    }
-
-    override fun launchKycIntro() {
-        val swapIntroFragment = SwapIntroFragment.newInstance()
-        replaceContentFragment(swapIntroFragment)
-    }
-
-    override fun launchSwapIntro() {
-        setCurrentTabItem(ITEM_SWAP)
-
-        val swapIntroFragment = SwapIntroFragment.newInstance()
-        replaceContentFragment(swapIntroFragment)
     }
 
     override fun launchPendingVerificationScreen(campaignType: CampaignType) {
@@ -701,10 +729,16 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
         val TAG: String = MainActivity::class.java.simpleName
         const val START_BUY_SELL_INTRO_KEY = "START_BUY_SELL_INTRO_KEY"
+        const val SHOW_SWAP = "SHOW_SWAP"
+        const val LAUNCH_AUTH_FLOW = "LAUNCH_AUTH_FLOW"
         const val ACCOUNT_EDIT = 2008
         const val SETTINGS_EDIT = 2009
         const val KYC_STARTED = 2011
         const val INTEREST_DASHBOARD = 2012
+        const val BANK_DEEP_LINK_SIMPLE_BUY = 2013
+        const val BANK_DEEP_LINK_SETTINGS = 2014
+        const val BANK_DEEP_LINK_DEPOSIT = 2015
+        const val BANK_DEEP_LINK_WITHDRAW = 2021
 
         // Keep these constants - the position of the toolbar items - and the generation of the toolbar items
         // together.
@@ -715,27 +749,29 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         private const val ITEM_TRANSFER = 4
 
         private fun toolbarNavigationItems(): List<AHBottomNavigationItem> =
-            listOf(AHBottomNavigationItem(
-                R.string.toolbar_cmd_activity,
-                R.drawable.ic_vector_toolbar_activity,
-                R.color.white
-            ), AHBottomNavigationItem(
-                R.string.toolbar_cmd_swap,
-                R.drawable.ic_vector_toolbar_swap,
-                R.color.white
-            ), AHBottomNavigationItem(
-                R.string.toolbar_cmd_home,
-                R.drawable.ic_vector_toolbar_home,
-                R.color.white
-            ), AHBottomNavigationItem(
-                R.string.buy_and_sell,
-                R.drawable.ic_tab_cart,
-                R.color.white
-            ), AHBottomNavigationItem(
-                R.string.toolbar_cmd_transfer,
-                R.drawable.ic_vector_toolbar_transfer,
-                R.color.white
-            ))
+            listOf(
+                AHBottomNavigationItem(
+                    R.string.toolbar_cmd_activity,
+                    R.drawable.ic_vector_toolbar_activity,
+                    R.color.white
+                ), AHBottomNavigationItem(
+                    R.string.toolbar_cmd_swap,
+                    R.drawable.ic_vector_toolbar_swap,
+                    R.color.white
+                ), AHBottomNavigationItem(
+                    R.string.toolbar_cmd_home,
+                    R.drawable.ic_vector_toolbar_home,
+                    R.color.white
+                ), AHBottomNavigationItem(
+                    R.string.buy_and_sell,
+                    R.drawable.ic_tab_cart,
+                    R.color.white
+                ), AHBottomNavigationItem(
+                    R.string.toolbar_cmd_transfer,
+                    R.drawable.ic_vector_toolbar_transfer,
+                    R.color.white
+                )
+            )
 
         fun start(context: Context, bundle: Bundle) {
             Intent(context, MainActivity::class.java).apply {
@@ -779,22 +815,113 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 msgTitle = R.string.tour_step_three_title,
                 msgBody = R.string.tour_step_three_body,
                 msgButton = R.string.tour_step_three_btn
-            ),
-            IntroTourStep(
-                name = "Step_Four",
-                lookupTriggerView = { bottom_navigation.getViewAtPosition(ITEM_SWAP) },
-                triggerClick = {
-                    replaceContentFragment(SwapTourFragment.newInstance())
-                },
-                analyticsEvent = IntroTourAnalyticsEvent.IntroSwapViewedAnalytics,
-                msgIcon = R.drawable.ic_vector_toolbar_swap,
-                msgTitle = R.string.tour_step_four_title,
-                msgBody = R.string.tour_step_four_body,
-                msgButton = R.string.tour_step_four_btn
             )
         )
 
         tour_guide.start(this, tourSteps)
+    }
+
+    override fun launchSimpleBuySell(viewType: BuySellFragment.BuySellViewType) {
+        setCurrentTabItem(ITEM_BUY_SELL)
+
+        val buySellFragment = BuySellFragment.newInstance(viewType)
+        replaceContentFragment(buySellFragment)
+    }
+
+    override fun launchOpenBankingLinking(bankLinkingInfo: BankLinkingInfo) {
+        startActivityForResult(
+            BankAuthActivity.newInstance(bankLinkingInfo.linkingId, bankLinkingInfo.bankAuthSource, this),
+            when (bankLinkingInfo.bankAuthSource) {
+                BankAuthSource.SIMPLE_BUY -> BANK_DEEP_LINK_SIMPLE_BUY
+                BankAuthSource.SETTINGS -> BANK_DEEP_LINK_SETTINGS
+                BankAuthSource.DEPOSIT -> BANK_DEEP_LINK_DEPOSIT
+                BankAuthSource.WITHDRAW -> BANK_DEEP_LINK_WITHDRAW
+            }.exhaustive
+        )
+    }
+
+    override fun launchSimpleBuyFromDeepLinkApproval() {
+        startActivity(SimpleBuyActivity.newInstance(this, launchFromApprovalDeepLink = true))
+    }
+
+    override fun handlePaymentForCancelledOrder(state: SimpleBuyState) =
+        replaceBottomSheet(
+            FiatTransactionBottomSheet.newInstance(
+                state.fiatCurrency, getString(R.string.yapily_payment_to_fiat_wallet_title, state.fiatCurrency),
+                getString(
+                    R.string.yapily_payment_to_fiat_wallet_subtitle,
+                    state.selectedCryptoCurrency?.displayTicker ?: getString(
+                        R.string.yapily_payment_to_fiat_wallet_default
+                    ),
+                    state.fiatCurrency
+                ),
+                FiatTransactionState.SUCCESS
+            )
+        )
+
+    override fun handleApprovalDepositComplete(
+        orderValue: FiatValue,
+        estimatedTransactionCompletionTime: String
+    ) =
+        replaceBottomSheet(
+            FiatTransactionBottomSheet.newInstance(
+                orderValue.currencyCode,
+                getString(R.string.deposit_confirmation_success_title, orderValue.toStringWithSymbol()),
+                getString(
+                    R.string.yapily_fiat_deposit_success_subtitle, orderValue.toStringWithSymbol(),
+                    orderValue.currencyCode,
+                    estimatedTransactionCompletionTime
+                ),
+                FiatTransactionState.SUCCESS
+            )
+        )
+
+    override fun handleApprovalDepositError(currency: String) =
+        replaceBottomSheet(
+            FiatTransactionBottomSheet.newInstance(
+                currency,
+                getString(R.string.deposit_confirmation_error_title),
+                getString(
+                    R.string.deposit_confirmation_error_subtitle
+                ),
+                FiatTransactionState.ERROR
+            )
+        )
+
+    override fun handleBuyApprovalError() {
+        ToastCustom.makeText(
+            this, getString(R.string.simple_buy_confirmation_error), Toast.LENGTH_LONG, ToastCustom.TYPE_ERROR
+        )
+    }
+
+    override fun handleApprovalDepositInProgress(amount: FiatValue) =
+        replaceBottomSheet(
+            FiatTransactionBottomSheet.newInstance(
+                amount.currencyCode,
+                getString(R.string.deposit_confirmation_pending_title),
+                getString(
+                    R.string.deposit_confirmation_pending_subtitle
+                ),
+                FiatTransactionState.PENDING
+            )
+        )
+
+    override fun handleApprovalDepositTimeout(currencyCode: String) =
+        replaceBottomSheet(
+            FiatTransactionBottomSheet.newInstance(
+                currencyCode,
+                getString(R.string.deposit_confirmation_pending_title),
+                getString(
+                    R.string.deposit_confirmation_pending_subtitle
+                ),
+                FiatTransactionState.ERROR
+            )
+        )
+
+    override fun showOpenBankingDeepLinkError() {
+        ToastCustom.makeText(
+            this, getString(R.string.open_banking_deeplink_error), Toast.LENGTH_LONG, ToastCustom.TYPE_ERROR
+        )
     }
 
     override fun onTourFinished() {
@@ -808,5 +935,9 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     }
 
     override fun onFlowFinished() {
+    }
+
+    override fun exitSimpleBuyFlow() {
+        launchSimpleBuySell()
     }
 }

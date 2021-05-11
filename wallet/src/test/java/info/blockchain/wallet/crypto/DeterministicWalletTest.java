@@ -6,7 +6,7 @@ import info.blockchain.wallet.test_data.TestVectorBip39;
 import info.blockchain.wallet.test_data.TestVectorBip39List;
 import info.blockchain.wallet.util.HexUtils;
 
-import org.bitcoinj.params.BitcoinMainNetParams;
+import org.bitcoinj.params.MainNetParams;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,19 +31,19 @@ public class DeterministicWalletTest {
     class TestWallet extends DeterministicWallet {
 
         public TestWallet(String coinPath, int mnemonicLength, String passphrase) {
-            super(BitcoinMainNetParams.get(), coinPath, mnemonicLength, passphrase);
+            super(MainNetParams.get(), coinPath, mnemonicLength, passphrase);
         }
 
         public TestWallet(String coinPath, String entropyHex, String passphrase) {
-            super(BitcoinMainNetParams.get(), coinPath, entropyHex, passphrase);
+            super(MainNetParams.get(), coinPath, entropyHex, passphrase);
         }
 
         public TestWallet(String coinPath, List<String> mnemonic, String passphrase) {
-            super(BitcoinMainNetParams.get(), coinPath, mnemonic, passphrase);
+            super(MainNetParams.get(), coinPath, mnemonic, passphrase);
         }
 
         public TestWallet() {
-            super(BitcoinMainNetParams.get());
+            super(MainNetParams.get());
         }
     }
 
@@ -228,7 +228,7 @@ public class DeterministicWalletTest {
 
             for(DeterministicAccount account : realWallet.getAccounts()) {
                 subject.addWatchOnlyAccount(account.getNode().serializePubB58(
-                    BitcoinMainNetParams.get()));
+                    MainNetParams.get()));
             }
 
             assertTrue(subject.isWatchOnly());

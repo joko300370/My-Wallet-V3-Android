@@ -1,9 +1,7 @@
 package com.blockchain.sunriver
 
-import com.blockchain.account.BalanceAndMin
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
-import info.blockchain.balance.withMajorValue
 import org.stellar.sdk.AssetTypeNative
 import org.stellar.sdk.CreateAccountOperation
 import org.stellar.sdk.KeyPair
@@ -15,15 +13,13 @@ import org.stellar.sdk.Server
 import org.stellar.sdk.Transaction
 import org.stellar.sdk.requests.ErrorResponse
 import org.stellar.sdk.requests.RequestBuilder
-import org.stellar.sdk.requests.TooManyRequestsException
 import org.stellar.sdk.responses.AccountResponse
 import org.stellar.sdk.responses.TransactionResponse
 import org.stellar.sdk.responses.operations.OperationResponse
-import java.io.IOException
 import java.math.BigDecimal
 import java.math.BigInteger
 
-private val basePerOperationFee = CryptoValue.lumensFromStroop(100.toBigInteger())
+private val basePerOperationFee = CryptoValue.fromMinor(CryptoCurrency.XLM, 100.toBigInteger())
 
 internal class HorizonProxy {
 
@@ -80,7 +76,6 @@ internal class HorizonProxy {
         }
     }
 
-    @Throws(IOException::class, TooManyRequestsException::class)
     fun getTransaction(hash: String): TransactionResponse =
         server.transactions()
             .transaction(hash)
@@ -169,7 +164,7 @@ internal class HorizonProxy {
                 timeout,
                 perOperationFee
             )
-        val fee = CryptoValue.lumensFromStroop(transaction.fee.toBigInteger())
+        val fee = CryptoValue.fromMinor(CryptoCurrency.XLM, transaction.fee.toBigInteger())
         val total = amount + fee
         val minBalance = minBalance(minReserve, account.subentryCount)
         if (account.balance < total + minBalance) {
@@ -188,7 +183,7 @@ internal class HorizonProxy {
     /**
      * TODO("AND-1601") Get min reserve dynamically.
      */
-    private val minReserve = CryptoCurrency.XLM.withMajorValue(0.5.toBigDecimal())
+    private val minReserve = CryptoValue.fromMajor(CryptoCurrency.XLM, 0.5.toBigDecimal())
     private val minSend = CryptoValue(CryptoCurrency.XLM, BigInteger.ONE)
 
     class SendResult(
@@ -270,10 +265,10 @@ private val AccountResponse?.balance: CryptoValue
         this?.balances?.firstOrNull {
             it.assetType == "native" && it.assetCode == null
         }?.balance?.let { CryptoValue.fromMajor(CryptoCurrency.XLM, it.toBigDecimal()) }
-            ?: CryptoValue.ZeroXlm
+            ?: CryptoValue.zero(CryptoCurrency.XLM)
 
 private fun AccountResponse?.minBalance(minReserve: CryptoValue): CryptoValue =
-    this?.let { minBalance(minReserve, subentryCount) } ?: CryptoValue.ZeroXlm
+    this?.let { minBalance(minReserve, subentryCount) } ?: CryptoValue.zero(CryptoCurrency.XLM)
 
 private fun minBalance(minReserve: CryptoValue, subentryCount: Int) =
     CryptoValue.fromMajor(CryptoCurrency.XLM, (2 + subentryCount).toBigDecimal() * minReserve.toBigDecimal())

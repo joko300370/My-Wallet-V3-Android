@@ -15,10 +15,10 @@ import kotlinx.android.synthetic.main.enter_fiat_crypto_layout.view.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.androidcoreui.utils.DecimalDigitsInputFilter
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visible
-import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
+import piuk.blockchain.android.ui.customviews.inputview.DecimalDigitsInputFilter
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.AfterTextChangedWatcher
 import java.text.DecimalFormatSymbols
 import java.util.Currency
 import java.util.Locale
@@ -49,13 +49,13 @@ class SingleCurrencyInputView(context: Context, attrs: AttributeSet) : Constrain
                 configuration.let {
                     when (it) {
                         is SingleInputViewConfiguration.Fiat -> {
-                            val fiatAmount = enter_amount.majorValue.toBigDecimalOrNull()?.let { amount ->
+                            val fiatAmount = enter_amount.bigDecimalValue?.let { amount ->
                                 FiatValue.fromMajor(it.fiatCurrency, amount)
                             } ?: FiatValue.zero(it.fiatCurrency)
                             amountSubject.onNext(fiatAmount)
                         }
                         is SingleInputViewConfiguration.Crypto -> {
-                            val cryptoAmount = enter_amount.majorValue.toBigDecimalOrNull()?.let { amount ->
+                            val cryptoAmount = enter_amount.bigDecimalValue?.let { amount ->
                                 CryptoValue.fromMajor(it.cryptoCurrency, amount)
                             } ?: CryptoValue.zero(it.cryptoCurrency)
 
@@ -126,9 +126,8 @@ class SingleCurrencyInputView(context: Context, attrs: AttributeSet) : Constrain
         filters =
             arrayOf(
                 DecimalDigitsInputFilter(
-                    maxIntegerDigitsForAmount,
-                    maxDecimalDigitsForAmount,
-                    prefixOrSuffix
+                    digitsAfterZero = maxDecimalDigitsForAmount,
+                    prefixOrSuffix = prefixOrSuffix
                 )
             )
     }

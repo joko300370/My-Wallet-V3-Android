@@ -43,14 +43,16 @@ class MetadataManager(
     private val metadataNodeFactory: MetadataNodeFactory
         get() = _metadataNodeFactory?.let {
             it
-        } ?: MetadataNodeFactory(credentials.guid,
+        } ?: MetadataNodeFactory(
+            credentials.guid,
             credentials.sharedKey,
             credentials.password,
-            metadataDerivation).also {
+            metadataDerivation
+        ).also {
             _metadataNodeFactory = it
         }
 
-    fun attemptMetadataSetup() = initMetadataNodes()
+    fun attemptMetadataSetup() = Completable.defer { initMetadataNodes() }
 
     fun decryptAndSetupMetadata(
         secondPassword: String
@@ -59,11 +61,6 @@ class MetadataManager(
         return generateNodes()
             .then { initMetadataNodes() }
     }
-
-    fun buildMetadata(metadataType: Int): Metadata =
-        metadataNodeFactory.metadataNode?.let {
-            Metadata.newInstance(metaDataHDNode = it, type = metadataType, metadataDerivation = metadataDerivation)
-        } ?: throw IllegalStateException("Metadata node is null")
 
     fun fetchMetadata(metadataType: Int): Maybe<String> =
         metadataNodeFactory.metadataNode?.let {
@@ -86,8 +83,10 @@ class MetadataManager(
 
     fun saveToMetadata(data: String, metadataType: Int): Completable =
         metadataNodeFactory.metadataNode?.let {
-            metadataInteractor.putMetadata(data,
-                Metadata.newInstance(metaDataHDNode = it, type = metadataType, metadataDerivation = metadataDerivation))
+            metadataInteractor.putMetadata(
+                data,
+                Metadata.newInstance(metaDataHDNode = it, type = metadataType, metadataDerivation = metadataDerivation)
+            )
         } ?: Completable.error(IllegalStateException("Metadata node is null"))
 
     /**
@@ -137,10 +136,6 @@ class MetadataManager(
      * Generates the nodes for the shared metadata service and saves them on the service. Takes an
      * optional second password if set by the user. this#loadNodes(String, String, String)
      * must be called first to avoid a {@link NullPointerException}.
-     *
-     * @param secondPassword An optional second password, if applicable
-     * @throws Exception Can throw a {@link DecryptionException} if the second password is wrong, or
-     *                   a generic Exception if saving the nodes fails
      */
     private fun generateNodes(): Completable {
         val remoteMetadataNodes = metadataNodeFactory.remoteMetadataHdNodes(payloadDataManager.masterKey)
@@ -167,6 +162,7 @@ private class MetadataBadPaddingTracker(metadataType: Int, throwable: Throwable)
                 9 -> "lockbox"
                 10 -> "userCredentials"
                 11 -> "bsv" // No longer used
+                12 -> "walletCredentials" // No longer used
                 else -> "unknown"
             }
     }

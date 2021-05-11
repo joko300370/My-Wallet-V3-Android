@@ -1,30 +1,41 @@
 package piuk.blockchain.android.coincore.impl.txEngine
 
+import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.WalletStatus
-import com.blockchain.swap.nabu.extensions.fromIso8601ToUtc
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
+import io.reactivex.Observable
 import io.reactivex.Single
-import piuk.blockchain.android.coincore.CryptoAccount
+import io.reactivex.disposables.Disposable
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
+import piuk.blockchain.android.coincore.TxConfirmation
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxResult
-import piuk.blockchain.android.coincore.TxOption
-import piuk.blockchain.android.coincore.TxOptionValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
+import piuk.blockchain.android.coincore.copyAndPut
 import piuk.blockchain.android.coincore.impl.BitPayInvoiceTarget
+import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
+import piuk.blockchain.android.data.api.bitpay.analytics.BitPayEvent
 import piuk.blockchain.android.data.api.bitpay.models.BitPayTransaction
 import piuk.blockchain.android.data.api.bitpay.models.BitPaymentRequest
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import java.lang.IllegalStateException
-import java.util.Calendar
+import rx.Subscription
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
+
+const val BITPAY_TIMER_SUB = "bitpay_timer"
+private val PendingTx.bitpayTimer: Subscription?
+    get() = (this.engineState[BITPAY_TIMER_SUB] as? Subscription)
 
 interface EngineTransaction {
     val encodedMsg: String
@@ -38,17 +49,20 @@ interface BitPayClientEngine {
     fun doOnTransactionFailed(pendingTx: PendingTx, e: Throwable)
 }
 
-class BtcBitpayTxEngine(
+class BitpayTxEngine(
     private val bitPayDataManager: BitPayDataManager,
     private val assetEngine: OnChainTxEngineBase,
-    private val walletPrefs: WalletStatus
+    private val walletPrefs: WalletStatus,
+    private val analytics: Analytics
 ) : TxEngine() {
 
     override fun assertInputsValid() {
-        // Only support BTC bitpay at this time
-        require(asset == CryptoCurrency.BTC)
-        require(txTarget is BitPayInvoiceTarget)
+        // Only support non-custodial BTC bitpay at this time
+        check(sourceAccount is CryptoNonCustodialAccount)
+        check(sourceAsset == CryptoCurrency.BTC)
+        check(txTarget is BitPayInvoiceTarget)
         require(assetEngine is BitPayClientEngine)
+        assetEngine.assertInputsValid()
     }
 
     private val executionClient: BitPayClientEngine by unsafeLazy {
@@ -60,12 +74,13 @@ class BtcBitpayTxEngine(
     }
 
     override fun start(
-        sourceAccount: CryptoAccount,
+        sourceAccount: BlockchainAccount,
         txTarget: TransactionTarget,
-        exchangeRates: ExchangeRateDataManager
+        exchangeRates: ExchangeRateDataManager,
+        refreshTrigger: RefreshTrigger
     ) {
-        super.start(sourceAccount, txTarget, exchangeRates)
-        assetEngine.start(sourceAccount, txTarget, exchangeRates)
+        super.start(sourceAccount, txTarget, exchangeRates, refreshTrigger)
+        assetEngine.start(sourceAccount, txTarget, exchangeRates, refreshTrigger)
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
@@ -73,7 +88,10 @@ class BtcBitpayTxEngine(
             .map { tx ->
                 tx.copy(
                     amount = bitpayInvoice.amount,
-                    feeLevel = FeeLevel.Priority
+                    feeSelection = tx.feeSelection.copy(
+                        selectedLevel = FeeLevel.Priority,
+                        availableLevels = AVAILABLE_FEE_LEVELS
+                    )
                 )
             }
 
@@ -81,8 +99,13 @@ class BtcBitpayTxEngine(
         assetEngine.doUpdateAmount(bitpayInvoice.amount, pendingTx)
             .flatMap { assetEngine.doBuildConfirmations(it) }
             .map { pTx ->
-                pTx.addOrReplaceOption(TxOptionValue.BitPayCountdown(getCountdownTimeoutMs()), true).run {
-                    if (hasOption(TxOption.FEE_SELECTION)) {
+                startTimerIfNotStarted(pTx)
+            }.map { pTx ->
+                pTx.addOrReplaceOption(
+                    TxConfirmationValue.BitPayCountdown(timeRemainingSecs()),
+                    true
+                ).run {
+                    if (hasOption(TxConfirmation.FEE_SELECTION)) {
                         addOrReplaceOption(makeFeeSelectionOption(pTx))
                     } else {
                         this
@@ -90,19 +113,66 @@ class BtcBitpayTxEngine(
                 }
             }
 
+    override fun doRefreshConfirmations(pendingTx: PendingTx): Single<PendingTx> =
+        Single.just(pendingTx.addOrReplaceOption(TxConfirmationValue.BitPayCountdown(timeRemainingSecs()), true))
+
+    private fun startTimerIfNotStarted(pendingTx: PendingTx): PendingTx =
+        if (pendingTx.bitpayTimer == null) {
+            pendingTx.copy(
+                engineState = pendingTx.engineState.copyAndPut(
+                    BITPAY_TIMER_SUB, startCountdownTimer(timeRemainingSecs())
+                )
+            )
+        } else {
+            pendingTx
+        }
+
+    private fun timeRemainingSecs() =
+        (bitpayInvoice.expireTimeMs - System.currentTimeMillis()) / 1000
+
+    private fun startCountdownTimer(remainingTime: Long): Disposable {
+        var remaining = remainingTime
+        return Observable.interval(1, TimeUnit.SECONDS)
+            .doOnEach { remaining-- }
+            .map { remaining }
+            .doOnNext { updateCountdownConfirmation() }
+            .takeUntil { it <= TIMEOUT_STOP }
+            .doOnComplete { handleCountdownComplete() }
+            .subscribe()
+    }
+
+    private fun updateCountdownConfirmation() {
+        refreshConfirmations(false)
+    }
+
+    private fun handleCountdownComplete() {
+        Timber.d("BitPay Invoice Countdown expired")
+        refreshConfirmations(true)
+    }
+
     // BitPay invoices _always_ require priority fees, so replace the option as defined by the
     // underlying asset engine.
-    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxOptionValue.FeeSelection =
-        TxOptionValue.FeeSelection(
-            absoluteFee = pendingTx.fees,
-            exchange = pendingTx.fees.toFiat(exchangeRates, userFiat),
-            selectedLevel = pendingTx.feeLevel,
-            availableLevels = setOf(FeeLevel.Priority)
+    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
+        TxConfirmationValue.FeeSelection(
+            feeDetails = FeeState.FeeDetails(pendingTx.feeAmount),
+            exchange = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+            selectedLevel = pendingTx.feeSelection.selectedLevel,
+            availableLevels = setOf(FeeLevel.Priority),
+            asset = sourceAsset
         )
 
     // Don't set the amount here, it is fixed so we can do it in the confirmation building step
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> =
         Single.just(pendingTx)
+
+    override fun doUpdateFeeLevel(
+        pendingTx: PendingTx,
+        level: FeeLevel,
+        customFeeAmount: Long
+    ): Single<PendingTx> {
+        require(pendingTx.feeSelection.availableLevels.contains(level))
+        return Single.just(pendingTx)
+    }
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         assetEngine.doValidateAmount(pendingTx)
@@ -115,20 +185,12 @@ class BtcBitpayTxEngine(
     private fun doValidateTimeout(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(pendingTx)
             .map { pTx ->
-                val remaining = (getCountdownTimeoutMs() - System.currentTimeMillis())
-                if (remaining <= 0) {
+                if (timeRemainingSecs() <= TIMEOUT_STOP) {
+                    analytics.logEvent(BitPayEvent.InvoiceExpired)
                     throw TxValidationFailure(ValidationState.INVOICE_EXPIRED)
                 }
                 pTx
             }
-
-    private fun getCountdownTimeoutMs(): Long =
-        bitpayInvoice.expires.fromIso8601ToUtc()?.let {
-            val calendar = Calendar.getInstance()
-            val timeZone = calendar.timeZone
-            val offset = timeZone.getOffset(it.time).toLong()
-            return it.time + offset
-        } ?: throw IllegalStateException("Unknown countdown time")
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
         executionClient.doPrepareTransaction(pendingTx, secondPassword)
@@ -136,13 +198,11 @@ class BtcBitpayTxEngine(
                 doExecuteTransaction(bitpayInvoice.invoiceId, preparedTx)
             }.doOnSuccess {
                 walletPrefs.setBitPaySuccess()
-//                analytics.logEvent(BitPayEvent.SuccessEvent(pendingTx.amount, CryptoCurrency.BTC))
+                analytics.logEvent(BitPayEvent.TxSuccess(pendingTx.amount as CryptoValue))
                 executionClient.doOnTransactionSuccess(pendingTx)
             }.doOnError { e ->
+                analytics.logEvent(BitPayEvent.TxFailed(e.message ?: e.toString()))
                 executionClient.doOnTransactionFailed(pendingTx, e)
-//                (it as? BitPayApiException)?.let { bitpayException ->
-//                    analytics.logEvent(BitPayEvent.FailureEvent(bitpayException.message ?: ""))
-//                }
             }.map {
                 TxResult.HashedTxResult(it, pendingTx.amount)
             }
@@ -180,4 +240,9 @@ class BtcBitpayTxEngine(
         }.map {
             tx.txHash
         }
+
+    companion object {
+        private const val TIMEOUT_STOP = 2
+        private val AVAILABLE_FEE_LEVELS = setOf(FeeLevel.Priority)
+    }
 }

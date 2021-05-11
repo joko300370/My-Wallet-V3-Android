@@ -2,28 +2,27 @@ package piuk.blockchain.android.ui.base
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.view.MotionEvent
+import android.view.WindowManager
 import androidx.annotation.CallSuper
 import androidx.annotation.StringRes
 import androidx.annotation.UiThread
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import androidx.appcompat.app.AlertDialog
-import android.view.MotionEvent
-import android.view.WindowManager
-import com.blockchain.koin.scopedInjectActivity
+import androidx.viewbinding.ViewBinding
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.SecurityPrefs
 import com.blockchain.ui.ActivityIndicator
-import com.blockchain.ui.dialog.MaterialProgressDialog
-import com.blockchain.ui.password.SecondPasswordHandler
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.koin.android.ext.android.inject
+import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.data.access.LogoutTimer
 import piuk.blockchain.androidcoreui.ApplicationLifeCycle
-import piuk.blockchain.androidcoreui.R
 import piuk.blockchain.androidcoreui.ui.base.ToolBarActivity
 
 /**
@@ -37,8 +36,6 @@ abstract class BlockchainActivity : ToolBarActivity() {
 
     val analytics: Analytics by inject()
     val appUtil: AppUtil by inject()
-
-    protected val secondPasswordHandler: SecondPasswordHandler by scopedInjectActivity()
 
     protected abstract val alwaysDisableScreenshots: Boolean
 
@@ -89,13 +86,15 @@ abstract class BlockchainActivity : ToolBarActivity() {
         }
         appUtil.activityIndicator = activityIndicator
 
-        compositeDisposable += activityIndicator.loading.observeOn(AndroidSchedulers.mainThread()).subscribeBy {
-            if (it == true) {
-                showLoading()
-            } else {
-                hideLoading()
+        compositeDisposable += activityIndicator.loading
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy {
+                if (it == true) {
+                    showLoading()
+                } else {
+                    hideLoading()
+                }
             }
-        }
     }
 
     protected open fun showLoading() {}
@@ -191,9 +190,15 @@ abstract class BlockchainActivity : ToolBarActivity() {
         val dlg = supportFragmentManager.findFragmentByTag(BOTTOM_DIALOG)
 
         dlg?.let {
-            (it as? SlidingModalBottomDialog)?.dismiss()
+            (it as? SlidingModalBottomDialog<ViewBinding>)?.dismiss()
                 ?: throw IllegalStateException("Fragment is not a $BOTTOM_DIALOG")
         }
+    }
+
+    @UiThread
+    fun replaceBottomSheet(bottomSheet: BottomSheetDialogFragment) {
+        clearBottomSheet()
+        showBottomSheet(bottomSheet)
     }
 
     override fun onBackPressed() {

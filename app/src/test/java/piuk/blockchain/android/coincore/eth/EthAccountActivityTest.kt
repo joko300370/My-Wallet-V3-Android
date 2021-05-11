@@ -2,18 +2,31 @@ package piuk.blockchain.android.coincore.eth
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.preferences.WalletStatus
+import com.blockchain.nabu.datamanagers.CurrencyPair
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.TransferDirection
+import com.blockchain.nabu.datamanagers.CustodialOrderState
+import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
+import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
+import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.FiatValue
+import info.blockchain.wallet.ethereum.EthereumAccount
 import info.blockchain.wallet.ethereum.data.EthLatestBlockNumber
 import info.blockchain.wallet.ethereum.data.EthTransaction
 import io.reactivex.Single
+import org.amshove.kluent.itReturns
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.spy
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
+import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.ethereum.models.CombinedEthModel
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -27,16 +40,26 @@ class EthAccountActivityTest {
     private val feeDataManager: FeeDataManager = mock()
     private val exchangeRates: ExchangeRateDataManager = mock()
     private val currencyPrefs: CurrencyPrefs = mock()
+    private val walletPrefs: WalletStatus = mock()
+    private val custodialWalletManager: CustodialWalletManager = mock()
+    private val ethAccount: EthereumAccount = mock {
+        on { address } itReturns ETH_ADDRESS
+        on { label } itReturns "TestEthAccount"
+    }
 
     private val subject =
-        spy(EthCryptoWalletAccount(
-            payloadManager = payloadManager,
-            label = "TestEthAccount",
-            address = "Test Address",
-            ethDataManager = ethDataManager,
-            fees = feeDataManager,
-            exchangeRates = exchangeRates
-        ))
+        spy(
+            EthCryptoWalletAccount(
+                payloadManager = payloadManager,
+                jsonAccount = ethAccount,
+                ethDataManager = ethDataManager,
+                fees = feeDataManager,
+                exchangeRates = exchangeRates,
+                walletPreferences = walletPrefs,
+                custodialWalletManager = custodialWalletManager,
+                identity = mock()
+            )
+        )
 
     @get:Rule
     val rxSchedulers = rxInit {
@@ -51,7 +74,75 @@ class EthAccountActivityTest {
     }
 
     @Test
-    fun fetchTransactionsEthereum() {
+    fun fetchTransactionsEthereumReplaceSendWithSwap() {
+        // Arrange
+        val latestBlock = EthLatestBlockNumber()
+        val transaction = EthTransaction(
+            hash = "hash",
+            from = ETH_ADDRESS,
+            to = "122345"
+        )
+
+        val ethModel: CombinedEthModel = mock()
+
+        whenever(ethDataManager.getLatestBlockNumber())
+            .thenReturn(Single.just(latestBlock))
+
+        whenever(ethDataManager.getEthTransactions())
+            .thenReturn(Single.just(listOf(transaction)))
+
+        whenever(ethDataManager.getEthResponseModel())
+            .thenReturn(ethModel)
+
+        val swapSummary = TradeTransactionItem(
+            "hash",
+            1L,
+            TransferDirection.ON_CHAIN,
+            "sendingAddress",
+            "receivingAddress",
+            CustodialOrderState.FINISHED,
+            CryptoValue.zero(CryptoCurrency.ETHER),
+            CryptoValue.zero(CryptoCurrency.BTC),
+            CryptoValue.zero(CryptoCurrency.BTC),
+            CurrencyPair.CryptoCurrencyPair(CryptoCurrency.ETHER, CryptoCurrency.BTC),
+            FiatValue.zero("USD"),
+            "USD"
+        )
+
+        val summaryList = listOf(swapSummary)
+        whenever(custodialWalletManager.getCustodialActivityForAsset(any(), any()))
+            .thenReturn(Single.just(summaryList))
+
+        doReturn(false).`when`(subject).isErc20FeeTransaction(any())
+
+        subject.activity
+            .test()
+            .assertComplete()
+            .assertNoErrors()
+            .assertValue {
+                it.size == 1 &&
+                    it[0].run {
+                        this is TradeActivitySummaryItem &&
+                            txId == swapSummary.txId &&
+                            direction == swapSummary.direction &&
+                            currencyPair == CurrencyPair.CryptoCurrencyPair(
+                            CryptoCurrency.ETHER,
+                            CryptoCurrency.BTC
+                        ) &&
+                            sendingAddress == swapSummary.sendingAddress &&
+                            receivingAddress == swapSummary.receivingAddress &&
+                            state == swapSummary.state &&
+                            fiatValue == swapSummary.fiatValue &&
+                            fiatCurrency == swapSummary.fiatCurrency
+                    }
+            }
+
+        verify(ethDataManager).getLatestBlockNumber()
+        verify(ethDataManager).getEthTransactions()
+    }
+
+    @Test
+    fun fetchTransactionsEthereumReceive() {
         // Arrange
         val latestBlock = EthLatestBlockNumber()
         val transaction: EthTransaction = mock()
@@ -71,12 +162,37 @@ class EthAccountActivityTest {
         whenever(ethDataManager.getEthResponseModel())
             .thenReturn(ethModel)
 
-        doReturn(true).`when`(subject).isErc20FeeTransaction(to)
+        val swapSummary = TradeTransactionItem(
+            "123",
+            1L,
+            TransferDirection.ON_CHAIN,
+            "sendingAddress",
+            "receivingAddress",
+            CustodialOrderState.FINISHED,
+            CryptoValue.zero(CryptoCurrency.ETHER),
+            CryptoValue.zero(CryptoCurrency.BTC),
+            CryptoValue.zero(CryptoCurrency.BTC),
+            CurrencyPair.CryptoCurrencyPair(CryptoCurrency.ETHER, CryptoCurrency.BTC),
+            FiatValue.zero("USD"),
+            "USD"
+        )
+
+        val summaryList = listOf(swapSummary)
+        whenever(custodialWalletManager.getCustodialActivityForAsset(any(), any()))
+            .thenReturn(Single.just(summaryList))
+
+        doReturn(false).`when`(subject).isErc20FeeTransaction(to)
 
         subject.activity
             .test()
             .assertComplete()
             .assertNoErrors()
+            .assertValue {
+                it.size == 1 &&
+                    it[0].run {
+                        this is EthActivitySummaryItem
+                    }
+            }
 
         verify(ethDataManager).getLatestBlockNumber()
         verify(ethDataManager).getEthTransactions()
@@ -98,6 +214,9 @@ class EthAccountActivityTest {
             .thenReturn(Single.just(listOf(ethTransaction)))
 
         doReturn(true).`when`(subject).isErc20FeeTransaction(ethTransaction.to)
+
+        whenever(custodialWalletManager.getCustodialActivityForAsset(any(), any()))
+            .thenReturn(Single.just(emptyList()))
 
         subject.activity
             .test()
@@ -130,6 +249,9 @@ class EthAccountActivityTest {
         whenever(ethDataManager.getEthTransactions())
             .thenReturn(Single.just(listOf(ethTransaction)))
 
+        whenever(custodialWalletManager.getCustodialActivityForAsset(any(), any()))
+            .thenReturn(Single.just(emptyList()))
+
         subject.activity
             .test()
             .assertValueCount(1)
@@ -143,5 +265,9 @@ class EthAccountActivityTest {
             }
 
         verify(ethDataManager).getEthTransactions()
+    }
+
+    companion object {
+        private const val ETH_ADDRESS = "test_address"
     }
 }

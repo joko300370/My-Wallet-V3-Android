@@ -12,21 +12,24 @@ import com.blockchain.notifications.NotificationsUtil
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.NotificationAppOpened
 import kotlinx.android.synthetic.main.activity_launcher.*
+import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.simplebuy.SimpleBuyIntroFragment
 import piuk.blockchain.android.ui.auth.PinEntryActivity
+import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.ui.home.MainActivity
+import piuk.blockchain.android.ui.kyc.email.entry.EmailEntryHost
+import piuk.blockchain.android.ui.kyc.email.entry.KycEmailEntryFragment
 import piuk.blockchain.android.ui.start.LandingActivity
 import piuk.blockchain.android.ui.start.PasswordRequiredActivity
-import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
-import piuk.blockchain.androidcoreui.utils.ViewUtils
-import piuk.blockchain.androidcoreui.utils.extensions.toast
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
+import piuk.blockchain.android.util.ViewUtils
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 
-class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), LauncherView {
+class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), LauncherView, EmailEntryHost {
 
     private val analytics: Analytics by inject()
     private val launcherPresenter: LauncherPresenter by scopedInject()
@@ -34,7 +37,8 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launcher)
-
+        setSupportActionBar(toolbar_general)
+        toolbar_general.gone()
         if (intent.hasExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION) &&
             intent.getBooleanExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION, false)
         ) {
@@ -69,11 +73,6 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
             .show()
     }
 
-    override fun onRequestUpgrade() {
-        startActivity(Intent(this, UpgradeWalletActivity::class.java))
-        finish()
-    }
-
     override fun onStartMainActivity(uri: Uri?, launchBuySellIntro: Boolean) {
         val intent = Intent(this, MainActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -83,9 +82,9 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
         startActivity(intent)
     }
 
-    override fun launchBuySellIntro() {
+    override fun launchEmailVerification() {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.content_frame, SimpleBuyIntroFragment(), SimpleBuyIntroFragment::class.simpleName)
+            .replace(R.id.content_frame, KycEmailEntryFragment(), KycEmailEntryFragment::class.simpleName)
             .commitAllowingStateLoss()
     }
 
@@ -100,8 +99,8 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
             AlertDialog.Builder(this, R.style.AlertDialogStyle)
                 .setTitle(R.string.app_name)
                 .setMessage(R.string.metadata_load_failure)
-                .setPositiveButton(R.string.retry) { _, _ -> presenter.onViewReady() }
-                .setNegativeButton(R.string.exit) { _, _ -> presenter.clearLoginState() }
+                .setPositiveButton(R.string.retry) { _, _ -> onRequestPin() }
+                .setNegativeButton(R.string.exit) { _, _ -> finish() }
                 .setCancelable(false)
                 .create()
                 .show()
@@ -113,8 +112,8 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
         editText.setHint(R.string.password)
         editText.inputType =
             InputType.TYPE_CLASS_TEXT or
-                    InputType.TYPE_TEXT_VARIATION_PASSWORD or
-                    InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+                InputType.TYPE_TEXT_VARIATION_PASSWORD or
+                InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
 
         val frameLayout = ViewUtils.getAlertDialogPaddedView(this, editText)
 
@@ -148,11 +147,24 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
     private class DelayStartRunnable internal constructor(
         private val activity: LauncherActivity
     ) : Runnable {
-
         override fun run() {
             if (activity.presenter != null && !activity.isFinishing) {
                 activity.onViewReady()
             }
         }
+    }
+
+    override fun onEmailEntryFragmentShown() {
+        setupToolbar(toolbar_general, R.string.security_check)
+        toolbar_general.navigationIcon = null
+        toolbar_general.visible()
+    }
+
+    override fun onEmailVerified() {
+        presenter.onEmailVerificationFinished()
+    }
+
+    override fun onEmailVerificationSkipped() {
+        presenter.onEmailVerificationFinished()
     }
 }

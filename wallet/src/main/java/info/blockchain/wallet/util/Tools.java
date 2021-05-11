@@ -1,21 +1,26 @@
 package info.blockchain.wallet.util;
 
-import info.blockchain.wallet.api.PersistentUrls;
+import info.blockchain.wallet.bch.BchTransaction;
+import info.blockchain.wallet.bch.BchMainNetParams;
 import info.blockchain.wallet.bip44.HDAccount;
-import info.blockchain.wallet.payload.data.LegacyAddress;
+import info.blockchain.wallet.payload.data.ImportedAddress;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+
 import javax.annotation.Nonnull;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.LegacyAddress;
+import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.TransactionInput;
 import org.bitcoinj.core.TransactionOutput;
+import org.bitcoinj.params.MainNetParams;
 
 public class Tools {
 
@@ -25,35 +30,29 @@ public class Tools {
         List<TransactionInput> inputList = new ArrayList<>(transaction.getInputs());
         List<TransactionOutput> outputList = new ArrayList<>(transaction.getOutputs());
 
-        Collections.sort(inputList, new Comparator<TransactionInput>() {
-            @Override
-            public int compare(TransactionInput o1, TransactionInput o2) {
-                byte[] hash1 = o1.getOutpoint().getHash().getBytes();
-                byte[] hash2 = o2.getOutpoint().getHash().getBytes();
-                int hashCompare = LexicographicalComparator.getComparator().compare(hash1, hash2);
-                if (hashCompare != 0) {
-                    return hashCompare;
-                } else {
-                    return (int) (o1.getOutpoint().getIndex() - o2.getOutpoint().getIndex());
-                }
+        Collections.sort(inputList, (o1, o2) -> {
+            byte[] hash1 = o1.getOutpoint().getHash().getBytes();
+            byte[] hash2 = o2.getOutpoint().getHash().getBytes();
+            int hashCompare = LexicographicalComparator.getComparator().compare(hash1, hash2);
+            if (hashCompare != 0) {
+                return hashCompare;
+            } else {
+                return (int) (o1.getOutpoint().getIndex() - o2.getOutpoint().getIndex());
             }
         });
 
-        Collections.sort(outputList, new Comparator<TransactionOutput>() {
-            @Override
-            public int compare(TransactionOutput o1, TransactionOutput o2) {
-                long amountDiff = o1.getValue().getValue() - o2.getValue().value;
-                if (amountDiff != 0) {
-                    return (int) amountDiff;
-                } else {
-                    byte[] hash1 = o1.getScriptBytes();
-                    byte[] hash2 = o2.getScriptBytes();
-                    return LexicographicalComparator.getComparator().compare(hash1, hash2);
-                }
+        Collections.sort(outputList, (o1, o2) -> {
+            long amountDiff = o1.getValue().getValue() - o2.getValue().value;
+            if (amountDiff != 0) {
+                return (int) amountDiff;
+            } else {
+                byte[] hash1 = o1.getScriptBytes();
+                byte[] hash2 = o2.getScriptBytes();
+                return LexicographicalComparator.getComparator().compare(hash1, hash2);
             }
         });
 
-        Transaction sortedTransaction = new Transaction(transaction.getParams());
+        Transaction sortedTransaction = makeTxObject(transaction.getParams());
         for (TransactionInput input : inputList) {
             sortedTransaction.addInput(input);
         }
@@ -78,8 +77,10 @@ public class Tools {
         return data;
     }
 
-    public static ECKey getECKeyFromKeyAndAddress(@Nonnull String decryptedKey, @Nonnull String address) throws
-            AddressFormatException {
+    public static ECKey getECKeyFromKeyAndAddress(
+        @Nonnull String decryptedKey,
+        @Nonnull String address
+    ) throws  AddressFormatException {
 
         byte[] privBytes = Base58.decode(decryptedKey);
         ECKey ecKey;
@@ -97,10 +98,10 @@ public class Tools {
             keyUnCompressed = ECKey.fromPrivate(priv2, false);
         }
 
-        if (keyCompressed.toAddress(PersistentUrls.getInstance().getBitcoinParams())
+        if (LegacyAddress.fromKey(MainNetParams.get(), keyCompressed)
                 .toString().equals(address)) {
             ecKey = keyCompressed;
-        } else if (keyUnCompressed.toAddress(PersistentUrls.getInstance().getBitcoinParams())
+        } else if (LegacyAddress.fromKey(MainNetParams.get(), keyUnCompressed)
                 .toString().equals(address)) {
             ecKey = keyUnCompressed;
         } else {
@@ -110,11 +111,11 @@ public class Tools {
         return ecKey;
     }
 
-    public static List<String> filterLegacyAddress(int filter, @Nonnull List<LegacyAddress> keys) {
+    public static List<String> filterImportedAddress(int filter, @Nonnull List<ImportedAddress> keys) {
 
         List<String> addressList = new ArrayList<>();
 
-        for (LegacyAddress key : keys) {
+        for (ImportedAddress key : keys) {
             if (key.getTag() == filter) {
                 addressList.add(key.getAddress());
             }
@@ -123,18 +124,6 @@ public class Tools {
         return addressList;
     }
 
-    public static List<String> getAddressList(int chain, String xpub, int startIndex, int endIndex) {
-        HDAccount hdAccount = new HDAccount(PersistentUrls.getInstance().getBitcoinParams(),
-                xpub);
-
-        List<String> list = new ArrayList<>();
-
-        for (int i = startIndex; i < endIndex; i++) {
-            list.add(hdAccount.getChain(chain).getAddressAt(i).getAddressString());
-        }
-
-        return list;
-    }
 
     /**
      * Returns a list of receive addresses between two points on the chain.
@@ -144,14 +133,21 @@ public class Tools {
      * @param endIndex   The finishing index, an arbitrary number away from the starting point
      * @return A non-null List of addresses as Strings
      */
-    public static List<String> getReceiveAddressList(HDAccount account, int startIndex, int endIndex) {
+    public static List<String> getReceiveAddressList(HDAccount account, int startIndex, int endIndex, int derivationType) {
         List<String> list = new ArrayList<>();
 
         for (int i = startIndex; i < endIndex; i++) {
-            list.add(account.getReceive().getAddressAt(i).getAddressString());
+            list.add(account.getReceive().getAddressAt(i, derivationType).getFormattedAddress());
         }
 
         return list;
     }
 
+    public static Transaction makeTxObject(NetworkParameters params) {
+        if (params instanceof BchMainNetParams) {
+            return new BchTransaction(params);
+        } else {
+            return new Transaction(params);
+        }
+    }
 }

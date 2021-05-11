@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -15,18 +16,42 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/vector_sheet_indicator_small" />
 
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/address_sheet_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small_margin"
+        android:background="@android:color/transparent"
+        android:padding="@dimen/tiny_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/title"
+        app:srcCompat="@drawable/ic_arrow_back_blue" />
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/title"
         style="@style/Text.Semibold.20"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginTop="@dimen/small_margin"
         android:layout_marginEnd="@dimen/standard_margin"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/address_sheet_back"
         app:layout_constraintTop_toBottomOf="@id/enter_address_indicator"
         tools:text="Destination" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/subtitle"
+        style="@style/Text.Light.14"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/tiny_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        tools:text="Blurb about screen" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/title_from"
@@ -39,7 +64,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title" />
+        app:layout_constraintTop_toBottomOf="@id/subtitle" />
 
     <View
         style="@style/SeparatorWithoutMargins"
@@ -50,7 +75,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/title_from" />
 
-    <piuk.blockchain.android.ui.customviews.account.AccountInfoCrypto
+    <FrameLayout
         android:id="@+id/from_details"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -81,14 +106,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/title_to" />
 
+    <!-- Visibility is deliberately set to gone here to prevent the bottom sheet from taking up unnecessary space -->
     <ViewSwitcher
         android:id="@+id/input_switcher"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:measureAllChildren="false"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title_to">
+        app:layout_constraintTop_toBottomOf="@id/title_to"
+        tools:visibility="visible">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/external_address"
@@ -96,8 +124,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/standard_margin"
             android:layout_marginTop="@dimen/small_margin"
-            android:layout_marginBottom="@dimen/small_margin"
-            android:layout_marginEnd="@dimen/standard_margin">
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:layout_marginBottom="@dimen/small_margin">
 
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/address_entry"
@@ -105,11 +133,12 @@
                 android:layout_height="wrap_content"
                 android:background="@color/grey_000"
                 android:hint="@string/send_enter_asset_address_hint"
+                android:imeOptions="actionDone"
                 android:inputType="textNoSuggestions"
-                android:paddingTop="@dimen/very_small_margin"
-                android:paddingBottom="@dimen/very_small_margin"
                 android:paddingStart="@dimen/very_small_margin"
+                android:paddingTop="@dimen/very_small_margin"
                 android:paddingEnd="@dimen/xlarge_margin"
+                android:paddingBottom="@dimen/very_small_margin"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -134,7 +163,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/tiny_margin"
                 android:contentDescription="@string/send_scan_qr_code"
-                android:src="@drawable/icon_qr_inverse"
+                android:src="@drawable/ic_qr_scan_inverse"
                 app:layout_constraintBottom_toBottomOf="@id/address_entry"
                 app:layout_constraintEnd_toEndOf="@id/address_entry"
                 app:layout_constraintTop_toTopOf="@id/address_entry" />
@@ -175,7 +204,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/miniscule_margin"
-                android:text="@string/send_internal_transfer_message"
+                android:text="@string/send_internal_transfer_message_1"
                 app:layout_constraintTop_toBottomOf="@id/internal_send_title" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -197,6 +226,7 @@
         app:layout_constraintTop_toBottomOf="@id/input_switcher" />
 
     <View
+        android:id="@+id/pick_separator"
         style="@style/SeparatorWithoutMargins"
         android:layout_width="0dp"
         android:layout_height="2dp"
@@ -205,17 +235,118 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/title_pick" />
 
+    <!-- Visibility is deliberately set to gone here to prevent the bottom sheet from taking up unnecessary space -->
+    <LinearLayout
+        android:id="@+id/select_an_account"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/very_small_margin"
+        android:layout_marginBottom="@dimen/standard_margin"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/cta_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title_pick"
+        app:layout_constraintVertical_bias="0"
+        tools:visibility="visible">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/standard_margin"
+            app:srcCompat="@drawable/ic_select_account" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/select_account_cta"
+            style="@style/Text.Semibold.16"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.8"
+            android:text="@string/select_a_wallet" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/standard_margin"
+            app:srcCompat="@drawable/ic_arrow_down" />
+    </LinearLayout>
+
+
+    <!-- Visibility is deliberately set to gone here to prevent the bottom sheet from taking up unnecessary space -->
     <piuk.blockchain.android.ui.customviews.account.AccountList
         android:id="@+id/wallet_select"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/very_small_margin"
         android:layout_marginBottom="@dimen/small_margin"
+        android:visibility="gone"
         app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toTopOf="@id/cta_button"
+        app:layout_constraintBottom_toTopOf="@id/upsell_title"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title_pick" />
+        app:layout_constraintTop_toBottomOf="@id/title_pick"
+        app:layout_goneMarginBottom="@dimen/standard_margin"
+        tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/upsell_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="upsell_title,upsell_message,swap_low_fees_badge,swap_faster_badge"
+        tools:visibility="visible" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/upsell_title"
+        style="@style/Text.Semibold.16"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/grid_6"
+        android:layout_marginEnd="@dimen/grid_6"
+        android:text="@string/upsell_title"
+        app:layout_constraintBottom_toTopOf="@+id/upsell_message"
+        app:layout_constraintTop_toBottomOf="@id/wallet_select"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/upsell_message"
+        style="@style/Text.Light.12"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/grid_1"
+        android:text="@string/upsell_message"
+        app:layout_constraintBottom_toTopOf="@id/swap_low_fees_badge"
+        app:layout_constraintEnd_toEndOf="@+id/upsell_title"
+        app:layout_constraintStart_toStartOf="@+id/upsell_title"
+        app:layout_constraintTop_toBottomOf="@+id/upsell_title"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <piuk.blockchain.android.ui.customviews.StatusPill
+        android:id="@+id/swap_low_fees_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/grid_1"
+        android:layout_marginBottom="@dimen/grid_4"
+        android:text="@string/swap_low_fees"
+        app:layout_constraintBottom_toTopOf="@+id/cta_button"
+        app:layout_constraintStart_toStartOf="@id/upsell_title"
+        app:layout_constraintTop_toBottomOf="@+id/upsell_message"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:status_type="upsell" />
+
+    <piuk.blockchain.android.ui.customviews.StatusPill
+        android:id="@+id/swap_faster_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/very_small_margin"
+        android:text="@string/swap_faster"
+        app:layout_constraintStart_toEndOf="@id/swap_low_fees_badge"
+        app:layout_constraintTop_toBottomOf="@+id/upsell_message"
+        app:layout_constraintTop_toTopOf="@id/swap_low_fees_badge"
+        app:status_type="upsell" />
 
     <Button
         android:id="@+id/cta_button"

@@ -8,6 +8,9 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 
 import info.blockchain.wallet.ethereum.util.HashUtil
+import info.blockchain.wallet.keys.MasterKey
+import info.blockchain.wallet.keys.SigningKey
+import info.blockchain.wallet.keys.SigningKeyImpl
 
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.crypto.ChildNumber
@@ -17,8 +20,6 @@ import org.web3j.crypto.Credentials
 import org.web3j.crypto.Keys
 import org.web3j.crypto.RawTransaction
 import org.web3j.crypto.TransactionEncoder
-
-import java.util.Arrays
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -33,7 +34,7 @@ class EthereumAccount : JsonSerializableAccount {
     private val archived: Boolean = false
 
     @JsonProperty("label")
-    var label = ""
+    override var label = ""
 
     @JsonProperty("correct")
     var isCorrect: Boolean = false
@@ -58,17 +59,17 @@ class EthereumAccount : JsonSerializableAccount {
      * @return 20-byte address
      */
     private fun computeAddress(pubBytes: ByteArray): ByteArray {
-        return HashUtil.sha3omit12(Arrays.copyOfRange(pubBytes, 1, pubBytes.size))
+        return HashUtil.sha3omit12(pubBytes.copyOfRange(1, pubBytes.size))
     }
 
-    /**
-     * @param transaction
-     * @return Signed transaction bytes
-     */
-    fun signTransaction(transaction: RawTransaction, accountKey: ECKey): ByteArray {
-        val credentials = Credentials.create(accountKey.privateKeyAsHex)
+    fun signTransaction(transaction: RawTransaction, masterKey: MasterKey): ByteArray {
+        val signingKey = deriveSigningKey(masterKey)
+        val credentials = Credentials.create(signingKey.privateKeyAsHex)
         return TransactionEncoder.signMessage(transaction, credentials)
     }
+
+    fun deriveSigningKey(masterKey: MasterKey): SigningKey =
+        SigningKeyImpl(deriveECKey(masterKey.toDeterministicKey(), 0))
 
     fun withChecksummedAddress(): String =
         Keys.toChecksumAddress(this.address)
@@ -77,12 +78,11 @@ class EthereumAccount : JsonSerializableAccount {
         address == this.withChecksummedAddress()
 
     companion object {
-
-        private val DERIVATION_PATH = "m/44'/60'/0'/0"
-        private val DERIVATION_PATH_PURPOSE = 44
-        private val DERIVATION_PATH_COIN = 60
-        private val CHANGE_INDEX = 0
-        private val ADDRESS_INDEX = 0
+        private const val DERIVATION_PATH = "m/44'/60'/0'/0"
+        private const val DERIVATION_PATH_PURPOSE = 44
+        private const val DERIVATION_PATH_COIN = 60
+        private const val CHANGE_INDEX = 0
+        private const val ADDRESS_INDEX = 0
 
         fun deriveAccount(masterKey: DeterministicKey, accountIndex: Int, label: String): EthereumAccount {
             val ethereumAccount = EthereumAccount(deriveECKey(masterKey, accountIndex))
@@ -91,7 +91,7 @@ class EthereumAccount : JsonSerializableAccount {
             return ethereumAccount
         }
 
-        fun deriveECKey(masterKey: DeterministicKey, accountIndex: Int): ECKey {
+        private fun deriveECKey(masterKey: DeterministicKey, accountIndex: Int): ECKey {
 
             val purposeKey =
                 HDKeyDerivation.deriveChildKey(

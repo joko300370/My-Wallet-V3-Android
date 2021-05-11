@@ -36,10 +36,10 @@ task jacocoRootReport(type: JacocoReport) {
     group = "Reporting"
     description = "Generate Jacoco coverage reports on the Debug build."
 
-    classDirectories = files()
-    sourceDirectories = coverageSourceDirs
+    getClassDirectories().setFrom(files())
+    getSourceDirectories().setFrom(coverageSourceDirs)
 
-    executionData = fileTree(dir: '.').matching { include '**/build/jacoco/*.exec' }
+    getExecutionData().setFrom(fileTree(dir: '.').matching { include '**/build/jacoco/*.exec' })
 
     reports {
         xml.enabled = true
@@ -49,12 +49,14 @@ task jacocoRootReport(type: JacocoReport) {
     onlyIf = { true }
 
     doFirst {
-        classDirectories = dirsToFileTrees(
+        getClassDirectories().setFrom(
+            dirsToFileTrees(
                 allDirsMatching(/\/intermediates\/classes\/.*[Dd]ebug$/) +
                         allDirsMatching(/\/tmp\/kotlin-classes\/.*[Dd]ebug$/) +
                         allDirsMatching(/\/build\/classes\/java\/main$/) +
                         allDirsMatching(/\/build\/classes\/kotlin\/main$/),
                 excludedDirs)
+        )
     }
 }
 

@@ -7,11 +7,13 @@ import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.wallet.prices.data.PriceDatum
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import org.amshove.kluent.`it returns`
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.btc.BtcAsset
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 
 class AssetDetailsModelTest {
@@ -28,11 +30,17 @@ class AssetDetailsModelTest {
             labels = mock(),
             pitLinking = mock(),
             crashLogger = mock(),
-            tiersService = mock(),
-            environmentConfig = mock(),
-            walletPreferences = mock()
+            walletPreferences = mock(),
+            offlineAccounts = mock(),
+            identity = mock(),
+            coinsWebsocket = mock()
         )
     )
+
+    private val environmentConfig: EnvironmentConfig = mock {
+        on { isRunningInDebugMode() } `it returns` false
+    }
+
     private val interactor: AssetDetailsInteractor = mock()
 
     @get:Rule
@@ -44,13 +52,14 @@ class AssetDetailsModelTest {
     @Before
     fun setUp() {
         model =
-            AssetDetailsModel(defaultState, Schedulers.io(), interactor)
+            AssetDetailsModel(defaultState, Schedulers.io(), interactor, environmentConfig, mock())
     }
 
     @Test
     fun `load details success`() {
         val assetDisplayMap = mapOf(
-            AssetFilter.Custodial to AssetDisplayInfo(mock(), mock(), mock(), mock(), emptySet()))
+            AssetFilter.Custodial to AssetDisplayInfo(mock(), mock(), mock(), mock(), emptySet())
+        )
 
         whenever(interactor.loadAssetDetails(any())).thenReturn(Single.just(assetDisplayMap))
 
@@ -80,10 +89,12 @@ class AssetDetailsModelTest {
         model.process(LoadHistoricPrices)
         testObserver.assertValueAt(0, defaultState)
         testObserver.assertValueAt(1, defaultState.copy(chartLoading = true))
-        testObserver.assertValueAt(2, defaultState.copy(
-            chartData = priceSeries,
-            chartLoading = false
-        ))
+        testObserver.assertValueAt(
+            2, defaultState.copy(
+                chartData = priceSeries,
+                chartLoading = false
+            )
+        )
     }
 
     @Test
@@ -98,12 +109,16 @@ class AssetDetailsModelTest {
 
         testObserver.assertValueAt(0, defaultState)
         testObserver.assertValueAt(1, defaultState.copy(timeSpan = monthTimeSpan))
-        testObserver.assertValueAt(2,
-            defaultState.copy(chartLoading = true, timeSpan = monthTimeSpan))
-        testObserver.assertValueAt(3, defaultState.copy(
-            chartData = priceSeries,
-            timeSpan = monthTimeSpan,
-            chartLoading = false
-        ))
+        testObserver.assertValueAt(
+            2,
+            defaultState.copy(chartLoading = true, timeSpan = monthTimeSpan)
+        )
+        testObserver.assertValueAt(
+            3, defaultState.copy(
+                chartData = priceSeries,
+                timeSpan = monthTimeSpan,
+                chartLoading = false
+            )
+        )
     }
 }

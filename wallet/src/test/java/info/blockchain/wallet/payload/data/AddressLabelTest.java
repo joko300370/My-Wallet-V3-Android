@@ -1,12 +1,11 @@
 package info.blockchain.wallet.payload.data;
 
 import java.net.URI;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.bitcoinj.params.BitcoinMainNetParams;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -16,12 +15,12 @@ public class AddressLabelTest {
     @Test
     public void fromJson_1() throws Exception {
         URI uri = getClass().getClassLoader().getResource("wallet_body_1.txt").toURI();
-        String body = new String(Files.readAllBytes(Paths.get(uri)), Charset.forName("utf-8"));
+        String body = new String(Files.readAllBytes(Paths.get(uri)), StandardCharsets.UTF_8);
 
-        Wallet wallet = Wallet.fromJson(BitcoinMainNetParams.get(), body);
-        HDWallet hdWallet = wallet.getHdWallets().get(0);
+        Wallet wallet = Wallet.fromJson(body);
+        WalletBody walletBody = wallet.getWalletBody();
 
-        List<Account> accounts = hdWallet.getAccounts();
+        List<Account> accounts = walletBody.getAccounts();
 
         List<AddressLabel> addressLabels = accounts.get(1).getAddressLabels();
         Assert.assertEquals(98, addressLabels.get(0).getIndex());
@@ -39,12 +38,12 @@ public class AddressLabelTest {
 
         //Ensure toJson doesn't write any unintended fields
         URI uri = getClass().getClassLoader().getResource("wallet_body_1.txt").toURI();
-        String body = new String(Files.readAllBytes(Paths.get(uri)), Charset.forName("utf-8"));
+        String body = new String(Files.readAllBytes(Paths.get(uri)), StandardCharsets.UTF_8);
 
-        Wallet wallet = Wallet.fromJson(BitcoinMainNetParams.get(), body);
-        HDWallet hdWallet = wallet.getHdWallets().get(0);
+        Wallet wallet = Wallet.fromJson(body);
+        WalletBody walletBody = wallet.getWalletBodies().get(0);
 
-        List<Account> accounts = hdWallet.getAccounts();
+        List<Account> accounts = walletBody.getAccounts();
 
         List<AddressLabel> addressLabels = accounts.get(1).getAddressLabels();
         String jsonString = addressLabels.get(0).toJson();

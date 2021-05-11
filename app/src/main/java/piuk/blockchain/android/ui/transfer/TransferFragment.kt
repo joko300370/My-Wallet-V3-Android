@@ -12,13 +12,12 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.transfer.receive.TransferReceiveFragment
 import piuk.blockchain.android.ui.transfer.send.TransferSendFragment
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.util.inflate
 
 class TransferFragment : Fragment() {
 
     private val startingView: TransferViewType by unsafeLazy {
-        arguments?.getSerializable(PARAM_START_VIEW) as? TransferViewType
-            ?: TransferViewType.TYPE_SEND
+        arguments?.getSerializable(PARAM_START_VIEW) as? TransferViewType ?: TransferViewType.TYPE_SEND
     }
 
     override fun onCreateView(
@@ -46,16 +45,14 @@ class TransferFragment : Fragment() {
     }
 
     companion object {
-
         private const val PARAM_START_VIEW = "show_view"
 
-        fun newInstance(transferViewType: TransferViewType = TransferViewType.TYPE_SEND): TransferFragment {
-            return TransferFragment().apply {
+        fun newInstance(transferViewType: TransferViewType = TransferViewType.TYPE_SEND): TransferFragment =
+            TransferFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(PARAM_START_VIEW, transferViewType)
                 }
             }
-        }
     }
 
     enum class TransferViewType {

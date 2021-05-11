@@ -6,154 +6,230 @@ import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
+import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
+import info.blockchain.balance.Money
+import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.view_account_crypto_overview.view.*
-import kotlinx.android.synthetic.main.view_account_crypto_overview.view.container
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
-import piuk.blockchain.android.accounts.CellDecorator
-import piuk.blockchain.android.accounts.addViewToBottomWithConstraints
-import piuk.blockchain.android.accounts.removePossibleBottomView
+import piuk.blockchain.android.coincore.AccountIcon
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.InterestAccount
-import piuk.blockchain.android.coincore.NonCustodialAccount
-import piuk.blockchain.android.coincore.TradingAccount
-import piuk.blockchain.android.util.assetName
-import piuk.blockchain.android.util.setCoinIcon
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.invisible
-import piuk.blockchain.androidcoreui.utils.extensions.visible
+import piuk.blockchain.android.coincore.NullCryptoAccount
+import piuk.blockchain.android.databinding.ViewAccountCryptoOverviewBinding
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
+import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
+import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
+import piuk.blockchain.android.ui.transactionflow.plugin.EnterAmountWidget
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.setAssetIconColours
+import piuk.blockchain.android.util.setImageDrawable
+import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 
 class AccountInfoCrypto @JvmOverloads constructor(
     ctx: Context,
     attr: AttributeSet? = null,
     defStyle: Int = 0
-) : ConstraintLayout(ctx, attr, defStyle), KoinComponent {
+) : ConstraintLayout(ctx, attr, defStyle), KoinComponent, EnterAmountWidget {
 
     private val exchangeRates: ExchangeRates by scopedInject()
     private val currencyPrefs: CurrencyPrefs by scopedInject()
     private val coincore: Coincore by scopedInject()
+    private val assetResources: AssetResources by scopedInject()
+    private val compositeDisposable = CompositeDisposable()
+    private var accountBalance: Money? = null
+    private var isEnabled: Boolean? = null
+    private var interestRate: Double? = null
+    private var displayedAccount: CryptoAccount = NullCryptoAccount()
 
-    init {
-        LayoutInflater.from(context)
-            .inflate(R.layout.view_account_crypto_overview, this, true)
-    }
-
-    var account: CryptoAccount? = null
-        private set
+    val binding: ViewAccountCryptoOverviewBinding =
+        ViewAccountCryptoOverviewBinding.inflate(LayoutInflater.from(context), this, true)
 
     fun updateAccount(
         account: CryptoAccount,
         onAccountClicked: (CryptoAccount) -> Unit,
-        disposables: CompositeDisposable,
-        cellDecorator: CellDecorator
+        cellDecorator: CellDecorator = DefaultCellDecorator()
     ) {
-        this.account = account
-        updateView(account, onAccountClicked, disposables, cellDecorator)
+        compositeDisposable.clear()
+        updateView(account, onAccountClicked, cellDecorator)
     }
 
     private fun updateView(
         account: CryptoAccount,
         onAccountClicked: (CryptoAccount) -> Unit,
-        disposables: CompositeDisposable,
         cellDecorator: CellDecorator
     ) {
-        updateAccountDetails(account, onAccountClicked, disposables, cellDecorator)
+        val accountsAreTheSame = displayedAccount.isTheSameWith(account)
+        updateAccountDetails(account, accountsAreTheSame, onAccountClicked, cellDecorator)
 
-        when (account) {
-            is InterestAccount -> setInterestAccountDetails(account, disposables)
-            is TradingAccount -> asset_account_icon.setImageResource(R.drawable.ic_account_badge_custodial)
-            is NonCustodialAccount -> asset_account_icon.gone()
-            else -> asset_account_icon.gone()
+        (account as? InterestAccount)?.let { setInterestAccountDetails(account, accountsAreTheSame) }
+
+        updateAccountIcon(account)
+
+        displayedAccount = account
+    }
+
+    private fun updateAccountIcon(account: CryptoAccount) {
+        with(binding) {
+            val accountIcon = AccountIcon(account, assetResources)
+            icon.setImageDrawable(accountIcon.icon)
+            accountIcon.indicator?.let {
+                assetAccountIcon.apply {
+                    visible()
+                    setAssetIconColours(
+                        tintColor = R.color.white,
+                        filterColor = assetResources.assetFilter(account.asset)
+                    )
+                    setImageResource(it)
+                }
+            } ?: kotlin.run { assetAccountIcon.gone() }
         }
     }
 
     private fun setInterestAccountDetails(
         account: CryptoAccount,
-        disposables: CompositeDisposable
+        accountsAreTheSame: Boolean
     ) {
-        asset_account_icon.setImageResource(R.drawable.ic_account_badge_interest)
+        with(binding) {
+            compositeDisposable += coincore[account.asset].interestRate().observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { assetSubtitle.text = resources.getString(R.string.empty) }
+                .doOnSuccess {
+                    interestRate = it
+                }.startWithValueIfCondition(value = interestRate, condition = accountsAreTheSame)
+                .subscribeBy(
+                    onNext = {
+                        assetSubtitle.text = resources.getString(R.string.dashboard_asset_balance_interest, it)
+                    },
+                    onError = {
+                        assetSubtitle.text = resources.getString(
+                            R.string.dashboard_asset_actions_interest_dsc_failed
+                        )
 
-        disposables += coincore[account.asset].interestRate().observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = {
-                    asset_subtitle.text = resources.getString(R.string.dashboard_asset_balance_interest, it)
-                },
-                onError = {
-                    asset_subtitle.text = resources.getString(
-                        R.string.dashboard_asset_actions_interest_dsc_failed)
-
-                    Timber.e("AssetActions error loading Interest rate: $it")
-                }
-            )
+                        Timber.e("AssetActions error loading Interest rate: $it")
+                    }
+                )
+        }
     }
 
     private fun updateAccountDetails(
         account: CryptoAccount,
+        accountsAreTheSame: Boolean,
         onAccountClicked: (CryptoAccount) -> Unit,
-        disposables: CompositeDisposable,
         cellDecorator: CellDecorator
     ) {
-        val crypto = account.asset
-        wallet_name.text = account.label
-        icon.setCoinIcon(crypto)
-        icon.visible()
 
-        asset_subtitle.setText(crypto.assetName())
+        with(binding) {
+            val crypto = account.asset
+            walletName.text = account.label
 
-        wallet_balance_crypto.invisible()
-        wallet_balance_fiat.invisible()
+            assetSubtitle.setText(assetResources.assetNameRes(crypto))
 
-        disposables += account.accountBalance
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { accountBalance ->
-                    wallet_balance_crypto.text = accountBalance.toStringWithSymbol()
-                    wallet_balance_fiat.text =
-                        accountBalance.toFiat(
-                            exchangeRates,
-                            currencyPrefs.selectedFiatCurrency
-                        ).toStringWithSymbol()
-
-                    wallet_balance_crypto.visible()
-                    wallet_balance_fiat.visible()
-                },
-                onError = {
-                    Timber.e("Cannot get balance for ${account.label}")
-                }
-            )
-        disposables += cellDecorator.view(container.context)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                container.addViewToBottomWithConstraints(
-                    view = it,
-                    bottomOfView = asset_subtitle,
-                    startOfView = asset_subtitle,
-                    endOfView = wallet_balance_crypto
+            compositeDisposable += account.accountBalance
+                .doOnSuccess {
+                    accountBalance = it
+                }.startWithValueIfCondition(
+                    value = accountBalance,
+                    alternativeValue = CryptoValue.zero(account.asset),
+                    condition = accountsAreTheSame
                 )
-            }
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe {
+                    walletBalanceCrypto.text = ""
+                    walletBalanceFiat.text = ""
+                }
+                .subscribeBy(
+                    onNext = { accountBalance ->
+                        walletBalanceCrypto.text = accountBalance.toStringWithSymbol()
+                        walletBalanceFiat.text =
+                            accountBalance.toFiat(
+                                exchangeRates,
+                                currencyPrefs.selectedFiatCurrency
+                            ).toStringWithSymbol()
+                    },
+                    onError = {
+                        Timber.e("Cannot get balance for ${account.label}")
+                    }
+                )
+            compositeDisposable += cellDecorator.view(container.context)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    container.addViewToBottomWithConstraints(
+                        view = it,
+                        bottomOfView = assetSubtitle,
+                        startOfView = assetSubtitle,
+                        endOfView = walletBalanceCrypto
+                    )
+                }
 
-        container.alpha = 1f
-
-        disposables += cellDecorator.isEnabled().observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { isEnabled ->
-                    if (isEnabled) {
-                        setOnClickListener { onAccountClicked(account) }
-                        container.alpha = 1f
-                    } else {
-                        container.alpha = .6f
-                        setOnClickListener { }
+            container.alpha = 1f
+            compositeDisposable += cellDecorator.isEnabled()
+                .doOnSuccess {
+                    isEnabled = it
+                }.startWithValueIfCondition(value = isEnabled, condition = accountsAreTheSame)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe {
+                    setOnClickListener {
                     }
                 }
-            )
+                .subscribeBy(
+                    onNext = { isEnabled ->
+                        if (isEnabled) {
+                            setOnClickListener {
+                                onAccountClicked(account)
+                            }
+                            container.alpha = 1f
+                        } else {
+                            container.alpha = .6f
+                        }
+                    }
+                )
 
-        container.removePossibleBottomView()
+            container.removePossibleBottomView()
+        }
+    }
+
+    fun dispose() {
+        compositeDisposable.clear()
+    }
+
+    override fun initControl(
+        model: TransactionModel,
+        customiser: EnterAmountCustomisations,
+        analytics: TxFlowAnalytics
+    ) {
+        // Do nothing
+    }
+
+    override fun update(state: TransactionState) {
+        updateAccount(state.sendingAccount as CryptoAccount, { })
+    }
+
+    override fun setVisible(isVisible: Boolean) {
+        binding.root.visibleIf { isVisible }
     }
 }
+
+private fun <T> Single<T>.startWithValueIfCondition(
+    value: T?,
+    alternativeValue: T? = null,
+    condition: Boolean
+): Observable<T> =
+    if (!condition)
+        this.toObservable()
+    else {
+        when {
+            value != null -> this.toObservable().startWith(value)
+            alternativeValue != null -> this.toObservable().startWith(alternativeValue)
+            else -> this.toObservable()
+        }
+    }

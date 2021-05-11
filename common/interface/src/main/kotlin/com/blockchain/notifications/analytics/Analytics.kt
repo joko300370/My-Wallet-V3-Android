@@ -31,6 +31,7 @@ sealed class NotificationAnalytics(
     override val event: String,
     override val params: Map<String, String> = mapOf()
 ) : AnalyticsEvent
+
 object NotificationReceived : NotificationAnalytics("pn_notification_received")
 object NotificationAppOpened : NotificationAnalytics("pn_app_opened")
 

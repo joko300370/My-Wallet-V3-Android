@@ -30,8 +30,9 @@ class Metadata(
             return Metadata(
                 address = address,
                 node = newNode,
-                encryptionKey = encryptionKey ?: Sha256Hash.hash(MetadataUtil.deriveHardened(payloadTypeNode,
-                    1).privKeyBytes),
+                encryptionKey = encryptionKey ?: Sha256Hash.hash(
+                    MetadataUtil.deriveHardened(payloadTypeNode, 1).privKeyBytes
+                ),
                 isEncrypted = isEncrypted,
                 type = type
             )

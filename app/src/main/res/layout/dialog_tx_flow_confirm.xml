@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -46,16 +47,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/confirm_sheet_title" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/amount"
-        style="@style/Text.Semibold.32"
-        android:layout_width="match_parent"
+    <FrameLayout
+        android:id="@+id/confirm_header_slot"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/standard_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/confirm_sheet_title"
-        tools:text="0.04129485 BTC" />
+        app:layout_constraintTop_toBottomOf="@+id/confirm_sheet_title" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/confirm_details_list"
@@ -63,16 +61,32 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/small_margin"
-        android:layout_marginBottom="@dimen/very_small_margin"
+        android:layout_marginBottom="@dimen/miniscule_margin"
         android:fadingEdge="vertical"
         android:fadingEdgeLength="@dimen/very_small_margin"
         android:requiresFadingEdge="vertical"
+        android:scrollbarSize="@dimen/miniscule_margin"
+        android:scrollbars="vertical"
         app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toTopOf="@id/confirm_cta_button"
+        app:layout_constraintBottom_toTopOf="@id/confirm_disclaimer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/amount"
+        app:layout_constraintTop_toBottomOf="@id/confirm_header_slot"
         tools:listitem="@layout/item_send_confirm_details" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/confirm_disclaimer"
+        style="@style/Text.Standard.12"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:layout_marginBottom="@dimen/tiny_margin"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/confirm_cta_button"
+        tools:text="Disclaimer blurb that spans several lines that spans several lines"
+        tools:visibility="visible" />
 
     <Button
         android:id="@+id/confirm_cta_button"

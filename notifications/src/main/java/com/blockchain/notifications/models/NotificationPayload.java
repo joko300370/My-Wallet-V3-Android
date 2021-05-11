@@ -14,6 +14,7 @@ public class NotificationPayload {
     private String title;
     private String body;
     private NotificationData data;
+    private Map<String, String> payload;
 
     public NotificationPayload(Map<String, String> map) {
         if (map.containsKey("title")) {
@@ -27,6 +28,7 @@ public class NotificationPayload {
         if (map.containsKey("data")) {
             data = new NotificationData(map.get("data"));
         }
+        payload = map;
     }
 
     @Nullable
@@ -46,13 +48,24 @@ public class NotificationPayload {
 
     @Nullable
     public NotificationType getType() {
-        return data != null ? data.getType() : null;
+        return data != null ? data.getType() :
+            payload.get("type") != null ? NotificationType.fromString(payload.get("type")) : null;
     }
 
     @Nullable
     public String getMdid() {
         return data != null ? data.getMdid() : null;
     }
+
+    public Map<String, String> getPayload() {
+        return payload;
+    }
+
+    public static final String PUB_KEY_HASH = "fcm_data_pubkeyhash";
+    public static final String DATA_MESSAGE = "fcm_data_message";
+    public static final String ORIGIN_IP = "origin_ip";
+    public static final String ORIGIN_COUNTRY = "origin_country";
+    public static final String ORIGIN_BROWSER = "origin_browser";
 
     private static class NotificationData {
 
@@ -97,7 +110,7 @@ public class NotificationPayload {
 
     public enum NotificationType {
         PAYMENT("payment"),
-        CONTACT_REQUEST("contact_request");
+        SECURE_CHANNEL_MESSAGE("secure_channel");
 
         private String name;
 

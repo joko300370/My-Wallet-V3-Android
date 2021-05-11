@@ -29,6 +29,13 @@
         <item name="android:layout_marginEnd">@dimen/standard_margin</item>
     </style>
 
+    <style name="CtaButton.NoBackgroundRedText">
+        <item name="android:background">@drawable/bkgd_button_no_bkgd_red_selection_selector</item>
+        <item name="android:textColor">@color/button_red_text_states</item>
+        <item name="android:layout_marginStart">@dimen/standard_margin</item>
+        <item name="android:layout_marginEnd">@dimen/standard_margin</item>
+    </style>
+
     <style name="CtaButton.White.Slim" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:background">@drawable/bkgd_button_white_selector</item>
         <item name="android:textColor">@color/button_white_text_states</item>
@@ -46,7 +53,7 @@
         <item name="android:layout_marginRight">@dimen/standard_margin</item>
     </style>
 
-    <style name="CtaButton.NoMargin"/>
+    <style name="CtaButton.NoMargin" />
 
     <style name="CtaButton.NoMargin.Blue">
         <item name="android:background">@drawable/bkgd_button_blue_selector</item>

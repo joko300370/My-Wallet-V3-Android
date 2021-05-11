@@ -103,16 +103,8 @@ public class TransactionSummary {
         return inputsXpubMap;
     }
 
-    public void setInputsXpubMap(HashMap<String, String> inputsXpubMap) {
-        this.inputsXpubMap = inputsXpubMap;
-    }
-
     public HashMap<String, String> getOutputsXpubMap() {
         return outputsXpubMap;
-    }
-
-    public void setOutputsXpubMap(HashMap<String, String> outputsXpubMap) {
-        this.outputsXpubMap = outputsXpubMap;
     }
 
     public boolean isPending() {

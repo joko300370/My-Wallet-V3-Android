@@ -3,7 +3,6 @@ package com.blockchain.sunriver
 import com.blockchain.testutils.lumens
 import com.blockchain.testutils.stroops
 import com.nhaarman.mockito_kotlin.mock
-import info.blockchain.balance.AccountReference
 import org.amshove.kluent.`it returns`
 import org.amshove.kluent.`should equal`
 import org.junit.Test
@@ -12,7 +11,7 @@ class MapToSendFundsResultTest {
 
     @Test
     fun `successful send mapping`() {
-        val from = AccountReference.Xlm("", "")
+        val from = XlmAccountReference("", "")
         val sendDetails = SendDetails(from = from, toAddress = "GABC", value = 200.lumens(), fee = 1.lumens())
         HorizonProxy.SendResult(
             success = true,
@@ -57,7 +56,7 @@ class MapToSendFundsResultTest {
         failureReason: HorizonProxy.FailureReason,
         expectedErrorCode: Int
     ) {
-        val fromAccount = AccountReference.Xlm("AC", "GEFD")
+        val fromAccount = XlmAccountReference("AC", "GEFD")
         val sendDetails = SendDetails(from = fromAccount, toAddress = "GABD", value = 50.lumens(), fee = 1.lumens())
         HorizonProxy.SendResult(
             success = false,

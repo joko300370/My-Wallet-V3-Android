@@ -1,11 +1,11 @@
 package piuk.blockchain.android.sell
 
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.remoteconfig.FeatureFlag
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.models.nabu.KycTiers
-import com.blockchain.swap.nabu.service.TierService
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
+import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.models.responses.nabu.KycTiers
+import com.blockchain.nabu.service.TierService
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -24,48 +24,41 @@ class BuySellFlowNavigatorTest {
     private val simpleBuyModel: SimpleBuyModel = mock()
     private val currencyPrefs: CurrencyPrefs = mock()
     private val custodialWalletManager: CustodialWalletManager = mock()
-    private val sellFeatureFlag: FeatureFlag = mock()
     private val tierService: TierService = mock()
+    private val eligibilityProvider: SimpleBuyEligibilityProvider = mock()
     private lateinit var subject: BuySellFlowNavigator
 
     @Before
     fun setUp() {
         subject = BuySellFlowNavigator(
-            simpleBuyModel, currencyPrefs, custodialWalletManager, tierService, sellFeatureFlag
+            simpleBuyModel, currencyPrefs, custodialWalletManager, eligibilityProvider, tierService
         )
-        whenever(sellFeatureFlag.enabled).thenReturn(Single.just(true))
         whenever(tierService.tiers()).thenReturn(Single.just(KycTiers.default()))
-        whenever(custodialWalletManager.isEligibleForSimpleBuy(any())).thenReturn(Single.just(true))
+        whenever(eligibilityProvider.isEligibleForSimpleBuy(any(), any())).thenReturn(Single.just(true))
     }
 
     @Test
-    fun `when buy state is pending and currency is right, buy should be launched`() {
+    fun `when buy state is pending and currency is right, hasPendingBuy should be true`() {
         whenever(simpleBuyModel.state).thenReturn(
             Observable.just(SimpleBuyState(orderState = OrderState.PENDING_EXECUTION, fiatCurrency = "GBP"))
         )
         whenever(currencyPrefs.selectedFiatCurrency).thenReturn("GBP")
+        whenever(eligibilityProvider.defCurrency).thenReturn("GBP")
+
+        whenever(custodialWalletManager.getSupportedFiatCurrencies()).thenReturn(Single.just(listOf("EUR", "GBP")))
+        whenever(custodialWalletManager.isCurrencySupportedForSimpleBuy("GBP"))
+            .thenReturn(Single.just(true))
 
         val test = subject.navigateTo().test()
 
-        test.assertValue(BuySellIntroAction.NavigateToBuy)
-    }
-
-    @Test
-    fun whenBuyStateIsPendingAndCurrencyIsNotRightThenSelectCurrencyShouldBeLaunchedWithOnlyThisCurrency() {
-        whenever(simpleBuyModel.state).thenReturn(Observable.just(
-            SimpleBuyState(orderState = OrderState.PENDING_EXECUTION, fiatCurrency = "USD")
-        ))
-        whenever(currencyPrefs.selectedFiatCurrency).thenReturn("GBP")
-
-        val test = subject.navigateTo().test()
-
-        test.assertValue(BuySellIntroAction.NavigateToCurrencySelection(listOf("USD")))
+        test.assertValue(BuySellIntroAction.DisplayBuySellIntro(isGoldButNotEligible = false, hasPendingBuy = true))
     }
 
     @Test
     fun `whenΒuyStateIsNotPendingAndCurrencyIsNotSupportedThenSelectCurrencyShouldBeLaunchedWithAllSupportedCrncies`() {
         whenever(simpleBuyModel.state).thenReturn(Observable.just(SimpleBuyState()))
         whenever(currencyPrefs.selectedFiatCurrency).thenReturn("USD")
+        whenever(eligibilityProvider.defCurrency).thenReturn("USD")
         whenever(custodialWalletManager.getSupportedFiatCurrencies()).thenReturn(Single.just(listOf("EUR", "GBP")))
         whenever(custodialWalletManager.isCurrencySupportedForSimpleBuy("USD"))
             .thenReturn(Single.just(false))
@@ -82,24 +75,10 @@ class BuySellFlowNavigatorTest {
         whenever(custodialWalletManager.getSupportedFiatCurrencies()).thenReturn(Single.just(listOf("EUR", "USD")))
         whenever(custodialWalletManager.isCurrencySupportedForSimpleBuy("USD"))
             .thenReturn(Single.just(true))
-
+        whenever(eligibilityProvider.defCurrency).thenReturn("USD")
         val test = subject.navigateTo().test()
 
-        test.assertValue(BuySellIntroAction.DisplayBuySellIntro(false, sellEnabled = true))
-    }
-
-    @Test
-    fun `whenBuyStateIsNotPendingCurrencyIsSupportedAndSellIsNotEnableNormalOnlyBuyUiIsDisplayed`() {
-        whenever(simpleBuyModel.state).thenReturn(Observable.just(SimpleBuyState()))
-        whenever(currencyPrefs.selectedFiatCurrency).thenReturn("USD")
-        whenever(sellFeatureFlag.enabled).thenReturn(Single.just(false))
-        whenever(custodialWalletManager.getSupportedFiatCurrencies()).thenReturn(Single.just(listOf("EUR", "USD")))
-        whenever(custodialWalletManager.isCurrencySupportedForSimpleBuy("USD"))
-            .thenReturn(Single.just(true))
-
-        val test = subject.navigateTo().test()
-
-        test.assertValue(BuySellIntroAction.DisplayBuySellIntro(false, sellEnabled = false))
+        test.assertValue(BuySellIntroAction.DisplayBuySellIntro(false, false))
     }
 
     @Test
@@ -107,8 +86,8 @@ class BuySellFlowNavigatorTest {
         whenever(simpleBuyModel.state).thenReturn(
             Observable.just(SimpleBuyState(id = "ORDERID", orderState = OrderState.PENDING_CONFIRMATION))
         )
+        whenever(eligibilityProvider.defCurrency).thenReturn("USD")
         whenever(currencyPrefs.selectedFiatCurrency).thenReturn("USD")
-        whenever(sellFeatureFlag.enabled).thenReturn(Single.just(true))
         whenever(custodialWalletManager.getSupportedFiatCurrencies()).thenReturn(Single.just(listOf("EUR", "USD")))
         whenever(custodialWalletManager.isCurrencySupportedForSimpleBuy("USD"))
             .thenReturn(Single.just(true))
@@ -117,7 +96,7 @@ class BuySellFlowNavigatorTest {
 
         val test = subject.navigateTo().test()
 
-        test.assertValue(BuySellIntroAction.DisplayBuySellIntro(false, sellEnabled = true))
+        test.assertValue(BuySellIntroAction.DisplayBuySellIntro(isGoldButNotEligible = false, hasPendingBuy = false))
         verify(custodialWalletManager).deleteBuyOrder("ORDERID")
     }
 }

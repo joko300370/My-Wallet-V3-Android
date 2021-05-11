@@ -29,10 +29,10 @@ task testCoverage(type: JacocoReport, dependsOn: "test") {
 
     def coverageSourceDirs = ["src/main/java"]
 
-    classDirectories = files([javaTree], [kotlinTree])
-    additionalSourceDirs = files(coverageSourceDirs)
-    sourceDirectories = files(coverageSourceDirs)
-    executionData = fileTree(dir: "$project.buildDir", includes: ["jacoco/*.exec"])
+    getClassDirectories().setFrom(files([javaTree], [kotlinTree]))
+    getAdditionalClassDirs().setFrom(files(coverageSourceDirs))
+    getSourceDirectories().setFrom(files(coverageSourceDirs))
+    getExecutionData().setFrom(fileTree(dir: "$project.buildDir", includes: ["jacoco/*.exec"]))
 
     reports {
         xml.enabled = true

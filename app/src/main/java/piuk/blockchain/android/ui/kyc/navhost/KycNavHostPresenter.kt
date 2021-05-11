@@ -1,12 +1,12 @@
 package piuk.blockchain.android.ui.kyc.navhost
 
 import com.blockchain.exceptions.MetadataNotFoundException
-import com.blockchain.swap.nabu.NabuToken
-import com.blockchain.swap.nabu.datamanagers.NabuDataManager
-import com.blockchain.swap.nabu.models.nabu.KycState
-import com.blockchain.swap.nabu.models.nabu.NabuUser
-import com.blockchain.swap.nabu.models.nabu.UserState
-import com.blockchain.swap.nabu.service.TierUpdater
+import com.blockchain.nabu.NabuToken
+import com.blockchain.nabu.datamanagers.NabuDataManager
+import com.blockchain.nabu.models.responses.nabu.KycState
+import com.blockchain.nabu.models.responses.nabu.NabuUser
+import com.blockchain.nabu.models.responses.nabu.UserState
+import com.blockchain.nabu.service.TierUpdater
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.plusAssign
@@ -38,12 +38,13 @@ class KycNavHostPresenter(
             fetchOfflineToken.flatMap {
                 nabuDataManager.getUser(it)
                     .subscribeOn(Schedulers.io())
+            }.flatMap {
+                updateTier2SelectedTierIfNeeded().toSingle { it }
             }.observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe { view.displayLoading(true) }
                 .subscribeBy(
                     onSuccess = {
                         registerForCampaignsIfNeeded()
-                        updateTier2SelectedTierIfNeeded()
                         redirectUserFlow(it)
                     },
                     onError = {
@@ -81,37 +82,45 @@ class KycNavHostPresenter(
             .subscribe()
     }
 
-    private fun updateTier2SelectedTierIfNeeded() {
+    private fun updateTier2SelectedTierIfNeeded(): Completable {
         if (view.campaignType != CampaignType.Sunriver) {
-            return
+            return Completable.complete()
         }
 
-        compositeDisposable += tierUpdater
+        return tierUpdater
             .setUserTier(2)
-            .doOnError(Timber::e)
-            .subscribe()
+            .onErrorComplete()
     }
 
     private fun redirectUserFlow(user: NabuUser) {
-        if (view.campaignType == CampaignType.Resubmission || user.isMarkedForResubmission) {
-            view.navigateToResubmissionSplash()
-        } else if (view.campaignType == CampaignType.Blockstack ||
-            view.campaignType == CampaignType.SimpleBuy || view.campaignType == CampaignType.Interest) {
-            compositeDisposable += kycNavigator.findNextStep()
-                .subscribeBy(
-                    onError = { Timber.e(it) },
-                    onSuccess = { view.navigate(it) }
-                )
-        } else if (user.state != UserState.None && user.kycState == KycState.None && !view.showTiersLimitsSplash) {
-            val current = user.tiers?.current
-            if (current == null || current == 0) {
-                val reentryPoint = reentryDecision.findReentryPoint(user)
-                val directions = kycNavigator.userAndReentryPointToDirections(user, reentryPoint)
-                view.navigate(directions)
-                Logging.logEvent(kycResumedEvent(reentryPoint))
+        when {
+            view.campaignType == CampaignType.Resubmission || user.isMarkedForResubmission -> {
+                view.navigateToResubmissionSplash()
             }
-        } else if (view.campaignType == CampaignType.Sunriver) {
-            view.navigateToKycSplash()
+            view.campaignType == CampaignType.Blockstack ||
+                view.campaignType == CampaignType.SimpleBuy ||
+                view.campaignType == CampaignType.Interest ||
+                view.campaignType == CampaignType.FiatFunds ||
+                (view.campaignType == CampaignType.None && !view.showTiersLimitsSplash) ||
+                view.campaignType == CampaignType.Swap -> {
+                compositeDisposable += kycNavigator.findNextStep()
+                    .subscribeBy(
+                        onError = { Timber.e(it) },
+                        onSuccess = { view.navigate(it) }
+                    )
+            }
+            user.state != UserState.None && user.kycState == KycState.None && !view.showTiersLimitsSplash -> {
+                val current = user.tiers?.current
+                if (current == null || current == 0) {
+                    val reentryPoint = reentryDecision.findReentryPoint(user)
+                    val directions = kycNavigator.userAndReentryPointToDirections(user, reentryPoint)
+                    view.navigate(directions)
+                    Logging.logEvent(kycResumedEvent(reentryPoint))
+                }
+            }
+            view.campaignType == CampaignType.Sunriver -> {
+                view.navigateToKycSplash()
+            }
         }
 
         // If no other methods are triggered, this will start KYC from scratch. If others have been called,
@@ -121,7 +130,9 @@ class KycNavHostPresenter(
 }
 
 internal fun NabuUser.toProfileModel(): ProfileModel = ProfileModel(
-    firstName ?: throw IllegalStateException("First Name is null"),
-    lastName ?: throw IllegalStateException("Last Name is null"),
-    address?.countryCode ?: throw IllegalStateException("Country Code is null")
+    firstName = firstName ?: throw IllegalStateException("First Name is null"),
+    lastName = lastName ?: throw IllegalStateException("Last Name is null"),
+    countryCode = address?.countryCode ?: throw IllegalStateException("Country Code is null"),
+    stateName = address?.state,
+    stateCode = address?.state
 )

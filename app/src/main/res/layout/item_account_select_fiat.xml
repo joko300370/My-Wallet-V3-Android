@@ -5,6 +5,8 @@
     android:id="@+id/fiat_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/smallest_margin"
+    android:layout_marginEnd="@dimen/smallest_margin"
     android:orientation="vertical">
 
     <piuk.blockchain.android.ui.customviews.account.AccountInfoFiat

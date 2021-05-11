@@ -2,14 +2,13 @@ package info.blockchain.balance
 
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.util.Currency
 
-sealed class ExchangeRate(var rate: BigDecimal) {
+sealed class ExchangeRate(val rate: BigDecimal) {
 
-    protected val rateInverse: BigDecimal get() = BigDecimal.valueOf(1.0 / rate.toDouble())
-
-    abstract fun convert(value: Money): Money
+    abstract fun convert(value: Money, round: Boolean = true): Money
     abstract fun price(): Money
-    abstract fun inverse(): ExchangeRate
+    abstract fun inverse(roundingMode: RoundingMode = RoundingMode.HALF_UP, scale: Int = -1): ExchangeRate
 
     class CryptoToCrypto(
         val from: CryptoCurrency,
@@ -24,37 +23,44 @@ sealed class ExchangeRate(var rate: BigDecimal) {
             )
         }
 
-        override fun convert(value: Money): Money =
+        override fun convert(value: Money, round: Boolean): Money =
             applyRate(value as CryptoValue)
 
         override fun price(): Money =
             CryptoValue.fromMajor(to, rate)
 
-        override fun inverse() =
-            CryptoToCrypto(to, from, rateInverse)
+        override fun inverse(roundingMode: RoundingMode, scale: Int) =
+            CryptoToCrypto(to,
+                from,
+                BigDecimal.ONE.divide(rate, if (scale == -1) from.dp else scale, roundingMode).stripTrailingZeros())
     }
 
-    class CryptoToFiat(
+    data class CryptoToFiat(
         val from: CryptoCurrency,
         val to: String,
-        rate: BigDecimal
-    ) : ExchangeRate(rate) {
-        fun applyRate(cryptoValue: CryptoValue): FiatValue {
+        private val _rate: BigDecimal
+    ) : ExchangeRate(_rate) {
+        fun applyRate(cryptoValue: CryptoValue, round: Boolean = false): FiatValue {
             validateCurrency(from, cryptoValue.currency)
             return FiatValue.fromMajor(
                 currencyCode = to,
-                major = rate.multiply(cryptoValue.toBigDecimal())
+                major = rate.multiply(cryptoValue.toBigDecimal()),
+                round = round
             )
         }
 
-        override fun convert(value: Money): Money =
-            applyRate(value as CryptoValue)
+        override fun convert(value: Money, round: Boolean): Money =
+            applyRate(value as CryptoValue, round)
 
         override fun price(): Money =
             FiatValue.fromMajor(to, rate)
 
-        override fun inverse() =
-            FiatToCrypto(to, from, rateInverse)
+        override fun inverse(roundingMode: RoundingMode, scale: Int) =
+            FiatToCrypto(
+                to,
+                from,
+                BigDecimal.ONE.divide(rate, if (scale == -1) from.dp else scale, roundingMode).stripTrailingZeros()
+            )
     }
 
     class FiatToCrypto(
@@ -70,14 +76,22 @@ sealed class ExchangeRate(var rate: BigDecimal) {
             )
         }
 
-        override fun convert(value: Money): Money =
+        override fun convert(value: Money, round: Boolean): Money =
             applyRate(value as FiatValue)
 
         override fun price(): Money =
             CryptoValue.fromMajor(to, rate)
 
-        override fun inverse() =
-            CryptoToFiat(to, from, rateInverse)
+        override fun inverse(roundingMode: RoundingMode, scale: Int) =
+            CryptoToFiat(
+                to,
+                from,
+                BigDecimal.ONE.divide(
+                    rate,
+                    if (scale == -1) Currency.getInstance(from).defaultFractionDigits else scale,
+                    roundingMode
+                ).stripTrailingZeros()
+            )
     }
 
     class FiatToFiat(
@@ -93,14 +107,22 @@ sealed class ExchangeRate(var rate: BigDecimal) {
             )
         }
 
-        override fun convert(value: Money): Money =
+        override fun convert(value: Money, round: Boolean): Money =
             applyRate(value as FiatValue)
 
         override fun price(): Money =
             FiatValue.fromMajor(to, rate)
 
-        override fun inverse() =
-            FiatToFiat(to, from, rateInverse)
+        override fun inverse(roundingMode: RoundingMode, scale: Int) =
+            FiatToFiat(
+                to,
+                from,
+                BigDecimal.ONE.divide(
+                    rate,
+                    if (scale == -1) Currency.getInstance(from).defaultFractionDigits else scale,
+                    roundingMode
+                ).stripTrailingZeros()
+            )
     }
 
     companion object {
@@ -135,14 +157,29 @@ operator fun FiatValue?.div(exchangeRate: ExchangeRate.CryptoToFiat?) =
     this?.let { exchangeRate?.inverse()?.applyRate(it) }
 
 fun ExchangeRate?.percentageDelta(previous: ExchangeRate?): Double =
-    if (this != null && previous != null && previous.rate != BigDecimal.ZERO) {
-        val current = rate
-        val prev = previous.rate
+    try {
+        if (this != null && previous != null && previous.rate.signum() != 0) {
+            val current = rate
+            val prev = previous.rate
 
-        (current - prev)
-            .divide(prev, 4, RoundingMode.HALF_EVEN)
-            .movePointRight(2)
-            .toDouble()
-    } else {
+            (current - prev)
+                .divide(prev, 4, RoundingMode.HALF_EVEN)
+                .movePointRight(2)
+                .toDouble()
+        } else {
+            Double.NaN
+        }
+    } catch (t: ArithmeticException) {
         Double.NaN
     }
+
+fun ExchangeRate.hasSameSourceAndTarget(other: ExchangeRate): Boolean =
+    when (this) {
+        is ExchangeRate.CryptoToFiat -> (other as? ExchangeRate.CryptoToFiat)?.from == from && other.to == to
+        is ExchangeRate.FiatToCrypto -> (other as? ExchangeRate.FiatToCrypto)?.from == from && other.to == to
+        is ExchangeRate.FiatToFiat -> (other as? ExchangeRate.FiatToFiat)?.from == from && other.to == to
+        is ExchangeRate.CryptoToCrypto -> (other as? ExchangeRate.CryptoToCrypto)?.from == from && other.to == to
+    }
+
+fun ExchangeRate.hasOppositeSourceAndTarget(other: ExchangeRate): Boolean =
+    this.hasSameSourceAndTarget(other.inverse())

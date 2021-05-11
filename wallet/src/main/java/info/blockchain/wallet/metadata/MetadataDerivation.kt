@@ -1,39 +1,38 @@
 package info.blockchain.wallet.metadata
 
+import info.blockchain.wallet.keys.MasterKey
 import org.bitcoinj.core.ECKey
-import org.bitcoinj.core.NetworkParameters
+import org.bitcoinj.core.LegacyAddress
 import org.bitcoinj.core.Utils
 import org.bitcoinj.crypto.ChildNumber
 import org.bitcoinj.crypto.DeterministicKey
 import org.bitcoinj.crypto.HDKeyDerivation
-import java.io.UnsupportedEncodingException
+import org.bitcoinj.params.MainNetParams
 import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 import java.util.Arrays
 
-class MetadataDerivation(private val bitcoinParams: NetworkParameters) {
+class MetadataDerivation {
 
-    @Throws(UnsupportedEncodingException::class, NoSuchAlgorithmException::class)
-    fun deriveMetadataNode(node: DeterministicKey): String {
+    fun deriveMetadataNode(node: MasterKey): String {
         return HDKeyDerivation.deriveChildKey(
-            node,
+            node.toDeterministicKey(),
             getPurpose("metadata") or ChildNumber.HARDENED_BIT
-        ).serializePrivB58(bitcoinParams)
+        ).serializePrivB58(MainNetParams.get())
     }
 
-    @Throws(UnsupportedEncodingException::class, NoSuchAlgorithmException::class)
-    fun deriveSharedMetadataNode(node: DeterministicKey?): String {
-        return HDKeyDerivation.deriveChildKey(node, getPurpose("mdid") or ChildNumber.HARDENED_BIT)
-            .serializePrivB58(bitcoinParams)
+    fun deriveSharedMetadataNode(node: MasterKey): String {
+        return HDKeyDerivation.deriveChildKey(
+            node.toDeterministicKey(),
+            getPurpose("mdid") or ChildNumber.HARDENED_BIT).serializePrivB58(MainNetParams.get()
+        )
     }
 
-    fun deriveAddress(key: ECKey) = key.toAddress(bitcoinParams).toString()
+    fun deriveAddress(key: ECKey): String = LegacyAddress.fromKey(MainNetParams.get(), key).toString()
 
     /**
      * BIP 43 purpose needs to be 31 bit or less. For lack of a BIP number we take the first 31 bits
      * of the SHA256 hash of a reverse domain.
      */
-    @Throws(NoSuchAlgorithmException::class, UnsupportedEncodingException::class)
     private fun getPurpose(sub: String): Int {
 
         val md = MessageDigest.getInstance("SHA-256")
@@ -48,6 +47,6 @@ class MetadataDerivation(private val bitcoinParams: NetworkParameters) {
     fun deserializeMetadataNode(node: String): DeterministicKey =
         DeterministicKey.deserializeB58(
             node,
-            bitcoinParams
+            MainNetParams.get()
         )
 }

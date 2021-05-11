@@ -2,7 +2,6 @@ package piuk.blockchain.androidcore.data.fees
 
 import com.blockchain.android.testutils.rxInit
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.api.FeeApi
 import io.reactivex.Observable
 import org.amshove.kluent.`should equal to`
@@ -10,7 +9,6 @@ import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 
 class FeeDataManagerTest {
@@ -18,7 +16,6 @@ class FeeDataManagerTest {
     private lateinit var subject: FeeDataManager
     private val rxBus = RxBus()
     private val feeApi: FeeApi = mock()
-    private val environmentSettings: EnvironmentConfig = mock()
 
     @Suppress("unused")
     @get:Rule
@@ -29,7 +26,7 @@ class FeeDataManagerTest {
 
     @Before
     fun setUp() {
-        subject = FeeDataManager(feeApi, environmentSettings, rxBus)
+        subject = FeeDataManager(feeApi, rxBus)
     }
 
     @Test
@@ -50,8 +47,7 @@ class FeeDataManagerTest {
     fun `Use default ETH fee on API Error`() {
         whenever(feeApi.ethFeeOptions)
             .thenReturn(Observable.error(Throwable()))
-        whenever(environmentSettings.environment)
-            .thenReturn(Environment.STAGING)
+
         subject.ethFeeOptions
             .test()
             .values()
@@ -69,8 +65,7 @@ class FeeDataManagerTest {
     fun `Use default BTC fee on API Error`() {
         whenever(feeApi.btcFeeOptions)
             .thenReturn(Observable.error(Throwable()))
-        whenever(environmentSettings.environment)
-            .thenReturn(Environment.STAGING)
+
         subject.btcFeeOptions
             .test()
             .values()
@@ -87,8 +82,7 @@ class FeeDataManagerTest {
     fun `Use default XLM fee on API Error`() {
         whenever(feeApi.xlmFeeOptions)
             .thenReturn(Observable.error(Throwable()))
-        whenever(environmentSettings.environment)
-            .thenReturn(Environment.STAGING)
+
         subject.xlmFeeOptions
             .test()
             .values()
@@ -96,6 +90,23 @@ class FeeDataManagerTest {
             .apply {
                 priorityFee `should equal to` 100
                 regularFee `should equal to` 100
+            }
+    }
+
+    @Test
+    fun `Use default ERC20 fee on API Error`() {
+        whenever(feeApi.getErc20FeeOptions(""))
+            .thenReturn(Observable.error(Throwable()))
+        subject.getErc20FeeOptions("")
+            .test()
+            .values()
+            .first()
+            .apply {
+                priorityFee `should equal to` 23
+                regularFee `should equal to` 23
+                gasLimit `should equal to` 21000
+                limits!!.min `should equal to` 23
+                limits!!.max `should equal to` 23
             }
     }
 }

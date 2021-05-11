@@ -1,7 +1,6 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
-import com.blockchain.remoteconfig.FeatureFlag
-import com.blockchain.swap.nabu.service.TierService
+import com.blockchain.nabu.service.TierService
 import com.nhaarman.mockito_kotlin.whenever
 import org.amshove.kluent.mock
 import org.junit.Before
@@ -13,7 +12,6 @@ class KycMoreInfoAnnouncementTest {
     private val dismissEntry: DismissRecorder.DismissEntry = mock()
 
     private val tierService: TierService = mock()
-    private val featureFlag: FeatureFlag = mock()
 
     private lateinit var subject: KycMoreInfoAnnouncement
 
@@ -26,7 +24,6 @@ class KycMoreInfoAnnouncementTest {
 
         subject = KycMoreInfoAnnouncement(
             tierService = tierService,
-            showPopupFeatureFlag = featureFlag,
             dismissRecorder = dismissRecorder
         )
     }

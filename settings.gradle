@@ -1,16 +1,14 @@
 include ':app',
         ':notifications',
         ':wallet',
+        ':blockchainApi',
         ':balance',
         ':common:interface',
         ':common:network',
         ':core',
         ':coreui',
-        ':lockbox',
-        ':swap',
         ':nabu',
         ':sunriver',
         ':testutils',
         ':testutils-android',
-        ':veriff',
-        ':zxing'
+        ':veriff'

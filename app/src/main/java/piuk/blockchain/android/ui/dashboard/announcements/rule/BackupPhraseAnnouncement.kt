@@ -31,8 +31,8 @@ class BackupPhraseAnnouncement(
                 name = name,
                 dismissRule = DismissRule.CardPeriodic,
                 dismissEntry = dismissEntry,
-                titleText = R.string.recovery_card_title,
-                bodyText = R.string.recovery_card_body,
+                titleText = R.string.recovery_card_title_1,
+                bodyText = R.string.recovery_card_body_1,
                 ctaText = R.string.recovery_card_cta,
                 iconImage = R.drawable.ic_announce_backup,
                 ctaFunction = {

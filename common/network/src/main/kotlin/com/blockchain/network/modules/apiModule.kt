@@ -9,11 +9,13 @@ import com.blockchain.koin.kotlinApiRetrofit
 import com.blockchain.koin.moshiExplorerRetrofit
 import com.blockchain.koin.moshiInterceptor
 import com.blockchain.koin.nabu
+import com.blockchain.koin.status
 import com.blockchain.network.EnvironmentUrls
 import com.blockchain.serialization.BigDecimalAdaptor
 import com.blockchain.serialization.BigIntegerAdapter
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.squareup.moshi.Moshi
-import io.reactivex.schedulers.Schedulers
 import okhttp3.CertificatePinner
 import okhttp3.Interceptor
 import org.koin.dsl.module
@@ -34,9 +36,7 @@ val apiModule = module {
         builder.add(BigIntegerAdapter())
     }
 
-    single { JacksonConverterFactory.create() }
-
-    single { RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()) }
+    single { JacksonConverterFactory.create(ObjectMapper().registerKotlinModule()) }
 
     single {
         CertificatePinner.Builder()
@@ -63,14 +63,9 @@ val apiModule = module {
      * This instance converts to Kotlin data classes ONLY; it will break if used to parse data models
      * written with Java + Jackson.
      */
-
-    /**
-     * This instance converts to Kotlin data classes ONLY; it will break if used to parse data models
-     * written with Java + Jackson.
-     */
     single(moshiExplorerRetrofit) {
         Retrofit.Builder()
-            .baseUrl(get<EnvironmentUrls>().explorerUrl)
+            .baseUrl(getProperty<String>("explorer-api"))
             .client(get())
             .addConverterFactory(get<MoshiConverterFactory>())
             .addCallAdapterFactory(get<RxJava2CallAdapterFactory>())
@@ -95,9 +90,18 @@ val apiModule = module {
             .build()
     }
 
+    single(status) {
+        Retrofit.Builder()
+            .baseUrl(get<EnvironmentUrls>().statusUrl)
+            .client(get())
+            .addConverterFactory(get<MoshiConverterFactory>())
+            .addCallAdapterFactory(get<RxJava2CallAdapterFactory>())
+            .build()
+    }
+
     single(apiRetrofit) {
         Retrofit.Builder()
-            .baseUrl(get<EnvironmentUrls>().apiUrl)
+            .baseUrl(getProperty<String>("blockchain-api"))
             .client(get())
             .addConverterFactory(get<JacksonConverterFactory>())
             .addCallAdapterFactory(get<RxJava2CallAdapterFactory>())
@@ -106,7 +110,7 @@ val apiModule = module {
 
     single(explorerRetrofit) {
         Retrofit.Builder()
-            .baseUrl(get<EnvironmentUrls>().explorerUrl)
+            .baseUrl(getProperty<String>("explorer-api"))
             .client(get())
             .addConverterFactory(get<JacksonConverterFactory>())
             .addCallAdapterFactory(get<RxJava2CallAdapterFactory>())

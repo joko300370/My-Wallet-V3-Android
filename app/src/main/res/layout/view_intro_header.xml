@@ -5,8 +5,8 @@
     android:id="@+id/intro_header_parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/ic_info_banner_background"
     android:orientation="vertical"
-    android:background="@drawable/ic_buy_sell_intro_background"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent">
 
@@ -23,6 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
         tools:text="@string/buy_with_cash" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -31,10 +32,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
         android:layout_marginBottom="@dimen/small_margin"
         tools:text="@string/select_crypto_you_want" />
 
     <View
+        android:id="@+id/intro_header_separator"
         style="@style/Separator"
         android:layout_width="match_parent"
         android:layout_height="1dp"

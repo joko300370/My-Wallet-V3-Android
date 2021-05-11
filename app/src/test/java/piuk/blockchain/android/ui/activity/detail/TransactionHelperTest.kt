@@ -106,7 +106,7 @@ class TransactionHelperTest {
             )
         )
 
-        whenever(payload.legacyAddressStringList)
+        whenever(payload.importedAddressStringList)
             .thenReturn(emptyList())
         whenever(payloadDataManager.wallet)
             .thenReturn(payload)
@@ -135,11 +135,10 @@ class TransactionHelperTest {
             value = 10.satoshi()
         )
 
-        val legacyStrings = listOf("key0", "key1")
-        val watchOnlyStrings = listOf("key2")
+        val importedStrings = listOf("key0", "key1")
 
-        whenever(payload.legacyAddressStringList)
-            .thenReturn(legacyStrings)
+        whenever(payload.importedAddressStringList)
+            .thenReturn(importedStrings)
 
         whenever(payloadDataManager.wallet)
             .thenReturn(payload)
@@ -166,10 +165,10 @@ class TransactionHelperTest {
             value = 10.satoshi()
         )
 
-        val legacyStrings = listOf("key0", "key1")
+        val importedStrings = listOf("key0", "key1")
 
-        whenever(payload.legacyAddressStringList)
-            .thenReturn(legacyStrings)
+        whenever(payload.importedAddressStringList)
+            .thenReturn(importedStrings)
 
         whenever(payloadDataManager.wallet)
             .thenReturn(payload)
@@ -224,7 +223,7 @@ class TransactionHelperTest {
             )
         )
 
-        whenever(bchDataManager.getLegacyAddressStringList())
+        whenever(bchDataManager.getImportedAddressStringList())
             .thenReturn(emptyList())
 
         // Act
@@ -251,10 +250,10 @@ class TransactionHelperTest {
             value = 10.satoshiCash()
         )
 
-        val legacyStrings = listOf("key0", "key1")
+        val importedStrings = listOf("key0", "key1")
 
-        whenever(bchDataManager.getLegacyAddressStringList())
-            .thenReturn(legacyStrings)
+        whenever(bchDataManager.getImportedAddressStringList())
+            .thenReturn(importedStrings)
 
         // Act
         val value = subject.filterNonChangeBchAddresses(item)
@@ -278,10 +277,10 @@ class TransactionHelperTest {
             value = 10.satoshi()
         )
 
-        val legacyStrings = listOf("key0", "key1")
+        val importedStrings = listOf("key0", "key1")
 
-        whenever(bchDataManager.getLegacyAddressStringList())
-            .thenReturn(legacyStrings)
+        whenever(bchDataManager.getImportedAddressStringList())
+            .thenReturn(importedStrings)
 
         whenever(bchDataManager.isOwnAddress(any()))
             .thenReturn(true)

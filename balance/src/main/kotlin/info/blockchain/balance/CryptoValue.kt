@@ -26,7 +26,7 @@ data class CryptoValue(
     override fun toFiat(exchangeRates: ExchangeRates, fiatCurrency: String): FiatValue =
         FiatValue.fromMajor(
             fiatCurrency,
-            exchangeRates.getLastPrice(currency, fiatCurrency).toBigDecimal() * toBigDecimal()
+            exchangeRates.getLastPrice(currency, fiatCurrency) * this.toBigDecimal()
         )
 
     /**
@@ -42,41 +42,14 @@ data class CryptoValue(
     override val isZero: Boolean get() = amount.signum() == 0
 
     companion object {
+        @Deprecated(
+            message = "As we add more assets, this will become a maintenance headache, prefer the zero(asset) method",
+            replaceWith = ReplaceWith("CryptoValue.zero(CryptoCurrency.BTC)")
+        )
         val ZeroBtc = CryptoValue(CryptoCurrency.BTC, BigInteger.ZERO)
-        val ZeroBch = CryptoValue(CryptoCurrency.BCH, BigInteger.ZERO)
-        val ZeroEth = CryptoValue(CryptoCurrency.ETHER, BigInteger.ZERO)
-        val ZeroStx = CryptoValue(CryptoCurrency.STX, BigInteger.ZERO)
-        val ZeroXlm = CryptoValue(CryptoCurrency.XLM, BigInteger.ZERO)
-        val ZeroPax = CryptoValue(CryptoCurrency.PAX, BigInteger.ZERO)
-        val ZeroAlg = CryptoValue(CryptoCurrency.ALGO, BigInteger.ZERO)
-        val ZeroUsdt = CryptoValue(CryptoCurrency.USDT, BigInteger.ZERO)
 
-        fun zero(cryptoCurrency: CryptoCurrency) = when (cryptoCurrency) {
-            CryptoCurrency.BTC -> ZeroBtc
-            CryptoCurrency.BCH -> ZeroBch
-            CryptoCurrency.ETHER -> ZeroEth
-            CryptoCurrency.XLM -> ZeroXlm
-            CryptoCurrency.PAX -> ZeroPax
-            CryptoCurrency.STX -> ZeroStx
-            CryptoCurrency.ALGO -> ZeroAlg
-            CryptoCurrency.USDT -> ZeroUsdt
-        }
-
-        // These calls are currently (mostly) only used in tests, where we have a second mechanism
-        // [xx.bitcoin(), xx.satoshi() etc] for generating CryptoValues.
-        // So ALL these coin specific calls are deprecated and will be removed once all the tests
-        // are updated to use the other, more readable, mechanism. Use the suggested
-        // replacement in test code. If found in prod code, then it's CryptoValue.fromMajor/fromMinor etc
-        @Deprecated("Historical method", ReplaceWith("satoshi.satoshi()"))
-        fun bitcoinFromSatoshis(satoshi: Long) =
-            CryptoValue(CryptoCurrency.BTC, satoshi.toBigInteger())
-
-        @Deprecated("Historical method", ReplaceWith("satoshi.satoshiCash()"))
-        fun bitcoinCashFromSatoshis(satoshi: Long) =
-            CryptoValue(CryptoCurrency.BCH, satoshi.toBigInteger())
-
-        @Deprecated("Historical method", ReplaceWith("stroop.stroops()"))
-        fun lumensFromStroop(stroop: BigInteger) = CryptoValue(CryptoCurrency.XLM, stroop)
+        fun zero(asset: CryptoCurrency) =
+            CryptoValue(asset, BigInteger.ZERO)
 
         fun fromMajor(
             currency: CryptoCurrency,
@@ -118,6 +91,11 @@ data class CryptoValue(
         return amount.compareTo(other.amount)
     }
 
+    override fun division(other: Money): Money {
+        require(other is CryptoValue)
+        return CryptoValue(currency, amount / other.amount)
+    }
+
     override fun ensureComparable(operation: String, other: Money) {
         if (other is CryptoValue) {
             if (currency != other.currency) {
@@ -129,7 +107,9 @@ data class CryptoValue(
     }
 }
 
+@Deprecated("Only used in tests")
 fun CryptoCurrency.withMajorValue(majorValue: BigDecimal) = CryptoValue.fromMajor(this, majorValue)
 
+@Deprecated("Only used in tests")
 fun CryptoCurrency.withMajorValueOrZero(majorValue: String, locale: Locale = Locale.getDefault()) =
     CryptoValue.fromMajor(this, majorValue.tryParseBigDecimal(locale) ?: BigDecimal.ZERO)

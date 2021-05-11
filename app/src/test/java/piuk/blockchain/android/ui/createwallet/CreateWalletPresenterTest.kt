@@ -1,76 +1,62 @@
 package piuk.blockchain.android.ui.createwallet
 
-import android.content.Intent
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
+import com.blockchain.preferences.WalletStatus
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
+import com.nhaarman.mockito_kotlin.verifyZeroInteractions
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.wallet.payload.data.Wallet
-import io.reactivex.Observable
+import io.reactivex.Single
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito
 import piuk.blockchain.android.R
-import piuk.blockchain.android.ui.recover.RecoverFundsActivity
+import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.android.util.FormatChecker
 import piuk.blockchain.androidcore.data.access.AccessState
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.PrngFixer
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AppUtil
 
 class CreateWalletPresenterTest {
 
     private lateinit var subject: CreateWalletPresenter
-    private var view: CreateWalletView = mock()
-    private var appUtil: AppUtil = mock()
-    private var accessState: AccessState = mock()
-    private var payloadDataManager: PayloadDataManager =
-        mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
-    private var prefsUtil: PersistentPrefs = mock()
-    private var prngFixer: PrngFixer = mock()
-    private var analytics: Analytics = mock()
+    private val view: CreateWalletView = mock()
+    private val appUtil: AppUtil = mock()
+    private val accessState: AccessState = mock()
+    private val payloadDataManager: PayloadDataManager = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
+    private val prefsUtil: PersistentPrefs = mock()
+    private val prngFixer: PrngFixer = mock()
+    private val analytics: Analytics = mock()
+    private val walletPrefs: WalletStatus = mock()
+    private val environmentConfig: EnvironmentConfig = mock()
+    private val formatChecker: FormatChecker = mock()
 
     @Before
     fun setUp() {
-        subject =
-            CreateWalletPresenter(payloadDataManager, prefsUtil, appUtil, accessState, prngFixer, analytics)
+        subject = CreateWalletPresenter(
+            payloadDataManager = payloadDataManager,
+            prefs = prefsUtil,
+            appUtil = appUtil,
+            accessState = accessState,
+            prngFixer = prngFixer,
+            analytics = analytics,
+            walletPrefs = walletPrefs,
+            environmentConfig = environmentConfig,
+            formatChecker = formatChecker
+        )
         subject.initView(view)
     }
 
     @Test
     fun onViewReady() {
         // Nothing to test
-    }
-
-    @Test
-    fun `parseExtras for create`() {
-        // Arrange
-        val intent: Intent = mock()
-        whenever(intent.getStringExtra(RecoverFundsActivity.RECOVERY_PHRASE)).thenReturn("")
-        // Act
-        subject.parseExtras(intent)
-        // Assert
-        verify(view).setTitleText(R.string.new_account_title)
-        verify(view).setNextText(R.string.new_account_cta_text)
-        verifyNoMoreInteractions(view)
-    }
-
-    @Test
-    fun `parseExtras for recover`() {
-        // Arrange
-        val intent: Intent = mock()
-        whenever(intent.getStringExtra(RecoverFundsActivity.RECOVERY_PHRASE))
-            .thenReturn("all all all all all all all all all all all all")
-        // Act
-        subject.parseExtras(intent)
-        // Assert
-        verify(view).setTitleText(R.string.recover_funds)
-        verify(view).setNextText(R.string.dialog_continue)
-        verifyNoMoreInteractions(view)
     }
 
     @Test
@@ -122,26 +108,27 @@ class CreateWalletPresenterTest {
     }
 
     @Test
-    fun `validateCredentials create wallet`() {
+    fun `create wallet`() {
         // Arrange
         val email = "john@snow.com"
         val pw1 = "MyTestWallet"
-        val pw2 = "MyTestWallet"
         val accountName = "AccountName"
         val sharedKey = "SHARED_KEY"
         val guid = "GUID"
+        val recoveryPhrase = ""
+
         whenever(view.getDefaultAccountName()).thenReturn(accountName)
         whenever(payloadDataManager.createHdWallet(any(), any(), any())).thenReturn(
-            Observable.just(
+            Single.just(
                 Wallet()
             )
         )
         whenever(payloadDataManager.wallet!!.guid).thenReturn(guid)
         whenever(payloadDataManager.wallet!!.sharedKey).thenReturn(sharedKey)
+
         // Act
         subject.passwordStrength = 80
-        subject.recoveryPhrase = ""
-        subject.validateCredentials(email, pw1, pw2)
+        subject.createOrRestoreWallet(email, pw1, recoveryPhrase)
         // Assert
         verify(prngFixer).applyPRNGFixes()
         val observer = payloadDataManager.createHdWallet(pw1, accountName, email).test()
@@ -150,94 +137,131 @@ class CreateWalletPresenterTest {
 
         verify(view).showProgressDialog(any())
         verify(prefsUtil).setValue(PersistentPrefs.KEY_EMAIL, email)
-        verify(prefsUtil).setValue(PersistentPrefs.KEY_WALLET_GUID, guid)
+        verify(prefsUtil).walletGuid = guid
+        verify(prefsUtil).sharedKey = sharedKey
         verify(accessState).isNewlyCreated = true
-        verify(appUtil).sharedKey = sharedKey
         verify(view).startPinEntryActivity()
         verify(view).dismissProgressDialog()
         verify(analytics).logEvent(AnalyticsEvents.WalletCreation)
     }
 
     @Test
-    fun `validateCredentials restore wallet`() {
+    fun `restore wallet`() {
         // Arrange
         val email = "john@snow.com"
         val pw1 = "MyTestWallet"
-        val pw2 = "MyTestWallet"
         val accountName = "AccountName"
         val sharedKey = "SHARED_KEY"
         val guid = "GUID"
+        val recoveryPhrase = "all all all all all all all all all all all all"
+
         whenever(view.getDefaultAccountName()).thenReturn(accountName)
         whenever(payloadDataManager.restoreHdWallet(any(), any(), any(), any()))
-            .thenReturn(Observable.just(Wallet()))
+            .thenReturn(Single.just(Wallet()))
         whenever(payloadDataManager.wallet!!.guid).thenReturn(guid)
         whenever(payloadDataManager.wallet!!.sharedKey).thenReturn(sharedKey)
+
         // Act
-        subject.passwordStrength = 80
-        subject.recoveryPhrase = "all all all all all all all all all all all all"
-        subject.validateCredentials(email, pw1, pw2)
+        subject.createOrRestoreWallet(email, pw1, recoveryPhrase)
+
         // Assert
-        val observer =
-            payloadDataManager.restoreHdWallet(email, pw1, accountName, subject.recoveryPhrase)
-                .test()
+        val observer = payloadDataManager.restoreHdWallet(email, pw1, accountName, recoveryPhrase)
+            .test()
         observer.assertComplete()
         observer.assertNoErrors()
 
         verify(view).showProgressDialog(any())
         verify(prefsUtil).setValue(PersistentPrefs.KEY_EMAIL, email)
         verify(prefsUtil).setValue(PersistentPrefs.KEY_ONBOARDING_COMPLETE, true)
-        verify(prefsUtil).setValue(PersistentPrefs.KEY_WALLET_GUID, guid)
+        verify(prefsUtil).walletGuid = guid
+        verify(prefsUtil).sharedKey = sharedKey
         verify(accessState).isNewlyCreated = true
-        verify(appUtil).sharedKey = sharedKey
         verify(view).startPinEntryActivity()
         verify(view).dismissProgressDialog()
     }
 
     @Test
-    fun `validateCredentials invalid email`() {
+    fun `validateCredentials are valid`() {
         // Arrange
+        val email = "john@snow.com"
+        val pw1 = "MyTestWallet"
+        val pw2 = "MyTestWallet"
+        whenever(formatChecker.isValidEmailAddress(anyString())).thenReturn(true)
 
         // Act
         subject.passwordStrength = 80
-        subject.validateCredentials("john", "MyTestWallet", "MyTestWallet")
+        val result = subject.validateCredentials(email, pw1, pw2)
         // Assert
-        verify(view).showToast(R.string.invalid_email, ToastCustom.TYPE_ERROR)
+        assert(result)
+        verifyNoMoreInteractions(view)
+    }
+
+    @Test
+    fun `validateCredentials invalid email`() {
+        // Arrange
+        whenever(formatChecker.isValidEmailAddress(anyString())).thenReturn(false)
+
+        // Act
+        subject.passwordStrength = 80
+        val result = subject.validateCredentials("john", "MyTestWallet", "MyTestWallet")
+        // Assert
+        assert(!result)
+        verify(view).showError(R.string.invalid_email)
         verifyNoMoreInteractions(view)
     }
 
     @Test
     fun `validateCredentials short password`() {
         // Arrange
+        whenever(formatChecker.isValidEmailAddress(anyString())).thenReturn(true)
 
         // Act
         subject.passwordStrength = 80
-        subject.validateCredentials("john@snow.com", "aaa", "aaa")
+        val result = subject.validateCredentials("john@snow.com", "aaa", "aaa")
         // Assert
-        verify(view).showToast(R.string.invalid_password_too_short, ToastCustom.TYPE_ERROR)
+        assert(!result)
+        verify(view).showError(R.string.invalid_password_too_short)
         verifyNoMoreInteractions(view)
     }
 
     @Test
-    fun `validateCredentials password missmatch`() {
+    fun `validateCredentials password mismatch`() {
         // Arrange
+        whenever(formatChecker.isValidEmailAddress(anyString())).thenReturn(true)
 
         // Act
         subject.passwordStrength = 80
-        subject.validateCredentials("john@snow.com", "MyTestWallet", "MyTestWallet2")
+        val result = subject.validateCredentials("john@snow.com", "MyTestWallet", "MyTestWallet2")
         // Assert
-        verify(view).showToast(R.string.password_mismatch_error, ToastCustom.TYPE_ERROR)
+        assert(!result)
+        verify(view).showError(R.string.password_mismatch_error)
         verifyNoMoreInteractions(view)
     }
 
     @Test
-    fun `validateCredentials weak password`() {
+    fun `validateCredentials weak password running on non debug mode`() {
         // Arrange
-
+        whenever(formatChecker.isValidEmailAddress(anyString())).thenReturn(true)
+        whenever(environmentConfig.isRunningInDebugMode()).thenReturn(false)
         // Act
         subject.passwordStrength = 20
-        subject.validateCredentials("john@snow.com", "aaaaaa", "aaaaaa")
+        val result = subject.validateCredentials("john@snow.com", "aaaaaa", "aaaaaa")
         // Assert
-        verify(view).showWeakPasswordDialog(any(), any())
+        assert(!result)
+        verify(view).warnWeakPassword(any(), any())
         verifyNoMoreInteractions(view)
+    }
+
+    @Test
+    fun `validateCredentials weak password running on  debug mode`() {
+        // Arrange
+        whenever(formatChecker.isValidEmailAddress(anyString())).thenReturn(true)
+        whenever(environmentConfig.isRunningInDebugMode()).thenReturn(true)
+        // Act
+        subject.passwordStrength = 5
+        val result = subject.validateCredentials("john@snow.com", "aaaaaa", "aaaaaa")
+        // Assert
+        assert(result)
+        verifyZeroInteractions(view)
     }
 }

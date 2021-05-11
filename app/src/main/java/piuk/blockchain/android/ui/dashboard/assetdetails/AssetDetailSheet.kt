@@ -2,15 +2,17 @@ package piuk.blockchain.android.ui.dashboard.assetdetails
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.UiThread
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.CustodialBalanceClicked
+import piuk.blockchain.android.simplebuy.CustodialBalanceClicked
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.wallet.DefaultLabels
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
@@ -21,28 +23,27 @@ import com.google.android.material.tabs.TabLayout
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import info.blockchain.wallet.prices.data.PriceDatum
-import kotlinx.android.synthetic.main.dialog_dashboared_asset_details.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.accounts.PendingBalanceAccountDecorator
 import piuk.blockchain.android.coincore.AssetFilter
+import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
+import piuk.blockchain.android.databinding.DialogSheetDashboardAssetDetailsBinding
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.account.PendingBalanceAccountDecorator
 import piuk.blockchain.android.ui.dashboard.setDeltaColour
+import piuk.blockchain.android.util.loadInterMedium
 import piuk.blockchain.androidcore.data.exchangerate.PriceSeries
 import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom.TYPE_ERROR
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.invisible
-import piuk.blockchain.androidcoreui.utils.extensions.visible
-import piuk.blockchain.androidcoreui.utils.helperfunctions.CustomFont
-import piuk.blockchain.androidcoreui.utils.helperfunctions.loadFont
-import piuk.blockchain.androidcoreui.utils.helperfunctions.setOnTabSelectedListener
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.invisible
+import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.setOnTabSelectedListener
 import java.math.RoundingMode
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -50,9 +51,10 @@ import java.util.Currency
 import java.util.Date
 import java.util.Locale
 
-class AssetDetailSheet :
-    MviBottomSheet<AssetDetailsModel, AssetDetailsIntent, AssetDetailsState>() {
+class AssetDetailSheet : MviBottomSheet<AssetDetailsModel,
+    AssetDetailsIntent, AssetDetailsState, DialogSheetDashboardAssetDetailsBinding>() {
     private val currencyPrefs: CurrencyPrefs by inject()
+    private val labels: DefaultLabels by inject()
     private val locale = Locale.getDefault()
 
     private val cryptoCurrency: CryptoCurrency by lazy {
@@ -62,13 +64,20 @@ class AssetDetailSheet :
 
     private val assetSelect: Coincore by scopedInject()
 
+    private val assetResources: AssetResources by scopedInject()
+
     private val token: CryptoAsset by lazy {
         assetSelect[cryptoCurrency]
     }
 
     private val detailsAdapter by lazy {
-        AssetDetailAdapter(::onAccountSelected,
-            cryptoCurrency.hasFeature(CryptoCurrency.CUSTODIAL_ONLY), token) {
+        AssetDetailAdapter(
+            ::onAccountSelected,
+            cryptoCurrency.hasFeature(CryptoCurrency.CUSTODIAL_ONLY),
+            token,
+            assetResources,
+            labels
+        ) {
             PendingBalanceAccountDecorator(it.account)
         }
     }
@@ -77,8 +86,8 @@ class AssetDetailSheet :
 
     override val model: AssetDetailsModel by scopedInject()
 
-    override val layoutResource: Int
-        get() = R.layout.dialog_dashboared_asset_details
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogSheetDashboardAssetDetailsBinding =
+        DialogSheetDashboardAssetDetailsBinding.inflate(inflater, container, false)
 
     @UiThread
     override fun render(newState: AssetDetailsState) {
@@ -86,13 +95,13 @@ class AssetDetailSheet :
             handleErrorState(newState.errorState)
         }
 
-        newState.assetDisplayMap?.let {
-            onGotAssetDetails(it)
+        newState.assetDisplayMap?.let { assetDisplayMap ->
+            onGotAssetDetails(assetDisplayMap)
         }
 
-        dialogView.current_price.text = newState.assetFiatPrice
+        binding.currentPrice.text = newState.assetFiatPrice
 
-        configureTimespanSelectionUI(dialogView, newState.timeSpan)
+        configureTimespanSelectionUI(binding, newState.timeSpan)
 
         if (newState.chartLoading) {
             chartToLoadingState()
@@ -100,29 +109,32 @@ class AssetDetailSheet :
             chartToDataState()
         }
 
-        dialogView.chart.apply {
+        binding.chart.apply {
             if (newState.chartData != state.chartData) {
                 updateChart(this, newState.chartData)
             }
         }
 
-        updatePriceChange(dialogView.price_change, newState.chartData)
+        updatePriceChange(binding.priceChange, newState.chartData)
 
         state = newState
     }
 
-    override fun initControls(view: View) {
-        with(view) {
-            configureChart(chart,
+    override fun initControls(binding: DialogSheetDashboardAssetDetailsBinding) {
+        model.process(LoadAsset(token))
+        with(binding) {
+            configureChart(
+                chart,
                 getFiatSymbol(currencyPrefs.selectedFiatCurrency),
-                cryptoCurrency.getDecimalPlaces())
+                assetResources.numOfDecimalsForChart(cryptoCurrency)
+            )
 
-            configureTabs(view.chart_price_periods)
+            configureTabs(chartPricePeriods)
 
-            current_price_title.text =
+            currentPriceTitle.text =
                 getString(R.string.dashboard_price_for_asset, cryptoCurrency.displayTicker)
 
-            asset_list.apply {
+            assetList.apply {
                 adapter = detailsAdapter
 
                 layoutManager = LinearLayoutManager(requireContext())
@@ -203,7 +215,7 @@ class AssetDetailSheet :
             visible()
             clear()
             if (data.isEmpty()) {
-                dialogView.price_change?.text = "--"
+                binding.priceChange.text = "--"
                 return
             }
             val entries = data
@@ -211,7 +223,8 @@ class AssetDetailSheet :
                 .map {
                     Entry(
                         it.timestamp.toFloat(),
-                        it.price!!.toFloat())
+                        it.price!!.toFloat()
+                    )
                 }
 
             this.data = LineData(LineDataSet(entries, null).apply {
@@ -226,7 +239,7 @@ class AssetDetailSheet :
                     context,
                     R.layout.price_chart_marker,
                     getFiatSymbol(currencyPrefs.selectedFiatCurrency),
-                    cryptoCurrency.getDecimalPlaces()
+                    assetResources.numOfDecimalsForChart(cryptoCurrency)
                 )
             })
             animateX(500)
@@ -243,14 +256,14 @@ class AssetDetailSheet :
                 getString(R.string.asset_details_exchange_load_failed_toast)
             else -> "" // this never triggers
         }
-        ToastCustom.makeText(requireContext(), errorString, Toast.LENGTH_SHORT, TYPE_ERROR)
+        ToastCustom.makeText(requireContext(), errorString, Toast.LENGTH_SHORT, ToastCustom.TYPE_ERROR)
     }
 
     private fun chartToLoadingState() {
-        with(dialogView) {
-            prices_loading?.visible()
-            chart?.invisible()
-            price_change?.apply {
+        with(binding) {
+            pricesLoading.visible()
+            chart.invisible()
+            priceChange.apply {
                 text = "--"
                 setTextColor(ContextCompat.getColor(context, R.color.dashboard_chart_unknown))
             }
@@ -258,8 +271,8 @@ class AssetDetailSheet :
     }
 
     private fun chartToDataState() {
-        dialogView.prices_loading?.gone()
-        dialogView.chart?.visible()
+        binding.pricesLoading.gone()
+        binding.chart.visible()
     }
 
     private fun configureTabs(chartPricePeriods: TabLayout) {
@@ -348,17 +361,13 @@ class AssetDetailSheet :
             xAxis.isGranularityEnabled = true
             setExtraOffsets(8f, 0f, 0f, 10f)
             setNoDataTextColor(ContextCompat.getColor(context, R.color.primary_grey_medium))
-            loadFont(
-                context,
-                CustomFont.MONTSERRAT_LIGHT
-            ) {
-                xAxis.typeface = it
-                axisLeft.typeface = it
-            }
+            val typeFace = context.loadInterMedium()
+            xAxis.typeface = typeFace
+            axisLeft.typeface = typeFace
         }
     }
 
-    private fun configureTimespanSelectionUI(view: View, selection: TimeSpan) {
+    private fun configureTimespanSelectionUI(binding: DialogSheetDashboardAssetDetailsBinding, selection: TimeSpan) {
         val dateFormat = when (selection) {
             TimeSpan.ALL_TIME -> SimpleDateFormat("yyyy", locale)
             TimeSpan.YEAR -> SimpleDateFormat("MMM ''yy", locale)
@@ -373,8 +382,8 @@ class AssetDetailSheet :
             TimeSpan.DAY -> 60 * 60 * 4F
         }
 
-        with(view) {
-            chart.chart.xAxis.apply {
+        with(binding) {
+            chart.xAxis.apply {
                 this.granularity = granularity
                 valueFormatter = object : ValueFormatter() {
                     override fun getFormattedValue(value: Float): String {
@@ -383,7 +392,7 @@ class AssetDetailSheet :
                 }
             }
 
-            price_change_period.text = resources.getString(
+            priceChangePeriod.text = resources.getString(
                 when (selection) {
                     TimeSpan.YEAR -> R.string.dashboard_time_span_last_year
                     TimeSpan.MONTH -> R.string.dashboard_time_span_last_month
@@ -393,21 +402,9 @@ class AssetDetailSheet :
                 }
             )
 
-            chart_price_periods.getTabAt(selection.ordinal)?.select()
+            chartPricePeriods.getTabAt(selection.ordinal)?.select()
         }
     }
-
-    private fun CryptoCurrency.getDecimalPlaces(): Int =
-        when (this) {
-            CryptoCurrency.BTC,
-            CryptoCurrency.ETHER,
-            CryptoCurrency.BCH,
-            CryptoCurrency.PAX,
-            CryptoCurrency.ALGO,
-            CryptoCurrency.USDT -> 2
-            CryptoCurrency.XLM -> 4
-            CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
-        }
 
     companion object {
         private const val ARG_CRYPTO_CURRENCY = "crypto"
@@ -417,7 +414,6 @@ class AssetDetailSheet :
                 arguments = Bundle().apply {
                     putSerializable(ARG_CRYPTO_CURRENCY, cryptoCurrency)
                 }
-                model.process(LoadAsset(token))
             }
         }
 

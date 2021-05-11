@@ -3,19 +3,17 @@ package piuk.blockchain.android.ui.transfer.receive
 import android.os.Bundle
 import android.view.View
 import piuk.blockchain.android.R
-import piuk.blockchain.android.accounts.DefaultCellDecorator
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.ui.transfer.AccountListFilterFn
+import piuk.blockchain.android.ui.customviews.account.DefaultCellDecorator
 import piuk.blockchain.android.ui.transfer.AccountSelectorFragment
 import piuk.blockchain.android.ui.transfer.receive.activity.ReceiveActivity
 
 class TransferReceiveFragment : AccountSelectorFragment() {
 
-    override val filterFn: AccountListFilterFn = { account ->
-        (account is CryptoAccount) && account.actions.contains(AssetAction.Receive)
-    }
+    override val fragmentAction: AssetAction
+        get() = AssetAction.Receive
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

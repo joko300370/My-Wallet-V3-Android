@@ -1,16 +1,17 @@
 package piuk.blockchain.android.ui.dashboard
 
 import com.blockchain.logging.CrashLogger
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.Money
-import info.blockchain.wallet.payload.PayloadManager
+import info.blockchain.wallet.prices.TimeAgo
 import info.blockchain.wallet.prices.TimeInterval
 import info.blockchain.wallet.prices.data.PriceDatum
 import io.reactivex.Maybe
@@ -23,13 +24,21 @@ import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
+import piuk.blockchain.android.coincore.AssetOrdering
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.coincore.fiat.LinkedBankAccount
+import piuk.blockchain.android.coincore.fiat.LinkedBanksFactory
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsFlow
+import piuk.blockchain.android.ui.settings.LinkablePaymentMethods
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -39,13 +48,15 @@ private class DashboardBalanceLoadFailure(msg: String, e: Throwable) : Exception
 
 class DashboardInteractor(
     private val coincore: Coincore,
-    private val payloadManager: PayloadManager,
+    private val payloadManager: PayloadDataManager,
     private val exchangeRates: ExchangeRates,
     private val currencyPrefs: CurrencyPrefs,
     private val custodialWalletManager: CustodialWalletManager,
     private val simpleBuyPrefs: SimpleBuyPrefs,
     private val analytics: Analytics,
-    private val crashLogger: CrashLogger
+    private val crashLogger: CrashLogger,
+    private val linkedBanksFactory: LinkedBanksFactory,
+    private val assetOrdering: AssetOrdering
 ) {
 
     // We have a problem here, in that pax init depends on ETH init
@@ -54,22 +65,39 @@ class DashboardInteractor(
     // which is on the radar - then we can clean up the entire app init sequence.
     // But for now, we'll catch any pax init failure here, unless ETH has initialised OK. And when we
     // get a valid ETH balance, will try for a PX balance. Yeah, this is a nasty hack TODO: Fix this
-    fun refreshBalances(model: DashboardModel, balanceFilter: AssetFilter): Disposable {
+    fun refreshBalances(model: DashboardModel, balanceFilter: AssetFilter, state: DashboardState): Disposable {
         val cd = CompositeDisposable()
 
-        CryptoCurrency.activeCurrencies()
+        state.assetMapKeys
             .filter { !it.hasFeature(CryptoCurrency.IS_ERC20) }
             .forEach { asset ->
                 cd += refreshAssetBalance(asset, model, balanceFilter)
-                    .ifEthLoadedGetErc20Balance(model, balanceFilter, cd)
-                    .ifEthFailedThenErc20Failed(asset, model)
+                    .ifEthLoadedGetErc20Balance(model, balanceFilter, cd, state)
+                    .ifEthFailedThenErc20Failed(asset, model, state)
                     .emptySubscribe()
             }
 
-        cd += checkForFiatBalances(model)
+        cd += checkForFiatBalances(model, currencyPrefs.selectedFiatCurrency)
 
         return cd
     }
+
+    fun getAvailableAssets(model: DashboardModel): Disposable =
+        assetOrdering.getAssetOrdering().subscribeBy(
+            onSuccess = { assetOrder ->
+                val assets = coincore.cryptoAssets.map { enabledAssets ->
+                    (enabledAssets as CryptoAsset).asset
+                }
+
+                val sortedAssets = assets.sortedBy { assetOrder.indexOf(it) }
+
+                model.process(UpdateDashboardCurrencies(sortedAssets))
+                model.process(RefreshAllIntent)
+            },
+            onError = {
+                Timber.e("Error getting ordering - $it")
+            }
+        )
 
     private fun refreshAssetBalance(
         asset: CryptoCurrency,
@@ -102,24 +130,26 @@ class DashboardInteractor(
     private fun Single<CryptoValue>.ifEthLoadedGetErc20Balance(
         model: DashboardModel,
         balanceFilter: AssetFilter,
-        disposables: CompositeDisposable
+        disposables: CompositeDisposable,
+        state: DashboardState
     ) = this.doOnSuccess { value ->
         if (value.currency == CryptoCurrency.ETHER) {
-            disposables += refreshAssetBalance(CryptoCurrency.PAX, model, balanceFilter)
-                .emptySubscribe()
-            disposables += refreshAssetBalance(CryptoCurrency.USDT, model, balanceFilter)
-                .emptySubscribe()
+            state.erc20Assets.forEach {
+                disposables += refreshAssetBalance(it, model, balanceFilter)
+                    .emptySubscribe()
+            }
         }
     }
 
     private fun Single<CryptoValue>.ifEthFailedThenErc20Failed(
         asset: CryptoCurrency,
-        model: DashboardModel
+        model: DashboardModel,
+        state: DashboardState
     ) = this.doOnError {
         if (asset == CryptoCurrency.ETHER) {
-            // If we can't get ETH, then we can't get erc20 tokens... so...
-            model.process(BalanceUpdateError(CryptoCurrency.PAX))
-            model.process(BalanceUpdateError(CryptoCurrency.USDT))
+            state.erc20Assets.forEach {
+                model.process(BalanceUpdateError(it))
+            }
         }
     }
 
@@ -137,14 +167,14 @@ class DashboardInteractor(
             )
         }
 
-    private fun checkForFiatBalances(model: DashboardModel): Disposable =
+    private fun checkForFiatBalances(model: DashboardModel, fiatCurrency: String): Disposable =
         coincore.fiatAssets.accountGroup()
             .flattenAsObservable { g -> g.accounts }
             .flatMapSingle { a ->
                 a.accountBalance.map { balance ->
                     FiatBalanceInfo(
                         balance,
-                        balance.toFiat(exchangeRates, currencyPrefs.selectedFiatCurrency),
+                        balance.toFiat(exchangeRates, fiatCurrency),
                         a as FiatAccount
                     )
                 }
@@ -162,11 +192,10 @@ class DashboardInteractor(
             )
 
     fun refreshPrices(model: DashboardModel, crypto: CryptoCurrency): Disposable {
-        val oneDayAgo = (System.currentTimeMillis() / 1000) - ONE_DAY
 
         return Singles.zip(
             coincore[crypto].exchangeRate(),
-            coincore[crypto].historicRate(oneDayAgo)
+            coincore[crypto].historicRate(TimeAgo.ONE_DAY.epoch)
         ) { rate, day -> PriceUpdate(crypto, rate, day) }
             .subscribeBy(
                 onSuccess = { model.process(it) },
@@ -195,9 +224,9 @@ class DashboardInteractor(
             )
     }
 
-    fun hasUserBackedUp(): Single<Boolean> = Single.just(payloadManager.isWalletBackedUp)
+    fun hasUserBackedUp(): Single<Boolean> = Single.just(payloadManager.isBackedUp)
 
-    fun cancelSimpleBuyOrder(orderId: String): Disposable? {
+    fun cancelSimpleBuyOrder(orderId: String): Disposable {
         return custodialWalletManager.deleteBuyOrder(orderId)
             .subscribeBy(
                 onComplete = { simpleBuyPrefs.clearState() },
@@ -238,28 +267,231 @@ class DashboardInteractor(
         return null
     }
 
-    fun getDepositFlow(
+    fun getInterestDepositFlow(
         model: DashboardModel,
-        sourceAccount: SingleAccount,
-        targetAccount: SingleAccount,
-        action: AssetAction
+        targetAccount: InterestAccount
     ): Disposable? {
-        if (sourceAccount is CryptoAccount) {
-            model.process(
-                UpdateLaunchDialogFlow(
-                    TransactionFlow(
-                        sourceAccount = sourceAccount,
-                        target = targetAccount,
-                        action = action
-                    )
+        require(targetAccount is CryptoAccount)
+        model.process(
+            UpdateLaunchDialogFlow(
+                TransactionFlow(
+                    target = targetAccount,
+                    action = AssetAction.InterestDeposit
                 )
             )
-        }
+        )
         return null
     }
 
+    fun getBankDepositFlow(
+        model: DashboardModel,
+        targetAccount: SingleAccount,
+        action: AssetAction,
+        shouldLaunchBankLinkTransfer: Boolean
+    ): Disposable {
+        require(targetAccount is FiatAccount)
+        return handleFiatDeposit(targetAccount, shouldLaunchBankLinkTransfer, model, action)
+    }
+
+    private fun handleFiatDeposit(
+        targetAccount: FiatAccount,
+        shouldLaunchBankLinkTransfer: Boolean,
+        model: DashboardModel,
+        action: AssetAction
+    ) = Singles.zip(
+        linkedBanksFactory.eligibleBankPaymentMethods(targetAccount.fiatCurrency).map { paymentMethods ->
+            // Ignore any WireTransferMethods In case BankLinkTransfer should launch
+            paymentMethods.filter { it == PaymentMethodType.BANK_TRANSFER || !shouldLaunchBankLinkTransfer }
+        },
+        linkedBanksFactory.getNonWireTransferBanks().map {
+            it.filter { bank -> bank.currency == targetAccount.fiatCurrency }
+        }
+    ).doOnSubscribe {
+        model.process(LongCallStarted)
+    }.flatMap { (paymentMethods, linkedBanks) ->
+        when {
+            linkedBanks.isEmpty() -> {
+                handleNoLinkedBanks(
+                    targetAccount,
+                    LinkablePaymentMethodsForAction.LinkablePaymentMethodsForDeposit(
+                        linkablePaymentMethods = LinkablePaymentMethods(
+                            targetAccount.fiatCurrency,
+                            paymentMethods
+                        )
+                    )
+                )
+            }
+            linkedBanks.size == 1 -> {
+                Single.just(FiatTransactionRequestResult.LaunchDepositFlow(linkedBanks[0]))
+            }
+            else -> {
+                Single.just(FiatTransactionRequestResult.LaunchDepositFlowWithMultipleAccounts)
+            }
+        }
+    }.doOnTerminate {
+        model.process(LongCallEnded)
+    }.subscribeBy(
+        onSuccess = {
+            handlePaymentMethodsUpdate(it, model, targetAccount, action)
+        },
+        onError = {
+            Timber.e("Error loading bank transfer info $it")
+        }
+    )
+
+    private fun handlePaymentMethodsUpdate(
+        it: FiatTransactionRequestResult?,
+        model: DashboardModel,
+        fiatAccount: SingleAccount,
+        action: AssetAction
+    ) {
+        when (it) {
+            is FiatTransactionRequestResult.LaunchDepositFlowWithMultipleAccounts -> {
+                model.process(
+                    UpdateLaunchDialogFlow(
+                        TransactionFlow(
+                            target = fiatAccount,
+                            action = action
+                        )
+                    )
+                )
+            }
+            is FiatTransactionRequestResult.LaunchDepositFlow -> {
+                model.process(
+                    UpdateLaunchDialogFlow(
+                        TransactionFlow(
+                            target = fiatAccount,
+                            sourceAccount = it.preselectedBankAccount,
+                            action = action
+                        )
+                    )
+                )
+            }
+            is FiatTransactionRequestResult.LaunchWithdrawalFlowWithMultipleAccounts -> {
+                model.process(
+                    UpdateLaunchDialogFlow(
+                        TransactionFlow(
+                            sourceAccount = fiatAccount,
+                            action = action
+                        )
+                    )
+                )
+            }
+            is FiatTransactionRequestResult.LaunchWithdrawalFlow -> {
+                model.process(
+                    UpdateLaunchDialogFlow(
+                        TransactionFlow(
+                            sourceAccount = fiatAccount,
+                            target = it.preselectedBankAccount,
+                            action = action
+                        )
+                    )
+                )
+            }
+            is FiatTransactionRequestResult.LaunchBankLink -> {
+                model.process(
+                    LaunchBankLinkFlow(
+                        it.linkBankTransfer,
+                        action
+                    )
+                )
+            }
+            is FiatTransactionRequestResult.NotSupportedPartner -> {
+                // TODO Show an error
+            }
+            is FiatTransactionRequestResult.LaunchPaymentMethodChooser -> {
+                model.process(
+                    ShowLinkablePaymentMethodsSheet(it.paymentMethodForAction)
+                )
+            }
+            is FiatTransactionRequestResult.LaunchDepositDetailsSheet -> {
+                model.process(ShowBankLinkingSheet(it.targetAccount))
+            }
+        }
+    }
+
+    private fun FiatAccount.isOpenBankingCurrency() =
+        this.fiatCurrency == "EUR" || this.fiatCurrency == "GBP"
+
+    private fun handleNoLinkedBanks(
+        targetAccount: FiatAccount,
+        paymentMethodForAction: LinkablePaymentMethodsForAction
+    ) =
+        when {
+            paymentMethodForAction.linkablePaymentMethods.linkMethods.containsAll(
+                listOf(PaymentMethodType.BANK_TRANSFER, PaymentMethodType.BANK_ACCOUNT)
+            ) -> {
+                Single.just(
+                    FiatTransactionRequestResult.LaunchPaymentMethodChooser(
+                        paymentMethodForAction
+                    )
+                )
+            }
+            paymentMethodForAction.linkablePaymentMethods.linkMethods.contains(PaymentMethodType.BANK_TRANSFER) -> {
+                linkBankTransfer(targetAccount.fiatCurrency).map {
+                    FiatTransactionRequestResult.LaunchBankLink(it) as FiatTransactionRequestResult
+                }.onErrorReturn {
+                    FiatTransactionRequestResult.NotSupportedPartner
+                }
+            }
+            paymentMethodForAction.linkablePaymentMethods.linkMethods.contains(PaymentMethodType.BANK_ACCOUNT) -> {
+                Single.just(FiatTransactionRequestResult.LaunchDepositDetailsSheet(targetAccount))
+            }
+            else -> {
+                Single.just(FiatTransactionRequestResult.NotSupportedPartner)
+            }
+        }
+
+    fun linkBankTransfer(currency: String): Single<LinkBankTransfer> =
+        custodialWalletManager.linkToABank(currency)
+
+    fun getBankWithdrawalFlow(
+        model: DashboardModel,
+        sourceAccount: SingleAccount,
+        action: AssetAction,
+        shouldLaunchBankLinkTransfer: Boolean
+    ): Disposable {
+        require(sourceAccount is FiatAccount)
+
+        return Singles.zip(
+            linkedBanksFactory.eligibleBankPaymentMethods(sourceAccount.fiatCurrency).map { paymentMethods ->
+                // Ignore any WireTransferMethods In case BankLinkTransfer should launch
+                paymentMethods.filter { it == PaymentMethodType.BANK_TRANSFER || !shouldLaunchBankLinkTransfer }
+            },
+            linkedBanksFactory.getAllLinkedBanks().map {
+                it.filter { bank -> bank.currency == sourceAccount.fiatCurrency }
+            }
+        ).flatMap { (paymentMethods, linkedBanks) ->
+            when {
+                linkedBanks.isEmpty() -> {
+                    handleNoLinkedBanks(
+                        sourceAccount,
+                        LinkablePaymentMethodsForAction.LinkablePaymentMethodsForWithdraw(
+                            LinkablePaymentMethods(
+                                sourceAccount.fiatCurrency,
+                                paymentMethods
+                            )
+                        )
+                    )
+                }
+                linkedBanks.size == 1 -> {
+                    Single.just(FiatTransactionRequestResult.LaunchWithdrawalFlow(linkedBanks[0]))
+                }
+                else -> {
+                    Single.just(FiatTransactionRequestResult.LaunchWithdrawalFlowWithMultipleAccounts)
+                }
+            }
+        }.subscribeBy(
+            onSuccess = {
+                handlePaymentMethodsUpdate(it, model, sourceAccount, action)
+            },
+            onError = {
+                // TODO Add error state to Dashboard
+            }
+        )
+    }
+
     companion object {
-        private const val ONE_DAY = 24 * 60 * 60L
         private val FLATLINE_CHART = listOf(
             PriceDatum(price = 1.0, timestamp = 0),
             PriceDatum(price = 1.0, timestamp = System.currentTimeMillis() / 1000)
@@ -268,4 +500,17 @@ class DashboardInteractor(
         private const val RETRY_INTERVAL_MS = 3000L
         private const val RETRY_COUNT = 3L
     }
+}
+
+private sealed class FiatTransactionRequestResult {
+    class LaunchBankLink(val linkBankTransfer: LinkBankTransfer) : FiatTransactionRequestResult()
+    class LaunchDepositFlow(val preselectedBankAccount: LinkedBankAccount) : FiatTransactionRequestResult()
+    class LaunchPaymentMethodChooser(val paymentMethodForAction: LinkablePaymentMethodsForAction) :
+        FiatTransactionRequestResult()
+
+    class LaunchDepositDetailsSheet(val targetAccount: FiatAccount) : FiatTransactionRequestResult()
+    object LaunchDepositFlowWithMultipleAccounts : FiatTransactionRequestResult()
+    class LaunchWithdrawalFlow(val preselectedBankAccount: LinkedBankAccount) : FiatTransactionRequestResult()
+    object LaunchWithdrawalFlowWithMultipleAccounts : FiatTransactionRequestResult()
+    object NotSupportedPartner : FiatTransactionRequestResult()
 }

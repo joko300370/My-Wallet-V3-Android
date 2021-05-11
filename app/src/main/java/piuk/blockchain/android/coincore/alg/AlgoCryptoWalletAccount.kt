@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.alg
 
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -11,18 +12,21 @@ import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
 internal class AlgoCryptoWalletAccount(
     payloadManager: PayloadDataManager,
+    custodialWalletManager: CustodialWalletManager,
     override val label: String,
     override val isDefault: Boolean = true,
-    override val exchangeRates: ExchangeRateDataManager
-) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ALGO) {
+    override val exchangeRates: ExchangeRateDataManager,
+    identity: UserIdentity
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ALGO, custodialWalletManager, identity) {
 
     override val accountBalance: Single<Money>
-        get() = Single.just(CryptoValue.ZeroAlg)
+        get() = Single.just(CryptoValue.zero(asset))
 
     override val actionableBalance: Single<Money>
         get() = accountBalance
@@ -36,10 +40,10 @@ internal class AlgoCryptoWalletAccount(
     override val isFunded: Boolean
         get() = false
 
-    override val actions: AvailableActions
-        get() = setOf(AssetAction.ViewActivity)
+    override val actions: Single<AvailableActions>
+        get() = Single.just(setOf(AssetAction.ViewActivity))
 
     override fun createTxEngine(): TxEngine {
-        TODO("Not yet implemented")
+        throw NotImplementedError("Custodial ALGO not implemented")
     }
 }

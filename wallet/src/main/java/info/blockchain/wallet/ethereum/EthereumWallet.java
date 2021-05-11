@@ -8,11 +8,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.bitcoinj.crypto.DeterministicKey;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+
+import info.blockchain.balance.CryptoCurrency;
+import info.blockchain.wallet.keys.MasterKey;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -36,14 +38,21 @@ public class EthereumWallet {
     /**
      * Creates new Ethereum wallet and derives account from provided wallet seed.
      *
-     * @param walletMasterKey    DeterministicKey of root node
-     * @param defaultAccountName The desired default account name
-     * @param defaultPaxLabel    The desired default account name for PAX
+     * @param walletMasterKey DeterministicKey of root node
+     * @param labelsMap       list of default labels for assets
      */
-    public EthereumWallet(DeterministicKey walletMasterKey, String defaultAccountName, String defaultPaxLabel, String defaultUsdtLabel) {
-
+    public EthereumWallet(
+        MasterKey walletMasterKey,
+        Map<CryptoCurrency, String> labelsMap
+    ) {
         ArrayList<EthereumAccount> accounts = new ArrayList<>();
-        accounts.add(EthereumAccount.Companion.deriveAccount(walletMasterKey, ACCOUNT_INDEX, defaultAccountName));
+        accounts.add(
+            EthereumAccount.Companion.deriveAccount(
+                walletMasterKey.toDeterministicKey(),
+                ACCOUNT_INDEX,
+                labelsMap.get(CryptoCurrency.ETHER)
+            )
+        );
 
         this.walletData = new EthereumWalletData();
         this.walletData.setHasSeen(false);
@@ -51,7 +60,14 @@ public class EthereumWallet {
         this.walletData.setTxNotes(new HashMap<String, String>());
         this.walletData.setAccounts(accounts);
 
-        updateErc20Tokens(defaultPaxLabel, defaultUsdtLabel);
+        Map<CryptoCurrency, String> erc20Assets = new HashMap<>();
+        for (Map.Entry<CryptoCurrency, String> e : labelsMap.entrySet()) {
+            if (e.getKey().hasFeature(CryptoCurrency.IS_ERC20)) {
+                erc20Assets.put(e.getKey(), e.getValue());
+            }
+        }
+
+        updateErc20Tokens(erc20Assets);
     }
 
     /**
@@ -115,6 +131,14 @@ public class EthereumWallet {
         return walletData.getAccounts().get(ACCOUNT_INDEX);
     }
 
+    public void renameAccount(String newLabel){
+        EthereumAccount account = getAccount();
+        account.setLabel(newLabel);
+        ArrayList<EthereumAccount> accounts = new ArrayList<>();
+        accounts.add(account);
+        walletData.setAccounts(accounts);
+    }
+
     public HashMap<String, String> getTxNotes() {
         return walletData.getTxNotes();
     }
@@ -149,7 +173,9 @@ public class EthereumWallet {
         return walletData.getErc20Tokens().get(tokenName);
     }
 
-    public boolean updateErc20Tokens(String defaultPaxLabel, String defaultUsdtLabel) {
+    public boolean updateErc20Tokens(
+        Map<CryptoCurrency, String> labelsMap
+    ) {
         boolean wasUpdated = false;
         if (walletData.getErc20Tokens() == null) {
             walletData.setErc20Tokens(new HashMap<String, Erc20TokenData>());
@@ -162,7 +188,7 @@ public class EthereumWallet {
         ) {
             map.put(
                 Erc20TokenData.PAX_CONTRACT_NAME,
-                Erc20TokenData.Companion.createPaxTokenData(defaultPaxLabel)
+                Erc20TokenData.Companion.createPaxTokenData(labelsMap.get(CryptoCurrency.PAX))
             );
             wasUpdated = true;
         }
@@ -172,7 +198,37 @@ public class EthereumWallet {
         ) {
             map.put(
                 Erc20TokenData.USDT_CONTRACT_NAME,
-                Erc20TokenData.Companion.createUsdtTokenData(defaultUsdtLabel)
+                Erc20TokenData.Companion.createUsdtTokenData(labelsMap.get(CryptoCurrency.USDT))
+            );
+            wasUpdated = true;
+        }
+
+        if (!map.containsKey(Erc20TokenData.DGLD_CONTRACT_NAME) ||
+            !map.get(Erc20TokenData.DGLD_CONTRACT_NAME).hasLabelAndAddressStored()
+        ) {
+            map.put(
+                Erc20TokenData.DGLD_CONTRACT_NAME,
+                Erc20TokenData.Companion.createDgldTokenData(labelsMap.get(CryptoCurrency.DGLD))
+            );
+            wasUpdated = true;
+        }
+
+        if (!map.containsKey(Erc20TokenData.AAVE_CONTRACT_NAME) ||
+            !map.get(Erc20TokenData.AAVE_CONTRACT_NAME).hasLabelAndAddressStored()
+        ) {
+            map.put(
+                Erc20TokenData.AAVE_CONTRACT_NAME,
+                Erc20TokenData.Companion.createAaveTokenData(labelsMap.get(CryptoCurrency.AAVE))
+            );
+            wasUpdated = true;
+        }
+
+        if (!map.containsKey(Erc20TokenData.YFI_CONTRACT_NAME) ||
+            !map.get(Erc20TokenData.YFI_CONTRACT_NAME).hasLabelAndAddressStored()
+        ) {
+            map.put(
+                Erc20TokenData.YFI_CONTRACT_NAME,
+                Erc20TokenData.Companion.createYfiTokenData(labelsMap.get(CryptoCurrency.YFI))
             );
             wasUpdated = true;
         }

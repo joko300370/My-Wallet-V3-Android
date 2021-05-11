@@ -1,19 +1,19 @@
 package piuk.blockchain.android
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.blockchain.koin.KoinStarter
 import com.blockchain.koin.apiRetrofit
-import com.blockchain.koin.explorerRetrofit
 import com.blockchain.logging.CrashLogger
-import com.blockchain.ui.CurrentContextAccess
 import com.facebook.stetho.Stetho
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -25,16 +25,16 @@ import info.blockchain.wallet.api.Environment
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.rxkotlin.subscribeBy
-import org.bitcoinj.core.NetworkParameters
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService
 import piuk.blockchain.android.data.connectivity.ConnectivityManager
+import piuk.blockchain.android.identity.SiftDigitalTrust
 import piuk.blockchain.android.ui.auth.LogoutActivity
 import piuk.blockchain.android.ui.home.models.MetadataEvent
 import piuk.blockchain.android.ui.ssl.SSLVerifyActivity
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.android.util.OSUtil
+import piuk.blockchain.android.util.CurrentContextAccess
 import piuk.blockchain.android.util.lifecycle.AppLifecycleListener
 import piuk.blockchain.android.util.lifecycle.LifecycleInterestedComponent
 import piuk.blockchain.androidcore.data.access.AccessState
@@ -43,7 +43,6 @@ import piuk.blockchain.androidcore.data.connectivity.ConnectionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.PrngFixer
 import piuk.blockchain.androidcoreui.ApplicationLifeCycle
-import piuk.blockchain.androidcoreui.BuildConfig
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import piuk.blockchain.androidcoreui.utils.logging.appLaunchEvent
 import retrofit2.Retrofit
@@ -52,16 +51,15 @@ import timber.log.Timber
 open class BlockchainApplication : Application(), FrameworkInterface {
 
     private val retrofitApi: Retrofit by inject(apiRetrofit)
-    private val retrofitExplorer: Retrofit by inject(explorerRetrofit)
     private val environmentSettings: EnvironmentConfig by inject()
     private val loginState: AccessState by inject()
     private val lifeCycleInterestedComponent: LifecycleInterestedComponent by inject()
     private val rxBus: RxBus by inject()
     private val currentContextAccess: CurrentContextAccess by inject()
     private val appUtils: AppUtil by inject()
-    private val osUtil: OSUtil by inject()
     private val crashLogger: CrashLogger by inject()
     private val coinsWebSocketService: CoinsWebSocketService by inject()
+    private val trust: SiftDigitalTrust by inject()
 
     private val lifecycleListener: AppLifecycleListener by lazy {
         AppLifecycleListener(lifeCycleInterestedComponent)
@@ -87,7 +85,7 @@ open class BlockchainApplication : Application(), FrameworkInterface {
         crashLogger.init(this)
         crashLogger.userLanguageLocale(resources.configuration.locale.language)
 
-        if (environmentSettings.shouldShowDebugMenu()) {
+        if (environmentSettings.isRunningInDebugMode()) {
             Stetho.initializeWithDefaults(this)
         }
 
@@ -121,7 +119,7 @@ open class BlockchainApplication : Application(), FrameworkInterface {
 
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
 
-        registerActivityLifecycleCallbacks(currentContextAccess.createCallBacks())
+        registerActivityLifecycleCallbacks(activityCallback)
 
         // Report Google Play Services availability
         Logging.init(this)
@@ -191,20 +189,8 @@ open class BlockchainApplication : Application(), FrameworkInterface {
         return retrofitApi
     }
 
-    override fun getRetrofitExplorerInstance(): Retrofit {
-        return retrofitExplorer
-    }
-
     override fun getEnvironment(): Environment {
         return environmentSettings.environment
-    }
-
-    override fun getBitcoinParams(): NetworkParameters {
-        return environmentSettings.bitcoinNetworkParameters
-    }
-
-    override fun getBitcoinCashParams(): NetworkParameters {
-        return environmentSettings.bitcoinCashNetworkParameters
     }
 
     override fun getDevice(): String {
@@ -278,6 +264,33 @@ open class BlockchainApplication : Application(), FrameworkInterface {
     private fun isGooglePlayServicesAvailable(context: Context): Boolean {
         val availability = GoogleApiAvailability.getInstance()
         return availability.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS
+    }
+
+    private val activityCallback = object : ActivityLifecycleCallbacks {
+
+        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+            trust.onActivityCreate(activity)
+        }
+
+        override fun onActivityResumed(activity: Activity) {
+            currentContextAccess.contextOpen(activity)
+            trust.onActivityResume(activity)
+        }
+
+        override fun onActivityPaused(activity: Activity) {
+            currentContextAccess.contextClose(activity)
+            trust.onActivityPause()
+        }
+
+        override fun onActivityStarted(activity: Activity) {}
+
+        override fun onActivityStopped(activity: Activity) {
+            trust.onActivityClose()
+        }
+
+        override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+
+        override fun onActivityDestroyed(activity: Activity) {}
     }
 
     companion object {

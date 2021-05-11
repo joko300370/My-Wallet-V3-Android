@@ -1,21 +1,21 @@
 package piuk.blockchain.android.ui.start
 
+import com.blockchain.logging.CrashLogger
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.wallet.payload.data.Wallet
-
-import org.junit.Before
-import org.junit.Test
 import org.amshove.kluent.any
 import org.amshove.kluent.mock
-import piuk.blockchain.android.testutils.RxTest
-import piuk.blockchain.androidcore.data.auth.AuthDataManager
-import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import piuk.blockchain.androidcore.utils.PersistentPrefs
-import piuk.blockchain.android.util.AppUtil
+import org.junit.Before
+import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoMoreInteractions
+import piuk.blockchain.android.testutils.RxTest
+import piuk.blockchain.android.util.AppUtil
+import piuk.blockchain.androidcore.data.auth.AuthDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.utils.PersistentPrefs
 
 class PasswordRequiredPresenterTest : RxTest() {
 
@@ -26,10 +26,11 @@ class PasswordRequiredPresenterTest : RxTest() {
     private val authDataManager: AuthDataManager = mock()
     private val payloadDataManager: PayloadDataManager = mock()
     private val wallet: Wallet = mock()
+    private val crashLogger: CrashLogger = mock()
 
     @Before
     fun setUp() {
-        whenever(prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, "")).thenReturn(GUID)
+        whenever(prefs.walletGuid).thenReturn(GUID)
 
         whenever(payloadDataManager.wallet).thenReturn(wallet)
         whenever(payloadDataManager.wallet!!.sharedKey).thenReturn("shared_key")
@@ -39,7 +40,8 @@ class PasswordRequiredPresenterTest : RxTest() {
             appUtil,
             prefs,
             authDataManager,
-            payloadDataManager
+            payloadDataManager,
+            crashLogger
         )
 
         subject.attachView(view)
@@ -48,7 +50,7 @@ class PasswordRequiredPresenterTest : RxTest() {
     @Test
     fun onContinueClickedNoPassword() {
         // Arrange
-        whenever(prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, "")).thenReturn("")
+        whenever(prefs.walletGuid).thenReturn("")
 
         // Act
         subject.onContinueClicked("")

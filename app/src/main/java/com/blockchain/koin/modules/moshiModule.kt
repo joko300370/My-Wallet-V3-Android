@@ -2,9 +2,9 @@ package com.blockchain.koin.modules
 
 import com.blockchain.koin.bigDecimal
 import com.blockchain.koin.bigInteger
+import com.blockchain.koin.interestEligibility
 import com.blockchain.koin.interestLimits
 import com.blockchain.koin.kyc
-import com.blockchain.koin.nabu
 import com.blockchain.network.modules.MoshiBuilderInterceptorList
 import org.koin.dsl.module
 
@@ -15,9 +15,9 @@ val moshiModule = module {
             listOf(
                 get(bigDecimal),
                 get(bigInteger),
-                get(nabu),
                 get(kyc),
-                get(interestLimits)
+                get(interestLimits),
+                get(interestEligibility)
             )
         )
     }

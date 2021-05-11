@@ -34,7 +34,18 @@ data class FeeApi(private val feeEndpoints: FeeEndpoints) {
      * fee option.
      */
     val xlmFeeOptions: Observable<FeeOptions>
-        get() = byCache("XLM") { feeEndpoints.getFeeOptions(CryptoCurrency.XLM.networkTicker.toLowerCase()) }
+        get() = byCache("XLM") {
+            feeEndpoints.getFeeOptions(CryptoCurrency.XLM.networkTicker.toLowerCase())
+        }
+
+    /**
+     * Returns a [FeeOptions] object for ERC20 tokens which contains both a "regular" and a "priority"
+     * fee option.
+     * @param contractAddress the contract address for ERC20
+     */
+    fun getErc20FeeOptions(contractAddress: String = ""): Observable<FeeOptions> {
+        return byCache("ETH") { feeEndpoints.getErc20FeeOptions(contractAddress) }
+    }
 
     companion object {
         internal val feeCache = mutableMapOf<String, FeeOptionsCacheEntry>()

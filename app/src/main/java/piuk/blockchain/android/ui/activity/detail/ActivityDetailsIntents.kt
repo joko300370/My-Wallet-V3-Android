@@ -1,13 +1,14 @@
 package piuk.blockchain.android.ui.activity.detail
 
-import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.OrderType
+import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
-import piuk.blockchain.android.ui.activity.CryptoAccountType
+import piuk.blockchain.android.coincore.TradeActivitySummaryItem
+import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 import java.util.Date
 
@@ -16,7 +17,7 @@ sealed class ActivityDetailsIntents : MviIntent<ActivityDetailState>
 class LoadActivityDetailsIntent(
     val cryptoCurrency: CryptoCurrency,
     val txHash: String,
-    val accountType: CryptoAccountType
+    val activityType: CryptoActivityType
 ) : ActivityDetailsIntents() {
     override fun reduce(oldState: ActivityDetailState): ActivityDetailState {
         return oldState
@@ -87,6 +88,32 @@ class LoadCustodialInterestHeaderDataIntent(
     }
 }
 
+class LoadSwapHeaderDataIntent(
+    private val summaryItem: TradeActivitySummaryItem
+) : ActivityDetailsIntents() {
+    override fun reduce(oldState: ActivityDetailState): ActivityDetailState {
+        return oldState.copy(
+            transactionType = TransactionSummary.TransactionType.SWAP,
+            amount = summaryItem.value,
+            isPending = summaryItem.state.isPending,
+            isFeeTransaction = false
+        )
+    }
+}
+
+class LoadSellHeaderDataIntent(
+    private val summaryItem: TradeActivitySummaryItem
+) : ActivityDetailsIntents() {
+    override fun reduce(oldState: ActivityDetailState): ActivityDetailState {
+        return oldState.copy(
+            transactionType = TransactionSummary.TransactionType.SELL,
+            amount = summaryItem.receivingValue,
+            isPending = summaryItem.state.isPending,
+            isFeeTransaction = false
+        )
+    }
+}
+
 class ListItemsLoadedIntent(
     private val list: List<ActivityDetailsType>
 ) : ActivityDetailsIntents() {
@@ -146,8 +173,7 @@ class UpdateDescriptionIntent(
     val txId: String,
     val cryptoCurrency: CryptoCurrency,
     val description: String
-) :
-    ActivityDetailsIntents() {
+) : ActivityDetailsIntents() {
     override fun reduce(oldState: ActivityDetailState): ActivityDetailState {
         return oldState
     }

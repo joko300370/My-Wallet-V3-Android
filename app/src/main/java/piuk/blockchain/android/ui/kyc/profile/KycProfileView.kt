@@ -12,6 +12,10 @@ interface KycProfileView : View {
 
     val countryCode: String
 
+    val stateCode: String?
+
+    val stateName: String?
+
     var dateOfBirth: Calendar?
 
     fun setButtonEnabled(enabled: Boolean)

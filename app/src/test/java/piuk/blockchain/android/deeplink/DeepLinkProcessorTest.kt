@@ -2,7 +2,7 @@ package piuk.blockchain.android.deeplink
 
 import android.content.Intent
 import android.net.Uri
-import com.blockchain.swap.nabu.models.nabu.CampaignData
+import com.blockchain.nabu.models.responses.nabu.CampaignData
 import com.blockchain.notifications.links.PendingLink
 import com.nhaarman.mockito_kotlin.mock
 import io.reactivex.Maybe
@@ -25,10 +25,7 @@ class DeepLinkProcessorTest {
 
     @Test
     fun `unknown uri`() {
-        givenUriExpect(
-            "https://login.blockchain.com/",
-            LinkState.NoUri
-        )
+        givenUriExpect("https://login.blockchain.com/", LinkState.NoUri)
     }
 
     @Test
@@ -106,7 +103,8 @@ private fun givenUriExpect(uri: String, expected: LinkState) {
         emailVerifiedLinkHelper = EmailVerificationDeepLinkHelper(),
         kycDeepLinkHelper = KycDeepLinkHelper(mock()),
         sunriverDeepLinkHelper = SunriverDeepLinkHelper(mock()),
-        thePitDeepLinkParser = ThePitDeepLinkParser()
+        thePitDeepLinkParser = ThePitDeepLinkParser(),
+        openBankingDeepLinkParser = OpenBankingDeepLinkParser()
     ).getLink(i)
         .test()
         .assertNoErrors()

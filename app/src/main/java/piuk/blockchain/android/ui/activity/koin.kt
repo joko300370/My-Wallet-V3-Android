@@ -17,7 +17,9 @@ val activitiesModule = module {
             ActivitiesModel(
                 initialState = ActivitiesState(),
                 mainScheduler = AndroidSchedulers.mainThread(),
-                interactor = get()
+                interactor = get(),
+                environmentConfig = get(),
+                crashLogger = get()
             )
         }
 
@@ -35,7 +37,9 @@ val activitiesModule = module {
             ActivityDetailsModel(
                 initialState = ActivityDetailState(),
                 mainScheduler = AndroidSchedulers.mainThread(),
-                interactor = get()
+                interactor = get(),
+                environmentConfig = get(),
+                crashLogger = get()
             )
         }
 
@@ -46,7 +50,8 @@ val activitiesModule = module {
                 assetActivityRepository = get(),
                 custodialWalletManager = get(),
                 stringUtils = get(),
-                coincore = get()
+                coincore = get(),
+                defaultLabels = get()
             )
         }
 
@@ -57,7 +62,6 @@ val activitiesModule = module {
                 stringUtils = get(),
                 bchDataManager = get(),
                 xlmDataManager = get(),
-                environmentSettings = get(),
                 coincore = get()
             )
         }

@@ -33,9 +33,11 @@ android {
         release {
             consumerProguardFiles 'proguard-rules.pro'
             manifestPlaceholders = [PLACES_KEY: buildProperties.secrets['placesReleaseKey'].string]
+            buildConfigString "DEEP_LINK_HOST", buildProperties.secrets['prodDynamicLink']
         }
         debug {
             manifestPlaceholders = [PLACES_KEY: buildProperties.secrets['placesDebugKey'].string]
+            buildConfigString "DEEP_LINK_HOST", buildProperties.secrets['stagingDynamicLink']
         }
     }
 
@@ -65,6 +67,7 @@ dependencies {
     implementation project(':common:interface')
     implementation project(':balance')
     implementation project(':wallet')
+    implementation project(':blockchainApi')
 
     api project(':notifications')
     implementation project(':veriff')
@@ -95,22 +98,3 @@ dependencies {
         ['kotlin-stdlib', 'kotlin-reflect'].each { exclude module: it }
     }
 }
-
-/*
-test {
-    testLogging {
-        events 'skipped', 'failed', 'standardOut', 'standardError'
-    }
-}
-
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = Versions.kotlinJvmTarget
-    }
-}
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = Versions.kotlinJvmTarget
-    }
-}
-*/

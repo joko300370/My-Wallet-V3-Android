@@ -1,0 +1,918 @@
+@file:Suppress("UnnecessaryVariable")
+
+package piuk.blockchain.android.coincore.btc
+
+import com.blockchain.android.testutils.rxInit
+import com.blockchain.koin.payloadScopeQualifier
+import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.preferences.WalletStatus
+import com.blockchain.testutils.bitcoin
+import com.blockchain.testutils.satoshi
+import com.nhaarman.mockito_kotlin.atLeastOnce
+import com.nhaarman.mockito_kotlin.atMost
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
+import com.nhaarman.mockito_kotlin.whenever
+import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
+import info.blockchain.wallet.api.data.FeeOptions
+import info.blockchain.wallet.payload.data.XPub
+import info.blockchain.wallet.payload.data.XPubs
+import info.blockchain.wallet.payload.model.Utxo
+import info.blockchain.wallet.payment.OutputType
+import info.blockchain.wallet.payment.SpendableUnspentOutputs
+import io.reactivex.Observable
+import io.reactivex.Single
+import org.amshove.kluent.itReturns
+import org.amshove.kluent.mock
+import org.bitcoinj.core.NetworkParameters
+import org.junit.After
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.koin.core.context.stopKoin
+import org.koin.dsl.module
+import piuk.blockchain.android.coincore.BlockchainAccount
+import kotlin.test.assertEquals
+import piuk.blockchain.android.coincore.CryptoAddress
+import piuk.blockchain.android.coincore.FeeLevel
+import piuk.blockchain.android.coincore.FeeSelection
+import piuk.blockchain.android.coincore.PendingTx
+import piuk.blockchain.android.coincore.TransactionTarget
+import piuk.blockchain.android.coincore.ValidationState
+import piuk.blockchain.android.coincore.impl.injectMocks
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import piuk.blockchain.androidcore.data.fees.FeeDataManager
+import piuk.blockchain.androidcore.data.payload.PayloadDataManager
+import piuk.blockchain.androidcore.data.payments.SendDataManager
+
+class BtcOnChainTxEngineTest {
+
+    @get:Rule
+    val initSchedulers = rxInit {
+        mainTrampoline()
+        ioTrampoline()
+        computationTrampoline()
+    }
+
+    private val btcDataManager: PayloadDataManager = mock {
+        on { getAddressOutputType(TARGET_ADDRESS) } itReturns OutputType.P2PKH
+        on { getXpubFormatOutputType(XPub.Format.LEGACY) } itReturns OutputType.P2PKH
+        on { getXpubFormatOutputType(XPub.Format.SEGWIT) } itReturns OutputType.P2WPKH
+    }
+    private val sendDataManager: SendDataManager = mock()
+    private val btcNetworkParams: NetworkParameters = mock()
+
+    private val btcFeeOptions: FeeOptions = mock {
+        on { regularFee } itReturns FEE_REGULAR
+        on { priorityFee } itReturns FEE_PRIORITY
+    }
+    private val feeManager: FeeDataManager = mock {
+        on { btcFeeOptions } itReturns Observable.just(btcFeeOptions)
+    }
+
+    private val walletPreferences: WalletStatus = mock {
+        on { getFeeTypeForAsset(ASSET) } itReturns FeeLevel.Regular.ordinal
+    }
+    private val exchangeRates: ExchangeRateDataManager = mock()
+
+    private val currencyPrefs: CurrencyPrefs = mock {
+        on { selectedFiatCurrency } itReturns SELECTED_FIAT
+    }
+
+    private val subject = BtcOnChainTxEngine(
+        btcDataManager = btcDataManager,
+        sendDataManager = sendDataManager,
+        feeManager = feeManager,
+        requireSecondPassword = false,
+        walletPreferences = walletPreferences
+    )
+
+    @Before
+    fun setup() {
+        injectMocks(
+            module {
+                scope(payloadScopeQualifier) {
+                    factory {
+                        currencyPrefs
+                    }
+                }
+            }
+        )
+    }
+
+    @After
+    fun teardown() {
+        stopKoin()
+    }
+
+    @Test
+    fun `inputs validate when correct`() {
+        val sourceAccount = mockSourceAccount()
+        val txTarget: CryptoAddress = mock {
+            on { asset } itReturns ASSET
+        }
+
+        // Act
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        subject.assertInputsValid()
+
+        // Assert
+        verify(sourceAccount, atLeastOnce()).asset
+        verify(txTarget).asset
+
+        noMoreInteractions(sourceAccount, txTarget)
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `inputs fail validation when source Asset incorrect`() {
+        val sourceAccount: BtcCryptoWalletAccount = mock {
+            on { asset } itReturns WRONG_ASSET
+        }
+
+        val txTarget: CryptoAddress = mock {
+            on { asset } itReturns ASSET
+        }
+
+        // Act
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        subject.assertInputsValid()
+
+        // Assert
+        verify(sourceAccount, atLeastOnce()).asset
+        verify(txTarget).asset
+
+        noMoreInteractions(sourceAccount, txTarget)
+    }
+
+    @Test
+    fun `asset is returned correctly`() {
+        // Arrange
+        val sourceAccount = mockSourceAccount()
+        val txTarget: CryptoAddress = mock {
+            on { asset } itReturns ASSET
+        }
+
+        // Act
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val asset = subject.sourceAsset
+
+        // Assert
+        assertEquals(asset, ASSET)
+        verify(sourceAccount, atLeastOnce()).asset
+
+        noMoreInteractions(sourceAccount, txTarget)
+    }
+
+    @Test
+    fun `PendingTx is correctly initialised`() {
+        // Arrange
+        val sourceAccount = mockSourceAccount()
+        val txTarget: CryptoAddress = mock {
+            on { asset } itReturns ASSET
+        }
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        // Act
+        subject.doInitialiseTx()
+            .test()
+            .assertValue {
+                it.amount == CryptoValue.zero(ASSET) &&
+                    it.totalBalance == CryptoValue.zero(ASSET) &&
+                    it.availableBalance == CryptoValue.zero(ASSET) &&
+                    it.feeAmount == CryptoValue.zero(ASSET) &&
+                    it.selectedFiat == SELECTED_FIAT &&
+                    it.confirmations.isEmpty() &&
+                    it.minLimit == null &&
+                    it.maxLimit == null &&
+                    it.validationState == ValidationState.UNINITIALISED &&
+                    it.engineState.isEmpty()
+            }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
+            .assertNoErrors()
+            .assertComplete()
+
+        verify(sourceAccount, atLeastOnce()).asset
+        verify(walletPreferences).getFeeTypeForAsset(ASSET)
+        verify(currencyPrefs).selectedFiatCurrency
+
+        noMoreInteractions(sourceAccount, txTarget)
+    }
+
+    @Test
+    fun `update amount modifies the pendingTx correctly for regular fees`() {
+        // Arrange
+        val inputAmount = 2.bitcoin()
+        val feePerKb = (FEE_REGULAR * 1000).satoshi()
+        val totalFee = (FEE_REGULAR * 1000 * 3).satoshi()
+
+        val txTarget: CryptoAddress = mock {
+            on { asset } itReturns ASSET
+            on { address } itReturns TARGET_ADDRESS
+        }
+
+        val totalBalance = 21.bitcoin()
+        val actionableBalance = 19.bitcoin()
+        val totalSweepable = totalBalance - totalFee
+
+        val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
+
+        whenever(btcDataManager.getAddressBalance(SOURCE_XPUBS)).thenReturn(totalBalance)
+
+        val unspentOutputs = listOf<Utxo>(mock(), mock())
+        whenever(sendDataManager.getUnspentBtcOutputs(SOURCE_XPUBS))
+            .thenReturn(Single.just(unspentOutputs))
+
+        whenever(
+            sendDataManager.getMaximumAvailable(
+                ASSET,
+                unspentOutputs,
+                TARGET_OUTPUT_TYPE,
+                feePerKb
+            )
+        ).thenReturn(
+            SendDataManager.MaxAvailable(
+                totalSweepable as CryptoValue,
+                (totalBalance - totalFee) as CryptoValue
+            )
+        )
+
+        val utxoBundle: SpendableUnspentOutputs = mock {
+            on { absoluteFee } itReturns totalFee.toBigInteger()
+        }
+
+        whenever(sendDataManager.getSpendableCoins(
+            unspentOutputs,
+            TARGET_OUTPUT_TYPE,
+            CHANGE_OUTPUT_TYPE,
+            inputAmount,
+            feePerKb
+        )).thenReturn(utxoBundle)
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = CryptoValue.zero(ASSET),
+            totalBalance = CryptoValue.zero(ASSET),
+            availableBalance = CryptoValue.zero(ASSET),
+            feeForFullAvailable = CryptoValue.zero(ASSET),
+            feeAmount = CryptoValue.zero(ASSET),
+            selectedFiat = SELECTED_FIAT,
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = CryptoCurrency.BTC
+            )
+        )
+
+        // Act
+        subject.doUpdateAmount(
+            inputAmount,
+            pendingTx
+        ).test()
+            .assertComplete()
+            .assertNoErrors()
+            .assertValue {
+                it.amount == inputAmount &&
+                it.totalBalance == totalBalance &&
+                it.availableBalance == totalSweepable &&
+                it.feeAmount == totalFee
+            }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
+
+        verify(txTarget, atMost(2)).address
+        verify(sourceAccount, atLeastOnce()).asset
+        verify(sourceAccount, atMost(2)).xpubs
+        verify(sourceAccount).accountBalance
+        verify(btcDataManager).getAddressBalance(SOURCE_XPUBS)
+        verify(btcDataManager, atMost(2)).getAddressOutputType(TARGET_ADDRESS)
+        verify(btcDataManager, atLeastOnce()).getXpubFormatOutputType(XPub.Format.LEGACY)
+        verify(feeManager).btcFeeOptions
+        verify(btcFeeOptions, atLeastOnce()).priorityFee
+        verify(btcFeeOptions, atLeastOnce()).regularFee
+        verify(sendDataManager).getUnspentBtcOutputs(SOURCE_XPUBS)
+        verify(sendDataManager).getMaximumAvailable(ASSET, unspentOutputs, TARGET_OUTPUT_TYPE, feePerKb)
+        verify(utxoBundle).absoluteFee
+        verify(sendDataManager)
+            .getSpendableCoins(unspentOutputs, TARGET_OUTPUT_TYPE, CHANGE_OUTPUT_TYPE, inputAmount, feePerKb)
+
+        noMoreInteractions(sourceAccount, txTarget)
+    }
+
+    @Test
+    fun `update amount modifies the pendingTx correctly for priority fees`() {
+        // Arrange
+        val inputAmount = 2.bitcoin()
+        val feePerKb = (FEE_PRIORITY * 1000).satoshi()
+        val totalFee = (FEE_REGULAR * 1000 * 3).satoshi()
+
+        val txTarget: CryptoAddress = mock {
+            on { asset } itReturns ASSET
+            on { address } itReturns TARGET_ADDRESS
+        }
+
+        val totalBalance = 21.bitcoin()
+        val actionableBalance = 19.bitcoin()
+        val totalSweepable = totalBalance - totalFee
+        val fullFee = totalBalance - actionableBalance
+
+        val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
+
+        whenever(btcDataManager.getAddressBalance(SOURCE_XPUBS)).thenReturn(totalBalance)
+
+        val unspentOutputs = listOf<Utxo>(mock(), mock())
+        whenever(sendDataManager.getUnspentBtcOutputs(SOURCE_XPUBS))
+            .thenReturn(Single.just(unspentOutputs))
+
+        whenever(
+            sendDataManager.getMaximumAvailable(
+                ASSET,
+                unspentOutputs,
+                TARGET_OUTPUT_TYPE,
+                feePerKb
+            )
+        ).thenReturn(
+            SendDataManager.MaxAvailable(
+                totalSweepable as CryptoValue,
+                fullFee as CryptoValue
+            )
+        )
+
+        val utxoBundle: SpendableUnspentOutputs = mock {
+            on { absoluteFee } itReturns totalFee.toBigInteger()
+        }
+
+        whenever(sendDataManager.getSpendableCoins(
+            unspentOutputs,
+            TARGET_OUTPUT_TYPE,
+            CHANGE_OUTPUT_TYPE,
+            inputAmount,
+            feePerKb
+        )).thenReturn(utxoBundle)
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = CryptoValue.zero(ASSET),
+            totalBalance = CryptoValue.zero(ASSET),
+            availableBalance = CryptoValue.zero(ASSET),
+            feeForFullAvailable = CryptoValue.zero(ASSET),
+            feeAmount = CryptoValue.zero(ASSET),
+            selectedFiat = SELECTED_FIAT,
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Priority,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = CryptoCurrency.BTC
+            )
+        )
+
+        // Act
+        subject.doUpdateAmount(
+            inputAmount,
+            pendingTx
+        ).test()
+            .assertComplete()
+            .assertNoErrors()
+            .assertValue {
+                it.amount == inputAmount &&
+                    it.totalBalance == totalBalance &&
+                    it.availableBalance == totalSweepable &&
+                    it.feeAmount == totalFee
+            }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Priority) }
+
+        verify(txTarget, atMost(2)).address
+        verify(sourceAccount, atLeastOnce()).asset
+        verify(sourceAccount, atMost(2)).xpubs
+        verify(sourceAccount).accountBalance
+        verify(btcDataManager).getAddressBalance(SOURCE_XPUBS)
+        verify(btcDataManager, atMost(2)).getAddressOutputType(TARGET_ADDRESS)
+        verify(btcDataManager, atLeastOnce()).getXpubFormatOutputType(XPub.Format.LEGACY)
+        verify(feeManager).btcFeeOptions
+        verify(btcFeeOptions, atLeastOnce()).regularFee
+        verify(btcFeeOptions, atLeastOnce()).priorityFee
+        verify(sendDataManager).getUnspentBtcOutputs(SOURCE_XPUBS)
+        verify(sendDataManager).getMaximumAvailable(ASSET, unspentOutputs, TARGET_OUTPUT_TYPE, feePerKb)
+        verify(utxoBundle).absoluteFee
+        verify(sendDataManager)
+            .getSpendableCoins(unspentOutputs, TARGET_OUTPUT_TYPE, CHANGE_OUTPUT_TYPE, inputAmount, feePerKb)
+
+        noMoreInteractions(sourceAccount, txTarget)
+    }
+
+    @Test
+    fun `update fee level from REGULAR to PRIORITY updates the pendingTx correctly`() {
+        // Arrange
+        val inputAmount = 2.bitcoin()
+        val regularFee = (FEE_REGULAR * 1000 * 3).satoshi()
+        val totalBalance = 21.bitcoin()
+        val actionableBalance = 19.bitcoin()
+        val regularSweepable = totalBalance - regularFee
+        val fullFee = totalBalance - actionableBalance
+
+        val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
+
+        val txTarget: CryptoAddress = mock {
+            on { asset } itReturns ASSET
+            on { address } itReturns TARGET_ADDRESS
+        }
+
+        whenever(btcDataManager.getAddressBalance(SOURCE_XPUBS)).thenReturn(totalBalance)
+
+        val unspentOutputs = listOf<Utxo>(mock(), mock())
+        whenever(sendDataManager.getUnspentBtcOutputs(SOURCE_XPUBS))
+            .thenReturn(Single.just(unspentOutputs))
+
+        val feePerKb = (FEE_PRIORITY * 1000).satoshi()
+        val priorityFee = (FEE_PRIORITY * 1000 * 3).satoshi()
+        val prioritySweepable = totalBalance - priorityFee
+
+        whenever(
+            sendDataManager.getMaximumAvailable(
+                ASSET,
+                unspentOutputs,
+                TARGET_OUTPUT_TYPE,
+                feePerKb
+            )
+        ).thenReturn(
+            SendDataManager.MaxAvailable(
+                prioritySweepable as CryptoValue,
+                priorityFee
+            )
+        )
+
+        val utxoBundle: SpendableUnspentOutputs = mock {
+            on { absoluteFee } itReturns priorityFee.toBigInteger()
+        }
+
+        whenever(sendDataManager.getSpendableCoins(
+            unspentOutputs,
+            TARGET_OUTPUT_TYPE,
+            CHANGE_OUTPUT_TYPE,
+            inputAmount,
+            feePerKb
+        )).thenReturn(utxoBundle)
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = inputAmount,
+            totalBalance = totalBalance,
+            availableBalance = regularSweepable,
+            feeForFullAvailable = fullFee,
+            feeAmount = regularFee,
+            selectedFiat = SELECTED_FIAT,
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = CryptoCurrency.BTC
+            )
+        )
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.Priority,
+            -1
+        ).test()
+            .assertComplete()
+            .assertNoErrors()
+            .assertValue {
+                it.amount == inputAmount &&
+                it.totalBalance == totalBalance &&
+                it.availableBalance == prioritySweepable &&
+                it.feeForFullAvailable == priorityFee &&
+                it.feeAmount == priorityFee
+            }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Priority) }
+
+        verify(txTarget, atMost(2)).address
+        verify(sourceAccount, atLeastOnce()).asset
+        verify(sourceAccount, atMost(2)).xpubs
+        verify(sourceAccount).accountBalance
+        verify(btcDataManager).getAddressBalance(SOURCE_XPUBS)
+        verify(btcDataManager, atMost(2)).getAddressOutputType(TARGET_ADDRESS)
+        verify(btcDataManager, atLeastOnce()).getXpubFormatOutputType(XPub.Format.LEGACY)
+        verify(feeManager).btcFeeOptions
+        verify(btcFeeOptions, atLeastOnce()).regularFee
+        verify(btcFeeOptions, atLeastOnce()).priorityFee
+        verify(sendDataManager).getUnspentBtcOutputs(SOURCE_XPUBS)
+        verify(sendDataManager).getMaximumAvailable(ASSET, unspentOutputs, TARGET_OUTPUT_TYPE, feePerKb)
+        verify(utxoBundle).absoluteFee
+        verify(sendDataManager)
+            .getSpendableCoins(unspentOutputs, TARGET_OUTPUT_TYPE, CHANGE_OUTPUT_TYPE, inputAmount, feePerKb)
+        verify(walletPreferences).setFeeTypeForAsset(ASSET, FeeLevel.Priority.ordinal)
+
+        noMoreInteractions(sourceAccount, txTarget)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `update fee level from REGULAR to NONE is rejected`() {
+        // Arrange
+        val inputAmount = 2.bitcoin()
+        val regularFee = (FEE_REGULAR * 1000 * 3).satoshi()
+        val totalBalance = 21.bitcoin()
+        val actionableBalance = 19.bitcoin()
+        val regularSweepable = totalBalance - regularFee
+
+        val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
+
+        val txTarget: CryptoAddress = mock {
+            on { asset } itReturns ASSET
+            on { address } itReturns TARGET_ADDRESS
+        }
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = inputAmount,
+            totalBalance = totalBalance,
+            availableBalance = regularSweepable,
+            feeForFullAvailable = regularFee,
+            feeAmount = regularFee,
+            selectedFiat = SELECTED_FIAT,
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS
+            )
+        )
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.None,
+            -1
+        ).test()
+
+        noMoreInteractions(sourceAccount, txTarget)
+    }
+
+    @Test
+    fun `update fee level from REGULAR to REGULAR has no effect`() {
+        // Arrange
+        val inputAmount = 2.bitcoin()
+        val regularFee = (FEE_REGULAR * 1000 * 3).satoshi()
+        val totalBalance = 21.bitcoin()
+        val actionableBalance = 19.bitcoin()
+        val regularSweepable = totalBalance - regularFee
+
+        val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
+
+        val txTarget: CryptoAddress = mock {
+            on { asset } itReturns ASSET
+            on { address } itReturns TARGET_ADDRESS
+        }
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = inputAmount,
+            totalBalance = totalBalance,
+            availableBalance = regularSweepable,
+            feeForFullAvailable = regularFee,
+            feeAmount = regularFee,
+            selectedFiat = SELECTED_FIAT,
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = CryptoCurrency.BTC
+            )
+        )
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.Regular,
+            -1
+        ).test()
+            .assertComplete()
+            .assertNoErrors()
+            .assertValue {
+                it.amount == inputAmount &&
+                it.totalBalance == totalBalance &&
+                it.availableBalance == regularSweepable &&
+                it.feeAmount == regularFee
+            }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Regular) }
+
+        noMoreInteractions(sourceAccount, txTarget)
+    }
+
+    @Test
+    fun `update fee level from REGULAR to CUSTOM is updates the pendingTx correctly`() {
+        // Arrange
+        val inputAmount = 2.bitcoin()
+        val regularFee = (FEE_REGULAR * 1000 * 3).satoshi()
+        val totalBalance = 21.bitcoin()
+        val actionableBalance = 19.bitcoin()
+        val regularSweepable = totalBalance - regularFee
+        val fullFee = regularFee
+
+        val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
+
+        val txTarget: CryptoAddress = mock {
+            on { asset } itReturns ASSET
+            on { address } itReturns TARGET_ADDRESS
+        }
+
+        whenever(btcDataManager.getAddressBalance(SOURCE_XPUBS)).thenReturn(totalBalance)
+
+        val unspentOutputs = listOf<Utxo>(mock(), mock())
+        whenever(sendDataManager.getUnspentBtcOutputs(SOURCE_XPUBS))
+            .thenReturn(Single.just(unspentOutputs))
+
+        val feeCustom = 7L
+        val feePerKb = (feeCustom * 1000).satoshi()
+        val expectedFee = (feeCustom * 1000 * 3).satoshi()
+        val expectedSweepable = totalBalance - expectedFee
+
+        whenever(
+            sendDataManager.getMaximumAvailable(
+                ASSET,
+                unspentOutputs,
+                TARGET_OUTPUT_TYPE,
+                feePerKb
+            )
+        ).thenReturn(
+            SendDataManager.MaxAvailable(
+                expectedSweepable as CryptoValue,
+                expectedFee
+            )
+        )
+
+        val utxoBundle: SpendableUnspentOutputs = mock {
+            on { absoluteFee } itReturns expectedFee.toBigInteger()
+        }
+
+        whenever(sendDataManager.getSpendableCoins(
+            unspentOutputs,
+            TARGET_OUTPUT_TYPE,
+            CHANGE_OUTPUT_TYPE,
+            inputAmount,
+            feePerKb
+        )).thenReturn(utxoBundle)
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = inputAmount,
+            totalBalance = totalBalance,
+            availableBalance = regularSweepable,
+            feeForFullAvailable = fullFee,
+            feeAmount = regularFee,
+            selectedFiat = SELECTED_FIAT,
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Regular,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = CryptoCurrency.BTC
+            )
+        )
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.Custom,
+            feeCustom
+        ).test()
+            .assertComplete()
+            .assertNoErrors()
+            .assertValue {
+                it.amount == inputAmount &&
+                it.totalBalance == totalBalance &&
+                it.availableBalance == expectedSweepable &&
+                it.feeForFullAvailable == expectedFee &&
+                it.feeAmount == expectedFee
+            }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Custom, feeCustom) }
+
+        verify(txTarget, atMost(2)).address
+        verify(sourceAccount, atLeastOnce()).asset
+        verify(sourceAccount, atMost(2)).xpubs
+        verify(sourceAccount).accountBalance
+        verify(btcDataManager).getAddressBalance(SOURCE_XPUBS)
+        verify(btcDataManager, atMost(2)).getAddressOutputType(TARGET_ADDRESS)
+        verify(btcDataManager, atLeastOnce()).getXpubFormatOutputType(XPub.Format.LEGACY)
+        verify(feeManager).btcFeeOptions
+        verify(btcFeeOptions, atLeastOnce()).regularFee
+        verify(btcFeeOptions, atLeastOnce()).priorityFee
+        verify(btcFeeOptions, atLeastOnce()).limits
+        verify(sendDataManager).getUnspentBtcOutputs(SOURCE_XPUBS)
+        verify(sendDataManager).getMaximumAvailable(ASSET, unspentOutputs, TARGET_OUTPUT_TYPE, feePerKb)
+        verify(utxoBundle).absoluteFee
+        verify(sendDataManager)
+            .getSpendableCoins(unspentOutputs, TARGET_OUTPUT_TYPE, CHANGE_OUTPUT_TYPE, inputAmount, feePerKb)
+        verify(walletPreferences).setFeeTypeForAsset(ASSET, FeeLevel.Custom.ordinal)
+
+        noMoreInteractions(sourceAccount, txTarget)
+    }
+
+    @Test
+    fun `changing the custom fee level updates the pendingTx correctly`() {
+        // Arrange
+        val inputAmount = 2.bitcoin()
+        val totalBalance = 21.bitcoin()
+        val actionableBalance = 19.bitcoin()
+
+        val initialCustomFee = 7L
+        val initialFee = (initialCustomFee * 1000 * 3).satoshi()
+        val customSweepable = totalBalance - initialFee
+        val fullFee = initialFee
+
+        val sourceAccount = mockSourceAccount(totalBalance, actionableBalance)
+
+        val txTarget: CryptoAddress = mock {
+            on { asset } itReturns ASSET
+            on { address } itReturns TARGET_ADDRESS
+        }
+
+        whenever(btcDataManager.getAddressBalance(SOURCE_XPUBS)).thenReturn(totalBalance)
+
+        val unspentOutputs = listOf<Utxo>(mock(), mock())
+        whenever(sendDataManager.getUnspentBtcOutputs(SOURCE_XPUBS))
+            .thenReturn(Single.just(unspentOutputs))
+
+        val feeCustom = 15L
+        val feePerKb = (feeCustom * 1000).satoshi()
+        val expectedFee = (feeCustom * 1000 * 3).satoshi()
+        val expectedSweepable = totalBalance - expectedFee
+
+        whenever(
+            sendDataManager.getMaximumAvailable(
+                ASSET,
+                unspentOutputs,
+                TARGET_OUTPUT_TYPE,
+                feePerKb
+            )
+        ).thenReturn(
+            SendDataManager.MaxAvailable(
+                expectedSweepable as CryptoValue,
+                expectedFee
+            )
+        )
+
+        val utxoBundle: SpendableUnspentOutputs = mock {
+            on { absoluteFee } itReturns expectedFee.toBigInteger()
+        }
+
+        whenever(sendDataManager.getSpendableCoins(
+            unspentOutputs,
+            TARGET_OUTPUT_TYPE,
+            CHANGE_OUTPUT_TYPE,
+            inputAmount,
+            feePerKb
+        )).thenReturn(utxoBundle)
+
+        subject.start(
+            sourceAccount,
+            txTarget,
+            exchangeRates
+        )
+
+        val pendingTx = PendingTx(
+            amount = inputAmount,
+            totalBalance = totalBalance,
+            availableBalance = customSweepable,
+            feeForFullAvailable = fullFee,
+            feeAmount = initialFee,
+            selectedFiat = SELECTED_FIAT,
+            feeSelection = FeeSelection(
+                selectedLevel = FeeLevel.Custom,
+                customAmount = initialCustomFee,
+                availableLevels = EXPECTED_AVAILABLE_FEE_LEVELS,
+                asset = CryptoCurrency.BTC
+            )
+        )
+
+        // Act
+        subject.doUpdateFeeLevel(
+            pendingTx,
+            FeeLevel.Custom,
+            feeCustom
+        ).test()
+            .assertComplete()
+            .assertNoErrors()
+            .assertValue {
+                val v = 1
+                it.amount == inputAmount &&
+                it.totalBalance == totalBalance &&
+                it.availableBalance == expectedSweepable &&
+                it.feeForFullAvailable == expectedFee &&
+                it.feeAmount == expectedFee
+            }
+            .assertValue { verifyFeeLevels(it.feeSelection, FeeLevel.Custom, feeCustom) }
+
+        verify(txTarget, atMost(2)).address
+        verify(sourceAccount, atLeastOnce()).asset
+        verify(sourceAccount, atMost(2)).xpubs
+        verify(sourceAccount).accountBalance
+        verify(btcDataManager).getAddressBalance(SOURCE_XPUBS)
+        verify(btcDataManager, atMost(2)).getAddressOutputType(TARGET_ADDRESS)
+        verify(btcDataManager, atLeastOnce()).getXpubFormatOutputType(XPub.Format.LEGACY)
+        verify(feeManager).btcFeeOptions
+        verify(btcFeeOptions, atLeastOnce()).regularFee
+        verify(btcFeeOptions, atLeastOnce()).priorityFee
+        verify(btcFeeOptions, atLeastOnce()).limits
+        verify(sendDataManager).getUnspentBtcOutputs(SOURCE_XPUBS)
+        verify(sendDataManager).getMaximumAvailable(ASSET, unspentOutputs, TARGET_OUTPUT_TYPE, feePerKb)
+        verify(utxoBundle).absoluteFee
+        verify(sendDataManager)
+            .getSpendableCoins(unspentOutputs, TARGET_OUTPUT_TYPE, CHANGE_OUTPUT_TYPE, inputAmount, feePerKb)
+        verify(walletPreferences).setFeeTypeForAsset(ASSET, FeeLevel.Custom.ordinal)
+
+        noMoreInteractions(sourceAccount, txTarget)
+    }
+
+    private fun verifyFeeLevels(feeSelection: FeeSelection, expectedLevel: FeeLevel, customFee: Long = -1) =
+        feeSelection.selectedLevel == expectedLevel &&
+            feeSelection.availableLevels == EXPECTED_AVAILABLE_FEE_LEVELS &&
+            feeSelection.availableLevels.contains(feeSelection.selectedLevel) &&
+            feeSelection.customAmount == customFee &&
+            feeSelection.asset == CryptoCurrency.BTC
+
+    private fun mockSourceAccount(
+        totalBalance: Money = CryptoValue.zero(ASSET),
+        availableBalance: Money = CryptoValue.zero(ASSET)
+    ) = mock<BtcCryptoWalletAccount> {
+        on { asset } itReturns ASSET
+        on { accountBalance } itReturns Single.just(totalBalance)
+        on { actionableBalance } itReturns Single.just(availableBalance)
+        on { xpubs } itReturns SOURCE_XPUBS
+    }
+
+    private fun noMoreInteractions(sourceAccount: BlockchainAccount, txTarget: TransactionTarget) {
+        verifyNoMoreInteractions(txTarget)
+        verifyNoMoreInteractions(btcDataManager)
+        verifyNoMoreInteractions(sendDataManager)
+        verifyNoMoreInteractions(btcNetworkParams)
+        verifyNoMoreInteractions(feeManager)
+        verifyNoMoreInteractions(btcFeeOptions)
+        verifyNoMoreInteractions(walletPreferences)
+        verifyNoMoreInteractions(sourceAccount)
+        verifyNoMoreInteractions(exchangeRates)
+        verifyNoMoreInteractions(currencyPrefs)
+    }
+
+    companion object {
+        private val ASSET = CryptoCurrency.BTC
+        private val WRONG_ASSET = CryptoCurrency.ETHER
+        private const val SOURCE_XPUB = "VALID_BTC_XPUB"
+        private val SOURCE_XPUBS = XPubs(
+            XPub(address = "VALID_BTC_XPUB", derivation = XPub.Format.LEGACY)
+        )
+        private const val TARGET_ADDRESS = "VALID_BTC_ADDRESS"
+        private const val FEE_REGULAR = 5L
+        private const val FEE_PRIORITY = 11L
+        private const val SELECTED_FIAT = "INR"
+
+        private val TARGET_OUTPUT_TYPE = OutputType.P2PKH
+        private val CHANGE_OUTPUT_TYPE = OutputType.P2PKH
+
+        private val EXPECTED_AVAILABLE_FEE_LEVELS = setOf(FeeLevel.Regular, FeeLevel.Priority, FeeLevel.Custom)
+    }
+}

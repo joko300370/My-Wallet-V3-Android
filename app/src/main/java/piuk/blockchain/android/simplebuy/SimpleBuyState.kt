@@ -1,23 +1,26 @@
 package piuk.blockchain.android.simplebuy
 
-import com.blockchain.swap.nabu.datamanagers.BankAccount
-import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.Partner
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.datamanagers.Quote
-import com.blockchain.swap.nabu.datamanagers.BuySellPair
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.datamanagers.BuySellPair
+import com.blockchain.nabu.datamanagers.CustodialQuote
+import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.datamanagers.Partner
+import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.TransferLimits
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.models.data.LinkBankTransfer
+import com.blockchain.nabu.models.data.LinkedBank
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.FiatValue
+import info.blockchain.balance.Money
 import piuk.blockchain.android.cards.EverypayAuthOptions
 import piuk.blockchain.android.ui.base.mvi.MviState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import java.io.Serializable
 import java.math.BigInteger
 import java.util.Date
-import java.util.regex.Pattern
 
 /**
  * This is an object that gets serialized with Gson so any properties that we don't
@@ -29,14 +32,12 @@ data class SimpleBuyState(
     val supportedPairsAndLimits: List<BuySellPair>? = null,
     private val amount: FiatValue? = null,
     val fiatCurrency: String = "USD",
-    val predefinedAmounts: List<FiatValue> = emptyList(),
     val selectedCryptoCurrency: CryptoCurrency? = null,
     val orderState: OrderState = OrderState.UNINITIALISED,
     private val expirationDate: Date? = null,
-    val quote: Quote? = null,
+    val custodialQuote: CustodialQuote? = null,
     val kycStartedButNotCompleted: Boolean = false,
     val kycVerificationState: KycState? = null,
-    val bankAccount: BankAccount? = null,
     val currentScreen: FlowScreen = FlowScreen.ENTER_AMOUNT,
     val selectedPaymentMethod: SelectedPaymentMethod? = null,
     val orderExchangePrice: FiatValue? = null,
@@ -48,12 +49,18 @@ data class SimpleBuyState(
     @Transient val exchangePrice: FiatValue? = null,
     @Transient val isLoading: Boolean = false,
     @Transient val everypayAuthOptions: EverypayAuthOptions? = null,
+    @Transient val authorisePaymentUrl: String? = null,
+    @Transient val linkedBank: LinkedBank? = null,
     val paymentSucceeded: Boolean = false,
+    val showRating: Boolean = false,
+    @Transient val shouldShowUnlockHigherFunds: Boolean = false,
     val withdrawalLockPeriod: BigInteger = BigInteger.ZERO,
+    @Transient val linkBankTransfer: LinkBankTransfer? = null,
     @Transient val paymentPending: Boolean = false,
+    @Transient val transferLimits: TransferLimits? = null,
     // we use this flag to avoid navigating back and forth, reset after navigating
     @Transient val confirmationActionRequested: Boolean = false,
-    @Transient val depositFundsRequested: Boolean = false
+    @Transient val newPaymentMethodToBeAdded: PaymentMethod? = null
 ) : MviState {
 
     @delegate:Transient
@@ -62,17 +69,8 @@ data class SimpleBuyState(
             orderState,
             amount,
             expirationDate,
-            quote
+            custodialQuote
         )
-    }
-
-    @Transient
-    private val pattern = Pattern.compile("-?\\d+(\\.\\d+)?")
-
-    @delegate:Transient
-    val availableCryptoCurrencies: List<CryptoCurrency> by unsafeLazy {
-        supportedPairsAndLimits?.filter { it.fiatCurrency == fiatCurrency }?.map { it.cryptoCurrency }?.distinct()
-            ?: emptyList()
     }
 
     @delegate:Transient
@@ -83,47 +81,49 @@ data class SimpleBuyState(
     }
 
     @delegate:Transient
-    val maxFiatAmount: FiatValue by unsafeLazy {
-        val maxPairBuyLimit = maxPairsLimit() ?: return@unsafeLazy FiatValue.fromMinor(fiatCurrency, Long.MAX_VALUE)
-
+    val maxFiatAmount: Money by unsafeLazy {
         val maxPaymentMethodLimit = selectedPaymentMethodDetails.maxLimit()
+        val maxUserLimit = transferLimits?.maxLimit
 
-        maxPaymentMethodLimit?.let {
-            FiatValue.fromMinor(fiatCurrency, it.coerceAtMost(maxPairBuyLimit))
-        } ?: FiatValue.fromMinor(fiatCurrency, maxPairBuyLimit)
+        if (maxPaymentMethodLimit != null && maxUserLimit != null)
+            Money.min(maxPaymentMethodLimit, maxUserLimit)
+        else
+            maxPaymentMethodLimit ?: maxUserLimit ?: FiatValue.zero(fiatCurrency)
     }
 
     @delegate:Transient
-    val minFiatAmount: FiatValue by unsafeLazy {
-        val minPairBuyLimit = minPairsLimit() ?: return@unsafeLazy FiatValue.zero(fiatCurrency)
-
+    val minFiatAmount: Money by unsafeLazy {
         val minPaymentMethodLimit = selectedPaymentMethodDetails.minLimit()
+        val minUserLimit = transferLimits?.minLimit
 
-        minPaymentMethodLimit?.let {
-            FiatValue.fromMinor(fiatCurrency, it.coerceAtLeast(minPairBuyLimit))
-        } ?: FiatValue.fromMinor(fiatCurrency, minPairBuyLimit)
+        if (minPaymentMethodLimit != null && minUserLimit != null)
+            Money.max(minPaymentMethodLimit, minUserLimit)
+        else
+            minPaymentMethodLimit ?: minUserLimit ?: FiatValue.zero(fiatCurrency)
     }
 
-    fun maxCryptoAmount(exchangeRateDataManager: ExchangeRateDataManager): CryptoValue? =
-        selectedCryptoCurrency?.let {
-            maxFiatAmount.toCrypto(exchangeRateDataManager, it)
-        }
+    fun maxCryptoAmount(exchangeRateDataManager: ExchangeRateDataManager): Money? {
+        val exchangeRate = ExchangeRate.FiatToCrypto(
+            from = fiatCurrency,
+            to = selectedCryptoCurrency ?: return null,
+            rate = exchangeRateDataManager.getLastPrice(selectedCryptoCurrency, fiatCurrency)
 
-    fun minCryptoAmount(exchangeRateDataManager: ExchangeRateDataManager): CryptoValue? =
-        selectedCryptoCurrency?.let {
-            minFiatAmount.toCrypto(exchangeRateDataManager, it)
-        }
+        )
+        return exchangeRate.convert(maxFiatAmount)
+    }
 
-    private fun PaymentMethod?.maxLimit(): Long? = this?.limits?.max?.valueMinor
-    private fun PaymentMethod?.minLimit(): Long? = this?.limits?.min?.valueMinor
+    fun minCryptoAmount(exchangeRateDataManager: ExchangeRateDataManager): Money? {
+        val exchangeRate = ExchangeRate.FiatToCrypto(
+            from = fiatCurrency,
+            to = selectedCryptoCurrency ?: return null,
+            rate = exchangeRateDataManager.getLastPrice(selectedCryptoCurrency, fiatCurrency)
 
-    private fun maxPairsLimit(): Long? = supportedPairsAndLimits?.find {
-        it.cryptoCurrency == selectedCryptoCurrency && it.fiatCurrency == fiatCurrency
-    }?.buyLimits?.maxLimit(fiatCurrency)?.valueMinor
+        )
+        return exchangeRate.convert(minFiatAmount)
+    }
 
-    private fun minPairsLimit(): Long? = supportedPairsAndLimits?.find {
-        it.cryptoCurrency == selectedCryptoCurrency && it.fiatCurrency == fiatCurrency
-    }?.buyLimits?.minLimit(fiatCurrency)?.valueMinor
+    private fun PaymentMethod?.maxLimit(): Money? = this?.limits?.max
+    private fun PaymentMethod?.minLimit(): Money? = this?.limits?.min
 
     @delegate:Transient
     val isAmountValid: Boolean by unsafeLazy {
@@ -134,7 +134,7 @@ data class SimpleBuyState(
 
     @delegate:Transient
     val error: InputError? by unsafeLazy {
-        order.amount?.takeIf { it.isZero.not() }?.let {
+        order.amount?.takeIf { it.isPositive }?.let {
             when {
                 it > maxFiatAmount -> InputError.ABOVE_MAX
                 it < minFiatAmount -> InputError.BELOW_MIN
@@ -142,6 +142,9 @@ data class SimpleBuyState(
             }
         }
     }
+
+    fun shouldLaunchExternalFlow(): Boolean =
+        authorisePaymentUrl != null && linkedBank != null && id != null
 }
 
 enum class KycState {
@@ -164,43 +167,75 @@ enum class KycState {
     VERIFIED_BUT_NOT_ELIGIBLE;
 
     fun verified() = this == VERIFIED_AND_ELIGIBLE || this == VERIFIED_BUT_NOT_ELIGIBLE
-
-    fun docsSubmitted() = this != PENDING
 }
 
 enum class FlowScreen {
-    ENTER_AMOUNT, KYC, KYC_VERIFICATION, CHECKOUT, BANK_DETAILS, ADD_CARD
+    ENTER_AMOUNT, KYC, KYC_VERIFICATION, CHECKOUT
 }
 
 enum class InputError {
     BELOW_MIN, ABOVE_MAX
 }
 
-sealed class ErrorState {
+sealed class ErrorState : Serializable {
     object GenericError : ErrorState()
     object NoAvailableCurrenciesToTrade : ErrorState()
+    object BankLinkingUpdateFailed : ErrorState()
+    object BankLinkingFailed : ErrorState()
+    object BankLinkingTimeout : ErrorState()
+    object LinkedBankAlreadyLinked : ErrorState()
+    object LinkedBankAccountUnsupported : ErrorState()
+    object LinkedBankNamesMismatched : ErrorState()
+    object LinkedBankNotSupported : ErrorState()
+    object LinkedBankRejected : ErrorState()
+    object LinkedBankExpired : ErrorState()
+    object LinkedBankFailure : ErrorState()
+    object LinkedBankInvalid : ErrorState()
+    object ApprovedBankDeclined : ErrorState()
+    object ApprovedBankRejected : ErrorState()
+    object ApprovedBankFailed : ErrorState()
+    object ApprovedBankExpired : ErrorState()
+    object ApprovedGenericError : ErrorState()
+    object DailyLimitExceeded : ErrorState()
+    object WeeklyLimitExceeded : ErrorState()
+    object YearlyLimitExceeded : ErrorState()
+    object ExistingPendingOrder : ErrorState()
 }
 
 data class SimpleBuyOrder(
     val orderState: OrderState = OrderState.UNINITIALISED,
     val amount: FiatValue? = null,
     val expirationDate: Date? = null,
-    val quote: Quote? = null
+    val custodialQuote: CustodialQuote? = null
 )
 
 data class PaymentOptions(
     val availablePaymentMethods: List<PaymentMethod> = emptyList(),
     val canAddCard: Boolean = false,
-    val canLinkFunds: Boolean = false
+    val canLinkFunds: Boolean = false,
+    val canLinkBank: Boolean = false
 )
 
 data class SelectedPaymentMethod(
     val id: String,
     val partner: Partner? = null,
     val label: String? = "",
-    val paymentMethodType: PaymentMethodType
+    val paymentMethodType: PaymentMethodType,
+    val isEligible: Boolean
 ) {
-    fun isBank() = paymentMethodType == PaymentMethodType.BANK_ACCOUNT
     fun isCard() = paymentMethodType == PaymentMethodType.PAYMENT_CARD
+    fun isBank() = paymentMethodType == PaymentMethodType.BANK_TRANSFER
     fun isFunds() = paymentMethodType == PaymentMethodType.FUNDS
+
+    fun concreteId(): String? =
+        if (isDefinedBank() || isDefinedCard()) id else null
+
+    private fun isDefinedCard() = paymentMethodType == PaymentMethodType.PAYMENT_CARD &&
+        id != PaymentMethod.UNDEFINED_CARD_PAYMENT_ID
+
+    private fun isDefinedBank() = paymentMethodType == PaymentMethodType.BANK_TRANSFER &&
+        id != PaymentMethod.UNDEFINED_BANK_TRANSFER_PAYMENT_ID
+
+    fun isActive() =
+        concreteId() != null || (paymentMethodType == PaymentMethodType.FUNDS && id == PaymentMethod.FUNDS_PAYMENT_ID)
 }

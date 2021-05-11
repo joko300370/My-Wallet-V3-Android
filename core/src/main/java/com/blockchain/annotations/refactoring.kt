@@ -2,7 +2,8 @@ package com.blockchain.annotations
 
 @Target(AnnotationTarget.TYPE,
     AnnotationTarget.FUNCTION,
-    AnnotationTarget.FILE)
+    AnnotationTarget.FILE,
+    AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
 annotation class MoveCandidate(val whereTo: String, val why: String = "")
 

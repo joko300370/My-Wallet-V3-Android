@@ -15,6 +15,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.blockchain.koin.payloadScope
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.RequestAnalyticsEvents
 import com.blockchain.preferences.CurrencyPrefs
@@ -33,23 +34,22 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.ui.base.MvpFragment
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.ui.share.ReceiveIntentHelper
 import piuk.blockchain.android.ui.share.ShareReceiveIntentAdapter
-import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.EditTextFormatUtil
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.extensions.toSafeLong
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
-import piuk.blockchain.androidcoreui.utils.extensions.disableSoftKeyboard
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.invisible
-import piuk.blockchain.androidcoreui.utils.extensions.toast
-import piuk.blockchain.androidcoreui.utils.extensions.visible
-import piuk.blockchain.androidcoreui.utils.helperfunctions.AfterTextChangedWatcher
+import piuk.blockchain.android.util.disableSoftKeyboard
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.invisible
+import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.AfterTextChangedWatcher
 import java.text.DecimalFormatSymbols
 import java.util.Locale
 
@@ -68,7 +68,6 @@ class ReceiveFragment : MvpFragment<ReceiveView, ReceivePresenter>(),
     override val presenter: ReceivePresenter by scopedInject()
     override val view: ReceiveView = this
 
-    private val appUtil: AppUtil by inject()
     private val rxBus: RxBus by inject()
     private val prefs: CurrencyPrefs by scopedInject()
 
@@ -79,7 +78,7 @@ class ReceiveFragment : MvpFragment<ReceiveView, ReceivePresenter>(),
     private val disposables = CompositeDisposable()
 
     private val receiveIntentHelper by unsafeLazy {
-        ReceiveIntentHelper(requireContext(), appUtil)
+        ReceiveIntentHelper(requireContext(), payloadScope.get())
     }
 
     private val event by unsafeLazy {
@@ -102,7 +101,7 @@ class ReceiveFragment : MvpFragment<ReceiveView, ReceivePresenter>(),
         scrollview?.post { scrollview?.scrollTo(0, 0) }
 
         requireActivity().onBackPressedDispatcher.addCallback(
-            this, object : OnBackPressedCallback(true) {
+            viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (custom_keyboard.isVisible) {
                     closeKeypad()
@@ -224,6 +223,7 @@ class ReceiveFragment : MvpFragment<ReceiveView, ReceivePresenter>(),
             image_qr.invisible()
             textview_receiving_address.invisible()
             progressbar.visible()
+            cta_button.isEnabled = false
         }
     }
 
@@ -233,6 +233,7 @@ class ReceiveFragment : MvpFragment<ReceiveView, ReceivePresenter>(),
             image_qr.visible()
             textview_receiving_address.visible()
             image_qr.setImageBitmap(bitmap)
+            cta_button.isEnabled = true
         }
     }
 
@@ -302,7 +303,7 @@ class ReceiveFragment : MvpFragment<ReceiveView, ReceivePresenter>(),
                     val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                     val clip = ClipData.newPlainText("Send address", address)
                     toast(R.string.copied_to_clipboard)
-                    clipboard.primaryClip = clip
+                    clipboard.setPrimaryClip(clip)
                 }
                 .setNegativeButton(R.string.common_no, null)
                 .show()

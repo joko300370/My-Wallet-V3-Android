@@ -1,10 +1,9 @@
 package piuk.blockchain.android.coincore.impl
 
+import androidx.annotation.VisibleForTesting
 import com.blockchain.logging.CrashLogger
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.swap.nabu.models.nabu.KycTierLevel
-import com.blockchain.swap.nabu.service.TierService
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
@@ -12,7 +11,9 @@ import info.blockchain.wallet.prices.TimeInterval
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
+import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.coincore.AccountGroup
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
@@ -20,16 +21,21 @@ import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.TradingAccount
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.thepit.PitLinking
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.exchangerate.PriceSeries
 import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import piuk.blockchain.androidcore.utils.extensions.then
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
 import java.math.BigDecimal
+import java.util.concurrent.atomic.AtomicBoolean
+
+interface AccountRefreshTrigger {
+    fun forceAccountsRefresh()
+}
 
 internal abstract class CryptoAssetBase(
     protected val payloadManager: PayloadDataManager,
@@ -40,11 +46,39 @@ internal abstract class CryptoAssetBase(
     protected val custodialManager: CustodialWalletManager,
     private val pitLinking: PitLinking,
     protected val crashLogger: CrashLogger,
-    private val tiersService: TierService,
-    protected val environmentConfig: EnvironmentConfig
-) : CryptoAsset {
+    protected val offlineAccounts: OfflineAccountUpdater,
+    private val identity: UserIdentity
+) : CryptoAsset, AccountRefreshTrigger {
 
-    private val accounts = mutableListOf<SingleAccount>()
+    private val activeAccounts: ActiveAccountList by unsafeLazy {
+        ActiveAccountList(asset, custodialManager)
+    }
+
+    protected val accounts: Single<SingleAccountList>
+        get() = activeAccounts.fetchAccountList(::loadAccounts).flatMap {
+            updateLabelsIfNeeded(it).toSingle { it }
+        }
+
+    private fun updateLabelsIfNeeded(list: SingleAccountList): Completable =
+        Completable.concat(
+            list.map {
+                val cryptoNonCustodialAccount = it as? CryptoNonCustodialAccount
+                if (cryptoNonCustodialAccount?.labelNeedsUpdate() == true)
+                    cryptoNonCustodialAccount.updateLabel(
+                        cryptoNonCustodialAccount.label.replace(
+                            labels.getOldDefaultNonCustodialWalletLabel(asset),
+                            labels.getDefaultNonCustodialWalletLabel(asset)
+                        )
+                    )
+                        .doOnError { error ->
+                            crashLogger.logException(error)
+                        }
+                        .onErrorComplete()
+                else
+                    Completable.complete()
+            }
+        )
+
     override val isEnabled: Boolean
         get() = !asset.hasFeature(CryptoCurrency.STUB_ASSET)
 
@@ -54,82 +88,82 @@ internal abstract class CryptoAssetBase(
             .doOnError { throwable ->
                 crashLogger.logException(throwable, "Coincore: Failed to load $asset wallet")
             }
-            .then { loadAccounts() }
             .doOnComplete { Timber.d("Coincore: Init $asset Complete") }
             .doOnError { Timber.d("Coincore: Init $asset Failed") }
 
-    private fun loadAccounts(): Completable =
-        Completable.fromCallable { accounts.clear() }
-            .then {
-                loadNonCustodialAccounts(labels)
-                    .doOnSuccess { accounts.addAll(it) }
-                    .ignoreElement()
-            }
-            .then {
-                loadCustodialAccount()
-                    .doOnSuccess { accounts.addAll(it) }
-                    .ignoreElement()
-            }
-            .then {
-                loadInterestAccounts(labels)
-                    .doOnSuccess { accounts.addAll(it) }
-                    .ignoreElement()
-            }
-            .doOnError { Timber.e("Error loading accounts for ${asset.networkTicker}: $it") }
+    private fun loadAccounts(): Single<SingleAccountList> =
+        Singles.zip(
+            loadNonCustodialAccounts(labels),
+            loadCustodialAccount(),
+            loadInterestAccounts()
+        ) { nc, c, i ->
+            nc + c + i
+        }.doOnError {
+            val errorMsg = "Error loading accounts for ${asset.networkTicker}"
+            Timber.e("$errorMsg: $it")
+            crashLogger.logException(it, errorMsg)
+        }
+
+    private fun CryptoNonCustodialAccount.labelNeedsUpdate(): Boolean {
+        val regex = """${labels.getOldDefaultNonCustodialWalletLabel(asset)}(\s?)([\d]*)""".toRegex()
+        return label.matches(regex)
+    }
+
+    // Called when the set of account in use bu this asset changes. Update the offline
+    // cache and the BE notification addresses here
+    protected open fun onAccountListChanged(accountList: List<SingleAccount>) {
+        Timber.d("Accounts changed!")
+    }
+
+    final override fun forceAccountsRefresh() {
+        activeAccounts.setForceRefresh()
+    }
 
     abstract fun initToken(): Completable
 
     abstract fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList>
 
-    private fun loadInterestAccounts(labels: DefaultLabels): Single<SingleAccountList> =
-        Single.just(
-            CryptoInterestAccount(
-                asset,
-                labels.getDefaultInterestWalletLabel(asset),
-                custodialManager,
-                exchangeRates,
-                environmentConfig
-            )
-        ).flatMap { account ->
-            account.isInterestEnabled().map {
-                if (account.isConfigured) {
-                    listOf(account)
+    private fun loadInterestAccounts(): Single<SingleAccountList> =
+        custodialManager.getInterestAvailabilityForAsset(asset)
+            .map {
+                if (it) {
+                    listOf(
+                        CryptoInterestAccount(
+                            asset,
+                            labels.getDefaultInterestWalletLabel(asset),
+                            custodialManager,
+                            exchangeRates
+                        )
+                    )
                 } else {
                     emptyList()
                 }
             }
-        }
 
     override fun interestRate(): Single<Double> = custodialManager.getInterestAccountRates(asset)
 
     open fun loadCustodialAccount(): Single<SingleAccountList> =
         Single.just(
-            CustodialTradingAccount(
-                asset = asset,
-                label = labels.getDefaultCustodialWalletLabel(asset),
-                exchangeRates = exchangeRates,
-                custodialWalletManager = custodialManager,
-                environmentConfig = environmentConfig
+            listOf(
+                CustodialTradingAccount(
+                    asset = asset,
+                    label = labels.getDefaultCustodialWalletLabel(asset),
+                    exchangeRates = exchangeRates,
+                    custodialWalletManager = custodialManager,
+                    identity = identity
+                )
             )
-        ).flatMap { account ->
-            account.accountBalance.map {
-                if (account.isConfigured) {
-                    listOf(account)
-                } else {
-                    emptyList()
-                }
+        )
+
+    final override fun accountGroup(filter: AssetFilter): Maybe<AccountGroup> =
+        accounts.flatMapMaybe {
+            Maybe.fromCallable {
+                it.makeAccountGroup(asset, labels, filter)
             }
         }
 
-    final override fun accountGroup(filter: AssetFilter): Maybe<AccountGroup> =
-        Maybe.fromCallable {
-            filterTokenAccounts(asset, labels, accounts, filter)
-        }
-
     final override fun defaultAccount(): Single<SingleAccount> =
-        Single.fromCallable {
-            accounts.first { it.isDefault }
-        }
+        accounts.map { it.first { a -> a.isDefault } }
 
     private fun getNonCustodialAccountList(): Single<SingleAccountList> =
         accountGroup(filter = AssetFilter.NonCustodial)
@@ -157,54 +191,78 @@ internal abstract class CryptoAssetBase(
             }
 
     override fun historicRateSeries(period: TimeSpan, interval: TimeInterval): Single<PriceSeries> =
-        historicRates.getHistoricPriceSeries(asset, currencyPrefs.selectedFiatCurrency, period)
+        if (asset.hasFeature(CryptoCurrency.PRICE_CHARTING))
+            historicRates.getHistoricPriceSeries(asset, currencyPrefs.selectedFiatCurrency, period)
+        else
+            Single.just(emptyList())
 
-    private fun getPitLinkingAccount(): Maybe<SingleAccount> =
+    private fun getPitLinkingTargets(): Maybe<SingleAccountList> =
         pitLinking.isPitLinked().filter { it }
             .flatMap { custodialManager.getExchangeSendAddressFor(asset) }
             .map { address ->
-                CryptoExchangeAccount(
-                    asset = asset,
-                    label = labels.getDefaultExchangeWalletLabel(asset),
-                    address = address,
-                    exchangeRates = exchangeRates,
-                    environmentConfig = environmentConfig
+                listOf(
+                    CryptoExchangeAccount(
+                        asset = asset,
+                        label = labels.getDefaultExchangeWalletLabel(),
+                        address = address,
+                        exchangeRates = exchangeRates
+                    )
                 )
             }
 
-    private fun getInterestAccount(): Maybe<SingleAccount> =
-        tiersService.tiers().flatMapMaybe { tier ->
-            if (tier.isApprovedFor(KycTierLevel.GOLD)) {
-                val interestAccounts = accounts.filterIsInstance<CryptoInterestAccount>()
-                if (interestAccounts.isNotEmpty()) {
-                    Maybe.just(interestAccounts.first())
-                } else {
-                    Maybe.empty()
+    private fun getInterestTargets(): Maybe<SingleAccountList> =
+        custodialManager.getInterestEligibilityForAsset(asset).flatMapMaybe { eligibility ->
+            if (eligibility.eligible) {
+                accounts.flatMapMaybe {
+                    Maybe.just(it.filterIsInstance<CryptoInterestAccount>())
                 }
             } else {
                 Maybe.empty()
             }
         }
 
-    private fun getCustodialAccount(): Maybe<SingleAccount> =
+    private fun getCustodialTargets(): Maybe<SingleAccountList> =
         accountGroup(AssetFilter.Custodial)
-            .map { it.accounts.first() }
+            .map { it.accounts }
             .onErrorComplete()
+
+    private fun getNonCustodialTargets(exclude: SingleAccount? = null): Maybe<SingleAccountList> =
+        getNonCustodialAccountList()
+            .map { ll ->
+                ll.filter { a -> a !== exclude }
+            }.flattenAsObservable {
+                it
+            }.flatMapMaybe { account ->
+                account.actions.flatMapMaybe {
+                    if (it.contains(AssetAction.Receive)) {
+                        Maybe.just(account)
+                    } else Maybe.empty()
+                }
+            }.toList().toMaybe()
 
     final override fun transactionTargets(account: SingleAccount): Single<SingleAccountList> {
         require(account is CryptoAccount)
         require(account.asset == asset)
 
         return when (account) {
-            is TradingAccount -> getNonCustodialAccountList()
+            is TradingAccount -> Maybe.concat(
+                listOf(
+                    getNonCustodialTargets(),
+                    getInterestTargets()
+                )
+            ).toList()
+                .map { ll -> ll.flatten() }
+                .onErrorReturnItem(emptyList())
             is NonCustodialAccount ->
                 Maybe.concat(
                     listOf(
-                        getPitLinkingAccount(),
-                        getInterestAccount(),
-                        getCustodialAccount()
+                        getPitLinkingTargets(),
+                        getInterestTargets(),
+                        getCustodialTargets(),
+                        getNonCustodialTargets(exclude = account)
                     )
                 ).toList()
+                    .map { ll -> ll.flatten() }
                     .onErrorReturnItem(emptyList())
             else -> Single.just(emptyList())
         }
@@ -217,4 +275,59 @@ fun ExchangeRateDataManager.fetchExchangeRate(
 ): Single<BigDecimal> =
     updateTickers()
         .andThen(Single.defer { Single.just(getLastPrice(cryptoCurrency, currencyName)) })
-        .map { it.toBigDecimal() }
+
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+internal class ActiveAccountList(
+    private val asset: CryptoCurrency,
+    private val custodialManager: CustodialWalletManager
+) {
+    private val activeList = mutableSetOf<CryptoAccount>()
+
+    private var interestEnabled = false
+    private val forceRefreshOnNext = AtomicBoolean(true)
+
+    fun setForceRefresh() {
+        forceRefreshOnNext.set(true)
+    }
+
+    fun fetchAccountList(
+        loader: () -> Single<SingleAccountList>
+    ): Single<SingleAccountList> =
+        shouldRefresh().flatMap { refresh ->
+            if (refresh) {
+                loader().map { updateWith(it) }
+            } else {
+                Single.just(activeList.toList())
+            }
+        }
+
+    private fun shouldRefresh() =
+        Singles.zip(
+            Single.just(interestEnabled),
+            custodialManager.getInterestAvailabilityForAsset(asset),
+            Single.just(forceRefreshOnNext.getAndSet(false))
+        ) { wasEnabled, isEnabled, force ->
+            interestEnabled = isEnabled
+            wasEnabled != isEnabled || force
+        }.onErrorReturn { false }
+
+    @Synchronized
+    private fun updateWith(
+        accounts: List<SingleAccount>
+    ): List<CryptoAccount> {
+        val newActives = mutableSetOf<CryptoAccount>()
+        accounts.filterIsInstance<CryptoAccount>()
+            .forEach { a ->
+                val existing = activeList.find { it.matches(a) }
+                if (existing != null) {
+                    newActives.add(existing)
+                } else {
+                    newActives.add(a)
+                }
+            }
+        activeList.clear()
+        activeList.addAll(newActives)
+
+        return activeList.toList()
+    }
+}

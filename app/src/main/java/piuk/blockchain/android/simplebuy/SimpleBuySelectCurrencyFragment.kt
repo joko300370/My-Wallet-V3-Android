@@ -2,21 +2,19 @@ package piuk.blockchain.android.simplebuy
 
 import android.os.Bundle
 import android.os.Parcelable
-import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.CurrencySelected
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.ui.trackLoading
-import info.blockchain.wallet.api.data.Settings.UNIT_FIAT
+import com.blockchain.ui.trackProgress
+import info.blockchain.wallet.api.data.Settings.Companion.UNIT_FIAT
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.parcel.Parcelize
-import kotlinx.android.synthetic.main.fragment_simple_buy_currency_selection.view.*
 import org.koin.android.ext.android.inject
-import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.FragmentSimpleBuyCurrencySelectionBinding
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
@@ -24,7 +22,8 @@ import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.util.Locale
 import java.util.Currency
 
-class SimpleBuySelectCurrencyFragment : MviBottomSheet<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(),
+class SimpleBuySelectCurrencyFragment :
+    MviBottomSheet<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState, FragmentSimpleBuyCurrencySelectionBinding>(),
     ChangeCurrencyOptionHost {
 
     private val currencyPrefs: CurrencyPrefs by inject()
@@ -44,11 +43,15 @@ class SimpleBuySelectCurrencyFragment : MviBottomSheet<SimpleBuyModel, SimpleBuy
         updateFiat(it)
     }
 
-    override val layoutResource: Int = R.layout.fragment_simple_buy_currency_selection
+    override fun initBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentSimpleBuyCurrencySelectionBinding =
+        FragmentSimpleBuyCurrencySelectionBinding.inflate(inflater, container, false)
 
-    override fun initControls(view: View) {
+    override fun initControls(binding: FragmentSimpleBuyCurrencySelectionBinding) {
         analytics.logEvent(SimpleBuyAnalytics.SELECT_YOUR_CURRENCY_SHOWN)
-        with(view) {
+        with(binding) {
             recycler.layoutManager = LinearLayoutManager(activity)
             recycler.adapter = adapter
         }
@@ -57,7 +60,7 @@ class SimpleBuySelectCurrencyFragment : MviBottomSheet<SimpleBuyModel, SimpleBuy
 
     private fun updateFiat(item: CurrencyItem) {
         compositeDisposable += settingsDataManager.updateFiatUnit(item.symbol)
-            .trackLoading(appUtil.activityIndicator)
+            .trackProgress(appUtil.activityIndicator)
             .doOnSubscribe {
                 adapter.canSelect = false
             }

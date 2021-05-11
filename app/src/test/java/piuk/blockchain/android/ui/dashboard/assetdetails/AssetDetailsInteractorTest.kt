@@ -60,18 +60,15 @@ class AssetDetailsInteractorTest {
         val price = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 56478.99.toBigDecimal())
 
         val walletCrypto = CryptoValue(CryptoCurrency.BTC, 548621.toBigInteger())
-        val custodialCrypto = CryptoValue.ZeroBtc
-        val interestCrypto = CryptoValue.ZeroBtc
-        val pendingCrypto = CryptoValue.ZeroBtc
-        val totalCrypto = walletCrypto + custodialCrypto + interestCrypto
+        val custodialCrypto = CryptoValue.zero(CryptoCurrency.BTC)
+        val interestCrypto = CryptoValue.zero(CryptoCurrency.BTC)
+        val pendingCrypto = CryptoValue.zero(CryptoCurrency.BTC)
 
         val walletFiat = FiatValue.fromMinor("USD", 30985)
         val custodialFiat = FiatValue.fromMinor("USD", 0)
         val interestFiat = FiatValue.fromMinor("USD", 0)
-        val totalFiat = walletFiat + custodialFiat + interestFiat
 
         val expectedResult = mapOf(
-            AssetFilter.All to AssetDisplayInfo(totalGroup, totalCrypto, pendingCrypto, totalFiat, emptySet()),
             AssetFilter.NonCustodial to AssetDisplayInfo(nonCustodialGroup,
                 walletCrypto,
                 pendingCrypto,
@@ -90,14 +87,18 @@ class AssetDetailsInteractorTest {
 
         whenever(asset.exchangeRate()).thenReturn(Single.just(price))
 
-        whenever(totalGroup.accountBalance).thenReturn(Single.just(totalCrypto))
-        whenever(totalGroup.pendingBalance).thenReturn(Single.just(pendingCrypto))
         whenever(nonCustodialGroup.accountBalance).thenReturn(Single.just(walletCrypto))
         whenever(nonCustodialGroup.pendingBalance).thenReturn(Single.just(pendingCrypto))
+        whenever(nonCustodialGroup.isEnabled).thenReturn(Single.just(true))
+        whenever(nonCustodialGroup.actions).thenReturn(Single.just(emptySet()))
         whenever(custodialGroup.accountBalance).thenReturn(Single.just(custodialCrypto))
         whenever(custodialGroup.pendingBalance).thenReturn(Single.just(pendingCrypto))
+        whenever(custodialGroup.actions).thenReturn(Single.just(emptySet()))
+        whenever(custodialGroup.isEnabled).thenReturn(Single.just(true))
         whenever(interestGroup.accountBalance).thenReturn(Single.just(interestCrypto))
         whenever(interestGroup.pendingBalance).thenReturn(Single.just(pendingCrypto))
+        whenever(interestGroup.isEnabled).thenReturn(Single.just(true))
+        whenever(interestGroup.actions).thenReturn(Single.just(emptySet()))
         whenever(asset.interestRate()).thenReturn(Single.just(interestRate))
 
         whenever(custodialGroup.accounts).thenReturn(listOf(mock()))
@@ -125,11 +126,9 @@ class AssetDetailsInteractorTest {
         whenever(asset.exchangeRate()).thenReturn(Single.error(Throwable()))
 
         val walletCrypto = CryptoValue(CryptoCurrency.BTC, 548621.toBigInteger())
-        val custodialCrypto = CryptoValue.ZeroBtc
-        val interestCrypto = CryptoValue.ZeroBtc
-        val totalCrypto = walletCrypto + custodialCrypto + interestCrypto
+        val custodialCrypto = CryptoValue.zero(CryptoCurrency.BTC)
+        val interestCrypto = CryptoValue.zero(CryptoCurrency.BTC)
 
-        whenever(totalGroup.accountBalance).thenReturn(Single.just(totalCrypto))
         whenever(nonCustodialGroup.accountBalance).thenReturn(Single.just(walletCrypto))
         whenever(custodialGroup.accountBalance).thenReturn(Single.just(custodialCrypto))
         whenever(interestGroup.accountBalance).thenReturn(Single.just(interestCrypto))
@@ -144,37 +143,15 @@ class AssetDetailsInteractorTest {
     @Test
     fun `cryptoBalance & fiatBalance never return if interest fails`() {
         val walletCrypto = CryptoValue(CryptoCurrency.BTC, 548621.toBigInteger())
-        val custodialCrypto = CryptoValue.ZeroBtc
-        val totalCrypto = walletCrypto + custodialCrypto
+        val custodialCrypto = CryptoValue.zero(CryptoCurrency.BTC)
 
         val price = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 5647899.toBigDecimal())
 
         whenever(asset.exchangeRate()).thenReturn(Single.just(price))
         whenever(asset.accountGroup(AssetFilter.Interest)).thenReturn(Maybe.error(Throwable()))
 
-        whenever(totalGroup.accountBalance).thenReturn(Single.just(totalCrypto))
         whenever(nonCustodialGroup.accountBalance).thenReturn(Single.just(walletCrypto))
         whenever(custodialGroup.accountBalance).thenReturn(Single.just(custodialCrypto))
-        whenever(asset.interestRate()).thenReturn(Single.just(interestRate))
-
-        val testObserver = interactor.loadAssetDetails(asset)
-            .test()
-        testObserver.assertNoValues()
-    }
-
-    @Test
-    fun `cryptoBalance, fiatBalance & interestBalance are never returned if totalBalance fails`() {
-        val walletCrypto = CryptoValue(CryptoCurrency.BTC, 548621.toBigInteger())
-        val custodialCrypto = CryptoValue.ZeroBtc
-        val interestCrypto = CryptoValue.ZeroBtc
-
-        val price = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 5647899.toBigDecimal())
-        whenever(asset.exchangeRate()).thenReturn(Single.just(price))
-
-        whenever(totalGroup.accountBalance).thenReturn(Single.error(Throwable()))
-        whenever(nonCustodialGroup.accountBalance).thenReturn(Single.just(walletCrypto))
-        whenever(custodialGroup.accountBalance).thenReturn(Single.just(custodialCrypto))
-        whenever(interestGroup.accountBalance).thenReturn(Single.just(interestCrypto))
         whenever(asset.interestRate()).thenReturn(Single.just(interestRate))
 
         val testObserver = interactor.loadAssetDetails(asset)

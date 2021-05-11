@@ -1,24 +1,32 @@
 package info.blockchain.wallet.util;
 
-import info.blockchain.api.blockexplorer.BlockExplorer;
-import info.blockchain.api.blockexplorer.FilterType;
-import info.blockchain.api.data.Balance;
-import info.blockchain.wallet.BlockchainFramework;
-import info.blockchain.wallet.api.PersistentUrls;
+import info.blockchain.api.BitcoinApi;
+import info.blockchain.api.bitcoin.data.BalanceDto;
 import info.blockchain.wallet.exceptions.ApiException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Map;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.DumpedPrivateKey;
 import org.bitcoinj.core.ECKey;
-import org.bitcoinj.params.BitcoinMainNetParams;
+import org.bitcoinj.core.LegacyAddress;
+import org.bitcoinj.core.NetworkParameters;
+import org.bitcoinj.crypto.BIP38PrivateKey;
+import org.bitcoinj.params.MainNetParams;
+import org.jetbrains.annotations.NotNull;
 import org.spongycastle.util.encoders.Hex;
-import retrofit2.Call;
+
+import info.blockchain.wallet.keys.SigningKey;
+import info.blockchain.wallet.keys.SigningKeyImpl;
+import info.blockchain.wallet.payload.model.Balance;
+import info.blockchain.wallet.payload.model.BalanceKt;
 import retrofit2.Response;
 
 @SuppressWarnings("WeakerAccess")
@@ -33,107 +41,130 @@ public class PrivateKeyFactory {
     public final static String WIF_UNCOMPRESSED = "wif_u";
 
     public String getFormat(String key) {
+        try {
+            // 51 characters base58, always starts with a '5'
+            if (key.matches("^5[1-9A-HJ-NP-Za-km-z]{50}$")) {
+                return WIF_UNCOMPRESSED;
+            }
+            // 52 characters, always starts with 'K' or 'L' (or 'c' for testnet)
+            else if (key.matches("^[LK][1-9A-HJ-NP-Za-km-z]{51}$")) {
+                return WIF_COMPRESSED;
 
-        // TODO: 04/01/2018 Pass params in. What about other coin params?
-        boolean isTestnet = !(PersistentUrls.getInstance().getBitcoinParams() instanceof BitcoinMainNetParams);
+            }
+            else if (key.matches("^[1-9A-HJ-NP-Za-km-z]{44}$") || key
+                    .matches("^[1-9A-HJ-NP-Za-km-z]{43}$")) {
+                return BASE58;
+            }
+            else if (key.matches("^[A-Fa-f0-9]{64}$")) {
+                return HEX;
+            }
+            else if (key.matches("^[A-Za-z0-9/=+]{44}$")) {
+                return BASE64;
+            }
+            else if (key.matches("^6P[1-9A-HJ-NP-Za-km-z]{56}$")) {
+                return BIP38;
+            }
+            else if (key.matches("^S[1-9A-HJ-NP-Za-km-z]{21}$") ||
+                     key.matches("^S[1-9A-HJ-NP-Za-km-z]{25}$") ||
+                     key.matches("^S[1-9A-HJ-NP-Za-km-z]{29}$") ||
+                     key.matches("^S[1-9A-HJ-NP-Za-km-z]{30}$")) {
 
-        // 51 characters base58, always starts with a '5'  (or '9', for testnet)
-        if (!isTestnet && key.matches("^5[1-9A-HJ-NP-Za-km-z]{50}$") ||
-                isTestnet && key.matches("^9[1-9A-HJ-NP-Za-km-z]{50}$")) {
-            return WIF_UNCOMPRESSED;
-        }
-        // 52 characters, always starts with 'K' or 'L' (or 'c' for testnet)
-        else if (!isTestnet && key.matches("^[LK][1-9A-HJ-NP-Za-km-z]{51}$") ||
-                isTestnet && key.matches("^[c][1-9A-HJ-NP-Za-km-z]{51}$")) {
-            return WIF_COMPRESSED;
-
-        } else if (key.matches("^[1-9A-HJ-NP-Za-km-z]{44}$") || key
-                .matches("^[1-9A-HJ-NP-Za-km-z]{43}$")) {
-            return BASE58;
-        }
-        else if (key.matches("^[A-Fa-f0-9]{64}$")) {
-            return HEX;
-        } else if (key.matches("^[A-Za-z0-9/=+]{44}$")) {
-            return BASE64;
-        } else if (key.matches("^6P[1-9A-HJ-NP-Za-km-z]{56}$")) {
-            return BIP38;
-        } else if (key.matches("^S[1-9A-HJ-NP-Za-km-z]{21}$") ||
-                key.matches("^S[1-9A-HJ-NP-Za-km-z]{25}$") ||
-                key.matches("^S[1-9A-HJ-NP-Za-km-z]{29}$") ||
-                key.matches("^S[1-9A-HJ-NP-Za-km-z]{30}$")) {
-
-            byte[] testBytes;
-            String data = key + "?";
-            try {
-                Hash hash = new Hash(
-                        MessageDigest.getInstance("SHA-256").digest(data.getBytes("UTF-8")));
-                testBytes = hash.getBytes();
+                String data = key + "?";
+                Hash hash = new Hash(MessageDigest.getInstance("SHA-256").digest(data.getBytes(StandardCharsets.UTF_8)));
+                byte[] testBytes = hash.getBytes();
 
                 if ((testBytes[0] == 0x00)) {
                     return MINI;
                 }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
             }
-
-            return null;
-        } else {
-            return null;
+        } catch (Throwable t) {
+            t.printStackTrace();
         }
+        return null;
     }
 
-    // TODO: 04/01/2018 Pass params in. What about other coin params?
-    public ECKey getKey(String format, String data) throws Exception {
+    public SigningKey getKeyFromImportedData(String format, String data, BitcoinApi bitcoinApi) throws Exception {
+        // If we're importing a key, we need bitcoinApi, if we're signing then we don't, so use the other
+        // 'getSigningKey()' method
+        MainNetParams netParams = MainNetParams.get();
         switch (format) {
             case WIF_UNCOMPRESSED:
             case WIF_COMPRESSED:
-                DumpedPrivateKey pk = DumpedPrivateKey.fromBase58(PersistentUrls.getInstance().getBitcoinParams(), data);
-                return pk.getKey();
+                DumpedPrivateKey pk = DumpedPrivateKey.fromBase58(netParams, data);
+                return new SigningKeyImpl(pk.getKey());
             case BASE58:
-                return decodeBase58PK(data);
+                return new SigningKeyImpl(decodeBase58PK(data));
             case BASE64:
-                return decodeBase64PK(data);
+                return new SigningKeyImpl(decodeBase64PK(data));
             case HEX:
-                return determineKey(data);
+                return new SigningKeyImpl(determineImportedKey(data, bitcoinApi, netParams));
             case MINI:
-                return decodeMiniKey(data);
+                return new SigningKeyImpl(decodeMiniKey(data, bitcoinApi, netParams));
             default:
                 throw new Exception("Unknown key format: " + format);
         }
     }
 
-    private ECKey decodeMiniKey(String mini) throws Exception {
-        Hash hash = new Hash(MessageDigest.getInstance("SHA-256").digest(mini.getBytes("UTF-8")));
-        return determineKey(hash.toString());
+    public SigningKey getSigningKey(String format, String data) throws Exception {
+        // If we're importing a key, we need bitcoinApi, if we're signing then we don't
+        MainNetParams netParams = MainNetParams.get();
+        switch (format) {
+            case WIF_UNCOMPRESSED:
+            case WIF_COMPRESSED:
+                DumpedPrivateKey pk = DumpedPrivateKey.fromBase58(netParams, data);
+                return new SigningKeyImpl(pk.getKey());
+            default:
+                throw new Exception("Unknown signing key format: " + format);
+        }
     }
 
-    // TODO: 04/01/2018 Pass params in. What about other coin params?
-    private ECKey determineKey(String hash) {
+    public SigningKey getBip38Key(
+        @NotNull String keyData,
+        @NotNull String keyPassword
+    ) throws BIP38PrivateKey.BadPassphraseException {
+        MainNetParams netParams = MainNetParams.get();
+        return new SigningKeyImpl(BIP38PrivateKey.fromBase58(netParams, keyData).decrypt(keyPassword));
+    }
+
+    private ECKey decodeMiniKey(
+        String mini,
+        BitcoinApi bitcoinApi,
+        NetworkParameters btcParameters
+    ) throws Exception {
+        Hash hash = new Hash(
+            MessageDigest.getInstance("SHA-256")
+                .digest(mini.getBytes(StandardCharsets.UTF_8))
+        );
+        return determineImportedKey(hash.toString(), bitcoinApi, btcParameters);
+    }
+
+    private ECKey determineImportedKey(String hash, BitcoinApi bitcoinApi, NetworkParameters btcParameters) {
 
         ECKey uncompressedKey = decodeHexPK(hash, false);
         ECKey compressedKey = decodeHexPK(hash, true);
 
         try {
-            String uncompressedAddress = uncompressedKey.toAddress(PersistentUrls.getInstance().getBitcoinParams()).toString();
-            String compressedAddress = compressedKey.toAddress(PersistentUrls.getInstance().getBitcoinParams()).toString();
+            String uncompressedAddress = LegacyAddress.fromKey(btcParameters, uncompressedKey).toString();
+            String compressedAddress = LegacyAddress.fromKey(btcParameters, compressedKey).toString();
 
             ArrayList<String> list = new ArrayList<>();
             list.add(uncompressedAddress);
             list.add(compressedAddress);
 
-            BlockExplorer blockExplorer = new BlockExplorer(BlockchainFramework.getRetrofitExplorerInstance(),
-                    BlockchainFramework.getRetrofitApiInstance(), BlockchainFramework.getApiCode());
-            Call<HashMap<String, Balance>> call = blockExplorer.getBalance(list, FilterType.RemoveUnspendable);
-
-            Response<HashMap<String, Balance>> exe = call.execute();
+            // No need to use segwit xpubs/addresses here, this is only called for imported
+            // addresses, which don't support segwit at this time.
+            Response<Map<String, BalanceDto>> exe = bitcoinApi.getBalance(
+                BitcoinApi.BITCOIN,
+                list,
+                Collections.emptyList(),
+                BitcoinApi.BalanceFilter.RemoveUnspendable
+            ).execute();
 
             if (!exe.isSuccessful()) {
                 throw new ApiException("Failed to connect to server.");
             }
 
-            HashMap<String, Balance> body = exe.body();
+            Map<String, Balance> body = BalanceKt.toBalanceMap(exe.body());
 
             BigInteger uncompressedBalance = body.get(uncompressedAddress).getFinalBalance();
             BigInteger compressedBalance = body.get(compressedAddress).getFinalBalance();

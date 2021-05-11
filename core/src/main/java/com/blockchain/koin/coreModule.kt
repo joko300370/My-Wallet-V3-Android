@@ -1,26 +1,22 @@
-@file:Suppress("USELESS_CAST")
-
 package com.blockchain.koin
 
 import android.preference.PreferenceManager
-import com.blockchain.datamanagers.AccountLookup
-import com.blockchain.datamanagers.AddressResolver
 import com.blockchain.datamanagers.DataManagerPayloadDecrypt
-import com.blockchain.datamanagers.MaximumSpendableCalculator
-import com.blockchain.datamanagers.SelfFeeCalculatingTransactionExecutor
-import com.blockchain.datamanagers.TransactionExecutor
-import com.blockchain.datamanagers.TransactionExecutorViaDataManagers
-import com.blockchain.datamanagers.TransactionExecutorWithoutFees
-import com.blockchain.fees.FeeType
 import com.blockchain.logging.LastTxUpdateDateOnSettingsService
 import com.blockchain.logging.LastTxUpdater
 import com.blockchain.logging.NullLogger
 import com.blockchain.logging.TimberLogger
 import com.blockchain.metadata.MetadataRepository
 import com.blockchain.payload.PayloadDecrypt
+import com.blockchain.preferences.AuthPrefs
+import com.blockchain.preferences.BankLinkingPrefs
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.DashboardPrefs
+import com.blockchain.preferences.InternalFeatureFlagPrefs
 import com.blockchain.preferences.NotificationPrefs
+import com.blockchain.preferences.OfflineCachePrefs
+import com.blockchain.preferences.RatingPrefs
+import com.blockchain.preferences.SecureChannelPrefs
 import com.blockchain.preferences.SecurityPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.preferences.ThePitLinkingPrefs
@@ -29,14 +25,11 @@ import com.blockchain.sunriver.XlmHorizonUrlFetcher
 import com.blockchain.sunriver.XlmTransactionTimeoutFetcher
 import com.blockchain.wallet.SeedAccess
 import com.blockchain.wallet.SeedAccessWithoutPrompt
-import info.blockchain.api.blockexplorer.BlockExplorer
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.wallet.metadata.MetadataDerivation
 import info.blockchain.wallet.util.PrivateKeyFactory
-import org.bitcoinj.params.BitcoinMainNetParams
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import piuk.blockchain.android.util.RootUtil
 import piuk.blockchain.androidcore.BuildConfig
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.access.AccessStateImpl
@@ -45,7 +38,6 @@ import piuk.blockchain.androidcore.data.auth.AuthDataManager
 import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataStore
 import piuk.blockchain.androidcore.data.erc20.datastores.Erc20DataStore
-import piuk.blockchain.androidcore.data.ethereum.EthereumAccountWrapper
 import piuk.blockchain.androidcore.data.ethereum.datastores.EthDataStore
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
@@ -56,6 +48,8 @@ import piuk.blockchain.androidcore.data.metadata.MoshiMetadataRepositoryAdapter
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManagerSeedAccessAdapter
 import piuk.blockchain.androidcore.data.payload.PayloadService
+import piuk.blockchain.androidcore.data.payload.PayloadVersionController
+import piuk.blockchain.androidcore.data.payload.PayloadVersionControllerImpl
 import piuk.blockchain.androidcore.data.payload.PromptingSeedAccessAdapter
 import piuk.blockchain.androidcore.data.payments.PaymentService
 import piuk.blockchain.androidcore.data.payments.SendDataManager
@@ -65,9 +59,7 @@ import piuk.blockchain.androidcore.data.settings.PhoneNumberUpdater
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.data.settings.SettingsEmailAndSyncUpdater
 import piuk.blockchain.androidcore.data.settings.SettingsPhoneNumberUpdater
-import piuk.blockchain.androidcore.data.settings.SettingsPhoneVerificationQuery
 import piuk.blockchain.androidcore.data.settings.SettingsService
-import piuk.blockchain.androidcore.data.settings.applyFlag
 import piuk.blockchain.androidcore.data.settings.datastore.SettingsDataStore
 import piuk.blockchain.androidcore.data.settings.datastore.SettingsMemoryStore
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
@@ -86,19 +78,46 @@ val coreModule = module {
 
     single { RxBus() }
 
-    factory { AuthService(get(), get()) }
+    factory {
+        AuthService(
+            walletApi = get(),
+            rxBus = get()
+        )
+    }
 
     factory { PrivateKeyFactory() }
 
-    factory { RootUtil() }
-
     scope(payloadScopeQualifier) {
 
-        factory { PayloadService(get()) }
+        factory {
+            PayloadService(
+                payloadManager = get(),
+                versionController = get()
+            )
+        }
 
-        factory { PayloadDataManager(get(), get(), get(), get(), get()) }
+        factory {
+            PayloadDataManager(
+                payloadService = get(),
+                privateKeyFactory = get(),
+                bitcoinApi = get(),
+                payloadManager = get(),
+                rxBus = get()
+            )
+        }
 
-        factory { DataManagerPayloadDecrypt(get(), get()) as PayloadDecrypt }
+        factory {
+            PayloadVersionControllerImpl(
+                settingsApi = get()
+            )
+        }.bind(PayloadVersionController::class)
+
+        factory {
+            DataManagerPayloadDecrypt(
+                payloadDataManager = get(),
+                bchDataManager = get()
+            )
+        }.bind(PayloadDecrypt::class)
 
         factory { PromptingSeedAccessAdapter(PayloadDataManagerSeedAccessAdapter(get()), get()) }
             .bind(SeedAccessWithoutPrompt::class)
@@ -108,59 +127,14 @@ val coreModule = module {
             MetadataManager(
                 payloadDataManager = get(),
                 metadataInteractor = get(),
-                metadataDerivation = MetadataDerivation(BitcoinMainNetParams.get()),
+                metadataDerivation = MetadataDerivation(),
                 crashLogger = get()
             )
         }
 
-        scoped { MoshiMetadataRepositoryAdapter(get(), get()) as MetadataRepository }
-
-        factory { AddressResolver(get(), get(), get()) }
-
-        factory { AccountLookup(get(), get(), get()) }
-
-        factory {
-            TransactionExecutorViaDataManagers(
-                payloadDataManager = get(),
-                ethDataManager = get(),
-                paxAccount = get(paxAccount),
-                usdtAccount = get(usdtAccount),
-                sendDataManager = get(),
-                addressResolver = get(),
-                accountLookup = get(),
-                defaultAccountDataManager = get(),
-                ethereumAccountWrapper = get(),
-                xlmSender = get(),
-                coinSelectionRemoteConfig = get(),
-                analytics = get()
-            ) as TransactionExecutor
-        }
-
-        factory(regularFee) {
-            SelfFeeCalculatingTransactionExecutor(
-                get(),
-                get(),
-                get(),
-                FeeType.Regular
-            ) as TransactionExecutorWithoutFees
-        }
-
-        factory(priorityFee) {
-            SelfFeeCalculatingTransactionExecutor(
-                get(),
-                get(),
-                get(),
-                FeeType.Priority
-            ) as TransactionExecutorWithoutFees
-        }
-
-        factory(regularFee) {
-            get<TransactionExecutorWithoutFees>(regularFee) as MaximumSpendableCalculator
-        }
-
-        factory(priorityFee) {
-            get<TransactionExecutorWithoutFees>(priorityFee) as MaximumSpendableCalculator
-        }
+        scoped {
+            MoshiMetadataRepositoryAdapter(get(), get())
+        }.bind(MetadataRepository::class)
 
         scoped { EthDataStore() }
 
@@ -170,7 +144,12 @@ val coreModule = module {
 
         scoped { WalletOptionsState() }
 
-        scoped { SettingsDataManager(get(), get(), get(), get()) }
+        scoped { SettingsDataManager(
+            settingsService = get(),
+            settingsDataStore = get(),
+            currencyPrefs = get(),
+            rxBus = get()
+        ) }
 
         scoped { SettingsService(get()) }
 
@@ -178,14 +157,31 @@ val coreModule = module {
             SettingsDataStore(SettingsMemoryStore(), get<SettingsService>().getSettingsObservable())
         }
 
-        factory { WalletOptionsDataManager(get(), get(), get(), get(explorerUrl)) }
-            .bind(XlmTransactionTimeoutFetcher::class).bind(XlmHorizonUrlFetcher::class)
+        factory {
+            WalletOptionsDataManager(
+                authService = get(),
+                walletOptionsState = get(),
+                settingsDataManager = get(),
+                explorerUrl = getProperty("explorer-api")
+            )
+        }.bind(XlmTransactionTimeoutFetcher::class)
+            .bind(XlmHorizonUrlFetcher::class)
 
-        factory { ExchangeRateDataManager(get(), get()) }.bind(ExchangeRates::class)
+        factory {
+            ExchangeRateDataManager(
+                exchangeRateDataStore = get(),
+                rxBus = get()
+            )
+        }.bind(ExchangeRates::class)
 
-        scoped { ExchangeRateDataStore(get(), get()) }
+        scoped {
+            ExchangeRateDataStore(
+                exchangeRateService = get(),
+                prefs = get()
+            )
+        }
 
-        scoped { FeeDataManager(get(), get(), get()) }
+        scoped { FeeDataManager(get(), get()) }
 
         factory {
             AuthDataManager(
@@ -200,21 +196,17 @@ val coreModule = module {
 
         factory { LastTxUpdateDateOnSettingsService(get()) }.bind(LastTxUpdater::class)
 
-        factory { SendDataManager(get(), get(), get()) }
-
-        factory { SettingsPhoneVerificationQuery(get()).applyFlag(get(smsVerifFeatureFlag)) }
+        factory {
+            SendDataManager(
+                paymentService = get(),
+                lastTxUpdater = get(),
+                rxBus = get()
+            )
+        }
 
         factory { SettingsPhoneNumberUpdater(get()) }.bind(PhoneNumberUpdater::class)
 
         factory { SettingsEmailAndSyncUpdater(get(), get()) }.bind(EmailSyncUpdater::class)
-    }
-
-    single {
-        BlockExplorer(
-            get(explorerRetrofit),
-            get(apiRetrofit),
-            getProperty("api-code")
-        )
     }
 
     factory {
@@ -239,10 +231,12 @@ val coreModule = module {
 
     single {
         PrefsUtil(
+            ctx = get(),
             store = get(),
             backupStore = CloudBackupAgent.backupPrefs(ctx = get()),
             idGenerator = get(),
-            uuidGenerator = get()
+            uuidGenerator = get(),
+            crashLogger = get()
         )
     }.bind(PersistentPrefs::class)
         .bind(CurrencyPrefs::class)
@@ -251,10 +245,21 @@ val coreModule = module {
         .bind(SecurityPrefs::class)
         .bind(ThePitLinkingPrefs::class)
         .bind(SimpleBuyPrefs::class)
+        .bind(RatingPrefs::class)
         .bind(WalletStatus::class)
         .bind(EncryptedPrefs::class)
+        .bind(OfflineCachePrefs::class)
+        .bind(AuthPrefs::class)
+        .bind(BankLinkingPrefs::class)
+        .bind(InternalFeatureFlagPrefs::class)
+        .bind(SecureChannelPrefs::class)
 
-    factory { PaymentService(get(), get(), get()) }
+    factory {
+        PaymentService(
+            payment = get(),
+            dustService = get()
+        )
+    }
 
     factory {
         PreferenceManager.getDefaultSharedPreferences(
@@ -269,14 +274,13 @@ val coreModule = module {
             NullLogger
     }
 
-    factory { EthereumAccountWrapper() }
-
     single {
         AccessStateImpl(
             context = get(),
             prefs = get(),
             rxBus = get(),
-            crashLogger = get()
+            crashLogger = get(),
+            trust = get()
         )
     }.bind(AccessState::class)
 

@@ -11,6 +11,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
+import info.blockchain.wallet.payload.data.XPub;
+import info.blockchain.wallet.payload.data.XPubs;
+
 /**
  * <p>
  *     Generic coin account data that can be stored in blockchain.info KV store.
@@ -58,10 +61,6 @@ public class GenericMetadataAccount implements JsonSerializableAccount {
         this.archived = archived;
     }
 
-    public String getXpub() {
-        return xpub;
-    }
-
     public void setXpub(String xpub) {
         this.xpub = xpub;
     }
@@ -75,5 +74,9 @@ public class GenericMetadataAccount implements JsonSerializableAccount {
 
     public static GenericMetadataAccount fromJson(String json) throws IOException {
         return new ObjectMapper().readValue(json, GenericMetadataAccount.class);
+    }
+
+    public XPubs xpubs() {
+        return new XPubs(new XPub(xpub, XPub.Format.LEGACY));
     }
 }

@@ -6,23 +6,23 @@ import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.coincore.SingleAccountList
 
-fun filterTokenAccounts(
+fun SingleAccountList.makeAccountGroup(
     asset: CryptoCurrency,
     labels: DefaultLabels,
-    accountList: List<SingleAccount>,
     assetFilter: AssetFilter
 ): AccountGroup? =
-        when (assetFilter) {
-            AssetFilter.All ->
-                buildAssetMasterGroup(asset, labels, accountList)
-            AssetFilter.NonCustodial ->
-                buildNonCustodialGroup(asset, labels, accountList)
-            AssetFilter.Custodial ->
-                buildCustodialGroup(asset, labels, accountList)
-            AssetFilter.Interest ->
-                buildInterestGroup(asset, labels, accountList)
-        }.exhaustive
+    when (assetFilter) {
+        AssetFilter.All ->
+            buildAssetMasterGroup(asset, labels, this)
+        AssetFilter.NonCustodial ->
+            buildNonCustodialGroup(asset, labels, this)
+        AssetFilter.Custodial ->
+            buildCustodialGroup(asset, labels, this)
+        AssetFilter.Interest ->
+            buildInterestGroup(asset, labels, this)
+    }.exhaustive
 
 private fun buildInterestGroup(
     asset: CryptoCurrency,
@@ -58,7 +58,7 @@ private fun buildNonCustodialGroup(
     accountList: List<SingleAccount>
 ): AccountGroup? {
     val grpAccounts = accountList.filterIsInstance<CryptoNonCustodialAccount>()
-    return if (accountList.isNotEmpty())
+    return if (grpAccounts.isNotEmpty())
         CryptoAccountNonCustodialGroup(
             asset, labels.getDefaultCustodialWalletLabel(asset), grpAccounts
         )

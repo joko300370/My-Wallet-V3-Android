@@ -1,126 +1,106 @@
 package info.blockchain.wallet
 
-import info.blockchain.api.blockexplorer.BlockExplorer
-import info.blockchain.api.data.UnspentOutput
+import info.blockchain.api.BitcoinApi
+import info.blockchain.wallet.bch.BchMainNetParams
 import info.blockchain.wallet.crypto.DeterministicAccount
 import info.blockchain.wallet.crypto.DeterministicWallet
 import info.blockchain.wallet.exceptions.HDWalletException
+import info.blockchain.wallet.keys.SigningKey
+import info.blockchain.wallet.keys.SigningKeyImpl
 import info.blockchain.wallet.multiaddress.MultiAddressFactoryBch
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import info.blockchain.wallet.payload.BalanceManagerBch
-import info.blockchain.wallet.payload.data.LegacyAddress
+import info.blockchain.wallet.payload.data.ImportedAddress
+import info.blockchain.wallet.payload.data.XPubs
+import info.blockchain.wallet.payload.model.Utxo
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
-import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.NetworkParameters
-import org.bitcoinj.params.BitcoinCashTestNet3Params
-import org.slf4j.LoggerFactory
 import java.math.BigInteger
 import java.util.ArrayList
 
-@Suppress("unused")
 open class BitcoinCashWallet : DeterministicWallet {
 
     private lateinit var balanceManager: BalanceManagerBch
-    private lateinit var multiAddressFactory: MultiAddressFactoryBch
+    private lateinit var multiAddressFactoryBch: MultiAddressFactoryBch
 
     private constructor(
-        blockExplorer: BlockExplorer,
+        bitcoinApi: BitcoinApi,
         params: NetworkParameters,
         coinPath: String,
         passphrase: String
     ) : super(params, coinPath, MNEMONIC_LENGTH, passphrase) {
-        setupApi(blockExplorer)
+        setupApi(bitcoinApi)
     }
 
     private constructor(
-        blockExplorer: BlockExplorer,
+        bitcoinApi: BitcoinApi,
         params: NetworkParameters,
         coinPath: String,
         entropyHex: String,
         passphrase: String
     ) : super(params, coinPath, entropyHex, passphrase) {
-        setupApi(blockExplorer)
+        setupApi(bitcoinApi)
     }
 
     private constructor(
-        blockExplorer: BlockExplorer,
+        bitcoinApi: BitcoinApi,
         params: NetworkParameters,
         coinPath: String,
         mnemonic: List<String>,
         passphrase: String
     ) : super(params, coinPath, mnemonic, passphrase) {
-        setupApi(blockExplorer)
+        setupApi(bitcoinApi)
     }
 
-    private constructor(blockExplorer: BlockExplorer, params: NetworkParameters) : super(params) {
-        setupApi(blockExplorer)
+    private constructor(bitcoinApi: BitcoinApi, params: NetworkParameters) : super(params) {
+        setupApi(bitcoinApi)
     }
 
-    private fun setupApi(blockExplorer: BlockExplorer) {
-        this.balanceManager = BalanceManagerBch(blockExplorer)
-        this.multiAddressFactory = MultiAddressFactoryBch(blockExplorer)
+    private fun setupApi(bitcoinApi: BitcoinApi) {
+        this.balanceManager = BalanceManagerBch(bitcoinApi)
+        this.multiAddressFactoryBch = MultiAddressFactoryBch(bitcoinApi)
     }
 
     /**
      * Updates the state of the [BalanceManagerBch], which ingests the balances for each address or
      * xPub.
      *
-     * @param legacyAddressList A list of [LegacyAddress] addresses
-     * @param allAccountsAndAddresses A list of both xPubs from HD accounts and [LegacyAddress]
+     * @param importedAddressList A list of [ImportedAddress] addresses
+     * @param xpubs A list of both xPubs from HD accounts and [ImportedAddress]
      * addresses
      */
     fun updateAllBalances(
-        allAccountsAndAddresses: Set<String>,
-        legacyAddressList: Set<String>
-    ): Completable =
-        if (isTestnet()) {
-            // TODO(bch testnet explorer coming soon)
-            Completable.complete()
-        } else {
-            Completable.fromCallable {
-                balanceManager.updateAllBalances(allAccountsAndAddresses, legacyAddressList)
-            }.subscribeOn(Schedulers.io())
-        }
+        xpubs: List<XPubs>,
+        importedAddressList: List<String>
+    ): Completable = Completable.fromCallable {
+        balanceManager.updateAllBalances(
+            xpubs,
+            importedAddressList
+        )
+    }.subscribeOn(Schedulers.io())
 
     /**
-     * Returns the balance of all imported addresses, excluding those belonging to
-     * archived addresses.
-     */
-    fun getImportedAddressBalance(): BigInteger =
-        balanceManager.importedAddressesBalance
-
-    /**
-     *
-     * @param legacyAddressList A list of all xpubs and legacy addresses
-     * @param watchOnly A list of watch-only legacy addresses
      * @param activeXpubs A list of active xPubs addresses.
-     * @param context Xpub or legacy address. Used to fetch transaction only relating to this address.
+     * @param context Xpub address. Used to fetch transaction only relating to this address.
      * @param limit Maximum amount of transactions fetched
      * @param offset Page offset
-     * @return All wallet transactions, all legacy transactions, or transaction relating to a single context/address
+     * @return All wallet transactions, all transactions, or transaction relating to a single context/address
      */
     fun getTransactions(
-        legacyAddressList: List<String>?,
-        activeXpubs: List<String>,
-        context: String?,
+        activeXpubs: List<XPubs>,
+        context: List<String>?,
         limit: Int,
         offset: Int
-    ): MutableList<TransactionSummary> =
-
-        if (isTestnet()) {
-            // TODO(bch testnet explorer coming soon)
-            mutableListOf()
-        } else {
-            multiAddressFactory.getAccountTransactions(
-                activeXpubs,
-                legacyAddressList,
-                context,
-                limit,
-                offset,
-                BCH_FORK_HEIGHT
-            ).toMutableList()
-        }
+    ): List<TransactionSummary> =
+        multiAddressFactoryBch.getAccountTransactions(
+            activeXpubs,
+            null,
+            context,
+            limit,
+            offset,
+            BCH_FORK_HEIGHT
+        )
 
     /**
      * Generates a Base58 Bitcoin Cash receive address for an account at a given position. The
@@ -131,7 +111,7 @@ open class BitcoinCashWallet : DeterministicWallet {
      */
     fun getNextReceiveAddress(accountIndex: Int): String {
         val xpub = getAccountPubB58(accountIndex)
-        val addressIndex = multiAddressFactory.getNextReceiveAddressIndex(xpub, listOf())
+        val addressIndex = multiAddressFactoryBch.getNextReceiveAddressIndex(xpub, listOf())
         return getReceiveBase58AddressAt(accountIndex, addressIndex)
     }
 
@@ -144,7 +124,7 @@ open class BitcoinCashWallet : DeterministicWallet {
      */
     fun getNextReceiveCashAddress(accountIndex: Int): String {
         val xpub = getAccountPubB58(accountIndex)
-        val addressIndex = multiAddressFactory.getNextReceiveAddressIndex(xpub, listOf())
+        val addressIndex = multiAddressFactoryBch.getNextReceiveAddressIndex(xpub, listOf())
         return getReceiveCashAddressAt(accountIndex, addressIndex)
     }
 
@@ -157,7 +137,7 @@ open class BitcoinCashWallet : DeterministicWallet {
      */
     fun getNextChangeAddress(accountIndex: Int): String {
         val xpub = getAccountPubB58(accountIndex)
-        val addressIndex = multiAddressFactory.getNextChangeAddressIndex(xpub)
+        val addressIndex = multiAddressFactoryBch.getNextChangeAddressIndex(xpub)
         return getChangeBase58AddressAt(accountIndex, addressIndex)
     }
 
@@ -170,7 +150,7 @@ open class BitcoinCashWallet : DeterministicWallet {
      */
     fun getNextChangeCashAddress(accountIndex: Int): String {
         val xpub = getAccountPubB58(accountIndex)
-        val addressIndex = multiAddressFactory.getNextChangeAddressIndex(xpub)
+        val addressIndex = multiAddressFactoryBch.getNextChangeAddressIndex(xpub)
         return getChangeCashAddressAt(accountIndex, addressIndex)
     }
 
@@ -186,7 +166,7 @@ open class BitcoinCashWallet : DeterministicWallet {
      */
     fun getReceiveAddressAtPosition(accountIndex: Int, position: Int): String {
         val xpub = getAccountPubB58(accountIndex)
-        val addressIndex = multiAddressFactory.getNextReceiveAddressIndex(xpub, listOf())
+        val addressIndex = multiAddressFactoryBch.getNextReceiveAddressIndex(xpub, listOf())
         return getReceiveBase58AddressAt(accountIndex, addressIndex + position)
     }
 
@@ -202,7 +182,7 @@ open class BitcoinCashWallet : DeterministicWallet {
      */
     fun getChangeAddressAtPosition(accountIndex: Int, position: Int): String {
         val xpub = getAccountPubB58(accountIndex)
-        val addressIndex = multiAddressFactory.getNextChangeAddressIndex(xpub)
+        val addressIndex = multiAddressFactoryBch.getNextChangeAddressIndex(xpub)
         return getChangeBase58AddressAt(accountIndex, addressIndex + position)
     }
 
@@ -229,11 +209,11 @@ open class BitcoinCashWallet : DeterministicWallet {
     }
 
     fun incrementNextReceiveAddress(xpub: String) {
-        multiAddressFactory.incrementNextReceiveAddress(xpub, listOf())
+        multiAddressFactoryBch.incrementNextReceiveAddress(xpub, listOf())
     }
 
     fun incrementNextChangeAddress(xpub: String) {
-        multiAddressFactory.incrementNextChangeAddress(xpub)
+        multiAddressFactoryBch.incrementNextChangeAddress(xpub)
     }
 
     /**
@@ -242,7 +222,7 @@ open class BitcoinCashWallet : DeterministicWallet {
      * @return
      */
     fun isOwnAddress(address: String) =
-        multiAddressFactory.isOwnHDAddress(address)
+        multiAddressFactoryBch.isOwnHDAddress(address)
 
     /**
      * Returns an xPub from an address if the address belongs to this wallet.
@@ -250,7 +230,7 @@ open class BitcoinCashWallet : DeterministicWallet {
      * @return An xPub as a String
      */
     fun getXpubFromAddress(address: String): String? {
-        return multiAddressFactory.getXpubFromAddress(address)
+        return multiAddressFactoryBch.getXpubFromAddress(address)
     }
 
     /**
@@ -266,41 +246,33 @@ open class BitcoinCashWallet : DeterministicWallet {
         balanceManager.subtractAmountFromAddressBalance(address, amount)
     }
 
-    @Throws(HDWalletException::class)
     fun getHDKeysForSigning(
         account: DeterministicAccount,
-        unspentOutputs: List<UnspentOutput>
-    ): List<ECKey> {
-
+        unspentOutputs: List<Utxo>
+    ): List<SigningKey> {
         if (!account.node.hasPrivKey())
             throw HDWalletException("Wallet private key unavailable. First decrypt with second password.")
         else {
-            val keys = ArrayList<ECKey>()
+            val keys = ArrayList<SigningKey>()
 
             for (unspentOutput in unspentOutputs) {
-                if (unspentOutput.xpub != null) {
-                    val split =
-                        unspentOutput.xpub.path.split("/".toRegex()).dropLastWhile { it.isEmpty() }
+                unspentOutput.xpub?.derivationPath?.let { path ->
+                    val split = path.split("/".toRegex()).dropLastWhile { it.isEmpty() }
                             .toTypedArray()
                     val chain = Integer.parseInt(split[1])
                     val addressIndex = Integer.parseInt(split[2])
                     val address = account.chains[chain]!!.getAddressAt(addressIndex)
-                    keys.add(address.ecKey)
+                    keys.add(SigningKeyImpl(address.ecKey))
                 }
             }
-
             return keys
         }
     }
 
-    private fun isTestnet() = params == BitcoinCashTestNet3Params.get()
-
     companion object {
-
         /**
          * Coin parameters
          */
-        private val log = LoggerFactory.getLogger(BitcoinCashWallet::class.java)
         const val BITCOIN_COIN_PATH = "M/44H/0H"
         const val BITCOINCASH_COIN_PATH = "M/44H/145H"
         const val MNEMONIC_LENGTH = 12
@@ -313,51 +285,51 @@ open class BitcoinCashWallet : DeterministicWallet {
 
         @Synchronized
         fun create(
-            blockExplorer: BlockExplorer,
+            bitcoinApi: BitcoinApi,
             params: NetworkParameters,
             coinPath: String
         ): BitcoinCashWallet {
-            return BitcoinCashWallet(blockExplorer, params, coinPath, "")
+            return BitcoinCashWallet(bitcoinApi, params, coinPath, "")
         }
 
         @Synchronized
         fun create(
-            blockExplorer: BlockExplorer,
+            bitcoinApi: BitcoinApi,
             params: NetworkParameters,
             coinPath: String,
             passphrase: String
         ): BitcoinCashWallet {
-            return BitcoinCashWallet(blockExplorer, params, coinPath, passphrase)
+            return BitcoinCashWallet(bitcoinApi, params, coinPath, passphrase)
         }
 
         @Synchronized
         fun restore(
-            blockExplorer: BlockExplorer,
+            bitcoinApi: BitcoinApi,
             params: NetworkParameters,
             coinPath: String,
             entropyHex: String,
             passphrase: String
         ): BitcoinCashWallet {
-            return BitcoinCashWallet(blockExplorer, params, coinPath, entropyHex, passphrase)
+            return BitcoinCashWallet(bitcoinApi, params, coinPath, entropyHex, passphrase)
         }
 
         @Synchronized
         fun restore(
-            blockExplorer: BlockExplorer,
-            params: NetworkParameters,
+            bitcoinApi: BitcoinApi,
             coinPath: String,
             mnemonic: List<String>,
             passphrase: String
         ): BitcoinCashWallet {
-            return BitcoinCashWallet(blockExplorer, params, coinPath, mnemonic, passphrase)
+            val params = BchMainNetParams.get()
+            return BitcoinCashWallet(bitcoinApi, params, coinPath, mnemonic, passphrase)
         }
 
         @Synchronized
         fun createWatchOnly(
-            blockExplorer: BlockExplorer,
+            bitcoinApi: BitcoinApi,
             params: NetworkParameters
         ): BitcoinCashWallet {
-            return BitcoinCashWallet(blockExplorer, params)
+            return BitcoinCashWallet(bitcoinApi, params)
         }
     }
 }

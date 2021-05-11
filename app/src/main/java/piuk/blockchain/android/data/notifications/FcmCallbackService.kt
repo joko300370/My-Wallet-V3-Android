@@ -4,17 +4,21 @@ import android.app.LauncherActivity
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
-import com.blockchain.annotations.BurnCandidate
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.NotificationsUtil
-import com.blockchain.notifications.R
+import piuk.blockchain.android.R
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.models.NotificationPayload
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import kotlinx.serialization.encodeToString
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.ui.home.MainActivity
+import piuk.blockchain.android.ui.auth.newlogin.AuthNewLoginSheet
+import piuk.blockchain.android.ui.auth.newlogin.SecureChannelManager
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcoreui.ApplicationLifeCycle
@@ -25,8 +29,10 @@ class FcmCallbackService : FirebaseMessagingService() {
     private val notificationManager: NotificationManager by inject()
     private val notificationTokenManager: NotificationTokenManager by scopedInject()
     private val rxBus: RxBus by inject()
-    private val accessState: AccessState by inject()
+    private val accessState: AccessState by scopedInject()
     private val analytics: Analytics by inject()
+    private val secureChannelManager: SecureChannelManager by scopedInject()
+    private val internalFlags: InternalFeatureFlagApi by inject()
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         // Check if message contains a data payload.
@@ -36,7 +42,10 @@ class FcmCallbackService : FirebaseMessagingService() {
             // Parse data, emit events
             val payload = NotificationPayload(remoteMessage.data)
             rxBus.emitEvent(NotificationPayload::class.java, payload)
-            sendNotification(payload)
+            sendNotification(
+                payload = payload,
+                foreground = ApplicationLifeCycle.getInstance().isForeground && accessState.isLoggedIn
+            )
         } else {
             // If there is no data field, provide this default behaviour
             NotificationsUtil(applicationContext, notificationManager, analytics).triggerNotification(
@@ -54,68 +63,90 @@ class FcmCallbackService : FirebaseMessagingService() {
 
     override fun onNewToken(newToken: String) {
         super.onNewToken(newToken)
-        newToken?.let {
-            notificationTokenManager.storeAndUpdateToken(it)
+        notificationTokenManager.storeAndUpdateToken(newToken)
+    }
+
+    /**
+     * Redirects the user to the [LauncherActivity] if [foreground] is set to true, otherwise to the [MainActivity]
+     * unless it is a new device login, in which case [MainActivity] is going to load the
+     * [piuk.blockchain.android.ui.auth.newlogin.AuthNewLoginSheet] .
+     */
+    private fun sendNotification(payload: NotificationPayload, foreground: Boolean) {
+        val notifyIntent = createIntentForNotification(payload, foreground)
+
+        notifyIntent?.let {
+            val intent = PendingIntent.getActivity(
+                applicationContext,
+                0,
+                notifyIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
+            val notificationId = if (foreground) ID_FOREGROUND_NOTIFICATION else ID_BACKGROUND_NOTIFICATION
+
+            if (isSecureChannelMessage(payload)) {
+                if (foreground) {
+                    startActivity(notifyIntent)
+                } else {
+                    NotificationsUtil(applicationContext, notificationManager, analytics).triggerNotification(
+                        getString(R.string.secure_channel_notif_title),
+                        getString(R.string.secure_channel_notif_title),
+                        getString(R.string.secure_channel_notif_summary),
+                        R.mipmap.ic_launcher,
+                        intent,
+                        notificationId
+                    )
+                }
+            } else {
+                triggerHeadsUpNotification(
+                    payload,
+                    intent,
+                    notificationId
+                )
+            }
         }
     }
 
-    private fun sendNotification(payload: NotificationPayload) {
-        if (ApplicationLifeCycle.getInstance().isForeground &&
-            accessState.isLoggedIn
-        ) {
-            sendForegroundNotification(payload)
+    private fun createIntentForNotification(payload: NotificationPayload, foreground: Boolean): Intent? {
+        return when {
+            isSecureChannelMessage(payload) -> createSecureChannelIntent(payload.payload, foreground)
+            foreground -> Intent(applicationContext, MainActivity::class.java).apply {
+                putExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION, true)
+            }
+            else -> Intent(applicationContext, LauncherActivity::class.java).apply {
+                putExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION, true)
+            }
+        }
+    }
+
+    private fun isSecureChannelMessage(payload: NotificationPayload) =
+        payload.type == NotificationPayload.NotificationType.SECURE_CHANNEL_MESSAGE
+
+    private fun createSecureChannelIntent(payload: MutableMap<String, String>, foreground: Boolean): Intent? {
+        if (internalFlags.isFeatureEnabled(GatedFeature.MODERN_AUTH_PAIRING)) {
+            val pubKeyHash = payload[NotificationPayload.PUB_KEY_HASH]
+                ?: return null
+            val messageRawEncrypted = payload[NotificationPayload.DATA_MESSAGE]
+                ?: return null
+
+            val message = secureChannelManager.decryptMessage(pubKeyHash, messageRawEncrypted)
+                ?: return null
+
+            return Intent(applicationContext, MainActivity::class.java).apply {
+                putExtra(MainActivity.LAUNCH_AUTH_FLOW, true)
+                putExtra(AuthNewLoginSheet.PUB_KEY_HASH, pubKeyHash)
+                putExtra(AuthNewLoginSheet.MESSAGE, SecureChannelManager.jsonBuilder.encodeToString(message))
+
+                putExtra(AuthNewLoginSheet.ORIGIN_IP, payload[NotificationPayload.ORIGIN_IP])
+                putExtra(AuthNewLoginSheet.ORIGIN_LOCATION, payload[NotificationPayload.ORIGIN_COUNTRY])
+                putExtra(AuthNewLoginSheet.ORIGIN_BROWSER, payload[NotificationPayload.ORIGIN_BROWSER])
+                putExtra(AuthNewLoginSheet.FORCE_PIN, !foreground)
+                if (foreground) {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+            }
         } else {
-            sendBackgroundNotification(payload)
+            return null
         }
-    }
-
-    /**
-     * Redirects the user to the [LauncherActivity] which will then handle the routing
-     * appropriately - ie if accepted Contact, show
-     * [piuk.blockchain.android.ui.contacts.list.ContactsListActivity], otherwise show [MainActivity].
-     */
-    private fun sendBackgroundNotification(payload: NotificationPayload) {
-        val notifyIntent = Intent(applicationContext, LauncherActivity::class.java)
-        notifyIntent.putExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION, true)
-
-        if (payload.type != null &&
-            payload.type == NotificationPayload.NotificationType.CONTACT_REQUEST
-        ) {
-            notifyIntent.putExtra(EXTRA_CONTACT_ACCEPTED, true)
-        }
-
-        val intent = PendingIntent.getActivity(
-            applicationContext,
-            0,
-            notifyIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-        triggerHeadsUpNotification(
-            payload, intent,
-            ID_BACKGROUND_NOTIFICATION
-        )
-    }
-
-    /**
-     * Redirects the user to the [MainActivity] which will then launch the balance fragment by
-     * default.
-     */
-    private fun sendForegroundNotification(payload: NotificationPayload) {
-        val notifyIntent = Intent(applicationContext, MainActivity::class.java)
-        notifyIntent.putExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION, true)
-
-        val intent = PendingIntent.getActivity(
-            applicationContext,
-            0,
-            notifyIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-        triggerHeadsUpNotification(
-            payload, intent,
-            ID_FOREGROUND_NOTIFICATION
-        )
     }
 
     /**
@@ -145,8 +176,6 @@ class FcmCallbackService : FirebaseMessagingService() {
 
     companion object {
 
-        @BurnCandidate("Contacts are gone. Remove this")
-        const val EXTRA_CONTACT_ACCEPTED = "contact_accepted"
         const val ID_BACKGROUND_NOTIFICATION = 1337
         const val ID_FOREGROUND_NOTIFICATION = 1338
         const val ID_BACKGROUND_NOTIFICATION_2FA = 1339

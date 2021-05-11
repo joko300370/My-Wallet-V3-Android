@@ -1,11 +1,13 @@
 package piuk.blockchain.android.ui.dashboard
 
+import com.blockchain.nabu.models.data.LinkBankTransfer
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
@@ -26,9 +28,39 @@ class FiatBalanceUpdate(
     }
 }
 
+class UpdateDashboardCurrencies(
+    private val assetList: List<CryptoCurrency>
+) : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState {
+        return oldState.copy(
+            assets = AssetMap(
+                assetList.associateBy(
+                    keySelector = { it },
+                    valueTransform = { CryptoAssetState(it) }
+                )
+            )
+        )
+    }
+}
+
+object GetAvailableAssets : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState {
+        return oldState.copy(
+            assets = AssetMap(mapOf())
+        )
+    }
+}
+
+object ResetDashboardNavigation : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState =
+        oldState.copy(
+            dashboardNavigationAction = null
+        )
+}
+
 object RefreshAllIntent : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState {
-        return oldState.copy(assets = oldState.assets.reset())
+        return oldState.copy(assets = oldState.assets.reset(), fiatAssets = FiatAssetState())
     }
 }
 
@@ -160,28 +192,38 @@ class ShowFiatAssetDetails(
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
-            showDashboardSheet = DashboardSheet.FIAT_FUNDS_DETAILS,
+            dashboardNavigationAction = DashboardNavigationAction.FiatFundsDetails,
             selectedFiatAccount = fiatAccount
         )
 }
 
-class ShowBankLinkingSheet(
+data class ShowBankLinkingSheet(
     private val fiatAccount: FiatAccount? = null
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
-            showDashboardSheet = DashboardSheet.LINK_OR_DEPOSIT,
+            dashboardNavigationAction = DashboardNavigationAction.LinkOrDeposit,
             selectedFiatAccount = fiatAccount
         )
 }
 
+data class ShowLinkablePaymentMethodsSheet(
+    private val paymentMethodsForAction: LinkablePaymentMethodsForAction
+) : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState =
+        oldState.copy(
+            dashboardNavigationAction = DashboardNavigationAction.PaymentMethods,
+            linkablePaymentMethodsForAction = paymentMethodsForAction
+        )
+}
+
 class ShowDashboardSheet(
-    private val dashboardSheet: DashboardSheet
+    private val dashboardNavigationAction: DashboardNavigationAction
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         // Custody sheet isn't displayed via this intent, so filter it out
         oldState.copy(
-            showDashboardSheet = dashboardSheet,
+            dashboardNavigationAction = dashboardNavigationAction,
             activeFlow = null,
             selectedFiatAccount = null
         )
@@ -196,7 +238,7 @@ class CancelSimpleBuyOrder(
 object ClearBottomSheet : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
-            showDashboardSheet = null,
+            dashboardNavigationAction = null,
             activeFlow = null,
             selectedAsset = null
         )
@@ -215,7 +257,7 @@ class ShowBackupSheet(
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
-            showDashboardSheet = DashboardSheet.BACKUP_BEFORE_SEND,
+            dashboardNavigationAction = DashboardNavigationAction.BackUpBeforeSend,
             backupSheetDetails = BackupDetails(account, action)
         )
 }
@@ -237,20 +279,31 @@ class LaunchSendFlow(
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
-            showDashboardSheet = null,
+            dashboardNavigationAction = null,
             activeFlow = null,
             backupSheetDetails = null
         )
 }
 
-class LaunchDepositFlow(
-    val toAccount: SingleAccount,
-    val fromAccount: SingleAccount,
-    val action: AssetAction
+class LaunchInterestDepositFlow(
+    val toAccount: InterestAccount
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
-            showDashboardSheet = null,
+            dashboardNavigationAction = null,
+            activeFlow = null,
+            backupSheetDetails = null
+        )
+}
+
+class LaunchBankTransferFlow(
+    val account: SingleAccount,
+    val action: AssetAction,
+    val shouldLaunchBankLinkTransfer: Boolean
+) : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState =
+        oldState.copy(
+            dashboardNavigationAction = null,
             activeFlow = null,
             backupSheetDetails = null
         )
@@ -261,7 +314,7 @@ class LaunchAssetDetailsFlow(
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
-            showDashboardSheet = null,
+            dashboardNavigationAction = null,
             activeFlow = null,
             backupSheetDetails = null
         )
@@ -272,8 +325,34 @@ class UpdateLaunchDialogFlow(
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
-            showDashboardSheet = null,
+            dashboardNavigationAction = null,
             activeFlow = flow,
+            backupSheetDetails = null
+        )
+}
+
+object LongCallStarted : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState =
+        oldState.copy(
+            hasLongCallInProgress = true
+        )
+}
+
+object LongCallEnded : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState =
+        oldState.copy(
+            hasLongCallInProgress = false
+        )
+}
+
+data class LaunchBankLinkFlow(
+    val linkBankTransfer: LinkBankTransfer,
+    val assetAction: AssetAction
+) : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState =
+        oldState.copy(
+            dashboardNavigationAction = DashboardNavigationAction.LinkBankWithPartner(linkBankTransfer, assetAction),
+            activeFlow = null,
             backupSheetDetails = null
         )
 }

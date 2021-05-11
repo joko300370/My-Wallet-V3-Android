@@ -1,16 +1,19 @@
 package piuk.blockchain.android.coincore.eth
 
+import com.blockchain.preferences.WalletStatus
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import info.blockchain.wallet.ethereum.EthereumAccount
+import io.reactivex.Completable
 import io.reactivex.Single
-import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.ReceiveAddress
-import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.TxEngine
+import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
@@ -19,27 +22,19 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 internal class EthCryptoWalletAccount(
     payloadManager: PayloadDataManager,
-    override val label: String,
-    internal val address: String,
+    private val jsonAccount: EthereumAccount,
     private val ethDataManager: EthDataManager,
     private val fees: FeeDataManager,
-    override val exchangeRates: ExchangeRateDataManager
-) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ETHER) {
+    private val walletPreferences: WalletStatus,
+    override val exchangeRates: ExchangeRateDataManager,
+    private val custodialWalletManager: CustodialWalletManager,
+    identity: UserIdentity
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.ETHER, custodialWalletManager, identity) {
 
-    constructor(
-        payloadManager: PayloadDataManager,
-        ethDataManager: EthDataManager,
-        fees: FeeDataManager,
-        jsonAccount: EthereumAccount,
-        exchangeRates: ExchangeRateDataManager
-    ) : this(
-        payloadManager,
-        jsonAccount.label,
-        jsonAccount.address,
-        ethDataManager,
-        fees,
-        exchangeRates
-    )
+    internal val address: String
+        get() = jsonAccount.address
+    override val label: String
+        get() = jsonAccount.label
 
     private val hasFunds = AtomicBoolean(false)
 
@@ -51,9 +46,9 @@ internal class EthCryptoWalletAccount(
             .singleOrError()
             .map { CryptoValue(CryptoCurrency.ETHER, it.getTotalBalance()) }
             .doOnSuccess {
-                hasFunds.set(it > CryptoValue.ZeroEth)
+                hasFunds.set(it > CryptoValue.zero(CryptoCurrency.ETHER))
             }
-            .map { it as Money }
+            .map { it }
 
     override val actionableBalance: Single<Money>
         get() = accountBalance
@@ -66,6 +61,14 @@ internal class EthCryptoWalletAccount(
             )
         )
 
+    override fun updateLabel(newLabel: String): Completable {
+        require(newLabel.isNotEmpty())
+        val revertLabel = label
+        jsonAccount.label = newLabel
+        return ethDataManager.updateAccountLabel(newLabel)
+            .doOnError { jsonAccount.label = revertLabel }
+    }
+
     override val activity: Single<ActivitySummaryList>
         get() = ethDataManager.getLatestBlockNumber()
             .flatMap { latestBlock ->
@@ -73,7 +76,6 @@ internal class EthCryptoWalletAccount(
                     .map { list ->
                         list.map { transaction ->
                             val isEr20FeeTransaction = isErc20FeeTransaction(transaction.to)
-
                             EthActivitySummaryItem(
                                 ethDataManager,
                                 transaction,
@@ -81,8 +83,11 @@ internal class EthCryptoWalletAccount(
                                 latestBlock.number.toLong(),
                                 exchangeRates,
                                 account = this
-                            ) as ActivitySummaryItem
+                            )
                         }
+                    }
+                    .flatMap {
+                        appendTradeActivity(custodialWalletManager, asset, it)
                     }
             }
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
@@ -109,6 +114,7 @@ internal class EthCryptoWalletAccount(
         EthOnChainTxEngine(
             ethDataManager = ethDataManager,
             feeManager = fees,
-            requireSecondPassword = ethDataManager.requireSecondPassword
+            requireSecondPassword = ethDataManager.requireSecondPassword,
+            walletPreferences = walletPreferences
         )
 }

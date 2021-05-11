@@ -13,13 +13,13 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.NullCryptoAddress
-import piuk.blockchain.android.data.datamanagers.QrCodeDataManager
+import piuk.blockchain.android.scan.QrCodeDataManager
 import piuk.blockchain.android.ui.base.MvpPresenter
 import piuk.blockchain.android.ui.base.MvpView
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 import piuk.blockchain.androidcore.utils.PersistentPrefs
-import piuk.blockchain.androidcoreui.ui.customviews.ToastCustom
 import timber.log.Timber
 
 interface ReceiveView : MvpView {
@@ -104,7 +104,7 @@ class ReceivePresenter(
         compositeDisposable += qrCodeDataManager.generateQrCode(uri, DIMENSION_QR_CODE)
             .doOnSubscribe { view?.showQrLoading() }
             .subscribeBy(
-                onNext = { view?.showQrCode(it) },
+                onSuccess = { view?.showQrCode(it) },
                 onError = { view?.showQrCode(null) }
             )
     }

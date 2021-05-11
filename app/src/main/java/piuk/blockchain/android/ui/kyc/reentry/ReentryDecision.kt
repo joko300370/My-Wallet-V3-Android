@@ -1,10 +1,10 @@
 package piuk.blockchain.android.ui.kyc.reentry
 
 import androidx.navigation.NavDirections
-import com.blockchain.swap.nabu.datamanagers.NabuDataManager
-import com.blockchain.swap.nabu.models.nabu.NabuUser
+import com.blockchain.nabu.datamanagers.NabuDataManager
+import com.blockchain.nabu.models.responses.nabu.NabuUser
 import piuk.blockchain.android.ui.kyc.navhost.toProfileModel
-import com.blockchain.swap.nabu.NabuToken
+import com.blockchain.nabu.NabuToken
 import io.reactivex.Single
 import piuk.blockchain.android.KycNavXmlDirections
 
@@ -41,9 +41,11 @@ class ReentryDecisionKycNavigator(
 
     override fun userAndReentryPointToDirections(user: NabuUser, reentryPoint: ReentryPoint) =
         when (reentryPoint) {
-            ReentryPoint.EmailEntry -> KycNavXmlDirections.actionStartEmailVerification()
+            ReentryPoint.EmailEntry -> KycNavXmlDirections.actionStartEmailVerification(true)
             ReentryPoint.CountrySelection -> KycNavXmlDirections.actionStartCountrySelection()
-            ReentryPoint.Profile -> KycNavXmlDirections.actionStartProfile(user.requireCountryCode())
+            ReentryPoint.Profile -> KycNavXmlDirections.actionStartProfile(
+                user.requireCountryCode(), user.address?.state ?: "", user.address?.state ?: ""
+            )
             ReentryPoint.Address -> KycNavXmlDirections.actionStartAddressEntry(user.toProfileModel())
             ReentryPoint.MobileEntry -> KycNavXmlDirections.actionStartMobileVerification(user.requireCountryCode())
             ReentryPoint.Veriff -> {

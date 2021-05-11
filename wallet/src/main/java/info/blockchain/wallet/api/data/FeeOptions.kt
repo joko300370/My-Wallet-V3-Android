@@ -91,29 +91,27 @@ class FeeOptions constructor(
             )
         }
 
-        private fun defaultForUsdt(): FeeOptions {
+        private fun defaultForDot(): FeeOptions {
             return FeeOptions(
                 regularFee = 4, // TODO what is the right amount here?
                 priorityFee = 4
             )
         }
 
-        private fun defaultForErc20(): FeeOptions = defaultForEth()
-
         /**
          * @param currency the currency
          * @return the default FeeOptions given a currency
          */
         fun defaultFee(currency: CryptoCurrency): FeeOptions {
-            return when (currency) {
-                CryptoCurrency.BTC -> defaultForBtc()
-                CryptoCurrency.ETHER -> defaultForEth()
-                CryptoCurrency.BCH -> defaultForBch()
-                CryptoCurrency.XLM -> defaultForXlm()
-                CryptoCurrency.PAX -> defaultForErc20()
-                CryptoCurrency.STX -> TODO("STUB: STX NOT IMPLEMENTED")
-                CryptoCurrency.ALGO -> defaultForAlg()
-                CryptoCurrency.USDT -> defaultForUsdt()
+            return when {
+                currency == CryptoCurrency.BTC -> defaultForBtc()
+                currency == CryptoCurrency.ETHER ||
+                currency.hasFeature(CryptoCurrency.IS_ERC20) -> defaultForEth()
+                currency == CryptoCurrency.BCH -> defaultForBch()
+                currency == CryptoCurrency.XLM -> defaultForXlm()
+                currency == CryptoCurrency.ALGO -> defaultForAlg()
+                currency == CryptoCurrency.DOT -> defaultForDot()
+                else -> throw NotImplementedError("STUB: ${currency.displayTicker} NOT IMPLEMENTED")
             }
         }
 

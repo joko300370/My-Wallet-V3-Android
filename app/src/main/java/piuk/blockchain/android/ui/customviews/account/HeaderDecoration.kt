@@ -211,3 +211,15 @@ class HeaderDecoration(
         }
     }
 }
+
+fun RecyclerView.removeAllHeaderDecorations() {
+    IntArray(itemDecorationCount) {
+        it
+    }.toList()
+        .mapNotNull { index ->
+            (getItemDecorationAt(index) as? HeaderDecoration)
+        }
+        .forEach {
+            removeItemDecoration(it)
+        }
+}

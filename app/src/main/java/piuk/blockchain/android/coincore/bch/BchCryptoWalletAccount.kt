@@ -1,101 +1,106 @@
 package piuk.blockchain.android.coincore.bch
 
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
+import info.blockchain.wallet.bch.BchMainNetParams
+import info.blockchain.wallet.bch.CashAddress
 import info.blockchain.wallet.coin.GenericMetadataAccount
+import io.reactivex.Completable
 import io.reactivex.Single
-import org.bitcoinj.core.Address
-import org.bitcoinj.core.NetworkParameters
-import piuk.blockchain.android.coincore.ActivitySummaryItem
+import org.bitcoinj.core.LegacyAddress
 import piuk.blockchain.android.coincore.ActivitySummaryList
+import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxEngine
+import piuk.blockchain.android.coincore.impl.AccountRefreshTrigger
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.transactionFetchCount
 import piuk.blockchain.android.coincore.impl.transactionFetchOffset
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.payments.SendDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
+import piuk.blockchain.androidcore.utils.extensions.then
 import java.util.concurrent.atomic.AtomicBoolean
 
-internal class BchCryptoWalletAccount(
+internal class BchCryptoWalletAccount private constructor(
     payloadManager: PayloadDataManager,
-    override val label: String,
-    private val address: String,
     private val bchManager: BchDataManager,
-    override val isDefault: Boolean = false,
+    // Used to lookup the account in payloadDataManager to fetch receive address
+    private val addressIndex: Int,
     override val exchangeRates: ExchangeRateDataManager,
-    private val networkParams: NetworkParameters,
     private val feeDataManager: FeeDataManager,
     private val sendDataManager: SendDataManager,
-    // TEMP keep a copy of the metadata account, for interop with the old send flow
-    // this can and will be removed when BCH is moved over and has a on-chain
-    // TransactionProcessor defined;
-    val internalAccount: GenericMetadataAccount,
-    private val walletPreferences: WalletStatus
-) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BCH) {
+    private val internalAccount: GenericMetadataAccount,
+    private val walletPreferences: WalletStatus,
+    private val custodialWalletManager: CustodialWalletManager,
+    private val refreshTrigger: AccountRefreshTrigger,
+    identity: UserIdentity
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BCH, custodialWalletManager, identity) {
 
     private val hasFunds = AtomicBoolean(false)
+
+    override val label: String
+        get() = internalAccount.label
+
+    override val isArchived: Boolean
+        get() = internalAccount.isArchived
+
+    override val isDefault: Boolean
+        get() = addressIndex == bchManager.getDefaultAccountPosition()
 
     override val isFunded: Boolean
         get() = hasFunds.get()
 
-    // From receive presenter:
-//    compositeDisposable += bchDataManager.updateAllBalances()
-//    .doOnSubscribe { view?.showQrLoading() }
-//    .andThen(
-//    bchDataManager.getWalletTransactions(50, 0)
-//    .onErrorReturn { emptyList() }
-//    )
-//    .flatMap { bchDataManager.getNextReceiveAddress(position) }
-// it may be that we need to update tx's etc to get a legitimat receive address
-
     override val accountBalance: Single<Money>
-        get() = bchManager.getBalance(address)
+        get() = bchManager.getBalance(internalAccount.xpubs())
             .map { CryptoValue.fromMinor(CryptoCurrency.BCH, it) }
             .doOnSuccess {
-                hasFunds.set(it > CryptoValue.ZeroBch)
+                hasFunds.set(it > CryptoValue.zero(CryptoCurrency.BCH))
             }
-            .map { it as Money }
+            .map { it }
 
     override val actionableBalance: Single<Money>
         get() = accountBalance
 
     override val receiveAddress: Single<ReceiveAddress>
         get() = bchManager.getNextReceiveAddress(
-            bchManager.getAccountMetadataList()
-                .indexOfFirst {
-                    it.xpub == bchManager.getDefaultGenericMetadataAccount()!!.xpub
-                }
+            addressIndex
         ).map {
-            val address = Address.fromBase58(networkParams, it)
-            address.toCashAddress()
-        }
-            .singleOrError()
+            val networkParams = BchMainNetParams.get()
+            val address = LegacyAddress.fromBase58(networkParams, it)
+            CashAddress.fromLegacyAddress(address)
+        }.singleOrError()
             .map {
                 BchAddress(address_ = it, label = label)
             }
 
     override val activity: Single<ActivitySummaryList>
-        get() = bchManager.getAddressTransactions(address, transactionFetchCount, transactionFetchOffset)
-            .onErrorReturn { emptyList() }
+        get() = bchManager.getAddressTransactions(
+            xpubAddress,
+            transactionFetchCount,
+            transactionFetchOffset
+        ).onErrorReturn { emptyList() }
             .mapList {
                 BchActivitySummaryItem(
                     it,
                     exchangeRates,
-                    account = this
-                ) as ActivitySummaryItem
+                    account = this,
+                    payloadDataManager = payloadDataManager
+                )
+            }.flatMap {
+                appendTradeActivity(custodialWalletManager, asset, it)
             }.doOnSuccess { setHasTransactions(it.isNotEmpty()) }
 
     override fun createTxEngine(): TxEngine =
         BchOnChainTxEngine(
-            feeDataManager = feeDataManager,
-            networkParams = networkParams,
+            feeManager = feeDataManager,
             sendDataManager = sendDataManager,
             bchDataManager = bchManager,
             payloadDataManager = payloadDataManager,
@@ -103,27 +108,86 @@ internal class BchCryptoWalletAccount(
             walletPreferences = walletPreferences
         )
 
-    constructor(
-        payloadManager: PayloadDataManager,
-        jsonAccount: GenericMetadataAccount,
-        bchManager: BchDataManager,
-        isDefault: Boolean,
-        exchangeRates: ExchangeRateDataManager,
-        networkParams: NetworkParameters,
-        feeDataManager: FeeDataManager,
-        sendDataManager: SendDataManager,
-        walletPreferences: WalletStatus
-    ) : this(
-        payloadManager,
-        jsonAccount.label,
-        jsonAccount.xpub,
-        bchManager,
-        isDefault,
-        exchangeRates,
-        networkParams,
-        feeDataManager,
-        sendDataManager,
-        jsonAccount,
-        walletPreferences
-    )
+    override fun updateLabel(newLabel: String): Completable {
+        require(newLabel.isNotEmpty())
+        val revertLabel = label
+        internalAccount.label = newLabel
+        return bchManager.syncWithServer()
+            .doOnError { internalAccount.label = revertLabel }
+    }
+
+    override fun archive(): Completable =
+        if (!isArchived && !isDefault) {
+            toggleArchived()
+        } else {
+            Completable.error(IllegalStateException("${asset.networkTicker} Account $label cannot be archived"))
+        }
+
+    override fun unarchive(): Completable =
+        if (isArchived) {
+            toggleArchived()
+        } else {
+            Completable.error(IllegalStateException("${asset.networkTicker} Account $label cannot be unarchived"))
+        }
+
+    private fun toggleArchived(): Completable {
+        val isArchived = this.isArchived
+        internalAccount.isArchived = !isArchived
+
+        return bchManager.syncWithServer()
+            .doOnError { internalAccount.isArchived = isArchived } // Revert
+            .then { bchManager.updateTransactions() }
+    }
+
+    override fun setAsDefault(): Completable {
+        require(!isDefault)
+        val revertDefault = bchManager.getDefaultAccountPosition()
+        bchManager.setDefaultAccountPosition(addressIndex)
+        return bchManager.syncWithServer()
+            .doOnError { bchManager.setDefaultAccountPosition(revertDefault) }
+    }
+
+    override val xpubAddress: String
+        get() = internalAccount.xpubs().default.address
+
+    override fun matches(other: CryptoAccount): Boolean =
+        other is BchCryptoWalletAccount && other.xpubAddress == xpubAddress
+
+    fun getReceiveAddressAtPosition(position: Int) =
+        bchManager.getReceiveAddressAtPosition(addressIndex, position)
+
+    internal fun forceRefresh() {
+        refreshTrigger.forceAccountsRefresh()
+    }
+
+    override fun doesAddressBelongToWallet(address: String): Boolean =
+        payloadDataManager.isOwnHDAddress(address)
+
+    companion object {
+        fun createBchAccount(
+            payloadManager: PayloadDataManager,
+            jsonAccount: GenericMetadataAccount,
+            bchManager: BchDataManager,
+            addressIndex: Int,
+            exchangeRates: ExchangeRateDataManager,
+            feeDataManager: FeeDataManager,
+            sendDataManager: SendDataManager,
+            walletPreferences: WalletStatus,
+            custodialWalletManager: CustodialWalletManager,
+            refreshTrigger: AccountRefreshTrigger,
+            identity: UserIdentity
+        ) = BchCryptoWalletAccount(
+            payloadManager = payloadManager,
+            bchManager = bchManager,
+            addressIndex = addressIndex,
+            exchangeRates = exchangeRates,
+            feeDataManager = feeDataManager,
+            sendDataManager = sendDataManager,
+            internalAccount = jsonAccount,
+            walletPreferences = walletPreferences,
+            custodialWalletManager = custodialWalletManager,
+            refreshTrigger = refreshTrigger,
+            identity = identity
+        )
+    }
 }

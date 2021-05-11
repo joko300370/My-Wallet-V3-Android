@@ -1,43 +1,20 @@
 package piuk.blockchain.android.ui.customviews
 
-import android.app.Activity
 import android.content.Context
-import android.net.Uri
-import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
-import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
-import com.blockchain.koin.scopedInject
-import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.swap.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.ui.urllinks.URL_SUPPORT_BALANCE_LOCKED
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.view_transaction_progress.view.*
 import org.koin.core.KoinComponent
-import org.koin.core.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.extensions.secondsToDays
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.visible
-import timber.log.Timber
-import java.math.BigInteger
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 
 class TransactionProgressView(context: Context, attrs: AttributeSet) :
     ConstraintLayout(context, attrs), KoinComponent {
-
-    private val stringUtils: StringUtils by inject()
-    private val compositeDisposable = CompositeDisposable()
-    private val walletManager: CustodialWalletManager by scopedInject()
-    private val currencyPrefs: CurrencyPrefs by scopedInject()
 
     init {
         inflate(context, R.layout.view_transaction_progress, this)
@@ -51,6 +28,12 @@ class TransactionProgressView(context: Context, attrs: AttributeSet) :
         tx_ok_btn.setOnClickListener {
             fn()
         }
+    }
+
+    fun configureSecondaryButton(text: String, fn: () -> Unit) {
+        secondary_btn.visible()
+        secondary_btn.text = text
+        secondary_btn.setOnClickListener { fn() }
     }
 
     fun showTxInProgress(title: String, subtitle: String) {
@@ -70,63 +53,26 @@ class TransactionProgressView(context: Context, attrs: AttributeSet) :
 
     fun showTxSuccess(
         title: String,
-        subtitle: String,
-        withdrawalLockPeriodSeconds: BigInteger = BigInteger.ZERO,
-        activityContext: Activity? = null
+        subtitle: String
     ) {
         tx_state_indicator.setImageResource(R.drawable.ic_check_circle)
         tx_state_indicator.visible()
         showEndStateUi()
         setText(title, subtitle)
-
-        require(activityContext != null)
-
-        // if we are showing transaction data, the user must be KYC.GOLD
-        compositeDisposable += walletManager.getSupportedFundsFiats(
-            currencyPrefs.selectedFiatCurrency, true)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { currencies ->
-                    showLockedFunds(currencies, withdrawalLockPeriodSeconds, activityContext)
-                },
-                onError = {
-                    Timber.e("Error getting supported fiat currencies: $it")
-                }
-            )
     }
 
-    private fun showLockedFunds(
-        currencies: List<String>,
-        withdrawalLockPeriodSeconds: BigInteger,
-        activityContext: Activity
+    fun showPendingTx(
+        title: String,
+        subtitle: SpannableStringBuilder
     ) {
-
-        withdrawalLockPeriodSeconds.secondsToDays().takeIf { it > 0 }?.let { days ->
-            val listOfSupportedCurrencies = currencies.joinToString("/")
-            val intro =
-                context.getString(R.string.tx_view_locked_funds_1, listOfSupportedCurrencies,
-                    resources.getQuantityString(R.plurals.lock_days, days.toInt(), days.toInt()))
-            val map = mapOf("learn_more_link" to Uri.parse(URL_SUPPORT_BALANCE_LOCKED))
-
-            val learnLink = stringUtils.getStringWithMappedLinks(
-                R.string.common_linked_learn_more,
-                map,
-                activityContext)
-
-            val sb = SpannableStringBuilder()
-            sb.append(intro)
-                .append(learnLink)
-                .setSpan(
-                    ForegroundColorSpan(ContextCompat.getColor(context, R.color.blue_600)),
-                    intro.length, intro.length + learnLink.length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-
-            tx_locked_funds.run {
-                setText(sb, TextView.BufferType.SPANNABLE)
-                movementMethod = LinkMovementMethod.getInstance()
-                visible()
-            }
-        } ?: tx_locked_funds.gone()
+        tx_state_indicator.setImageResource(R.drawable.ic_check_circle)
+        tx_state_indicator.visible()
+        showEndStateUi()
+        tx_title.text = title
+        tx_subtitle.run {
+            setText(subtitle, TextView.BufferType.SPANNABLE)
+            movementMethod = LinkMovementMethod.getInstance()
+        }
     }
 
     fun showTxError(title: String, subtitle: String) {
@@ -135,6 +81,36 @@ class TransactionProgressView(context: Context, attrs: AttributeSet) :
         showEndStateUi()
         setText(title, subtitle)
     }
+
+    fun showFiatTxSuccess(title: String, subtitle: String, currency: String) {
+        setFiatAssetIcon(currency)
+        tx_state_indicator.setImageResource(R.drawable.ic_tx_deposit_w_green_bkgd)
+        tx_state_indicator.visible()
+        showEndStateUi()
+        setText(title, subtitle)
+    }
+
+    fun showFiatTxPending(title: String, subtitle: String, currency: String) {
+        setFiatAssetIcon(currency)
+        showTxInProgress(title, subtitle)
+    }
+
+    fun showFiatTxError(title: String, subtitle: String, currency: String) {
+        setFiatAssetIcon(currency)
+        tx_icon.setImageResource(R.drawable.ic_alert)
+        tx_state_indicator.gone()
+        showEndStateUi()
+        setText(title, subtitle)
+    }
+
+    private fun setFiatAssetIcon(currency: String) =
+        setAssetIcon(
+            when (currency) {
+                "EUR" -> R.drawable.ic_funds_euro_masked
+                "GBP" -> R.drawable.ic_funds_euro_masked
+                else -> R.drawable.ic_funds_usd_masked
+            }
+        )
 
     private fun showEndStateUi() {
         progress.gone()

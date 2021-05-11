@@ -14,6 +14,7 @@ import io.reactivex.Observable
 import junit.framework.TestCase.assertTrue
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.amshove.kluent.mock
 import org.junit.Before
 import org.junit.Test
@@ -89,7 +90,7 @@ class AuthDataManagerTest : RxTest() {
         val sessionId = "SESSION_ID"
         val guid = "GUID"
         val code = "123456"
-        val responseBody = ResponseBody.create(("application/json").toMediaTypeOrNull(), "{}")
+        val responseBody = "{}".toResponseBody(("application/json").toMediaTypeOrNull())
         whenever(authService.submitTwoFactorCode(sessionId, guid, code))
             .thenReturn(Observable.just(responseBody))
         // Act
@@ -105,6 +106,7 @@ class AuthDataManagerTest : RxTest() {
     fun validatePinSuccessful() {
         val pin = "1234"
         val key = "SHARED_KEY"
+        val guid = ""
         val encryptedPassword = "ENCRYPTED_PASSWORD"
         val decryptionKey = "DECRYPTION_KEY"
         val plaintextPassword = "PLAINTEXT_PASSWORD"
@@ -112,10 +114,10 @@ class AuthDataManagerTest : RxTest() {
 
         status.success = decryptionKey
         whenever(prefsUtil.pinId).thenReturn(key)
-        whenever(prefsUtil.getValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, ""))
-            .thenReturn(encryptedPassword)
+        whenever(prefsUtil.encryptedPassword).thenReturn(encryptedPassword)
         whenever(prefsUtil.backupEnabled).thenReturn(true)
         whenever(prefsUtil.hasBackup()).thenReturn(true)
+        whenever(prefsUtil.walletGuid).thenReturn(guid)
         whenever(authService.validateAccess(key, pin))
             .thenReturn(Observable.just(Response.success(status)))
 
@@ -128,7 +130,11 @@ class AuthDataManagerTest : RxTest() {
         ).thenReturn(plaintextPassword)
 
         // Act
-        val observer = subject.validatePin(pin).test()
+        subject.validatePin(pin)
+            .test()
+            .assertComplete()
+            .assertValue(plaintextPassword)
+            .assertNoErrors()
 
         // Assert
         verify(accessState).setPin(pin)
@@ -138,13 +144,11 @@ class AuthDataManagerTest : RxTest() {
         verify(prefsUtil).pinId
         verify(prefsUtil).hasBackup()
         verify(prefsUtil).backupEnabled
-        verify(prefsUtil).getValue(PersistentPrefs.KEY_WALLET_GUID)
+        verify(prefsUtil).walletGuid
 
-        verify(prefsUtil).getValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, "")
+        verify(prefsUtil).encryptedPassword
 
         verify(prefsUtil).restoreFromBackup(anyString(), eq(aesUtilWrapper))
-
-        verifyNoMoreInteractions(prefsUtil)
 
         verify(authService).validateAccess(key, pin)
         verifyNoMoreInteractions(authService)
@@ -156,10 +160,9 @@ class AuthDataManagerTest : RxTest() {
         )
 
         verifyNoMoreInteractions(aesUtilWrapper)
+        verifyNoMoreInteractions(prefsUtil)
+
         verifyZeroInteractions(prngHelper)
-        observer.assertComplete()
-        observer.assertValue(plaintextPassword)
-        observer.assertNoErrors()
     }
 
     @Test
@@ -178,10 +181,7 @@ class AuthDataManagerTest : RxTest() {
                 Observable.just(
                     Response.error(
                         403,
-                        ResponseBody.create(
-                            ("application/json").toMediaTypeOrNull(),
-                            "{}"
-                        )
+                        "{}".toResponseBody(("application/json").toMediaTypeOrNull())
                     )
                 )
             )
@@ -190,7 +190,7 @@ class AuthDataManagerTest : RxTest() {
         // Assert
         verify(accessState).setPin(pin)
         verifyNoMoreInteractions(accessState)
-        verify(prefsUtil).pinId == ""
+        verify(prefsUtil).pinId
         verifyNoMoreInteractions(prefsUtil)
         verify(authService).validateAccess(key, pin)
         verifyNoMoreInteractions(authService)
@@ -263,7 +263,7 @@ class AuthDataManagerTest : RxTest() {
             eq(AESUtil.PIN_PBKDF2_ITERATIONS)
         )
         verifyNoMoreInteractions(aesUtilWrapper)
-        verify(prefsUtil).setValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, encryptedPassword)
+        verify(prefsUtil).encryptedPassword = encryptedPassword
         verify(prefsUtil).pinId = anyString()
         verify(prefsUtil).backupEnabled
         verify(prefsUtil).hasBackup()
@@ -289,10 +289,7 @@ class AuthDataManagerTest : RxTest() {
             Observable.just(
                 Response.error(
                     500,
-                    ResponseBody.create(
-                        ("application/json").toMediaTypeOrNull(),
-                        "{}"
-                    )
+                    "{}".toResponseBody(("application/json").toMediaTypeOrNull())
                 )
             )
         )
@@ -358,10 +355,8 @@ class AuthDataManagerTest : RxTest() {
         // Arrange
         val sessionId = "SESSION_ID"
         val guid = "GUID"
-        val responseBody = ResponseBody.create(
-            ("application/json").toMediaTypeOrNull(),
-            ERROR_BODY
-        )
+        val responseBody = ERROR_BODY.toResponseBody(("application/json").toMediaTypeOrNull())
+
         whenever(authService.getEncryptedPayload(guid, sessionId))
             .thenReturn(Observable.just(Response.error(500, responseBody)))
         // Act

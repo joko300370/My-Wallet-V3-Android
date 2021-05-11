@@ -2,24 +2,40 @@ package piuk.blockchain.androidcore.utils
 
 import android.annotation.SuppressLint
 import android.app.backup.BackupManager
+import android.content.Context
 import android.content.SharedPreferences
+import android.util.Base64
 import androidx.annotation.VisibleForTesting
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.logging.CrashLogger
+import com.blockchain.preferences.Authorization
+import com.blockchain.preferences.BrowserIdentity
+import com.blockchain.preferences.BrowserIdentityMapping
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.wallet.api.data.Settings.UNIT_FIAT
+import info.blockchain.wallet.api.data.Settings.Companion.UNIT_FIAT
 import info.blockchain.wallet.crypto.AESUtil
-import piuk.blockchain.androidcore.BuildConfig
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import org.bitcoinj.core.ECKey
+import org.bitcoinj.core.Sha256Hash
+import org.spongycastle.util.encoders.Hex
+import piuk.blockchain.androidcore.utils.PersistentPrefs.Companion.KEY_SWIPE_TO_RECEIVE_ENABLED
 import java.util.Currency
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 interface UUIDGenerator {
     fun generateUUID(): String
 }
 
 class PrefsUtil(
+    private val ctx: Context,
     private val store: SharedPreferences,
     private val backupStore: SharedPreferences,
     private val idGenerator: DeviceIdGenerator,
-    private val uuidGenerator: UUIDGenerator
+    private val uuidGenerator: UUIDGenerator,
+    private val crashLogger: CrashLogger
 ) : PersistentPrefs {
 
     private var isUnderAutomationTesting = false // Don't persist!
@@ -51,7 +67,13 @@ class PrefsUtil(
         set(value) {
             setValue(KEY_PIN_IDENTIFIER, value)
             backupStore.edit().putString(KEY_PIN_IDENTIFIER, value).commit()
-            BackupManager.dataChanged(BuildConfig.APPLICATION_ID)
+            BackupManager.dataChanged(ctx.packageName)
+        }
+
+    override var newSwapEnabled: Boolean
+        get() = getValue(NEW_SWAP_ENABLED, false)
+        set(value) {
+            setValue(NEW_SWAP_ENABLED, value)
         }
 
     override var devicePreIDVCheckFailed: Boolean
@@ -95,7 +117,17 @@ class PrefsUtil(
     // From CurrencyPrefs
     override var selectedFiatCurrency: String
         get() = getValue(KEY_SELECTED_FIAT, "")
-        set(fiat) = setValue(KEY_SELECTED_FIAT, fiat)
+        set(fiat) {
+            // We are seeing some crashes when this is read and is invalid when creating a FiatValue object.
+            // So we'll try and catch them when it's written and find the root cause on a future iteration
+            // Check the currency is supported and throw a meaningful exception message if it's not
+            try {
+                Currency.getInstance(fiat)
+                setValue(KEY_SELECTED_FIAT, fiat)
+            } catch (e: IllegalArgumentException) {
+                crashLogger.logAndRethrowException(IllegalArgumentException("Unknown currency id: $fiat"))
+            }
+        }
 
     override var selectedCryptoCurrency: CryptoCurrency
         get() =
@@ -147,17 +179,40 @@ class PrefsUtil(
     override fun getSupportedCardTypes(): String? =
         getValue(KEY_SUPPORTED_CARDS_STATE, "").takeIf { it != "" }
 
-    override fun updateSimpleBuyState(simpleBuyState: String) {
-        setValue(KEY_SIMPLE_BUY_STATE, simpleBuyState)
+    override fun updateSimpleBuyState(simpleBuyState: String) = setValue(KEY_SIMPLE_BUY_STATE, simpleBuyState)
+
+    override fun getBankLinkingState(): String = getValue(KEY_BANK_LINKING, "")
+
+    override fun setBankLinkingState(state: String) = setValue(KEY_BANK_LINKING, state)
+
+    override fun getDynamicOneTimeTokenUrl(): String = getValue(KEY_ONE_TIME_TOKEN_PATH, "")
+
+    override fun setDynamicOneTimeTokenUrl(path: String) {
+        val previousValue = getDynamicOneTimeTokenUrl()
+        if (path.isNotEmpty() && previousValue != path) {
+            setValue(KEY_ONE_TIME_TOKEN_PATH, path)
+        }
     }
 
-    override fun clearState() {
-        removeValue(KEY_SIMPLE_BUY_STATE)
-    }
+    override fun clearState() = removeValue(KEY_SIMPLE_BUY_STATE)
 
     override var addCardInfoDismissed: Boolean
         get() = getValue(KEY_ADD_CARD_INFO, false)
         set(dismissed) = setValue(KEY_ADD_CARD_INFO, dismissed)
+
+    override var hasCompletedAtLeastOneBuy: Boolean
+        get() = getValue(KEY_HAS_COMPLETED_AT_LEAST_ONE_BUY, false)
+        set(value) {
+            setValue(KEY_HAS_COMPLETED_AT_LEAST_ONE_BUY, value)
+        }
+
+    override var hasSeenRatingDialog: Boolean
+        get() = getValue(HAS_SEEN_RATING, false)
+        set(value) = setValue(HAS_SEEN_RATING, value)
+
+    override var preRatingActionCompletedTimes: Int
+        get() = getValue(PRE_RATING_ACTION_COMPLETED_TIMES, 0)
+        set(value) = setValue(PRE_RATING_ACTION_COMPLETED_TIMES, value)
 
     // From Onboarding
     override var swapIntroCompleted: Boolean
@@ -214,6 +269,30 @@ class PrefsUtil(
     override fun getFeeTypeForAsset(cryptoCurrency: CryptoCurrency): Int =
         getValue(NETWORK_FEE_PRIORITY_KEY + cryptoCurrency.networkTicker, -1)
 
+    override val hasSeenSwapPromo: Boolean
+        get() = getValue(SWAP_KYC_PROMO, false)
+
+    override fun setSeenSwapPromo() = setValue(SWAP_KYC_PROMO, true)
+
+    override val hasSeenTradingSwapPromo: Boolean
+        get() = getValue(SWAP_TRADING_PROMO, false)
+
+    override fun setSeenTradingSwapPromo() = setValue(SWAP_TRADING_PROMO, true)
+
+    override val resendSmsRetries: Int
+        get() = getValue(TWO_FA_SMS_RETRIES, MAX_ALLOWED_RETRIES)
+
+    override fun setResendSmsRetries(retries: Int) {
+        setValue(TWO_FA_SMS_RETRIES, retries)
+    }
+
+    override val isNewUser: Boolean
+        get() = getValue(IS_NEW_USER, false)
+
+    override fun setNewUser() {
+        setValue(IS_NEW_USER, true)
+    }
+
     // Notification prefs
     override var arePushNotificationsEnabled: Boolean
         get() = getValue(KEY_PUSH_NOTIFICATION_ENABLED, true)
@@ -232,7 +311,7 @@ class PrefsUtil(
             .putString(
                 KEY_ENCRYPTED_GUID,
                 aes.encrypt(
-                    getValue(PersistentPrefs.KEY_WALLET_GUID, ""),
+                    getValue(KEY_WALLET_GUID, ""),
                     encryptionKey,
                     AESUtil.PIN_PBKDF2_ITERATIONS_GUID
                 )
@@ -240,14 +319,14 @@ class PrefsUtil(
             .putString(
                 KEY_ENCRYPTED_SHARED_KEY,
                 aes.encrypt(
-                    getValue(PersistentPrefs.KEY_SHARED_KEY, ""),
+                    getValue(KEY_SHARED_KEY, ""),
                     encryptionKey,
                     AESUtil.PIN_PBKDF2_ITERATIONS_SHAREDKEY
                 )
             )
             .commit()
 
-        BackupManager.dataChanged(BuildConfig.APPLICATION_ID)
+        BackupManager.dataChanged(ctx.packageName)
     }
 
     override fun restoreFromBackup(decryptionKey: String, aes: AESUtilWrapper) {
@@ -261,7 +340,7 @@ class PrefsUtil(
             backupStore.getString(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, "") ?: ""
         )
         setValue(
-            PersistentPrefs.KEY_WALLET_GUID,
+            KEY_WALLET_GUID,
             aes.decrypt(
                 backupStore.getString(KEY_ENCRYPTED_GUID, ""),
                 decryptionKey,
@@ -269,7 +348,7 @@ class PrefsUtil(
             )
         )
         setValue(
-            PersistentPrefs.KEY_SHARED_KEY,
+            KEY_SHARED_KEY,
             aes.decrypt(
                 backupStore.getString(KEY_ENCRYPTED_SHARED_KEY, ""),
                 decryptionKey,
@@ -288,8 +367,7 @@ class PrefsUtil(
         }
 
     override fun hasBackup(): Boolean =
-        backupEnabled &&
-            backupStore.getString(KEY_ENCRYPTED_GUID, "").isNullOrEmpty().not()
+        backupEnabled && backupStore.getString(KEY_ENCRYPTED_GUID, "").isNullOrEmpty().not()
 
     @SuppressLint("ApplySharedPref")
     override fun clearBackup() {
@@ -303,8 +381,88 @@ class PrefsUtil(
             .putString(KEY_ENCRYPTED_SHARED_KEY, "")
             .commit()
 
-        BackupManager.dataChanged(BuildConfig.APPLICATION_ID)
+        BackupManager.dataChanged(ctx.packageName)
     }
+
+    // SwipeToReceive
+    override var offlineCacheData: String?
+        get() = getValue(OFFLINE_CACHE_KEY)
+        set(value) {
+            if (value != null) {
+                setValue(OFFLINE_CACHE_KEY, value)
+            } else {
+                clearLegacyCacheData()
+                removeValue(OFFLINE_CACHE_KEY)
+            }
+        }
+
+    override var offlineCacheEnabled: Boolean
+        get() = getValue(KEY_SWIPE_TO_RECEIVE_ENABLED, true)
+        set(value) = setValue(KEY_SWIPE_TO_RECEIVE_ENABLED, value)
+
+    override var encodedPin: String
+        get() = decodeFromBase64ToString(getValue(KEY_ENCRYPTED_PIN_CODE, ""))
+        set(value) = setValue(KEY_ENCRYPTED_PIN_CODE, encodeToBase64(value))
+
+    override var biometricsEnabled: Boolean
+        get() = getValue(KEY_FINGERPRINT_ENABLED, false)
+        set(value) = setValue(KEY_FINGERPRINT_ENABLED, value)
+
+    override val encodedKeyName: String
+        get() = KEY_ENCRYPTED_PIN_CODE
+
+    override var sharedKey: String
+        get() = getValue(KEY_SHARED_KEY, "")
+        set(value) = setValue(KEY_SHARED_KEY, value)
+
+    override var walletGuid: String
+        get() = getValue(KEY_WALLET_GUID, "")
+        set(value) = setValue(KEY_WALLET_GUID, value)
+
+    override var encryptedPassword: String
+        get() = getValue(KEY_ENCRYPTED_PASSWORD, "")
+        set(value) = setValue(KEY_ENCRYPTED_PASSWORD, value)
+
+    override var pinFails: Int
+        get() = getValue(KEY_PIN_FAILS, 0)
+        set(value) = setValue(KEY_PIN_FAILS, value)
+
+    override fun clearEncodedPin() {
+        removeValue(KEY_ENCRYPTED_PIN_CODE)
+    }
+
+    private fun encodeToBase64(data: String) =
+        Base64.encodeToString(data.toByteArray(charset("UTF-8")), Base64.DEFAULT)
+
+    private fun decodeFromBase64ToString(data: String): String =
+        String(Base64.decode(data.toByteArray(charset("UTF-8")), Base64.DEFAULT))
+
+    private fun clearLegacyCacheData() {
+        removeValue(KEY_SWIPE_RECEIVE_BTC_ADDRESSES)
+        removeValue(KEY_SWIPE_RECEIVE_ETH_ADDRESS)
+        removeValue(KEY_SWIPE_RECEIVE_BCH_ADDRESSES)
+        removeValue(KEY_SWIPE_RECEIVE_XLM_ADDRESS)
+        removeValue(KEY_SWIPE_RECEIVE_BTC_ACCOUNT_NAME)
+        removeValue(KEY_SWIPE_RECEIVE_BCH_ACCOUNT_NAME)
+    }
+
+    // internal feature flags
+    override fun isFeatureEnabled(gatedFeature: GatedFeature): Boolean = getValue(gatedFeature.name, false)
+
+    override fun enableFeature(gatedFeature: GatedFeature) = setValue(gatedFeature.name, true)
+
+    override fun disableFeature(gatedFeature: GatedFeature) = setValue(gatedFeature.name, false)
+
+    override fun disableAllFeatures() {
+        GatedFeature.values().forEach { feature ->
+            disableFeature(feature)
+        }
+    }
+
+    override fun getAllFeatures(): Map<GatedFeature, Boolean> =
+        GatedFeature.values().map {
+            it to isFeatureEnabled(it)
+        }.toMap()
 
     // Raw accessors
     override fun getValue(name: String): String? =
@@ -353,17 +511,70 @@ class PrefsUtil(
         clearBackup()
     }
 
+    // Secure Channel Prefs
+    override val deviceKey: String
+        get() = if (has(KEY_SECURE_CHANNEL_IDENTITY_KEY)) {
+            getValue(KEY_SECURE_CHANNEL_IDENTITY_KEY, "")
+        } else {
+            val key = ECKey()
+            setValue(KEY_SECURE_CHANNEL_IDENTITY_KEY, key.privateKeyAsHex)
+            getValue(KEY_SECURE_CHANNEL_IDENTITY_KEY, "")
+        }
+
+    private fun getBrowserIdentityMapping() =
+        Json.decodeFromString<BrowserIdentityMapping>(
+            getValue(KEY_SECURE_CHANNEL_BROWSER_MAPPINGS, """{ "mapping": {} }""")
+        )
+
+    private fun setBrowserIdentityMapping(browserIdentity: BrowserIdentityMapping) =
+        setValue(KEY_SECURE_CHANNEL_BROWSER_MAPPINGS, Json.encodeToString(browserIdentity))
+
+    override fun getBrowserIdentity(pubkeyHash: String): BrowserIdentity? {
+        val browserIdentityMapping = getBrowserIdentityMapping()
+        val mapping = browserIdentityMapping.mapping
+        return mapping.get(pubkeyHash)
+    }
+    override fun addBrowserIdentity(browserIdentity: BrowserIdentity) {
+        getBrowserIdentityMapping().mapping
+            .also { it.put(browserIdentity.pubKeyHash(), browserIdentity) }
+            .also { setBrowserIdentityMapping(BrowserIdentityMapping(it)) }
+    }
+
+    override fun removeBrowserIdentity(pubkeyHash: String) {
+        getBrowserIdentityMapping().mapping
+            .also { it.remove(pubkeyHash) }
+            .also { setBrowserIdentityMapping(BrowserIdentityMapping(it)) }
+    }
+
+    override fun updateBrowserIdentityUsedTimestamp(pubkeyHash: String) {
+        getBrowserIdentityMapping().mapping
+            .also { it.get(pubkeyHash)?.lastUsed = System.currentTimeMillis() }
+            .also { setBrowserIdentityMapping(BrowserIdentityMapping(it)) }
+    }
+    override fun addBrowserIdentityAuthorization(pubkeyHash: String, authorization: Authorization) {
+        getBrowserIdentityMapping().mapping
+            .also { it.get(pubkeyHash)?.authorized?.add(authorization) }
+            .also { setBrowserIdentityMapping(BrowserIdentityMapping(it)) }
+    }
+    override fun pruneBrowserIdentities() {
+        getBrowserIdentityMapping().mapping
+            .filterNot { it.value.lastUsed == 0L &&
+                (System.currentTimeMillis() - it.value.scanned) > TimeUnit.MINUTES.toMillis(2) }
+            .toMutableMap()
+            .also { setBrowserIdentityMapping(BrowserIdentityMapping(it)) }
+    }
+
     /**
      * Clears everything but the GUID for logging back in and the deviceId - for pre-IDV checking
      */
     override fun logOut() {
-        val guid = getValue(PersistentPrefs.KEY_WALLET_GUID, "")
+        val guid = getValue(KEY_WALLET_GUID, "")
         val deviceId = getValue(KEY_PRE_IDV_DEVICE_ID, "")
 
         clear()
 
         setValue(KEY_LOGGED_OUT, true)
-        setValue(PersistentPrefs.KEY_WALLET_GUID, guid)
+        setValue(KEY_WALLET_GUID, guid)
         setValue(KEY_PRE_IDV_DEVICE_ID, deviceId)
     }
 
@@ -400,8 +611,11 @@ class PrefsUtil(
         private const val KEY_SIMPLE_BUY_STATE = "key_simple_buy_state"
         private const val KEY_CARD_STATE = "key_card_state"
         private const val KEY_ADD_CARD_INFO = "key_add_card_info"
+        private const val KEY_HAS_COMPLETED_AT_LEAST_ONE_BUY = "has_completed_at_least_one_buy"
 
         private const val KEY_SUPPORTED_CARDS_STATE = "key_supported_cards"
+        private const val KEY_BANK_LINKING = "KEY_BANK_LINKING"
+        private const val KEY_ONE_TIME_TOKEN_PATH = "KEY_ONE_TIME_TOKEN_PATH"
 
         private const val KEY_SWAP_INTRO_COMPLETED = "key_swap_intro_completed"
         private const val KEY_INTRO_TOUR_COMPLETED = "key_intro_tour_complete"
@@ -415,10 +629,17 @@ class PrefsUtil(
         private const val WALLET_FUNDED_KEY = "WALLET_FUNDED_KEY"
         private const val BITPAY_TRANSACTION_SUCCEEDED = "BITPAY_TRANSACTION_SUCCEEDED"
         private const val NETWORK_FEE_PRIORITY_KEY = "fee_type_key_"
+        private const val SWAP_KYC_PROMO = "SWAP_KYC_PROMO"
+        private const val SWAP_TRADING_PROMO = "SWAP_TRADING_PROMO"
+        private const val TWO_FA_SMS_RETRIES = "TWO_FA_SMS_RETRIES"
+        private const val IS_NEW_USER = "IS_NEW_USER"
+        private const val MAX_ALLOWED_RETRIES = 3
 
         // For QA:
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
         const val KEY_IS_DEVICE_ID_RANDOMISED = "random_device_id"
+
+        const val NEW_SWAP_ENABLED = "swap_v_2_enabled"
 
         private const val KEY_FIREBASE_TOKEN = "firebase_token"
         private const val KEY_PUSH_NOTIFICATION_ENABLED = "push_notification_enabled"
@@ -427,5 +648,32 @@ class PrefsUtil(
         private const val KEY_ENCRYPTED_GUID = "encrypted_guid"
         private const val KEY_ENCRYPTED_SHARED_KEY = "encrypted_shared_key"
         private const val KEY_CLOUD_BACKUP_ENABLED = "backup_enabled"
+        private const val KEY_SECURE_CHANNEL_IDENTITY_KEY = "secure_channel_identity"
+        private const val KEY_SECURE_CHANNEL_BROWSER_MAPPINGS = "secure_channel_browsers"
+
+        // Rating
+        private const val HAS_SEEN_RATING = "has_seen_rating"
+        private const val PRE_RATING_ACTION_COMPLETED_TIMES = "pre_rating_action_completed_times"
+
+        // Swipe to receive
+        // Legacy keys. Only clear, add new data with new key
+        private const val KEY_SWIPE_RECEIVE_BTC_ADDRESSES = "swipe_receive_addresses"
+        private const val KEY_SWIPE_RECEIVE_ETH_ADDRESS = "swipe_receive_eth_address"
+        private const val KEY_SWIPE_RECEIVE_BCH_ADDRESSES = "swipe_receive_bch_addresses"
+        private const val KEY_SWIPE_RECEIVE_XLM_ADDRESS = "key_swipe_receive_xlm_address"
+        private const val KEY_SWIPE_RECEIVE_BTC_ACCOUNT_NAME = "swipe_receive_account_name"
+        private const val KEY_SWIPE_RECEIVE_BCH_ACCOUNT_NAME = "swipe_receive_bch_account_name"
+        // New key
+        private const val OFFLINE_CACHE_KEY = "key_offline_address_cache"
+        // Auth prefs
+        private const val KEY_ENCRYPTED_PIN_CODE = "encrypted_pin_code"
+        private const val KEY_FINGERPRINT_ENABLED = "fingerprint_enabled"
+
+        private const val KEY_WALLET_GUID = "guid"
+        private const val KEY_SHARED_KEY = "sharedKey"
+        private const val KEY_ENCRYPTED_PASSWORD = "encrypted_password"
+        const val KEY_PIN_FAILS = "pin_fails"
     }
 }
+
+fun BrowserIdentity.pubKeyHash() = Sha256Hash.of(Hex.decode(this.pubkey)).toString()

@@ -1,18 +1,16 @@
 package piuk.blockchain.android.ui.backup.start
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.fragment_backup_start.*
-import piuk.blockchain.android.R
 import com.blockchain.koin.scopedInject
 import com.blockchain.koin.scopedInjectActivity
 import com.blockchain.ui.password.SecondPasswordHandler
+import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.FragmentBackupStartBinding
 import piuk.blockchain.android.ui.backup.wordlist.BackupWalletWordListFragment
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
 
 class BackupWalletStartingFragment :
     BaseFragment<BackupWalletStartingView, BackupWalletStartingPresenter>(),
@@ -22,38 +20,34 @@ class BackupWalletStartingFragment :
 
     private val secondPasswordHandler: SecondPasswordHandler by scopedInjectActivity()
 
+    private var _binding: FragmentBackupStartBinding? = null
+    private val binding get() = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = container!!.inflate(R.layout.fragment_backup_start)
+    ): View {
+        _binding = FragmentBackupStartBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        button_start.setOnClickListener {
-            if (presenter.isDoubleEncrypted()) {
-                secondPasswordHandler.validate(object :
-                    SecondPasswordHandler.ResultListener {
+        binding.buttonStart.setOnClickListener {
+            secondPasswordHandler.validate(
+                requireContext(),
+                object : SecondPasswordHandler.ResultListener {
                     override fun onNoSecondPassword() {
-                        throw IllegalStateException("This point should never be reached")
+                        loadFragmentWordListFragment()
                     }
 
                     override fun onSecondPasswordValidated(validatedSecondPassword: String) {
-                        val fragment = BackupWalletWordListFragment().apply {
-                            arguments = Bundle().apply {
-                                putString(
-                                    BackupWalletWordListFragment.ARGUMENT_SECOND_PASSWORD,
-                                    validatedSecondPassword
-                                )
-                            }
-                        }
-                        loadFragment(fragment)
+                        loadFragmentWordListFragment(validatedSecondPassword)
                     }
-                })
-            } else {
-                loadFragment(BackupWalletWordListFragment())
-            }
+                }
+            )
         }
     }
 
@@ -61,7 +55,17 @@ class BackupWalletStartingFragment :
 
     override fun getMvpView() = this
 
-    private fun loadFragment(fragment: Fragment) {
+    private fun loadFragmentWordListFragment(secondPassword: String? = null) {
+        val fragment = BackupWalletWordListFragment().apply {
+            secondPassword?.let {
+                arguments = Bundle().apply {
+                    putString(
+                        BackupWalletWordListFragment.ARGUMENT_SECOND_PASSWORD,
+                        it
+                    )
+                }
+            }
+        }
         activity?.run {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.content_frame, fragment)

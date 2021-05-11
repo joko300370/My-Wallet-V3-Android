@@ -1,26 +1,30 @@
 package piuk.blockchain.android.ui.transactionflow.engine
 
+import com.blockchain.nabu.models.data.LinkBankTransfer
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
 import piuk.blockchain.android.coincore.AssetAction
-import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.InvoiceTarget
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
-import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.ui.base.mvi.MviIntent
-import java.util.EmptyStackException
+import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
+import java.util.Stack
 
 sealed class TransactionIntent : MviIntent<TransactionState> {
 
-    class InitialiseWithSourceAccount(
-        private val action: AssetAction,
-        private val fromAccount: CryptoAccount,
+    // The InitialiseXYZ intents are data classes so the TransactionFlowIntentMapperTest can compare them
+    data class InitialiseWithSourceAccount(
+        val action: AssetAction,
+        val fromAccount: BlockchainAccount,
         private val passwordRequired: Boolean
     ) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
@@ -29,21 +33,25 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
                 sendingAccount = fromAccount,
                 errorState = TransactionErrorState.NONE,
                 passwordRequired = passwordRequired,
-                currentStep = selectStep(passwordRequired),
                 nextEnabled = passwordRequired
-            ).updateBackstack(oldState)
-
-        private fun selectStep(passwordRequired: Boolean): TransactionStep =
-            if (passwordRequired) {
-                TransactionStep.ENTER_PASSWORD
-            } else {
-                TransactionStep.ENTER_ADDRESS
-            }
+            )
     }
 
-    class InitialiseWithSourceAndTargetAccount(
-        private val action: AssetAction,
-        val fromAccount: CryptoAccount,
+    data class InitialiseWithNoSourceOrTargetAccount(
+        val action: AssetAction,
+        private val passwordRequired: Boolean
+    ) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            TransactionState(
+                action = action,
+                passwordRequired = passwordRequired,
+                errorState = TransactionErrorState.NONE
+            )
+    }
+
+    data class InitialiseWithSourceAndTargetAccount(
+        val action: AssetAction,
+        val fromAccount: BlockchainAccount,
         val target: TransactionTarget,
         private val passwordRequired: Boolean
     ) : TransactionIntent() {
@@ -67,6 +75,67 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
                 target is InvoiceTarget -> TransactionStep.CONFIRM_DETAIL
                 else -> TransactionStep.ENTER_AMOUNT
             }
+    }
+
+    data class InitialiseWithSourceAndPreferredTarget(
+        val action: AssetAction,
+        val fromAccount: BlockchainAccount,
+        val target: TransactionTarget,
+        private val passwordRequired: Boolean
+    ) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            TransactionState(
+                action = action,
+                sendingAccount = fromAccount,
+                selectedTarget = target,
+                errorState = TransactionErrorState.NONE,
+                passwordRequired = passwordRequired,
+                currentStep = TransactionStep.ENTER_ADDRESS,
+                nextEnabled = true
+            ).updateBackstack(oldState)
+    }
+
+    data class InitialiseWithTargetAndNoSource(
+        val action: AssetAction,
+        val target: TransactionTarget,
+        private val passwordRequired: Boolean
+    ) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            TransactionState(
+                action = action,
+                selectedTarget = target,
+                errorState = TransactionErrorState.NONE,
+                passwordRequired = passwordRequired,
+                nextEnabled = true
+            )
+    }
+
+    data class ReInitialiseWithTargetAndNoSource(
+        val action: AssetAction,
+        val target: TransactionTarget,
+        private val passwordRequired: Boolean
+    ) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                action = action,
+                selectedTarget = target,
+                errorState = TransactionErrorState.NONE,
+                passwordRequired = passwordRequired,
+                nextEnabled = false,
+                stepsBackStack = Stack()
+            )
+    }
+
+    object ClearBackStack : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState = oldState.copy(
+            stepsBackStack = Stack()
+        )
+    }
+
+    object ResetFlow : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState = oldState.copy(
+            currentStep = TransactionStep.CLOSED
+        )
     }
 
     class ValidatePassword(
@@ -106,6 +175,28 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             ).updateBackstack(oldState)
     }
 
+    class AvailableAccountsListUpdated(private val targets: List<TransactionTarget>) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                availableTargets = targets,
+                currentStep = selectStep(oldState.passwordRequired)
+            ).updateBackstack(oldState)
+
+        private fun selectStep(passwordRequired: Boolean): TransactionStep =
+            when {
+                passwordRequired -> TransactionStep.ENTER_PASSWORD
+                else -> TransactionStep.ENTER_ADDRESS
+            }
+    }
+
+    class AvailableSourceAccountsListUpdated(private val accounts: List<BlockchainAccount>) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                availableSources = accounts,
+                currentStep = TransactionStep.SELECT_SOURCE
+            ).updateBackstack(oldState)
+    }
+
     // Check a manually entered address is correct. If it is, the interactor will send a
     // TargetAddressValidated intent which, in turn, will enable the next cta on the enter
     // address sheet
@@ -117,7 +208,7 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
     }
 
     class TargetAddressValidated(
-        val transactionTarget: TransactionTarget
+        private val transactionTarget: TransactionTarget
     ) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState.copy(
@@ -139,14 +230,31 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
     // Fired from the enter address sheet when a target address is confirmed - by selecting from the list
     // (in this build, this will change for swap) or when the CTA is clicked. Move to the enter amount sheet
     // once this has been processed. Do not send this from anywhere _but_ the enter address sheet.
-    class TargetSelectionConfirmed(
-        val transactionTarget: TransactionTarget
+    object TargetSelected : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                errorState = TransactionErrorState.NONE,
+                currentStep = TransactionStep.ENTER_AMOUNT,
+                nextEnabled = false
+            ).updateBackstack(oldState)
+    }
+
+    class TargetSelectionUpdated(
+        private val transactionTarget: TransactionTarget
     ) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState.copy(
                 errorState = TransactionErrorState.NONE,
                 selectedTarget = transactionTarget,
-                currentStep = TransactionStep.ENTER_AMOUNT,
+                nextEnabled = true
+            ).updateBackstack(oldState)
+    }
+
+    object ShowTargetSelection : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                errorState = TransactionErrorState.NONE,
+                currentStep = TransactionStep.SELECT_TARGET_ACCOUNT,
                 nextEnabled = false
             ).updateBackstack(oldState)
     }
@@ -160,7 +268,7 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
     }
 
     class FiatRateUpdated(
-        private val fiatRate: ExchangeRate.CryptoToFiat
+        private val fiatRate: ExchangeRate
     ) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState.copy(
@@ -190,17 +298,43 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             ).updateBackstack(oldState)
     }
 
+    class TargetAccountSelected(
+        private val selectedTarget: TransactionTarget
+    ) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                currentStep = TransactionStep.ENTER_ADDRESS,
+                selectedTarget = selectedTarget,
+                nextEnabled = true
+            ).updateBackstack(oldState)
+    }
+
+    class SourceAccountSelected(
+        val sourceAccount: BlockchainAccount
+    ) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                sendingAccount = sourceAccount
+            )
+    }
+
     class AmountChanged(
         val amount: Money
     ) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState.copy(
-                nextEnabled = false
+                nextEnabled = false,
+                setMax = false
             ).updateBackstack(oldState)
     }
 
+    object UseMaxSpendable : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(setMax = true)
+    }
+
     class ModifyTxOption(
-        val option: TxOptionValue
+        val confirmation: TxConfirmationValue
     ) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState = oldState
     }
@@ -214,6 +348,15 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
                 nextEnabled = pendingTx.validationState == ValidationState.CAN_EXECUTE,
                 errorState = pendingTx.validationState.mapToTransactionError()
             ).updateBackstack(oldState)
+    }
+
+    class DisplayModeChanged(
+        private val displayMode: DisplayMode
+    ) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                displayMode = displayMode
+            )
     }
 
     // Fired when the cta of the enter amount sheet is clicked. This just moved to the
@@ -231,7 +374,7 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             oldState.copy(
                 nextEnabled = false,
                 currentStep = TransactionStep.IN_PROGRESS,
-                executionStatus = TxExecutionStatus.IN_PROGRESS
+                executionStatus = TxExecutionStatus.InProgress
             ).updateBackstack(oldState)
     }
 
@@ -242,15 +385,75 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             oldState.copy(
                 nextEnabled = true,
                 currentStep = TransactionStep.IN_PROGRESS,
-                executionStatus = TxExecutionStatus.ERROR
+                executionStatus = TxExecutionStatus.Error(error)
             ).updateBackstack(oldState)
+    }
+
+    class ApprovalRequired(
+        private val bankApprovalData: BankPaymentApproval
+    ) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                currentStep = TransactionStep.IN_PROGRESS,
+                executionStatus = TxExecutionStatus.ApprovalRequired(bankApprovalData)
+            ).updateBackstack(oldState)
+    }
+
+    data class SetFeeLevel(
+        val feeLevel: FeeLevel,
+        val customFeeAmount: Long?
+    ) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState
+    }
+
+    object StartLinkABank : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState = oldState
+    }
+
+    object RefreshSourceAccounts : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState = oldState.copy(
+            linkBankState = BankLinkingState.NotStarted
+        )
+    }
+
+    class LinkBankInfoSuccess(private val bankTransferInfo: LinkBankTransfer) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                linkBankState = BankLinkingState.Success(bankTransferInfo)
+            )
+    }
+
+    class LinkBankFailed(private val e: Throwable) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                linkBankState = BankLinkingState.Error(e)
+            )
     }
 
     object InvalidateTransaction : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState.copy(
                 pendingTx = null,
-                nextEnabled = false
+                selectedTarget = NullAddress,
+                nextEnabled = false,
+                fiatRate = null,
+                targetRate = null
+            ).updateBackstack(oldState)
+    }
+
+    object NavigateBackFromEnterAmount : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState = oldState
+    }
+
+    object InvalidateTransactionKeepingTarget : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                pendingTx = null,
+                sendingAccount = NullCryptoAccount(),
+                nextEnabled = false,
+                fiatRate = null,
+                targetRate = null
             ).updateBackstack(oldState)
     }
 
@@ -258,26 +461,30 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState.copy(
                 nextEnabled = true,
-                executionStatus = TxExecutionStatus.COMPLETED
+                executionStatus = TxExecutionStatus.Completed
             ).updateBackstack(oldState)
     }
 
     // This fn pops the backstack, thus no need to update the backstack here
     object ReturnToPreviousStep : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState {
-            try {
-                val stack = oldState.stepsBackStack
-                val previousStep = stack.pop()
-                return oldState.copy(
-                    stepsBackStack = stack,
-                    currentStep = previousStep,
-                    errorState = TransactionErrorState.NONE
-                )
-            } catch (e: EmptyStackException) {
-                // if the stack is empty, throw
-                throw IllegalStateException("Cannot go back")
-            }
+            val stack = oldState.stepsBackStack
+            require(stack.isNotEmpty())
+
+            val previousStep = stack.pop()
+            return oldState.copy(
+                stepsBackStack = stack,
+                currentStep = previousStep,
+                errorState = TransactionErrorState.NONE
+            )
         }
+    }
+
+    object ShowMoreAccounts : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                currentStep = TransactionStep.SELECT_TARGET_ACCOUNT
+            ).updateBackstack(oldState)
     }
 
     // Fired from when the confirm transaction sheet is created.
@@ -313,9 +520,12 @@ private fun ValidationState.mapToTransactionError() =
         ValidationState.INVALID_ADDRESS -> TransactionErrorState.INVALID_ADDRESS
         ValidationState.ADDRESS_IS_CONTRACT -> TransactionErrorState.ADDRESS_IS_CONTRACT
         ValidationState.UNDER_MIN_LIMIT -> TransactionErrorState.BELOW_MIN_LIMIT
+        ValidationState.PENDING_ORDERS_LIMIT_REACHED -> TransactionErrorState.PENDING_ORDERS_LIMIT_REACHED
         ValidationState.HAS_TX_IN_FLIGHT -> TransactionErrorState.TRANSACTION_IN_FLIGHT
         ValidationState.OPTION_INVALID -> TransactionErrorState.TX_OPTION_INVALID
         ValidationState.OVER_MAX_LIMIT -> TransactionErrorState.ABOVE_MAX_LIMIT
+        ValidationState.OVER_SILVER_TIER_LIMIT -> TransactionErrorState.OVER_SILVER_TIER_LIMIT
+        ValidationState.OVER_GOLD_TIER_LIMIT -> TransactionErrorState.OVER_GOLD_TIER_LIMIT
         ValidationState.INVOICE_EXPIRED, // We shouldn't see this here
         ValidationState.UNKNOWN_ERROR -> TransactionErrorState.UNKNOWN_ERROR
     }

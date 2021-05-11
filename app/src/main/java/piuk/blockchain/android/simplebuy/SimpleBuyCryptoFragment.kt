@@ -7,43 +7,41 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.TextView
 import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.CurrencyChangedFromBuyForm
-import com.blockchain.notifications.analytics.PaymentMethodSelected
-import com.blockchain.notifications.analytics.SimpleBuyAnalytics
-import com.blockchain.notifications.analytics.buyConfirmClicked
+import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.UndefinedPaymentMethod
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.swap.nabu.datamanagers.OrderState
-import com.blockchain.swap.nabu.datamanagers.PaymentMethod
-import com.blockchain.swap.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.bumptech.glide.Glide
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
-import kotlinx.android.synthetic.main.fragment_simple_buy_buy_crypto.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.cards.CardDetailsActivity
 import piuk.blockchain.android.cards.CardDetailsActivity.Companion.ADD_CARD_REQUEST_CODE
 import piuk.blockchain.android.cards.icon
+import piuk.blockchain.android.coincore.AssetResources
+import piuk.blockchain.android.databinding.FragmentSimpleBuyBuyCryptoBinding
 import piuk.blockchain.android.ui.base.ErrorSlidingBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
 import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
-import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
-import piuk.blockchain.android.util.assetName
-import piuk.blockchain.android.util.drawableResFilled
+import piuk.blockchain.android.ui.dashboard.sheets.WireTransferAccountDetailsBottomSheet
+import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthSource
+import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.setAssetIconColours
+import piuk.blockchain.android.util.visible
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.utils.extensions.gone
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
-import piuk.blockchain.androidcoreui.utils.extensions.visible
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
 
 class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(),
     SimpleBuyScreen,
@@ -52,13 +50,18 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
 
     override val model: SimpleBuyModel by scopedInject()
     private val exchangeRateDataManager: ExchangeRateDataManager by scopedInject()
+    private val assetResources: AssetResources by scopedInject()
 
     private var lastState: SimpleBuyState? = null
-    private val compositeDesposable = CompositeDisposable()
+    private val compositeDisposable = CompositeDisposable()
 
     private val cryptoCurrency: CryptoCurrency by unsafeLazy {
         arguments?.getSerializable(ARG_CRYPTO_CURRENCY) as? CryptoCurrency
             ?: throw IllegalArgumentException("No cryptoCurrency specified")
+    }
+
+    private val preselectedMethodId: String? by unsafeLazy {
+        arguments?.getString(ARG_PAYMENT_METHOD_ID)
     }
 
     override fun navigator(): SimpleBuyNavigator =
@@ -68,11 +71,29 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     private val currencyPrefs: CurrencyPrefs by inject()
 
     override fun onBackPressed(): Boolean = true
+
+    private var _binding: FragmentSimpleBuyBuyCryptoBinding? = null
+
+    private val binding get() = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_simple_buy_buy_crypto)
+    ): View {
+        _binding = FragmentSimpleBuyBuyCryptoBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        model.process(SimpleBuyIntent.FetchBuyLimits(currencyPrefs.selectedFiatCurrency, cryptoCurrency))
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -80,33 +101,33 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
         activity.setupToolbar(R.string.simple_buy_buy_crypto_title)
 
-        model.process(SimpleBuyIntent.FetchBuyLimits(currencyPrefs.selectedFiatCurrency, cryptoCurrency))
         model.process(SimpleBuyIntent.FlowCurrentScreen(FlowScreen.ENTER_AMOUNT))
-        model.process(SimpleBuyIntent.FetchSuggestedPaymentMethod(currencyPrefs.selectedFiatCurrency))
+        model.process(
+            SimpleBuyIntent.FetchSuggestedPaymentMethod(currencyPrefs.selectedFiatCurrency, preselectedMethodId)
+        )
         model.process(SimpleBuyIntent.FetchSupportedFiatCurrencies)
         analytics.logEvent(SimpleBuyAnalytics.BUY_FORM_SHOWN)
 
-        compositeDesposable += input_amount.amount.subscribe {
+        compositeDisposable += binding.inputAmount.amount.subscribe {
             when (it) {
                 is FiatValue -> model.process(SimpleBuyIntent.AmountUpdated(it))
                 else -> throw IllegalStateException("CryptoValue is not supported as input yet")
             }
         }
 
-        btn_continue.setOnClickListener {
+        binding.btnContinue.setOnClickListener {
             startBuy()
         }
 
-        payment_method_details_root.setOnClickListener {
-            lastState?.paymentOptions?.let {
-                showBottomSheet(PaymentMethodChooserBottomSheet.newInstance(it.availablePaymentMethods.filterNot {
-                    it is PaymentMethod.Undefined
-                },
-                    it.canAddCard, it.canLinkFunds))
-            }
+        binding.paymentMethodDetailsRoot.setOnClickListener {
+            showPaymentMethodsBottomSheet(
+                if (lastState?.paymentOptions?.availablePaymentMethods?.any { it.canUsedForPaying() } == true)
+                    PaymentMethodsChooserState.AVAILABLE_TO_PAY
+                else PaymentMethodsChooserState.AVAILABLE_TO_ADD
+            )
         }
 
-        compositeDesposable += input_amount.onImeAction.subscribe {
+        compositeDisposable += binding.inputAmount.onImeAction.subscribe {
             when (it) {
                 PrefixedOrSuffixedEditText.ImeOptions.NEXT -> {
                     startBuy()
@@ -118,15 +139,35 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         }
     }
 
+    override fun showAvailableToAddPaymentMethods() {
+        showPaymentMethodsBottomSheet(PaymentMethodsChooserState.AVAILABLE_TO_ADD)
+    }
+
+    private fun showPaymentMethodsBottomSheet(state: PaymentMethodsChooserState) {
+        lastState?.paymentOptions?.let {
+            showBottomSheet(PaymentMethodChooserBottomSheet.newInstance(
+                when (state) {
+                    PaymentMethodsChooserState.AVAILABLE_TO_PAY -> it.availablePaymentMethods.filter { method ->
+                        method.canUsedForPaying()
+                    }
+                    PaymentMethodsChooserState.AVAILABLE_TO_ADD -> it.availablePaymentMethods.filter { method ->
+                        method.canBeAdded()
+                    }
+                }))
+        }
+    }
+
     private fun startBuy() {
         lastState?.let {
             if (canContinue(it)) {
                 model.process(SimpleBuyIntent.BuyButtonClicked)
                 model.process(SimpleBuyIntent.CancelOrderIfAnyAndCreatePendingOne)
-                analytics.logEvent(buyConfirmClicked(
-                    lastState?.order?.amount?.valueMinor.toString(),
-                    lastState?.fiatCurrency ?: "",
-                    lastState?.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString() ?: "")
+                analytics.logEvent(
+                    buyConfirmClicked(
+                        lastState?.order?.amount?.valueMinor.toString(),
+                        lastState?.fiatCurrency.orEmpty(),
+                        lastState?.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString().orEmpty()
+                    )
                 )
             }
         }
@@ -135,8 +176,12 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     override fun onFiatCurrencyChanged(fiatCurrency: String) {
         if (fiatCurrency == lastState?.fiatCurrency) return
         model.process(SimpleBuyIntent.FiatCurrencyUpdated(fiatCurrency))
-        model.process(SimpleBuyIntent.FetchBuyLimits(fiatCurrency,
-            lastState?.selectedCryptoCurrency ?: return))
+        model.process(
+            SimpleBuyIntent.FetchBuyLimits(
+                fiatCurrency,
+                lastState?.selectedCryptoCurrency ?: return
+            )
+        )
         model.process(SimpleBuyIntent.FetchSuggestedPaymentMethod(currencyPrefs.selectedFiatCurrency))
         analytics.logEvent(CurrencyChangedFromBuyForm(fiatCurrency))
     }
@@ -145,39 +190,45 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         lastState = newState
 
         if (newState.errorState != null) {
-            showErrorState(newState.errorState)
+            handleErrorState(newState.errorState)
             return
         }
 
         newState.selectedCryptoCurrency?.let {
-            if (!input_amount.isConfigured) {
-                input_amount.configuration = FiatCryptoViewConfiguration(
-                    input = CurrencyType.Fiat,
-                    output = CurrencyType.Fiat,
-                    fiatCurrency = newState.fiatCurrency,
-                    cryptoCurrency = it,
-                    canSwap = false,
-                    predefinedAmount = newState.order.amount ?: FiatValue.zero(newState.fiatCurrency)
-                )
-            }
-            buy_icon.setAssetIconColours(it, activity)
+            binding.inputAmount.configuration = FiatCryptoViewConfiguration(
+                inputCurrency = CurrencyType.Fiat(newState.fiatCurrency),
+                outputCurrency = CurrencyType.Fiat(newState.fiatCurrency),
+                exchangeCurrency = CurrencyType.Crypto(it),
+                canSwap = false,
+                predefinedAmount = newState.order.amount ?: FiatValue.zero(newState.fiatCurrency)
+            )
+            binding.buyIcon.setAssetIconColours(
+                tintColor = assetResources.assetTint(it),
+                filterColor = assetResources.assetFilter(it)
+            )
         }
         newState.selectedCryptoCurrency?.let {
-            crypto_icon.setImageResource(it.drawableResFilled())
-            crypto_text.setText(it.assetName())
+            binding.cryptoIcon.setImageResource(assetResources.drawableResFilled(it))
+            binding.cryptoText.setText(assetResources.assetNameRes(it))
         }
 
         newState.exchangePrice?.let {
-            crypto_exchange_rate.text = it.toStringWithSymbol()
+            binding.cryptoExchangeRate.text = it.toStringWithSymbol()
         }
 
-        input_amount.maxLimit = newState.maxFiatAmount
+        newState.maxFiatAmount.takeIf { it.currencyCode == currencyPrefs.selectedFiatCurrency }?.let {
+            binding.inputAmount.maxLimit = it
+        }
 
-        newState.selectedPaymentMethodDetails?.let {
-            renderPaymentMethod(it)
-        } ?: hidePaymentMethod()
+        if (newState.paymentOptions.availablePaymentMethods.isEmpty()) {
+            hidePaymentMethod()
+        } else {
+            newState.selectedPaymentMethodDetails?.let {
+                renderDefinedPaymentMethod(it)
+            } ?: renderUndefinedPaymentMethod()
+        }
 
-        btn_continue.isEnabled = canContinue(newState)
+        binding.btnContinue.isEnabled = canContinue(newState)
         newState.error?.let {
             handleError(it, newState)
         } ?: kotlin.run {
@@ -188,161 +239,221 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
             newState.kycVerificationState != null &&
             newState.orderState == OrderState.PENDING_CONFIRMATION
         ) {
-            when (newState.kycVerificationState) {
-                // Kyc state unknown because error, or gold docs unsubmitted
-                KycState.PENDING -> {
-                    startKyc()
-                }
-                // Awaiting results state
-                KycState.IN_REVIEW,
-                KycState.UNDECIDED -> {
-                    navigator().goToKycVerificationScreen()
-                }
-                // Got results, kyc verification screen will show error
-                KycState.VERIFIED_BUT_NOT_ELIGIBLE,
-                KycState.FAILED -> {
-                    navigator().goToKycVerificationScreen()
-                }
-                // We have done kyc and are verified
-                KycState.VERIFIED_AND_ELIGIBLE -> {
-                    if (newState.selectedPaymentMethod?.paymentMethodType != PaymentMethodType.UNKNOWN) {
-                        navigator().goToCheckOutScreen()
-                    } else
-                        goToAddNewPaymentMethod(newState.selectedPaymentMethod.id)
-                }
-            }.exhaustive
+            handlePostOrderCreationAction(newState)
         }
 
-        if (
-            newState.depositFundsRequested &&
-            newState.kycVerificationState != null
-        ) {
-            when (newState.kycVerificationState) {
-                // Kyc state unknown because error, or gold docs unsubmitted
-                KycState.PENDING -> {
-                    startKyc()
-                }
-                // Awaiting results state
-                KycState.IN_REVIEW,
-                KycState.UNDECIDED,
-                KycState.VERIFIED_BUT_NOT_ELIGIBLE,
-                KycState.FAILED -> {
-                    navigator().goToKycVerificationScreen()
-                }
-                // We have done kyc and are verified
-                KycState.VERIFIED_AND_ELIGIBLE -> {
-                    showBottomSheet(LinkBankAccountDetailsBottomSheet.newInstance(
-                        lastState?.fiatCurrency ?: return
-                    ))
-                }
-            }.exhaustive
+        newState.newPaymentMethodToBeAdded?.let {
+            handleNewPaymentMethodAdding(newState)
+        }
+
+        newState.linkBankTransfer?.let {
+            model.process(SimpleBuyIntent.ResetLinkBankTransfer)
+            startActivityForResult(
+                BankAuthActivity.newInstance(
+                    it, BankAuthSource.SIMPLE_BUY, requireContext()
+                ), BankAuthActivity.LINK_BANK_REQUEST_CODE
+            )
         }
     }
+
+    private fun handleNewPaymentMethodAdding(state: SimpleBuyState) {
+        require(state.newPaymentMethodToBeAdded is UndefinedPaymentMethod)
+        addPaymentMethod(state.newPaymentMethodToBeAdded.paymentMethodType)
+        model.process(SimpleBuyIntent.AddNewPaymentMethodHandled)
+        model.process(SimpleBuyIntent.SelectedPaymentMethodUpdate(state.newPaymentMethodToBeAdded))
+    }
+
+    private fun handlePostOrderCreationAction(newState: SimpleBuyState) {
+        when {
+            newState.selectedPaymentMethod?.isActive() == true -> {
+                navigator().goToCheckOutScreen()
+            }
+            newState.selectedPaymentMethod?.isEligible == true -> {
+                addPaymentMethod(newState.selectedPaymentMethod.paymentMethodType)
+            }
+            else -> {
+                require(newState.kycVerificationState != null)
+                require(newState.kycVerificationState != KycState.VERIFIED_AND_ELIGIBLE)
+                when (newState.kycVerificationState) {
+                    // Kyc state unknown because error, or gold docs unsubmitted
+                    KycState.PENDING -> {
+                        startKyc()
+                    }
+                    // Awaiting results state
+                    KycState.IN_REVIEW,
+                    KycState.UNDECIDED -> {
+                        navigator().goToKycVerificationScreen()
+                    }
+                    // Got results, kyc verification screen will show error
+                    KycState.VERIFIED_BUT_NOT_ELIGIBLE,
+                    KycState.FAILED -> {
+                        navigator().goToKycVerificationScreen()
+                    }
+                    KycState.VERIFIED_AND_ELIGIBLE -> throw IllegalStateException(
+                        "Payment method should be active or eligible"
+                    )
+                }.exhaustive
+            }
+        }
+    }
+
+    /**
+     * Once User selects the option to Link a bank then his/her Kyc status is checked.
+     * If is VERIFIED_AND_ELIGIBLE then we try to link a bank and if the fetched partner is supported
+     * then the LinkBankActivity is launched.
+     * In case that user is not VERIFIED_AND_ELIGIBLE then we just select the payment method and when
+     * user presses Continue the KYC flow is launched
+     */
 
     private fun startKyc() {
         model.process(SimpleBuyIntent.NavigationHandled)
         model.process(SimpleBuyIntent.KycStarted)
-        navigator().startKyc()
         analytics.logEvent(SimpleBuyAnalytics.START_GOLD_FLOW)
-    }
-
-    private fun goToAddNewPaymentMethod(selectedPaymentMethodId: String) {
-        when (selectedPaymentMethodId) {
-            PaymentMethod.UNDEFINED_CARD_PAYMENT_ID -> {
-                addPaymentMethod(PaymentMethodType.PAYMENT_CARD)
-            }
-            PaymentMethod.UNDEFINED_FUNDS_PAYMENT_ID -> {
-                addPaymentMethod(PaymentMethodType.FUNDS)
-            }
-            else -> {
-            }
-        }
-    }
-
-    private fun hidePaymentMethod() {
-        payment_method.gone()
-        payment_method_separator.gone()
-        payment_method_details_root.gone()
+        KycNavHostActivity.startForResult(this, CampaignType.SimpleBuy, SimpleBuyActivity.KYC_STARTED)
     }
 
     private fun canContinue(state: SimpleBuyState) =
-        state.isAmountValid && state.selectedPaymentMethod?.id != PaymentMethod.UNDEFINED_PAYMENT_ID && !state.isLoading
+        state.isAmountValid && state.selectedPaymentMethod != null && !state.isLoading
 
-    private fun renderPaymentMethod(selectedPaymentMethod: PaymentMethod) {
+    private fun renderDefinedPaymentMethod(selectedPaymentMethod: PaymentMethod) {
+
         when (selectedPaymentMethod) {
-            is PaymentMethod.Undefined -> {
-                payment_method_icon.setImageResource(R.drawable.ic_add_payment_method)
-            }
-            is PaymentMethod.BankTransfer -> renderBankPayment(selectedPaymentMethod)
             is PaymentMethod.Card -> renderCardPayment(selectedPaymentMethod)
             is PaymentMethod.Funds -> renderFundsPayment(selectedPaymentMethod)
+            is PaymentMethod.Bank -> renderBankPayment(selectedPaymentMethod)
             is PaymentMethod.UndefinedCard -> renderUndefinedCardPayment(selectedPaymentMethod)
+            is PaymentMethod.UndefinedBankTransfer -> renderUndefinedBankTransfer(selectedPaymentMethod)
+            else -> {
+            }
         }
-        payment_method.visible()
-        payment_method_separator.visible()
-        payment_method_details_root.visible()
-        undefined_payment_text.showIfPaymentMethodUndefined(selectedPaymentMethod)
-        payment_method_title.showIfPaymentMethodDefined(selectedPaymentMethod)
-        payment_method_limit.showIfPaymentMethodDefined(selectedPaymentMethod)
+        with(binding) {
+            paymentMethod.visible()
+            paymentMethodSeparator.visible()
+            paymentMethodDetailsRoot.visible()
+            undefinedPaymentText.gone()
+            paymentMethodTitle.visible()
+            paymentMethodLimit.visible()
+        }
+    }
+
+    private fun renderUndefinedPaymentMethod() {
+        with(binding) {
+            paymentMethodIcon.setImageResource(R.drawable.ic_add_payment_method)
+            undefinedPaymentText.text = getString(R.string.select_payment_method)
+            paymentMethod.visible()
+            paymentMethodSeparator.visible()
+            paymentMethodDetailsRoot.visible()
+            undefinedPaymentText.visible()
+            paymentMethodTitle.gone()
+            paymentMethodLimit.gone()
+        }
     }
 
     private fun renderFundsPayment(paymentMethod: PaymentMethod.Funds) {
-        payment_method_icon.setImageResource(
-            paymentMethod.icon()
-        )
-        payment_method_title.text = getString(paymentMethod.label())
+        with(binding) {
+            paymentMethodBankInfo.gone()
+            paymentMethodIcon.setImageResource(
+                paymentMethod.icon()
+            )
+            paymentMethodTitle.text = getString(paymentMethod.label())
 
-        payment_method_limit.text =
-            getString(R.string.payment_method_limit, paymentMethod.limits.max.toStringWithSymbol())
+            paymentMethodLimit.text = paymentMethod.limits.max.toStringWithSymbol()
+        }
+    }
+
+    private fun renderBankPayment(paymentMethod: PaymentMethod.Bank) {
+        with(binding) {
+            paymentMethodIcon.setImageResource(R.drawable.ic_bank_transfer)
+            if (paymentMethod.iconUrl.isNotEmpty()) {
+                Glide.with(requireContext()).load(paymentMethod.iconUrl).into(paymentMethodIcon)
+            }
+
+            paymentMethodTitle.text = paymentMethod.bankName
+            paymentMethodBankInfo.text =
+                requireContext().getString(
+                    R.string.payment_method_type_account_info, paymentMethod.uiAccountType,
+                    paymentMethod.accountEnding
+                )
+            paymentMethodBankInfo.visible()
+            paymentMethodLimit.text =
+                getString(R.string.payment_method_limit, paymentMethod.limits.max.toStringWithSymbol())
+        }
     }
 
     private fun renderUndefinedCardPayment(selectedPaymentMethod: PaymentMethod.UndefinedCard) {
-        payment_method_icon.setImageResource(R.drawable.ic_payment_card)
-        payment_method_title.text = getString(R.string.credit_or_debit_card)
-        payment_method_limit.text =
-            getString(R.string.payment_method_limit, selectedPaymentMethod.limits.max.toStringWithSymbol())
+        with(binding) {
+            paymentMethodBankInfo.gone()
+            paymentMethodIcon.setImageResource(R.drawable.ic_payment_card)
+            paymentMethodTitle.text = getString(R.string.credit_or_debit_card)
+            paymentMethodLimit.text =
+                getString(R.string.payment_method_limit, selectedPaymentMethod.limits.max.toStringWithSymbol())
+        }
+    }
+
+    private fun renderUndefinedBankTransfer(selectedPaymentMethod: PaymentMethod.UndefinedBankTransfer) {
+        with(binding) {
+            paymentMethodBankInfo.gone()
+            paymentMethodIcon.setImageResource(R.drawable.ic_bank_transfer)
+            paymentMethodTitle.text = getString(R.string.link_a_bank)
+            paymentMethodLimit.text =
+                getString(R.string.payment_method_limit, selectedPaymentMethod.limits.max.toStringWithSymbol())
+        }
     }
 
     private fun renderCardPayment(selectedPaymentMethod: PaymentMethod.Card) {
-        payment_method_icon.setImageResource(selectedPaymentMethod.cardType.icon())
-        payment_method_title.text = selectedPaymentMethod.uiLabelWithDigits()
-        payment_method_limit.text =
-            getString(R.string.payment_method_limit, selectedPaymentMethod.limits.max.toStringWithSymbol())
-    }
-
-    private fun renderBankPayment(selectedPaymentMethod: PaymentMethod.BankTransfer) {
-        payment_method_title.text = getString(R.string.bank_wire_transfer)
-        payment_method_icon.setImageResource(R.drawable.ic_bank_transfer)
-        payment_method_limit.text =
-            getString(R.string.payment_method_limit, selectedPaymentMethod.limits.max.toStringWithSymbol())
+        with(binding) {
+            paymentMethodBankInfo.gone()
+            paymentMethodIcon.setImageResource(selectedPaymentMethod.cardType.icon())
+            paymentMethodTitle.text = selectedPaymentMethod.detailedLabel()
+            paymentMethodLimit.text =
+                getString(R.string.payment_method_limit, selectedPaymentMethod.limits.max.toStringWithSymbol())
+        }
     }
 
     private fun clearError() {
-        input_amount.hideError()
+        binding.inputAmount.hideLabels()
     }
 
-    private fun showErrorState(errorState: ErrorState) {
-        showBottomSheet(ErrorSlidingBottomDialog.newInstance(activity))
+    private fun hidePaymentMethod() {
+        with(binding) {
+            paymentMethod.gone()
+            paymentMethodSeparator.gone()
+            paymentMethodDetailsRoot.gone()
+        }
+    }
+
+    private fun handleErrorState(errorState: ErrorState) {
+        if (errorState == ErrorState.LinkedBankNotSupported) {
+            model.process(SimpleBuyIntent.ClearError)
+            model.process(SimpleBuyIntent.ClearAnySelectedPaymentMethods)
+            navigator().launchBankAuthWithError(errorState)
+        } else {
+            showBottomSheet(ErrorSlidingBottomDialog.newInstance(activity))
+        }
     }
 
     private fun handleError(error: InputError, state: SimpleBuyState) {
         when (error) {
             InputError.ABOVE_MAX -> {
-                input_amount.showError(
-                    if (input_amount.configuration.input == CurrencyType.Fiat)
+                binding.inputAmount.showError(
+                    if (binding.inputAmount.configuration.inputCurrency.isFiat())
                         resources.getString(R.string.maximum_buy, state.maxFiatAmount.toStringWithSymbol())
                     else
-                        resources.getString(R.string.maximum_buy,
-                            state.maxCryptoAmount(exchangeRateDataManager)?.toStringWithSymbol())
+                        resources.getString(
+                            R.string.maximum_buy,
+                            state.maxCryptoAmount(exchangeRateDataManager)?.toStringWithSymbol()
+                        )
                 )
             }
             InputError.BELOW_MIN -> {
-                input_amount.showError(
-                    if (input_amount.configuration.input == CurrencyType.Fiat)
+                binding.inputAmount.showError(
+                    if (binding.inputAmount.configuration.inputCurrency.isFiat())
                         resources.getString(R.string.minimum_buy, state.minFiatAmount.toStringWithSymbol())
                     else
-                        resources.getString(R.string.minimum_buy,
-                            state.minCryptoAmount(exchangeRateDataManager)?.toStringWithSymbol())
+                        resources.getString(
+                            R.string.minimum_buy,
+                            state.minCryptoAmount(exchangeRateDataManager)?.toStringWithSymbol()
+                        )
                 )
             }
         }
@@ -358,27 +469,24 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
     }
 
     override fun onPaymentMethodChanged(paymentMethod: PaymentMethod) {
-        model.process(SimpleBuyIntent.SelectedPaymentMethodUpdate(paymentMethod))
-        analytics.logEvent(PaymentMethodSelected(
-            when (paymentMethod) {
-                is PaymentMethod.BankTransfer -> PaymentMethodType.BANK_ACCOUNT.toAnalyticsString()
-                is PaymentMethod.Card -> PaymentMethodType.PAYMENT_CARD.toAnalyticsString()
-                is PaymentMethod.Funds -> PaymentMethodType.FUNDS.toAnalyticsString()
-                else -> ""
-            }
-        ))
+        model.process(SimpleBuyIntent.PaymentMethodChangeRequested(paymentMethod))
     }
 
-    override fun addPaymentMethod(type: PaymentMethodType) {
+    private fun addPaymentMethod(type: PaymentMethodType) {
         when (type) {
             PaymentMethodType.PAYMENT_CARD -> {
                 val intent = Intent(activity, CardDetailsActivity::class.java)
                 startActivityForResult(intent, ADD_CARD_REQUEST_CODE)
             }
             PaymentMethodType.FUNDS -> {
-                showBottomSheet(LinkBankAccountDetailsBottomSheet.newInstance(
-                    lastState?.fiatCurrency ?: return
-                ))
+                showBottomSheet(
+                    WireTransferAccountDetailsBottomSheet.newInstance(
+                        lastState?.fiatCurrency ?: return
+                    )
+                )
+            }
+            PaymentMethodType.BANK_TRANSFER -> {
+                model.process(SimpleBuyIntent.LinkBankTransferRequested)
             }
             else -> {
             }
@@ -386,49 +494,62 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
         analytics.logEvent(PaymentMethodSelected(type.toAnalyticsString()))
     }
 
-    override fun depositFundsRequested() {
-        model.process(SimpleBuyIntent.DepositFundsRequested)
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == ADD_CARD_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            model.process(
-                SimpleBuyIntent.FetchSuggestedPaymentMethod(currencyPrefs.selectedFiatCurrency,
-                    (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as? PaymentMethod.Card)?.id
-                ))
+            val preselectedId = (data?.extras?.getSerializable(CardDetailsActivity.CARD_KEY) as? PaymentMethod.Card)?.id
+            updatePaymentMethods(preselectedId)
+        }
+        if (requestCode == BankAuthActivity.LINK_BANK_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            val preselectedId = data?.extras?.getString(BankAuthActivity.LINKED_BANK_ID_KEY)
+            updatePaymentMethods(preselectedId)
+        }
+        if (requestCode == SimpleBuyActivity.KYC_STARTED) {
+            if (resultCode == SimpleBuyActivity.RESULT_KYC_SIMPLE_BUY_COMPLETE) {
+                model.process(SimpleBuyIntent.KycCompleted)
+                navigator().goToKycVerificationScreen()
+            } else if (resultCode == KycNavHostActivity.RESULT_KYC_FOR_SDD_COMPLETE) {
+                model.process(
+                    SimpleBuyIntent.UpdatePaymentMethodsAndAddTheFirstEligible(
+                        currencyPrefs.selectedFiatCurrency
+                    )
+                )
+            }
         }
     }
 
-    private fun TextView.showIfPaymentMethodDefined(paymentMethod: PaymentMethod) {
-        visibleIf {
-            paymentMethod !is PaymentMethod.Undefined
-        }
-    }
-
-    private fun TextView.showIfPaymentMethodUndefined(paymentMethod: PaymentMethod) {
-        visibleIf {
-            paymentMethod is PaymentMethod.Undefined
-        }
+    private fun updatePaymentMethods(preselectedId: String?) {
+        model.process(
+            SimpleBuyIntent.FetchSuggestedPaymentMethod(
+                currencyPrefs.selectedFiatCurrency,
+                preselectedId
+            )
+        )
     }
 
     companion object {
-        private const val ARG_CRYPTO_CURRENCY = "crypto"
-        fun newInstance(cryptoCurrency: CryptoCurrency): SimpleBuyCryptoFragment {
+        private const val ARG_CRYPTO_CURRENCY = "CRYPTO"
+        private const val ARG_PAYMENT_METHOD_ID = "PAYMENT_METHOD_ID"
+
+        fun newInstance(cryptoCurrency: CryptoCurrency, preselectedMethodId: String? = null): SimpleBuyCryptoFragment {
             return SimpleBuyCryptoFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(ARG_CRYPTO_CURRENCY, cryptoCurrency)
+                    preselectedMethodId?.let { putString(ARG_PAYMENT_METHOD_ID, preselectedMethodId) }
                 }
             }
         }
+    }
+
+    private enum class PaymentMethodsChooserState {
+        AVAILABLE_TO_PAY, AVAILABLE_TO_ADD
     }
 }
 
 interface PaymentMethodChangeListener {
     fun onPaymentMethodChanged(paymentMethod: PaymentMethod)
-    fun addPaymentMethod(type: PaymentMethodType)
-    fun depositFundsRequested()
+    fun showAvailableToAddPaymentMethods()
 }
 
 interface ChangeCurrencyHost : SimpleBuyScreen {

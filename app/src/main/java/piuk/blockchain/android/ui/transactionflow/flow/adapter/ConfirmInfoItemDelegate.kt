@@ -6,15 +6,16 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_send_confirm_details.view.*
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.TxOption
-import piuk.blockchain.android.coincore.TxOptionValue
+import piuk.blockchain.android.coincore.TxConfirmation
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapper
-import piuk.blockchain.androidcoreui.utils.extensions.inflate
+import piuk.blockchain.android.util.inflate
 
-class ConfirmInfoItemDelegate<in T>(private val mapper: TxConfirmReadOnlyMapper) : AdapterDelegate<T> {
+class ConfirmInfoItemDelegate<in T>(private val mapper: TxConfirmReadOnlyMapper) :
+    AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
-        return (items[position] as? TxOptionValue)?.option == TxOption.READ_ONLY
+        return (items[position] as? TxConfirmationValue)?.confirmation == TxConfirmation.READ_ONLY
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
@@ -28,7 +29,7 @@ class ConfirmInfoItemDelegate<in T>(private val mapper: TxConfirmReadOnlyMapper)
         position: Int,
         holder: RecyclerView.ViewHolder
     ) = (holder as InfoItemViewHolder).bind(
-        items[position] as TxOptionValue
+        items[position] as TxConfirmationValue
     )
 }
 
@@ -39,7 +40,7 @@ class InfoItemViewHolder(val parent: View, private val mapper: TxConfirmReadOnly
     override val containerView: View?
         get() = itemView
 
-    fun bind(item: TxOptionValue) {
+    fun bind(item: TxConfirmationValue) {
         mapper.map(item).let { (title, value) ->
             itemView.confirmation_item_label.text = title
             itemView.confirmation_item_value.text = value

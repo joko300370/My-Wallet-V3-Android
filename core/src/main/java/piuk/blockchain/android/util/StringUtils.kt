@@ -1,26 +1,34 @@
 package piuk.blockchain.android.util
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+import android.graphics.Typeface
 import android.net.Uri
 import android.text.Spannable
 import android.text.SpannableString
+import android.text.SpannableStringBuilder
 import android.text.SpannedString
+import android.text.TextPaint
 import android.text.style.ClickableSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.view.View
+import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 
 class StringUtils(private val context: Context) {
 
+    @Deprecated("Don't be get getting strings in non-UI code")
     fun getString(@StringRes stringId: Int): String {
         return context.getString(stringId)
     }
 
-    fun getStringWithMappedLinks(
+    fun getStringWithMappedAnnotations(
         @StringRes stringId: Int,
         linksMap: Map<String, Uri?>,
-        launchActivity: Activity,
+        ctx: Context,
         onClick: () -> Unit = {}
     ): CharSequence {
 
@@ -31,20 +39,66 @@ class StringUtils(private val context: Context) {
         for (annotation in rawText.getSpans(0, rawText.length, android.text.Annotation::class.java)) {
             if (annotation.key == "link") {
                 out.setSpan(
-                    object : ClickableSpan() {
-                        override fun onClick(widget: View?) {
-                            linksMap[annotation.value]?.let {
-                                launchActivity.startActivity(Intent(Intent.ACTION_VIEW,
-                                    it))
-                            }
-                            onClick()
+                    ClickableSpanWithoutUnderline {
+                        linksMap[annotation.value]?.let {
+                            val intent = Intent(Intent.ACTION_VIEW, it).addFlags(FLAG_ACTIVITY_NEW_TASK)
+                            ctx.startActivity(intent)
                         }
+                        onClick()
                     },
                     rawText.getSpanStart(annotation),
                     rawText.getSpanEnd(annotation),
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+            if (annotation.key == "font" && annotation.value == "bold") {
+                out.setSpan(
+                    StyleSpan(Typeface.BOLD),
+                    rawText.getSpanStart(annotation),
+                    rawText.getSpanEnd(annotation),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
             }
         }
         return out
+    }
+
+    fun getResolvedStringWithAppendedMappedLearnMore(
+        staticText: String,
+        @StringRes textToMap: Int,
+        url: String,
+        context: Context,
+        @ColorRes linkColour: Int,
+        onClick: () -> Unit = {}
+    ): SpannableStringBuilder {
+        val map = mapOf("learn_more_link" to Uri.parse(url))
+        val learnMoreLink = getStringWithMappedAnnotations(
+            textToMap,
+            map,
+            context,
+            onClick
+        )
+
+        val sb = SpannableStringBuilder()
+            .append(staticText)
+            .append(learnMoreLink)
+        sb.setSpan(
+            ForegroundColorSpan(ContextCompat.getColor(context, linkColour)),
+            staticText.length, staticText.length + learnMoreLink.length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        return sb
+    }
+}
+
+private class ClickableSpanWithoutUnderline(val onClick: () -> Unit) : ClickableSpan() {
+    override fun onClick(widget: View) {
+        onClick.invoke()
+    }
+
+    override fun updateDrawState(ds: TextPaint) {
+        super.updateDrawState(ds)
+        ds.isUnderlineText = false
     }
 }

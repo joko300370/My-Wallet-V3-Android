@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -13,6 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/small_margin"
         android:background="@android:color/transparent"
+        android:contentDescription="@string/content_desc_enter_amount"
         android:digits="0123456789-.,"
         android:focusable="true"
         android:focusableInTouchMode="true"
@@ -22,6 +24,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="$1241" />
+
+    <TextView
+        android:id="@+id/fake_hint"
+        style="@style/Text.Semibold.40"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/common_zero"
+        android:textColor="@color/grey_200"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/enter_amount"
+        app:layout_constraintStart_toStartOf="@+id/enter_amount"
+        app:layout_constraintTop_toTopOf="@+id/enter_amount"
+        tools:visibility="gone" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/exchange_amount"
@@ -46,21 +61,36 @@
         app:srcCompat="@drawable/ic_currency_type_swap"
         tools:visibility="visible" />
 
-    <androidx.appcompat.widget.AppCompatTextView
+    <piuk.blockchain.android.ui.customviews.StatusPill
         android:id="@+id/error"
-        style="@style/Text.Error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/size_massive"
         android:layout_marginTop="@dimen/tiny_margin"
-        android:layout_marginEnd="@dimen/size_massive"
-        android:gravity="center"
+        android:layout_marginStart="@dimen/epic_margin"
+        android:layout_marginEnd="@dimen/epic_margin"
         android:visibility="gone"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/enter_amount"
-        tools:text="$ 200000 Max"
+        app:status_type="error"
+        tools:text="Not enough BTC in your wallet to send with current network fees."
+        tools:visibility="visible" />
+
+    <piuk.blockchain.android.ui.customviews.StatusPill
+        android:id="@+id/info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/tiny_margin"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/enter_amount"
+        app:status_type="info"
+        tools:text="Tap here to trade more"
         tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

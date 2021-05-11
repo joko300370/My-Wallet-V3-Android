@@ -1,44 +1,55 @@
 package piuk.blockchain.android.ui.transactionflow.flow
 
-import android.view.View
+import android.text.method.LinkMovementMethod
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.ExchangeRates
-import kotlinx.android.synthetic.main.dialog_tx_flow_confirm.view.*
 import org.koin.android.ext.android.inject
-import piuk.blockchain.android.R
-import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.coincore.AssetResources
+import piuk.blockchain.android.databinding.DialogTxFlowConfirmBinding
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
 import piuk.blockchain.android.ui.transactionflow.flow.adapter.ConfirmTransactionDelegateAdapter
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionConfirmationCustomisations
+import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.androidcoreui.utils.extensions.visibleIf
+import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 
-class ConfirmTransactionSheet(
-    host: SlidingModalBottomDialog.Host
-) : TransactionFlowSheet(host) {
-    override val layoutResource: Int = R.layout.dialog_tx_flow_confirm
+class ConfirmTransactionSheet : TransactionFlowSheet<DialogTxFlowConfirmBinding>() {
 
     private val stringUtils: StringUtils by inject()
     private val exchangeRates: ExchangeRates by scopedInject()
     private val prefs: CurrencyPrefs by scopedInject()
     private val mapper: TxConfirmReadOnlyMapper by scopedInject()
-    private val customiser: TransactionFlowCustomiser by inject()
+    private val mapperNewCheckout: TxConfirmReadOnlyMapperNewCheckout by scopedInject()
+    private val customiser: TransactionConfirmationCustomisations by inject()
+    private val assetResources: AssetResources by scopedInject()
+
+    private var headerSlot: TxFlowWidget? = null
 
     private val listAdapter: ConfirmTransactionDelegateAdapter by lazy {
         ConfirmTransactionDelegateAdapter(
             model = model,
             stringUtils = stringUtils,
             activityContext = requireActivity(),
+            analytics = analyticsHooks,
             mapper = mapper,
+            mapperNewCheckout = mapperNewCheckout,
             selectedCurrency = prefs.selectedFiatCurrency,
-            exchangeRates = exchangeRates
+            exchangeRates = exchangeRates,
+            assetResources = assetResources
         )
     }
+
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogTxFlowConfirmBinding =
+        DialogTxFlowConfirmBinding.inflate(inflater, container, false)
 
     override fun render(newState: TransactionState) {
         Timber.d("!TRANSACTION!> Rendering! ConfirmTransactionSheet")
@@ -46,23 +57,46 @@ class ConfirmTransactionSheet(
 
         // We _should_ always have a pending Tx when we get here
         newState.pendingTx?.let {
-            listAdapter.items = newState.pendingTx.options.toList()
+            listAdapter.items = newState.pendingTx.confirmations.toList()
             listAdapter.notifyDataSetChanged()
-            dialogView.amount.text = newState.pendingTx.amount.toStringWithSymbol()
         }
 
-        with(dialogView) {
-            confirm_cta_button.text = customiser.confirmCtaText(newState)
-            confirm_sheet_title.text = customiser.confirmTitle(newState)
-            confirm_cta_button.isEnabled = newState.nextEnabled
-            confirm_sheet_back.visibleIf { newState.canGoBack }
+        with(binding) {
+            confirmCtaButton.text = customiser.confirmCtaText(newState)
+            confirmSheetTitle.text = customiser.confirmTitle(newState)
+            confirmCtaButton.isEnabled = newState.nextEnabled
+            confirmSheetBack.visibleIf { newState.canGoBack }
+
+            if (customiser.confirmDisclaimerVisibility(newState.action)) {
+                confirmDisclaimer.apply {
+                    text = customiser.confirmDisclaimerBlurb(newState.action, requireContext())
+                    visible()
+                    movementMethod = LinkMovementMethod.getInstance()
+                }
+            }
+            initialiseHeaderSlotIfNeeded(newState)
+        }
+
+        headerSlot?.update(newState)
+        cacheState(newState)
+    }
+
+    private fun DialogTxFlowConfirmBinding.initialiseHeaderSlotIfNeeded(state: TransactionState) {
+        if (headerSlot == null) {
+            headerSlot = customiser.confirmInstallHeaderView(
+                requireContext(),
+                confirmHeaderSlot,
+                state
+            ).apply {
+                initControl(model, customiser, analyticsHooks)
+            }
         }
     }
 
-    override fun initControls(view: View) {
-        view.confirm_cta_button.setOnClickListener { onCtaClick() }
+    override fun initControls(binding: DialogTxFlowConfirmBinding) {
+        binding.confirmCtaButton.setOnClickListener { onCtaClick() }
 
-        with(view.confirm_details_list) {
+        with(binding.confirmDetailsList) {
             addItemDecoration(BlockchainListDividerDecor(requireContext()))
 
             layoutManager = LinearLayoutManager(
@@ -73,7 +107,8 @@ class ConfirmTransactionSheet(
             adapter = listAdapter
         }
 
-        view.confirm_sheet_back.setOnClickListener {
+        binding.confirmSheetBack.setOnClickListener {
+            analyticsHooks.onStepBackClicked(state)
             model.process(TransactionIntent.ReturnToPreviousStep)
         }
 
@@ -81,6 +116,7 @@ class ConfirmTransactionSheet(
     }
 
     private fun onCtaClick() {
+        analyticsHooks.onConfirmationCtaClick(state)
         model.process(TransactionIntent.ExecuteTransaction)
     }
 }

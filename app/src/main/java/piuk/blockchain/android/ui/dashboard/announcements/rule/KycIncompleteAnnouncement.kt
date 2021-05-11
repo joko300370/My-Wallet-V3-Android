@@ -1,7 +1,7 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import androidx.annotation.VisibleForTesting
-import com.blockchain.swap.nabu.status.KycTiersQueries
+import com.blockchain.nabu.status.KycTiersQueries
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.SunriverCampaignRegistration
 import piuk.blockchain.android.campaign.SunriverCardType
@@ -61,7 +61,7 @@ internal class KycIncompleteAnnouncement(
                 val campaignType = if (cardType == SunriverCardType.FinishSignUp) {
                     CampaignType.Sunriver
                 } else {
-                    CampaignType.Swap
+                    CampaignType.None
                 }
                 host.startKyc(campaignType)
             },
