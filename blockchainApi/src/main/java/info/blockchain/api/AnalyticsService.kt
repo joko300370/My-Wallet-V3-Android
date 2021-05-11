@@ -10,12 +10,11 @@ import retrofit2.Retrofit
 class AnalyticsService(retrofit: Retrofit) {
     private val api: AnalyticsApiInterface = retrofit.create(AnalyticsApiInterface::class.java)
 
-    fun postEvent(events: List<NabuAnalyticsEvent>, id: String, timeStamp: String): Completable {
+    fun postEvents(events: List<NabuAnalyticsEvent>, id: String): Completable {
         return api.postAnalytics(
             AnalyticsRequestBody(
                 id = id,
                 events = events,
-                originalTimestamp = timeStamp,
                 context = AnalyticsContext()
             )
         )
@@ -23,8 +22,9 @@ class AnalyticsService(retrofit: Retrofit) {
 }
 
 @Serializable
-class NabuAnalyticsEvent(
+data class NabuAnalyticsEvent(
     val name: String,
     val type: String,
-    val properties: Map<String, String>
+    val originalTimestamp: String,
+    val properties: Map<String, String> = emptyMap()
 )

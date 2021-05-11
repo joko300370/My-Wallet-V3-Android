@@ -66,6 +66,7 @@ import com.blockchain.nabu.status.KycTiersQueries
 import com.blockchain.nabu.datamanagers.analytics.AnalyticsFileLocalPersistence
 import com.blockchain.nabu.stores.NabuSessionTokenStore
 import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.operations.AppStartUpFlushable
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -300,7 +301,9 @@ val nabuModule = module {
             prefs = lazy { get() },
             localAnalyticsPersistence = get()
         )
-    }.bind(Analytics::class)
+    }
+        .bind(AppStartUpFlushable::class)
+        .bind(Analytics::class)
 
     single {
         AnalyticsFileLocalPersistence(

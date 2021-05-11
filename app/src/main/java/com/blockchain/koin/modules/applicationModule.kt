@@ -670,6 +670,7 @@ val applicationModule = module {
                 crashLogger = get(),
                 simpleBuySync = get(),
                 rxBus = get(),
+                flushables = getAll(),
                 walletCredentialsUpdater = get()
             )
         }

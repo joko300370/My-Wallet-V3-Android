@@ -16,6 +16,7 @@ interface AnalyticsLocalPersistence {
     fun size(): Single<Long>
     fun save(item: NabuAnalyticsEvent): Completable
     fun getAllItems(): Single<List<NabuAnalyticsEvent>>
+    fun getOldestItems(n: Int): Single<List<NabuAnalyticsEvent>>
 
     /**
      * Removes the eldest {@code n} elements.
@@ -49,6 +50,14 @@ class AnalyticsFileLocalPersistence(context: Context) : AnalyticsLocalPersistenc
     override fun getAllItems(): Single<List<NabuAnalyticsEvent>> {
         return Single.fromCallable {
             queueFile.read(queueFile.size()).map {
+                Json.decodeFromString(it)
+            }
+        }
+    }
+
+    override fun getOldestItems(n: Int): Single<List<NabuAnalyticsEvent>> {
+        return Single.fromCallable {
+            queueFile.read(n.toLong()).map {
                 Json.decodeFromString(it)
             }
         }
