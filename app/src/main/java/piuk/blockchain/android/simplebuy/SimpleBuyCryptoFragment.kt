@@ -43,7 +43,8 @@ import piuk.blockchain.android.util.visible
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 
-class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(),
+class SimpleBuyCryptoFragment :
+    MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState, FragmentSimpleBuyBuyCryptoBinding>(),
     SimpleBuyScreen,
     PaymentMethodChangeListener,
     ChangeCurrencyHost {
@@ -72,23 +73,8 @@ class SimpleBuyCryptoFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Sim
 
     override fun onBackPressed(): Boolean = true
 
-    private var _binding: FragmentSimpleBuyBuyCryptoBinding? = null
-
-    private val binding get() = _binding!!
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentSimpleBuyBuyCryptoBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentSimpleBuyBuyCryptoBinding =
+        FragmentSimpleBuyBuyCryptoBinding.inflate(inflater, container, false)
 
     override fun onResume() {
         super.onResume()

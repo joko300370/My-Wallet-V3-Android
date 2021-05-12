@@ -27,11 +27,7 @@ import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
 import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 
-class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState>() {
-
-    private var _binding: FragmentLoginBinding? = null
-
-    private val binding get() = _binding!!
+class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState, FragmentLoginBinding>() {
 
     override val model: LoginModel by scopedInject()
 
@@ -39,11 +35,6 @@ class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState>() {
 
     private val googleSignInClient: GoogleSignInClient by lazy {
         GoogleSignIn.getClient(requireContext(), gso)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentLoginBinding.inflate(inflater)
-        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -82,10 +73,8 @@ class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState>() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentLoginBinding =
+        FragmentLoginBinding.inflate(inflater, container, false)
 
     override fun render(newState: LoginState) {
         updateUI(newState)

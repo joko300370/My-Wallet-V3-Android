@@ -8,23 +8,21 @@ import android.view.View
 import android.view.ViewGroup
 import com.blockchain.koin.scopedInject
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
-import kotlinx.android.synthetic.main.fragment_card_verification.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.FragmentCardVerificationBinding
 import piuk.blockchain.android.ui.base.mvi.MviFragment
-import piuk.blockchain.android.util.inflate
 
-class CardVerificationFragment : MviFragment<CardModel, CardIntent, CardState>(), AddCardFlowFragment {
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_card_verification)
+class CardVerificationFragment : MviFragment<CardModel, CardIntent, CardState, FragmentCardVerificationBinding>(),
+    AddCardFlowFragment {
 
     override val model: CardModel by scopedInject()
 
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentCardVerificationBinding =
+        FragmentCardVerificationBinding.inflate(inflater, container, false)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        ok_btn.setOnClickListener {
+        binding.okBtn.setOnClickListener {
             navigator.exitWithError()
         }
     }
@@ -51,7 +49,7 @@ class CardVerificationFragment : MviFragment<CardModel, CardIntent, CardState>()
                 newState.authoriseEverypayCard.exitLink
             )
             model.process(CardIntent.ResetEveryPayAuth)
-            progress.visibility = View.GONE
+            binding.progress.visibility = View.GONE
         }
     }
 
@@ -60,23 +58,27 @@ class CardVerificationFragment : MviFragment<CardModel, CardIntent, CardState>()
     }
 
     private fun renderLoadingState() {
-        progress.visibility = View.VISIBLE
-        icon.visibility = View.GONE
-        ok_btn.visibility = View.GONE
-        title.text = getString(R.string.linking_card_title)
-        subtitle.text = getString(R.string.linking_card_subtitle)
+        with(binding) {
+            progress.visibility = View.VISIBLE
+            icon.visibility = View.GONE
+            okBtn.visibility = View.GONE
+            title.text = getString(R.string.linking_card_title)
+            subtitle.text = getString(R.string.linking_card_subtitle)
+        }
     }
 
     private fun renderErrorState(error: CardError) {
-        progress.visibility = View.GONE
-        icon.visibility = View.VISIBLE
-        ok_btn.visibility = View.VISIBLE
-        title.text = getString(R.string.linking_card_error_title)
-        subtitle.text = when (error) {
-            CardError.CREATION_FAILED -> getString(R.string.could_not_save_card)
-            CardError.ACTIVATION_FAIL -> getString(R.string.could_not_activate_card)
-            CardError.PENDING_AFTER_POLL -> getString(R.string.card_still_pending)
-            CardError.LINK_FAILED -> getString(R.string.card_link_failed)
+        with(binding) {
+            progress.visibility = View.GONE
+            icon.visibility = View.VISIBLE
+            okBtn.visibility = View.VISIBLE
+            title.text = getString(R.string.linking_card_error_title)
+            subtitle.text = when (error) {
+                CardError.CREATION_FAILED -> getString(R.string.could_not_save_card)
+                CardError.ACTIVATION_FAIL -> getString(R.string.could_not_activate_card)
+                CardError.PENDING_AFTER_POLL -> getString(R.string.card_still_pending)
+                CardError.LINK_FAILED -> getString(R.string.card_link_failed)
+            }
         }
     }
 

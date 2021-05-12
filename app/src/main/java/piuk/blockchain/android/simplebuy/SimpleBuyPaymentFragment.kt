@@ -39,8 +39,10 @@ import piuk.blockchain.android.ui.transactionflow.flow.customisations.Transactio
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.secondsToDays
 
-class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(),
-    SimpleBuyScreen, UnlockHigherLimitsBottomSheet.Host {
+class SimpleBuyPaymentFragment :
+    MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState, FragmentSimpleBuyPaymentBinding>(),
+    SimpleBuyScreen,
+    UnlockHigherLimitsBottomSheet.Host {
 
     override val model: SimpleBuyModel by scopedInject()
     private val stringUtils: StringUtils by inject()
@@ -62,17 +64,8 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
         isFirstLoad = savedInstanceState == null
     }
 
-    private var _binding: FragmentSimpleBuyPaymentBinding? = null
-    private val binding get() = _binding!!
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentSimpleBuyPaymentBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentSimpleBuyPaymentBinding =
+        FragmentSimpleBuyPaymentBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -87,11 +80,6 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
                 }
             }
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     override fun render(newState: SimpleBuyState) {

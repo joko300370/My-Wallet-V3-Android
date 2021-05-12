@@ -72,7 +72,8 @@ class EmptyDashboardItem : DashboardItem
 
 private typealias RefreshFn = () -> Unit
 
-class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent, DashboardState>(),
+class DashboardFragment :
+    HomeScreenMviFragment<DashboardModel, DashboardIntent, DashboardState, FragmentDashboardBinding>(),
     ForceBackupForSendSheet.Host,
     FiatFundsDetailSheet.Host,
     KycBenefitsBottomSheet.Host,
@@ -98,11 +99,6 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
             assetResources = assetResources
         )
     }
-
-    private var _binding: FragmentDashboardBinding? = null
-
-    private val binding: FragmentDashboardBinding
-        get() = _binding!!
 
     private lateinit var theLayoutManager: RecyclerView.LayoutManager
 
@@ -339,14 +335,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
     override fun onBackPressed(): Boolean = false
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentDashboardBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentDashboardBinding =
+        FragmentDashboardBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

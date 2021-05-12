@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.home
 
 import androidx.fragment.app.Fragment
+import androidx.viewbinding.ViewBinding
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
@@ -56,7 +57,8 @@ interface HomeNavigator {
     fun startInterestDashboard()
 }
 
-abstract class HomeScreenMviFragment<M : MviModel<S, I>, I : MviIntent<S>, S : MviState> : MviFragment<M, I, S>(),
+abstract class HomeScreenMviFragment<M : MviModel<S, I>, I : MviIntent<S>, S : MviState, E : ViewBinding>
+    : MviFragment<M, I, S, E>(),
     HomeScreenFragment {
 
     override fun navigator(): HomeNavigator =

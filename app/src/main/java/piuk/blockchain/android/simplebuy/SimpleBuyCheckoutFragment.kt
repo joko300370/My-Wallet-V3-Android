@@ -37,12 +37,10 @@ import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 
-class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(), SimpleBuyScreen,
+class SimpleBuyCheckoutFragment :
+    MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState, FragmentSimplebuyCheckoutBinding>(),
+    SimpleBuyScreen,
     SimpleBuyCancelOrderBottomSheet.Host {
-
-    private var _binding: FragmentSimplebuyCheckoutBinding? = null
-    private val binding: FragmentSimplebuyCheckoutBinding
-        get() = _binding!!
 
     override val model: SimpleBuyModel by scopedInject()
 
@@ -65,14 +63,8 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
         internalFlags.isFeatureEnabled(GatedFeature.CHECKOUT)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentSimplebuyCheckoutBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentSimplebuyCheckoutBinding =
+        FragmentSimplebuyCheckoutBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

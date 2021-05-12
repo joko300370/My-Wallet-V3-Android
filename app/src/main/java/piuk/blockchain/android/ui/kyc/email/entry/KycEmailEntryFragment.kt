@@ -24,8 +24,10 @@ import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.data.settings.Email
 
-class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, EmailVeriffState>(),
-    SlidingModalBottomDialog.Host, ResendOrChangeEmailBottomSheet.ResendOrChangeEmailHost {
+class KycEmailEntryFragment :
+    MviFragment<EmailVeriffModel, EmailVeriffIntent, EmailVeriffState, FragmentKycAddEmailBinding>(),
+    SlidingModalBottomDialog.Host,
+    ResendOrChangeEmailBottomSheet.ResendOrChangeEmailHost {
 
     private val emailEntryHost: EmailEntryHost by ParentActivityDelegate(
         this
@@ -36,19 +38,6 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
         if (arguments?.containsKey("mustBeValidated") == true)
             EmailVerificationArgs.fromBundle(arguments ?: Bundle()).mustBeValidated
         else false
-    }
-
-    private var _binding: FragmentKycAddEmailBinding? = null
-
-    private val binding get() = _binding!!
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentKycAddEmailBinding.inflate(inflater, container, false)
-        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -64,10 +53,8 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentKycAddEmailBinding =
+        FragmentKycAddEmailBinding.inflate(inflater, container, false)
 
     override val model: EmailVeriffModel by scopedInject()
 
