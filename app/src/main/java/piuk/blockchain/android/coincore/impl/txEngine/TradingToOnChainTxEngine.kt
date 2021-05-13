@@ -11,7 +11,6 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FeeSelection
-import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxEngine
@@ -19,6 +18,7 @@ import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.updateTxValidity
+import piuk.blockchain.android.ui.transactionflow.flow.FeeInfo
 
 // Transfer from a custodial trading account to an onChain non-custodial account
 class TradingToOnChainTxEngine(
@@ -77,14 +77,25 @@ class TradingToOnChainTxEngine(
             confirmations = listOfNotNull(
                 TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
                 TxConfirmationValue.NewTo(
-                    txTarget, NullCryptoAccount(), AssetAction.Send
+                    txTarget, AssetAction.Send, sourceAccount
+                ),
+                TxConfirmationValue.CompoundNetworkFee(
+                    receivingFeeInfo = if (!pendingTx.feeAmount.isZero) {
+                        FeeInfo(
+                            pendingTx.feeAmount,
+                            pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+                            sourceAsset
+                        )
+                    } else null,
+                    feeLevel = pendingTx.feeSelection.selectedLevel,
+                    ignoreErc20LinkedNote = true
                 ),
                 TxConfirmationValue.NewTotal(
-                    totalWithoutFee = (pendingTx.amount as CryptoValue).minus(
+                    totalWithFee = (pendingTx.amount as CryptoValue).plus(
                         pendingTx.feeAmount as CryptoValue
                     ),
                     exchange = pendingTx.amount.toFiat(exchangeRates, userFiat)
-                        .minus(pendingTx.feeAmount.toFiat(exchangeRates, userFiat))
+                        .plus(pendingTx.feeAmount.toFiat(exchangeRates, userFiat))
                 ),
                 if (isNoteSupported) {
                     TxConfirmationValue.Description()

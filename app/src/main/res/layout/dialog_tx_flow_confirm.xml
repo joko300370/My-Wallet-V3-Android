@@ -60,7 +60,6 @@
         style="@style/Text.Semibold.14"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/small_margin"
         android:layout_marginBottom="@dimen/miniscule_margin"
         android:fadingEdge="vertical"
         android:fadingEdgeLength="@dimen/very_small_margin"

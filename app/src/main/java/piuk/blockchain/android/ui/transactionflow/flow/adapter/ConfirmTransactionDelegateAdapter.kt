@@ -31,6 +31,7 @@ class ConfirmTransactionDelegateAdapter(
             addAdapterDelegate(ComplexConfirmationCheckoutDelegate(mapperNewCheckout))
             addAdapterDelegate(ExpandableSimpleConfirmationCheckout(mapperNewCheckout))
             addAdapterDelegate(ExpandableComplexConfirmationCheckout(mapperNewCheckout))
+            addAdapterDelegate(CompoundExpandableFeeConfirmationCheckoutDelegate(mapperNewCheckout))
             addAdapterDelegate(ConfirmInfoItemDelegate(mapper))
             addAdapterDelegate(ConfirmNoteItemDelegate(model))
             addAdapterDelegate(ConfirmXlmMemoItemDelegate(model, stringUtils, activityContext))

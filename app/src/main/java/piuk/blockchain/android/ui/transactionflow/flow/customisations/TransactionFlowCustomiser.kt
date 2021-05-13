@@ -57,8 +57,8 @@ interface TransactionFlowCustomiser :
 class TransactionFlowCustomiserImpl(
     private val resources: Resources,
     private val assetResources: AssetResources,
-    private val features: InternalFeatureFlagApi,
-    private val stringUtils: StringUtils
+    private val stringUtils: StringUtils,
+    private val features: InternalFeatureFlagApi
 ) : TransactionFlowCustomiser {
     override fun enterAmountActionIcon(state: TransactionState): Int {
         return when (state.action) {
@@ -796,9 +796,13 @@ class TransactionFlowCustomiserImpl(
         frame: FrameLayout,
         state: TransactionState
     ): ConfirmSheetWidget =
-        when (state.action) {
-            AssetAction.Swap -> SwapInfoHeaderView(ctx).also { frame.addView(it) }
-            else -> SimpleInfoHeaderView(ctx).also { frame.addView(it) }
+        if (features.isFeatureEnabled(GatedFeature.CHECKOUT)) {
+            when (state.action) {
+                AssetAction.Swap -> SwapInfoHeaderView(ctx).also { frame.addView(it) }
+                else -> SimpleInfoHeaderView(ctx).also { frame.addView(it) }
+            }
+        } else {
+            SimpleInfoHeaderView(ctx).also { frame.addView(it) }
         }
 
     override fun defInputType(state: TransactionState, fiatCurrency: String): CurrencyType =

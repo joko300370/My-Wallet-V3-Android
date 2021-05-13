@@ -5,105 +5,162 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="@dimen/grid_6"
-    android:layout_marginEnd="@dimen/grid_6">
+    android:paddingTop="@dimen/grid_4">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/amount_fiat"
-        style="@style/Text.Semibold.32"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:paddingStart="@dimen/standard_margin"
-        android:paddingTop="@dimen/standard_margin"
-        android:paddingEnd="@dimen/standard_margin"
-        android:textColor="@color/grey_800"
-        app:layout_constraintEnd_toEndOf="parent"
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/sending_icon"
+        android:layout_width="@dimen/grid_8"
+        android:layout_height="@dimen/grid_8"
+        android:layout_marginStart="@dimen/grid_6"
+        app:layout_constraintBottom_toBottomOf="@id/sending_account_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/from_label"
+        app:srcCompat="@drawable/ic_tx_confirming" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/sending_account_icon"
+        android:layout_width="@dimen/grid_4"
+        android:layout_height="@dimen/grid_4"
+        android:background="@drawable/white_circle"
+        android:padding="1dp"
+        app:layout_constraintCircle="@+id/sending_icon"
+        app:layout_constraintCircleAngle="135"
+        app:layout_constraintCircleRadius="@dimen/grid_5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="$10000" />
+        app:srcCompat="@drawable/ic_non_custodial_account_indicator" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/from_label"
+        style="@style/Text.Semibold.16"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/grid_4"
         android:layout_marginTop="@dimen/grid_4"
-        android:background="@drawable/bkgd_box_rounded_corners"
-        app:layout_constraintTop_toBottomOf="@id/amount_fiat">
+        android:text="@string/common_from"
+        app:layout_constraintBottom_toTopOf="@id/sending_account_label"
+        app:layout_constraintStart_toEndOf="@id/sending_icon"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/sending_icon"
-            android:layout_width="@dimen/grid_4"
-            android:layout_height="@dimen/grid_4"
-            android:layout_marginStart="@dimen/grid_2"
-            android:layout_marginTop="@dimen/grid_3"
-            android:layout_marginBottom="@dimen/grid_3"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_tx_confirming" />
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/sending_account_label"
+        style="@style/Text.Light.14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/from_label"
+        app:layout_constraintTop_toBottomOf="@id/from_label"
+        tools:text="Key wallet" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/sending_amount"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/grid_2"
-            android:layout_marginEnd="@dimen/grid_2"
-            android:ellipsize="end"
-            android:gravity="start"
-            android:maxLines="1"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/icon_separation"
-            app:layout_constraintStart_toEndOf="@id/sending_icon"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="12341234123412341234" />
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/sending_amount_crypto"
+        style="@style/Text.Semibold.16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/grid_6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/from_label"
+        tools:text="1.2344 ETH" />
 
-        <View
-            android:id="@+id/view_separation"
-            android:layout_width="@dimen/grid_0.25"
-            android:layout_height="0dp"
-            android:background="@color/grey_100"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/sending_amount_fiat"
+        style="@style/Text.Light.14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@id/sending_amount_crypto"
+        app:layout_constraintTop_toBottomOf="@id/sending_amount_crypto"
+        tools:text="$5000" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/icon_separation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_checkout_swap" />
+    <View
+        android:id="@+id/view_separation"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/grid_0.25"
+        android:layout_marginTop="@dimen/grid_4"
+        android:background="@color/grey_100"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sending_account_label" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/receiving_amount"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/grid_2"
-            android:layout_marginEnd="@dimen/grid_2"
-            android:ellipsize="end"
-            android:gravity="end"
-            android:maxLines="1"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/receiving_icon"
-            app:layout_constraintStart_toEndOf="@id/icon_separation"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="1234123412341234123412341234" />
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/icon_separation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/view_separation"
+        app:layout_constraintEnd_toEndOf="@id/sending_icon"
+        app:layout_constraintStart_toStartOf="@id/sending_icon"
+        app:layout_constraintTop_toTopOf="@id/view_separation"
+        app:srcCompat="@drawable/ic_arrow_down_white_bkgd" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/receiving_icon"
-            android:layout_width="@dimen/grid_4"
-            android:layout_height="@dimen/grid_4"
-            android:layout_marginTop="@dimen/grid_3"
-            android:layout_marginEnd="@dimen/grid_2"
-            android:layout_marginBottom="@dimen/grid_3"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_tx_confirming" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/receiving_icon"
+        android:layout_width="@dimen/grid_8"
+        android:layout_height="@dimen/grid_8"
+        android:layout_marginStart="@dimen/grid_6"
+        app:layout_constraintBottom_toBottomOf="@id/receiving_account_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/to_label"
+        app:srcCompat="@drawable/ic_tx_confirming" />
 
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/receiving_account_icon"
+        android:layout_width="@dimen/grid_4"
+        android:layout_height="@dimen/grid_4"
+        android:background="@drawable/white_circle"
+        android:padding="1dp"
+        app:layout_constraintCircle="@+id/receiving_icon"
+        app:layout_constraintCircleAngle="135"
+        app:layout_constraintCircleRadius="@dimen/grid_5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_non_custodial_account_indicator" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/to_label"
+        style="@style/Text.Semibold.16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/grid_4"
+        android:layout_marginTop="@dimen/grid_4"
+        android:text="@string/common_to"
+        app:layout_constraintBottom_toTopOf="@id/receiving_account_label"
+        app:layout_constraintStart_toEndOf="@id/receiving_icon"
+        app:layout_constraintTop_toBottomOf="@id/view_separation" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/receiving_account_label"
+        style="@style/Text.Light.14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/to_label"
+        app:layout_constraintTop_toBottomOf="@id/to_label"
+        tools:text="Key wallet" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/receiving_amount_crypto"
+        style="@style/Text.Semibold.16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/grid_6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/to_label"
+        tools:text="1.2344 ETH" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/receiving_amount_fiat"
+        style="@style/Text.Light.14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@id/receiving_amount_crypto"
+        app:layout_constraintTop_toBottomOf="@id/receiving_amount_crypto"
+        tools:text="$5000" />
+
+    <View
+        android:id="@+id/view_separation_bottom"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/grid_0.25"
+        android:layout_marginTop="@dimen/grid_4"
+        android:background="@color/grey_100"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/receiving_amount_fiat" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -34,6 +34,8 @@ class StringUtils(private val context: Context) {
     ): CharSequence = getStringWithMappedAnnotations(ctx, stringId, linksMap, onClick)
 
     companion object {
+        private const val EMPTY_SPACE = " "
+
         fun getStringWithMappedAnnotations(
             context: Context,
             @StringRes stringId: Int,
@@ -89,10 +91,11 @@ class StringUtils(private val context: Context) {
 
             val sb = SpannableStringBuilder()
                 .append(staticText)
+                .append(EMPTY_SPACE)
                 .append(learnMoreLink)
             sb.setSpan(
                 ForegroundColorSpan(ContextCompat.getColor(context, linkColour)),
-                staticText.length, staticText.length + learnMoreLink.length,
+                staticText.length, staticText.length + EMPTY_SPACE.length + learnMoreLink.length,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
             return sb

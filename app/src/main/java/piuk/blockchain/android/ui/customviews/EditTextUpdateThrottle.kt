@@ -14,6 +14,7 @@ class EditTextUpdateThrottle(
 ) : TextWatcher {
 
     private var timer: Timer? = null
+
     private val handler: Handler = Handler(Looper.getMainLooper())
 
     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {

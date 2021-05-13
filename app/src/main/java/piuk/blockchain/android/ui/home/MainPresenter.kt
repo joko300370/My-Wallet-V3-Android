@@ -90,11 +90,10 @@ interface MainView : MvpView, HomeNavigator {
     fun handleApprovalDepositInProgress(amount: FiatValue)
     fun handleApprovalDepositError(currency: String)
     fun handleApprovalDepositTimeout(currencyCode: String)
+    fun handleBuyApprovalError()
 
     fun launchUpsellAssetAction(upsell: KycUpgradePromptManager.Type, action: AssetAction, account: BlockchainAccount)
     fun launchAssetAction(action: AssetAction, account: BlockchainAccount)
-
-    fun handleBuyApprovalError()
 }
 
 class MainPresenter internal constructor(

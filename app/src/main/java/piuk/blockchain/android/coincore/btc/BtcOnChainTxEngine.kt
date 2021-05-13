@@ -25,7 +25,6 @@ import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FeeLevelRates
 import piuk.blockchain.android.coincore.FeeSelection
-import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
@@ -37,6 +36,7 @@ import piuk.blockchain.android.coincore.impl.txEngine.BitPayClientEngine
 import piuk.blockchain.android.coincore.impl.txEngine.EngineTransaction
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.updateTxValidity
+import piuk.blockchain.android.ui.transactionflow.flow.FeeInfo
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.payments.SendDataManager
@@ -220,20 +220,23 @@ class BtcOnChainTxEngine(
         pendingTx.copy(
             confirmations = listOfNotNull(
                 TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
-                TxConfirmationValue.NewTo(
-                    txTarget, NullCryptoAccount(), AssetAction.Send
-                ),
-                buildNewFee(
-                    pendingTx.feeAmount,
-                    pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
-                    sourceAsset
+                TxConfirmationValue.NewTo(txTarget, AssetAction.Send, sourceAccount),
+                TxConfirmationValue.CompoundNetworkFee(
+                    sendingFeeInfo = if (!pendingTx.feeAmount.isZero) {
+                        FeeInfo(
+                            pendingTx.feeAmount,
+                            pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+                            sourceAsset
+                        )
+                    } else null,
+                    feeLevel = pendingTx.feeSelection.selectedLevel
                 ),
                 TxConfirmationValue.NewTotal(
-                    totalWithoutFee = (pendingTx.amount as CryptoValue).minus(
+                    totalWithFee = (pendingTx.amount as CryptoValue).plus(
                         pendingTx.feeAmount as CryptoValue
                     ),
                     exchange = pendingTx.amount.toFiat(exchangeRates, userFiat)
-                        .minus(pendingTx.feeAmount.toFiat(exchangeRates, userFiat))
+                        .plus(pendingTx.feeAmount.toFiat(exchangeRates, userFiat))
                 ),
                 TxConfirmationValue.Description(),
                 if (isLargeTransaction(pendingTx)) {

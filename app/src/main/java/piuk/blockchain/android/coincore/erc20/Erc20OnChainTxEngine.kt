@@ -17,7 +17,6 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FeeSelection
-import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
@@ -26,8 +25,8 @@ import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.updateTxValidity
+import piuk.blockchain.android.ui.transactionflow.flow.FeeInfo
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
-import piuk.blockchain.androidcore.data.exchangerate.toCrypto
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.utils.extensions.then
 import java.math.BigDecimal
@@ -61,17 +60,11 @@ open class Erc20OnChainTxEngine(
         )
 
     private fun buildConfirmationTotal(pendingTx: PendingTx): TxConfirmationValue.NewTotal {
-        val amount = pendingTx.amount.toFiat(exchangeRates, userFiat) as FiatValue
-        val amountFee = pendingTx.feeAmount.toFiat(exchangeRates, userFiat) as FiatValue
-
-        val amountFeeToCrypto = amountFee.toCrypto(exchangeRates, sourceAsset)
-
-        val total = amount.minus(amountFee)
-        val exchange = pendingTx.amount.minus(amountFeeToCrypto)
+        val fiatAmount = pendingTx.amount.toFiat(exchangeRates, userFiat) as FiatValue
 
         return TxConfirmationValue.NewTotal(
-            totalWithoutFee = total,
-            exchange = exchange
+            totalWithFee = pendingTx.amount,
+            exchange = fiatAmount
         )
     }
 
@@ -80,12 +73,17 @@ open class Erc20OnChainTxEngine(
             confirmations = listOfNotNull(
                 TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
                 TxConfirmationValue.NewTo(
-                    txTarget, NullCryptoAccount(), AssetAction.Send
+                    txTarget, AssetAction.Send, sourceAccount
                 ),
-                buildNewFee(
-                    pendingTx.feeAmount,
-                    pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
-                    CryptoCurrency.ETHER
+                TxConfirmationValue.CompoundNetworkFee(
+                    sendingFeeInfo = if (!pendingTx.feeAmount.isZero) {
+                        FeeInfo(
+                            pendingTx.feeAmount,
+                            pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+                            sourceAsset
+                        )
+                    } else null,
+                    feeLevel = pendingTx.feeSelection.selectedLevel
                 ),
                 buildConfirmationTotal(pendingTx),
                 TxConfirmationValue.Description()

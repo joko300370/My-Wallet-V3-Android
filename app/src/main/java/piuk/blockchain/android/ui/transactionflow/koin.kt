@@ -12,6 +12,7 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TxFlowErrorReporting
 import piuk.blockchain.android.ui.transactionflow.flow.ActiveTransactionFlow
+import piuk.blockchain.android.ui.transactionflow.flow.CompoundNetworkFeeFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.EstimatedCompletionPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.ExchangePriceFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.FeedTotalFormatter
@@ -50,8 +51,8 @@ val transactionModule = module {
         TransactionFlowCustomiserImpl(
             resources = get<Context>().resources,
             assetResources = get(),
-            features = get(),
-            stringUtils = get()
+            stringUtils = get(),
+            features = get()
         )
     }.bind(TransactionFlowCustomiser::class)
         .bind(EnterAmountCustomisations::class)
@@ -94,6 +95,13 @@ val transactionModule = module {
 
     factory {
         NewNetworkFormatter(
+            context = get(),
+            assetResources = get()
+        )
+    }.bind(TxOptionsFormatterNewCheckout::class)
+
+    factory {
+        CompoundNetworkFeeFormatter(
             context = get(),
             assetResources = get()
         )

@@ -25,13 +25,13 @@ class CheckoutAdapterDelegate : DelegationAdapter<SimpleBuyCheckoutItem>(Adapter
 }
 
 sealed class SimpleBuyCheckoutItem {
-    data class SimpleCheckoutItem(val title: String, val value: String, val isImportant: Boolean = false) :
+    data class SimpleCheckoutItem(val label: String, val title: String, val isImportant: Boolean = false) :
         SimpleBuyCheckoutItem()
 
-    data class ComplexCheckoutItem(val title: String, val detail: String, val subtitle: String) :
+    data class ComplexCheckoutItem(val label: String, val title: String, val subtitle: String) :
         SimpleBuyCheckoutItem()
 
-    data class ExpandableCheckoutItem(val title: String, val value: String, val expandableContent: CharSequence) :
+    data class ExpandableCheckoutItem(val label: String, val title: String, val expandableContent: CharSequence) :
         SimpleBuyCheckoutItem()
 }
 
@@ -60,9 +60,9 @@ private class SimpleCheckoutItemViewHolder(
 
     fun bind(item: SimpleBuyCheckoutItem.SimpleCheckoutItem) {
         with(binding) {
-            simpleItemTitle.text = item.title
-            simpleItemLabel.text = item.value
 
+            simpleItemTitle.text = item.title
+            simpleItemLabel.text = item.label
             if (item.isImportant) {
                 simpleItemTitle.setTextAppearance(R.style.Text_Semibold_16)
                 simpleItemLabel.setTextAppearance(R.style.Text_Semibold_16)
@@ -99,8 +99,8 @@ private class ComplexCheckoutItemItemViewHolder(
 
     fun bind(item: SimpleBuyCheckoutItem.ComplexCheckoutItem) {
         with(binding) {
-            complexItemTitle.text = item.title
-            complexItemLabel.text = item.detail
+            complexItemTitle.text = item.label
+            complexItemLabel.text = item.title
             complexItemSubtitle.text = item.subtitle
         }
     }
@@ -150,8 +150,8 @@ private class ExpandableCheckoutItemViewHolder(
 
     fun bind(item: SimpleBuyCheckoutItem.ExpandableCheckoutItem) {
         with(binding) {
+            expandableItemLabel.text = item.label
             expandableItemTitle.text = item.title
-            expandableItemLabel.text = item.value
             expandableItemExpansion.text = item.expandableContent
         }
     }
