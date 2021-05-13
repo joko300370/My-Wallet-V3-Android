@@ -21,7 +21,6 @@ import piuk.blockchain.android.databinding.FragmentAddNewCardBinding
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.AfterTextChangedWatcher
 import java.util.Calendar
@@ -44,12 +43,6 @@ class AddNewCardFragment :
     override val cardDetailsPersistence: CardDetailsPersistence
         get() = (activity as? CardDetailsPersistence)
             ?: throw IllegalStateException("Parent must implement CardDetailsPersistence")
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_add_new_card)
 
     private val textWatcher = object : AfterTextChangedWatcher() {
         override fun afterTextChanged(s: Editable?) {

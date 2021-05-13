@@ -35,7 +35,6 @@ import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.util.getAccount
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.putAccount
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.visible
@@ -223,12 +222,6 @@ class ActivitiesFragment :
 
     private val preselectedAccount: BlockchainAccount?
         get() = arguments?.getAccount(PARAM_ACCOUNT)
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_activities)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
