@@ -30,7 +30,7 @@ object Versions {
     const val preference = "1.1.0"
     const val dynamicanimation = "1.0.0"
     const val annotations = "1.1.0"
-    const val constraintLayout = "1.1.0"
+    const val constraintLayout = "2.0.4"
     const val multidex = "2.0.1"
     const val navigation = "2.1.0"
     const val lifecycle = "2.1.0"
@@ -88,7 +88,7 @@ object Versions {
 
     // Custom Views
     const val charts = "3.1.0"
-    const val circleIndicator = "1.2.2"
+    const val circleIndicator = "2.1.6"
     const val bottomNav = "2.2.0"
     const val countryPicker = "2.0.4"
 

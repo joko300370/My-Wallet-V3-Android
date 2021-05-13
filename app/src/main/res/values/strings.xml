@@ -2071,4 +2071,20 @@
     <string name="verify_device_title">Verify Device</string>
     <string name="verify_device_desc">We sent a verification email to %s. Please click the link in the email to continue.</string>
     <string name="open_email_cta">Open email</string>
+
+    <!-- Recurring buy screens -->
+    <string name="recurring_buy_toolbar">Recurring Buys</string>
+    <string name="recurring_buy_cta">Set up recurring buy</string>
+    <string name="recurring_buy_title_1">Instead of timing the market, many smart investors use</string>
+    <string name="recurring_buy_title_2">The strategy is pretty simple</string>
+    <string name="recurring_buy_title_3">When the price goes down,</string>
+    <string name="recurring_buy_title_4">When the price goes up,</string>
+    <string name="recurring_buy_title_5">But does it work?</string>
+    <string name="recurring_buy_subtitle_1">Dollar cost averaging</string>
+    <string name="recurring_buy_subtitle_2">Invest the same amount every week</string>
+    <string name="recurring_buy_subtitle_3">You’ll buy more crypto.</string>
+    <string name="recurring_buy_subtitle_4">You’ll buy less.</string>
+    <string name="recurring_buy_subtitle_5_1">Over the past 5 years, buying Bitcoin every week performed better than timing the market&#160;</string>
+    <string name="recurring_buy_subtitle_5_2">82% of the time.</string>
+
 </resources>
