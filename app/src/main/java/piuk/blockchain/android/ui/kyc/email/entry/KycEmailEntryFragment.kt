@@ -11,14 +11,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.blockchain.koin.scopedInject
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.EmailVerificationArgs
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.FragmentKycAddEmailBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
-import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
@@ -32,7 +30,6 @@ class KycEmailEntryFragment :
     private val emailEntryHost: EmailEntryHost by ParentActivityDelegate(
         this
     )
-    private val stringUtils: StringUtils by inject()
 
     private val emailMustBeValidated by lazy {
         if (arguments?.containsKey("mustBeValidated") == true)

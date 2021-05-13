@@ -1,6 +1,6 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
-import android.view.View
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.wallet.DefaultLabels
@@ -9,8 +9,6 @@ import info.blockchain.balance.Money
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
-import kotlinx.android.synthetic.main.dialog_dashboard_asset_label_item.view.*
-import kotlinx.android.synthetic.main.view_account_crypto_overview.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetAction
@@ -19,15 +17,13 @@ import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
+import piuk.blockchain.android.databinding.DialogDashboardAssetLabelItemBinding
+import piuk.blockchain.android.databinding.ViewAccountCryptoOverviewBinding
 import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.customviews.account.addViewToBottomWithConstraints
 import piuk.blockchain.android.util.context
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.inflate
-import piuk.blockchain.android.util.setAssetIconColours
-import piuk.blockchain.android.util.setImageDrawable
 import piuk.blockchain.android.util.visible
-import java.lang.IllegalArgumentException
 import kotlin.properties.Delegates
 
 data class AssetDetailItem(
@@ -39,75 +35,66 @@ data class AssetDetailItem(
     val interestRate: Double
 )
 
-class AssetDetailViewHolder(itemView: View, private val labels: DefaultLabels) : RecyclerView.ViewHolder(itemView) {
+class AssetDetailViewHolder(private val binding: ViewAccountCryptoOverviewBinding, private val labels: DefaultLabels) :
+    RecyclerView.ViewHolder(binding.root) {
 
     fun bind(
         item: AssetDetailItem,
         onAccountSelected: (BlockchainAccount, AssetFilter) -> Unit,
         disposable: CompositeDisposable,
-        block: AssetDetailsDecorator,
-        assetResources: AssetResources
+        block: AssetDetailsDecorator
     ) {
-        with(itemView) {
+        with(binding) {
             val asset = getAsset(item.account, item.balance.currencyCode)
 
-            icon.setImageDrawable(assetResources.drawableResFilled(asset))
-            asset_subtitle.text = when (item.assetFilter) {
+            assetSubtitle.text = when (item.assetFilter) {
                 AssetFilter.NonCustodial,
                 AssetFilter.Custodial -> labels.getAssetMasterWalletLabel(asset)
-                AssetFilter.Interest -> resources.getString(
+                AssetFilter.Interest -> context.resources.getString(
                     R.string.dashboard_asset_balance_interest, item.interestRate
                 )
                 else -> throw IllegalArgumentException("Not supported filter")
             }
 
-            wallet_name.text = when (item.assetFilter) {
+            walletName.text = when (item.assetFilter) {
                 AssetFilter.NonCustodial -> labels.getDefaultNonCustodialWalletLabel(asset)
                 AssetFilter.Custodial -> labels.getDefaultCustodialWalletLabel(asset)
                 AssetFilter.Interest -> labels.getDefaultInterestWalletLabel(asset)
                 else -> throw IllegalArgumentException("Not supported filter")
             }
 
-            rootView.setOnClickListener {
+            root.setOnClickListener {
                 onAccountSelected(item.account, item.assetFilter)
             }
 
             when (item.assetFilter) {
-                AssetFilter.NonCustodial -> {
-                    asset_account_icon.visible()
-                    asset_account_icon.setImageResource(
-                        R.drawable.ic_non_custodial_account_indicator
-                    )
-                }
-                AssetFilter.Interest -> {
-                    asset_account_icon.visible()
-                    asset_account_icon.setImageResource(
-                        R.drawable.ic_interest_account_indicator
-                    )
-                }
+                AssetFilter.NonCustodial,
+                AssetFilter.Interest,
                 AssetFilter.Custodial -> {
-                    asset_account_icon.visible()
-                    asset_account_icon.setImageResource(
-                        R.drawable.ic_custodial_account_indicator
+                    assetWithAccount.visible()
+                    assetWithAccount.updateIcon(
+                        when (item.account) {
+                            is CryptoAccount -> item.account
+                            is AccountGroup -> item.account.selectFirstAccount()
+                            else -> throw IllegalStateException(
+                                "Unsupported account type for asset details ${item.account}"
+                            )
+                        }
                     )
                 }
-                AssetFilter.All -> asset_account_icon.gone()
+                AssetFilter.All -> assetWithAccount.gone()
             }
-            asset_account_icon.setAssetIconColours(
-                tintColor = R.color.white,
-                filterColor = assetResources.assetFilter(asset)
-            )
 
-            wallet_balance_fiat.text = item.balance.toStringWithSymbol()
-            wallet_balance_crypto.text = item.fiatBalance.toStringWithSymbol()
-            disposable += block(item).view(rootView.context)
+            walletBalanceFiat.text = item.balance.toStringWithSymbol()
+            walletBalanceCrypto.text = item.fiatBalance.toStringWithSymbol()
+            disposable += block(item).view(root.context)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     container.addViewToBottomWithConstraints(
                         view = it,
-                        bottomOfView = asset_subtitle,
-                        startOfView = asset_subtitle,
-                        endOfView = wallet_balance_crypto
+                        bottomOfView = assetSubtitle,
+                        startOfView = assetSubtitle,
+                        endOfView = walletBalanceCrypto
                     )
                 }
         }
@@ -124,9 +111,10 @@ class AssetDetailViewHolder(itemView: View, private val labels: DefaultLabels) :
         } ?: throw IllegalStateException("Unsupported account type ${this::class.java}")
 }
 
-class LabelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class LabelViewHolder(private val binding: DialogDashboardAssetLabelItemBinding) :
+    RecyclerView.ViewHolder(binding.root) {
     fun bind(token: CryptoAsset) {
-        itemView.asset_label_description.text = when (token.asset) {
+        binding.assetLabelDescription.text = when (token.asset) {
             CryptoCurrency.ALGO -> context.getString(R.string.algorand_asset_label)
             CryptoCurrency.DOT -> context.getString(R.string.polkadot_asset_label)
             else -> ""
@@ -157,9 +145,13 @@ internal class AssetDetailAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         if (viewType == TYPE_CRYPTO) {
-            AssetDetailViewHolder(parent.inflate(R.layout.view_account_crypto_overview), labels)
+            AssetDetailViewHolder(
+                ViewAccountCryptoOverviewBinding.inflate(LayoutInflater.from(parent.context), parent, false), labels
+            )
         } else {
-            LabelViewHolder(parent.inflate(R.layout.dialog_dashboard_asset_label_item))
+            LabelViewHolder(
+                DialogDashboardAssetLabelItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            )
         }
 
     override fun getItemCount(): Int = if (showBanner) itemList.size + 1 else itemList.size
@@ -181,8 +173,7 @@ internal class AssetDetailAdapter(
                 itemList[position],
                 onAccountSelected,
                 compositeDisposable,
-                assetDetailsDecorator,
-                assetResources
+                assetDetailsDecorator
             )
         } else {
             (holder as LabelViewHolder).bind(token)

@@ -497,7 +497,8 @@ class PayloadDataManager internal constructor(
 
     // Update if timeout of forceRefresh, get the balance - pull the code from ActivityCache/BtcCoinLikeToken
     private val balanceUpdater = RefreshUpdater<CryptoValue>(
-        fnRefresh = { Completable.fromCallable { updateAllBalances() } }
+        fnRefresh = { updateAllBalances() },
+        refreshInterval = BALANCE_REFRESH_INTERVAL
     )
 
     fun getAddressBalanceRefresh(
@@ -646,6 +647,10 @@ class PayloadDataManager internal constructor(
         } catch (ignored: AddressFormatException) {
             null
         }
+    }
+
+    companion object {
+        private const val BALANCE_REFRESH_INTERVAL = 15 * 1000L
     }
 }
 

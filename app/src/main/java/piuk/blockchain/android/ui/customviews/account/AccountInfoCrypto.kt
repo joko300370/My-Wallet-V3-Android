@@ -17,7 +17,6 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.koin.core.KoinComponent
 import piuk.blockchain.android.R
-import piuk.blockchain.android.coincore.AccountIcon
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
@@ -29,10 +28,6 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
 import piuk.blockchain.android.ui.transactionflow.plugin.EnterAmountWidget
-import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.setAssetIconColours
-import piuk.blockchain.android.util.setImageDrawable
-import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 
@@ -74,26 +69,9 @@ class AccountInfoCrypto @JvmOverloads constructor(
 
         (account as? InterestAccount)?.let { setInterestAccountDetails(account, accountsAreTheSame) }
 
-        updateAccountIcon(account)
+        binding.assetWithAccount.updateIcon(account)
 
         displayedAccount = account
-    }
-
-    private fun updateAccountIcon(account: CryptoAccount) {
-        with(binding) {
-            val accountIcon = AccountIcon(account, assetResources)
-            icon.setImageDrawable(accountIcon.icon)
-            accountIcon.indicator?.let {
-                assetAccountIcon.apply {
-                    visible()
-                    setAssetIconColours(
-                        tintColor = R.color.white,
-                        filterColor = assetResources.assetFilter(account.asset)
-                    )
-                    setImageResource(it)
-                }
-            } ?: kotlin.run { assetAccountIcon.gone() }
-        }
     }
 
     private fun setInterestAccountDetails(

@@ -28,8 +28,9 @@ import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.databinding.DialogSheetInterestDetailsBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
-import piuk.blockchain.android.util.secondsToDays
 import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.secondsToDays
+import piuk.blockchain.android.util.visible
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -75,7 +76,8 @@ class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetails
             interestDetailsTitle.text = account.label
             interestDetailsSheetHeader.text = getString(assetResources.assetNameRes(cryptoCurrency))
             interestDetailsLabel.text = getString(assetResources.assetNameRes(cryptoCurrency))
-            interestDetailsAssetIcon.setImageResource(assetResources.drawableResFilled(cryptoCurrency))
+
+            interestDetailsAssetWithIcon.updateIcon(account as CryptoAccount)
 
             interestDetailsActivityCta.setOnClickListener {
                 host.gotoActivityFor(account as BlockchainAccount)
@@ -84,8 +86,10 @@ class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetails
                 accounts.filter { account -> account is CryptoAccount && account.asset == cryptoCurrency }
             }
                 .onErrorReturn { emptyList() }
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy { accounts ->
                     if (accounts.isNotEmpty()) {
+                        interestDetailsDepositCta.visible()
                         interestDetailsDepositCta.text =
                             getString(R.string.tx_title_deposit, cryptoCurrency.displayTicker)
                         interestDetailsDepositCta.setOnClickListener {

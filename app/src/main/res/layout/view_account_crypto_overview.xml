@@ -8,15 +8,13 @@
     android:layout_height="wrap_content"
     android:paddingTop="@dimen/small_margin">
 
-    <ImageView
-        android:id="@+id/icon"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginStart="@dimen/standard_margin"
-        android:importantForAccessibility="no"
+    <piuk.blockchain.android.ui.customviews.account.AssetWithAccountIcon
+        android:id="@+id/asset_with_account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/grid_6"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@drawable/vector_bitcoin_colored" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/wallet_name"
@@ -28,8 +26,8 @@
         android:ellipsize="end"
         android:singleLine="true"
         app:layout_constraintEnd_toStartOf="@id/wallet_balance_fiat"
-        app:layout_constraintStart_toEndOf="@id/icon"
-        app:layout_constraintTop_toTopOf="@id/icon"
+        app:layout_constraintStart_toEndOf="@id/asset_with_account"
+        app:layout_constraintTop_toTopOf="@id/asset_with_account"
         tools:text="BTC Wallet" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -66,18 +64,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/asset_subtitle"
         tools:text="1.638192 BTC" />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/asset_account_icon"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintCircle="@+id/icon"
-        app:layout_constraintCircleAngle="135"
-        android:background="@drawable/white_circle"
-        android:padding="1dp"
-        app:layout_constraintCircleRadius="20dp"
-        app:srcCompat="@drawable/ic_non_custodial_account_indicator" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

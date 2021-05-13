@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/interest_details_sheet_indicator"
@@ -38,7 +40,7 @@
         android:ellipsize="end"
         app:layout_constraintEnd_toStartOf="@id/interest_details_crypto_value"
         app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toEndOf="@id/interest_details_asset_icon"
+        app:layout_constraintStart_toEndOf="@id/interest_details_asset_with_icon"
         app:layout_constraintTop_toBottomOf="@id/interest_details_sheet_header"
         tools:text="My account name" />
 
@@ -55,25 +57,14 @@
         app:layout_constraintTop_toBottomOf="@id/interest_details_title"
         tools:text="my account description" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/interest_details_asset_icon"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+    <piuk.blockchain.android.ui.customviews.account.AssetWithAccountIcon
+        android:id="@+id/interest_details_asset_with_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/standard_margin"
         app:layout_constraintBottom_toBottomOf="@id/interest_details_label"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/interest_details_title"
-        tools:src="@drawable/vector_bitcoin_colored" />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/interest_details_acc_icon"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:translationX="-8dp"
-        android:translationY="-12dp"
-        app:layout_constraintStart_toEndOf="@id/interest_details_asset_icon"
-        app:layout_constraintTop_toBottomOf="@id/interest_details_asset_icon"
-        app:srcCompat="@drawable/ic_interest_account_indicator" />
+        app:layout_constraintTop_toTopOf="@id/interest_details_title" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/interest_details_fiat_value"
@@ -145,6 +136,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/very_small_margin"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:text="Deposit BTC" />
+        tools:text="Deposit BTC"
+        tools:visibility="visible" />
 </androidx.constraintlayout.widget.ConstraintLayout>
