@@ -47,11 +47,11 @@ import com.blockchain.nabu.models.data.BankPartner
 import com.blockchain.nabu.models.data.BankTransferDetails
 import com.blockchain.nabu.models.data.BankTransferStatus
 import com.blockchain.nabu.models.data.CryptoWithdrawalFeeAndLimit
+import com.blockchain.nabu.models.data.FiatWithdrawalFeeAndLimit
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
 import com.blockchain.nabu.models.data.LinkedBankErrorState
 import com.blockchain.nabu.models.data.LinkedBankState
-import com.blockchain.nabu.models.data.FiatWithdrawalFeeAndLimit
 import com.blockchain.nabu.models.responses.banktransfer.BankInfoResponse
 import com.blockchain.nabu.models.responses.banktransfer.BankMediaResponse.Companion.ICON
 import com.blockchain.nabu.models.responses.banktransfer.BankTransferChargeAttributes
@@ -1028,7 +1028,11 @@ class LiveCustodialWalletManager(
             partner = partner.toLinkingBankPartner(BankPartner.values().toList()) ?: return null,
             state = state.toLinkedBankState(),
             bankName = details?.bankName.orEmpty(),
-            accountName = details?.accountName.orEmpty(),
+            accountName = if (details?.accountName.isNullOrEmpty()) {
+                details?.bankName.orEmpty()
+            } else {
+                details?.accountName.orEmpty()
+            },
             accountNumber = details?.accountNumber?.replace("x", "").orEmpty(),
             errorStatus = error?.toLinkedBankErrorState() ?: LinkedBankErrorState.NONE,
             accountType = details?.bankAccountType.orEmpty(),
