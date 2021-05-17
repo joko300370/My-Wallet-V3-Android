@@ -34,6 +34,9 @@
             android:name=".ui.launcher.LauncherActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask">
+            <meta-data android:name="android.app.shortcuts"
+                android:resource="@xml/debug_shortcuts" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -72,20 +75,14 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
+
         <activity
             android:name="piuk.blockchain.com.FeatureFlagsHandlingActivity"
             android:clearTaskOnLaunch="true"
-            android:excludeFromRecents="true"
-            android:label="BC Debug Opts"
             android:screenOrientation="portrait"
             android:taskAffinity="piuk.blockchain.com.FeatureFlagsHandlingActivity"
-            android:theme="@style/AppTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            android:theme="@style/AppTheme"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <activity
             android:name=".ui.home.MainActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"

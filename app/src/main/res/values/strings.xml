@@ -2,6 +2,8 @@
 <resources>
 
     <!-- common -->
+    <string name="debug_app_shortcut">BC Debug Opts</string>
+    <string name="debug_app_shortcut_short">BC Opts</string>
     <string name="common_replaceable_value">%1$s</string>
     <string name="common_hyphenated_strings">%1$s - %2$s</string>
     <string name="common_newlined_strings">%1$s\n%2$s</string>
