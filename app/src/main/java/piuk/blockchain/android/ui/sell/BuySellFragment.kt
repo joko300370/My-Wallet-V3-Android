@@ -91,10 +91,12 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
                     renderNotEligibleUi()
                 }
             }
-            else -> startActivity(SimpleBuyActivity.newInstance(
-                context = activity as Context,
-                launchFromNavigationBar = true, launchKycResume = false
-            ))
+            else -> startActivity(
+                SimpleBuyActivity.newInstance(
+                    context = activity as Context,
+                    launchFromNavigationBar = true, launchKycResume = false
+                )
+            )
         }
     }
 
@@ -128,9 +130,11 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
             pager.adapter = pagerAdapter
             when (showView) {
                 BuySellViewType.TYPE_BUY -> pager.setCurrentItem(
-                    BuySellViewType.TYPE_BUY.ordinal, true)
+                    BuySellViewType.TYPE_BUY.ordinal, true
+                )
                 BuySellViewType.TYPE_SELL -> pager.setCurrentItem(
-                    BuySellViewType.TYPE_SELL.ordinal, true)
+                    BuySellViewType.TYPE_SELL.ordinal, true
+                )
             }
         }
 
@@ -153,11 +157,12 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
     companion object {
         private const val VIEW_TYPE = "VIEW_TYPE"
 
-        fun newInstance(viewType: BuySellViewType = BuySellViewType.TYPE_BUY) = BuySellFragment().apply {
-            arguments = Bundle().apply {
-                putSerializable(VIEW_TYPE, viewType)
+        fun newInstance(viewType: BuySellViewType = BuySellViewType.TYPE_BUY) =
+            BuySellFragment().apply {
+                arguments = Bundle().apply {
+                    putSerializable(VIEW_TYPE, viewType)
+                }
             }
-        }
     }
 
     enum class BuySellViewType {

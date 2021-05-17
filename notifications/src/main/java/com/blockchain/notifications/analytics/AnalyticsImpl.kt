@@ -5,6 +5,7 @@ import android.os.Bundle
 import com.blockchain.featureflags.GatedFeature
 import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.google.firebase.analytics.FirebaseAnalytics
+import java.io.Serializable
 
 class AnalyticsImpl internal constructor(
     private val firebaseAnalytics: FirebaseAnalytics,
@@ -16,8 +17,9 @@ class AnalyticsImpl internal constructor(
     private val sentAnalytics = mutableSetOf<String>()
 
     override fun logEvent(analyticsEvent: AnalyticsEvent) {
-        firebaseAnalytics.logEvent(analyticsEvent.event, toBundle(analyticsEvent.params))
-        if (internalFeatureFlagApi.value.isFeatureEnabled(GatedFeature.SEGMENT_ANALYTICS)) {
+        if (!nabuAnalyticsNames.contains(analyticsEvent.event)) {
+            firebaseAnalytics.logEvent(analyticsEvent.event, toBundle(analyticsEvent.params))
+        } else if (internalFeatureFlagApi.value.isFeatureEnabled(GatedFeature.SEGMENT_ANALYTICS)) {
             nabuAnalytics.logEvent(analyticsEvent)
         }
     }
@@ -36,11 +38,11 @@ class AnalyticsImpl internal constructor(
         }
     }
 
-    private fun toBundle(params: Map<String, String>): Bundle? {
+    private fun toBundle(params: Map<String, Serializable>): Bundle? {
         if (params.isEmpty()) return null
 
         return Bundle().apply {
-            params.forEach { (k, v) -> putString(k, v) }
+            params.forEach { (k, v) -> putString(k, v.toString()) }
         }
     }
 
@@ -49,4 +51,6 @@ class AnalyticsImpl internal constructor(
 
     private fun setMetricAsSent(metricName: String) =
         store.edit().putBoolean("HAS_SENT_METRIC_$metricName", true).apply()
+
+    private val nabuAnalyticsNames = AnalyticsNames.values().map { it.eventName }
 }

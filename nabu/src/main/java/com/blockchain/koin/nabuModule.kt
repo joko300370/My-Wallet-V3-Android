@@ -299,7 +299,9 @@ val nabuModule = module {
         NabuAnalytics(
             analyticsService = get(),
             prefs = lazy { get() },
-            localAnalyticsPersistence = get()
+            localAnalyticsPersistence = get(),
+            crashLogger = get(),
+            tokenStore = get()
         )
     }
         .bind(AppStartUpFlushable::class)

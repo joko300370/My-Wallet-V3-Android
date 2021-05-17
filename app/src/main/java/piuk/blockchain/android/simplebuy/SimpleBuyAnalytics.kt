@@ -3,7 +3,10 @@ package piuk.blockchain.android.simplebuy
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.notifications.analytics.AnalyticsEvent
+import com.blockchain.notifications.analytics.AnalyticsNames
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.Money
+import java.io.Serializable
 
 enum class SimpleBuyAnalytics(override val event: String, override val params: Map<String, String> = emptyMap()) :
     AnalyticsEvent {
@@ -78,6 +81,14 @@ fun PaymentMethod.toAnalyticsString(): String =
         is PaymentMethod.UndefinedFunds -> "FUNDS"
         is PaymentMethod.Bank,
         is PaymentMethod.UndefinedBankTransfer -> "LINK_BANK"
+        else -> ""
+    }
+
+fun PaymentMethod.toNabuAnalyticsString(): String =
+    when (this) {
+        is PaymentMethod.Card -> "PAYMENT_CARD"
+        is PaymentMethod.Bank -> "BANK_TRANSFER"
+        is PaymentMethod.Funds -> "FUNDS"
         else -> ""
     }
 
@@ -168,5 +179,22 @@ class CurrencyChangedFromBuyForm(fiatCurrency: String) : AnalyticsEvent {
     override val event: String = "sb_buy_form_fiat_changed"
     override val params: Map<String, String> = mapOf(
         "currency" to fiatCurrency
+    )
+}
+
+class BuyAmountEntered(inputAmount: Money, maxAmount: Money, outputCurrency: String) : AnalyticsEvent {
+    override val event: String = AnalyticsNames.BUY_AMOUNT_ENTERED.eventName
+    override val params: Map<String, Serializable> = mapOf(
+        "input_amount" to inputAmount.toBigDecimal(),
+        "input_currency" to inputAmount.currencyCode,
+        "input_amount_max" to maxAmount.toBigDecimal(),
+        "output_currency" to outputCurrency
+    )
+}
+
+class BuyPaymentMethodSelected(type: String) : AnalyticsEvent {
+    override val event: String = AnalyticsNames.BUY_PAYMENT_METHOD_CHANGED.eventName
+    override val params: Map<String, Serializable> = mapOf(
+        "payment_type" to type
     )
 }

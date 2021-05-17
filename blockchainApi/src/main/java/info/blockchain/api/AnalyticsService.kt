@@ -1,17 +1,22 @@
-package info.blockchain.api
+@file:UseSerializers(BigDecimalSerializer::class)
 
+package info.blockchain.api
 import info.blockchain.api.analytics.AnalyticsApiInterface
 import info.blockchain.api.analytics.AnalyticsContext
 import info.blockchain.api.analytics.AnalyticsRequestBody
+import info.blockchain.api.serializers.BigDecimalSerializer
 import io.reactivex.Completable
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import retrofit2.Retrofit
+import java.math.BigDecimal
 
 class AnalyticsService(retrofit: Retrofit) {
     private val api: AnalyticsApiInterface = retrofit.create(AnalyticsApiInterface::class.java)
 
-    fun postEvents(events: List<NabuAnalyticsEvent>, id: String): Completable {
+    fun postEvents(events: List<NabuAnalyticsEvent>, id: String, authorization: String?): Completable {
         return api.postAnalytics(
+            authorization,
             AnalyticsRequestBody(
                 id = id,
                 events = events,
@@ -26,5 +31,6 @@ data class NabuAnalyticsEvent(
     val name: String,
     val type: String,
     val originalTimestamp: String,
-    val properties: Map<String, String> = emptyMap()
+    val properties: Map<String, String>,
+    val numericProperties: Map<String, BigDecimal>
 )

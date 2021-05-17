@@ -10,8 +10,8 @@ interface UpsellHost : HostedBottomSheet.Host {
     fun startUpsellKyc()
 }
 
-internal /*package*/ class CustodialReceiveUpsellSheet
-    : SlidingModalBottomDialog<DialogSheetUpsellCustodialReceiveBinding>() {
+internal /*package*/ class CustodialReceiveUpsellSheet :
+    SlidingModalBottomDialog<DialogSheetUpsellCustodialReceiveBinding>() {
     override val host: UpsellHost by lazy {
         super.host as? UpsellHost ?: throw IllegalStateException(
             "Host fragment is not a CustodialReceiveUpsellSheet.Host"

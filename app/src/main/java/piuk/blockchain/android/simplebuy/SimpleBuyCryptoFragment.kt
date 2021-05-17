@@ -155,6 +155,17 @@ class SimpleBuyCryptoFragment :
                         lastState?.selectedPaymentMethod?.paymentMethodType?.toAnalyticsString().orEmpty()
                     )
                 )
+                check(lastState?.order?.amount != null)
+                check(lastState?.maxFiatAmount != null)
+                check(lastState?.selectedCryptoCurrency?.networkTicker != null)
+
+                analytics.logEvent(
+                    BuyAmountEntered(
+                        lastState?.order?.amount ?: return,
+                        lastState?.maxFiatAmount ?: return,
+                        lastState?.selectedCryptoCurrency?.networkTicker ?: return
+                    )
+                )
             }
         }
     }
@@ -456,6 +467,12 @@ class SimpleBuyCryptoFragment :
 
     override fun onPaymentMethodChanged(paymentMethod: PaymentMethod) {
         model.process(SimpleBuyIntent.PaymentMethodChangeRequested(paymentMethod))
+        if (paymentMethod.canUsedForPaying())
+            analytics.logEvent(
+                BuyPaymentMethodSelected(
+                    paymentMethod.toNabuAnalyticsString()
+                )
+            )
     }
 
     private fun addPaymentMethod(type: PaymentMethodType) {

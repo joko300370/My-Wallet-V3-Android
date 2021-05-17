@@ -1,8 +1,11 @@
 package com.blockchain.nabu.datamanagers.analytics
 
+import com.blockchain.logging.CrashLogger
+import com.blockchain.nabu.stores.NabuSessionTokenStore
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.blockchain.operations.AppStartUpFlushable
+import com.blockchain.utils.Optional
 import com.blockchain.utils.toUtcIso8601
 import info.blockchain.api.AnalyticsService
 import info.blockchain.api.NabuAnalyticsEvent
@@ -13,12 +16,15 @@ import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import piuk.blockchain.androidcore.utils.extensions.then
+import java.math.BigDecimal
 import java.util.Date
 
 class NabuAnalytics(
     private val analyticsService: AnalyticsService,
     private val prefs: Lazy<PersistentPrefs>,
-    private val localAnalyticsPersistence: AnalyticsLocalPersistence
+    private val localAnalyticsPersistence: AnalyticsLocalPersistence,
+    private val crashLogger: CrashLogger,
+    private val tokenStore: NabuSessionTokenStore
 ) : Analytics, AppStartUpFlushable {
     private val compositeDisposable = CompositeDisposable()
 
@@ -31,6 +37,9 @@ class NabuAnalytics(
         // TODO log failure
         compositeDisposable += localAnalyticsPersistence.save(nabuEvent)
             .subscribeOn(Schedulers.computation())
+            .doOnError {
+                crashLogger.logException(it)
+            }
             .onErrorComplete()
             .then {
                 sendToApiAndFlushIfNeeded()
@@ -65,7 +74,7 @@ class NabuAnalytics(
             }
 
             val completables = listOfSublists.map { list ->
-                analyticsService.postEvents(list, id).then {
+                postEvents(list).then {
                     localAnalyticsPersistence.removeOldestItems(list.size)
                 }
             }
@@ -75,11 +84,16 @@ class NabuAnalytics(
 
     private fun batchToApiAndFlush(): Completable {
         return localAnalyticsPersistence.getOldestItems(BATCH_SIZE).flatMapCompletable {
-            analyticsService.postEvents(it, id)
+            postEvents(it)
         }.then {
             localAnalyticsPersistence.removeOldestItems(BATCH_SIZE)
         }
     }
+
+    private fun postEvents(events: List<NabuAnalyticsEvent>): Completable =
+        tokenStore.getAccessToken().firstOrError().flatMapCompletable {
+            analyticsService.postEvents(events, id, if (it is Optional.Some) it.element.authHeader else null)
+        }
 
     override fun logEventOnce(analyticsEvent: AnalyticsEvent) {}
 
@@ -95,5 +109,6 @@ private fun AnalyticsEvent.toNabuAnalyticsEvent(): NabuAnalyticsEvent =
         name = this.event,
         type = "EVENT",
         originalTimestamp = Date().toUtcIso8601(),
-        properties = this.params
+        properties = this.params.filter { it.value is String }.mapValues { it.toString() },
+        numericProperties = this.params.filter { it.value is Number }.mapValues { BigDecimal(it.value.toString()) }
     )

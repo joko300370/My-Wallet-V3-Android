@@ -4,11 +4,13 @@ import info.blockchain.api.NabuAnalyticsEvent
 import io.reactivex.Completable
 import kotlinx.serialization.Serializable
 import retrofit2.http.Body
+import retrofit2.http.Header
 import retrofit2.http.POST
 
 interface AnalyticsApiInterface {
     @POST("events/publish")
     fun postAnalytics(
+        @Header("authorization") authorization: String?,
         @Body body: AnalyticsRequestBody
     ): Completable
 }

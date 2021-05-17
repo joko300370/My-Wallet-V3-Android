@@ -57,8 +57,8 @@ interface HomeNavigator {
     fun startInterestDashboard()
 }
 
-abstract class HomeScreenMviFragment<M : MviModel<S, I>, I : MviIntent<S>, S : MviState, E : ViewBinding>
-    : MviFragment<M, I, S, E>(),
+abstract class HomeScreenMviFragment<M : MviModel<S, I>, I : MviIntent<S>, S : MviState, E : ViewBinding> :
+    MviFragment<M, I, S, E>(),
     HomeScreenFragment {
 
     override fun navigator(): HomeNavigator =

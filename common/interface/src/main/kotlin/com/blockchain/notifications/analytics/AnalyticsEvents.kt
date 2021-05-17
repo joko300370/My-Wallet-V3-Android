@@ -88,3 +88,8 @@ fun apiError(host: String, path: String, body: String?, requestId: String?, erro
                 "request_id" to requestId
             ).mapNotNull { it.value?.let { value -> it.key to value } }.toMap()
     }
+
+enum class AnalyticsNames(val eventName: String) {
+    BUY_AMOUNT_ENTERED("Buy Amount Entered"),
+    BUY_PAYMENT_METHOD_CHANGED("Buy Payment Method Selected"),
+}
