@@ -92,4 +92,6 @@ fun apiError(host: String, path: String, body: String?, requestId: String?, erro
 enum class AnalyticsNames(val eventName: String) {
     BUY_AMOUNT_ENTERED("Buy Amount Entered"),
     BUY_PAYMENT_METHOD_CHANGED("Buy Payment Method Selected"),
+    BUY_SELL_CLICKED("Buy Sell Clicked"),
+    BUY_SELL_VIEWED("Buy Sell Viewed");
 }

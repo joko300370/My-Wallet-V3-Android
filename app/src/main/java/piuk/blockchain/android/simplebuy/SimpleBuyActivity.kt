@@ -68,7 +68,7 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
                     currentState.copy(bankAuthFlow = BankAuthFlowState.BANK_APPROVAL_COMPLETE).toPreferencesValue()
                 )
             }
-
+            analytics.logEvent(BuySellViewedEvent(BuySellType.BUY))
             subscribeForNavigation()
         }
     }

@@ -34,6 +34,9 @@ import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.databinding.FragmentDashboardBinding
+import piuk.blockchain.android.simplebuy.BuySellClicked
+import piuk.blockchain.android.simplebuy.BuySellOrigin
+import piuk.blockchain.android.simplebuy.BuySellType
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import piuk.blockchain.android.simplebuy.SimpleBuyCancelOrderBottomSheet
 import piuk.blockchain.android.ui.airdrops.AirdropStatusSheet
@@ -525,10 +528,20 @@ class DashboardFragment :
         }
 
         override fun startBuy() {
+            analytics.logEvent(
+                BuySellClicked(
+                    origin = BuySellOrigin.DASHBOARD_PROMO, type = BuySellType.BUY
+                )
+            )
             navigator().launchSimpleBuySell()
         }
 
         override fun startSell() {
+            analytics.logEvent(
+                BuySellClicked(
+                    origin = BuySellOrigin.DASHBOARD_PROMO, type = BuySellType.SELL
+                )
+            )
             navigator().launchSimpleBuySell(BuySellFragment.BuySellViewType.TYPE_SELL)
         }
 

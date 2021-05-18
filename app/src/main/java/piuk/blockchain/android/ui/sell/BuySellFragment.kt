@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.blockchain.koin.payloadScope
 import com.blockchain.koin.scopedInject
+import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.ui.trackProgress
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -18,6 +19,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_buy_sell.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.simplebuy.BuySellViewedEvent
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.simplebuy.SimpleBuyCheckoutFragment
 import piuk.blockchain.android.simplebuy.SimpleBuySelectCurrencyFragment
@@ -38,6 +40,7 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
 
     private val compositeDisposable = CompositeDisposable()
     private val appUtil: AppUtil by inject()
+    private val analytics: Analytics by inject()
     private val simpleBuySync: SimpleBuySyncFactory by scopedInject()
     private val buySellFlowNavigator: BuySellFlowNavigator
         get() = payloadScope.get()
@@ -56,6 +59,7 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity?.setupToolbar(R.string.buy_and_sell)
+        analytics.logEvent(BuySellViewedEvent())
     }
 
     private fun subscribeForNavigation() {

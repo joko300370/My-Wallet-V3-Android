@@ -1,5 +1,6 @@
 package piuk.blockchain.android.simplebuy
 
+import com.blockchain.extensions.withoutNullValues
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.notifications.analytics.AnalyticsEvent
@@ -60,17 +61,7 @@ enum class SimpleBuyAnalytics(override val event: String, override val params: M
     WIRE_TRANSFER_LOADING_ERROR("sb_link_bank_loading_error"),
     WIRE_TRANSFER_SCREEN_SHOWN("sb_link_bank_screen_shown"),
 
-    ACH_SUCCESS("sb_ach_success"),
-    ACH_CLOSE("sb_ach_close"),
-    ACH_ERROR("sb_ach_error"),
-
-    WITHDRAWAL_FORM_SHOWN("cash_withdraw_form_shown"),
-    WITHDRAWAL_CONFIRM_AMOUNT("cash_withdraw_form_confirm_click"),
-    WITHDRAWAL_CHECKOUT_SHOWN("cash_withdraw_form_shown"),
-    WITHDRAWAL_CHECKOUT_CONFIRM("cash_withdraw_checkout_confirm"),
-    WITHDRAWAL_CHECKOUT_CANCEL("cash_withdraw_checkout_cancel"),
-    WITHDRAWAL_SUCCESS("cash_withdraw_success"),
-    WITHDRAWAL_ERROR("cash_withdraw_error"),
+    ACH_SUCCESS("sb_ach_success");
 }
 
 fun PaymentMethod.toAnalyticsString(): String =
@@ -192,9 +183,36 @@ class BuyAmountEntered(inputAmount: Money, maxAmount: Money, outputCurrency: Str
     )
 }
 
+class BuySellViewedEvent(private val type: BuySellType? = null) : AnalyticsEvent {
+    override val event: String
+        get() = AnalyticsNames.BUY_SELL_VIEWED.eventName
+    override val params: Map<String, Serializable>
+        get() = mapOf(
+            "type" to type?.name
+        ).withoutNullValues()
+}
+
+class BuySellClicked(private val origin: BuySellOrigin, val type: BuySellType? = null) : AnalyticsEvent {
+    override val event: String
+        get() = AnalyticsNames.BUY_SELL_CLICKED.eventName
+    override val params: Map<String, Serializable>
+        get() = mapOf(
+            "origin" to origin.name,
+            "type" to type?.name
+        ).withoutNullValues()
+}
+
 class BuyPaymentMethodSelected(type: String) : AnalyticsEvent {
     override val event: String = AnalyticsNames.BUY_PAYMENT_METHOD_CHANGED.eventName
     override val params: Map<String, Serializable> = mapOf(
         "payment_type" to type
     )
+}
+
+enum class BuySellOrigin {
+    NAVIGATION, SEND, DASHBOARD_PROMO, TRANSACTION_DETAILS
+}
+
+enum class BuySellType {
+    BUY, SELL
 }

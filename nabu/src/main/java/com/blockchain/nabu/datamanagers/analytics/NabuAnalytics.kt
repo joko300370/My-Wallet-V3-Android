@@ -109,6 +109,6 @@ private fun AnalyticsEvent.toNabuAnalyticsEvent(): NabuAnalyticsEvent =
         name = this.event,
         type = "EVENT",
         originalTimestamp = Date().toUtcIso8601(),
-        properties = this.params.filter { it.value is String }.mapValues { it.toString() },
+        properties = this.params.filter { it.value is String }.mapValues { it.value.toString() },
         numericProperties = this.params.filter { it.value is Number }.mapValues { BigDecimal(it.value.toString()) }
     )

@@ -50,7 +50,7 @@ class AnalyticsFileLocalPersistence(context: Context) : AnalyticsLocalPersistenc
     override fun getAllItems(): Single<List<NabuAnalyticsEvent>> {
         return Single.fromCallable {
             queueFile.read(queueFile.size()).map {
-                Json.decodeFromString(it)
+                Json.decodeFromString<NabuAnalyticsEvent>(it)
             }
         }
     }
@@ -58,7 +58,7 @@ class AnalyticsFileLocalPersistence(context: Context) : AnalyticsLocalPersistenc
     override fun getOldestItems(n: Int): Single<List<NabuAnalyticsEvent>> {
         return Single.fromCallable {
             queueFile.read(n.toLong()).map {
-                Json.decodeFromString(it)
+                Json.decodeFromString<NabuAnalyticsEvent>(it)
             }
         }
     }

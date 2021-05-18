@@ -50,6 +50,8 @@ import piuk.blockchain.android.coincore.CryptoTarget
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.android.scan.QrScanResultProcessor
+import piuk.blockchain.android.simplebuy.BuySellClicked
+import piuk.blockchain.android.simplebuy.BuySellOrigin
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.simplebuy.SimpleBuyState
 import piuk.blockchain.android.simplebuy.SmallSimpleBuyNavigator
@@ -147,6 +149,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                     ITEM_BUY_SELL -> {
                         launchSimpleBuySell()
                         analytics.logEvent(RequestAnalyticsEvents.TabItemClicked)
+                        analytics.logEvent(BuySellClicked(origin = BuySellOrigin.NAVIGATION))
                     }
                     ITEM_TRANSFER -> {
                         startTransferFragment()
@@ -839,10 +842,11 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         action: AssetAction,
         account: BlockchainAccount
     ) = when (action) {
-            AssetAction.Receive -> replaceBottomSheet(ReceiveSheet.newInstance(account as CryptoAccount))
-            AssetAction.Swap -> tryTolaunchSwap(sourceAccount = account as CryptoAccount)
-            AssetAction.ViewActivity -> startActivitiesFragment(account)
-        else -> { }
+        AssetAction.Receive -> replaceBottomSheet(ReceiveSheet.newInstance(account as CryptoAccount))
+        AssetAction.Swap -> tryTolaunchSwap(sourceAccount = account as CryptoAccount)
+        AssetAction.ViewActivity -> startActivitiesFragment(account)
+        else -> {
+        }
     }
 
     override fun launchOpenBankingLinking(bankLinkingInfo: BankLinkingInfo) {

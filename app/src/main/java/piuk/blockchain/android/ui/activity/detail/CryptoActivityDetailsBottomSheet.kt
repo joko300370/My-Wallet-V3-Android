@@ -20,6 +20,9 @@ import io.reactivex.rxkotlin.plusAssign
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.databinding.DialogSheetActivityDetailsBinding
+import piuk.blockchain.android.simplebuy.BuySellClicked
+import piuk.blockchain.android.simplebuy.BuySellOrigin
+import piuk.blockchain.android.simplebuy.BuySellType
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.ui.activity.CryptoActivityType
@@ -163,6 +166,9 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
                 AndroidSchedulers.mainThread()
             )
                 .subscribe {
+                    analytics.logEvent(
+                        BuySellClicked(origin = BuySellOrigin.TRANSACTION_DETAILS, type = BuySellType.BUY)
+                    )
                     startActivity(SimpleBuyActivity.newInstance(requireContext(), arguments.cryptoCurrency, true))
                     dismiss()
                 }
