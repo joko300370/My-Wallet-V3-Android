@@ -23,10 +23,10 @@ import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.NotificationsUtil
 import com.blockchain.notifications.analytics.AnalyticsEvents
+import com.blockchain.notifications.analytics.LaunchOrigin
 import com.blockchain.notifications.analytics.NotificationAppOpened
 import com.blockchain.notifications.analytics.RequestAnalyticsEvents
 import com.blockchain.notifications.analytics.SendAnalytics
-import com.blockchain.notifications.analytics.SwapAnalyticsEvents
 import com.blockchain.notifications.analytics.TransactionsAnalyticsEvents
 import com.blockchain.notifications.analytics.activityShown
 import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_SUPPORT_PORTAL
@@ -51,7 +51,6 @@ import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.android.scan.QrScanResultProcessor
 import piuk.blockchain.android.simplebuy.BuySellClicked
-import piuk.blockchain.android.simplebuy.BuySellOrigin
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.simplebuy.SimpleBuyState
 import piuk.blockchain.android.simplebuy.SmallSimpleBuyNavigator
@@ -91,6 +90,7 @@ import piuk.blockchain.android.ui.tour.IntroTourHost
 import piuk.blockchain.android.ui.tour.IntroTourStep
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.ui.transactionflow.analytics.SwapAnalyticsEvents
 import piuk.blockchain.android.ui.transfer.TransferFragment
 import piuk.blockchain.android.ui.transfer.receive.ReceiveSheet
 import piuk.blockchain.android.ui.upsell.UpsellHost
@@ -145,11 +145,12 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                     ITEM_SWAP -> {
                         tryTolaunchSwap()
                         analytics.logEvent(SwapAnalyticsEvents.SwapTabItemClick)
+                        analytics.logEvent(SwapAnalyticsEvents.SwapClickedEvent(LaunchOrigin.NAVIGATION))
                     }
                     ITEM_BUY_SELL -> {
                         launchSimpleBuySell()
                         analytics.logEvent(RequestAnalyticsEvents.TabItemClicked)
-                        analytics.logEvent(BuySellClicked(origin = BuySellOrigin.NAVIGATION))
+                        analytics.logEvent(BuySellClicked(origin = LaunchOrigin.NAVIGATION))
                     }
                     ITEM_TRANSFER -> {
                         startTransferFragment()
@@ -498,10 +499,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         sourceAccount: CryptoAccount?,
         targetAccount: CryptoAccount?
     ) {
-        startSwapFlow(sourceAccount, targetAccount)
-    }
-
-    override fun launchSwap(sourceAccount: CryptoAccount?, targetAccount: CryptoAccount?) {
         startSwapFlow(sourceAccount, targetAccount)
     }
 

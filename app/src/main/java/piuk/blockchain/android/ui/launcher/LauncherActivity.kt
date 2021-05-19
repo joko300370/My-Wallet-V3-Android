@@ -10,6 +10,8 @@ import androidx.appcompat.widget.AppCompatEditText
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.NotificationsUtil
 import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.notifications.analytics.KYCAnalyticsEvents
+import com.blockchain.notifications.analytics.LaunchOrigin
 import com.blockchain.notifications.analytics.NotificationAppOpened
 import kotlinx.android.synthetic.main.activity_launcher.*
 import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
@@ -83,6 +85,7 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
     }
 
     override fun launchEmailVerification() {
+        analytics.logEvent(KYCAnalyticsEvents.EmailVeriffRequested(LaunchOrigin.SIGN_UP))
         supportFragmentManager.beginTransaction()
             .replace(R.id.content_frame, KycEmailEntryFragment(), KycEmailEntryFragment::class.simpleName)
             .commitAllowingStateLoss()

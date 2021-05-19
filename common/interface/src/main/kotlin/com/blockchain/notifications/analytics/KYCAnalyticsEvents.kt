@@ -1,5 +1,7 @@
 package com.blockchain.notifications.analytics
 
+import java.io.Serializable
+
 sealed class KYCAnalyticsEvents(override val event: String, override val params: Map<String, String> = mapOf()) :
     AnalyticsEvent {
     object CountrySelected : KYCAnalyticsEvents("kyc_country_selected")
@@ -12,4 +14,18 @@ sealed class KYCAnalyticsEvents(override val event: String, override val params:
     object Tier2Clicked : KYCAnalyticsEvents("kyc_unlock_gold_click")
     object PhoneNumberUpdateButtonClicked : KYCAnalyticsEvents("kyc_phone_update_button_click")
     object AddressChanged : KYCAnalyticsEvents("kyc_address_detail_set")
+
+    class EmailVeriffRequested(override val origin: LaunchOrigin) : AnalyticsEvent {
+        override val event: String
+            get() = AnalyticsNames.EMAIL_VERIFF_REQUESTED.eventName
+        override val params: Map<String, Serializable>
+            get() = emptyMap()
+    }
+
+    class UpgradeKycVeriffClicked(override val origin: LaunchOrigin) : AnalyticsEvent {
+        override val event: String
+            get() = AnalyticsNames.EMAIL_VERIFF_REQUESTED.eventName
+        override val params: Map<String, Serializable>
+            get() = emptyMap()
+    }
 }

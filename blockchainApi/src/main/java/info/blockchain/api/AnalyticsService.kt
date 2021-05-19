@@ -1,6 +1,6 @@
 @file:UseSerializers(BigDecimalSerializer::class)
-
 package info.blockchain.api
+
 import info.blockchain.api.analytics.AnalyticsApiInterface
 import info.blockchain.api.analytics.AnalyticsContext
 import info.blockchain.api.analytics.AnalyticsRequestBody
@@ -14,13 +14,19 @@ import java.math.BigDecimal
 class AnalyticsService(retrofit: Retrofit) {
     private val api: AnalyticsApiInterface = retrofit.create(AnalyticsApiInterface::class.java)
 
-    fun postEvents(events: List<NabuAnalyticsEvent>, id: String, authorization: String?): Completable {
+    fun postEvents(
+        events: List<NabuAnalyticsEvent>,
+        id: String,
+        analyticsContext: AnalyticsContext,
+        authorization: String?
+    ): Completable {
+
         return api.postAnalytics(
             authorization,
             AnalyticsRequestBody(
                 id = id,
                 events = events,
-                context = AnalyticsContext()
+                context = analyticsContext
             )
         )
     }

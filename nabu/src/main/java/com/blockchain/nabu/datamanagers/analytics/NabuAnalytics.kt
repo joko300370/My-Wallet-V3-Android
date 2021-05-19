@@ -4,6 +4,7 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.stores.NabuSessionTokenStore
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvent
+import com.blockchain.notifications.analytics.LaunchOrigin
 import com.blockchain.operations.AppStartUpFlushable
 import com.blockchain.utils.Optional
 import com.blockchain.utils.toUtcIso8601
@@ -24,6 +25,7 @@ class NabuAnalytics(
     private val prefs: Lazy<PersistentPrefs>,
     private val localAnalyticsPersistence: AnalyticsLocalPersistence,
     private val crashLogger: CrashLogger,
+    private val analyticsContextProvider: AnalyticsContextProvider,
     private val tokenStore: NabuSessionTokenStore
 ) : Analytics, AppStartUpFlushable {
     private val compositeDisposable = CompositeDisposable()
@@ -34,7 +36,7 @@ class NabuAnalytics(
 
     override fun logEvent(analyticsEvent: AnalyticsEvent) {
         val nabuEvent = analyticsEvent.toNabuAnalyticsEvent()
-        // TODO log failure
+
         compositeDisposable += localAnalyticsPersistence.save(nabuEvent)
             .subscribeOn(Schedulers.computation())
             .doOnError {
@@ -92,7 +94,9 @@ class NabuAnalytics(
 
     private fun postEvents(events: List<NabuAnalyticsEvent>): Completable =
         tokenStore.getAccessToken().firstOrError().flatMapCompletable {
-            analyticsService.postEvents(events, id, if (it is Optional.Some) it.element.authHeader else null)
+            analyticsService.postEvents(
+                events, id, analyticsContextProvider.context(), if (it is Optional.Some) it.element.authHeader else null
+            )
         }
 
     override fun logEventOnce(analyticsEvent: AnalyticsEvent) {}
@@ -109,6 +113,14 @@ private fun AnalyticsEvent.toNabuAnalyticsEvent(): NabuAnalyticsEvent =
         name = this.event,
         type = "EVENT",
         originalTimestamp = Date().toUtcIso8601(),
-        properties = this.params.filter { it.value is String }.mapValues { it.value.toString() },
+        properties = this.params.filter { it.value is String }.mapValues { it.value.toString() }
+            .plusOriginIfAvailable(this.origin),
         numericProperties = this.params.filter { it.value is Number }.mapValues { BigDecimal(it.value.toString()) }
     )
+
+private fun Map<String, String>.plusOriginIfAvailable(launchOrigin: LaunchOrigin?): Map<String, String> {
+    val origin = launchOrigin ?: return this
+    return this.toMutableMap().apply {
+        this["origin"] = origin.name
+    }.toMap()
+}

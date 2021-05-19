@@ -93,5 +93,25 @@ enum class AnalyticsNames(val eventName: String) {
     BUY_AMOUNT_ENTERED("Buy Amount Entered"),
     BUY_PAYMENT_METHOD_CHANGED("Buy Payment Method Selected"),
     BUY_SELL_CLICKED("Buy Sell Clicked"),
-    BUY_SELL_VIEWED("Buy Sell Viewed");
+    BUY_SELL_VIEWED("Buy Sell Viewed"),
+    SWAP_VIEWED("Swap Viewed"),
+    SWAP_CLICKED("Swap Clicked"),
+    EMAIL_VERIFF_REQUESTED("Email Verification Requested");
+}
+
+enum class LaunchOrigin {
+    NAVIGATION,
+    SEND,
+    SWAP,
+    AIRDROP,
+    RESUBMISSION,
+    SIMPLETRADE,
+    DASHBOARD_PROMO,
+    TRANSACTION_DETAILS,
+    CURRENCY_PAGE,
+    SAVINGS,
+    FIAT_FUNDS,
+    SIGN_UP,
+    SETTINGS,
+    VERIFICATION;
 }

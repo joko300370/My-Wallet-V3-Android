@@ -5,6 +5,7 @@ import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.blockchain.notifications.analytics.AnalyticsNames
+import com.blockchain.notifications.analytics.LaunchOrigin
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.Money
 import java.io.Serializable
@@ -192,12 +193,12 @@ class BuySellViewedEvent(private val type: BuySellType? = null) : AnalyticsEvent
         ).withoutNullValues()
 }
 
-class BuySellClicked(private val origin: BuySellOrigin, val type: BuySellType? = null) : AnalyticsEvent {
+class BuySellClicked(override val origin: LaunchOrigin, val type: BuySellType? = null) : AnalyticsEvent {
+
     override val event: String
         get() = AnalyticsNames.BUY_SELL_CLICKED.eventName
     override val params: Map<String, Serializable>
         get() = mapOf(
-            "origin" to origin.name,
             "type" to type?.name
         ).withoutNullValues()
 }
@@ -207,10 +208,6 @@ class BuyPaymentMethodSelected(type: String) : AnalyticsEvent {
     override val params: Map<String, Serializable> = mapOf(
         "payment_type" to type
     )
-}
-
-enum class BuySellOrigin {
-    NAVIGATION, SEND, DASHBOARD_PROMO, TRANSACTION_DETAILS
 }
 
 enum class BuySellType {

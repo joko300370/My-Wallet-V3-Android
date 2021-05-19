@@ -24,6 +24,8 @@ import com.blockchain.nabu.datamanagers.TransactionErrorMapper
 import com.blockchain.nabu.datamanagers.UniqueAnalyticsNabuUserReporter
 import com.blockchain.nabu.datamanagers.UniqueAnalyticsWalletReporter
 import com.blockchain.nabu.datamanagers.WalletReporter
+import com.blockchain.nabu.datamanagers.analytics.AnalyticsContextProvider
+import com.blockchain.nabu.datamanagers.analytics.AnalyticsContextProviderImpl
 import com.blockchain.nabu.datamanagers.analytics.AnalyticsLocalPersistence
 import com.blockchain.nabu.datamanagers.analytics.NabuAnalytics
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.LiveCustodialWalletManager
@@ -69,6 +71,7 @@ import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.operations.AppStartUpFlushable
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import piuk.blockchain.androidcore.utils.PersistentPrefs
 import retrofit2.Retrofit
 
 val nabuModule = module {
@@ -298,7 +301,8 @@ val nabuModule = module {
     single(nabu) {
         NabuAnalytics(
             analyticsService = get(),
-            prefs = lazy { get() },
+            prefs = lazy { get<PersistentPrefs>() },
+            analyticsContextProvider = get(),
             localAnalyticsPersistence = get(),
             crashLogger = get(),
             tokenStore = get()
@@ -306,6 +310,10 @@ val nabuModule = module {
     }
         .bind(AppStartUpFlushable::class)
         .bind(Analytics::class)
+
+    factory {
+        AnalyticsContextProviderImpl()
+    }.bind(AnalyticsContextProvider::class)
 
     single {
         AnalyticsFileLocalPersistence(

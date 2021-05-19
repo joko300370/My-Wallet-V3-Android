@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.AnalyticsEvents
+import com.blockchain.notifications.analytics.LaunchOrigin
 import com.blockchain.preferences.CurrencyPrefs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import info.blockchain.balance.CryptoCurrency
@@ -35,7 +36,6 @@ import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.databinding.FragmentDashboardBinding
 import piuk.blockchain.android.simplebuy.BuySellClicked
-import piuk.blockchain.android.simplebuy.BuySellOrigin
 import piuk.blockchain.android.simplebuy.BuySellType
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import piuk.blockchain.android.simplebuy.SimpleBuyCancelOrderBottomSheet
@@ -64,6 +64,7 @@ import piuk.blockchain.android.ui.sell.BuySellFragment
 import piuk.blockchain.android.ui.settings.BankLinkingHost
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.ui.transactionflow.analytics.SwapAnalyticsEvents
 import piuk.blockchain.android.util.launchUrlInBrowser
 import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.data.events.ActionEvent
@@ -500,7 +501,10 @@ class DashboardFragment :
 
         override fun startKyc(campaignType: CampaignType) = navigator().launchKyc(campaignType)
 
-        override fun startSwap() = navigator().tryTolaunchSwap()
+        override fun startSwap() {
+            analytics.logEvent(SwapAnalyticsEvents.SwapClickedEvent(LaunchOrigin.DASHBOARD_PROMO))
+            navigator().tryTolaunchSwap()
+        }
 
         override fun startPitLinking() = navigator().launchThePitLinking()
 
@@ -530,7 +534,7 @@ class DashboardFragment :
         override fun startBuy() {
             analytics.logEvent(
                 BuySellClicked(
-                    origin = BuySellOrigin.DASHBOARD_PROMO, type = BuySellType.BUY
+                    origin = LaunchOrigin.DASHBOARD_PROMO, type = BuySellType.BUY
                 )
             )
             navigator().launchSimpleBuySell()
@@ -539,7 +543,7 @@ class DashboardFragment :
         override fun startSell() {
             analytics.logEvent(
                 BuySellClicked(
-                    origin = BuySellOrigin.DASHBOARD_PROMO, type = BuySellType.SELL
+                    origin = LaunchOrigin.DASHBOARD_PROMO, type = BuySellType.SELL
                 )
             )
             navigator().launchSimpleBuySell(BuySellFragment.BuySellViewType.TYPE_SELL)

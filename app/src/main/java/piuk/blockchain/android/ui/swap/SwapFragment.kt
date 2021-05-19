@@ -101,7 +101,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
                 DividerItemDecoration.VERTICAL
             )
         )
-
+        analytics.logEvent(SwapAnalyticsEvents.SwapViewedEvent)
         loadSwapOrKyc(showLoading = true)
     }
 

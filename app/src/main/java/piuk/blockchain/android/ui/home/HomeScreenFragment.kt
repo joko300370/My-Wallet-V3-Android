@@ -28,11 +28,6 @@ interface HomeNavigator {
         targetAccount: CryptoAccount? = null
     )
 
-    fun launchSwap(
-        sourceAccount: CryptoAccount? = null,
-        targetAccount: CryptoAccount? = null
-    )
-
     fun launchKyc(campaignType: CampaignType)
     fun launchThePitLinking(linkId: String = "")
     fun launchThePit()

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.InterestState
 import com.blockchain.notifications.analytics.ActivityAnalytics
+import com.blockchain.notifications.analytics.LaunchOrigin
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -21,7 +22,6 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.databinding.DialogSheetActivityDetailsBinding
 import piuk.blockchain.android.simplebuy.BuySellClicked
-import piuk.blockchain.android.simplebuy.BuySellOrigin
 import piuk.blockchain.android.simplebuy.BuySellType
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
@@ -167,7 +167,7 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
             )
                 .subscribe {
                     analytics.logEvent(
-                        BuySellClicked(origin = BuySellOrigin.TRANSACTION_DETAILS, type = BuySellType.BUY)
+                        BuySellClicked(origin = LaunchOrigin.TRANSACTION_DETAILS, type = BuySellType.BUY)
                     )
                     startActivity(SimpleBuyActivity.newInstance(requireContext(), arguments.cryptoCurrency, true))
                     dismiss()

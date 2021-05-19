@@ -2,12 +2,15 @@ package piuk.blockchain.android.ui.dashboard.assetdetails
 
 import androidx.fragment.app.FragmentManager
 import com.blockchain.koin.scopedInject
+import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.notifications.analytics.LaunchOrigin
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.koin.core.KoinComponent
+import org.koin.core.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AccountGroup
 import piuk.blockchain.android.coincore.AssetAction
@@ -22,6 +25,7 @@ import piuk.blockchain.android.coincore.impl.CryptoAccountCustodialGroup
 import piuk.blockchain.android.coincore.impl.CryptoAccountNonCustodialGroup
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.analytics.SwapAnalyticsEvents
 import timber.log.Timber
 
 enum class AssetDetailsStep {
@@ -49,6 +53,7 @@ class AssetDetailsFlow(
     private var localState: AssetDetailsState = AssetDetailsState()
     private val disposables = CompositeDisposable()
     private val model: AssetDetailsModel by scopedInject()
+    private val analytics: Analytics by inject()
     private lateinit var assetFlowHost: AssetDetailsHost
 
     override fun startFlow(fragmentManager: FragmentManager, host: FlowHost) {
@@ -275,6 +280,7 @@ class AssetDetailsFlow(
     private fun launchSwap(account: SingleAccount) {
         assetFlowHost.performAssetActionFor(AssetAction.Swap, account)
         finishFlow()
+        analytics.logEvent(SwapAnalyticsEvents.SwapClickedEvent(LaunchOrigin.CURRENCY_PAGE))
     }
 
     private fun launchActivity(account: SingleAccount) {

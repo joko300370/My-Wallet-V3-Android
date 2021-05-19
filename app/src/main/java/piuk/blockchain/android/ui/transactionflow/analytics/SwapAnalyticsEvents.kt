@@ -1,8 +1,11 @@
 package piuk.blockchain.android.ui.transactionflow.analytics
 
 import com.blockchain.notifications.analytics.AnalyticsEvent
+import com.blockchain.notifications.analytics.AnalyticsNames
+import com.blockchain.notifications.analytics.LaunchOrigin
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.constructMap
+import java.io.Serializable
 
 sealed class SwapAnalyticsEvents(
     override val event: String,
@@ -21,7 +24,7 @@ sealed class SwapAnalyticsEvents(
     object SwapSilverLimitSheet : SwapAnalyticsEvents("swap_silver_limit_screen_seen")
     object SwapSilverLimitSheetCta : SwapAnalyticsEvents("swap_silver_limit_upgrade_click")
     object CancelTransaction : SwapAnalyticsEvents("swap_checkout_cancel")
-
+    object SwapTabItemClick : SwapAnalyticsEvents("swap_tab_item_click")
     data class SwapConfirmPair(
         val asset: CryptoCurrency,
         val target: String
@@ -41,21 +44,35 @@ sealed class SwapAnalyticsEvents(
         val asset: CryptoCurrency,
         val source: String,
         val target: String
-    ) : SwapAnalyticsEvents("swap_checkout_success", params = constructMap(
-        asset = asset,
-        target = target,
-        source = source
-    ))
+    ) : SwapAnalyticsEvents(
+        "swap_checkout_success", params = constructMap(
+            asset = asset,
+            target = target,
+            source = source
+        )
+    )
 
     data class TransactionFailed(
         val asset: CryptoCurrency,
         val target: String?,
         val source: String?,
         val error: String
-    ) : SwapAnalyticsEvents("swap_checkout_error", params = constructMap(
-        asset = asset,
-        target = target,
-        source = source,
-        error = error
-    ))
+    ) : SwapAnalyticsEvents(
+        "swap_checkout_error", params = constructMap(
+            asset = asset,
+            target = target,
+            source = source,
+            error = error
+        )
+    )
+
+    object SwapViewedEvent : SwapAnalyticsEvents(AnalyticsNames.SWAP_VIEWED.eventName, params = emptyMap())
+
+    class SwapClickedEvent(override val origin: LaunchOrigin) :
+        AnalyticsEvent {
+        override val event: String
+            get() = AnalyticsNames.SWAP_CLICKED.eventName
+        override val params: Map<String, Serializable>
+            get() = mapOf()
+    }
 }

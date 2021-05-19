@@ -18,9 +18,15 @@ interface AnalyticsApiInterface {
 @Serializable
 class AnalyticsRequestBody(
     val id: String,
-    val context: AnalyticsContext = AnalyticsContext(),
+    val context: AnalyticsContext,
     val events: List<NabuAnalyticsEvent>
 )
 
 @Serializable
-class AnalyticsContext(val context: Map<String, String> = mapOf())
+class AnalyticsContext(val device: DeviceInfo, val locale: String, val screen: ScreenInfo, val timezone: String)
+
+@Serializable
+class DeviceInfo(val manufacturer: String?, val model: String, val name: String)
+
+@Serializable
+class ScreenInfo(val density: Float, val height: Int, val width: Int)

@@ -27,6 +27,8 @@ interface UserAnalytics {
 interface AnalyticsEvent {
     val event: String
     val params: Map<String, Serializable>
+    val origin: LaunchOrigin?
+    get() = null
 }
 
 sealed class NotificationAnalytics(
