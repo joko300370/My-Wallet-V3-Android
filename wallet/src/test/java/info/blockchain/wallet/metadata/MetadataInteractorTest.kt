@@ -33,8 +33,6 @@ class MetadataInteractorTest {
         metaDataHDNode = metadataDerivation.deserializeMetadataNode("xprv9vM7oGsuM9zGW2tneNriS8NJF6DNrZEK" +
                 "vYMXSwP8SJNJRUuX6iXjZLQCCy52cXJKKb6XwWF3vr6mQCyy9d5msL9TrycrBmbPibKd2LhzjDW"),
         type = 6,
-        isEncrypted = true,
-        encryptionKey = null,
         metadataDerivation = metadataDerivation
     )
 

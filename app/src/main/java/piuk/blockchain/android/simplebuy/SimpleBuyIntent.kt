@@ -118,8 +118,15 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
             when {
                 preselectedId != null -> availablePaymentMethods.firstOrNull { it.id == preselectedId }?.id
                 oldStateId != null -> availablePaymentMethods.firstOrNull { it.id == oldStateId }?.id
-                else -> availablePaymentMethods.firstOrNull { it.isEligible }?.id
-                    ?: availablePaymentMethods.firstIfSizeOne()
+                else -> {
+                    // we skip undefined funds cause this payment method should trigger a bottom sheet
+                    // and it should always be actioned before
+                    val paymentMethodsThatCanBePreselected =
+                        availablePaymentMethods.filter { it !is PaymentMethod.UndefinedFunds }
+                    paymentMethodsThatCanBePreselected.firstOrNull { it.isEligible && it.canUsedForPaying() }?.id
+                        ?: paymentMethodsThatCanBePreselected.firstOrNull { it.isEligible }?.id
+                        ?: paymentMethodsThatCanBePreselected.firstIfSizeOne()
+                }
             }
 
         private fun List<PaymentMethod>.firstIfSizeOne(): String? =

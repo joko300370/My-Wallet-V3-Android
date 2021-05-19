@@ -188,7 +188,7 @@ class BtcOnChainTxEngine(
             amount = amount,
             totalBalance = balance,
             availableBalance = available.maxSpendable,
-            feeForFullAvailable = available.forForMax,
+            feeForFullAvailable = available.feeForMax,
             feeAmount = CryptoValue.fromMinor(sourceAsset, utxoBundle.absoluteFee),
             feeSelection = pendingTx.feeSelection.copy(
                 customLevelRates = feeOptions.toLevelRates()

@@ -299,7 +299,7 @@ class SendDataManagerTest {
         // Assert
         result shouldEqual SendDataManager.MaxAvailable(
             maxSpendable = CryptoValue.fromMinor(CryptoCurrency.BTC, sweepable.first),
-            forForMax = CryptoValue.fromMinor(CryptoCurrency.BTC, sweepable.second)
+            feeForMax = CryptoValue.fromMinor(CryptoCurrency.BTC, sweepable.second)
         )
 
         verify(mockPaymentService).getMaximumAvailable(unspent, targetOutputType, fee, false)
@@ -319,7 +319,7 @@ class SendDataManagerTest {
         // Assert
         result shouldEqual SendDataManager.MaxAvailable(
             maxSpendable = CryptoValue.fromMinor(CryptoCurrency.BCH, sweepable.first),
-            forForMax = CryptoValue.fromMinor(CryptoCurrency.BCH, sweepable.second)
+            feeForMax = CryptoValue.fromMinor(CryptoCurrency.BCH, sweepable.second)
         )
         verify(mockPaymentService).getMaximumAvailable(unspent, targetOutputType, fee, true)
         verifyNoMoreInteractions(mockPaymentService)

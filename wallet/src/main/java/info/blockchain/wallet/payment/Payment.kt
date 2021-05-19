@@ -70,8 +70,7 @@ class Payment(
             unspentCoins,
             targetOutputType,
             feePerKb,
-            addReplayProtection,
-            true
+            addReplayProtection
         )
     }
 
@@ -89,8 +88,7 @@ class Payment(
             changeOutputType,
             paymentAmount,
             feePerKb,
-            addReplayProtection,
-            true
+            addReplayProtection
         )
     }
 
