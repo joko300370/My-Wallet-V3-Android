@@ -10,6 +10,7 @@
         android:id="@+id/sb_buy_crypto_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -22,9 +23,9 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/buy_icon"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_marginStart="20dp"
+                android:layout_width="@dimen/grid_6"
+                android:layout_height="@dimen/grid_6"
+                android:layout_marginStart="@dimen/grid_5"
                 android:background="@drawable/buy_currency_background"
                 app:layout_constraintBottom_toBottomOf="@+id/crypto_icon"
                 app:layout_constraintStart_toStartOf="@+id/crypto_icon"
@@ -36,7 +37,7 @@
                 android:id="@+id/crypto_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/huge_margin"
+                android:layout_marginEnd="@dimen/grid_10"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -57,7 +58,7 @@
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline"
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
+                android:layout_height="@dimen/grid_0.25"
                 android:orientation="horizontal"
                 app:layout_constraintGuide_percent="0.5" />
 
@@ -89,6 +90,7 @@
         android:layout_marginStart="@dimen/small_margin"
         android:layout_marginTop="@dimen/small_margin"
         android:layout_marginEnd="@dimen/small_margin"
+        app:layout_constraintBottom_toTopOf="@id/recurring_buy_label"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sb_buy_crypto_header"
@@ -96,21 +98,51 @@
         tools:layout_height="20dp" />
 
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/recurring_buy_label"
+        style="@style/Text.Light.14"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/grid_4"
+        android:text="@string/recurring_buy_label"
+        app:layout_constraintBottom_toTopOf="@id/payment_method"
+        app:layout_constraintStart_toStartOf="@id/payment_method"
+        app:layout_constraintTop_toBottomOf="@id/input_amount" />
+
+    <Button
+        android:id="@+id/recurring_buy_cta"
+        style="@style/CtaButton.White.Slim"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/grid_6"
+        android:text="@string/recurring_buy_one_time_short"
+        app:layout_constraintBottom_toBottomOf="@id/recurring_buy_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/recurring_buy_label" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/frequency_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="recurring_buy_cta, recurring_buy_label"
+        tools:visibility="visible" />
+
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/payment_method"
         style="@style/Text.Semibold.12"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginStart="@dimen/grid_4"
         android:layout_marginTop="@dimen/standard_margin"
         android:text="@string/payment_method"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/input_amount" />
+        app:layout_constraintTop_toBottomOf="@+id/recurring_buy_label" />
 
     <View
         android:id="@+id/payment_method_separator"
         style="@style/Separator"
         android:layout_width="0dp"
-        android:layout_height="1dp"
+        android:layout_height="@dimen/grid_0.25"
         android:layout_marginStart="@dimen/tiny_margin"
         app:layout_constraintBottom_toBottomOf="@+id/payment_method"
         app:layout_constraintStart_toEndOf="@+id/payment_method"
@@ -118,16 +150,15 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/payment_method_details_root"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginTop="@dimen/tiny_margin"
         android:layout_marginEnd="@dimen/standard_margin"
         android:background="@drawable/payment_method_background"
         android:paddingTop="@dimen/tiny_margin"
         android:paddingBottom="@dimen/tiny_margin"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/payment_method"
         app:layout_constraintTop_toBottomOf="@+id/payment_method">
 
         <androidx.appcompat.widget.AppCompatImageView

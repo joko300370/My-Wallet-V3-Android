@@ -60,7 +60,9 @@ data class SimpleBuyState(
     @Transient val transferLimits: TransferLimits? = null,
     // we use this flag to avoid navigating back and forth, reset after navigating
     @Transient val confirmationActionRequested: Boolean = false,
-    @Transient val newPaymentMethodToBeAdded: PaymentMethod? = null
+    @Transient val newPaymentMethodToBeAdded: PaymentMethod? = null,
+    val recurringBuyFrequency: RecurringBuyFrequency = RecurringBuyFrequency.ONE_TIME,
+    @Transient private val recurringBuyEligiblePaymentMethods: List<PaymentMethodType> = emptyList()
 ) : MviState {
 
     @delegate:Transient
@@ -122,6 +124,14 @@ data class SimpleBuyState(
         return exchangeRate.convert(minFiatAmount)
     }
 
+    fun isSelectedPaymentMethodRecurringBuyEligible(): Boolean =
+        when (selectedPaymentMethodDetails) {
+            is PaymentMethod.Funds -> recurringBuyEligiblePaymentMethods.contains(PaymentMethodType.FUNDS)
+            is PaymentMethod.Bank -> recurringBuyEligiblePaymentMethods.contains(PaymentMethodType.BANK_TRANSFER)
+            is PaymentMethod.Card -> recurringBuyEligiblePaymentMethods.contains(PaymentMethodType.PAYMENT_CARD)
+            else -> false
+        }
+
     private fun PaymentMethod?.maxLimit(): Money? = this?.limits?.max
     private fun PaymentMethod?.minLimit(): Money? = this?.limits?.min
 
@@ -167,6 +177,14 @@ enum class KycState {
     VERIFIED_BUT_NOT_ELIGIBLE;
 
     fun verified() = this == VERIFIED_AND_ELIGIBLE || this == VERIFIED_BUT_NOT_ELIGIBLE
+}
+
+enum class RecurringBuyFrequency {
+    ONE_TIME,
+    DAILY,
+    WEEKLY,
+    BI_WEEKLY,
+    MONTHLY
 }
 
 enum class FlowScreen {

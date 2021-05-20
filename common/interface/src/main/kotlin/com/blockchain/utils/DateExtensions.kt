@@ -3,6 +3,8 @@ package com.blockchain.utils
 import org.apache.commons.lang3.time.DateUtils
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -43,4 +45,9 @@ fun Date.toLocalTime(): Date {
     val offset = timeZone.getOffset(this.time)
 
     return Date(this.time + offset)
+}
+
+fun ZonedDateTime.to12HourFormat(): String {
+    val formatter = DateTimeFormatter.ofPattern("ha")
+    return formatter.format(this).toString()
 }

@@ -264,6 +264,8 @@ class SimpleBuyInteractor(
                 }
             }
 
+    fun getRecurringBuyEligibility() = custodialWalletManager.getRecurringBuyEligibility()
+
     // attributes are null in case of bank
     fun confirmOrder(
         orderId: String,

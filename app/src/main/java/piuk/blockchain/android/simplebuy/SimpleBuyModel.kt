@@ -21,6 +21,7 @@ import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.cards.partners.CardActivator
 import piuk.blockchain.android.cards.partners.EverypayCardActivator
 import piuk.blockchain.android.networking.PollResult
@@ -286,10 +287,14 @@ class SimpleBuyModel(
         interactor.eligiblePaymentMethods(
             fiatCurrency,
             selectedPaymentMethodId
+        ).zipWith(
+            interactor.getRecurringBuyEligibility()
+                .onErrorReturn { emptyList() }
         )
             .subscribeBy(
-                onSuccess = {
-                    process(it)
+                onSuccess = { (intent, eligibility) ->
+                    process(SimpleBuyIntent.RecurringBuyEligibilityUpdated(eligibility))
+                    process(intent)
                 },
                 onError = {
                     process(SimpleBuyIntent.ErrorIntent())

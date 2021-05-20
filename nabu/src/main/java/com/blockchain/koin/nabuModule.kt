@@ -26,6 +26,7 @@ import com.blockchain.nabu.datamanagers.UniqueAnalyticsWalletReporter
 import com.blockchain.nabu.datamanagers.WalletReporter
 import com.blockchain.nabu.datamanagers.analytics.AnalyticsContextProvider
 import com.blockchain.nabu.datamanagers.analytics.AnalyticsContextProviderImpl
+import com.blockchain.nabu.datamanagers.analytics.AnalyticsFileLocalPersistence
 import com.blockchain.nabu.datamanagers.analytics.AnalyticsLocalPersistence
 import com.blockchain.nabu.datamanagers.analytics.NabuAnalytics
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.LiveCustodialWalletManager
@@ -36,6 +37,9 @@ import com.blockchain.nabu.datamanagers.featureflags.KycFeatureEligibility
 import com.blockchain.nabu.datamanagers.repositories.AssetBalancesRepository
 import com.blockchain.nabu.datamanagers.repositories.NabuUserRepository
 import com.blockchain.nabu.datamanagers.repositories.QuotesProvider
+import com.blockchain.nabu.datamanagers.repositories.RecurringBuyEligibilityProvider
+import com.blockchain.nabu.datamanagers.repositories.RecurringBuyEligibilityProviderImpl
+import com.blockchain.nabu.datamanagers.repositories.RecurringBuyRepository
 import com.blockchain.nabu.datamanagers.repositories.WithdrawLocksRepository
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestAvailabilityProvider
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestAvailabilityProviderImpl
@@ -65,7 +69,6 @@ import com.blockchain.nabu.service.RetailWalletTokenService
 import com.blockchain.nabu.service.TierService
 import com.blockchain.nabu.service.TierUpdater
 import com.blockchain.nabu.status.KycTiersQueries
-import com.blockchain.nabu.datamanagers.analytics.AnalyticsFileLocalPersistence
 import com.blockchain.nabu.stores.NabuSessionTokenStore
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.operations.AppStartUpFlushable
@@ -117,7 +120,8 @@ val nabuModule = module {
                 custodialRepository = get(),
                 bankLinkingEnabledProvider = get(),
                 transactionErrorMapper = get(),
-                currencyPrefs = get()
+                currencyPrefs = get(),
+                recurringBuysRepository = get()
             )
         }.bind(CustodialWalletManager::class)
 
@@ -184,6 +188,14 @@ val nabuModule = module {
                 exchangeRates = get()
             )
         }.bind(SwapActivityProvider::class)
+
+        factory {
+            RecurringBuyEligibilityProviderImpl(
+                nabuService = get(),
+                authenticator = get(),
+                features = get()
+            )
+        }.bind(RecurringBuyEligibilityProvider::class)
 
         factory(uniqueUserAnalytics) {
             UniqueAnalyticsNabuUserReporter(
@@ -255,6 +267,10 @@ val nabuModule = module {
 
         scoped {
             WithdrawLocksRepository(custodialWalletManager = get())
+        }
+
+        scoped {
+            RecurringBuyRepository(recurringBuyEligibilityProvider = get())
         }
 
         factory {

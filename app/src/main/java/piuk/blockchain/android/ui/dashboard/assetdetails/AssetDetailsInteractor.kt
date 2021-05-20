@@ -19,7 +19,7 @@ import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 
 typealias AssetDisplayMap = Map<AssetFilter, AssetDisplayInfo>
-
+// FIXME this won't support anything recurring buy related - refactor
 data class AssetDisplayInfo(
     val account: BlockchainAccount,
     val amount: Money,
@@ -84,6 +84,7 @@ class AssetDetailsInteractor(
             }.toMaybe()
         }.toSingle(Details.NoDetails)
 
+    // TODO load recurring buy information here to present to the bottom sheet
     private fun getAssetDisplayDetails(asset: CryptoAsset): Single<AssetDisplayMap> {
         return Singles.zip(
             asset.exchangeRate(),

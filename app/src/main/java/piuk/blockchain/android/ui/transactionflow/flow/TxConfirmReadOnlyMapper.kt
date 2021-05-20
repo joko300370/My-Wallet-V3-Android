@@ -231,7 +231,7 @@ class CompoundNetworkFeeFormatter(
         when {
             !sendingFeeInfo.asset.hasFeature(CryptoCurrency.IS_ERC20) &&
                 !receivingFeeInfo.asset.hasFeature(CryptoCurrency.IS_ERC20) -> {
-                StringUtils.Companion.getResolvedStringWithAppendedMappedLearnMore(
+                StringUtils.getResolvedStringWithAppendedMappedLearnMore(
                     context.resources.getString(
                         R.string.checkout_dual_fee_note, assetResources.getDisplayName(sendingFeeInfo.asset),
                         assetResources.getDisplayName(receivingFeeInfo.asset)
@@ -241,7 +241,7 @@ class CompoundNetworkFeeFormatter(
             }
             sendingFeeInfo.asset.hasFeature(CryptoCurrency.IS_ERC20) &&
                 !receivingFeeInfo.asset.hasFeature(CryptoCurrency.IS_ERC20) -> {
-                StringUtils.Companion.getResolvedStringWithAppendedMappedLearnMore(
+                StringUtils.getResolvedStringWithAppendedMappedLearnMore(
                     context.resources.getString(
                         R.string.checkout_one_erc_20_one_not_fee_note,
                         assetResources.getDisplayName(sendingFeeInfo.asset),
@@ -253,7 +253,7 @@ class CompoundNetworkFeeFormatter(
             }
             !sendingFeeInfo.asset.hasFeature(CryptoCurrency.IS_ERC20) &&
                 receivingFeeInfo.asset.hasFeature(CryptoCurrency.IS_ERC20) -> {
-                StringUtils.Companion.getResolvedStringWithAppendedMappedLearnMore(
+                StringUtils.getResolvedStringWithAppendedMappedLearnMore(
                     context.resources.getString(
                         R.string.checkout_one_erc_20_one_not_fee_note,
                         assetResources.getDisplayName(receivingFeeInfo.asset),
@@ -265,7 +265,7 @@ class CompoundNetworkFeeFormatter(
             }
             sendingFeeInfo.asset.hasFeature(CryptoCurrency.IS_ERC20) &&
                 receivingFeeInfo.asset.hasFeature(CryptoCurrency.IS_ERC20) -> {
-                StringUtils.Companion.getResolvedStringWithAppendedMappedLearnMore(
+                StringUtils.getResolvedStringWithAppendedMappedLearnMore(
                     context.resources.getString(
                         R.string.checkout_both_erc_20_fee_note,
                         assetResources.getDisplayName(sendingFeeInfo.asset),
@@ -282,7 +282,7 @@ class CompoundNetworkFeeFormatter(
     private fun getSingleFeeNote(item: FeeInfo, ignoreErc20LinkedNote: Boolean): SpannableStringBuilder =
         when {
             !item.asset.hasFeature(CryptoCurrency.IS_ERC20) || ignoreErc20LinkedNote -> {
-                StringUtils.Companion.getResolvedStringWithAppendedMappedLearnMore(
+                StringUtils.getResolvedStringWithAppendedMappedLearnMore(
                     context.resources.getString(
                         R.string.checkout_one_fee_note, assetResources.getDisplayName(item.asset)
                     ),
@@ -290,7 +290,7 @@ class CompoundNetworkFeeFormatter(
                 )
             }
             else -> {
-                StringUtils.Companion.getResolvedStringWithAppendedMappedLearnMore(
+                StringUtils.getResolvedStringWithAppendedMappedLearnMore(
                     context.resources.getString(
                         R.string.checkout_one_erc_20_fee_note,
                         assetResources.getDisplayName(item.asset)

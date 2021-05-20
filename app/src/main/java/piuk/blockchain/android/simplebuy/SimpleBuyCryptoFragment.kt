@@ -1,13 +1,17 @@
 package piuk.blockchain.android.simplebuy
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.appcompat.app.AlertDialog
 import com.blockchain.extensions.exhaustive
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.PaymentMethod
@@ -40,11 +44,15 @@ import piuk.blockchain.android.ui.linkbank.BankAuthSource
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
 
 class SimpleBuyCryptoFragment :
     MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState, FragmentSimpleBuyBuyCryptoBinding>(),
+    RecurringBuySelectionBottomSheet.Host,
     SimpleBuyScreen,
     PaymentMethodChangeListener,
     ChangeCurrencyHost {
@@ -52,6 +60,7 @@ class SimpleBuyCryptoFragment :
     override val model: SimpleBuyModel by scopedInject()
     private val exchangeRateDataManager: ExchangeRateDataManager by scopedInject()
     private val assetResources: AssetResources by scopedInject()
+    private val features: InternalFeatureFlagApi by inject()
 
     private var lastState: SimpleBuyState? = null
     private val compositeDisposable = CompositeDisposable()
@@ -63,6 +72,10 @@ class SimpleBuyCryptoFragment :
 
     private val preselectedMethodId: String? by unsafeLazy {
         arguments?.getString(ARG_PAYMENT_METHOD_ID)
+    }
+
+    private val isRecurringBuyEnabled: Boolean by lazy {
+        features.isFeatureEnabled(GatedFeature.RECURRING_BUYS)
     }
 
     override fun navigator(): SimpleBuyNavigator =
@@ -114,20 +127,24 @@ class SimpleBuyCryptoFragment :
         }
 
         compositeDisposable += binding.inputAmount.onImeAction.subscribe {
-            when (it) {
-                PrefixedOrSuffixedEditText.ImeOptions.NEXT -> {
-                    startBuy()
-                }
-                else -> {
-                    // do nothing
-                }
+            if (it == PrefixedOrSuffixedEditText.ImeOptions.NEXT) startBuy()
+        }
+
+        binding.recurringBuyCta.setOnClickListener {
+            if (lastState?.isSelectedPaymentMethodRecurringBuyEligible() == true) {
+                showBottomSheet(
+                    lastState?.let {
+                        RecurringBuySelectionBottomSheet.newInstance(it.recurringBuyFrequency)
+                    }
+                )
+            } else {
+                showDialogRecurringBuyUnavailable()
             }
         }
     }
 
-    override fun showAvailableToAddPaymentMethods() {
+    override fun showAvailableToAddPaymentMethods() =
         showPaymentMethodsBottomSheet(PaymentMethodsChooserState.AVAILABLE_TO_ADD)
-    }
 
     private fun showPaymentMethodsBottomSheet(state: PaymentMethodsChooserState) {
         lastState?.paymentOptions?.let {
@@ -141,6 +158,12 @@ class SimpleBuyCryptoFragment :
                     }
                 }))
         }
+    }
+
+    private fun isRecurringFrequencyAvailableForPaymentMethod(): Boolean {
+        val intervalSelected = lastState?.recurringBuyFrequency
+        val canBeUsedForRecurringBuy = lastState?.isSelectedPaymentMethodRecurringBuyEligible() ?: false
+        return !(!canBeUsedForRecurringBuy && intervalSelected != RecurringBuyFrequency.ONE_TIME)
     }
 
     private fun startBuy() {
@@ -168,6 +191,22 @@ class SimpleBuyCryptoFragment :
                 )
             }
         }
+    }
+
+    private fun showDialogRecurringBuyUnavailable() {
+        showAlert(
+            AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle)
+                .setTitle(R.string.recurring_buy_unavailable_title)
+                .setMessage(R.string.recurring_buy_unavailable_message)
+                .setCancelable(false)
+                .setPositiveButton(R.string.recurring_buy_cta_alert) { dialog, _ ->
+                    val interval = RecurringBuyFrequency.ONE_TIME
+                    model.process(SimpleBuyIntent.RecurringBuyIntervalUpdated(interval))
+                    binding.recurringBuyCta.text = interval.mapToString(requireContext())
+                    dialog.dismiss()
+                }
+                .create()
+        )
     }
 
     override fun onFiatCurrencyChanged(fiatCurrency: String) {
@@ -313,6 +352,8 @@ class SimpleBuyCryptoFragment :
         state.isAmountValid && state.selectedPaymentMethod != null && !state.isLoading
 
     private fun renderDefinedPaymentMethod(selectedPaymentMethod: PaymentMethod) {
+        binding.frequencySpinner.visibleIf { isRecurringBuyEnabled }
+        if (isRecurringBuyEnabled) renderRecurringBuy(selectedPaymentMethod)
 
         when (selectedPaymentMethod) {
             is PaymentMethod.Card -> renderCardPayment(selectedPaymentMethod)
@@ -330,6 +371,25 @@ class SimpleBuyCryptoFragment :
             undefinedPaymentText.gone()
             paymentMethodTitle.visible()
             paymentMethodLimit.visible()
+        }
+    }
+
+    private fun renderRecurringBuy(paymentMethod: PaymentMethod) {
+        with(binding) {
+            if (lastState?.isSelectedPaymentMethodRecurringBuyEligible() == true) {
+                recurringBuyCta.apply {
+                    background = requireContext().getResolvedDrawable(R.drawable.bkgd_button_white_selector)
+                    setTextColor(requireContext().getResolvedColor(R.color.button_white_text_states))
+                }
+            } else {
+                if (!isRecurringFrequencyAvailableForPaymentMethod()) {
+                    showDialogRecurringBuyUnavailable()
+                }
+                recurringBuyCta.apply {
+                    background = requireContext().getResolvedDrawable(R.drawable.bkgd_grey_000_rounded)
+                    setTextColor(requireContext().getResolvedColor(R.color.grey_800))
+                }
+            }
         }
     }
 
@@ -461,6 +521,11 @@ class SimpleBuyCryptoFragment :
         model.process(SimpleBuyIntent.NavigationHandled)
     }
 
+    override fun onIntervalSelected(interval: RecurringBuyFrequency) {
+        model.process(SimpleBuyIntent.RecurringBuyIntervalUpdated(interval))
+        binding.recurringBuyCta.text = interval.mapToString(requireContext())
+    }
+
     override fun onSheetClosed() {
         model.process(SimpleBuyIntent.ClearError)
     }
@@ -547,6 +612,16 @@ class SimpleBuyCryptoFragment :
 
     private enum class PaymentMethodsChooserState {
         AVAILABLE_TO_PAY, AVAILABLE_TO_ADD
+    }
+}
+
+fun RecurringBuyFrequency.mapToString(context: Context): String {
+    return when (this) {
+        RecurringBuyFrequency.ONE_TIME -> context.getString(R.string.recurring_buy_one_time_short)
+        RecurringBuyFrequency.DAILY -> context.getString(R.string.recurring_buy_daily)
+        RecurringBuyFrequency.WEEKLY -> context.getString(R.string.recurring_buy_weekly)
+        RecurringBuyFrequency.BI_WEEKLY -> context.getString(R.string.recurring_buy_bi_weekly)
+        RecurringBuyFrequency.MONTHLY -> context.getString(R.string.recurring_buy_monthly)
     }
 }
 

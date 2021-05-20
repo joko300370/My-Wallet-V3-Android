@@ -38,6 +38,7 @@ import com.blockchain.nabu.datamanagers.featureflags.BankLinkingEnabledProvider
 import com.blockchain.nabu.datamanagers.featureflags.Feature
 import com.blockchain.nabu.datamanagers.featureflags.FeatureEligibility
 import com.blockchain.nabu.datamanagers.repositories.AssetBalancesRepository
+import com.blockchain.nabu.datamanagers.repositories.RecurringBuyRepository
 import com.blockchain.nabu.datamanagers.repositories.interest.Eligibility
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestLimits
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestRepository
@@ -121,7 +122,8 @@ class LiveCustodialWalletManager(
     private val achDepositWithdrawFeatureFlag: FeatureFlag,
     private val sddFeatureFlag: FeatureFlag,
     private val bankLinkingEnabledProvider: BankLinkingEnabledProvider,
-    private val transactionErrorMapper: TransactionErrorMapper
+    private val transactionErrorMapper: TransactionErrorMapper,
+    private val recurringBuysRepository: RecurringBuyRepository
 ) : CustodialWalletManager {
 
     override val defaultFiatCurrency: String
@@ -541,7 +543,9 @@ class LiveCustodialWalletManager(
                         val cardLimits = PaymentLimits(paymentMethod.limits.min, paymentMethod.limits.max, fiatCurrency)
                         cardsResponse.takeIf { cards -> cards.isNotEmpty() }?.filter { it.state.isActive() }
                             ?.forEach { cardResponse: CardResponse ->
-                                availablePaymentMethods.add(cardResponse.toCardPaymentMethod(cardLimits))
+                                availablePaymentMethods.add(
+                                    cardResponse.toCardPaymentMethod(cardLimits)
+                                )
                             }
                     } else if (
                         paymentMethod.type == PaymentMethodResponse.FUNDS &&
@@ -577,7 +581,9 @@ class LiveCustodialWalletManager(
                         linkedBanks.filter { linkedBank ->
                             linkedBank.state == BankState.ACTIVE
                         }.forEach { linkedBank: Bank ->
-                            availablePaymentMethods.add(linkedBank.toBankPaymentMethod(bankLimits))
+                            availablePaymentMethods.add(
+                                linkedBank.toBankPaymentMethod(bankLimits)
+                            )
                         }
                     } else if (
                         paymentMethod.type == PaymentMethodResponse.BANK_ACCOUNT &&
@@ -629,6 +635,8 @@ class LiveCustodialWalletManager(
                 availablePaymentMethods.sortedBy { paymentMethod -> paymentMethod.order }.toList()
             }
         }
+
+    override fun getRecurringBuyEligibility() = recurringBuysRepository.getRecurringBuyEligibleMethods()
 
     override fun addNewCard(
         fiatCurrency: String,
@@ -700,9 +708,9 @@ class LiveCustodialWalletManager(
     override fun getCardDetails(cardId: String): Single<PaymentMethod.Card> =
         authenticator.authenticate {
             nabuService.getCardDetails(it, cardId)
-        }.map {
-            it.toCardPaymentMethod(
-                PaymentLimits(FiatValue.zero(it.currency), FiatValue.zero(it.currency))
+        }.map { cardsResponse ->
+            cardsResponse.toCardPaymentMethod(
+                PaymentLimits(FiatValue.zero(cardsResponse.currency), FiatValue.zero(cardsResponse.currency))
             )
         }
 
@@ -711,8 +719,8 @@ class LiveCustodialWalletManager(
     ): Single<List<PaymentMethod.Card>> =
         authenticator.authenticate {
             nabuService.getCards(it)
-        }.map {
-            it.filter { states.contains(it.state.toCardStatus()) || states.isEmpty() }.map {
+        }.map { cardsResponse ->
+            cardsResponse.filter { states.contains(it.state.toCardStatus()) || states.isEmpty() }.map {
                 it.toCardPaymentMethod(
                     PaymentLimits(FiatValue.zero(it.currency), FiatValue.zero(it.currency))
                 )
@@ -1028,11 +1036,7 @@ class LiveCustodialWalletManager(
             partner = partner.toLinkingBankPartner(BankPartner.values().toList()) ?: return null,
             state = state.toLinkedBankState(),
             bankName = details?.bankName.orEmpty(),
-            accountName = if (details?.accountName.isNullOrEmpty()) {
-                details?.bankName.orEmpty()
-            } else {
-                details?.accountName.orEmpty()
-            },
+            accountName = details?.accountName.orEmpty(),
             accountNumber = details?.accountNumber?.replace("x", "").orEmpty(),
             errorStatus = error?.toLinkedBankErrorState() ?: LinkedBankErrorState.NONE,
             accountType = details?.bankAccountType.orEmpty(),
@@ -1145,7 +1149,7 @@ class LiveCustodialWalletManager(
             } ?: Date(),
             cardType = card?.type ?: CardType.UNKNOWN,
             status = state.toCardStatus(),
-            true
+            isEligible = true
         )
 
     private fun Bank.toBankPaymentMethod(bankLimits: PaymentLimits) =

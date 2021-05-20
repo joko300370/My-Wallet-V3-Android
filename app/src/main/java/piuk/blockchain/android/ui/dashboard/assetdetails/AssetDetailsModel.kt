@@ -104,7 +104,7 @@ class AssetDetailsModel(
             is CustodialSheetFinished,
             is TransactionInFlight,
             is ShowInterestDashboard,
-            is ClearActionStates -> null
+            is ClearActionStates,
             is AccountActionsLoaded -> null
         }
     }

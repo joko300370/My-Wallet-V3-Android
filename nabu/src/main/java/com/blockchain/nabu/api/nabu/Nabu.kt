@@ -50,6 +50,7 @@ import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
 import com.blockchain.nabu.models.responses.simplebuy.DepositRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.FeesResponse
 import com.blockchain.nabu.models.responses.simplebuy.ProductTransferRequestBody
+import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyEligibilityResponse
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyAllBalancesResponse
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyBalanceResponse
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyConfirmationAttributes
@@ -529,4 +530,9 @@ internal interface Nabu {
         @Header("authorization") authorization: String,
         @Body body: OpenBankingTokenBody
     ): Completable
+
+    @GET(NABU_RECURRING_BUY_ELIGIBILITY)
+    fun getRecurringBuyEligibility(
+        @Header("authorization") authorization: String
+    ): Single<RecurringBuyEligibilityResponse>
 }

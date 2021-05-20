@@ -32,6 +32,7 @@ object Versions {
     const val annotations = "1.1.0"
     const val constraintLayout = "2.0.4"
     const val multidex = "2.0.1"
+    const val desugaring = "1.1.5"
     const val navigation = "2.1.0"
     const val lifecycle = "2.1.0"
     const val camera = "1.0.0-rc04"
@@ -153,6 +154,7 @@ object Libraries {
     const val annotations = "androidx.annotations:annotations:${Versions.annotations}"
     const val constraintLayout = "androidx.constraintlayout:constraintlayout:${Versions.constraintLayout}"
     const val multidex = "androidx.multidex:multidex:${Versions.multidex}"
+    const val desugaring = "com.android.tools:desugar_jdk_libs:${Versions.desugaring}"
 
     const val navigationControllerCore = "androidx.navigation:navigation-ui:${Versions.navigation}"
     const val navigationControllerFragments = "androidx.navigation:navigation-fragment:${Versions.navigation}"

@@ -691,6 +691,12 @@ class NabuService(retrofit: Retrofit) {
         body = body
     ).wrapErrorMessage()
 
+    fun getRecurringBuyEligibility(
+        sessionToken: NabuSessionTokenResponse
+    ) = service.getRecurringBuyEligibility(
+        authorization = sessionToken.authHeader
+    ).wrapErrorMessage()
+
     companion object {
         internal const val CLIENT_TYPE = "APP"
     }

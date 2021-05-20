@@ -180,6 +180,8 @@ android {
     }
 
     compileOptions {
+        coreLibraryDesugaringEnabled true
+
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -255,6 +257,7 @@ dependencies {
     implementation project(':blockchainApi')
 
     implementation Libraries.multidex
+    coreLibraryDesugaring Libraries.desugaring
 
     implementation Libraries.koin
     implementation Libraries.koinAndroid

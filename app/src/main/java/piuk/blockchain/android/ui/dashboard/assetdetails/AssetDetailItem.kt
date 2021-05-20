@@ -122,6 +122,7 @@ class LabelViewHolder(private val binding: DialogDashboardAssetLabelItemBinding)
     }
 }
 
+// TODO convert this to adapter delegate and break out 4 types of viewholders
 internal class AssetDetailAdapter(
     private val onAccountSelected: (BlockchainAccount, AssetFilter) -> Unit,
     private val showBanner: Boolean,

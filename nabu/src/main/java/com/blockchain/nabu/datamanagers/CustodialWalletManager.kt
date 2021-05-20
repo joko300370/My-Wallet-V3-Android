@@ -11,9 +11,9 @@ import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.blockchain.nabu.models.data.BankPartner
 import com.blockchain.nabu.models.data.BankTransferDetails
 import com.blockchain.nabu.models.data.CryptoWithdrawalFeeAndLimit
+import com.blockchain.nabu.models.data.FiatWithdrawalFeeAndLimit
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
-import com.blockchain.nabu.models.data.FiatWithdrawalFeeAndLimit
 import com.blockchain.nabu.models.responses.interest.InterestActivityItemResponse
 import com.blockchain.nabu.models.responses.interest.InterestAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
@@ -266,6 +266,8 @@ interface CustodialWalletManager {
     fun updateOpenBankingConsent(url: String, token: String): Completable
 
     val defaultFiatCurrency: String
+
+    fun getRecurringBuyEligibility(): Single<List<PaymentMethodType>>
 }
 
 data class InterestActivityItem(
@@ -494,8 +496,13 @@ sealed class PaymentMethod(
     open val isEligible: Boolean
 ) : Serializable {
 
-    data class UndefinedCard(override val limits: PaymentLimits, override val isEligible: Boolean) :
-        PaymentMethod(UNDEFINED_CARD_PAYMENT_ID, limits, UNDEFINED_CARD_PAYMENT_METHOD_ORDER, isEligible),
+    data class UndefinedCard(
+        override val limits: PaymentLimits,
+        override val isEligible: Boolean
+    ) :
+        PaymentMethod(
+            UNDEFINED_CARD_PAYMENT_ID, limits, UNDEFINED_CARD_PAYMENT_METHOD_ORDER, isEligible
+        ),
         UndefinedPaymentMethod {
         override val paymentMethodType: PaymentMethodType
             get() = PaymentMethodType.PAYMENT_CARD
@@ -513,14 +520,21 @@ sealed class PaymentMethod(
         override val limits: PaymentLimits,
         override val isEligible: Boolean
     ) :
-        PaymentMethod(UNDEFINED_FUNDS_PAYMENT_ID, limits, UNDEFINED_FUNDS_PAYMENT_METHOD_ORDER, isEligible),
+        PaymentMethod(
+            UNDEFINED_FUNDS_PAYMENT_ID, limits, UNDEFINED_FUNDS_PAYMENT_METHOD_ORDER, isEligible
+        ),
         UndefinedPaymentMethod {
         override val paymentMethodType: PaymentMethodType
             get() = PaymentMethodType.FUNDS
     }
 
-    data class UndefinedBankTransfer(override val limits: PaymentLimits, override val isEligible: Boolean) :
-        PaymentMethod(UNDEFINED_BANK_TRANSFER_PAYMENT_ID, limits, UNDEFINED_BANK_TRANSFER_METHOD_ORDER, isEligible),
+    data class UndefinedBankTransfer(
+        override val limits: PaymentLimits,
+        override val isEligible: Boolean
+    ) :
+        PaymentMethod(
+            UNDEFINED_BANK_TRANSFER_PAYMENT_ID, limits, UNDEFINED_BANK_TRANSFER_METHOD_ORDER, isEligible
+        ),
         UndefinedPaymentMethod {
         override val paymentMethodType: PaymentMethodType
             get() = PaymentMethodType.BANK_TRANSFER

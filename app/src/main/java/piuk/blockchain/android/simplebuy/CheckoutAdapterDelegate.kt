@@ -60,15 +60,15 @@ private class SimpleCheckoutItemViewHolder(
 
     fun bind(item: SimpleBuyCheckoutItem.SimpleCheckoutItem) {
         with(binding) {
-
             simpleItemTitle.text = item.title
             simpleItemLabel.text = item.label
+
             if (item.isImportant) {
-                simpleItemTitle.setTextAppearance(R.style.Text_Semibold_16)
                 simpleItemLabel.setTextAppearance(R.style.Text_Semibold_16)
+                simpleItemTitle.setTextAppearance(R.style.Text_Semibold_16)
             } else {
-                simpleItemTitle.setTextAppearance(R.style.Text_Standard_14)
                 simpleItemLabel.setTextAppearance(R.style.Text_Standard_14)
+                simpleItemTitle.setTextAppearance(R.style.Text_Standard_14)
             }
         }
     }

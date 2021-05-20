@@ -2090,5 +2090,22 @@
     <string name="recurring_buy_subtitle_4">You’ll buy less.</string>
     <string name="recurring_buy_subtitle_5_1">Over the past 5 years, buying Bitcoin every week performed better than timing the market&#160;</string>
     <string name="recurring_buy_subtitle_5_2">82% of the time.</string>
+    <string name="recurring_buy_label">Frequency</string>
+    <string name="recurring_buy_one_time_short">One time</string>
+    <string name="recurring_buy_one_time">One time purchase</string>
+    <string name="recurring_buy_daily">Every day</string>
+    <string name="recurring_buy_weekly">Every week</string>
+    <string name="recurring_buy_bi_weekly">Every 2 weeks</string>
+    <string name="recurring_buy_monthly">Every month</string>
+    <string name="recurring_buy_frequency_label">Recurring</string>
+    <string name="recurring_buy_frequency_subtitle">on %1$s</string>
+    <string name="recurring_buy_frequency_subtitle_each_day">around %s</string>
+    <string name="recurring_buy_frequency_subtitle_monthly">on day %s</string>
+    <string name="recurring_buy_frequency_subtitle_monthly_last_day">on the last day</string>
+    <string name="recurring_buy_frequency_subtitle_today">Today</string>
+    <string name="recurring_buy_unavailable_title">Recurring buy unavailable</string>
+    <string name="recurring_buy_unavailable_message">Please use a different payment method to set up a recurring buy</string>
+    <string name="recurring_buy_selection_title">Select frequency</string>
+    <string name="recurring_buy_cta_alert">OK</string>
 
 </resources>
