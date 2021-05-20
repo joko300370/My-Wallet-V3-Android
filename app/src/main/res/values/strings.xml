@@ -1910,6 +1910,8 @@
     <string name="kyc_country_selection_title_1">Select Your Country</string>
     <string name="security_check">Security Check</string>
     <string name="success_email_veriff">Success! Your email has been confirmed.</string>
+    <string name="error_email_veriff_title">Oops! Something went wrong.</string>
+    <string name="error_email_veriff">We were unable to your verify your email. Please try again or we can send you a new email.</string>
     <string name="email_verified">Email Verified</string>
     <string name="email_verification_part_1">We sent a verification email to&#160;</string>
     <string name="email_verification_part_2">. Please tap the link in the email to continue.</string>

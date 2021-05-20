@@ -1611,7 +1611,7 @@ Anote estas 12 palavras por ordem e guarde-as num lugar seguro. Nunca as partilh
     <string name="security_check">Verificação de segurança</string>
     <string name="success_email_veriff">Sucesso! O seu e-mail foi confirmado!</string>
     <string name="email_verified">E-mail verificado</string>
-    <string name="email_verification_part_1">Enviamos um e-mail de verificação para</string>
+    <string name="email_verification_part_1">Enviamos um e-mail de verificação para&#160;</string>
     <string name="email_verification_part_2">Clique na ligação do e-mail para continuar.</string>
     <string name="email_verify">Verifique o seu e-mail</string>
     <string name="edit_email_address">Edite o endereço de e-mail</string>

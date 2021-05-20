@@ -1635,7 +1635,7 @@ I tuoi fondi saranno disponibili per il prelievo una volta che il trasferimento 
     <string name="security_check">Controllo di sicurezza</string>
     <string name="success_email_veriff">La tua e-mail è stata confermata.</string>
     <string name="email_verified">E-mail verificata</string>
-    <string name="email_verification_part_1">Abbiamo inviato un\'e-mail di verifica a</string>
+    <string name="email_verification_part_1">Abbiamo inviato un\'e-mail di verifica a&#160;</string>
     <string name="email_verification_part_2">. Tocca il link nell\'e-mail per continuare.</string>
     <string name="email_verify">Verifica la tua e-mail</string>
     <string name="edit_email_address">Modifica indirizzo e-mail</string>

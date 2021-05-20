@@ -33,7 +33,7 @@ class SettingsEmailAndSyncUpdaterTest {
             .values()
             .single().apply {
                 address `should equal` "email@blockchain.com"
-                verified `should be` false
+                isVerified `should be` false
             }
     }
 
@@ -53,7 +53,7 @@ class SettingsEmailAndSyncUpdaterTest {
             .values()
             .single().apply {
                 address `should equal` "otheremail@emaildomain.com"
-                verified `should be` true
+                isVerified `should be` true
             }
     }
 
@@ -69,7 +69,7 @@ class SettingsEmailAndSyncUpdaterTest {
             .values()
             .single().apply {
                 address `should equal` ""
-                verified `should be` false
+                isVerified `should be` false
             }
     }
 
@@ -95,7 +95,7 @@ class SettingsEmailAndSyncUpdaterTest {
             .values()
             .single().apply {
                 address `should equal` "newemail@blockchain.com"
-                verified `should be` false
+                isVerified `should be` false
             }
         verify(settingsDataManager).fetchSettings()
         verify(settingsDataManager).updateEmail("newemail@blockchain.com", null)
@@ -119,7 +119,7 @@ class SettingsEmailAndSyncUpdaterTest {
             .values()
             .single().apply {
                 address `should equal` "oldemail@blockchain.com"
-                verified `should be` false
+                isVerified `should be` false
             }
         verify(settingsDataManager).updateEmail("oldemail@blockchain.com")
         verifyNoMoreInteractions(settingsDataManager)
@@ -141,7 +141,7 @@ class SettingsEmailAndSyncUpdaterTest {
             .values()
             .single().apply {
                 address `should equal` "theemail@emaildomain.com"
-                verified `should be` true
+                isVerified `should be` true
             }
         verify(settingsDataManager).fetchSettings()
         verify(settingsDataManager, never()).updateEmail(any())
@@ -166,7 +166,7 @@ class SettingsEmailAndSyncUpdaterTest {
             .values()
             .single().apply {
                 address `should equal` "theemail@emaildomain.com"
-                verified `should be` false
+                isVerified `should be` false
             }
         verify(settingsDataManager).fetchSettings()
         verify(settingsDataManager).updateEmail("theemail@emaildomain.com", null)

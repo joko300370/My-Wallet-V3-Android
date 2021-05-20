@@ -1630,7 +1630,7 @@ Une fois que c\'est fait, veuillez réessayer.</string>
     <string name="security_check">Vérification de sécurité</string>
     <string name="success_email_veriff">Succès ! Votre adresse électronique a été confirmé.</string>
     <string name="email_verified">Courriel vérifié</string>
-    <string name="email_verification_part_1">Nous avons envoyé un courriel de vérification à </string>
+    <string name="email_verification_part_1">Nous avons envoyé un courriel de vérification à&#160;</string>
     <string name="email_verification_part_2">. Veuillez cliquer sur le lien dans le courriel pour continuer.</string>
     <string name="email_verify">Vérifiez votre adresse électronique</string>
     <string name="edit_email_address">Modifier l\'adresse électronique</string>

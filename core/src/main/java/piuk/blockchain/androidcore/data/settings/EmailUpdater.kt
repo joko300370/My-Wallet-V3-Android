@@ -4,7 +4,7 @@ import io.reactivex.Single
 
 data class Email(
     val address: String,
-    val verified: Boolean
+    val isVerified: Boolean
 )
 
 interface EmailSyncUpdater {
