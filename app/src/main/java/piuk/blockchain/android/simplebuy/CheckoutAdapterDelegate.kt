@@ -132,15 +132,15 @@ private class ExpandableCheckoutItemViewHolder(
     init {
         with(binding) {
             expandableItemExpansion.movementMethod = LinkMovementMethod.getInstance()
-            expandableItemTitle.setOnClickListener {
+            expandableItemLabel.setOnClickListener {
                 isExpanded = !isExpanded
                 expandableItemExpansion.visibleIf { isExpanded }
                 if (isExpanded) {
-                    expandableItemTitle.compoundDrawables[DRAWABLE_END_POSITION].setTint(
+                    expandableItemLabel.compoundDrawables[DRAWABLE_END_POSITION].setTint(
                         expandableItemTitle.context.getResolvedColor(R.color.blue_600)
                     )
                 } else {
-                    expandableItemTitle.compoundDrawables[DRAWABLE_END_POSITION].setTint(
+                    expandableItemLabel.compoundDrawables[DRAWABLE_END_POSITION].setTint(
                         expandableItemTitle.context.getResolvedColor(R.color.grey_300)
                     )
                 }
