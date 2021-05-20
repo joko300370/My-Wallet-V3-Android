@@ -6,14 +6,20 @@ import android.app.PendingIntent
 import android.content.Intent
 import com.blockchain.featureflags.GatedFeature
 import com.blockchain.featureflags.InternalFeatureFlagApi
+import com.blockchain.koin.mwaFeatureFlag
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.NotificationsUtil
 import piuk.blockchain.android.R
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.models.NotificationPayload
+import com.blockchain.remoteconfig.FeatureFlag
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import io.reactivex.Maybe
+import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.rxkotlin.zipWith
+import io.reactivex.schedulers.Schedulers
 import kotlinx.serialization.encodeToString
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.ui.home.MainActivity
@@ -33,6 +39,7 @@ class FcmCallbackService : FirebaseMessagingService() {
     private val analytics: Analytics by inject()
     private val secureChannelManager: SecureChannelManager by scopedInject()
     private val internalFlags: InternalFeatureFlagApi by inject()
+    private val mwaFF: FeatureFlag by inject(mwaFeatureFlag)
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         // Check if message contains a data payload.
@@ -72,80 +79,92 @@ class FcmCallbackService : FirebaseMessagingService() {
      * [piuk.blockchain.android.ui.auth.newlogin.AuthNewLoginSheet] .
      */
     private fun sendNotification(payload: NotificationPayload, foreground: Boolean) {
-        val notifyIntent = createIntentForNotification(payload, foreground)
-
-        notifyIntent?.let {
-            val intent = PendingIntent.getActivity(
-                applicationContext,
-                0,
-                notifyIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT
-            )
-            val notificationId = if (foreground) ID_FOREGROUND_NOTIFICATION else ID_BACKGROUND_NOTIFICATION
-
-            if (isSecureChannelMessage(payload)) {
-                if (foreground) {
-                    startActivity(notifyIntent)
-                } else {
-                    NotificationsUtil(applicationContext, notificationManager, analytics).triggerNotification(
-                        getString(R.string.secure_channel_notif_title),
-                        getString(R.string.secure_channel_notif_title),
-                        getString(R.string.secure_channel_notif_summary),
-                        R.mipmap.ic_launcher,
-                        intent,
-                        notificationId
+        val compositeDisposable = createIntentForNotification(payload, foreground)
+            .zipWith(mwaFF.enabled.toMaybe())
+            .subscribeOn(Schedulers.io())
+            .subscribeBy(
+                onSuccess = { result ->
+                    val notifyIntent = result.first
+                    val isModernAuthEnabled = result.second
+                    val intent = PendingIntent.getActivity(
+                        applicationContext,
+                        0,
+                        notifyIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
                     )
-                }
-            } else {
-                triggerHeadsUpNotification(
-                    payload,
-                    intent,
-                    notificationId
-                )
-            }
-        }
+                    val notificationId = if (foreground) ID_FOREGROUND_NOTIFICATION else ID_BACKGROUND_NOTIFICATION
+
+                    if (isSecureChannelMessage(payload) && isModernAuthEnabled) {
+                        if (foreground) {
+                            startActivity(notifyIntent)
+                        } else {
+                            NotificationsUtil(applicationContext, notificationManager, analytics).triggerNotification(
+                                getString(R.string.secure_channel_notif_title),
+                                getString(R.string.secure_channel_notif_title),
+                                getString(R.string.secure_channel_notif_summary),
+                                R.mipmap.ic_launcher,
+                                intent,
+                                notificationId
+                            )
+                        }
+                    } else {
+                        triggerHeadsUpNotification(
+                            payload,
+                            intent,
+                            notificationId
+                        )
+                    }
+                },
+                onError = {}
+            )
     }
 
-    private fun createIntentForNotification(payload: NotificationPayload, foreground: Boolean): Intent? {
+    private fun createIntentForNotification(payload: NotificationPayload, foreground: Boolean): Maybe<Intent> {
         return when {
             isSecureChannelMessage(payload) -> createSecureChannelIntent(payload.payload, foreground)
-            foreground -> Intent(applicationContext, MainActivity::class.java).apply {
-                putExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION, true)
-            }
-            else -> Intent(applicationContext, LauncherActivity::class.java).apply {
-                putExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION, true)
-            }
+            foreground -> Maybe.just(
+                Intent(applicationContext, MainActivity::class.java).apply {
+                    putExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION, true)
+                }
+            )
+            else -> Maybe.just(
+                Intent(applicationContext, LauncherActivity::class.java).apply {
+                    putExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION, true)
+                }
+            )
         }
     }
 
     private fun isSecureChannelMessage(payload: NotificationPayload) =
         payload.type == NotificationPayload.NotificationType.SECURE_CHANNEL_MESSAGE
 
-    private fun createSecureChannelIntent(payload: MutableMap<String, String>, foreground: Boolean): Intent? {
+    private fun createSecureChannelIntent(payload: MutableMap<String, String>, foreground: Boolean): Maybe<Intent> {
         if (internalFlags.isFeatureEnabled(GatedFeature.MODERN_AUTH_PAIRING)) {
             val pubKeyHash = payload[NotificationPayload.PUB_KEY_HASH]
-                ?: return null
+                ?: return Maybe.empty()
             val messageRawEncrypted = payload[NotificationPayload.DATA_MESSAGE]
-                ?: return null
+                ?: return Maybe.empty()
 
             val message = secureChannelManager.decryptMessage(pubKeyHash, messageRawEncrypted)
-                ?: return null
+                ?: return Maybe.empty()
 
-            return Intent(applicationContext, MainActivity::class.java).apply {
-                putExtra(MainActivity.LAUNCH_AUTH_FLOW, true)
-                putExtra(AuthNewLoginSheet.PUB_KEY_HASH, pubKeyHash)
-                putExtra(AuthNewLoginSheet.MESSAGE, SecureChannelManager.jsonBuilder.encodeToString(message))
+            return Maybe.just(
+                Intent(applicationContext, MainActivity::class.java).apply {
+                    putExtra(MainActivity.LAUNCH_AUTH_FLOW, true)
+                    putExtra(AuthNewLoginSheet.PUB_KEY_HASH, pubKeyHash)
+                    putExtra(AuthNewLoginSheet.MESSAGE, SecureChannelManager.jsonBuilder.encodeToString(message))
 
-                putExtra(AuthNewLoginSheet.ORIGIN_IP, payload[NotificationPayload.ORIGIN_IP])
-                putExtra(AuthNewLoginSheet.ORIGIN_LOCATION, payload[NotificationPayload.ORIGIN_COUNTRY])
-                putExtra(AuthNewLoginSheet.ORIGIN_BROWSER, payload[NotificationPayload.ORIGIN_BROWSER])
-                putExtra(AuthNewLoginSheet.FORCE_PIN, !foreground)
-                if (foreground) {
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    putExtra(AuthNewLoginSheet.ORIGIN_IP, payload[NotificationPayload.ORIGIN_IP])
+                    putExtra(AuthNewLoginSheet.ORIGIN_LOCATION, payload[NotificationPayload.ORIGIN_COUNTRY])
+                    putExtra(AuthNewLoginSheet.ORIGIN_BROWSER, payload[NotificationPayload.ORIGIN_BROWSER])
+                    putExtra(AuthNewLoginSheet.FORCE_PIN, !foreground)
+                    if (foreground) {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
                 }
-            }
+            )
         } else {
-            return null
+            return Maybe.empty()
         }
     }
 

@@ -6,11 +6,13 @@ import androidx.appcompat.app.AlertDialog
 import com.blockchain.featureflags.GatedFeature
 import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.payloadScope
+import com.blockchain.remoteconfig.FeatureFlag
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.MaybeSubject
 import io.reactivex.subjects.SingleSubject
 import piuk.blockchain.android.R
@@ -62,8 +64,22 @@ class QrScanError(val errorCode: ErrorCode, msg: String) : Exception(msg) {
 
 class QrScanResultProcessor(
     private val bitPayDataManager: BitPayDataManager,
-    private val internalFlags: InternalFeatureFlagApi
+    private val internalFlags: InternalFeatureFlagApi,
+    mwaFeatureFlag: FeatureFlag
 ) {
+    private var isMWAEnabled: Boolean = false
+
+    init {
+        val compositeDisposable = mwaFeatureFlag.enabled.observeOn(Schedulers.io()).subscribe(
+            { result ->
+                isMWAEnabled = result
+            },
+            {
+                isMWAEnabled = false
+            }
+        )
+    }
+
     fun processScan(scanResult: String, isDeeplinked: Boolean = false): Single<ScanResult> =
         when {
             scanResult.isHttpUri() -> Single.just(ScanResult.HttpUri(scanResult, isDeeplinked))
@@ -71,8 +87,7 @@ class QrScanResultProcessor(
                 .map {
                     ScanResult.TxTarget(setOf(it), isDeeplinked)
                 }
-            internalFlags.isFeatureEnabled(GatedFeature.MODERN_AUTH_PAIRING) &&
-                scanResult.isJson() -> Single.just(ScanResult.SecuredChannelLogin(scanResult))
+            isAuthEnabled() && scanResult.isJson() -> Single.just(ScanResult.SecuredChannelLogin(scanResult))
             else -> {
                 val addressParser: AddressFactory = payloadScope.get()
                 addressParser.parse(scanResult)
@@ -86,6 +101,8 @@ class QrScanResultProcessor(
                     }
             }
         }
+
+    private fun isAuthEnabled() = internalFlags.isFeatureEnabled(GatedFeature.MODERN_AUTH_PAIRING) && isMWAEnabled
 
     private fun parseBitpayInvoice(bitpayUri: String): Single<CryptoTarget> =
         BitPayInvoiceTarget.fromLink(CryptoCurrency.BTC, bitpayUri, bitPayDataManager)

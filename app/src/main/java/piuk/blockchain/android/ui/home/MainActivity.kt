@@ -595,7 +595,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         startTransferFragment()
     }
 
-    override fun onNewIntent(intent: android.content.Intent) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         if (intent.getBooleanExtra(LAUNCH_AUTH_FLOW, false)) {
             intent.extras?.let {

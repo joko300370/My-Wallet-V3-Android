@@ -6,6 +6,7 @@ import com.blockchain.koin.explorerRetrofit
 import com.blockchain.koin.gbp
 import com.blockchain.koin.interestAccountFeatureFlag
 import com.blockchain.koin.moshiExplorerRetrofit
+import com.blockchain.koin.mwaFeatureFlag
 import com.blockchain.koin.payloadScope
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.koin.usd
@@ -387,7 +388,8 @@ val applicationModule = module {
         scoped {
             QrScanResultProcessor(
                 bitPayDataManager = get(),
-                internalFlags = get()
+                internalFlags = get(),
+                mwaFeatureFlag = get(mwaFeatureFlag)
             )
         }
 

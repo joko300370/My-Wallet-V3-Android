@@ -2,6 +2,7 @@ package com.blockchain.koin.modules
 
 import com.blockchain.koin.achDepositWithdrawFeatureFlag
 import com.blockchain.koin.interestAccountFeatureFlag
+import com.blockchain.koin.mwaFeatureFlag
 import com.blockchain.koin.obFeatureFlag
 import com.blockchain.koin.sddFeatureFlag
 import com.blockchain.remoteconfig.RemoteConfig
@@ -24,5 +25,8 @@ val featureFlagsModule = module {
 
     factory(sddFeatureFlag) {
         get<RemoteConfig>().featureFlag("sdd_enabled")
+    }
+    factory(mwaFeatureFlag) {
+        get<RemoteConfig>().featureFlag("mwa_enabled")
     }
 }
