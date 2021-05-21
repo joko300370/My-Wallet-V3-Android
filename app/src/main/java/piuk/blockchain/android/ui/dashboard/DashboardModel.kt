@@ -273,6 +273,8 @@ class DashboardModel(
             is LaunchAssetDetailsFlow -> interactor.getAssetDetailsFlow(this, intent.cryptoCurrency)
             is LaunchInterestDepositFlow ->
                 interactor.getInterestDepositFlow(this, intent.toAccount)
+            is LaunchInterestWithdrawFlow ->
+                interactor.getInterestWithdrawFlow(this, intent.fromAccount)
             is LaunchBankTransferFlow -> processBankTransferFlow(intent)
             is LaunchSendFlow -> interactor.getSendFlow(this, intent.fromAccount, intent.action)
             is FiatBalanceUpdate,

@@ -118,8 +118,23 @@
         android:background="@drawable/info_text_background"
         android:gravity="center"
         android:text="@string/interest_summary_disclaimer_label"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/interest_details_withdraw_cta"
+        app:layout_constraintTop_toBottomOf="@id/interest_details_list"
+        tools:visibility="visible" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/interest_details_withdraw_cta"
+        style="@style/CtaButton.White"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/very_small_margin"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/interest_details_activity_cta"
-        app:layout_constraintTop_toBottomOf="@id/interest_details_list" />
+        app:layout_constraintTop_toBottomOf="@id/interest_details_list"
+        app:layout_constraintVertical_bias="1"
+        tools:text="Withdraw BTC"
+        tools:visibility="visible" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/interest_details_activity_cta"
@@ -128,7 +143,9 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/very_small_margin"
         android:text="@string/activities_title"
-        app:layout_constraintBottom_toTopOf="@id/interest_details_deposit_cta" />
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/interest_details_deposit_cta"
+        tools:visibility="visible" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/interest_details_deposit_cta"

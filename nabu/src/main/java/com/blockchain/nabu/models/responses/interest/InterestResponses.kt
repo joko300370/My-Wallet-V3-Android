@@ -98,3 +98,9 @@ enum class DisabledReason {
     OTHER,
     NONE
 }
+
+data class InterestWithdrawalBody(
+    val withdrawalAddress: String,
+    val amount: String,
+    val currency: String
+)

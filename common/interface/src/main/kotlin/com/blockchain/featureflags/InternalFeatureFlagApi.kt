@@ -19,5 +19,6 @@ enum class GatedFeature(val readableName: String) {
     RECEIVE_TO_CUSTODIAL("Receive to trading accounts"),
     SEND_TO_DOMAIN("Send to domain addresses"),
     SINGLE_SIGN_ON("Enable New SSO Flow"), // If true, the new login flow will be used
+    INTEREST_WITHDRAWAL("Enable interest withdrawal"),
     RECURRING_BUYS("Enable recurring buys")
 }

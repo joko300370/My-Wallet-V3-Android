@@ -3,7 +3,7 @@ package piuk.blockchain.android.coincore.fiat
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.repositories.AssetBalancesRepository
+import com.blockchain.nabu.datamanagers.repositories.CustodialAssetWalletsBalancesRepository
 import com.blockchain.wallet.DefaultLabels
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.mock
@@ -26,14 +26,14 @@ class FiatAssetTransferTest {
     }
 
     private val labels: DefaultLabels = mock()
-    private val assetBalancesRepository: AssetBalancesRepository = mock()
+    private val custodialAssetWalletsBalancesRepository: CustodialAssetWalletsBalancesRepository = mock()
     private val exchangeRateDataManager: ExchangeRateDataManager = mock()
     private val custodialWalletManager: CustodialWalletManager = mock()
     private val currencyPrefs: CurrencyPrefs = mock()
 
     private val subject = FiatAsset(
         labels,
-        assetBalancesRepository,
+        custodialAssetWalletsBalancesRepository,
         exchangeRateDataManager,
         custodialWalletManager,
         currencyPrefs

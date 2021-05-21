@@ -139,7 +139,7 @@ val coincoreModule = module {
         scoped {
             FiatAsset(
                 labels = get(),
-                assetBalancesRepository = get(),
+                custodialAssetWalletsBalancesRepository = get(),
                 exchangeRateDataManager = get(),
                 custodialWalletManager = get(),
                 currencyPrefs = get()

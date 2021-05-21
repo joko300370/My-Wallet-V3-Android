@@ -296,6 +296,17 @@ class LaunchInterestDepositFlow(
         )
 }
 
+class LaunchInterestWithdrawFlow(
+    val fromAccount: InterestAccount
+) : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState =
+        oldState.copy(
+            dashboardNavigationAction = null,
+            activeFlow = null,
+            backupSheetDetails = null
+        )
+}
+
 class LaunchBankTransferFlow(
     val account: SingleAccount,
     val action: AssetAction,

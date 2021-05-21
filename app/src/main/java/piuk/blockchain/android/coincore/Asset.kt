@@ -25,6 +25,7 @@ enum class AssetAction {
     Sell,
     Summary,
     InterestDeposit,
+    InterestWithdraw,
     FiatDeposit
 }
 

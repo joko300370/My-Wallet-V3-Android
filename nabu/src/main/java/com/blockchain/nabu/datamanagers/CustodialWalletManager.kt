@@ -81,11 +81,13 @@ interface CustodialWalletManager {
 
     fun fetchFiatWithdrawFeeAndMinLimit(
         currency: String,
+        product: Product,
         paymentMethodType: PaymentMethodType
     ): Single<FiatWithdrawalFeeAndLimit>
 
     fun fetchCryptoWithdrawFeeAndMinLimit(
-        currency: CryptoCurrency
+        currency: CryptoCurrency,
+        product: Product
     ): Single<CryptoWithdrawalFeeAndLimit>
 
     fun fetchWithdrawLocksTime(
@@ -204,6 +206,10 @@ interface CustodialWalletManager {
     fun getInterestEnabledAssets(): Single<List<CryptoCurrency>>
 
     fun getInterestEligibilityForAsset(crypto: CryptoCurrency): Single<Eligibility>
+
+    fun startInterestWithdrawal(cryptoCurrency: CryptoCurrency, amount: Money, address: String): Completable
+
+    fun getInterestActionableBalanceForAsset(crypto: CryptoCurrency): Maybe<CryptoValue>
 
     fun getSupportedFundsFiats(fiatCurrency: String = defaultFiatCurrency): Single<List<String>>
 

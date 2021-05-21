@@ -3,7 +3,7 @@ package piuk.blockchain.android.coincore.fiat
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.TransactionState
 import com.blockchain.nabu.datamanagers.TransactionType
-import com.blockchain.nabu.datamanagers.repositories.AssetBalancesRepository
+import com.blockchain.nabu.datamanagers.repositories.CustodialAssetWalletsBalancesRepository
 import com.blockchain.nabu.models.responses.interest.DisabledReason
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.FiatValue
@@ -29,14 +29,14 @@ internal class FiatCustodialAccount(
     override val label: String,
     override val fiatCurrency: String,
     override val isDefault: Boolean = false,
-    private val assetBalancesRepository: AssetBalancesRepository,
+    private val custodialAssetWalletsBalancesRepository: CustodialAssetWalletsBalancesRepository,
     private val custodialWalletManager: CustodialWalletManager,
     private val exchangesRatesDataManager: ExchangeRateDataManager
 ) : FiatAccount {
     private val hasFunds = AtomicBoolean(false)
 
     override val accountBalance: Single<Money>
-        get() = assetBalancesRepository.getTotalBalanceForAsset(fiatCurrency)
+        get() = custodialAssetWalletsBalancesRepository.getFiatTotalBalanceForAsset(fiatCurrency)
             .toSingle(FiatValue.zero(fiatCurrency))
             .map {
                 it as Money
@@ -45,7 +45,7 @@ internal class FiatCustodialAccount(
             }
 
     override val actionableBalance: Single<Money>
-        get() = assetBalancesRepository.getActionableBalanceForAsset(fiatCurrency)
+        get() = custodialAssetWalletsBalancesRepository.getFiatActionableBalanceForAsset(fiatCurrency)
             .toSingle(FiatValue.zero(fiatCurrency))
             .map {
                 it as Money
@@ -54,7 +54,7 @@ internal class FiatCustodialAccount(
             }
 
     override val pendingBalance: Single<Money>
-        get() = assetBalancesRepository.getPendingBalanceForAsset(fiatCurrency)
+        get() = custodialAssetWalletsBalancesRepository.getFiatPendingBalanceForAsset(fiatCurrency)
             .toSingle(FiatValue.zero(fiatCurrency))
             .map {
                 it as Money

@@ -65,6 +65,15 @@ class InterestDashboardActivity : BlockchainActivity(),
         ).startFlow(supportFragmentManager, this)
     }
 
+    override fun goToInterestWithdraw(fromAccount: InterestAccount) {
+        clearBottomSheet()
+        require(fromAccount is CryptoAccount)
+        TransactionFlow(
+            sourceAccount = fromAccount,
+            action = AssetAction.InterestWithdraw
+        ).startFlow(supportFragmentManager, this)
+    }
+
     override fun onSheetClosed() {
         // do nothing
     }

@@ -763,7 +763,8 @@
     <string name="dashboard_asset_actions_send_dsc">Transfer %1$s to any Wallet</string>
     <string name="dashboard_asset_actions_receive_dsc">Accept or Share Your %1$s Address</string>
     <string name="dashboard_asset_actions_swap_dsc">Exchange %1$s for Another Crypto</string>
-    <string name="dashboard_asset_actions_deposit_dsc">Add %1$s to your Interest Wallet</string>
+    <string name="dashboard_asset_actions_deposit_dsc">Add %1$s to your Interest Account</string>
+    <string name="dashboard_asset_actions_withdraw_dsc">Withdraw %1$s from your Interest Account</string>
     <string name="dashboard_asset_actions_summary_title">Interest Summary</string>
     <string name="dashboard_asset_actions_summary_dsc">View your accrued %1$s Interest</string>
     <string name="dashboard_asset_actions_interest_dsc_failed">Could not load Interest details</string>
@@ -1377,6 +1378,7 @@
     <string name="select_account_sheet_empty">You have no eligible Wallets to perform this action.</string>
     <string name="select_send_sheet_title">Send from</string>
     <string name="select_deposit_source_title">Transfer from</string>
+    <string name="select_withdraw_target_title">Withdraw to</string>
     <string name="select_send_source_title">Send from</string>
     <string name="activity_state_initialised">Initialised</string>
     <string name="activity_state_uninitialised">Uninitialised</string>
@@ -1529,6 +1531,7 @@
     <string name="withdraw_confirmation_progress_title">Withdrawing %1$s</string>
     <string name="withdraw_confirmation_success_title">%1$s Withdrawn!</string>
     <string name="withdraw_confirmation_success_message">We are sending the cash now. Expect the cash to hit your bank on %1$s. Check the status of your Withdrawal at anytime from your Activity Screen</string>
+    <string name="withdraw_interest_confirmation_success_message">Your %1$s will be available in your %2$s within 2 days.</string>
     <string name="withdraw_target_select_title">Withdraw to…</string>
     <string name="withdraw_confirmation_eta">Funds Will Arrive by</string>
     <string name="add_a_bank">Add a Bank</string>
@@ -1575,6 +1578,7 @@
     <string name="send_enter_amount_available">Available</string>
     <string name="send_enter_amount_max">Send Max</string>
     <string name="sell_enter_amount_max">Sell Max</string>
+    <string name="withdraw_enter_amount_max">Withdraw Max</string>
     <string name="sell_enter_amount_min_error">%1$s Min</string>
     <string name="sell_enter_amount_max_error">%1$s Max</string>
     <string name="sell_enter_amount_error_insufficient_funds_for_fees">Not enough %1$s in your wallet to sell with current network fees.</string>

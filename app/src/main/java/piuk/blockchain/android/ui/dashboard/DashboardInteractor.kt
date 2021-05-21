@@ -283,6 +283,23 @@ class DashboardInteractor(
         return null
     }
 
+    fun getInterestWithdrawFlow(
+        model: DashboardModel,
+        sourceAccount: InterestAccount
+    ): Disposable? {
+        require(sourceAccount is CryptoAccount)
+
+        model.process(
+            UpdateLaunchDialogFlow(
+                TransactionFlow(
+                    sourceAccount = sourceAccount,
+                    action = AssetAction.InterestWithdraw
+                )
+            )
+        )
+        return null
+    }
+
     fun getBankDepositFlow(
         model: DashboardModel,
         targetAccount: SingleAccount,

@@ -25,6 +25,8 @@ import piuk.blockchain.android.coincore.impl.txEngine.TradingToOnChainTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.android.coincore.impl.txEngine.interest.InterestDepositOnChainTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.interest.InterestDepositTradingEngine
+import piuk.blockchain.android.coincore.impl.txEngine.interest.InterestWithdrawOnChainTxEngine
+import piuk.blockchain.android.coincore.impl.txEngine.interest.InterestWithdrawTradingTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.sell.OnChainSellTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.sell.TradingSellTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.swap.OnChainSwapTxEngine
@@ -49,9 +51,43 @@ class TxProcessorFactory(
         when (source) {
             is CryptoNonCustodialAccount -> createOnChainProcessor(source, target, action)
             is CustodialTradingAccount -> createTradingProcessor(source, target, action)
+            is CryptoInterestAccount -> createInterestWithdrawalProcessor(source, target, action)
             is BankAccount -> createFiatDepositProcessor(source, target, action)
             is FiatAccount -> createFiatWithdrawalProcessor(source, target, action)
             else -> Single.error(NotImplementedError())
+        }
+
+    private fun createInterestWithdrawalProcessor(
+        source: CryptoInterestAccount,
+        target: TransactionTarget,
+        action: AssetAction
+    ): Single<TransactionProcessor> =
+        when (target) {
+            is CustodialTradingAccount -> {
+                Single.just(
+                    TransactionProcessor(
+                        exchangeRates = exchangeRates,
+                        sourceAccount = source,
+                        txTarget = target,
+                        engine = InterestWithdrawTradingTxEngine(
+                            walletManager = walletManager
+                        )
+                    )
+                )
+            }
+            is CryptoNonCustodialAccount -> {
+                Single.just(
+                    TransactionProcessor(
+                        exchangeRates = exchangeRates,
+                        sourceAccount = source,
+                        txTarget = target,
+                        engine = InterestWithdrawOnChainTxEngine(
+                            walletManager = walletManager
+                        )
+                    )
+                )
+            }
+            else -> Single.error(IllegalStateException("$target is not supported yet"))
         }
 
     private fun createFiatDepositProcessor(

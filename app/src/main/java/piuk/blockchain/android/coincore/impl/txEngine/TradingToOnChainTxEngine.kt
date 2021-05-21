@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore.impl.txEngine
 
 import com.blockchain.featureflags.GatedFeature
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.Product
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import io.reactivex.Completable
@@ -32,7 +33,7 @@ class TradingToOnChainTxEngine(
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
-        walletManager.fetchCryptoWithdrawFeeAndMinLimit(sourceAsset)
+        walletManager.fetchCryptoWithdrawFeeAndMinLimit(sourceAsset, Product.TRADE)
             .map {
                 PendingTx(
                     amount = CryptoValue.zero(sourceAsset),

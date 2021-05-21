@@ -18,6 +18,7 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
+import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
@@ -134,7 +135,8 @@ internal abstract class CryptoAssetBase(
                             asset,
                             labels.getDefaultInterestWalletLabel(asset),
                             custodialManager,
-                            exchangeRates
+                            exchangeRates,
+                            features
                         )
                     )
                 } else {
@@ -267,6 +269,14 @@ internal abstract class CryptoAssetBase(
                 ).toList()
                     .map { ll -> ll.flatten() }
                     .onErrorReturnItem(emptyList())
+            is InterestAccount -> {
+                Maybe.concat(
+                    getCustodialTargets(),
+                    getNonCustodialTargets()
+                ).toList()
+                    .map { ll -> ll.flatten() }
+                    .onErrorReturnItem(emptyList())
+            }
             else -> Single.just(emptyList())
         }
     }

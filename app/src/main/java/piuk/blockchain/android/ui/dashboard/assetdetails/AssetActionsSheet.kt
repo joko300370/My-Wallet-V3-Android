@@ -121,8 +121,7 @@ class AssetActionsSheet :
         account: BlockchainAccount,
         actions: AvailableActions
     ): List<AssetActionItem> {
-        val firstAccount = account.selectFirstAccount()
-        return when (firstAccount) {
+        return when (val firstAccount = account.selectFirstAccount()) {
             is InterestAccount -> actions.toMutableList().apply {
                 add(0, AssetAction.InterestDeposit)
             }.map { mapAction(it, firstAccount.asset, firstAccount) }
@@ -188,7 +187,6 @@ class AssetActionsSheet :
             ) {
                 goToSummary()
             }
-
             AssetAction.InterestDeposit -> AssetActionItem(
                 getString(R.string.common_transfer),
                 R.drawable.ic_tx_deposit_arrow,
@@ -196,6 +194,14 @@ class AssetActionsSheet :
                 asset, action
             ) {
                 goToInterestDeposit()
+            }
+            AssetAction.InterestWithdraw -> AssetActionItem(
+                getString(R.string.common_withdraw),
+                R.drawable.ic_tx_withdraw,
+                getString(R.string.dashboard_asset_actions_withdraw_dsc, asset.displayTicker),
+                asset, action
+            ) {
+                goToInterestWithdraw()
             }
             AssetAction.Sell -> AssetActionItem(
                 getString(R.string.common_sell),
@@ -216,6 +222,10 @@ class AssetActionsSheet :
 
     private fun goToInterestDeposit() {
         model.process(HandleActionIntent(AssetAction.InterestDeposit))
+    }
+
+    private fun goToInterestWithdraw() {
+        model.process(HandleActionIntent(AssetAction.InterestWithdraw))
     }
 
     private fun goToSummary() {

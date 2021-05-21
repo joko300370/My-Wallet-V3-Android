@@ -57,7 +57,7 @@ data class SimpleBuyBalanceResponse(
     val actionable: String
 )
 
-data class SimpleBuyAllBalancesResponse(
+data class AllAssetBalancesResponse(
     @field:Json(name = "BTC")
     val BTC: SimpleBuyBalanceResponse? = null,
     @field:Json(name = "BCH")

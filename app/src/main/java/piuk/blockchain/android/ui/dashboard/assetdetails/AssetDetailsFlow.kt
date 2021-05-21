@@ -45,6 +45,7 @@ class AssetDetailsFlow(
         fun performAssetActionFor(action: AssetAction, account: BlockchainAccount)
         fun goToSellFrom(account: CryptoAccount)
         fun goToInterestDeposit(toAccount: InterestAccount)
+        fun goToInterestWithdraw(fromAccount: InterestAccount)
         fun goToSummary(account: SingleAccount, asset: CryptoCurrency)
         fun goToInterestDashboard()
     }
@@ -153,7 +154,7 @@ class AssetDetailsFlow(
                 selectAccountOrPerformAction(
                     state = newState,
                     singleAccountAction = {
-                        launchNewSend(it)
+                        launchSend(it)
                     }
                 )
             }
@@ -192,6 +193,14 @@ class AssetDetailsFlow(
                     toAccount = account
                 )
             }
+            AssetAction.InterestWithdraw -> {
+                val account = newState.selectedAccount.selectFirstAccount()
+                check(account is InterestAccount)
+                assetFlowHost.goToInterestWithdraw(
+                    fromAccount = account
+                )
+            }
+            else -> throw IllegalStateException("${newState.hostAction} is not supported in this flow")
         }
     }
 
@@ -249,7 +258,7 @@ class AssetDetailsFlow(
     override fun onAccountSelected(account: BlockchainAccount) {
         val singleAccount = account as SingleAccount
         when (localState.hostAction) {
-            AssetAction.Send -> launchNewSend(singleAccount)
+            AssetAction.Send -> launchSend(singleAccount)
             AssetAction.Sell -> launchSell(singleAccount)
             AssetAction.ViewActivity -> launchActivity(singleAccount)
             AssetAction.Swap -> launchSwap(singleAccount)
@@ -267,7 +276,7 @@ class AssetDetailsFlow(
         }
     }
 
-    private fun launchNewSend(account: SingleAccount) {
+    private fun launchSend(account: SingleAccount) {
         assetFlowHost.performAssetActionFor(AssetAction.Send, account)
         finishFlow()
     }

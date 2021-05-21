@@ -3,6 +3,7 @@ package piuk.blockchain.android.coincore.impl.txEngine
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.Product
 import com.blockchain.nabu.models.data.CryptoWithdrawalFeeAndLimit
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.testutils.usdPax
@@ -157,7 +158,7 @@ class TradingToOnChainTxEngineTest {
         }
 
         val feesAndLimits = CryptoWithdrawalFeeAndLimit(minLimit = 5000.toBigInteger(), fee = BigInteger.ONE)
-        whenever(walletManager.fetchCryptoWithdrawFeeAndMinLimit(ASSET))
+        whenever(walletManager.fetchCryptoWithdrawFeeAndMinLimit(ASSET, Product.TRADE))
             .thenReturn(Single.just(feesAndLimits))
 
         subject.start(
@@ -188,7 +189,7 @@ class TradingToOnChainTxEngineTest {
 
         verify(sourceAccount, atLeastOnce()).asset
         verify(currencyPrefs).selectedFiatCurrency
-        verify(walletManager).fetchCryptoWithdrawFeeAndMinLimit(ASSET)
+        verify(walletManager).fetchCryptoWithdrawFeeAndMinLimit(ASSET, Product.TRADE)
 
         noMoreInteractions(sourceAccount, txTarget)
     }

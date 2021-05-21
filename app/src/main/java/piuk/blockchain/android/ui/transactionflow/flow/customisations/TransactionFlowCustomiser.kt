@@ -67,7 +67,8 @@ class TransactionFlowCustomiserImpl(
             AssetAction.FiatDeposit -> R.drawable.ic_tx_deposit_w_green_bkgd
             AssetAction.Swap -> R.drawable.ic_swap_light_blue
             AssetAction.Sell -> R.drawable.ic_tx_sell
-            AssetAction.Withdraw -> R.drawable.ic_tx_withdraw_arrow
+            AssetAction.Withdraw -> R.drawable.ic_tx_withdraw_w_green_bkgd
+            AssetAction.InterestWithdraw -> R.drawable.ic_tx_withdraw
             else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
         }
     }
@@ -112,6 +113,7 @@ class TransactionFlowCustomiserImpl(
             AssetAction.InterestDeposit -> resources.getString(R.string.common_transfer)
             AssetAction.Swap -> resources.getString(R.string.swap_select_target_title)
             AssetAction.Withdraw -> resources.getString(R.string.common_withdraw)
+            AssetAction.InterestWithdraw -> resources.getString(R.string.select_withdraw_target_title)
             else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
         }
 
@@ -198,6 +200,9 @@ class TransactionFlowCustomiserImpl(
                 R.string.tx_title_withdraw,
                 (state.sendingAccount as FiatAccount).fiatCurrency
             )
+            AssetAction.InterestWithdraw -> resources.getString(
+                R.string.tx_title_withdraw, state.sendingAsset.displayTicker
+            )
             else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
         }
     }
@@ -208,6 +213,7 @@ class TransactionFlowCustomiserImpl(
             AssetAction.InterestDeposit -> resources.getString(R.string.send_enter_amount_deposit_max)
             AssetAction.Swap -> resources.getString(R.string.swap_enter_amount_max)
             AssetAction.Sell -> resources.getString(R.string.sell_enter_amount_max)
+            AssetAction.InterestWithdraw -> resources.getString(R.string.withdraw_enter_amount_max)
             else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
         }
 
@@ -274,6 +280,7 @@ class TransactionFlowCustomiserImpl(
     override fun enterAmountMaxNetworkFeeLabel(state: TransactionState): String =
         when (state.action) {
             AssetAction.InterestDeposit,
+            AssetAction.InterestWithdraw,
             AssetAction.Sell,
             AssetAction.Swap,
             AssetAction.Send -> resources.getString(R.string.send_enter_amount_max_fee)
@@ -284,7 +291,8 @@ class TransactionFlowCustomiserImpl(
         when (state.action) {
             AssetAction.Send -> resources.getString(R.string.send_confirmation_title)
             AssetAction.Swap -> resources.getString(R.string.common_confirm)
-            AssetAction.InterestDeposit -> resources.getString(R.string.common_confirm)
+            AssetAction.InterestDeposit,
+            AssetAction.InterestWithdraw -> resources.getString(R.string.common_confirm)
             AssetAction.Sell -> resources.getString(R.string.checkout)
             AssetAction.FiatDeposit -> resources.getString(R.string.common_deposit)
             AssetAction.Withdraw -> resources.getString(R.string.common_withdraw)
@@ -312,7 +320,8 @@ class TransactionFlowCustomiserImpl(
             AssetAction.FiatDeposit -> resources.getString(
                 R.string.deposit_confirmation_cta_button, amount
             )
-            AssetAction.Withdraw -> resources.getString(
+            AssetAction.Withdraw,
+            AssetAction.InterestWithdraw -> resources.getString(
                 R.string.withdraw_confirmation_cta_button, amount
             )
             else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
@@ -377,7 +386,8 @@ class TransactionFlowCustomiserImpl(
                 R.string.deposit_confirmation_progress_title,
                 amount
             )
-            AssetAction.Withdraw -> resources.getString(
+            AssetAction.Withdraw,
+            AssetAction.InterestWithdraw -> resources.getString(
                 R.string.withdraw_confirmation_progress_title,
                 amount
             )
@@ -395,7 +405,8 @@ class TransactionFlowCustomiserImpl(
             AssetAction.Sell -> resources.getString(R.string.sell_confirmation_progress_message)
             AssetAction.Swap -> resources.getString(R.string.swap_confirmation_progress_message)
             AssetAction.FiatDeposit -> resources.getString(R.string.deposit_confirmation_progress_message)
-            AssetAction.Withdraw -> resources.getString(R.string.withdraw_confirmation_progress_message)
+            AssetAction.Withdraw,
+            AssetAction.InterestWithdraw -> resources.getString(R.string.withdraw_confirmation_progress_message)
             else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
         }
     }
@@ -420,7 +431,8 @@ class TransactionFlowCustomiserImpl(
                 R.string.deposit_confirmation_success_title,
                 amount
             )
-            AssetAction.Withdraw -> resources.getString(R.string.withdraw_confirmation_success_title, amount)
+            AssetAction.Withdraw,
+            AssetAction.InterestWithdraw -> resources.getString(R.string.withdraw_confirmation_success_title, amount)
             else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
         }
     }
@@ -451,6 +463,11 @@ class TransactionFlowCustomiserImpl(
             AssetAction.Withdraw -> resources.getString(
                 R.string.withdraw_confirmation_success_message,
                 getEstimatedTransactionCompletionTime()
+            )
+            AssetAction.InterestWithdraw -> resources.getString(
+                R.string.withdraw_interest_confirmation_success_message,
+                state.sendingAsset.displayTicker,
+                state.selectedTarget.label
             )
             else -> throw IllegalArgumentException("Action not supported by Transaction Flow")
         }
@@ -610,6 +627,7 @@ class TransactionFlowCustomiserImpl(
             AssetAction.Summary -> throw IllegalStateException()
             AssetAction.Send,
             AssetAction.InterestDeposit,
+            AssetAction.InterestWithdraw,
             AssetAction.Sell,
             AssetAction.Swap -> BalanceAndFeeView(ctx).also { frame.addView(it) }
             AssetAction.Receive -> SmallBalanceView(ctx).also { frame.addView(it) }
@@ -676,7 +694,8 @@ class TransactionFlowCustomiserImpl(
                 R.string.swap_enter_amount_min_swap,
                 amount
             )
-            AssetAction.Withdraw -> resources.getString(
+            AssetAction.Withdraw,
+            AssetAction.InterestWithdraw -> resources.getString(
                 R.string.withdraw_enter_amount_min,
                 amount
             )
@@ -777,7 +796,8 @@ class TransactionFlowCustomiserImpl(
         resources.getString(
             when (action) {
                 AssetAction.Send -> R.string.common_send
-                AssetAction.Withdraw -> R.string.common_withdraw
+                AssetAction.Withdraw,
+                AssetAction.InterestWithdraw -> R.string.common_withdraw
                 AssetAction.Swap -> R.string.common_swap
                 AssetAction.Sell -> R.string.common_sell
                 AssetAction.InterestDeposit,

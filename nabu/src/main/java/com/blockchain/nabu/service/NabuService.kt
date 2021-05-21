@@ -9,6 +9,7 @@ import com.blockchain.nabu.models.responses.banktransfer.CreateLinkBankRequestBo
 import com.blockchain.nabu.models.responses.banktransfer.OpenBankingTokenBody
 import com.blockchain.nabu.models.responses.banktransfer.UpdateProviderAccountBody
 import com.blockchain.nabu.models.responses.interest.InterestAccountDetailsResponse
+import com.blockchain.nabu.models.responses.interest.InterestWithdrawalBody
 import com.blockchain.nabu.models.responses.nabu.AddAddressRequest
 import com.blockchain.nabu.models.responses.nabu.AirdropStatusList
 import com.blockchain.nabu.models.responses.nabu.ApplicantIdRequest
@@ -358,8 +359,12 @@ class NabuService(retrofit: Retrofit) {
         }
     }.wrapErrorMessage()
 
-    internal fun fetchWithdrawFee(sessionToken: NabuSessionTokenResponse, paymentMethod: String) =
-        service.withdrawFee(sessionToken.authHeader, type = paymentMethod)
+    internal fun fetchWithdrawFeesAndLimits(
+        sessionToken: NabuSessionTokenResponse,
+        product: String,
+        paymentMethod: String
+    ) =
+        service.getWithdrawFeeAndLimits(sessionToken.authHeader, product, paymentMethod)
             .wrapErrorMessage()
 
     internal fun fetchWithdrawLocksRules(
@@ -505,9 +510,15 @@ class NabuService(retrofit: Retrofit) {
         }
     }.wrapErrorMessage()
 
-    fun getBalanceForAllAssets(
+    fun getCustodialWalletBalanceForAllAssets(
         sessionToken: NabuSessionTokenResponse
-    ) = service.getBalanceForAllAssets(
+    ) = service.getCustodialWalletBalanceForAllAssets(
+        sessionToken.authHeader
+    ).wrapErrorMessage()
+
+    fun getInterestWalletBalanceForAllAssets(
+        sessionToken: NabuSessionTokenResponse
+    ) = service.getInterestWalletBalanceForAllAssets(
         sessionToken.authHeader
     ).wrapErrorMessage()
 
@@ -632,6 +643,12 @@ class NabuService(retrofit: Retrofit) {
         sessionToken: NabuSessionTokenResponse,
         currency: String
     ) = service.getInterestLimits(authorization = sessionToken.authHeader, currency = currency)
+        .wrapErrorMessage()
+
+    fun createInterestWithdrawal(
+        sessionToken: NabuSessionTokenResponse,
+        body: InterestWithdrawalBody
+    ) = service.createInterestWithdrawal(authorization = sessionToken.authHeader, body = body)
         .wrapErrorMessage()
 
     fun getInterestEnabled(

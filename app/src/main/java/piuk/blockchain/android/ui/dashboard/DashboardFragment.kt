@@ -628,6 +628,10 @@ class DashboardFragment :
         model.process(LaunchInterestDepositFlow(toAccount))
     }
 
+    override fun goToInterestWithdraw(fromAccount: InterestAccount) {
+        model.process(LaunchInterestWithdrawFlow(fromAccount))
+    }
+
     override fun goToSummary(account: SingleAccount, asset: CryptoCurrency) {
         model.process(UpdateSelectedCryptoAccount(account, asset))
         model.process(ShowDashboardSheet(DashboardNavigationAction.InterestSummary))

@@ -19,6 +19,7 @@ import com.blockchain.nabu.models.responses.interest.InterestEligibilityFullResp
 import com.blockchain.nabu.models.responses.interest.InterestEnabledResponse
 import com.blockchain.nabu.models.responses.interest.InterestLimitsFullResponse
 import com.blockchain.nabu.models.responses.interest.InterestRateResponse
+import com.blockchain.nabu.models.responses.interest.InterestWithdrawalBody
 import com.blockchain.nabu.models.responses.nabu.AddAddressRequest
 import com.blockchain.nabu.models.responses.nabu.AirdropStatusList
 import com.blockchain.nabu.models.responses.nabu.ApplicantIdRequest
@@ -42,6 +43,7 @@ import com.blockchain.nabu.models.responses.sdd.SDDStatusResponse
 import com.blockchain.nabu.models.responses.simplebuy.ActivateCardResponse
 import com.blockchain.nabu.models.responses.simplebuy.AddNewCardBodyRequest
 import com.blockchain.nabu.models.responses.simplebuy.AddNewCardResponse
+import com.blockchain.nabu.models.responses.simplebuy.AllAssetBalancesResponse
 import com.blockchain.nabu.models.responses.simplebuy.BankAccountResponse
 import com.blockchain.nabu.models.responses.simplebuy.BuyOrderListResponse
 import com.blockchain.nabu.models.responses.simplebuy.BuySellOrderResponse
@@ -51,7 +53,6 @@ import com.blockchain.nabu.models.responses.simplebuy.DepositRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.FeesResponse
 import com.blockchain.nabu.models.responses.simplebuy.ProductTransferRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyEligibilityResponse
-import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyAllBalancesResponse
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyBalanceResponse
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyConfirmationAttributes
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyCurrency
@@ -275,10 +276,10 @@ internal interface Nabu {
         @Body order: CustodialWalletOrder
     ): Single<BuySellOrderResponse>
 
-    @GET(NABU_SIMPLE_BUY_WITHDRAW_ORDER_FEE)
-    fun withdrawFee(
+    @GET(NABU_TRADES_WITHDRAW_FEES_AND_LIMITS)
+    fun getWithdrawFeeAndLimits(
         @Header("authorization") authorization: String,
-        @Query("product") product: String = "SIMPLEBUY",
+        @Query("product") product: String,
         @Query("paymentMethod") type: String
     ): Single<FeesResponse>
 
@@ -401,9 +402,14 @@ internal interface Nabu {
     ): Single<Response<SimpleBuyBalanceResponse>>
 
     @GET(NABU_SIMPLE_BUY_ASSET_BALANCE)
-    fun getBalanceForAllAssets(
+    fun getCustodialWalletBalanceForAllAssets(
         @Header("authorization") authorization: String
-    ): Single<SimpleBuyAllBalancesResponse>
+    ): Single<AllAssetBalancesResponse>
+
+    @GET(NABU_INTEREST_BALANCES)
+    fun getInterestWalletBalanceForAllAssets(
+        @Header("authorization") authorization: String
+    ): Single<AllAssetBalancesResponse>
 
     @Headers("blockchain-origin: simplebuy")
     @POST(NABU_SIMPLE_BUY_BALANCE_TRANSFER)
@@ -442,6 +448,12 @@ internal interface Nabu {
         @Header("authorization") authorization: String,
         @Query("currency") currency: String
     ): Single<InterestLimitsFullResponse>
+
+    @POST(NABU_INTEREST_WITHDRAWAL)
+    fun createInterestWithdrawal(
+        @Header("authorization") authorization: String,
+        @Body body: InterestWithdrawalBody
+    ): Completable
 
     @GET(NABU_INTEREST_ENABLED)
     fun getInterestEnabled(

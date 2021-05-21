@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.notifications.analytics.InterestAnalytics
@@ -17,6 +19,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetResources
@@ -39,9 +42,8 @@ import java.util.Locale
 class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetailsBinding>() {
     interface Host : SlidingModalBottomDialog.Host {
         fun gotoActivityFor(account: BlockchainAccount)
-        fun goToInterestDeposit(
-            toAccount: InterestAccount
-        )
+        fun goToInterestDeposit(toAccount: InterestAccount)
+        fun goToInterestWithdraw(fromAccount: InterestAccount)
     }
 
     override val host: Host by lazy {
@@ -62,6 +64,7 @@ class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetails
     private val currencyPrefs: CurrencyPrefs by scopedInject()
     private val coincore: Coincore by scopedInject()
     private val assetResources: AssetResources by scopedInject()
+    private val features: InternalFeatureFlagApi by inject()
 
     private val listAdapter: InterestSummaryAdapter by lazy { InterestSummaryAdapter() }
 
@@ -93,8 +96,8 @@ class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetails
                         interestDetailsDepositCta.text =
                             getString(R.string.tx_title_deposit, cryptoCurrency.displayTicker)
                         interestDetailsDepositCta.setOnClickListener {
-                            host.goToInterestDeposit(account as InterestAccount)
                             analytics.logEvent(InterestAnalytics.INTEREST_SUMMARY_DEPOSIT_CTA)
+                            host.goToInterestDeposit(account as InterestAccount)
                         }
                     } else {
                         interestDetailsDepositCta.gone()
@@ -127,6 +130,23 @@ class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetails
     }
 
     private fun compositeToView(composite: CompositeInterestDetails) {
+        if (features.isFeatureEnabled(GatedFeature.INTEREST_WITHDRAWAL) && composite.balance.isPositive) {
+            with(binding) {
+                interestDetailsDisclaimer.gone()
+                interestDetailsActivityCta.gone()
+                interestDetailsWithdrawCta.text = getString(R.string.tx_title_withdraw, cryptoCurrency.displayTicker)
+                interestDetailsWithdrawCta.visible()
+                interestDetailsWithdrawCta.setOnClickListener {
+                    analytics.logEvent(InterestAnalytics.INTEREST_SUMMARY_WITHDRAW_CTA)
+                    host.goToInterestWithdraw(account as InterestAccount)
+                }
+            }
+        } else {
+            with(binding) {
+                interestDetailsDisclaimer.visible()
+                interestDetailsActivityCta.visible()
+            }
+        }
         val itemList = mutableListOf<InterestSummaryInfoItem>()
         itemList.apply {
             add(
