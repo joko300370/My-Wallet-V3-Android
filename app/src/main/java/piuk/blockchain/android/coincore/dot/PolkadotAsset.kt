@@ -19,7 +19,6 @@ import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import java.util.concurrent.atomic.AtomicBoolean
 
 internal class PolkadotAsset(
     payloadManager: PayloadDataManager,
@@ -49,11 +48,6 @@ internal class PolkadotAsset(
 
     override val asset: CryptoCurrency
         get() = CryptoCurrency.DOT
-
-    private val isDotFeatureFlagEnabled = AtomicBoolean(false)
-
-    override val isEnabled: Boolean
-        get() = isDotFeatureFlagEnabled.get()
 
     override fun initToken(): Completable = Completable.complete()
 
