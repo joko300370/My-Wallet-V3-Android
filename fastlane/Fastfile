@@ -141,6 +141,9 @@ platform :android do
       sh("echo \"--------------Copying Secrets Properties--------------\"")
       sh("cp " + credentials_folder + "/secrets.properties ../app")
 
+      sh("echo \"--------------Copying Debug Signing Key--------------\"")
+      sh("cp " + credentials_folder + "/blockchainDebugKey.keystore ../app")
+
     end
 
 
@@ -175,6 +178,9 @@ platform :android do
 
       sh("echo \"--------------Copying Secrets Properties--------------\"")
       sh("cp ../../tmp/credentials/secrets.properties ../app")
+
+      sh("echo \"--------------Copying Debug Signing Key--------------\"")
+      sh("cp ../../tmp/credentials/blockchainDebugKey.keystore ../app")
     end
 
 

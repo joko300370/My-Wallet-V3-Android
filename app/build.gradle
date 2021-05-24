@@ -27,6 +27,14 @@ def getGitCommitHash = { ->
 }
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('blockchainDebugKey.keystore')
+            storePassword buildProperties.secrets['keyPassword'].string
+            keyPassword buildProperties.secrets['keyPassword'].string
+            keyAlias buildProperties.secrets['debugKeyAlias'].string
+        }
+    }
     compileSdkVersion Versions.compileSdk
     buildToolsVersion Versions.buildTools
     dexOptions.javaMaxHeapSize "3g"
