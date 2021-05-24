@@ -28,6 +28,7 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
 import piuk.blockchain.android.ui.transactionflow.plugin.EnterAmountWidget
+import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 
@@ -69,8 +70,10 @@ class AccountInfoCrypto @JvmOverloads constructor(
 
         (account as? InterestAccount)?.let { setInterestAccountDetails(account, accountsAreTheSame) }
 
-        binding.assetWithAccount.updateIcon(account)
-
+        with(binding.assetWithAccount) {
+            updateIcon(account)
+            visible()
+        }
         displayedAccount = account
     }
 

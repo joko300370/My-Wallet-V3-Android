@@ -21,7 +21,6 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.TransactionTarget
-import piuk.blockchain.android.coincore.isCustodial
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.account.AccountInfoBank
 import piuk.blockchain.android.ui.customviews.account.AccountInfoCrypto
@@ -172,11 +171,7 @@ class TransactionFlowCustomiserImpl(
         }
 
     override fun selectTargetShowManualEnterAddress(state: TransactionState): Boolean =
-        when (state.action) {
-            AssetAction.Send ->
-                !state.sendingAccount.isCustodial() || features.isFeatureEnabled(GatedFeature.SEND_FROM_CUSTODIAL)
-            else -> false
-        }
+        state.action == AssetAction.Send
 
     override fun enterAmountTitle(state: TransactionState): String {
         return when (state.action) {

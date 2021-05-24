@@ -928,6 +928,11 @@
     <string name="aave_yfi_dot_available_card_body">Aave, YFI and Polkadot tokens are now available to Buy, Sell, Swap and Send in your Wallet.</string>
     <string name="aave_yfi_dot_available_card_cta">Buy Now</string>
 
+    <!-- Domain address announcement -->
+    <string name="domain_announcement_title">Introducing Send to Domains</string>
+    <string name="domain_announcement_description">You can send money directly to registered Unstoppable and ENS domains. Send crypto to .crypto, .eth, .xyz extensions and many more!</string>
+    <string name="domain_announcement_action">Get Started</string>
+
     <!-- Airdrop Status bottom sheet -->
     <string name="airdrop_received_sheet_heading">Airdrop</string>
     <string name="airdrop_received_sheet_status_label">Status</string>

@@ -1,6 +1,5 @@
 package piuk.blockchain.android.coincore
 
-import com.blockchain.featureflags.GatedFeature
 import com.blockchain.featureflags.InternalFeatureFlagApi
 import info.blockchain.api.AddressMappingService
 import info.blockchain.api.DomainAddressNotFound
@@ -56,6 +55,7 @@ interface AddressFactory {
 class AddressFactoryImpl(
     private val coincore: Coincore,
     private val addressResolver: AddressMappingService,
+    @Suppress("unused")
     private val features: InternalFeatureFlagApi
 ) : AddressFactory {
 
@@ -101,8 +101,5 @@ class AddressFactoryImpl(
         }
 
     private fun isDomainAddress(address: String): Single<Boolean> =
-        Single.just(
-            features.isFeatureEnabled(GatedFeature.SEND_TO_DOMAIN) &&
-                address.contains('.')
-        )
+        Single.just(address.contains('.'))
 }

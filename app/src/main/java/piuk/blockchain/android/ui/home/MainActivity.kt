@@ -438,8 +438,12 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         OnboardingActivity.launchForFingerprints(this)
     }
 
-    override fun launchTransfer() {
+    override fun launchReceive() {
         startTransferFragment(TransferFragment.TransferViewType.TYPE_RECEIVE)
+    }
+
+    override fun launchSend() {
+        startTransferFragment(TransferFragment.TransferViewType.TYPE_SEND)
     }
 
     private fun showLogoutDialog() {

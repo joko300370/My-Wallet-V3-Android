@@ -518,7 +518,7 @@ class DashboardFragment :
 
         override fun startIntroTourGuide() = navigator().launchIntroTour()
 
-        override fun startTransferCrypto() = navigator().launchTransfer()
+        override fun startTransferCrypto() = navigator().launchReceive()
 
         override fun startStxReceivedDetail() =
             model.process(ShowDashboardSheet(DashboardNavigationAction.StxAirdropComplete))
@@ -547,6 +547,10 @@ class DashboardFragment :
                 )
             )
             navigator().launchSimpleBuySell(BuySellFragment.BuySellViewType.TYPE_SELL)
+        }
+
+        override fun startSend() {
+            navigator().launchSend()
         }
 
         override fun startInterestDashboard() {

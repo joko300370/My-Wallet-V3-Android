@@ -35,7 +35,8 @@ interface HomeNavigator {
     fun launchSetup2Fa()
     fun launchVerifyEmail()
     fun launchSetupFingerprintLogin()
-    fun launchTransfer()
+    fun launchReceive()
+    fun launchSend()
     fun performAssetActionFor(action: AssetAction, account: BlockchainAccount)
 
     fun launchIntroTour()

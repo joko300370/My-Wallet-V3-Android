@@ -21,6 +21,7 @@ import piuk.blockchain.android.ui.dashboard.announcements.rule.KycResubmissionAn
 import piuk.blockchain.android.ui.dashboard.announcements.rule.RegisterBiometricsAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.RegisteredForAirdropMiniAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SellIntroAnnouncement
+import piuk.blockchain.android.ui.dashboard.announcements.rule.SendToDomainAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SimpleBuyFinishSignupAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.StxCompleteAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.SwapAnnouncement
@@ -225,6 +226,13 @@ val dashboardAnnouncementsModule = module {
         factory {
             AaveYfiDotAvailableAnnouncement(
                 dismissRecorder = get()
+            )
+        }.bind(AnnouncementRule::class)
+
+        factory {
+            SendToDomainAnnouncement(
+                dismissRecorder = get(),
+                coincore = get()
             )
         }.bind(AnnouncementRule::class)
     }
