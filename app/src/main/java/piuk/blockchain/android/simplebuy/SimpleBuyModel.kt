@@ -5,8 +5,10 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.ApprovalErrorStatus
 import com.blockchain.nabu.datamanagers.BuySellOrder
 import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.datamanagers.RecurringBuyOrder
 import com.blockchain.nabu.datamanagers.UndefinedPaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.RecurringBuyState
 import com.blockchain.nabu.models.data.BankPartner.Companion.YAPILY_DEEPLINK_PAYMENT_APPROVAL_URL
 import com.blockchain.nabu.models.responses.nabu.NabuApiException
 import com.blockchain.nabu.models.responses.nabu.NabuErrorCodes
@@ -21,7 +23,6 @@ import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.cards.partners.CardActivator
 import piuk.blockchain.android.cards.partners.EverypayCardActivator
 import piuk.blockchain.android.networking.PollResult
@@ -287,19 +288,19 @@ class SimpleBuyModel(
         interactor.eligiblePaymentMethods(
             fiatCurrency,
             selectedPaymentMethodId
-        ).zipWith(
+        ).flatMap { intent ->
             interactor.getRecurringBuyEligibility()
-                .onErrorReturn { emptyList() }
+                .map { intent to it }
+                .onErrorReturn { intent to emptyList() }
+        }.subscribeBy(
+            onSuccess = { (intent, eligibility) ->
+                process(SimpleBuyIntent.RecurringBuyEligibilityUpdated(eligibility))
+                process(intent)
+            },
+            onError = {
+                process(SimpleBuyIntent.ErrorIntent())
+            }
         )
-            .subscribeBy(
-                onSuccess = { (intent, eligibility) ->
-                    process(SimpleBuyIntent.RecurringBuyEligibilityUpdated(eligibility))
-                    process(intent)
-                },
-                onError = {
-                    process(SimpleBuyIntent.ErrorIntent())
-                }
-            )
 
     private fun handleOrderAttrs(order: BuySellOrder) {
         order.attributes?.everypay?.let {
@@ -331,13 +332,31 @@ class SimpleBuyModel(
                 }?.paymentAttributes()
             },
             isBankPayment
-        ).subscribeBy(
-            onSuccess = {
-                val orderCreatedSuccessfully = it.state == OrderState.FINISHED
+        ).flatMap { buySellOrder ->
+            interactor.createRecurringBuyOrder(
+                amount = previousState.order.amount ?: throw IllegalStateException("amount exception"),
+                frequency = previousState.recurringBuyFrequency,
+                paymentMethodId = previousState.selectedPaymentMethod?.id ?: throw IllegalStateException(
+                    "selectedPaymentMethod exception"
+                ),
+                paymentMethodType = previousState.selectedPaymentMethod.paymentMethodType,
+                currency = previousState.selectedCryptoCurrency?.networkTicker ?: throw IllegalStateException(
+                    "selectedCryptoCurrency exception"
+                )
+            )
+                .map { buySellOrder to it }
+                .onErrorReturn { buySellOrder to RecurringBuyOrder(RecurringBuyState.NOT_ACTIVE) }
+        }.subscribeBy(
+            onSuccess = { (buySellOrder, recurringBuy) ->
+                val orderCreatedSuccessfully = buySellOrder.state == OrderState.FINISHED
                 if (orderCreatedSuccessfully) {
                     updatePersistingCountersForCompletedOrders()
                 }
-                process(SimpleBuyIntent.OrderCreated(it, shouldShowAppRating(orderCreatedSuccessfully)))
+                process(
+                    SimpleBuyIntent.OrderCreated(
+                        buySellOrder, shouldShowAppRating(orderCreatedSuccessfully), recurringBuy.state
+                    )
+                )
             },
             onError = {
                 processOrderErrors(it)

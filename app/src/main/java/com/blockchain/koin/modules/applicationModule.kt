@@ -462,7 +462,8 @@ val applicationModule = module {
                 coincore = get(),
                 eligibilityProvider = get(),
                 bankLinkingPrefs = get(),
-                analytics = get()
+                analytics = get(),
+                featureFlagApi = get()
             )
         }
 

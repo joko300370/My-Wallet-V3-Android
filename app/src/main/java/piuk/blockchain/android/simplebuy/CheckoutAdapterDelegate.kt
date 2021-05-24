@@ -99,8 +99,8 @@ private class ComplexCheckoutItemItemViewHolder(
 
     fun bind(item: SimpleBuyCheckoutItem.ComplexCheckoutItem) {
         with(binding) {
-            complexItemTitle.text = item.label
-            complexItemLabel.text = item.title
+            complexItemLabel.text = item.label
+            complexItemTitle.text = item.title
             complexItemSubtitle.text = item.subtitle
         }
     }

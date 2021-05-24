@@ -52,7 +52,9 @@ import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
 import com.blockchain.nabu.models.responses.simplebuy.DepositRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.FeesResponse
 import com.blockchain.nabu.models.responses.simplebuy.ProductTransferRequestBody
+import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyResponse
 import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyEligibilityResponse
+import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyBalanceResponse
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyConfirmationAttributes
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyCurrency
@@ -547,4 +549,10 @@ internal interface Nabu {
     fun getRecurringBuyEligibility(
         @Header("authorization") authorization: String
     ): Single<RecurringBuyEligibilityResponse>
+
+    @POST(NABU_RECURRING_BUY_CREATE)
+    fun createRecurringBuy(
+        @Header("authorization") authorization: String,
+        @Body recurringBuyBody: RecurringBuyRequestBody
+    ): Single<RecurringBuyResponse>
 }

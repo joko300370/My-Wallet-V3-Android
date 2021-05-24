@@ -34,6 +34,7 @@ import com.blockchain.nabu.models.responses.simplebuy.ConfirmOrderRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
 import com.blockchain.nabu.models.responses.simplebuy.DepositRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.ProductTransferRequestBody
+import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyConfirmationAttributes
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyCurrency
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyEligibility
@@ -358,6 +359,14 @@ class NabuService(retrofit: Retrofit) {
             Single.error(it)
         }
     }.wrapErrorMessage()
+
+    fun createRecurringBuyOrder(
+        sessionToken: NabuSessionTokenResponse,
+        recurringOrderBody: RecurringBuyRequestBody
+    ) = service.createRecurringBuy(
+        authorization = sessionToken.authHeader,
+        recurringBuyBody = recurringOrderBody
+    ).wrapErrorMessage()
 
     internal fun fetchWithdrawFeesAndLimits(
         sessionToken: NabuSessionTokenResponse,

@@ -63,14 +63,16 @@ class TransactionProgressView(context: Context, attrs: AttributeSet) :
 
     fun showPendingTx(
         title: String,
-        subtitle: SpannableStringBuilder
+        subtitle: String,
+        locksNote: SpannableStringBuilder
     ) {
         tx_state_indicator.setImageResource(R.drawable.ic_check_circle)
         tx_state_indicator.visible()
         showEndStateUi()
         tx_title.text = title
-        tx_subtitle.run {
-            setText(subtitle, TextView.BufferType.SPANNABLE)
+        tx_subtitle.text = subtitle
+        tx_note_locks.run {
+            setText(locksNote, TextView.BufferType.SPANNABLE)
             movementMethod = LinkMovementMethod.getInstance()
         }
     }

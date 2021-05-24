@@ -5,6 +5,7 @@ import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.LiveCustodialWalletManager
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.RecurringBuyState
 import com.blockchain.nabu.datamanagers.repositories.interest.Eligibility
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestLimits
 import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
@@ -18,6 +19,7 @@ import com.blockchain.nabu.models.responses.interest.InterestActivityItemRespons
 import com.blockchain.nabu.models.responses.interest.InterestAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
 import com.blockchain.nabu.models.responses.simplebuy.PaymentAttributes
+import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyConfirmationAttributes
 import com.braintreepayments.cardform.utils.CardType
 import info.blockchain.balance.CryptoCurrency
@@ -100,6 +102,10 @@ interface CustodialWalletManager {
         custodialWalletOrder: CustodialWalletOrder,
         stateAction: String? = null
     ): Single<BuySellOrder>
+
+    fun createRecurringBuyOrder(
+        recurringBuyRequestBody: RecurringBuyRequestBody
+    ): Single<RecurringBuyOrder>
 
     fun createWithdrawOrder(
         amount: Money,
@@ -762,4 +768,8 @@ data class EligiblePaymentMethodType(
 data class SimplifiedDueDiligenceUserState(
     val isVerified: Boolean,
     val stateFinalised: Boolean
+)
+
+data class RecurringBuyOrder(
+    val state: RecurringBuyState = RecurringBuyState.NOT_INITIALISED
 )

@@ -28,6 +28,7 @@ import com.blockchain.nabu.datamanagers.PartnerCredentials
 import com.blockchain.nabu.datamanagers.PaymentLimits
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.Product
+import com.blockchain.nabu.datamanagers.RecurringBuyOrder
 import com.blockchain.nabu.datamanagers.SimplifiedDueDiligenceUserState
 import com.blockchain.nabu.datamanagers.TransactionErrorMapper
 import com.blockchain.nabu.datamanagers.TransactionState
@@ -81,6 +82,8 @@ import com.blockchain.nabu.models.responses.simplebuy.BuySellOrderResponse
 import com.blockchain.nabu.models.responses.simplebuy.ConfirmOrderRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
 import com.blockchain.nabu.models.responses.simplebuy.ProductTransferRequestBody
+import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyResponse
+import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyConfirmationAttributes
 import com.blockchain.nabu.models.responses.simplebuy.TransactionResponse
 import com.blockchain.nabu.models.responses.simplebuy.TransferRequest
@@ -172,6 +175,16 @@ class LiveCustodialWalletManager(
                 stateAction
             )
         }.map { response -> response.toBuySellOrder() }
+
+    override fun createRecurringBuyOrder(
+        recurringBuyRequestBody: RecurringBuyRequestBody
+    ): Single<RecurringBuyOrder> =
+        authenticator.authenticate {
+            nabuService.createRecurringBuyOrder(
+                it,
+                recurringBuyRequestBody
+            )
+        }.map { response -> response.toRecurringBuyOrder() }
 
     override fun createWithdrawOrder(amount: Money, bankId: String): Completable =
         authenticator.authenticateCompletable {
@@ -1426,6 +1439,24 @@ enum class CardStatus {
     UNKNOWN,
     EXPIRED
 }
+
+enum class RecurringBuyState {
+    ACTIVE,
+    NOT_ACTIVE,
+    NOT_INITIALISED
+}
+
+private fun RecurringBuyResponse.recurringBuyState() =
+    when (state) {
+        RecurringBuyResponse.ACTIVE -> RecurringBuyState.ACTIVE
+        RecurringBuyResponse.NOT_ACTIVE -> RecurringBuyState.NOT_ACTIVE
+        else -> throw IllegalStateException("Unsupported recurring state")
+    }
+
+private fun RecurringBuyResponse.toRecurringBuyOrder(): RecurringBuyOrder =
+    RecurringBuyOrder(
+        state = recurringBuyState()
+    )
 
 private fun BuySellOrderResponse.type() =
     when (side) {

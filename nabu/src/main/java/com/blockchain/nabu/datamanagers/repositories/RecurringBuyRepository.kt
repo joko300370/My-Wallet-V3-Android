@@ -47,12 +47,11 @@ class RecurringBuyRepository(
         cacheLifetimeSeconds = CACHE_LIFETIME,
         refreshFn = {
             recurringBuyEligibilityProvider.getRecurringBuyEligibility()
-                .doOnSuccess { Timber.d("Balance response: $it") }
+                .doOnSuccess { Timber.d("Recurring Eligibility response: $it") }
         }
     )
 
-    fun getRecurringBuyEligibleMethods() =
-        cache.getCachedSingle()
+    fun getRecurringBuyEligibleMethods() = cache.getCachedSingle()
 
     companion object {
         private const val CACHE_LIFETIME = 7200L // 2 hours

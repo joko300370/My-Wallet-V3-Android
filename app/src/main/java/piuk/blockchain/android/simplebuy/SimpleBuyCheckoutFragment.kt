@@ -299,7 +299,6 @@ class SimpleBuyCheckoutFragment :
                 SimpleBuyCheckoutItem.ComplexCheckoutItem(
                     getString(R.string.recurring_buy_frequency_label),
                     state.recurringBuyFrequency.mapToString(requireContext()),
-
                     buildSubtitleRecurringBuy(state.recurringBuyFrequency)
                 )
             } else null,
@@ -362,7 +361,7 @@ class SimpleBuyCheckoutFragment :
                     )
                 }
             }
-            else -> ""
+            RecurringBuyFrequency.ONE_TIME -> ""
         }
     }
 

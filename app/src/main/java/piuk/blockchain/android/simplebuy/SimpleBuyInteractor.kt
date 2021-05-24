@@ -1,5 +1,7 @@
 package piuk.blockchain.android.simplebuy
 
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.BillingAddress
 import com.blockchain.nabu.datamanagers.BuySellOrder
 import com.blockchain.nabu.datamanagers.BuySellPairs
@@ -11,6 +13,7 @@ import com.blockchain.nabu.datamanagers.OrderOutput
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.Product
+import com.blockchain.nabu.datamanagers.RecurringBuyOrder
 import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
@@ -21,6 +24,7 @@ import com.blockchain.nabu.models.data.LinkedBank
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
+import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyConfirmationAttributes
 import com.blockchain.nabu.service.TierService
 import com.blockchain.notifications.analytics.Analytics
@@ -28,6 +32,7 @@ import com.blockchain.preferences.BankLinkingPrefs
 import com.blockchain.ui.trackProgress
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
+import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -54,8 +59,13 @@ class SimpleBuyInteractor(
     private val analytics: Analytics,
     private val eligibilityProvider: SimpleBuyEligibilityProvider,
     private val coincore: Coincore,
-    private val bankLinkingPrefs: BankLinkingPrefs
+    private val bankLinkingPrefs: BankLinkingPrefs,
+    private val featureFlagApi: InternalFeatureFlagApi
 ) {
+
+    private val isRecurringBuyEnabled: Boolean by lazy {
+        featureFlagApi.isFeatureEnabled(GatedFeature.RECURRING_BUYS)
+    }
 
     // ignore limits when user is in tier 0
     fun fetchBuyLimitsAndSupportedCryptoCurrencies(
@@ -106,6 +116,29 @@ class SimpleBuyInteractor(
         ).map {
             SimpleBuyIntent.OrderCreated(it)
         }
+
+    fun createRecurringBuyOrder(
+        amount: Money,
+        currency: String,
+        paymentMethodId: String,
+        paymentMethodType: PaymentMethodType,
+        frequency: RecurringBuyFrequency
+    ): Single<RecurringBuyOrder> {
+        return if (isRecurringBuyEnabled && frequency != RecurringBuyFrequency.ONE_TIME) {
+            custodialWalletManager.createRecurringBuyOrder(
+                RecurringBuyRequestBody(
+                    inputValue = amount.toBigInteger().toString(),
+                    inputCurrency = amount.currencyCode,
+                    destinationCurrency = currency,
+                    paymentMethod = paymentMethodType.name,
+                    period = frequency.name,
+                    beneficiaryId = paymentMethodId
+                )
+            )
+        } else {
+            Single.just(RecurringBuyOrder())
+        }
+    }
 
     fun fetchWithdrawLockTime(
         paymentMethod: PaymentMethodType,

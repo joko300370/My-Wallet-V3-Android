@@ -7,6 +7,7 @@ import com.blockchain.nabu.datamanagers.Partner
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.RecurringBuyState
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
 import info.blockchain.balance.CryptoCurrency
@@ -62,6 +63,7 @@ data class SimpleBuyState(
     @Transient val confirmationActionRequested: Boolean = false,
     @Transient val newPaymentMethodToBeAdded: PaymentMethod? = null,
     val recurringBuyFrequency: RecurringBuyFrequency = RecurringBuyFrequency.ONE_TIME,
+    val recurringBuyState: RecurringBuyState = RecurringBuyState.NOT_INITIALISED,
     @Transient private val recurringBuyEligiblePaymentMethods: List<PaymentMethodType> = emptyList()
 ) : MviState {
 

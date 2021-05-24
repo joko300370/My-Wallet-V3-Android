@@ -2111,5 +2111,7 @@
     <string name="recurring_buy_unavailable_message">Please use a different payment method to set up a recurring buy</string>
     <string name="recurring_buy_selection_title">Select frequency</string>
     <string name="recurring_buy_cta_alert">OK</string>
+    <string name="recurring_buy_payment_message">You’ll be charged %1$s %2$s for the market equivalent of %3$s. You can manage your Recurring Buy from the %4$s Wallets &amp; Accounts Page.</string>
+    <string name="recurring_buy_creation_error">Error creating your Recurring Buy. Please try again.</string>
 
 </resources>
