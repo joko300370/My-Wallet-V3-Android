@@ -108,11 +108,13 @@ class AssetActionsSheet :
         }
 
     private fun showAssetBalances(state: AssetDetailsState) {
-        binding.assetActionsAccountDetails.updateAccount(
-            state.selectedAccount.selectFirstAccount(),
-            {},
-            PendingBalanceAccountDecorator(state.selectedAccount.selectFirstAccount())
-        )
+        with(binding.assetActionsAccountDetails) {
+            updateAccount(
+                state.selectedAccount.selectFirstAccount(),
+                {},
+                PendingBalanceAccountDecorator(state.selectedAccount.selectFirstAccount())
+            )
+        }
     }
 
     // we want to display Interest deposit only for Interest accounts and not for the accounts that

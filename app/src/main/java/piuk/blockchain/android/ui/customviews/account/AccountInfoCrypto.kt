@@ -79,7 +79,9 @@ class AccountInfoCrypto @JvmOverloads constructor(
         accountsAreTheSame: Boolean
     ) {
         with(binding) {
-            compositeDisposable += coincore[account.asset].interestRate().observeOn(AndroidSchedulers.mainThread())
+            compositeDisposable += coincore[account.asset]
+                .interestRate()
+                .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe { assetSubtitle.text = resources.getString(R.string.empty) }
                 .doOnSuccess {
                     interestRate = it

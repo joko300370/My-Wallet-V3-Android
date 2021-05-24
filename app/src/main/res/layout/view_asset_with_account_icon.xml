@@ -8,8 +8,8 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/asset_icon"
-        android:layout_width="@dimen/grid_8"
-        android:layout_height="@dimen/grid_8"
+        android:layout_width="@dimen/asset_icon_size"
+        android:layout_height="@dimen/asset_icon_size"
         android:importantForAccessibility="no"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"

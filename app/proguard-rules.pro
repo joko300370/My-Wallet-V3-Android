@@ -152,6 +152,7 @@
         public static final com.fasterxml.jackson.annotation.JsonAutoDetect$Visibility *;
 }
 # Temporary fix: Keep classes for jackson json
+-keep public class info.blockchain.api.** { *; }
 -keep public class info.blockchain.api.data.** { *; }
 -keep public class piuk.blockchain.android.coincore.** { *; }
 -keep public class piuk.blockchain.android.simplebuy.yodlee.** { *; }
@@ -169,6 +170,9 @@
 -keep public class com.blockchain.nabu.api.** { *; }
 -keep public class com.blockchain.nabu.models.** { *; }
 -keepclasseswithmembernames class android.support.v4.widget.DrawerLayout { *; }
+
+# Kotlinx serialisation
+-keep public class info.blockchain.api.** { *; }
 
 # Javapoet
 -dontwarn com.squareup.javapoet.**
