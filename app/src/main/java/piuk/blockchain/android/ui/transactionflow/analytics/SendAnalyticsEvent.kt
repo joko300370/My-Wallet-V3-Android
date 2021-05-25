@@ -2,6 +2,7 @@ package piuk.blockchain.android.ui.transactionflow.analytics
 
 import com.blockchain.extensions.withoutNullValues
 import com.blockchain.notifications.analytics.AnalyticsEvent
+import com.blockchain.notifications.analytics.AnalyticsNames
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.FEE_SCHEDULE
@@ -11,6 +12,7 @@ import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Comp
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.PARAM_OLD_FEE
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.PARAM_SOURCE
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics.Companion.PARAM_TARGET
+import java.io.Serializable
 
 sealed class SendAnalyticsEvent(
     override val event: String,
@@ -74,4 +76,49 @@ sealed class SendAnalyticsEvent(
                 PARAM_NEW_FEE to newFee.name
             )
         )
+
+    class SendAmountMaxClicked(
+        private val currency: String,
+        private val fromAccountType: TxFlowAnalyticsAccountType,
+        private val toAccountType: TxFlowAnalyticsAccountType
+    ) : AnalyticsEvent {
+        override val event: String
+            get() = AnalyticsNames.SEND_MAX_CLICKED.name
+        override val params: Map<String, Serializable>
+            get() = mapOf(
+                "currency" to currency,
+                "from_account_type" to fromAccountType.name,
+                "to_account_type" to toAccountType.name
+            )
+    }
+
+    class SendSourceAccountSelected(
+        private val currency: String,
+        private val fromAccountType: TxFlowAnalyticsAccountType
+    ) : AnalyticsEvent {
+        override val event: String
+            get() = AnalyticsNames.SEND_FROM_SELECTED.name
+        override val params: Map<String, Serializable>
+            get() = mapOf(
+                "currency" to currency,
+                "from_account_type" to fromAccountType.name
+            )
+    }
+
+    class SendSubmitted(
+        private val currency: String,
+        private val feeType: AnalyticsFeeType,
+        private val fromAccountType: TxFlowAnalyticsAccountType,
+        private val toAccountType: TxFlowAnalyticsAccountType
+    ) : AnalyticsEvent {
+        override val event: String
+            get() = AnalyticsNames.SEND_SUBMITTED.name
+        override val params: Map<String, Serializable>
+            get() = mapOf(
+                "currency" to currency,
+                "feeType" to feeType.name,
+                "from_account_typed" to fromAccountType.name,
+                "to_account_type" to toAccountType.name
+            )
+    }
 }

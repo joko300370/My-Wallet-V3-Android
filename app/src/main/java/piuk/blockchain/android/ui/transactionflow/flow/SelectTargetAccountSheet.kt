@@ -49,6 +49,7 @@ class SelectTargetAccountSheet : TransactionFlowSheet<DialogSheetAccountSelector
     private fun doOnAccountSelected(account: BlockchainAccount) {
         require(account is SingleAccount)
         model.process(TransactionIntent.TargetAccountSelected(account))
+        analyticsHooks.onTargetAccountSelected(account, state)
     }
 
     private fun doOnLoadError(it: Throwable) {

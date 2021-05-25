@@ -138,6 +138,17 @@ sealed class SwapAnalyticsEvents(
             )
     }
 
+    class SwapTargetAccountSelected(private val currency: String, private val account: TxFlowAnalyticsAccountType) :
+        AnalyticsEvent {
+        override val event: String
+            get() = AnalyticsNames.SWAP_RECEIVE_SELECTED.eventName
+        override val params: Map<String, Serializable>
+            get() = mapOf(
+                "output_currency" to currency,
+                "output_type" to account.name
+            )
+    }
+
     class OnChainSwapRequested(
         private val exchangeRate: BigDecimal,
         private val amount: Money,

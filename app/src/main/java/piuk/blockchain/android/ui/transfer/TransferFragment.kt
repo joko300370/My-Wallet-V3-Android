@@ -7,8 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import com.blockchain.notifications.analytics.Analytics
 import kotlinx.android.synthetic.main.fragment_transfer.*
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.transfer.analytics.TransferAnalyticsEvent
 import piuk.blockchain.android.ui.transfer.receive.TransferReceiveFragment
 import piuk.blockchain.android.ui.transfer.send.TransferSendFragment
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -19,6 +22,8 @@ class TransferFragment : Fragment() {
     private val startingView: TransferViewType by unsafeLazy {
         arguments?.getSerializable(PARAM_START_VIEW) as? TransferViewType ?: TransferViewType.TYPE_SEND
     }
+
+    private val analytics: Analytics by inject()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,6 +47,7 @@ class TransferFragment : Fragment() {
                 TransferViewType.TYPE_RECEIVE -> TransferViewType.TYPE_RECEIVE.ordinal
             }, true
         )
+        analytics.logEvent(TransferAnalyticsEvent.TransferViewed)
     }
 
     companion object {

@@ -11,6 +11,7 @@ import com.blockchain.koin.payloadScope
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.service.TierService
+import com.blockchain.notifications.analytics.LaunchOrigin
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -34,6 +35,7 @@ import piuk.blockchain.android.ui.customviews.account.PendingBalanceAccountDecor
 import piuk.blockchain.android.ui.customviews.account.StatusDecorator
 import piuk.blockchain.android.ui.customviews.account.addViewToBottomWithConstraints
 import piuk.blockchain.android.ui.customviews.account.removePossibleBottomView
+import piuk.blockchain.android.ui.transfer.analytics.TransferAnalyticsEvent
 import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.setAssetIconColours
 import timber.log.Timber
@@ -160,6 +162,12 @@ class AssetActionsSheet :
                 ) {
                     logActionEvent(AssetDetailsAnalytics.SEND_CLICKED, asset)
                     processAction(AssetAction.Send)
+                    analytics.logEvent(
+                        TransferAnalyticsEvent.TransferClicked(
+                            LaunchOrigin.CURRENCY_PAGE,
+                            type = TransferAnalyticsEvent.AnalyticsTransferType.SEND
+                        )
+                    )
                 }
             AssetAction.Receive ->
                 AssetActionItem(
@@ -171,6 +179,12 @@ class AssetActionsSheet :
                 ) {
                     logActionEvent(AssetDetailsAnalytics.RECEIVE_CLICKED, asset)
                     processAction(AssetAction.Receive)
+                    analytics.logEvent(
+                        TransferAnalyticsEvent.TransferClicked(
+                            LaunchOrigin.CURRENCY_PAGE,
+                            type = TransferAnalyticsEvent.AnalyticsTransferType.SEND
+                        )
+                    )
                 }
             AssetAction.Swap -> AssetActionItem(
                 account, getString(R.string.common_swap),

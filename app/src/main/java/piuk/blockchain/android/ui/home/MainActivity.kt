@@ -93,6 +93,7 @@ import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.transactionflow.analytics.SwapAnalyticsEvents
 import piuk.blockchain.android.ui.transfer.TransferFragment
+import piuk.blockchain.android.ui.transfer.analytics.TransferAnalyticsEvent
 import piuk.blockchain.android.ui.transfer.receive.ReceiveSheet
 import piuk.blockchain.android.ui.upsell.UpsellHost
 import piuk.blockchain.android.ui.upsell.KycUpgradePromptManager
@@ -156,6 +157,12 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                         analytics.logEvent(BuySellClicked(origin = LaunchOrigin.NAVIGATION))
                     }
                     ITEM_TRANSFER -> {
+                        analytics.logEvent(
+                            TransferAnalyticsEvent.TransferClicked(
+                                origin = LaunchOrigin.NAVIGATION,
+                                type = TransferAnalyticsEvent.AnalyticsTransferType.RECEIVE
+                            )
+                        )
                         startTransferFragment()
                     }
                 }

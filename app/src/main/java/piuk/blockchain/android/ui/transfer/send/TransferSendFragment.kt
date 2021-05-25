@@ -16,6 +16,8 @@ import piuk.blockchain.android.ui.customviews.account.DefaultCellDecorator
 import piuk.blockchain.android.ui.home.HomeNavigator
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.ui.transactionflow.analytics.SendAnalyticsEvent
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalyticsAccountType
 import piuk.blockchain.android.ui.transfer.AccountSelectorFragment
 import piuk.blockchain.android.ui.transfer.analytics.TransferAnalyticsEvent
 
@@ -63,6 +65,14 @@ class TransferSendFragment : AccountSelectorFragment(), DialogFlow.FlowHost {
         require(account is CryptoAccount)
 
         analytics.logEvent(TransferAnalyticsEvent.SourceWalletSelected(account))
+        analytics.logEvent(
+            SendAnalyticsEvent.SendSourceAccountSelected(
+                currency = account.asset.networkTicker,
+                fromAccountType = TxFlowAnalyticsAccountType.fromAccount(
+                    account
+                )
+            )
+        )
         startTransactionFlow(account)
     }
 

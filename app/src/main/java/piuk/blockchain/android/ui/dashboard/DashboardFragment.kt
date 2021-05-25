@@ -65,6 +65,7 @@ import piuk.blockchain.android.ui.settings.BankLinkingHost
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.transactionflow.analytics.SwapAnalyticsEvents
+import piuk.blockchain.android.ui.transfer.analytics.TransferAnalyticsEvent
 import piuk.blockchain.android.util.launchUrlInBrowser
 import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.data.events.ActionEvent
@@ -518,7 +519,14 @@ class DashboardFragment :
 
         override fun startIntroTourGuide() = navigator().launchIntroTour()
 
-        override fun startTransferCrypto() = navigator().launchReceive()
+        override fun startTransferCrypto() {
+            analytics.logEvent(
+                TransferAnalyticsEvent.TransferClicked(
+                    origin = LaunchOrigin.DASHBOARD_PROMO, type = TransferAnalyticsEvent.AnalyticsTransferType.RECEIVE
+                )
+            )
+            navigator().launchReceive()
+        }
 
         override fun startStxReceivedDetail() =
             model.process(ShowDashboardSheet(DashboardNavigationAction.StxAirdropComplete))
@@ -550,6 +558,11 @@ class DashboardFragment :
         }
 
         override fun startSend() {
+            analytics.logEvent(
+                TransferAnalyticsEvent.TransferClicked(
+                    origin = LaunchOrigin.DASHBOARD_PROMO, type = TransferAnalyticsEvent.AnalyticsTransferType.SEND
+                )
+            )
             navigator().launchSend()
         }
 
@@ -609,7 +622,7 @@ class DashboardFragment :
         model.process(ClearBottomSheet)
     }
 
-    private fun launchNewSendFor(account: SingleAccount, action: AssetAction) {
+    private fun launchSendFor(account: SingleAccount, action: AssetAction) {
         if (account is CustodialTradingAccount) {
             model.process(CheckBackupStatus(account, action))
         } else {
@@ -620,7 +633,7 @@ class DashboardFragment :
     override fun performAssetActionFor(action: AssetAction, account: BlockchainAccount) {
         clearBottomSheet()
         when (action) {
-            AssetAction.Send -> launchNewSendFor(account as SingleAccount, action)
+            AssetAction.Send -> launchSendFor(account as SingleAccount, action)
             else -> navigator().performAssetActionFor(action, account)
         }
     }

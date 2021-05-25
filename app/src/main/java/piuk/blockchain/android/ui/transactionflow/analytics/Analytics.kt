@@ -86,6 +86,19 @@ class TxFlowAnalytics(
         }
     }
 
+    fun onTargetAccountSelected(account: BlockchainAccount, state: TransactionState) {
+        when (state.action) {
+            AssetAction.Swap -> analytics.logEvent(
+                SwapAnalyticsEvents.SwapTargetAccountSelected(
+                    (account as CryptoAccount).asset.networkTicker,
+                    TxFlowAnalyticsAccountType.fromAccount(account)
+                )
+            )
+            else -> {
+            }
+        }
+    }
+
     private fun triggerWithdrawScreenEvent(step: TransactionStep, currency: String) {
         when (step) {
             TransactionStep.SELECT_SOURCE,
@@ -181,6 +194,15 @@ class TxFlowAnalytics(
                     )
                 )
             }
+            AssetAction.Send -> {
+                require(account is CryptoAccount)
+                analytics.logEvent(
+                    SendAnalyticsEvent.SendSourceAccountSelected(
+                        currency = account.asset.networkTicker,
+                        fromAccountType = TxFlowAnalyticsAccountType.fromAccount(account)
+                    )
+                )
+            }
             else -> {
             }
         }
@@ -213,14 +235,23 @@ class TxFlowAnalytics(
     // Enter amount sheet
     fun onMaxClicked(state: TransactionState) {
         when (state.action) {
-            AssetAction.Send -> analytics.logEvent(SendAnalyticsEvent.SendMaxClicked)
+            AssetAction.Send -> {
+                analytics.logEvent(SendAnalyticsEvent.SendMaxClicked)
+                analytics.logEvent(
+                    SendAnalyticsEvent.SendAmountMaxClicked(
+                        currency = state.sendingAsset.networkTicker,
+                        toAccountType = TxFlowAnalyticsAccountType.fromAccount(state.sendingAccount),
+                        fromAccountType = TxFlowAnalyticsAccountType.fromTransactionTarget(state.selectedTarget)
+                    )
+                )
+            }
             AssetAction.Swap -> {
                 check(state.selectedTarget is CryptoAccount)
                 analytics.logEvent(
                     SwapAnalyticsEvents.SwapMaxAmountClicked(
                         sourceCurrency = state.sendingAsset.toString(),
                         sourceAccountType = TxFlowAnalyticsAccountType.fromAccount(state.sendingAccount),
-                        targetAccountType = TxFlowAnalyticsAccountType.fromAccount(state.selectedTarget),
+                        targetAccountType = TxFlowAnalyticsAccountType.fromTransactionTarget(state.selectedTarget),
                         targetCurrency = state.selectedTarget.asset.toString()
                     )
                 )
@@ -283,7 +314,7 @@ class TxFlowAnalytics(
     // Confirm sheet
     fun onConfirmationCtaClick(state: TransactionState) {
         when (state.action) {
-            AssetAction.Send ->
+            AssetAction.Send -> {
                 analytics.logEvent(
                     SendAnalyticsEvent.ConfirmTransaction(
                         asset = state.sendingAsset,
@@ -292,6 +323,16 @@ class TxFlowAnalytics(
                         feeLevel = state.pendingTx?.feeSelection?.selectedLevel.toString()
                     )
                 )
+                analytics.logEvent(
+                    SendAnalyticsEvent.SendSubmitted(
+                        currency = state.sendingAsset.networkTicker,
+                        feeType = state.pendingTx?.feeSelection?.selectedLevel?.toAnalyticsFee()
+                            ?: AnalyticsFeeType.NONE,
+                        fromAccountType = TxFlowAnalyticsAccountType.fromAccount(state.sendingAccount),
+                        toAccountType = TxFlowAnalyticsAccountType.fromTransactionTarget(state.selectedTarget)
+                    )
+                )
+            }
             AssetAction.InterestDeposit ->
                 analytics.logEvent(
                     InterestDepositAnalyticsEvent.ConfirmationsCtaClick(
@@ -472,15 +513,35 @@ fun TransactionTarget.toCategory(): String =
     }
 
 enum class TxFlowAnalyticsAccountType {
-    TRADING, USERKEY;
+    TRADING, USERKEY, SAVINGS, EXTERNAL;
 
     companion object {
-        fun fromAccount(account: BlockchainAccount): TxFlowAnalyticsAccountType {
-            return if (account is TradingAccount || account is InterestAccount || account is BankAccount)
-                TRADING
-            else USERKEY
+        fun fromAccount(account: BlockchainAccount): TxFlowAnalyticsAccountType =
+            when (account) {
+                is TradingAccount,
+                is BankAccount -> TRADING
+                is InterestAccount -> SAVINGS
+                else -> USERKEY
+            }
+
+        fun fromTransactionTarget(transactionTarget: TransactionTarget): TxFlowAnalyticsAccountType {
+            (transactionTarget as? BlockchainAccount)?.let {
+                return fromAccount(it)
+            } ?: return EXTERNAL
         }
     }
+}
+
+private fun FeeLevel.toAnalyticsFee(): AnalyticsFeeType =
+    when (this) {
+        FeeLevel.Custom -> AnalyticsFeeType.CUSTOM
+        FeeLevel.Regular -> AnalyticsFeeType.NORMAL
+        FeeLevel.None -> AnalyticsFeeType.NONE
+        FeeLevel.Priority -> AnalyticsFeeType.PRIORITY
+    }
+
+enum class AnalyticsFeeType {
+    CUSTOM, NORMAL, PRIORITY, NONE
 }
 
 class AmountSwitched(private val action: AssetAction, private val newInput: CurrencyType) : AnalyticsEvent {
