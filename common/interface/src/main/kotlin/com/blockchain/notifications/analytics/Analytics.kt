@@ -28,7 +28,11 @@ interface AnalyticsEvent {
     val event: String
     val params: Map<String, Serializable>
     val origin: LaunchOrigin?
-    get() = null
+        get() = null
+}
+
+interface TxFlowAnalyticsEvent {
+    val flowType: String
 }
 
 sealed class NotificationAnalytics(

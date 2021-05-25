@@ -90,6 +90,7 @@ class SelectSourceAccountSheet : TransactionFlowSheet<DialogSheetAccountSelector
         binding.apply {
             accountList.onAccountSelected = {
                 model.process(TransactionIntent.SourceAccountSelected(it))
+                analyticsHooks.onSourceAccountSelected(it, state)
             }
             accountListBack.setOnClickListener {
                 model.process(TransactionIntent.ReturnToPreviousStep)
