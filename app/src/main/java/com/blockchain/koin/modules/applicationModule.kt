@@ -388,7 +388,6 @@ val applicationModule = module {
         scoped {
             QrScanResultProcessor(
                 bitPayDataManager = get(),
-                internalFlags = get(),
                 mwaFeatureFlag = get(mwaFeatureFlag)
             )
         }

@@ -33,8 +33,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
-import com.blockchain.featureflags.GatedFeature
-import com.blockchain.featureflags.InternalFeatureFlagApi
+import com.blockchain.koin.mwaFeatureFlag
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.Bank
 import com.blockchain.nabu.datamanagers.PaymentMethod
@@ -46,6 +45,7 @@ import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.ui.urllinks.URL_PRIVACY_POLICY
 import com.blockchain.ui.urllinks.URL_TOS_POLICY
 import com.google.android.play.core.review.ReviewInfo
@@ -56,6 +56,7 @@ import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.util.PasswordUtil
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.schedulers.Schedulers
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
@@ -186,7 +187,9 @@ class SettingsFragment : PreferenceFragmentCompat(),
     private val analytics: Analytics by inject()
     private val rxBus: RxBus by inject()
     private val formatChecker: FormatChecker by inject()
-    private val internalFlags: InternalFeatureFlagApi by inject()
+    private val mwaFF: FeatureFlag by inject(mwaFeatureFlag)
+
+    private var isMWAEnabled: Boolean = false
 
     private var pwStrength = 0
     private var progressDialog: MaterialProgressDialog? = null
@@ -204,6 +207,15 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
         analytics.logEvent(AnalyticsEvents.Settings)
         Logging.logContentView(javaClass.simpleName)
+
+        val compositeDisposable = mwaFF.enabled.observeOn(Schedulers.io()).subscribe(
+            { result ->
+                isMWAEnabled = result
+            },
+            {
+                isMWAEnabled = false
+            }
+        )
 
         initReviews()
     }
@@ -243,7 +255,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
         thePit.onClick { settingsPresenter.onThePitClicked() }
         thePit?.isVisible = true
 
-        qrConnectPref?.isVisible = internalFlags.isFeatureEnabled(GatedFeature.MODERN_AUTH_PAIRING)
+        qrConnectPref?.isVisible = isMWAEnabled
         qrConnectPref.onClick { PairingBottomSheet().show(childFragmentManager, BOTTOM_SHEET) }
 
         // Preferences

@@ -1,7 +1,5 @@
 package piuk.blockchain.android.ui.auth.newlogin
 
-import com.blockchain.featureflags.GatedFeature
-import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.Authorization
 import com.blockchain.preferences.BrowserIdentity
@@ -23,8 +21,7 @@ class AuthNewLoginModel(
     crashLogger: CrashLogger,
     private val secureChannelManager: SecureChannelManager,
     private val secureChannelPrefs: SecureChannelPrefs,
-    private val walletApi: WalletApi,
-    private val internalFlags: InternalFeatureFlagApi
+    private val walletApi: WalletApi
 ) : MviModel<AuthNewLoginState, AuthNewLoginIntents>(initialState, mainScheduler, environmentConfig, crashLogger) {
 
     override fun performAction(previousState: AuthNewLoginState, intent: AuthNewLoginIntents): Disposable? {
@@ -74,8 +71,7 @@ class AuthNewLoginModel(
                 process(
                     AuthNewLoginIntents.EnableApproval(
                         enableApproval = isAuthorized(previousState.browserIdentity, previousState.message) ||
-                            previousState.ip == it ||
-                            internalFlags.isFeatureEnabled(GatedFeature.MODERN_AUTH_ENABLE_APPROVAL)
+                            previousState.ip == it
                     )
                 )
             },

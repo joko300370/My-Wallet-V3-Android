@@ -3,8 +3,6 @@ package piuk.blockchain.android.scan
 import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.appcompat.app.AlertDialog
-import com.blockchain.featureflags.GatedFeature
-import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.payloadScope
 import com.blockchain.remoteconfig.FeatureFlag
 import info.blockchain.balance.CryptoCurrency
@@ -64,7 +62,6 @@ class QrScanError(val errorCode: ErrorCode, msg: String) : Exception(msg) {
 
 class QrScanResultProcessor(
     private val bitPayDataManager: BitPayDataManager,
-    private val internalFlags: InternalFeatureFlagApi,
     mwaFeatureFlag: FeatureFlag
 ) {
     private var isMWAEnabled: Boolean = false
@@ -87,7 +84,7 @@ class QrScanResultProcessor(
                 .map {
                     ScanResult.TxTarget(setOf(it), isDeeplinked)
                 }
-            isAuthEnabled() && scanResult.isJson() -> Single.just(ScanResult.SecuredChannelLogin(scanResult))
+            isMWAEnabled && scanResult.isJson() -> Single.just(ScanResult.SecuredChannelLogin(scanResult))
             else -> {
                 val addressParser: AddressFactory = payloadScope.get()
                 addressParser.parse(scanResult)
@@ -101,8 +98,6 @@ class QrScanResultProcessor(
                     }
             }
         }
-
-    private fun isAuthEnabled() = internalFlags.isFeatureEnabled(GatedFeature.MODERN_AUTH_PAIRING) && isMWAEnabled
 
     private fun parseBitpayInvoice(bitpayUri: String): Single<CryptoTarget> =
         BitPayInvoiceTarget.fromLink(CryptoCurrency.BTC, bitpayUri, bitPayDataManager)

@@ -4,8 +4,6 @@ import android.app.LauncherActivity
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
-import com.blockchain.featureflags.GatedFeature
-import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.mwaFeatureFlag
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.NotificationTokenManager
@@ -38,7 +36,6 @@ class FcmCallbackService : FirebaseMessagingService() {
     private val accessState: AccessState by scopedInject()
     private val analytics: Analytics by inject()
     private val secureChannelManager: SecureChannelManager by scopedInject()
-    private val internalFlags: InternalFeatureFlagApi by inject()
     private val mwaFF: FeatureFlag by inject(mwaFeatureFlag)
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
@@ -139,7 +136,6 @@ class FcmCallbackService : FirebaseMessagingService() {
         payload.type == NotificationPayload.NotificationType.SECURE_CHANNEL_MESSAGE
 
     private fun createSecureChannelIntent(payload: MutableMap<String, String>, foreground: Boolean): Maybe<Intent> {
-        if (internalFlags.isFeatureEnabled(GatedFeature.MODERN_AUTH_PAIRING)) {
             val pubKeyHash = payload[NotificationPayload.PUB_KEY_HASH]
                 ?: return Maybe.empty()
             val messageRawEncrypted = payload[NotificationPayload.DATA_MESSAGE]
@@ -163,9 +159,6 @@ class FcmCallbackService : FirebaseMessagingService() {
                     }
                 }
             )
-        } else {
-            return Maybe.empty()
-        }
     }
 
     /**

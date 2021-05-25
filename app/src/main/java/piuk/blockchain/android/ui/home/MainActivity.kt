@@ -18,8 +18,7 @@ import androidx.fragment.app.Fragment
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem
 import com.blockchain.extensions.exhaustive
-import com.blockchain.featureflags.GatedFeature
-import com.blockchain.featureflags.InternalFeatureFlagApi
+import com.blockchain.koin.mwaFeatureFlag
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.NotificationsUtil
 import com.blockchain.notifications.analytics.AnalyticsEvents
@@ -29,6 +28,7 @@ import com.blockchain.notifications.analytics.RequestAnalyticsEvents
 import com.blockchain.notifications.analytics.SendAnalytics
 import com.blockchain.notifications.analytics.TransactionsAnalyticsEvents
 import com.blockchain.notifications.analytics.activityShown
+import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_SUPPORT_PORTAL
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import info.blockchain.balance.CryptoCurrency
@@ -36,6 +36,7 @@ import info.blockchain.balance.FiatValue
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar_general.*
@@ -116,7 +117,9 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     override val presenter: MainPresenter by scopedInject()
     private val qrProcessor: QrScanResultProcessor by scopedInject()
     private val assetResources: AssetResources by scopedInject()
-    private val internalFlags: InternalFeatureFlagApi by inject()
+    private val mwaFF: FeatureFlag by inject(mwaFeatureFlag)
+
+    private var isMWAEnabled: Boolean = false
 
     override val view: MainView = this
 
@@ -242,6 +245,14 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 )
             }
         }
+        val compositeDisposable = mwaFF.enabled.observeOn(Schedulers.io()).subscribe(
+            { result ->
+                isMWAEnabled = result
+            },
+            {
+                isMWAEnabled = false
+            }
+        )
     }
 
     override fun onResume() {
@@ -384,7 +395,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 ACCOUNT_EDIT
             )
             R.id.login_web_wallet -> {
-                if (internalFlags.isFeatureEnabled(GatedFeature.MODERN_AUTH_PAIRING)) {
+                if (isMWAEnabled) {
                     QrScanActivity.start(this, QrExpected.MAIN_ACTIVITY_QR)
                 } else {
                     showBottomSheet(PairingBottomSheet())
