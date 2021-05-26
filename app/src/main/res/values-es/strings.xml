@@ -157,7 +157,7 @@
     <string name="remote_save_ko">Error al guardar</string>
     <string name="change_pin_code">Cambiar PIN</string>
     <string name="drawer_addresses">Direcciones</string>
-    <string name="wallets">Billeteras</string>
+    <string name="common_wallets">Billeteras</string>
     <string name="save_name">Guardar nombre</string>
     <string name="receive_address_to_clipboard">Copie esta dirección de recepción en el portapapeles? Si es así,
  Tenga en cuenta que otras aplicaciones pueden ver esta información. 

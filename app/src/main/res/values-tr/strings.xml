@@ -158,7 +158,7 @@
     <string name="remote_save_ko">Başarısız kaydet</string>
     <string name="change_pin_code">Pin\'i değiştir</string>
     <string name="drawer_addresses">Adresler</string>
-    <string name="wallets">cüzdan</string>
+    <string name="common_wallets">cüzdan</string>
     <string name="save_name">Adı kaydet</string>
     <string name="receive_address_to_clipboard">Bu alma adresi panoya kopyalansın mı? Öyleyse,
  diğer uygulamaların bu bilgilere bakabileceğini unutmayın. 

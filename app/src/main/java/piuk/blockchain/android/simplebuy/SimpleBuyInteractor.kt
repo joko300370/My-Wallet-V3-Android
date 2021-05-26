@@ -32,7 +32,6 @@ import com.blockchain.preferences.BankLinkingPrefs
 import com.blockchain.ui.trackProgress
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
-import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -117,22 +116,20 @@ class SimpleBuyInteractor(
             SimpleBuyIntent.OrderCreated(it)
         }
 
-    fun createRecurringBuyOrder(
-        amount: Money,
-        currency: String,
-        paymentMethodId: String,
-        paymentMethodType: PaymentMethodType,
-        frequency: RecurringBuyFrequency
-    ): Single<RecurringBuyOrder> {
-        return if (isRecurringBuyEnabled && frequency != RecurringBuyFrequency.ONE_TIME) {
+    fun createRecurringBuyOrder(state: SimpleBuyState): Single<RecurringBuyOrder> {
+        return if (isRecurringBuyEnabled) {
+            require(state.order.amount != null) { "createRecurringBuyOrder amount is null" }
+            require(state.selectedCryptoCurrency != null) { "createRecurringBuyOrder selected crypto is null" }
+            require(state.selectedPaymentMethod != null) { "createRecurringBuyOrder selected payment method is null" }
+
             custodialWalletManager.createRecurringBuyOrder(
                 RecurringBuyRequestBody(
-                    inputValue = amount.toBigInteger().toString(),
-                    inputCurrency = amount.currencyCode,
-                    destinationCurrency = currency,
-                    paymentMethod = paymentMethodType.name,
-                    period = frequency.name,
-                    beneficiaryId = paymentMethodId
+                    inputValue = state.order.amount?.toBigDecimal().toString(),
+                    inputCurrency = state.order.amount?.currencyCode.toString(),
+                    destinationCurrency = state.selectedCryptoCurrency.networkTicker,
+                    paymentMethod = state.selectedPaymentMethod.paymentMethodType.name,
+                    period = state.recurringBuyFrequency.name,
+                    beneficiaryId = state.selectedPaymentMethod.id
                 )
             )
         } else {

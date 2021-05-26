@@ -9,7 +9,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.ActivityRecurringBuyOnBoardingBinding
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 
-class RecurringBuyOnBoardingActivity : AppCompatActivity() {
+class RecurringBuyOnboardingActivity : AppCompatActivity() {
 
     private val binding: ActivityRecurringBuyOnBoardingBinding by lazy {
         ActivityRecurringBuyOnBoardingBinding.inflate(layoutInflater)

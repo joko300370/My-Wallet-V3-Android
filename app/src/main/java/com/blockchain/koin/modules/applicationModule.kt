@@ -448,7 +448,8 @@ val applicationModule = module {
             AssetDetailsInteractor(
                 interestFeatureFlag = get(interestAccountFeatureFlag),
                 dashboardPrefs = get(),
-                coincore = get()
+                coincore = get(),
+                custodialWalletManager = get()
             )
         }
 

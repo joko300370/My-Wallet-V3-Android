@@ -1,49 +1,69 @@
-package piuk.blockchain.android.ui.dashboard.assetdetails
+package piuk.blockchain.android.ui.dashboard.assetdetails.delegates
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.balance.Money
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AccountGroup
-import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.CryptoAsset
-import piuk.blockchain.android.databinding.DialogDashboardAssetLabelItemBinding
 import piuk.blockchain.android.databinding.ViewAccountCryptoOverviewBinding
+import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.customviews.account.addViewToBottomWithConstraints
+import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsItem
+import piuk.blockchain.android.ui.dashboard.assetdetails.selectFirstAccount
 import piuk.blockchain.android.util.context
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
-import kotlin.properties.Delegates
+import piuk.blockchain.android.util.visibleIf
 
-data class AssetDetailItem(
-    val assetFilter: AssetFilter,
-    val account: BlockchainAccount,
-    val balance: Money,
-    val fiatBalance: Money,
-    val actions: Set<AssetAction>,
-    val interestRate: Double
-)
+class AssetDetailsDelegate(
+    private val onAccountSelected: (BlockchainAccount, AssetFilter) -> Unit,
+    private val disposable: CompositeDisposable,
+    private val block: AssetDetailsInfoDecorator,
+    private val labels: DefaultLabels
+) : AdapterDelegate<AssetDetailsItem> {
+    override fun isForViewType(items: List<AssetDetailsItem>, position: Int): Boolean =
+        items[position] is AssetDetailsItem.CryptoDetailsInfo
 
-class AssetDetailViewHolder(private val binding: ViewAccountCryptoOverviewBinding, private val labels: DefaultLabels) :
-    RecyclerView.ViewHolder(binding.root) {
+    override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
+        AssetWalletViewHolder(
+            ViewAccountCryptoOverviewBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            onAccountSelected,
+            disposable,
+            block,
+            labels
+        )
 
-    fun bind(
-        item: AssetDetailItem,
-        onAccountSelected: (BlockchainAccount, AssetFilter) -> Unit,
-        disposable: CompositeDisposable,
-        block: AssetDetailsDecorator
-    ) {
+    override fun onBindViewHolder(
+        items: List<AssetDetailsItem>,
+        position: Int,
+        holder: RecyclerView.ViewHolder
+    ) = (holder as AssetWalletViewHolder).bind(
+        items[position] as AssetDetailsItem.CryptoDetailsInfo,
+        items.indexOfFirst { it is AssetDetailsItem.CryptoDetailsInfo } == position
+    )
+}
+
+private class AssetWalletViewHolder(
+    private val binding: ViewAccountCryptoOverviewBinding,
+    private val onAccountSelected: (BlockchainAccount, AssetFilter) -> Unit,
+    private val disposable: CompositeDisposable,
+    private val block: AssetDetailsInfoDecorator,
+    private val labels: DefaultLabels
+) : RecyclerView.ViewHolder(binding.root) {
+
+    fun bind(item: AssetDetailsItem.CryptoDetailsInfo, isFirstItemOfCategory: Boolean) {
         with(binding) {
+            walletHeaderGroup.visibleIf { isFirstItemOfCategory }
+
             val asset = getAsset(item.account, item.balance.currencyCode)
 
             assetSubtitle.text = when (item.assetFilter) {
@@ -110,78 +130,4 @@ class AssetDetailViewHolder(private val binding: ViewAccountCryptoOverviewBindin
         } ?: throw IllegalStateException("Unsupported account type ${this::class.java}")
 }
 
-class LabelViewHolder(private val binding: DialogDashboardAssetLabelItemBinding) :
-    RecyclerView.ViewHolder(binding.root) {
-    fun bind(token: CryptoAsset) {
-        binding.assetLabelDescription.text = when (token.asset) {
-            CryptoCurrency.ALGO -> context.getString(R.string.algorand_asset_label)
-            CryptoCurrency.DOT -> context.getString(R.string.polkadot_asset_label)
-            else -> ""
-        }
-    }
-}
-
-internal class AssetDetailAdapter(
-    private val onAccountSelected: (BlockchainAccount, AssetFilter) -> Unit,
-    private val showBanner: Boolean,
-    private val token: CryptoAsset,
-    private val labels: DefaultLabels,
-    private val assetDetailsDecorator: AssetDetailsDecorator
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val compositeDisposable = CompositeDisposable()
-
-    var itemList: List<AssetDetailItem> by Delegates.observable(emptyList()) { _, oldValue, newValue ->
-        if (oldValue != newValue) {
-            notifyDataSetChanged()
-        }
-    }
-
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView)
-        compositeDisposable.clear()
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
-        if (viewType == TYPE_CRYPTO) {
-            AssetDetailViewHolder(
-                ViewAccountCryptoOverviewBinding.inflate(LayoutInflater.from(parent.context), parent, false), labels
-            )
-        } else {
-            LabelViewHolder(
-                DialogDashboardAssetLabelItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            )
-        }
-
-    override fun getItemCount(): Int = if (showBanner) itemList.size + 1 else itemList.size
-
-    override fun getItemViewType(position: Int): Int =
-        if (showBanner) {
-            if (position >= itemList.size) {
-                TYPE_LABEL
-            } else {
-                TYPE_CRYPTO
-            }
-        } else {
-            TYPE_CRYPTO
-        }
-
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is AssetDetailViewHolder) {
-            holder.bind(
-                itemList[position],
-                onAccountSelected,
-                compositeDisposable,
-                assetDetailsDecorator
-            )
-        } else {
-            (holder as LabelViewHolder).bind(token)
-        }
-    }
-
-    companion object {
-        private const val TYPE_CRYPTO = 0
-        private const val TYPE_LABEL = 1
-    }
-}
-
-typealias AssetDetailsDecorator = (AssetDetailItem) -> CellDecorator
+typealias AssetDetailsInfoDecorator = (AssetDetailsItem.CryptoDetailsInfo) -> CellDecorator

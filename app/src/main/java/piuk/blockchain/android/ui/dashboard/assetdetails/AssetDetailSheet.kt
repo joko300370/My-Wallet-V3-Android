@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,9 +9,10 @@ import android.widget.Toast
 import androidx.annotation.UiThread
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.scopedInject
-import piuk.blockchain.android.simplebuy.CustodialBalanceClicked
+import com.blockchain.nabu.models.data.RecurringBuy
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.wallet.DefaultLabels
 import com.github.mikephil.charting.charts.LineChart
@@ -32,18 +34,21 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.databinding.DialogSheetDashboardAssetDetailsBinding
+import piuk.blockchain.android.simplebuy.CustodialBalanceClicked
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.account.PendingBalanceAccountDecorator
+import piuk.blockchain.android.ui.dashboard.assetdetails.delegates.AssetDetailAdapterDelegate
 import piuk.blockchain.android.ui.dashboard.setDeltaColour
-import piuk.blockchain.android.util.loadInterMedium
-import piuk.blockchain.androidcore.data.exchangerate.PriceSeries
-import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
+import piuk.blockchain.android.ui.recurringbuy.RecurringBuyOnboardingActivity
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.invisible
-import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.loadInterMedium
 import piuk.blockchain.android.util.setOnTabSelectedListener
+import piuk.blockchain.android.util.visible
+import piuk.blockchain.androidcore.data.exchangerate.PriceSeries
+import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 import java.math.RoundingMode
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -63,6 +68,7 @@ class AssetDetailSheet : MviBottomSheet<AssetDetailsModel,
     }
 
     private val assetSelect: Coincore by scopedInject()
+    private val internalFlags: InternalFeatureFlagApi by inject()
 
     private val assetResources: AssetResources by scopedInject()
 
@@ -70,13 +76,31 @@ class AssetDetailSheet : MviBottomSheet<AssetDetailsModel,
         assetSelect[cryptoCurrency]
     }
 
+    private val isRecurringBuyEnabled: Boolean by lazy {
+        internalFlags.isFeatureEnabled(GatedFeature.RECURRING_BUYS)
+    }
+
+    private val listItems = mutableListOf<AssetDetailsItem>()
+
     private val detailsAdapter by lazy {
         AssetDetailAdapter(
             ::onAccountSelected,
             cryptoCurrency.hasFeature(CryptoCurrency.CUSTODIAL_ONLY),
             token,
-            assetResources,
             labels
+        ) {
+            PendingBalanceAccountDecorator(it.account)
+        }
+    }
+
+    private val adapterDelegate by lazy {
+        AssetDetailAdapterDelegate(
+            ::onAccountSelected,
+            token,
+            labels,
+            ::openOnboardingForRecurringBuy,
+            ::onRecurringBuyClicked,
+            assetResources
         ) {
             PendingBalanceAccountDecorator(it.account)
         }
@@ -91,12 +115,18 @@ class AssetDetailSheet : MviBottomSheet<AssetDetailsModel,
 
     @UiThread
     override fun render(newState: AssetDetailsState) {
+        clearList()
+
         if (newState.errorState != AssetDetailsError.NONE) {
             handleErrorState(newState.errorState)
         }
 
         newState.assetDisplayMap?.let { assetDisplayMap ->
             onGotAssetDetails(assetDisplayMap)
+        }
+
+        newState.recurringBuys?.let {
+            renderRecurringBuys(it)
         }
 
         binding.currentPrice.text = newState.assetFiatPrice
@@ -122,6 +152,7 @@ class AssetDetailSheet : MviBottomSheet<AssetDetailsModel,
 
     override fun initControls(binding: DialogSheetDashboardAssetDetailsBinding) {
         model.process(LoadAsset(token))
+
         with(binding) {
             configureChart(
                 chart,
@@ -135,15 +166,13 @@ class AssetDetailSheet : MviBottomSheet<AssetDetailsModel,
                 getString(R.string.dashboard_price_for_asset, cryptoCurrency.displayTicker)
 
             assetList.apply {
-                adapter = detailsAdapter
-
-                layoutManager = LinearLayoutManager(requireContext())
+                adapter = if (isRecurringBuyEnabled) {
+                    adapterDelegate
+                } else {
+                    detailsAdapter
+                }
                 addItemDecoration(BlockchainListDividerDecor(requireContext()))
             }
-
-            model.process(LoadAssetDisplayDetails)
-            model.process(LoadAssetFiatValue)
-            model.process(LoadHistoricPrices)
         }
     }
 
@@ -152,53 +181,139 @@ class AssetDetailSheet : MviBottomSheet<AssetDetailsModel,
         model.process(ClearSheetDataIntent)
     }
 
+    private fun openOnboardingForRecurringBuy() {
+        val intent = Intent(requireActivity(), RecurringBuyOnboardingActivity::class.java)
+        startActivity(intent)
+    }
+
+    private fun onRecurringBuyClicked(recurringBuy: RecurringBuy) {
+        clearList()
+        // TODO in next story
+    }
+
+    private fun clearList() {
+        listItems.clear()
+        updateList()
+    }
+
+    private fun updateList() {
+        adapterDelegate.items = listItems
+        adapterDelegate.notifyDataSetChanged()
+    }
+
+    private fun renderRecurringBuys(recurringBuys: Map<String, RecurringBuy>) {
+        if (recurringBuys.keys.isNotEmpty()) {
+            val recurringBuysItems = recurringBuys.values.map {
+                AssetDetailsItem.RecurringBuyInfo(
+                    it
+                )
+            }
+            listItems.addAll(recurringBuysItems)
+        } else {
+            listItems.add(AssetDetailsItem.RecurringBuyBanner)
+        }
+
+        updateList()
+    }
+
     private fun onGotAssetDetails(assetDetails: AssetDisplayMap) {
+        if (isRecurringBuyEnabled) {
+            val itemList = mutableListOf<AssetDetailsItem>()
 
-        val itemList = mutableListOf<AssetDetailItem>()
-
-        assetDetails[AssetFilter.NonCustodial]?.let {
-            itemList.add(
-                AssetDetailItem(
-                    assetFilter = AssetFilter.NonCustodial,
-                    account = it.account,
-                    balance = it.amount,
-                    fiatBalance = it.fiatValue,
-                    actions = it.actions,
-                    interestRate = it.interestRate
+            assetDetails[AssetFilter.NonCustodial]?.let {
+                itemList.add(
+                    AssetDetailsItem.CryptoDetailsInfo(
+                        assetFilter = AssetFilter.NonCustodial,
+                        account = it.account,
+                        balance = it.amount,
+                        fiatBalance = it.fiatValue,
+                        actions = it.actions,
+                        interestRate = it.interestRate
+                    )
                 )
-            )
-        }
+            }
 
-        assetDetails[AssetFilter.Custodial]?.let {
-            itemList.add(
-                AssetDetailItem(
-                    assetFilter = AssetFilter.Custodial,
-                    account = it.account,
-                    balance = it.amount,
-                    fiatBalance = it.fiatValue,
-                    actions = it.actions,
-                    interestRate = it.interestRate
+            assetDetails[AssetFilter.Custodial]?.let {
+                itemList.add(
+                    AssetDetailsItem.CryptoDetailsInfo(
+                        assetFilter = AssetFilter.Custodial,
+                        account = it.account,
+                        balance = it.amount,
+                        fiatBalance = it.fiatValue,
+                        actions = it.actions,
+                        interestRate = it.interestRate
+                    )
                 )
-            )
-        }
+            }
 
-        assetDetails[AssetFilter.Interest]?.let {
-            itemList.add(
-                AssetDetailItem(
-                    assetFilter = AssetFilter.Interest,
-                    account = it.account,
-                    balance = it.amount,
-                    fiatBalance = it.fiatValue,
-                    actions = it.actions,
-                    interestRate = it.interestRate
+            assetDetails[AssetFilter.Interest]?.let {
+                itemList.add(
+                    AssetDetailsItem.CryptoDetailsInfo(
+                        assetFilter = AssetFilter.Interest,
+                        account = it.account,
+                        balance = it.amount,
+                        fiatBalance = it.fiatValue,
+                        actions = it.actions,
+                        interestRate = it.interestRate
+                    )
                 )
-            )
-        }
+            }
 
-        detailsAdapter.itemList = itemList
+            if (cryptoCurrency.hasFeature(CryptoCurrency.CUSTODIAL_ONLY)) {
+                listItems.add(0, AssetDetailsItem.AssetLabel)
+            }
+
+            listItems.addAll(0, itemList)
+            updateList()
+        } else {
+            val itemList = mutableListOf<AssetDetailItem>()
+
+            assetDetails[AssetFilter.NonCustodial]?.let {
+                itemList.add(
+                    AssetDetailItem(
+                        assetFilter = AssetFilter.NonCustodial,
+                        account = it.account,
+                        balance = it.amount,
+                        fiatBalance = it.fiatValue,
+                        actions = it.actions,
+                        interestRate = it.interestRate
+                    )
+                )
+            }
+
+            assetDetails[AssetFilter.Custodial]?.let {
+                itemList.add(
+                    AssetDetailItem(
+                        assetFilter = AssetFilter.Custodial,
+                        account = it.account,
+                        balance = it.amount,
+                        fiatBalance = it.fiatValue,
+                        actions = it.actions,
+                        interestRate = it.interestRate
+                    )
+                )
+            }
+
+            assetDetails[AssetFilter.Interest]?.let {
+                itemList.add(
+                    AssetDetailItem(
+                        assetFilter = AssetFilter.Interest,
+                        account = it.account,
+                        balance = it.amount,
+                        fiatBalance = it.fiatValue,
+                        actions = it.actions,
+                        interestRate = it.interestRate
+                    )
+                )
+            }
+
+            detailsAdapter.itemList = itemList
+        }
     }
 
     private fun onAccountSelected(account: BlockchainAccount, assetFilter: AssetFilter) {
+        clearList()
+
         if (account is CryptoAccount && assetFilter == AssetFilter.Custodial) {
             analytics.logEvent(CustodialBalanceClicked(account.asset))
         }

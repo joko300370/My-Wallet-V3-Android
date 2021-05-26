@@ -9,9 +9,10 @@ import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.UndefinedPaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
-import com.blockchain.nabu.datamanagers.custodialwalletimpl.RecurringBuyState
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
+import com.blockchain.nabu.models.data.RecurringBuyFrequency
+import com.blockchain.nabu.models.data.RecurringBuyState
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
@@ -339,7 +340,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     class OrderCreated(
         private val buyOrder: BuySellOrder,
         private val showInAppRating: Boolean = false,
-        private val recurringBuyState: RecurringBuyState = RecurringBuyState.NOT_INITIALISED
+        private val recurringBuyState: RecurringBuyState = RecurringBuyState.UNINITIALISED
     ) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(

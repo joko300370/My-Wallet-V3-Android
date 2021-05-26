@@ -5,7 +5,6 @@ import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.LiveCustodialWalletManager
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
-import com.blockchain.nabu.datamanagers.custodialwalletimpl.RecurringBuyState
 import com.blockchain.nabu.datamanagers.repositories.interest.Eligibility
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestLimits
 import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
@@ -15,6 +14,8 @@ import com.blockchain.nabu.models.data.CryptoWithdrawalFeeAndLimit
 import com.blockchain.nabu.models.data.FiatWithdrawalFeeAndLimit
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
+import com.blockchain.nabu.models.data.RecurringBuy
+import com.blockchain.nabu.models.data.RecurringBuyState
 import com.blockchain.nabu.models.responses.interest.InterestActivityItemResponse
 import com.blockchain.nabu.models.responses.interest.InterestAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
@@ -280,6 +281,8 @@ interface CustodialWalletManager {
     val defaultFiatCurrency: String
 
     fun getRecurringBuyEligibility(): Single<List<PaymentMethodType>>
+
+    fun getRecurringBuysForAsset(assetTicker: String): Single<List<RecurringBuy>>
 }
 
 data class InterestActivityItem(
@@ -771,5 +774,5 @@ data class SimplifiedDueDiligenceUserState(
 )
 
 data class RecurringBuyOrder(
-    val state: RecurringBuyState = RecurringBuyState.NOT_INITIALISED
+    val state: RecurringBuyState = RecurringBuyState.UNINITIALISED
 )

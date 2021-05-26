@@ -47,7 +47,7 @@ class InternalAccountsHeaderDelegate(
             features: InternalFeatureFlagApi,
             listener: AccountAdapter.Listener
         ) {
-            header.setText(R.string.wallets)
+            header.setText(R.string.common_wallets)
 
             if (item.enableCreate && features.isFeatureEnabled(GatedFeature.ADD_SUB_WALLET_ADDRESSES)) {
                 itemView.setOnClickListener { listener.onCreateNewClicked() }

@@ -3,6 +3,7 @@ package piuk.blockchain.android.simplebuy
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import com.blockchain.nabu.models.data.RecurringBuyFrequency
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.DialogSheetRecurringBuyBinding
 import piuk.blockchain.android.ui.base.HostedBottomSheet
@@ -49,6 +50,7 @@ class RecurringBuySelectionBottomSheet : SlidingModalBottomDialog<DialogSheetRec
             RecurringBuyFrequency.WEEKLY -> R.id.rb_weekly
             RecurringBuyFrequency.BI_WEEKLY -> R.id.rb_bi_weekly
             RecurringBuyFrequency.MONTHLY -> R.id.rb_monthly
+            RecurringBuyFrequency.UNKNOWN -> R.id.rb_one_time
         }
 
     private fun idToInterval(checkedId: Int) =

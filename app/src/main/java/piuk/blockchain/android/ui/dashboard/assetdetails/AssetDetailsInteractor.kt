@@ -1,5 +1,7 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.models.data.RecurringBuy
 import com.blockchain.preferences.DashboardPrefs
 import com.blockchain.remoteconfig.FeatureFlag
 import info.blockchain.balance.CryptoCurrency
@@ -19,7 +21,26 @@ import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 
 typealias AssetDisplayMap = Map<AssetFilter, AssetDisplayInfo>
-// FIXME this won't support anything recurring buy related - refactor
+
+sealed class AssetDetailsItem {
+    data class CryptoDetailsInfo(
+        val assetFilter: AssetFilter,
+        val account: BlockchainAccount,
+        val balance: Money,
+        val fiatBalance: Money,
+        val actions: Set<AssetAction>,
+        val interestRate: Double = Double.NaN
+    ) : AssetDetailsItem()
+
+    data class RecurringBuyInfo(
+        val recurringBuy: RecurringBuy
+    ) : AssetDetailsItem()
+
+    object AssetLabel : AssetDetailsItem()
+
+    object RecurringBuyBanner : AssetDetailsItem()
+}
+
 data class AssetDisplayInfo(
     val account: BlockchainAccount,
     val amount: Money,
@@ -32,7 +53,8 @@ data class AssetDisplayInfo(
 class AssetDetailsInteractor(
     private val interestFeatureFlag: FeatureFlag,
     private val dashboardPrefs: DashboardPrefs,
-    private val coincore: Coincore
+    private val coincore: Coincore,
+    private val custodialWalletManager: CustodialWalletManager
 ) {
 
     fun loadAssetDetails(asset: CryptoAsset) =
@@ -84,7 +106,6 @@ class AssetDetailsInteractor(
             }.toMaybe()
         }.toSingle(Details.NoDetails)
 
-    // TODO load recurring buy information here to present to the bottom sheet
     private fun getAssetDisplayDetails(asset: CryptoAsset): Single<AssetDisplayMap> {
         return Singles.zip(
             asset.exchangeRate(),
@@ -145,4 +166,7 @@ class AssetDetailsInteractor(
             )
         }
     }
+
+    fun loadRecurringBuysForAsset(assetTicker: String) =
+        custodialWalletManager.getRecurringBuysForAsset(assetTicker)
 }

@@ -121,7 +121,8 @@ val nabuModule = module {
                 bankLinkingEnabledProvider = get(),
                 transactionErrorMapper = get(),
                 currencyPrefs = get(),
-                recurringBuysRepository = get()
+                recurringBuysRepository = get(),
+                features = get()
             )
         }.bind(CustodialWalletManager::class)
 

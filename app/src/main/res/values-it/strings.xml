@@ -158,7 +158,7 @@
     <string name="remote_save_ko">Salvataggio fallito</string>
     <string name="change_pin_code">Cambia PIN</string>
     <string name="drawer_addresses">indirizzi</string>
-    <string name="wallets">Portafogli</string>
+    <string name="common_wallets">Portafogli</string>
     <string name="save_name">Salva nome</string>
     <string name="receive_address_to_clipboard">Copia questo indirizzo di ricezione negli Appunti? Se è così,
  essere informato che altre applicazioni potrebbero essere in grado di guardare queste informazioni. 

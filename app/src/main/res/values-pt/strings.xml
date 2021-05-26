@@ -158,7 +158,7 @@
     <string name="remote_save_ko">Salvar sem êxito</string>
     <string name="change_pin_code">Alterar PIN</string>
     <string name="drawer_addresses">Endereços</string>
-    <string name="wallets">Carteiras</string>
+    <string name="common_wallets">Carteiras</string>
     <string name="save_name">Salvar nome</string>
     <string name="receive_address_to_clipboard">Copiar este endereço de recebimento para a área de transferência? Se então,
  esteja ciente de que outros aplicativos poderão examinar essas informações. 

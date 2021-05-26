@@ -8,8 +8,8 @@ import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.RecurringBuyOrder
 import com.blockchain.nabu.datamanagers.UndefinedPaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
-import com.blockchain.nabu.datamanagers.custodialwalletimpl.RecurringBuyState
 import com.blockchain.nabu.models.data.BankPartner.Companion.YAPILY_DEEPLINK_PAYMENT_APPROVAL_URL
+import com.blockchain.nabu.models.data.RecurringBuyState
 import com.blockchain.nabu.models.responses.nabu.NabuApiException
 import com.blockchain.nabu.models.responses.nabu.NabuErrorCodes
 import com.blockchain.nabu.models.responses.simplebuy.EverypayPaymentAttrs
@@ -293,14 +293,14 @@ class SimpleBuyModel(
                 .map { intent to it }
                 .onErrorReturn { intent to emptyList() }
         }.subscribeBy(
-            onSuccess = { (intent, eligibility) ->
-                process(SimpleBuyIntent.RecurringBuyEligibilityUpdated(eligibility))
-                process(intent)
-            },
-            onError = {
-                process(SimpleBuyIntent.ErrorIntent())
-            }
-        )
+                onSuccess = { (intent, eligibility) ->
+                    process(SimpleBuyIntent.RecurringBuyEligibilityUpdated(eligibility))
+                    process(intent)
+                },
+                onError = {
+                    process(SimpleBuyIntent.ErrorIntent())
+                }
+            )
 
     private fun handleOrderAttrs(order: BuySellOrder) {
         order.attributes?.everypay?.let {
@@ -333,17 +333,7 @@ class SimpleBuyModel(
             },
             isBankPayment
         ).flatMap { buySellOrder ->
-            interactor.createRecurringBuyOrder(
-                amount = previousState.order.amount ?: throw IllegalStateException("amount exception"),
-                frequency = previousState.recurringBuyFrequency,
-                paymentMethodId = previousState.selectedPaymentMethod?.id ?: throw IllegalStateException(
-                    "selectedPaymentMethod exception"
-                ),
-                paymentMethodType = previousState.selectedPaymentMethod.paymentMethodType,
-                currency = previousState.selectedCryptoCurrency?.networkTicker ?: throw IllegalStateException(
-                    "selectedCryptoCurrency exception"
-                )
-            )
+            interactor.createRecurringBuyOrder(previousState)
                 .map { buySellOrder to it }
                 .onErrorReturn { buySellOrder to RecurringBuyOrder(RecurringBuyState.NOT_ACTIVE) }
         }.subscribeBy(

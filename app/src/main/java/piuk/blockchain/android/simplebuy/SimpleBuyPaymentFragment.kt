@@ -16,9 +16,9 @@ import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
-import com.blockchain.nabu.datamanagers.custodialwalletimpl.RecurringBuyState
 import com.blockchain.nabu.models.data.BankPartner
 import com.blockchain.nabu.models.data.LinkedBank
+import com.blockchain.nabu.models.data.RecurringBuyState
 import com.blockchain.preferences.RatingPrefs
 import com.blockchain.ui.urllinks.URL_SUPPORT_BALANCE_LOCKED
 import com.google.android.play.core.review.ReviewInfo
@@ -215,7 +215,8 @@ class SimpleBuyPaymentFragment :
                     getString(
                         R.string.recurring_buy_payment_message,
                         newState.order.amount?.toStringWithSymbol(),
-                        newState.recurringBuyFrequency.mapToString(requireContext()).toLowerCase(Locale.getDefault()),
+                        newState.recurringBuyFrequency.toHumanReadableRecurringBuy(requireContext())
+                            .toLowerCase(Locale.getDefault()),
                         getString(assetResources.assetNameRes(newState.orderValue.currency)),
                         newState.selectedCryptoCurrency?.networkTicker
                     )

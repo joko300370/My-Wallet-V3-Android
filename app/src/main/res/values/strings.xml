@@ -42,6 +42,8 @@
     <string name="common_approve">Approve</string>
     <string name="common_deny">Deny</string>
     <string name="common_payment">Payment</string>
+    <string name="common_unknown">Unknown</string>
+    <string name="common_wallets">Wallets</string>
 
     <plurals name="transfer_label_plural">
         <item quantity="one">1 imported address</item>
@@ -231,7 +233,6 @@
     <string name="change_pin_code">Change PIN</string>
     <string name="drawer_addresses">Addresses</string>
 
-    <string name="wallets">Wallets</string>
     <string name="save_name">Save name</string>
     <string name="receive_address_to_clipboard">Copy this receive address to the clipboard? If so,
         be advised that other applications may be able to look at this information.
@@ -2118,5 +2119,11 @@
     <string name="recurring_buy_cta_alert">OK</string>
     <string name="recurring_buy_payment_message">You’ll be charged %1$s %2$s for the market equivalent of %3$s. You can manage your Recurring Buy from the %4$s Wallets &amp; Accounts Page.</string>
     <string name="recurring_buy_creation_error">Error creating your Recurring Buy. Please try again.</string>
-
+    <string name="dashboard_title_recurring_buy">Unsure when to buy?</string>
+    <string name="dashboard_recurring_buy_description">Timing the market is hard, which is why many investors use dollar cost averaging.</string>
+    <string name="dashboard_recurring_buy_learn_more">Learn more →</string>
+    <string name="dashboard_recurring_buy_item_title">Buy %1$s in %2$s %3$s</string>
+    <string name="dashboard_recurring_buy_item_label">Next buy: %1$s</string>
+    <string name="dashboard_recurring_buy_item_label_error">Low balance. Add Funds</string>
+    <string name="dashboard_recurring_buy_title">Recurring buys</string>
 </resources>

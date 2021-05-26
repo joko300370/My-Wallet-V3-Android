@@ -158,7 +158,7 @@
     <string name="remote_save_ko">Сохранить неудачно</string>
     <string name="change_pin_code">Изменить PIN</string>
     <string name="drawer_addresses">Адреса</string>
-    <string name="wallets">Кошельки</string>
+    <string name="common_wallets">Кошельки</string>
     <string name="save_name">Сохранить имя</string>
     <string name="receive_address_to_clipboard">Скопировать этот получаемый адрес в буфер обмена? Если так,
  Имейте в виду, что другие приложения могут просматривать эту информацию. 

@@ -158,7 +158,7 @@
     <string name="remote_save_ko">Enregistrement infructueux</string>
     <string name="change_pin_code">Modifier le code PIN</string>
     <string name="drawer_addresses">Adresses</string>
-    <string name="wallets">Portefeuilles</string>
+    <string name="common_wallets">Portefeuilles</string>
     <string name="save_name">Enregistrer le nom</string>
     <string name="receive_address_to_clipboard">Copiez cette adresse de réception dans le presse-papiers? Si c\'est le cas,
  sachez que d\'autres applications peuvent consulter ces informations. 

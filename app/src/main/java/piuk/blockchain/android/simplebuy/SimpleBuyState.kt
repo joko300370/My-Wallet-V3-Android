@@ -7,9 +7,10 @@ import com.blockchain.nabu.datamanagers.Partner
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
-import com.blockchain.nabu.datamanagers.custodialwalletimpl.RecurringBuyState
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
+import com.blockchain.nabu.models.data.RecurringBuyFrequency
+import com.blockchain.nabu.models.data.RecurringBuyState
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
@@ -63,7 +64,7 @@ data class SimpleBuyState(
     @Transient val confirmationActionRequested: Boolean = false,
     @Transient val newPaymentMethodToBeAdded: PaymentMethod? = null,
     val recurringBuyFrequency: RecurringBuyFrequency = RecurringBuyFrequency.ONE_TIME,
-    val recurringBuyState: RecurringBuyState = RecurringBuyState.NOT_INITIALISED,
+    val recurringBuyState: RecurringBuyState = RecurringBuyState.UNINITIALISED,
     @Transient private val recurringBuyEligiblePaymentMethods: List<PaymentMethodType> = emptyList()
 ) : MviState {
 
@@ -179,14 +180,6 @@ enum class KycState {
     VERIFIED_BUT_NOT_ELIGIBLE;
 
     fun verified() = this == VERIFIED_AND_ELIGIBLE || this == VERIFIED_BUT_NOT_ELIGIBLE
-}
-
-enum class RecurringBuyFrequency {
-    ONE_TIME,
-    DAILY,
-    WEEKLY,
-    BI_WEEKLY,
-    MONTHLY
 }
 
 enum class FlowScreen {

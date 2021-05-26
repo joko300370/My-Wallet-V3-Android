@@ -372,9 +372,9 @@ class NabuService(retrofit: Retrofit) {
         sessionToken: NabuSessionTokenResponse,
         product: String,
         paymentMethod: String
-    ) =
-        service.getWithdrawFeeAndLimits(sessionToken.authHeader, product, paymentMethod)
-            .wrapErrorMessage()
+    ) = service.getWithdrawFeeAndLimits(
+        sessionToken.authHeader, product, paymentMethod
+    ).wrapErrorMessage()
 
     internal fun fetchWithdrawLocksRules(
         sessionToken: NabuSessionTokenResponse,
@@ -721,6 +721,14 @@ class NabuService(retrofit: Retrofit) {
         sessionToken: NabuSessionTokenResponse
     ) = service.getRecurringBuyEligibility(
         authorization = sessionToken.authHeader
+    ).wrapErrorMessage()
+
+    fun getRecurringBuysForAsset(
+        sessionToken: NabuSessionTokenResponse,
+        assetTicker: String
+    ) = service.getRecurringBuysForAsset(
+        authorization = sessionToken.authHeader,
+        assetTicker = assetTicker
     ).wrapErrorMessage()
 
     companion object {

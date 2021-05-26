@@ -17,6 +17,7 @@ import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.UndefinedPaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.models.data.RecurringBuyFrequency
 import com.blockchain.preferences.CurrencyPrefs
 import com.bumptech.glide.Glide
 import info.blockchain.balance.CryptoCurrency
@@ -202,7 +203,7 @@ class SimpleBuyCryptoFragment :
                 .setPositiveButton(R.string.recurring_buy_cta_alert) { dialog, _ ->
                     val interval = RecurringBuyFrequency.ONE_TIME
                     model.process(SimpleBuyIntent.RecurringBuyIntervalUpdated(interval))
-                    binding.recurringBuyCta.text = interval.mapToString(requireContext())
+                    binding.recurringBuyCta.text = interval.toHumanReadableRecurringBuy(requireContext())
                     dialog.dismiss()
                 }
                 .create()
@@ -523,7 +524,7 @@ class SimpleBuyCryptoFragment :
 
     override fun onIntervalSelected(interval: RecurringBuyFrequency) {
         model.process(SimpleBuyIntent.RecurringBuyIntervalUpdated(interval))
-        binding.recurringBuyCta.text = interval.mapToString(requireContext())
+        binding.recurringBuyCta.text = interval.toHumanReadableRecurringBuy(requireContext())
     }
 
     override fun onSheetClosed() {
@@ -615,13 +616,14 @@ class SimpleBuyCryptoFragment :
     }
 }
 
-fun RecurringBuyFrequency.mapToString(context: Context): String {
+fun RecurringBuyFrequency.toHumanReadableRecurringBuy(context: Context): String {
     return when (this) {
         RecurringBuyFrequency.ONE_TIME -> context.getString(R.string.recurring_buy_one_time_short)
         RecurringBuyFrequency.DAILY -> context.getString(R.string.recurring_buy_daily)
         RecurringBuyFrequency.WEEKLY -> context.getString(R.string.recurring_buy_weekly)
         RecurringBuyFrequency.BI_WEEKLY -> context.getString(R.string.recurring_buy_bi_weekly)
         RecurringBuyFrequency.MONTHLY -> context.getString(R.string.recurring_buy_monthly)
+        else -> context.getString(R.string.common_unknown)
     }
 }
 

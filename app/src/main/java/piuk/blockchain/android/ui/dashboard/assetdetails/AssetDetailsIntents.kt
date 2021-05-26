@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
+import com.blockchain.nabu.models.data.RecurringBuy
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.prices.data.PriceDatum
 import piuk.blockchain.android.coincore.AssetAction
@@ -14,8 +15,7 @@ sealed class AssetDetailsIntent : MviIntent<AssetDetailsState>
 class ShowAssetActionsIntent(
     val account: BlockchainAccount
 ) : AssetDetailsIntent() {
-    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
-        oldState
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState = oldState
 }
 
 class AccountActionsLoaded(
@@ -39,18 +39,6 @@ class LoadAsset(
             asset = asset,
             assetDisplayMap = mapOf()
         )
-}
-
-object LoadAssetDisplayDetails : AssetDetailsIntent() {
-    override fun reduce(oldState: AssetDetailsState): AssetDetailsState = oldState
-}
-
-object LoadAssetFiatValue : AssetDetailsIntent() {
-    override fun reduce(oldState: AssetDetailsState): AssetDetailsState = oldState
-}
-
-object LoadHistoricPrices : AssetDetailsIntent() {
-    override fun reduce(oldState: AssetDetailsState): AssetDetailsState = oldState
 }
 
 class UpdateTimeSpan(
@@ -123,6 +111,20 @@ object AssetExchangeRateFailed : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(
             errorState = AssetDetailsError.NO_EXCHANGE_RATE
+        )
+}
+
+class RecurringBuyDataLoaded(private val items: Map<String, RecurringBuy>) : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(
+            recurringBuys = items
+        )
+}
+
+object RecurringBuyDataFailed : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(
+            errorState = AssetDetailsError.NO_RECURRING_BUYS
         )
 }
 

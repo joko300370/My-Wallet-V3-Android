@@ -1,5 +1,7 @@
 package com.blockchain.nabu.datamanagers.custodialwalletimpl
 
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.Authenticator
 import com.blockchain.nabu.datamanagers.ApprovalErrorStatus
 import com.blockchain.nabu.datamanagers.Bank
@@ -54,6 +56,7 @@ import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
 import com.blockchain.nabu.models.data.LinkedBankErrorState
 import com.blockchain.nabu.models.data.LinkedBankState
+import com.blockchain.nabu.models.data.RecurringBuy
 import com.blockchain.nabu.models.responses.banktransfer.BankInfoResponse
 import com.blockchain.nabu.models.responses.banktransfer.BankMediaResponse.Companion.ICON
 import com.blockchain.nabu.models.responses.banktransfer.BankTransferChargeAttributes
@@ -82,11 +85,12 @@ import com.blockchain.nabu.models.responses.simplebuy.BuySellOrderResponse
 import com.blockchain.nabu.models.responses.simplebuy.ConfirmOrderRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
 import com.blockchain.nabu.models.responses.simplebuy.ProductTransferRequestBody
-import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyResponse
 import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyConfirmationAttributes
 import com.blockchain.nabu.models.responses.simplebuy.TransactionResponse
 import com.blockchain.nabu.models.responses.simplebuy.TransferRequest
+import com.blockchain.nabu.models.responses.simplebuy.toRecurringBuy
+import com.blockchain.nabu.models.responses.simplebuy.toRecurringBuyOrder
 import com.blockchain.nabu.models.responses.swap.CreateOrderRequest
 import com.blockchain.nabu.models.responses.swap.CustodialOrderResponse
 import com.blockchain.nabu.models.responses.tokenresponse.NabuSessionTokenResponse
@@ -127,7 +131,8 @@ class LiveCustodialWalletManager(
     private val sddFeatureFlag: FeatureFlag,
     private val bankLinkingEnabledProvider: BankLinkingEnabledProvider,
     private val transactionErrorMapper: TransactionErrorMapper,
-    private val recurringBuysRepository: RecurringBuyRepository
+    private val recurringBuysRepository: RecurringBuyRepository,
+    private val features: InternalFeatureFlagApi
 ) : CustodialWalletManager {
 
     override val defaultFiatCurrency: String
@@ -653,6 +658,19 @@ class LiveCustodialWalletManager(
         }
 
     override fun getRecurringBuyEligibility() = recurringBuysRepository.getRecurringBuyEligibleMethods()
+
+    override fun getRecurringBuysForAsset(assetTicker: String): Single<List<RecurringBuy>> =
+        if (features.isFeatureEnabled(GatedFeature.RECURRING_BUYS)) {
+            authenticator.authenticate { sessionToken ->
+                nabuService.getRecurringBuysForAsset(sessionToken, assetTicker).map { list ->
+                    list.mapNotNull {
+                        it.toRecurringBuy()
+                    }
+                }
+            }
+        } else {
+            Single.just(emptyList())
+        }
 
     override fun addNewCard(
         fiatCurrency: String,
@@ -1440,24 +1458,6 @@ enum class CardStatus {
     EXPIRED
 }
 
-enum class RecurringBuyState {
-    ACTIVE,
-    NOT_ACTIVE,
-    NOT_INITIALISED
-}
-
-private fun RecurringBuyResponse.recurringBuyState() =
-    when (state) {
-        RecurringBuyResponse.ACTIVE -> RecurringBuyState.ACTIVE
-        RecurringBuyResponse.NOT_ACTIVE -> RecurringBuyState.NOT_ACTIVE
-        else -> throw IllegalStateException("Unsupported recurring state")
-    }
-
-private fun RecurringBuyResponse.toRecurringBuyOrder(): RecurringBuyOrder =
-    RecurringBuyOrder(
-        state = recurringBuyState()
-    )
-
 private fun BuySellOrderResponse.type() =
     when (side) {
         "BUY" -> OrderType.BUY
@@ -1523,7 +1523,7 @@ private fun String.toApprovalError(): ApprovalErrorStatus =
         else -> ApprovalErrorStatus.UNKNOWN
     }
 
-private fun String.toPaymentMethodType(): PaymentMethodType =
+fun String.toPaymentMethodType(): PaymentMethodType =
     when (this) {
         PaymentMethodResponse.PAYMENT_CARD -> PaymentMethodType.PAYMENT_CARD
         PaymentMethodResponse.BANK_TRANSFER -> PaymentMethodType.BANK_TRANSFER

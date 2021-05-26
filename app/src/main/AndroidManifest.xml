@@ -174,7 +174,7 @@
             android:name=".ui.linkbank.BankAuthActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.recurringbuy.RecurringBuyOnBoardingActivity"
+            android:name=".ui.recurringbuy.RecurringBuyOnboardingActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <meta-data

@@ -17,6 +17,7 @@ import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.models.data.RecurringBuyFrequency
 import com.blockchain.ui.urllinks.ORDER_PRICE_EXPLANATION
 import com.blockchain.ui.urllinks.PRIVATE_KEY_EXPLANATION
 import com.blockchain.utils.to12HourFormat
@@ -298,7 +299,7 @@ class SimpleBuyCheckoutFragment :
             if (state.recurringBuyFrequency != RecurringBuyFrequency.ONE_TIME) {
                 SimpleBuyCheckoutItem.ComplexCheckoutItem(
                     getString(R.string.recurring_buy_frequency_label),
-                    state.recurringBuyFrequency.mapToString(requireContext()),
+                    state.recurringBuyFrequency.toHumanReadableRecurringBuy(requireContext()),
                     buildSubtitleRecurringBuy(state.recurringBuyFrequency)
                 )
             } else null,
@@ -306,7 +307,6 @@ class SimpleBuyCheckoutFragment :
                 getString(R.string.purchase),
                 state.order.amount.addStringWithSymbolOrDefault(state.fiatCurrency)
             ),
-
             buildPaymentFee(
                 state, StringUtils.getStringWithMappedAnnotations(
                     requireContext(),
@@ -314,7 +314,6 @@ class SimpleBuyCheckoutFragment :
                     linksMap
                 )
             ),
-
             SimpleBuyCheckoutItem.SimpleCheckoutItem(
                 getString(R.string.common_total),
                 (state.order.amount?.plus(state.fee ?: FiatValue.zero(state.fiatCurrency)) as? FiatValue)
@@ -361,7 +360,8 @@ class SimpleBuyCheckoutFragment :
                     )
                 }
             }
-            RecurringBuyFrequency.ONE_TIME -> ""
+            RecurringBuyFrequency.ONE_TIME,
+            RecurringBuyFrequency.UNKNOWN -> ""
         }
     }
 

@@ -47,7 +47,7 @@ class RecurringBuyRepository(
         cacheLifetimeSeconds = CACHE_LIFETIME,
         refreshFn = {
             recurringBuyEligibilityProvider.getRecurringBuyEligibility()
-                .doOnSuccess { Timber.d("Recurring Eligibility response: $it") }
+                .doOnSuccess { Timber.d("Recurring buy eligibility response: $it") }
         }
     )
 

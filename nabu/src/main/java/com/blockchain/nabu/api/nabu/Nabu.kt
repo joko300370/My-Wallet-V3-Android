@@ -555,4 +555,10 @@ internal interface Nabu {
         @Header("authorization") authorization: String,
         @Body recurringBuyBody: RecurringBuyRequestBody
     ): Single<RecurringBuyResponse>
+
+    @GET(NABU_RECURRING_BUY_LIST)
+    fun getRecurringBuysForAsset(
+        @Header("authorization") authorization: String,
+        @Query("currency") assetTicker: String
+    ): Single<List<RecurringBuyResponse>>
 }
