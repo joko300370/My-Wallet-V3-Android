@@ -16,6 +16,7 @@ import org.json.JSONObject
 import org.web3j.crypto.Hash
 import org.web3j.utils.Numeric
 import java.math.BigInteger
+import java.util.Locale
 import java.util.regex.Pattern
 import javax.annotation.Nonnull
 
@@ -139,7 +140,7 @@ object FormatsUtil {
         address: String
     ) = isValidLegacyBtcAddress(address) || isValidBech32BtcAddress(address)
 
-    fun isValidLegacyBtcAddress(
+    private fun isValidLegacyBtcAddress(
         address: String
     ): Boolean = try {
         val networkParam = MainNetParams.get()
@@ -149,7 +150,7 @@ object FormatsUtil {
         false
     }
 
-    fun isValidBech32BtcAddress(
+    private fun isValidBech32BtcAddress(
         address: String
     ): Boolean = try {
         val networkParam = MainNetParams.get()
@@ -217,7 +218,11 @@ object FormatsUtil {
 
     private fun validateChecksumEthereumAddress(address: String): Boolean {
         val addr = address.replace("0x", "")
-        val hash = Numeric.toHexStringNoPrefix(Hash.sha3(addr.toLowerCase().toByteArray()))
+        val hash = Numeric.toHexStringNoPrefix(
+            Hash.sha3(
+                addr.toLowerCase(Locale.ROOT).toByteArray()
+            )
+        )
         for (i in 0..39) {
             if (Character.isLetter(addr[i])) {
                 // each uppercase letter should correlate with a first bit of 1 in the hash
