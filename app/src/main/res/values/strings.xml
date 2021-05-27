@@ -2029,7 +2029,7 @@
     <string name="kyc_upsell_custodial_dlg_body">Get access to the Trading Account in seconds by completing your profile and getting Silver access.</string>
     <string name="kyc_upsell_custodial_dlg_item_title_1">Verify Your Email</string>
     <string name="kyc_upsell_custodial_dlg_item_body_1">Confirm your email address to protect your Blockchain.com Wallet.</string>
-    <string name="kyc_upsell_custodial_dlg_item_title_2"><![CDATA[Add Your Name & Address]]></string>
+    <string name="kyc_upsell_custodial_dlg_item_title_2">Add Your Name &amp; Address</string>
     <string name="kyc_upsell_custodial_dlg_item_body_2">We need to know your name and address to comply with local laws.</string>
     <string name="kyc_upsell_custodial_dlg_item_title_3">Use the Trading Account</string>
     <string name="kyc_upsell_custodial_dlg_item_body_3">Receive, Buy and Swap cryptocurrencies with your Trading Account.</string>
