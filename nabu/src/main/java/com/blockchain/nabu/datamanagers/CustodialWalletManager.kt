@@ -138,6 +138,8 @@ interface CustodialWalletManager {
 
     fun getAllOrdersFor(crypto: CryptoCurrency): Single<BuyOrderList>
 
+    fun getRecurringBuyOrdersFor(crypto: CryptoCurrency): Single<RecurringBuyTransactions>
+
     fun getBuyOrder(orderId: String): Single<BuySellOrder>
 
     fun deleteBuyOrder(orderId: String): Completable
@@ -367,6 +369,7 @@ enum class ApprovalErrorStatus {
 }
 
 typealias BuyOrderList = List<BuySellOrder>
+typealias RecurringBuyTransactions = List<RecurringBuyTransaction>
 
 data class OrderInput(private val symbol: String, private val amount: String? = null)
 
@@ -413,6 +416,13 @@ enum class TransactionType {
 enum class TransactionState {
     COMPLETED,
     PENDING,
+    UNKNOWN
+}
+
+enum class RecurringBuyActivityState {
+    PENDING,
+    FAILED,
+    COMPLETED,
     UNKNOWN
 }
 
@@ -775,4 +785,13 @@ data class SimplifiedDueDiligenceUserState(
 
 data class RecurringBuyOrder(
     val state: RecurringBuyState = RecurringBuyState.UNINITIALISED
+)
+
+data class RecurringBuyTransaction(
+    val id: String,
+    val recurringBuyId: String,
+    val state: RecurringBuyActivityState,
+    val originMoney: Money,
+    val destinationValue: CryptoValue,
+    val insertedAt: Date
 )

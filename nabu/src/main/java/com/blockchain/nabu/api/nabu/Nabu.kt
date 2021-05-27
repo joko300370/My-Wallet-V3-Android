@@ -55,6 +55,7 @@ import com.blockchain.nabu.models.responses.simplebuy.ProductTransferRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyResponse
 import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyEligibilityResponse
 import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyRequestBody
+import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyTransactionResponse
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyBalanceResponse
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyConfirmationAttributes
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyCurrency
@@ -559,6 +560,14 @@ internal interface Nabu {
     @GET(NABU_RECURRING_BUY_LIST)
     fun getRecurringBuysForAsset(
         @Header("authorization") authorization: String,
-        @Query("currency") assetTicker: String
+        @Query("currency") assetTicker: String? = null
     ): Single<List<RecurringBuyResponse>>
+
+    @GET(NABU_RECURRING_BUY_TRANSACTIONS)
+    fun fetchRecurringBuysTransactions(
+        @Header("authorization") authorization: String,
+        @Query("recurringBuyId") recurringBuyId: String? = null,
+        @Query("currency") assetTicker: String? = null,
+        @Query("limit") limit: Int? = null
+    ): Single<List<RecurringBuyTransactionResponse>>
 }

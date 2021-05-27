@@ -5,6 +5,7 @@ import com.blockchain.nabu.datamanagers.InterestState
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.CustodialOrderState
+import com.blockchain.nabu.datamanagers.RecurringBuyActivityState
 import com.blockchain.nabu.datamanagers.TransactionState
 import com.blockchain.nabu.datamanagers.TransactionType
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
@@ -100,6 +101,19 @@ data class TradeActivitySummaryItem(
     override fun totalFiatWhenExecuted(selectedFiat: String): Single<Money> = Single.just(fiatValue)
 }
 
+data class RecurringBuyActivitySummaryItem(
+    override val exchangeRates: ExchangeRateDataManager,
+    override val cryptoCurrency: CryptoCurrency,
+    override val txId: String,
+    override val timeStampMs: Long,
+    override val value: Money,
+    override val account: SingleAccount,
+    val destinationValue: Money,
+    val state: RecurringBuyActivityState
+) : CryptoActivitySummaryItem() {
+    override fun totalFiatWhenExecuted(selectedFiat: String): Single<Money> = Single.just(value)
+}
+
 data class CustodialInterestActivitySummaryItem(
     override val exchangeRates: ExchangeRateDataManager,
     override val cryptoCurrency: CryptoCurrency,
@@ -115,8 +129,8 @@ data class CustodialInterestActivitySummaryItem(
 ) : CryptoActivitySummaryItem() {
     fun isPending(): Boolean =
         status == InterestState.PENDING ||
-                status == InterestState.PROCESSING ||
-                status == InterestState.MANUAL_REVIEW
+            status == InterestState.PROCESSING ||
+            status == InterestState.MANUAL_REVIEW
 }
 
 data class CustodialTradingActivitySummaryItem(
@@ -153,16 +167,16 @@ abstract class NonCustodialActivitySummaryItem : CryptoActivitySummaryItem() {
     open var note: String? = null
 
     override fun toString(): String = "cryptoCurrency = $cryptoCurrency" +
-            "transactionType  = $transactionType " +
-            "timeStamp  = $timeStampMs " +
-            "total  = ${value.toStringWithSymbol()} " +
-            "txId (hash)  = $txId " +
-            "inputsMap  = $inputsMap " +
-            "outputsMap  = $outputsMap " +
-            "confirmations  = $confirmations " +
-            "doubleSpend  = $doubleSpend " +
-            "isPending  = $isPending " +
-            "note = $note"
+        "transactionType  = $transactionType " +
+        "timeStamp  = $timeStampMs " +
+        "total  = ${value.toStringWithSymbol()} " +
+        "txId (hash)  = $txId " +
+        "inputsMap  = $inputsMap " +
+        "outputsMap  = $outputsMap " +
+        "confirmations  = $confirmations " +
+        "doubleSpend  = $doubleSpend " +
+        "isPending  = $isPending " +
+        "note = $note"
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -170,17 +184,17 @@ abstract class NonCustodialActivitySummaryItem : CryptoActivitySummaryItem() {
         val that = other as NonCustodialActivitySummaryItem?
 
         return this.cryptoCurrency == that?.cryptoCurrency &&
-                this.transactionType == that.transactionType &&
-                this.timeStampMs == that.timeStampMs &&
-                this.value == that.value &&
-                this.txId == that.txId &&
-                this.inputsMap == that.inputsMap &&
-                this.outputsMap == that.outputsMap &&
-                this.confirmations == that.confirmations &&
-                this.doubleSpend == that.doubleSpend &&
-                this.isFeeTransaction == that.isFeeTransaction &&
-                this.isPending == that.isPending &&
-                this.note == that.note
+            this.transactionType == that.transactionType &&
+            this.timeStampMs == that.timeStampMs &&
+            this.value == that.value &&
+            this.txId == that.txId &&
+            this.inputsMap == that.inputsMap &&
+            this.outputsMap == that.outputsMap &&
+            this.confirmations == that.confirmations &&
+            this.doubleSpend == that.doubleSpend &&
+            this.isFeeTransaction == that.isFeeTransaction &&
+            this.isPending == that.isPending &&
+            this.note == that.note
     }
 
     override fun hashCode(): Int {

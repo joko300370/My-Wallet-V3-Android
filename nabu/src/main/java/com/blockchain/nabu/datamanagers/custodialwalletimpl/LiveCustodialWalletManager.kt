@@ -31,6 +31,7 @@ import com.blockchain.nabu.datamanagers.PaymentLimits
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.Product
 import com.blockchain.nabu.datamanagers.RecurringBuyOrder
+import com.blockchain.nabu.datamanagers.RecurringBuyTransaction
 import com.blockchain.nabu.datamanagers.SimplifiedDueDiligenceUserState
 import com.blockchain.nabu.datamanagers.TransactionErrorMapper
 import com.blockchain.nabu.datamanagers.TransactionState
@@ -91,6 +92,7 @@ import com.blockchain.nabu.models.responses.simplebuy.TransactionResponse
 import com.blockchain.nabu.models.responses.simplebuy.TransferRequest
 import com.blockchain.nabu.models.responses.simplebuy.toRecurringBuy
 import com.blockchain.nabu.models.responses.simplebuy.toRecurringBuyOrder
+import com.blockchain.nabu.models.responses.simplebuy.toRecurringBuyTransaction
 import com.blockchain.nabu.models.responses.swap.CreateOrderRequest
 import com.blockchain.nabu.models.responses.swap.CustodialOrderResponse
 import com.blockchain.nabu.models.responses.tokenresponse.NabuSessionTokenResponse
@@ -665,6 +667,21 @@ class LiveCustodialWalletManager(
                 nabuService.getRecurringBuysForAsset(sessionToken, assetTicker).map { list ->
                     list.mapNotNull {
                         it.toRecurringBuy()
+                    }
+                }
+            }
+        } else {
+            Single.just(emptyList())
+        }
+
+    override fun getRecurringBuyOrdersFor(crypto: CryptoCurrency): Single<List<RecurringBuyTransaction>> =
+        if (features.isFeatureEnabled(GatedFeature.RECURRING_BUYS)) {
+            authenticator.authenticate { sessionToken ->
+                nabuService.getRecurringBuysTransactions(
+                    sessionToken, crypto.networkTicker
+                ).map { list ->
+                    list.map {
+                        it.toRecurringBuyTransaction()
                     }
                 }
             }
@@ -1389,7 +1406,7 @@ private fun String.toCryptoCurrencyPair(): CurrencyPair.CryptoCurrencyPair? {
     return CurrencyPair.CryptoCurrencyPair(source, destination)
 }
 
-private fun String.toTransactionState(): TransactionState =
+fun String.toTransactionState(): TransactionState =
     when (this) {
         TransactionResponse.COMPLETE -> TransactionState.COMPLETED
         TransactionResponse.PENDING,

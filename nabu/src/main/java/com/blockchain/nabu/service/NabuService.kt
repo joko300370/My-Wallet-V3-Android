@@ -731,6 +731,14 @@ class NabuService(retrofit: Retrofit) {
         assetTicker = assetTicker
     ).wrapErrorMessage()
 
+    fun getRecurringBuysTransactions(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String? = null
+    ) = service.fetchRecurringBuysTransactions(
+        authorization = sessionToken.authHeader,
+        assetTicker = currency
+    ).wrapErrorMessage()
+
     companion object {
         internal const val CLIENT_TYPE = "APP"
     }

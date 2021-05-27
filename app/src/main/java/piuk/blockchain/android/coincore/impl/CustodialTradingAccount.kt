@@ -7,6 +7,7 @@ import com.blockchain.nabu.datamanagers.CustodialOrderState
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.Product
+import com.blockchain.nabu.datamanagers.RecurringBuyTransaction
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import info.blockchain.balance.CryptoCurrency
@@ -16,6 +17,7 @@ import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
+import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
@@ -23,6 +25,7 @@ import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
+import piuk.blockchain.android.coincore.RecurringBuyActivitySummaryItem
 import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.coincore.TxResult
@@ -106,22 +109,25 @@ open class CustodialTradingAccount(
             .map { it }
 
     override val activity: Single<ActivitySummaryList>
-        get() = custodialWalletManager.getAllOrdersFor(asset)
-            .mapList { orderToSummary(it) }
-            .filterActivityStates()
-            .flatMap {
-                appendTradeActivity(custodialWalletManager, asset, it)
+        get() = custodialWalletManager.getAllOrdersFor(asset).mapList { orderToSummary(it) }
+            .zipWith(custodialWalletManager.getRecurringBuyOrdersFor(asset).mapList { orderToSummary(it) })
+            .flatMap { (buySellList, recurringBuyList) ->
+                appendTradeActivity(custodialWalletManager, asset, buySellList + recurringBuyList)
             }
+            .filterActivityStates()
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
             .onErrorReturn { emptyList() }
 
-    override val isFunded: Boolean
+    override
+    val isFunded: Boolean
         get() = hasFunds.get()
 
-    override val isDefault: Boolean =
+    override
+    val isDefault: Boolean =
         false // Default is, presently, only ever a non-custodial account.
 
-    override val sourceState: Single<TxSourceState>
+    override
+    val sourceState: Single<TxSourceState>
         get() = Singles.zip(
             accountBalance,
             actionableBalance
@@ -133,7 +139,8 @@ open class CustodialTradingAccount(
             }
         }
 
-    override val actions: Single<AvailableActions>
+    override
+    val actions: Single<AvailableActions>
         get() =
             Singles.zip(
                 accountBalance.map { it.isPositive },
@@ -184,22 +191,43 @@ open class CustodialTradingAccount(
                 receivingAddress = null,
                 state = order.state.toCustodialOrderState(),
                 direction = TransferDirection.INTERNAL,
-                receivingValue = order.orderValue ?: throw IllegalStateException("Order missing receivingValue"),
+                receivingValue = order.orderValue ?: throw IllegalStateException(
+                    "Order missing receivingValue"
+                ),
                 depositNetworkFee = Single.just(CryptoValue.zero(order.crypto.currency)),
                 withdrawalNetworkFee = order.fee ?: FiatValue.zero(order.fiat.currencyCode),
-                currencyPair = CurrencyPair.CryptoToFiatCurrencyPair(order.crypto.currency, order.fiat.currencyCode),
+                currencyPair = CurrencyPair.CryptoToFiatCurrencyPair(
+                    order.crypto.currency, order.fiat.currencyCode
+                ),
                 fiatValue = order.fiat,
                 fiatCurrency = order.fiat.currencyCode
             )
         }
+
+    private fun orderToSummary(order: RecurringBuyTransaction): ActivitySummaryItem =
+        RecurringBuyActivitySummaryItem(
+            exchangeRates = exchangeRates,
+            cryptoCurrency = order.destinationValue.currency,
+            txId = order.id,
+            timeStampMs = order.insertedAt.time,
+            account = this,
+            value = order.originMoney,
+            state = order.state,
+            destinationValue = order.destinationValue
+        )
 
     // Stop gap filter, until we finalise which item we wish to display to the user.
     // TODO: This can be done via the API when it's settled
     private fun Single<ActivitySummaryList>.filterActivityStates(): Single<ActivitySummaryList> {
         return flattenAsObservable { list ->
             list.filter {
-                (it is CustodialTradingActivitySummaryItem && displayedStates.contains(it.status)) or
-                    (it is TradeActivitySummaryItem && displayedStates.contains(it.state))
+                (it is CustodialTradingActivitySummaryItem && displayedStates.contains(
+                    it.status
+                )) or
+                    (it is TradeActivitySummaryItem && displayedStates.contains(
+                        it.state
+                    )) or
+                    (it is RecurringBuyActivitySummaryItem)
             }
         }.toList()
     }

@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.UiThread
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.annotations.CommonCode
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.ActivityAnalytics
@@ -32,6 +31,7 @@ import piuk.blockchain.android.ui.activity.detail.FiatActivityDetailsBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
+import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.util.getAccount
 import piuk.blockchain.android.util.gone
@@ -50,7 +50,7 @@ class ActivitiesFragment :
 
     override val model: ActivitiesModel by scopedInject()
 
-    private val theAdapter: ActivitiesDelegateAdapter by lazy {
+    private val activityAdapter: ActivitiesDelegateAdapter by lazy {
         ActivitiesDelegateAdapter(
             prefs = get(),
             assetResources = assetResources,
@@ -60,8 +60,6 @@ class ActivitiesFragment :
             onFiatItemClicked = { cc, tx -> onFiatActivityClicked(cc, tx) }
         )
     }
-
-    private lateinit var theLayoutManager: RecyclerView.LayoutManager
 
     private val displayList = mutableListOf<ActivitySummaryItem>()
 
@@ -83,12 +81,7 @@ class ActivitiesFragment :
     @UiThread
     override fun render(newState: ActivitiesState) {
         if (newState.isError) {
-            ToastCustom.makeText(
-                requireContext(),
-                getString(R.string.activity_loading_error),
-                ToastCustom.LENGTH_SHORT,
-                ToastCustom.TYPE_ERROR
-            )
+            toast(R.string.activity_loading_error, ToastCustom.TYPE_ERROR)
         }
 
         switchView(newState)
@@ -123,7 +116,6 @@ class ActivitiesFragment :
                 }
             }
         }
-
         this.state = newState
     }
 
@@ -214,7 +206,7 @@ class ActivitiesFragment :
             } else {
                 displayList.addAll(this)
             }
-            theAdapter.notifyDataSetChanged()
+            activityAdapter.notifyDataSetChanged()
         }
     }
 
@@ -235,14 +227,12 @@ class ActivitiesFragment :
     }
 
     private fun setupRecycler() {
-        theLayoutManager = SafeLayoutManager(requireContext())
-
         binding.contentList.apply {
-            layoutManager = theLayoutManager
-            adapter = theAdapter
+            layoutManager = SafeLayoutManager(requireContext())
+            adapter = activityAdapter
             addItemDecoration(BlockchainListDividerDecor(requireContext()))
         }
-        theAdapter.items = displayList
+        activityAdapter.items = displayList
     }
 
     private fun setupToolbar() {
@@ -318,8 +308,7 @@ class ActivitiesFragment :
         fun newInstance(account: BlockchainAccount?): ActivitiesFragment {
             return ActivitiesFragment().apply {
                 arguments = Bundle().apply {
-                    if (account != null)
-                        putAccount(PARAM_ACCOUNT, account)
+                    account?.let { putAccount(PARAM_ACCOUNT, it) }
                 }
             }
         }

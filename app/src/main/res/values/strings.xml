@@ -2126,4 +2126,6 @@
     <string name="dashboard_recurring_buy_item_label">Next buy: %1$s</string>
     <string name="dashboard_recurring_buy_item_label_error">Low balance. Add Funds</string>
     <string name="dashboard_recurring_buy_title">Recurring buys</string>
+    <string name="recurring_buy_activity_failed">Failed. Low balance.</string>
+    <string name="recurring_buy_activity_pending">Pending</string>
 </resources>
