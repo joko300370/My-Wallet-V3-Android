@@ -2,25 +2,22 @@ package com.blockchain.notifications.analytics
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import com.blockchain.featureflags.GatedFeature
-import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.google.firebase.analytics.FirebaseAnalytics
 import java.io.Serializable
 
 class AnalyticsImpl internal constructor(
     private val firebaseAnalytics: FirebaseAnalytics,
     private val nabuAnalytics: Analytics,
-    private val store: SharedPreferences,
-    private val internalFeatureFlagApi: Lazy<InternalFeatureFlagApi>
+    private val store: SharedPreferences
 ) : Analytics {
 
     private val sentAnalytics = mutableSetOf<String>()
 
     override fun logEvent(analyticsEvent: AnalyticsEvent) {
-        if (!nabuAnalyticsNames.contains(analyticsEvent.event)) {
-            firebaseAnalytics.logEvent(analyticsEvent.event, toBundle(analyticsEvent.params))
-        } else if (internalFeatureFlagApi.value.isFeatureEnabled(GatedFeature.SEGMENT_ANALYTICS)) {
+        if (nabuAnalyticsNames.contains(analyticsEvent.event)) {
             nabuAnalytics.logEvent(analyticsEvent)
+        } else {
+            firebaseAnalytics.logEvent(analyticsEvent.event, toBundle(analyticsEvent.params))
         }
     }
 

@@ -98,7 +98,6 @@ enum class AnalyticsNames(val eventName: String) {
     SWAP_CLICKED("Swap Clicked"),
     SWAP_RECEIVE_SELECTED("Swap Receive Selected"),
     SWAP_MAX_CLICKED("Swap Amount Max Clicked"),
-    SWAP_AMOUNT_SWITCHED("Swap Amount Switched"),
     SWAP_FROM_SELECTED("Swap From Selected"),
     SWAP_ACCOUNTS_SELECTED("Swap Accounts Selected"),
     SWAP_AMOUNT_ENTERED("Swap Amount Entered"),

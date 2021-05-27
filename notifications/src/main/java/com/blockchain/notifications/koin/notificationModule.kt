@@ -2,7 +2,6 @@ package com.blockchain.notifications.koin
 
 import android.app.NotificationManager
 import android.content.Context
-import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.nabu
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.notifications.NotificationService
@@ -49,8 +48,7 @@ val notificationModule = module {
         AnalyticsImpl(
             firebaseAnalytics = get(),
             nabuAnalytics = get(nabu),
-            store = get(),
-            internalFeatureFlagApi = lazy { get<InternalFeatureFlagApi>() }
+            store = get()
         )
     }.bind(Analytics::class)
 

@@ -546,7 +546,7 @@ enum class AnalyticsFeeType {
 
 class AmountSwitched(private val action: AssetAction, private val newInput: CurrencyType) : AnalyticsEvent {
     override val event: String
-        get() = AnalyticsNames.AMOUNT_SWITCHED.name
+        get() = AnalyticsNames.AMOUNT_SWITCHED.eventName
     override val params: Map<String, Serializable>
         get() = mapOf(
             "product" to action.toAnalyticsProduct(),

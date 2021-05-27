@@ -83,7 +83,7 @@ sealed class SendAnalyticsEvent(
         private val toAccountType: TxFlowAnalyticsAccountType
     ) : AnalyticsEvent {
         override val event: String
-            get() = AnalyticsNames.SEND_MAX_CLICKED.name
+            get() = AnalyticsNames.SEND_MAX_CLICKED.eventName
         override val params: Map<String, Serializable>
             get() = mapOf(
                 "currency" to currency,
@@ -97,7 +97,7 @@ sealed class SendAnalyticsEvent(
         private val fromAccountType: TxFlowAnalyticsAccountType
     ) : AnalyticsEvent {
         override val event: String
-            get() = AnalyticsNames.SEND_FROM_SELECTED.name
+            get() = AnalyticsNames.SEND_FROM_SELECTED.eventName
         override val params: Map<String, Serializable>
             get() = mapOf(
                 "currency" to currency,
@@ -112,7 +112,7 @@ sealed class SendAnalyticsEvent(
         private val toAccountType: TxFlowAnalyticsAccountType
     ) : AnalyticsEvent {
         override val event: String
-            get() = AnalyticsNames.SEND_SUBMITTED.name
+            get() = AnalyticsNames.SEND_SUBMITTED.eventName
         override val params: Map<String, Serializable>
             get() = mapOf(
                 "currency" to currency,

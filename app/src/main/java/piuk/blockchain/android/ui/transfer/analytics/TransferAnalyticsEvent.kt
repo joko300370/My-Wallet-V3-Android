@@ -31,7 +31,7 @@ sealed class TransferAnalyticsEvent(
         private val type: AnalyticsTransferType
     ) : AnalyticsEvent {
         override val event: String
-            get() = AnalyticsNames.SEND_RECEIVE_CLICKED.name
+            get() = AnalyticsNames.SEND_RECEIVE_CLICKED.eventName
         override val params: Map<String, Serializable>
             get() = mapOf(
                 "type" to type.name
@@ -40,7 +40,7 @@ sealed class TransferAnalyticsEvent(
 
     object TransferViewed : AnalyticsEvent {
         override val event: String
-            get() = AnalyticsNames.SEND_RECEIVE_CLICKED.name
+            get() = AnalyticsNames.SEND_RECEIVE_VIEWED.eventName
         override val params: Map<String, Serializable>
             get() = mapOf()
     }
