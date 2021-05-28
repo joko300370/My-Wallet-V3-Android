@@ -11,6 +11,7 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.notifications.analytics.InterestAnalytics
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.utils.secondsToDays
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
@@ -32,7 +33,6 @@ import piuk.blockchain.android.databinding.DialogSheetInterestDetailsBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.secondsToDays
 import piuk.blockchain.android.util.visible
 import timber.log.Timber
 import java.text.SimpleDateFormat

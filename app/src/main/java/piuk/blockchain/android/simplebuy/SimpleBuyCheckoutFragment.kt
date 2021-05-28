@@ -20,7 +20,7 @@ import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.RecurringBuyFrequency
 import com.blockchain.ui.urllinks.ORDER_PRICE_EXPLANATION
 import com.blockchain.ui.urllinks.PRIVATE_KEY_EXPLANATION
-import com.blockchain.utils.to12HourFormat
+import com.blockchain.utils.secondsToDays
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import org.koin.android.ext.android.inject
@@ -33,14 +33,10 @@ import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.secondsToDays
 import piuk.blockchain.android.util.setOnClickListenerDebounced
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import java.time.Month
-import java.time.ZonedDateTime
-import java.util.Locale
 
 class SimpleBuyCheckoutFragment :
     MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState, FragmentSimplebuyCheckoutBinding>(),
@@ -300,7 +296,7 @@ class SimpleBuyCheckoutFragment :
                 SimpleBuyCheckoutItem.ComplexCheckoutItem(
                     getString(R.string.recurring_buy_frequency_label),
                     state.recurringBuyFrequency.toHumanReadableRecurringBuy(requireContext()),
-                    buildSubtitleRecurringBuy(state.recurringBuyFrequency)
+                    state.recurringBuyFrequency.toHumanReadableRecurringDate(requireContext())
                 )
             } else null,
             SimpleBuyCheckoutItem.SimpleCheckoutItem(
@@ -320,49 +316,6 @@ class SimpleBuyCheckoutFragment :
                     .addStringWithSymbolOrDefault(state.fiatCurrency), true
             )
         )
-    }
-
-    private fun isLastDayOfTheMonth(): Boolean {
-        val date = ZonedDateTime.now()
-        val dayOfMonth = date.dayOfMonth
-        val month = date.month
-
-        val isLastDayOfFebruary = month == Month.FEBRUARY && (dayOfMonth == 28 || dayOfMonth == 29)
-        val isLastDayOf31months = dayOfMonth == 31 &&
-            (month == Month.JANUARY || month == Month.MARCH || month == Month.MAY ||
-                month == Month.JULY || month == Month.AUGUST || month == Month.OCTOBER || month == Month.DECEMBER)
-
-        return isLastDayOfFebruary || isLastDayOf31months
-    }
-
-    private fun buildSubtitleRecurringBuy(recurringBuyFrequency: RecurringBuyFrequency): String {
-        val dateTime = ZonedDateTime.now()
-        return when (recurringBuyFrequency) {
-            RecurringBuyFrequency.DAILY -> {
-                getString(
-                    R.string.recurring_buy_frequency_subtitle_each_day,
-                    dateTime.to12HourFormat()
-                )
-            }
-            RecurringBuyFrequency.BI_WEEKLY, RecurringBuyFrequency.WEEKLY -> {
-                getString(
-                    R.string.recurring_buy_frequency_subtitle,
-                    dateTime.dayOfWeek.toString().toLowerCase(Locale.getDefault()).capitalize(Locale.getDefault())
-                )
-            }
-            RecurringBuyFrequency.MONTHLY -> {
-                if (isLastDayOfTheMonth()) {
-                    getString(R.string.recurring_buy_frequency_subtitle_monthly_last_day)
-                } else {
-                    getString(
-                        R.string.recurring_buy_frequency_subtitle_monthly,
-                        dateTime.dayOfMonth.toString()
-                    )
-                }
-            }
-            RecurringBuyFrequency.ONE_TIME,
-            RecurringBuyFrequency.UNKNOWN -> ""
-        }
     }
 
     private fun FiatValue?.addStringWithSymbolOrDefault(fiatCurrency: String): String {

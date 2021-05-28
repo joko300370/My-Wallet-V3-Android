@@ -42,7 +42,7 @@ import piuk.blockchain.android.ui.linkbank.BankAuthSource
 import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionFlowCustomiserImpl.Companion.getEstimatedTransactionCompletionTime
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.secondsToDays
+import com.blockchain.utils.secondsToDays
 import java.util.Locale
 
 class SimpleBuyPaymentFragment :

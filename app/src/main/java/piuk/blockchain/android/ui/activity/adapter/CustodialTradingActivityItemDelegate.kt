@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.utils.toFormattedDate
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.dialog_activities_tx_item.view.*
@@ -18,7 +19,6 @@ import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.android.util.toFormattedDate
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.inflate
 import java.util.Date

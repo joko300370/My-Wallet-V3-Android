@@ -1,6 +1,8 @@
 package com.blockchain.utils
 
 import org.apache.commons.lang3.time.DateUtils
+import java.math.BigInteger
+import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.time.ZonedDateTime
@@ -9,6 +11,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import kotlin.math.ceil
 
 /**
  * Converts a [String] from an ISO 8601 date to a [Date] object. The receiving [String] can specify
@@ -51,3 +54,42 @@ fun ZonedDateTime.to12HourFormat(): String {
     val formatter = DateTimeFormatter.ofPattern("ha")
     return formatter.format(this).toString()
 }
+
+fun ZonedDateTime.isLastDayOfTheMonth(): Boolean {
+    val nextDay = this.plusDays(1)
+    return this.month != nextDay.month
+}
+
+/**
+ * Takes a [Date] object and converts it to our standard date format, ie March 09, 2018 @11:47.
+ *
+ * @param locale The current [Locale].
+ * @return A formatted [String] object.
+ */
+fun Date.toFormattedString(locale: Locale = Locale.getDefault()): String {
+    val dateFormat = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM)
+    val timeFormat = SimpleDateFormat("hh:mm a", locale)
+    val dateText = dateFormat.format(this)
+    val timeText = timeFormat.format(this)
+
+    return "$timeText on $dateText"
+}
+
+/**
+ * Takes a [Date] object and converts it to our standard date format, ie March 09, 2018 @11:47.
+ *
+ * @param locale The current [Locale].
+ * @return A formatted [String] object.
+ */
+fun Date.toFormattedDate(): String {
+    val dateFormat = SimpleDateFormat.getDateInstance(DateFormat.MEDIUM)
+    return dateFormat.format(this)
+}
+
+fun BigInteger.secondsToDays(): Long =
+    ceil(this.toDouble() / SECONDS_OF_DAY).toLong()
+
+fun Int.secondsToDays(): Int =
+    ceil(this.toDouble() / SECONDS_OF_DAY).toInt()
+
+private const val SECONDS_OF_DAY: Long = 86400

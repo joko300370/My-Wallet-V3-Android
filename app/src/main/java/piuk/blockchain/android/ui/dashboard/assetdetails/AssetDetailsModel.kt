@@ -16,6 +16,7 @@ import piuk.blockchain.android.ui.base.mvi.MviState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 import timber.log.Timber
+import java.util.Stack
 
 data class AssetDetailsState(
     val asset: CryptoAsset? = null,
@@ -32,7 +33,9 @@ data class AssetDetailsState(
     val hostAction: AssetAction? = null,
     val selectedAccountCryptoBalance: Money? = null,
     val selectedAccountFiatBalance: Money? = null,
-    val navigateToInterestDashboard: Boolean = false
+    val navigateToInterestDashboard: Boolean = false,
+    val selectedRecurringBuy: RecurringBuy? = null,
+    val stepsBackStack: Stack<AssetDetailsStep> = Stack()
 ) : MviState
 
 enum class AssetDetailsError {
@@ -41,7 +44,8 @@ enum class AssetDetailsError {
     NO_ASSET_DETAILS,
     NO_EXCHANGE_RATE,
     TX_IN_FLIGHT,
-    NO_RECURRING_BUYS
+    NO_RECURRING_BUYS,
+    RECURRING_BUY_DELETE
 }
 
 class AssetDetailsModel(
@@ -80,6 +84,11 @@ class AssetDetailsModel(
                 loadAssetDetails(intent.asset)
                 loadRecurringBuysForAsset(intent.asset)
             }
+            is DeleteRecurringBuy -> {
+                previousState.selectedRecurringBuy?.let {
+                    deleteRecurringBuy(it.id)
+                }
+            }
             is HandleActionIntent,
             is ChartLoading,
             is ChartDataLoaded,
@@ -99,9 +108,24 @@ class AssetDetailsModel(
             is ClearActionStates,
             is AccountActionsLoaded,
             is RecurringBuyDataFailed,
-            is RecurringBuyDataLoaded -> null
+            is RecurringBuyDataLoaded,
+            is ShowRecurringBuySheet,
+            is ClearSelectedRecurringBuy,
+            is UpdateRecurringBuy,
+            is UpdateRecurringBuyError -> null
         }
     }
+
+    private fun deleteRecurringBuy(id: String) =
+        interactor.deleteRecurringBuy(id)
+            .subscribeBy(
+                onComplete = {
+                    process(UpdateRecurringBuy)
+                },
+                onError = {
+                    process(UpdateRecurringBuyError)
+                }
+            )
 
     private fun loadAssetDetails(asset: CryptoAsset) =
         interactor.loadAssetDetails(asset)

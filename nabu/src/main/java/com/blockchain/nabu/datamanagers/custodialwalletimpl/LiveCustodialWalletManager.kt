@@ -689,6 +689,11 @@ class LiveCustodialWalletManager(
             Single.just(emptyList())
         }
 
+    override fun cancelRecurringBuy(id: String): Completable =
+        authenticator.authenticateCompletable { sessionToken ->
+            nabuService.cancelRecurringBuy(sessionToken, id)
+        }
+
     override fun addNewCard(
         fiatCurrency: String,
         billingAddress: BillingAddress

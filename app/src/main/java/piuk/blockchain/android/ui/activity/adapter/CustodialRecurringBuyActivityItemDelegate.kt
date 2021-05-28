@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.nabu.datamanagers.RecurringBuyActivityState
+import com.blockchain.utils.toFormattedDate
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.ActivitySummaryItem
@@ -15,7 +16,6 @@ import piuk.blockchain.android.databinding.DialogActivitiesTxItemBinding
 import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.setAssetIconColours
-import piuk.blockchain.android.util.toFormattedDate
 import java.util.Date
 
 class CustodialRecurringBuyActivityItemDelegate(

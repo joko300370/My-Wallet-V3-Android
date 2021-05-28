@@ -731,6 +731,14 @@ class NabuService(retrofit: Retrofit) {
         assetTicker = assetTicker
     ).wrapErrorMessage()
 
+    fun cancelRecurringBuy(
+        sessionToken: NabuSessionTokenResponse,
+        id: String
+    ) = service.cancelRecurringBuy(
+        authorization = sessionToken.authHeader,
+        id = id
+    ).wrapErrorMessage()
+
     fun getRecurringBuysTransactions(
         sessionToken: NabuSessionTokenResponse,
         currency: String? = null

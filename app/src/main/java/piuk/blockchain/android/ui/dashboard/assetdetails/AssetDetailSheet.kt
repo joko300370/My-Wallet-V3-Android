@@ -188,7 +188,7 @@ class AssetDetailSheet : MviBottomSheet<AssetDetailsModel,
 
     private fun onRecurringBuyClicked(recurringBuy: RecurringBuy) {
         clearList()
-        // TODO in next story
+        model.process(ShowRecurringBuySheet(recurringBuy))
     }
 
     private fun clearList() {

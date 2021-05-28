@@ -285,6 +285,8 @@ interface CustodialWalletManager {
     fun getRecurringBuyEligibility(): Single<List<PaymentMethodType>>
 
     fun getRecurringBuysForAsset(assetTicker: String): Single<List<RecurringBuy>>
+
+    fun cancelRecurringBuy(id: String): Completable
 }
 
 data class InterestActivityItem(

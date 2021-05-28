@@ -77,6 +77,8 @@ class AssetDetailsInteractor(
             }
     }
 
+    fun deleteRecurringBuy(id: String) = custodialWalletManager.cancelRecurringBuy(id)
+
     private sealed class Details {
         object NoDetails : Details()
         class DetailsItem(

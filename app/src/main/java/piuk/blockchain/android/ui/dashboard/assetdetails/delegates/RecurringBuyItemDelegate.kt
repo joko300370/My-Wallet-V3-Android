@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.nabu.models.data.RecurringBuy
 import com.blockchain.nabu.models.data.RecurringBuyState
+import com.blockchain.utils.toFormattedDate
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.databinding.ViewAccountRecurringBuyOverviewBinding
@@ -13,7 +14,6 @@ import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsItem
 import piuk.blockchain.android.util.context
 import piuk.blockchain.android.util.setAssetIconColours
-import piuk.blockchain.android.util.toFormattedDate
 import piuk.blockchain.android.util.visibleIf
 
 class RecurringBuyItemDelegate(

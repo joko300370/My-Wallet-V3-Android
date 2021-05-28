@@ -19,6 +19,8 @@ import com.blockchain.nabu.datamanagers.UndefinedPaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.RecurringBuyFrequency
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.utils.to12HourFormat
+import com.blockchain.utils.isLastDayOfTheMonth
 import com.bumptech.glide.Glide
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
@@ -50,6 +52,8 @@ import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
+import java.time.ZonedDateTime
+import java.util.Locale
 
 class SimpleBuyCryptoFragment :
     MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState, FragmentSimpleBuyBuyCryptoBinding>(),
@@ -624,6 +628,36 @@ fun RecurringBuyFrequency.toHumanReadableRecurringBuy(context: Context): String 
         RecurringBuyFrequency.BI_WEEKLY -> context.getString(R.string.recurring_buy_bi_weekly)
         RecurringBuyFrequency.MONTHLY -> context.getString(R.string.recurring_buy_monthly)
         else -> context.getString(R.string.common_unknown)
+    }
+}
+
+fun RecurringBuyFrequency.toHumanReadableRecurringDate(context: Context): String {
+    val dateTime = ZonedDateTime.now()
+    return when (this) {
+        RecurringBuyFrequency.DAILY -> {
+            context.getString(
+                R.string.recurring_buy_frequency_subtitle_each_day,
+                dateTime.to12HourFormat()
+            )
+        }
+        RecurringBuyFrequency.BI_WEEKLY, RecurringBuyFrequency.WEEKLY -> {
+            context.getString(
+                R.string.recurring_buy_frequency_subtitle,
+                dateTime.dayOfWeek.toString().toLowerCase(Locale.getDefault()).capitalize(Locale.getDefault())
+            )
+        }
+        RecurringBuyFrequency.MONTHLY -> {
+            if (dateTime.isLastDayOfTheMonth()) {
+                context.getString(R.string.recurring_buy_frequency_subtitle_monthly_last_day)
+            } else {
+                context.getString(
+                    R.string.recurring_buy_frequency_subtitle_monthly,
+                    dateTime.dayOfMonth.toString()
+                )
+            }
+        }
+        RecurringBuyFrequency.ONE_TIME,
+        RecurringBuyFrequency.UNKNOWN -> ""
     }
 }
 

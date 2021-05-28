@@ -2126,6 +2126,12 @@
     <string name="dashboard_recurring_buy_item_label">Next buy: %1$s</string>
     <string name="dashboard_recurring_buy_item_label_error">Low balance. Add Funds</string>
     <string name="dashboard_recurring_buy_title">Recurring buys</string>
+    <string name="recurring_buy_info_cta">Cancel Recurring Buy</string>
+    <string name="recurring_buy_sheet_title">Recurring %1$s Buy</string>
+    <string name="recurring_buy_info_purchase_label">Next Purchase</string>
+    <string name="recurring_buy_cancelled_toast">Recurring buy cancelled</string>
+    <string name="recurring_buy_cancelled_error_toast">Oops! There was an issue cancelling your recurring buy. Please try again later.</string>
+    <string name="recurring_buy_cancel_dialog_desc">Are you sure you want to cancel this Recurring Buy?</string>
     <string name="recurring_buy_activity_failed">Failed. Low balance.</string>
     <string name="recurring_buy_activity_pending">Pending</string>
 </resources>

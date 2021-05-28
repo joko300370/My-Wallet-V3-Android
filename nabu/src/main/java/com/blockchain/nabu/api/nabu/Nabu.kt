@@ -52,9 +52,9 @@ import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
 import com.blockchain.nabu.models.responses.simplebuy.DepositRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.FeesResponse
 import com.blockchain.nabu.models.responses.simplebuy.ProductTransferRequestBody
-import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyResponse
 import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyEligibilityResponse
 import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyRequestBody
+import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyResponse
 import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyTransactionResponse
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyBalanceResponse
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyConfirmationAttributes
@@ -562,6 +562,12 @@ internal interface Nabu {
         @Header("authorization") authorization: String,
         @Query("currency") assetTicker: String? = null
     ): Single<List<RecurringBuyResponse>>
+
+    @DELETE("$NABU_RECURRING_BUY/{id}/cancel")
+    fun cancelRecurringBuy(
+        @Header("authorization") authorization: String,
+        @Path("id") id: String
+    ): Completable
 
     @GET(NABU_RECURRING_BUY_TRANSACTIONS)
     fun fetchRecurringBuysTransactions(

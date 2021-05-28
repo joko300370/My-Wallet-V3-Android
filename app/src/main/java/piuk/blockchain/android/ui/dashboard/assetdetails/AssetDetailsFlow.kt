@@ -24,16 +24,18 @@ import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.impl.CryptoAccountCustodialGroup
 import piuk.blockchain.android.coincore.impl.CryptoAccountNonCustodialGroup
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
+import piuk.blockchain.android.ui.dashboard.sheets.RecurringBuyDetailsSheet
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.analytics.SwapAnalyticsEvents
 import timber.log.Timber
 
-enum class AssetDetailsStep {
+enum class AssetDetailsStep(val addToBackStack: Boolean = false) {
     ZERO,
     CUSTODY_INTRO_SHEET,
-    ASSET_DETAILS,
-    ASSET_ACTIONS,
-    SELECT_ACCOUNT
+    ASSET_DETAILS(true),
+    RECURRING_BUY_DETAILS(true),
+    ASSET_ACTIONS(true),
+    SELECT_ACCOUNT(true)
 }
 
 class AssetDetailsFlow(
@@ -113,6 +115,7 @@ class AssetDetailsFlow(
                         else -> R.string.select_account_sheet_title
                     }
                 )
+                AssetDetailsStep.RECURRING_BUY_DETAILS -> RecurringBuyDetailsSheet.newInstance()
             }
         )
     }
