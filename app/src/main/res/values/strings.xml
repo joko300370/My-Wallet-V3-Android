@@ -1051,7 +1051,7 @@
 
     <!-- Email -->
     <string name="kyc_email_hint_focused">Your Email</string>
-    <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
+    <string name="kyc_email_hint_unfocused">Your Email</string>
     <string name="kyc_email_error_saving_email">Error saving email, please try again</string>
     <string name="kyc_email_send_verification">Send Email</string>
     <string name="kyc_email_validation_header">Check your inbox.</string>
@@ -1081,7 +1081,7 @@
     <string name="kyc_veriff_splash_country_supported_subheader">Not all countries are supported at this time. Check our up to date <annotation link="country_list">list of countries</annotation> before proceeding.</string>
 
     <!-- Veriff Splash -->
-    <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
+    <string name="kyc_veriff_splash_title">Documents needed</string>
     <string name="kyc_veriff_splash_error_silver">SILVER VERIFIED</string>
     <string name="kyc_veriff_splash_header">Let’s Confirm It’s You</string>
     <string name="kyc_veriff_splash_subtitle">You’ll need 1 of the ID types below to continue.</string>
@@ -1104,13 +1104,13 @@
     <string name="kyc_complete_home_address">Home Address Added</string>
     <string name="kyc_complete_id_uploaded">ID Uploaded</string>
     <string name="kyc_complete_video_uploaded">Video uploaded</string>
-    <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
+    <string name="kyc_help_dialog_need_some_help">Need some help?</string>
     <string name="kyc_help_dialog_need_some_help_body">Our Blockchain Support Team has written Help Guides explaining why we need to verify your identity.</string>
 
     <!-- Help -->
     <string name="kyc_help_dialog_read_now">Read Now</string>
     <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-    <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
+    <string name="kyc_help_dialog_contact_support">Contact Support</string>
     <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
 
     <!-- Settings -->
@@ -1124,7 +1124,7 @@
     <string name="kyc_settings_gold_level_in_review">Gold Level - In review</string>
     <string name="kyc_settings_gold_level_approved">Gold Level - Approved</string>
     <string name="kyc_settings_silver_level_approved">Silver Level - Approved</string>
-    <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
+    <string name="kyc_settings_tier_status_failed">Failed</string>
     <string name="kyc_status_error">Error fetching KYC status</string>
     <string name="kyc_status_title_in_progress">Verification In Progress</string>
 
@@ -1152,12 +1152,12 @@
     <!-- Drop-off Card -->
     <string name="kyc_drop_off_card_button">Continue verification</string>
     <string name="kyc_documents_needed">Documents needed</string>
-    <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
+    <string name="kyc_resubmission_card_title">Documents needed</string>
 
     <!-- Resubmission Card -->
     <string name="kyc_resubmission_card_description">We had some issues with the documents you’ve supplied. Please try uploading the documents again to continue with your verification.</string>
     <string name="kyc_resubmission_card_button">Upload Documents</string>
-    <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
+    <string name="kyc_resubmission_splash_title">Documents needed</string>
     <string name="kyc_resubmission_splash_description_1">We are unable to verify your identity and need you to re upload the required documents.</string>
 
     <!-- Resubmission Splash -->
@@ -1272,8 +1272,8 @@
     <string name="airdrop_activity_title">Airdrops</string>
 
     <string-array name="xlm_memo_types_manual">
-        <item>@string/xlm_memo_text</item>
-        <item>@string/xlm_memo_id</item>
+        <item>Memo Text</item>
+        <item>Memo ID</item>
     </string-array>
 
     <!--Simple buy-->
@@ -1806,10 +1806,10 @@
 
     <!-- Transaction Flow confirmation screen -->
     <string name="confirm_status_msg_insufficient_funds">You have insufficient funds in this account to process this transaction</string>
-    <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
+    <string name="confirm_status_msg_insufficient_gas">You do not have enough ETH to process this transaction.</string>
     <string name="confirm_status_msg_option_invalid">Please ensure you`ve agreed to our Terms.</string>
-    <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
-    <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+    <string name="confirm_status_msg_invoice_expired">BitPay Invoice Expired</string>
+    <string name="confirm_status_msg_unexpected_error">An unexpected error has occurred. Please try again.</string>
     <string name="pending_swap_info_message">You have 1 swap pending. Once that clears, you can make a new swap.</string>
     <string name="deposit_fee">Network Fee</string>
     <string name="current_unit_price">%1$s = %2$s</string>
@@ -1892,7 +1892,7 @@
     <string name="trading_withdrawal_balance_locked">Oops! For security reasons, your balance is currently locked, please try again later.</string>
     <string name="trading_withdrawal_insufficient_funds">Oops! You don’t have enough funds to Withdraw</string>
     <string name="trading_internal_server_error">Oops! This service is currently unavailable, please try again later.</string>
-    <string name="trading_albert_error">@string/send_progress_error_title</string>
+    <string name="trading_albert_error">Oops! Something Went Wrong. Please try again.</string>
     <string name="trading_service_temp_disabled">This service will be back soon. We’re updating &amp; fixing some bugs right now.</string>
     <string name="trading_insufficient_balance">Oops! You don’t have enough balance to %1$s.</string>
     <string name="trading_amount_below_min">Oops! The amount you selected is below the minimum %1$s limit.</string>

@@ -15,8 +15,8 @@
         <item>douzième mot</item>
     </string-array>
     <string-array name="xlm_memo_types_manual">
-        <item>@string/xlm_memo_text</item>
-        <item>@string/xlm_memo_id</item>
+        <item>Texte mémo</item>
+        <item>ID mémo</item>
     </string-array>
     <string name="backup_wallet">Fonds de sauvegarde</string>
     <string name="action_settings">Réglages</string>
@@ -720,7 +720,7 @@
     <string name="kyc_email_title">Vérifiez votre e-mail</string>
     <string name="kyc_email_message">Nous devons vérifier votre adresse e-mail en tant que couche de sécurité supplémentaire.</string>
     <string name="kyc_email_hint_focused">Votre email</string>
-    <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
+    <string name="kyc_email_hint_unfocused">Votre email</string>
     <string name="kyc_email_error_saving_email">Erreur lors de l\'enregistrement de l\'e-mail, veuillez réessayer</string>
     <string name="kyc_email_send_verification">Envoyer un e-mail</string>
     <string name="kyc_email_validation_header">Vérifiez votre boîte de réception.</string>
@@ -742,7 +742,7 @@
     <string name="kyc_phone_number_error_resending">Erreur lors de l\'envoi du code, veuillez réessayer</string>
     <string name="kyc_veriff_splash_country_supported_header">Mon pays est-il pris en charge?</string>
     <string name="kyc_veriff_splash_country_supported_subheader">Tous les pays ne sont pas pris en charge pour le moment. Consultez notre <annotation link="country_list"> liste de pays </annotation> avant de continuer.</string>
-    <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
+    <string name="kyc_veriff_splash_title">Documents nécessaires</string>
     <string name="kyc_veriff_splash_error_silver">ARGENT VÉRIFIÉ</string>
     <string name="kyc_veriff_splash_header">Confirmez que c\'est vous</string>
     <string name="kyc_veriff_splash_subtitle">Vous aurez besoin de l\'un des types d\'ID ci-dessous pour continuer.</string>
@@ -763,11 +763,11 @@
     <string name="kyc_complete_home_address">Adresse personnelle ajoutée</string>
     <string name="kyc_complete_id_uploaded">ID téléchargé</string>
     <string name="kyc_complete_video_uploaded">Vidéo téléchargée</string>
-    <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
+    <string name="kyc_help_dialog_need_some_help">Besoin d\'aide?</string>
     <string name="kyc_help_dialog_need_some_help_body">Notre équipe d\'assistance Blockchain a rédigé des guides d\'aide expliquant pourquoi nous devons vérifier votre identité.</string>
     <string name="kyc_help_dialog_read_now">Lisez maintenant</string>
     <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-    <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
+    <string name="kyc_help_dialog_contact_support">Contactez le support</string>
     <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
     <string name="kyc_settings_status_rejected">Échoué</string>
     <string name="kyc_settings_status_verified">Vérifié</string>
@@ -777,7 +777,7 @@
     <string name="kyc_settings_gold_level_in_review">Gold Level - En revue</string>
     <string name="kyc_settings_gold_level_approved">Niveau Or - Approuvé</string>
     <string name="kyc_settings_silver_level_approved">Niveau Argent - Approuvé</string>
-    <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
+    <string name="kyc_settings_tier_status_failed">Échoué</string>
     <string name="kyc_status_error">Erreur lors de la récupération de l\'état KYC</string>
     <string name="kyc_status_title_in_progress">Vérification en cours</string>
     <string name="kyc_status_title_failed">Échec de la vérification</string>
@@ -799,10 +799,10 @@
     <string name="kyc_drop_off_card_description">Reprenez là où vous vous étiez arrêté et terminez votre vérification d\'identité.</string>
     <string name="kyc_drop_off_card_button">Poursuivre la vérification</string>
     <string name="kyc_documents_needed">Documents nécessaires</string>
-    <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
+    <string name="kyc_resubmission_card_title">Documents nécessaires</string>
     <string name="kyc_resubmission_card_description">Nous avons eu quelques problèmes avec les documents que vous avez fournis. Veuillez réessayer de télécharger les documents pour poursuivre votre vérification.</string>
     <string name="kyc_resubmission_card_button">Télécharger des documents</string>
-    <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
+    <string name="kyc_resubmission_splash_title">Documents nécessaires</string>
     <string name="kyc_resubmission_splash_description_1">Nous ne sommes pas en mesure de vérifier votre identité et avons besoin que vous téléchargiez à nouveau les documents requis.</string>
     <string name="kyc_resubmission_splash_description_2">Principales raisons pour cela:</string>
     <string name="kyc_resubmission_splash_description_3">Les photos requises sont manquantes.</string>
@@ -1330,10 +1330,10 @@ Veuillez réessayer plus tard.</string>
     <string name="sell_info_action">Envoyer maintenant →</string>
     <string name="common_pending">En attente</string>
     <string name="confirm_status_msg_insufficient_funds">Vous n\'avez pas suffisamment de fonds sur ce compte pour traiter cette transaction</string>
-    <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
+    <string name="confirm_status_msg_insufficient_gas">Vous ne disposez pas de suffisamment d\'ETH pour traiter cette transaction.</string>
     <string name="confirm_status_msg_option_invalid">Veuillez vous assurer que vous avez accepté nos conditions.</string>
-    <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
-    <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+    <string name="confirm_status_msg_invoice_expired">La facture BitPay a expiré</string>
+    <string name="confirm_status_msg_unexpected_error">Une erreur inattendue s\'est produite. Veuillez réessayer.</string>
     <string name="common_replaceable_value">%1$s</string>
     <string name="common_free">Gratuit</string>
     <string name="two_fa_new_request">Demande d\'un nouveau code…</string>
@@ -1500,7 +1500,7 @@ Note : Vous ne pourrez pas envoyer ou retirer ces fonds de votre portefeuille pe
     <string name="trading_withdrawal_balance_locked">Oups ! Pour des raisons de sécurité, votre solde est actuellement bloqué, veuillez réessayer plus tard.</string>
     <string name="trading_withdrawal_insufficient_funds">Oups ! Vous n\'avez pas assez de fonds pour faire un Retrait</string>
     <string name="trading_internal_server_error">Oups ! Ce service est actuellement indisponible, veuillez réessayer plus tard.</string>
-    <string name="trading_albert_error">@string/send_progress_error_title</string>
+    <string name="trading_albert_error">Oups ! Un problème est survenu.</string>
     <string name="trading_service_temp_disabled">Ce service sera bientôt de retour. Nous mettons à jour et corrigeons quelques bugs en ce moment même.</string>
     <string name="trading_insufficient_balance">Oups ! Votre solde est insuffisant pour %1$s.</string>
     <string name="trading_amount_below_min">Oups ! Le montant que vous avez sélectionné est inférieur à la limite minimale de %1$s.</string>

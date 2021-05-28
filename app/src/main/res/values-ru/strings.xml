@@ -15,8 +15,8 @@
         <item>двенадцатое слово</item>
     </string-array>
     <string-array name="xlm_memo_types_manual">
-        <item>@string/xlm_memo_text</item>
-        <item>@string/xlm_memo_id</item>
+        <item>Memo Text</item>
+        <item>Memo ID</item>
     </string-array>
     <string name="backup_wallet">Резервные фонды</string>
     <string name="action_settings">настройки</string>
@@ -720,7 +720,7 @@
     <string name="kyc_email_title">Подтвердите Ваш электронный адрес</string>
     <string name="kyc_email_message">Нам нужно подтвердить ваш адрес электронной почты как дополнительный уровень безопасности.</string>
     <string name="kyc_email_hint_focused">Ваш адрес электронной почты</string>
-    <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
+    <string name="kyc_email_hint_unfocused">Ваш адрес электронной почты</string>
     <string name="kyc_email_error_saving_email">Ошибка при сохранении электронной почты, пожалуйста, попробуйте еще раз</string>
     <string name="kyc_email_send_verification">Отправить письмо</string>
     <string name="kyc_email_validation_header">Проверь свои входящие.</string>
@@ -742,7 +742,7 @@
     <string name="kyc_phone_number_error_resending">Ошибка при отправке кода, пожалуйста, попробуйте еще раз</string>
     <string name="kyc_veriff_splash_country_supported_header">Поддерживается ли моя страна?</string>
     <string name="kyc_veriff_splash_country_supported_subheader">В настоящее время поддерживаются не все страны. Проверьте наш обновленный <annotation link="country_list"> список стран </annotation> прежде чем продолжить.</string>
-    <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
+    <string name="kyc_veriff_splash_title">Необходимые документы</string>
     <string name="kyc_veriff_splash_error_silver">СЕРЕБРО ПРОВЕРЕНО</string>
     <string name="kyc_veriff_splash_header">Давайте подтвердим, что это ты</string>
     <string name="kyc_veriff_splash_subtitle">Для продолжения вам понадобится один из следующих типов идентификаторов.</string>
@@ -763,11 +763,11 @@
     <string name="kyc_complete_home_address">Добавлен домашний адрес</string>
     <string name="kyc_complete_id_uploaded">ID загружен</string>
     <string name="kyc_complete_video_uploaded">Видео загружено</string>
-    <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
+    <string name="kyc_help_dialog_need_some_help">Нужна помощь?</string>
     <string name="kyc_help_dialog_need_some_help_body">Наша группа поддержки Blockchain написала справочные руководства, объясняющие, почему мы должны подтвердить вашу личность.</string>
     <string name="kyc_help_dialog_read_now">Прочитай сейчас</string>
     <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-    <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
+    <string name="kyc_help_dialog_contact_support">Контактная поддержка</string>
     <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
     <string name="kyc_settings_status_rejected">Не удалось</string>
     <string name="kyc_settings_status_verified">Проверенный</string>
@@ -777,7 +777,7 @@
     <string name="kyc_settings_gold_level_in_review">Золотой уровень - в обзоре</string>
     <string name="kyc_settings_gold_level_approved">Золотой уровень - утвержден</string>
     <string name="kyc_settings_silver_level_approved">Уровень серебра - Утверждено</string>
-    <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
+    <string name="kyc_settings_tier_status_failed">Не удалось</string>
     <string name="kyc_status_error">Ошибка при получении статуса KYC</string>
     <string name="kyc_status_title_in_progress">Проверка в процессе</string>
     <string name="kyc_status_title_failed">Ошибка проверки</string>
@@ -799,10 +799,10 @@
     <string name="kyc_drop_off_card_description">Возьмите, где вы остановились, и завершите проверку вашей личности.</string>
     <string name="kyc_drop_off_card_button">Продолжить проверку</string>
     <string name="kyc_documents_needed">Необходимые документы</string>
-    <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
+    <string name="kyc_resubmission_card_title">Необходимые документы</string>
     <string name="kyc_resubmission_card_description">У нас были некоторые проблемы с документами, которые вы предоставили. Пожалуйста, попробуйте загрузить документы еще раз, чтобы продолжить проверку.</string>
     <string name="kyc_resubmission_card_button">Загрузить документы</string>
-    <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
+    <string name="kyc_resubmission_splash_title">Необходимые документы</string>
     <string name="kyc_resubmission_splash_description_1">Мы не можем подтвердить вашу личность, и вам необходимо повторно загрузить необходимые документы.</string>
     <string name="kyc_resubmission_splash_description_2">Основные причины этого:</string>
     <string name="kyc_resubmission_splash_description_3">Требуемые фотографии отсутствуют.</string>
@@ -1332,10 +1332,10 @@
     <string name="sell_info_action">Отправить сейчас →</string>
     <string name="common_pending">В ожидании</string>
     <string name="confirm_status_msg_insufficient_funds">Для обработки этой транзакции на этом счете у вас недостаточно средств</string>
-    <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
+    <string name="confirm_status_msg_insufficient_gas">У вас недостаточно ETH для обработки этой транзакции.</string>
     <string name="confirm_status_msg_option_invalid">Убедитесь, что вы согласны с нашими Условиями.</string>
-    <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
-    <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+    <string name="confirm_status_msg_invoice_expired">Срок действия счета BitPay истек</string>
+    <string name="confirm_status_msg_unexpected_error">Произошла непредвиденная ошибка. Пожалуйста, попробуйте еще раз.</string>
     <string name="common_replaceable_value">%1$s</string>
     <string name="common_free">Бесплатно</string>
     <string name="two_fa_new_request">Запрос нового кода...</string>
@@ -1504,7 +1504,7 @@
     <string name="trading_withdrawal_balance_locked">Ой! По соображениям безопасности ваш баланс в настоящее время заблокирован. Пожалуйста, повторите попытку позже.</string>
     <string name="trading_withdrawal_insufficient_funds">Ой! У вас недостаточно средств для вывода</string>
     <string name="trading_internal_server_error">Ой! Эта услуга в настоящее время недоступна. Пожалуйста, повторите попытку позже.</string>
-    <string name="trading_albert_error">@string/send_progress_error_title</string>
+    <string name="trading_albert_error">Ой! Что-то пошло не так.</string>
     <string name="trading_service_temp_disabled">Эта услуга скоро будет снова доступна. Мы вносим обновления и исправляем некоторые ошибки прямо сейчас.</string>
     <string name="trading_insufficient_balance">Ой! У вас недостаточно средств, чтобы %1$s.</string>
     <string name="trading_amount_below_min">Ой! Выбранная вами сумма меньше минимального лимита %1$s.</string>

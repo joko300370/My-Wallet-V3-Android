@@ -15,8 +15,8 @@
         <item>onikinci kelime</item>
     </string-array>
     <string-array name="xlm_memo_types_manual">
-        <item>@string/xlm_memo_text</item>
-        <item>@string/xlm_memo_id</item>
+        <item>Not MetniNot Metni</item>
+        <item>Not Kimliği</item>
     </string-array>
     <string name="backup_wallet">Yedek fonlar</string>
     <string name="action_settings">Ayarlar</string>
@@ -720,7 +720,7 @@
     <string name="kyc_email_title">Eposta adresinizi doğrulayın</string>
     <string name="kyc_email_message">Ek güvenlik katmanı olarak e-posta adresinizi doğrulamamız gerekiyor.</string>
     <string name="kyc_email_hint_focused">E-posta adresiniz</string>
-    <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
+    <string name="kyc_email_hint_unfocused">E-posta adresiniz</string>
     <string name="kyc_email_error_saving_email">E-posta kaydedilirken hata oluştu, lütfen tekrar deneyin</string>
     <string name="kyc_email_send_verification">Eposta gönder</string>
     <string name="kyc_email_validation_header">Gelen kutunu kontrol et.</string>
@@ -740,7 +740,7 @@
     <string name="kyc_phone_number_error_resending">Kod gönderilirken hata oluştu, lütfen tekrar deneyin</string>
     <string name="kyc_veriff_splash_country_supported_header">Ülkem destekleniyor mu?</string>
     <string name="kyc_veriff_splash_country_supported_subheader">Şu anda tüm ülkeler desteklenmemektedir. <annotation link="country_list"> etmeden önce güncel </annotation> ülke listemize.</string>
-    <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
+    <string name="kyc_veriff_splash_title">Gerekli belgeler</string>
     <string name="kyc_veriff_splash_error_silver">GÜMÜŞ DOĞRULANDI</string>
     <string name="kyc_veriff_splash_header">Sizin Olduğunuzu Onaylayalım</string>
     <string name="kyc_veriff_splash_subtitle">Devam etmek için aşağıdaki kimlik türlerinden birine ihtiyacınız olacak.</string>
@@ -761,11 +761,11 @@
     <string name="kyc_complete_home_address">Ev Adresi Eklendi</string>
     <string name="kyc_complete_id_uploaded">Yüklenen Kimlik</string>
     <string name="kyc_complete_video_uploaded">Video yüklendi</string>
-    <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
+    <string name="kyc_help_dialog_need_some_help">Yardıma ihtiyacım var?</string>
     <string name="kyc_help_dialog_need_some_help_body">Blockchain Destek Ekibimiz, kimliğinizi neden doğrulamamız gerektiğini açıklayan Yardım Kılavuzları yazdı.</string>
     <string name="kyc_help_dialog_read_now">Şimdi Oku</string>
     <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-    <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
+    <string name="kyc_help_dialog_contact_support">İletişim desteği</string>
     <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
     <string name="kyc_settings_status_rejected">Başarısız oldu</string>
     <string name="kyc_settings_status_verified">Doğrulanmış</string>
@@ -775,7 +775,7 @@
     <string name="kyc_settings_gold_level_in_review">Altın Seviyesi - İnceleniyor</string>
     <string name="kyc_settings_gold_level_approved">Altın Seviyesi - Onaylandı</string>
     <string name="kyc_settings_silver_level_approved">Gümüş Seviyesi - Onaylı</string>
-    <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
+    <string name="kyc_settings_tier_status_failed">Başarısız oldu</string>
     <string name="kyc_status_error">KYC durumu getirilirken hata oluştu</string>
     <string name="kyc_status_title_in_progress">Doğrulama Sürüyor</string>
     <string name="kyc_status_title_failed">Doğrulama başarısız oldu</string>
@@ -797,10 +797,10 @@
     <string name="kyc_drop_off_card_description">Kaldığınız yerden devam edin ve kimlik doğrulama işleminizi tamamlayın.</string>
     <string name="kyc_drop_off_card_button">Doğrulamaya devam et</string>
     <string name="kyc_documents_needed">Gerekli belgeler</string>
-    <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
+    <string name="kyc_resubmission_card_title">Gerekli belgeler</string>
     <string name="kyc_resubmission_card_description">Verdiğiniz belgelerle ilgili bazı sorunlar yaşadık. Doğrulamanıza devam etmek için lütfen belgeleri tekrar yüklemeyi deneyin.</string>
     <string name="kyc_resubmission_card_button">Belgeleri Yükle</string>
-    <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
+    <string name="kyc_resubmission_splash_title">Gerekli belgeler</string>
     <string name="kyc_resubmission_splash_description_1">Kimliğinizi doğrulayamıyoruz ve gerekli belgeleri yeniden yüklemenizi istiyoruz.</string>
     <string name="kyc_resubmission_splash_description_2">Bunun gerçekleşmesinin ana nedenleri:</string>
     <string name="kyc_resubmission_splash_description_3">Gerekli fotoğraflar eksik.</string>
@@ -1326,10 +1326,10 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
     <string name="sell_info_action">Şimdi Gönder →</string>
     <string name="common_pending">Bekliyor</string>
     <string name="confirm_status_msg_insufficient_funds">Bu hesapta bu işlemi gerçekleştirmek için yeterli paranız yok</string>
-    <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
+    <string name="confirm_status_msg_insufficient_gas">Bu işlemi gerçekleştirmek içinsize ait yeterli ETH bulunmuyor.</string>
     <string name="confirm_status_msg_option_invalid">Lütfen Şartlarımızı kabul ettiğinizden emin olun.</string>
-    <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
-    <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+    <string name="confirm_status_msg_invoice_expired">BitPay Faturasının Süresi Doldu</string>
+    <string name="confirm_status_msg_unexpected_error">Beklenmedik bir hata oldu. Lütfen daha sonra tekrar deneyin.</string>
     <string name="common_replaceable_value">%1$s</string>
     <string name="common_free">Ücretsiz</string>
     <string name="two_fa_new_request">Yeni kod isteniyor...</string>
@@ -1499,7 +1499,7 @@ Not: Önümüzdeki %1$s gün boyunca Bu tutarı cüzdanınızdan gönderemeyecek
     <string name="trading_withdrawal_balance_locked">Hata! Güvenlik nedeniyle bakiyeniz şu anda kilitli, lütfen daha sonra tekrar deneyin.</string>
     <string name="trading_withdrawal_insufficient_funds">Hata! Para çekmek için yeterli paranız yok</string>
     <string name="trading_internal_server_error">Hata! Bu hizmet şu anda kullanılamıyor, lütfen daha sonra tekrar deneyin.</string>
-    <string name="trading_albert_error">@string/send_progress_error_title</string>
+    <string name="trading_albert_error">Hata! Bir şeyler ters gitti.</string>
     <string name="trading_service_temp_disabled">Bu hizmet yakında geri dönecek. Şu anda bazı hataları güncelliyor ve düzeltiyoruz.</string>
     <string name="trading_insufficient_balance">Hata! %1$s için yeterli bakiyeniz yok.</string>
     <string name="trading_amount_below_min">Hata! Seçtiğiniz tutar minimum %1$s sınırının altındadır.</string>

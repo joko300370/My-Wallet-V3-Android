@@ -15,8 +15,8 @@
         <item>duodécima palabra</item>
     </string-array>
     <string-array name="xlm_memo_types_manual">
-        <item>@string/xlm_memo_text</item>
-        <item>@string/xlm_memo_id</item>
+        <item>Memo Text</item>
+        <item>ID de memorando</item>
     </string-array>
     <string name="backup_wallet">Respaldar fondos</string>
     <string name="action_settings">Configuraciones</string>
@@ -719,7 +719,7 @@ Euros/Dolares</string>
     <string name="kyc_email_title">Verifique su correo electrónico</string>
     <string name="kyc_email_message">Necesitamos verificar su dirección de correo electrónico como una capa adicional de seguridad.</string>
     <string name="kyc_email_hint_focused">Tu correo electrónico</string>
-    <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
+    <string name="kyc_email_hint_unfocused">Tu correo electrónico</string>
     <string name="kyc_email_error_saving_email">Se produjo un error al guardar el correo electrónico. Vuelve a intentarlo.</string>
     <string name="kyc_email_send_verification">Enviar correo electrónico</string>
     <string name="kyc_email_validation_header">Revisa tu correo.</string>
@@ -741,7 +741,7 @@ Euros/Dolares</string>
     <string name="kyc_phone_number_error_resending">Se produjo un error al enviar el código. Vuelve a intentarlo.</string>
     <string name="kyc_veriff_splash_country_supported_header">¿Mi país es compatible?</string>
     <string name="kyc_veriff_splash_country_supported_subheader">No todos los países son compatibles en este momento. Consulte nuestra lista actualizada de <annotation link="country_list"> de países </annotation> antes de continuar.</string>
-    <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
+    <string name="kyc_veriff_splash_title">Documentos necesarios</string>
     <string name="kyc_veriff_splash_error_silver">PLATA VERIFICADA</string>
     <string name="kyc_veriff_splash_header">Confirmemos que eres tú</string>
     <string name="kyc_veriff_splash_subtitle">Necesitará 1 de los tipos de ID a continuación para continuar.</string>
@@ -762,11 +762,11 @@ Euros/Dolares</string>
     <string name="kyc_complete_home_address">Dirección de casa agregada</string>
     <string name="kyc_complete_id_uploaded">Identificación cargada</string>
     <string name="kyc_complete_video_uploaded">Video subido</string>
-    <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
+    <string name="kyc_help_dialog_need_some_help">¿Necesita ayuda?</string>
     <string name="kyc_help_dialog_need_some_help_body">Nuestro equipo de soporte de Blockchain ha escrito guías de ayuda que explican por qué necesitamos verificar su identidad.</string>
     <string name="kyc_help_dialog_read_now">Lee ahora</string>
     <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-    <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
+    <string name="kyc_help_dialog_contact_support">Soporte de contacto</string>
     <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
     <string name="kyc_settings_status_rejected">Ha fallado</string>
     <string name="kyc_settings_status_verified">Verificado</string>
@@ -776,7 +776,7 @@ Euros/Dolares</string>
     <string name="kyc_settings_gold_level_in_review">Nivel Oro - En revisión</string>
     <string name="kyc_settings_gold_level_approved">Nivel de oro: aprobado</string>
     <string name="kyc_settings_silver_level_approved">Nivel Plata - Aprobado</string>
-    <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
+    <string name="kyc_settings_tier_status_failed">Ha fallado</string>
     <string name="kyc_status_error">Error al recuperar el estado de KYC</string>
     <string name="kyc_status_title_in_progress">Verificación en progreso</string>
     <string name="kyc_status_title_failed">Fallo en la verificación</string>
@@ -798,7 +798,8 @@ Euros/Dolares</string>
     <string name="kyc_drop_off_card_description">Continúe donde lo dejó y complete su verificación de identidad.</string>
     <string name="kyc_drop_off_card_button">Continuar verificación</string>
     <string name="kyc_documents_needed">Documentos necesarios</string>
-    <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
+    <string name="kyc_resubmission_card_title">Documentos necesarios</string>
+    <string name="kyc_resubmission_splash_title">Documentos necesarios</string>
     <string name="kyc_resubmission_card_description">Tuvimos algunos problemas con los documentos que nos ha proporcionado. Intente cargar los documentos nuevamente para continuar con su verificación.</string>
     <string name="kyc_resubmission_card_button">Cargar documentos</string>
     <string name="kyc_resubmission_splash_description_1">No podemos verificar su identidad y necesitamos que vuelva a cargar los documentos requeridos.</string>
@@ -860,7 +861,7 @@ Euros/Dolares</string>
     <string name="asset_card_rate_period">24 horas</string>
     <string name="cannot_launch_app">Blockchain Wallet no se puede ejecutar en este dispositivo.</string>
     <string name="help">Ayuda</string>
-    <string name="need_some_help">¿Necesito ayuda?</string>
+    <string name="need_some_help">¿Necesita ayuda?</string>
     <string name="insufficient_funds">Fondos insuficientes</string>
     <string name="xlm_memo_text">Memo Text</string>
     <string name="xlm_memo_id">ID de memorando</string>
@@ -1325,10 +1326,10 @@ Verifique su conexión a Internet y vuelva a intentarlo o comuníquese con el so
     <string name="sell_info_action">Enviar ahora →</string>
     <string name="common_pending">Pendiente</string>
     <string name="confirm_status_msg_insufficient_funds">No tiene fondos suficientes en esta cuenta para procesar esta transacción</string>
-    <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
+    <string name="confirm_status_msg_insufficient_gas">No tiene suficiente ETH para efectuar esta transacción.</string>
     <string name="confirm_status_msg_option_invalid">Asegúrese de haber aceptado nuestros Términos.</string>
-    <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
-    <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+    <string name="confirm_status_msg_invoice_expired">Factura de BitPay caducada</string>
+    <string name="confirm_status_msg_unexpected_error">Ha ocurrido un error inesperado. Inténtelo de nuevo.</string>
     <string name="common_replaceable_value">%1$s</string>
     <string name="common_free">Gratis</string>
     <string name="two_fa_new_request">Solicitando nuevo código…</string>
@@ -1495,7 +1496,7 @@ Nota: No podrá enviar ni retirar estos fondos de su monedero durante los próxi
     <string name="trading_withdrawal_balance_locked">¡Vaya! Por razones de seguridad, su saldo está bloqueado en este momento. Inténtelo de nuevo más tarde.</string>
     <string name="trading_withdrawal_insufficient_funds">¡Vaya! No tiene suficientes fondos para retirar</string>
     <string name="trading_internal_server_error">¡Vaya! Este servicio no está disponible en este momento. Inténtelo de nuevo más tarde.</string>
-    <string name="trading_albert_error">@string/send_progress_error_title</string>
+    <string name="trading_albert_error">¡Vaya! Algo ha salido mal.</string>
     <string name="trading_service_temp_disabled">Este servicio volverá a estar disponible pronto. Estamos actualizando y arreglando algunos errores en este momento.</string>
     <string name="trading_insufficient_balance">¡Vaya! No tiene suficiente saldo para %1$s.</string>
     <string name="trading_amount_below_min">¡Vaya! El importe seleccionado está por debajo del límite mínimo de %1$s.</string>
