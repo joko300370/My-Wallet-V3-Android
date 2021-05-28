@@ -5,6 +5,7 @@ import com.blockchain.notifications.analytics.AnalyticsNames
 import com.blockchain.notifications.analytics.LaunchOrigin
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalyticsAccountType
 import piuk.blockchain.android.ui.transactionflow.analytics.toCategory
 import java.io.Serializable
 
@@ -43,6 +44,32 @@ sealed class TransferAnalyticsEvent(
             get() = AnalyticsNames.SEND_RECEIVE_VIEWED.eventName
         override val params: Map<String, Serializable>
             get() = mapOf()
+    }
+
+    class ReceiveAccountSelected(
+        private val accountType: TxFlowAnalyticsAccountType,
+        private val currency: String
+    ) : AnalyticsEvent {
+        override val event: String
+            get() = AnalyticsNames.RECEIVE_ACCOUNT_SELECTED.eventName
+        override val params: Map<String, Serializable>
+            get() = mapOf(
+                "account_type" to accountType.name,
+                "currency" to currency
+            )
+    }
+
+    class ReceiveDetailsCopied(
+        private val accountType: TxFlowAnalyticsAccountType,
+        private val currency: String
+    ) : AnalyticsEvent {
+        override val event: String
+            get() = AnalyticsNames.RECEIVE_ADDRESS_COPIED.eventName
+        override val params: Map<String, Serializable>
+            get() = mapOf(
+                "account_type" to accountType.name,
+                "currency" to currency
+            )
     }
 
     companion object {

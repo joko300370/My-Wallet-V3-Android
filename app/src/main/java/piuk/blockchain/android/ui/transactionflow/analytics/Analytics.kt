@@ -25,6 +25,7 @@ import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
 import java.io.Serializable
+import java.util.Locale
 
 const val WALLET_TYPE_NON_CUSTODIAL = "non_custodial"
 const val WALLET_TYPE_CUSTODIAL = "custodial"
@@ -550,12 +551,12 @@ class AmountSwitched(private val action: AssetAction, private val newInput: Curr
     override val params: Map<String, Serializable>
         get() = mapOf(
             "product" to action.toAnalyticsProduct(),
-            "switch_to" to if (newInput is CurrencyType.Fiat) "FIAT" else "Crypto"
+            "switch_to" to if (newInput is CurrencyType.Fiat) "FIAT" else "CRYPTO"
         )
 }
 
 private fun AssetAction.toAnalyticsProduct(): String =
     when (this) {
-        AssetAction.InterestDeposit -> "Savings"
+        AssetAction.InterestDeposit -> "SAVINGS"
         else -> this.name
-    }
+    }.toUpperCase(Locale.ENGLISH)

@@ -19,12 +19,15 @@ import piuk.blockchain.android.databinding.DialogReceiveBinding
 import piuk.blockchain.android.databinding.ReceiveShareRowBinding
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.toast
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalyticsAccountType
+import piuk.blockchain.android.ui.transfer.analytics.TransferAnalyticsEvent
 import piuk.blockchain.android.ui.transfer.receive.plugin.ReceiveMemoView
 import piuk.blockchain.android.util.getAccount
 import piuk.blockchain.android.util.invisible
 import piuk.blockchain.android.util.putAccount
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
+import java.lang.IllegalStateException
 
 internal class ReceiveSheet : MviBottomSheet<ReceiveModel, ReceiveIntent, ReceiveState, DialogReceiveBinding>() {
     override val model: ReceiveModel by scopedInject()
@@ -64,7 +67,17 @@ internal class ReceiveSheet : MviBottomSheet<ReceiveModel, ReceiveIntent, Receiv
             val addressAvailable = newState.qrBitmap != null
             if (addressAvailable) {
                 shareButton.setOnClickListener { shareAddress() }
-                copyButton.setOnClickListener { copyAddress(newState.address) }
+                copyButton.setOnClickListener {
+                    analytics.logEvent(
+                        TransferAnalyticsEvent.ReceiveDetailsCopied(
+                            accountType = TxFlowAnalyticsAccountType.fromAccount(newState.account),
+                            currency = account?.asset?.networkTicker ?: throw IllegalStateException(
+                                "Account asset is missing"
+                            )
+                        )
+                    )
+                    copyAddress(newState.address)
+                }
             } else {
                 shareButton.setOnClickListener { }
                 copyButton.setOnClickListener { }

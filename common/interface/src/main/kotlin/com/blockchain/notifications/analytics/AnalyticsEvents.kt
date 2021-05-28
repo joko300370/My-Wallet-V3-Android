@@ -108,6 +108,8 @@ enum class AnalyticsNames(val eventName: String) {
     SEND_FROM_SELECTED("Send From Selected"),
     SEND_SUBMITTED("Send Submitted"),
     SEND_RECEIVE_VIEWED("Send Receive Viewed"),
+    RECEIVE_ACCOUNT_SELECTED("Receive Currency Selected"),
+    RECEIVE_ADDRESS_COPIED("Receive Details Copied"),
     EMAIL_VERIFF_REQUESTED("Email Verification Requested");
 }
 
