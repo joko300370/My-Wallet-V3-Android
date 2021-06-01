@@ -2,9 +2,9 @@ package piuk.blockchain.android.ui.login
 
 import com.blockchain.logging.CrashLogger
 import io.reactivex.Scheduler
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
+import org.json.JSONObject
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import timber.log.Timber
@@ -21,7 +21,8 @@ class LoginModel(
     override fun performAction(previousState: LoginState, intent: LoginIntents): Disposable? {
         return when (intent) {
             is LoginIntents.LoginWithQr -> loginWithQrCode(intent.qrString)
-            is LoginIntents.SendEmail -> sendVerificationEmail(intent.selectedEmail)
+            is LoginIntents.ObtainSessionIdForEmail -> obtainSessionId(intent.selectedEmail)
+            is LoginIntents.SendEmail -> sendVerificationEmail(intent.sessionId, intent.selectedEmail)
             else -> null
         }
     }
@@ -44,15 +45,36 @@ class LoginModel(
             )
     }
 
-    private fun sendVerificationEmail(email: String): Disposable {
+    private fun obtainSessionId(email: String): Disposable {
 
-        return interactor.sendEmailForVerification(email)
-            .subscribeOn(AndroidSchedulers.mainThread())
+        return interactor.obtainSessionId(email)
+            .subscribeBy(
+                onSuccess = { responseBody ->
+                    val response = JSONObject(responseBody.string())
+                    if (response.has(SESSION_TOKEN)) {
+                        val sessionId = response.getString(SESSION_TOKEN)
+                        process(LoginIntents.SendEmail(sessionId, email))
+                    } else {
+                        process(LoginIntents.GetSessionIdFailed)
+                    }
+                },
+                onError = { throwable ->
+                    Timber.e(throwable)
+                    process(LoginIntents.GetSessionIdFailed) }
+            )
+    }
+
+    private fun sendVerificationEmail(sessionId: String, email: String): Disposable {
+        return interactor.sendEmailForVerification(sessionId, email)
             .subscribeBy(
                 onComplete = { process(LoginIntents.ShowEmailSent) },
                 onError = { throwable ->
                     Timber.e(throwable)
                     process(LoginIntents.ShowEmailFailed) }
             )
+    }
+
+    companion object {
+        private const val SESSION_TOKEN = "token"
     }
 }

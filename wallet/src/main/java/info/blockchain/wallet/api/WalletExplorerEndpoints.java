@@ -154,9 +154,28 @@ public interface WalletExplorerEndpoints {
     Single<WalletApi.IPResponse> getExternalIP();
 
     @FormUrlEncoded
+    @POST("wallet/sessions")
+    Single<ResponseBody> createSessionId(
+        @Field("email") String email,
+        @Field("api_code") String apiCode
+    );
+
+    @FormUrlEncoded
+    @POST("wallet")
+    Single<Response<ResponseBody>> authorizeSession(
+        @Header("Authorization") String sessionId,
+        @Field("token") String authCode,
+        @Field("api_code") String apiCode,
+        @Field("method") String method,
+        @Field("confirm_approval") Boolean confirmApproval
+    );
+
+    @FormUrlEncoded
     @POST("wallet")
     Single<ResponseBody> sendEmailForVerification(
+        @Header("Authorization") String sessionId,
         @Field("method") String method,
+        @Field("api_code") String apiCode,
         @Field("email") String email
     );
 }

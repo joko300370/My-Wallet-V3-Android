@@ -8,18 +8,21 @@ enum class LoginStep {
     SHOW_SCAN_ERROR,
     ENTER_PIN,
     ENTER_EMAIL,
+    GET_SESSION_ID,
     SEND_EMAIL,
     VERIFY_DEVICE,
+    SHOW_SESSION_ERROR,
     SHOW_EMAIL_ERROR
 }
 
 data class LoginState(
     val email: String = "",
+    val sessionId: String = "",
     val currentStep: LoginStep = LoginStep.SELECT_METHOD,
     val shouldRestartApp: Boolean = false
 ) : MviState {
-    val isLoggingIn: Boolean
-        get() = currentStep == LoginStep.LOG_IN
+    val isLoading: Boolean
+        get() = setOf(LoginStep.LOG_IN, LoginStep.GET_SESSION_ID, LoginStep.SEND_EMAIL).contains(currentStep)
     val isTypingEmail: Boolean
-        get() = currentStep == LoginStep.ENTER_EMAIL
+        get() = setOf(LoginStep.ENTER_EMAIL, LoginStep.SEND_EMAIL).contains(currentStep)
 }

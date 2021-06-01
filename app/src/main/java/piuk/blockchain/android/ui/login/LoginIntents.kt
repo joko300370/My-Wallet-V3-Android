@@ -16,10 +16,19 @@ sealed class LoginIntents : MviIntent<LoginState> {
             )
     }
 
-    data class SendEmail(val selectedEmail: String) : LoginIntents() {
+    data class ObtainSessionIdForEmail(val selectedEmail: String) : LoginIntents() {
         override fun reduce(oldState: LoginState): LoginState =
             oldState.copy(
                 email = selectedEmail,
+                currentStep = LoginStep.GET_SESSION_ID
+            )
+    }
+
+    data class SendEmail(val sessionId: String, val selectedEmail: String) : LoginIntents() {
+        override fun reduce(oldState: LoginState): LoginState =
+            oldState.copy(
+                email = selectedEmail,
+                sessionId = sessionId,
                 currentStep = LoginStep.SEND_EMAIL
             )
     }
@@ -28,6 +37,13 @@ sealed class LoginIntents : MviIntent<LoginState> {
         override fun reduce(oldState: LoginState): LoginState =
             oldState.copy(
                 currentStep = LoginStep.VERIFY_DEVICE
+            )
+    }
+
+    object GetSessionIdFailed : LoginIntents() {
+        override fun reduce(oldState: LoginState): LoginState =
+            oldState.copy(
+                currentStep = LoginStep.SHOW_SESSION_ERROR
             )
     }
 

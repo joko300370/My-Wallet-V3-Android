@@ -145,7 +145,7 @@ class WalletApi(
     fun submitTwoFactorCode(sessionId: String, guid: String?, twoFactorCode: String): Observable<ResponseBody> {
         val headerMap: MutableMap<String, String> =
             HashMap()
-        headerMap["Authorization"] = "Bearer $sessionId"
+        headerMap["Authorization"] = sessionId.withBearerPrefix()
         return explorerInstance.submitTwoFactorCode(
             headerMap,
             "get-wallet",
@@ -236,11 +236,31 @@ class WalletApi(
             }
     }
 
-    fun sendEmailForVerification(email: String): Single<ResponseBody> {
-        return explorerInstance.sendEmailForVerification("send-guid-reminder", email)
+    fun createSessionId(email: String): Single<ResponseBody> =
+        explorerInstance.createSessionId(email, getApiCode())
+
+    fun authorizeSession(authToken: String, sessionId: String): Single<Response<ResponseBody>> =
+        explorerInstance.authorizeSession(
+            sessionId.withBearerPrefix(),
+            authToken,
+            getApiCode(),
+            "authorize-approve",
+            true
+        )
+
+    fun sendEmailForVerification(sessionId: String, email: String): Single<ResponseBody> {
+        return explorerInstance.sendEmailForVerification(
+            sessionId.withBearerPrefix(),
+            "send-guid-reminder",
+            getApiCode(),
+            email
+        )
     }
 
     private fun getApiCode(): String {
         return apiCode.apiCode
     }
+
+    private fun String.withBearerPrefix() =
+        "Bearer $this"
 }

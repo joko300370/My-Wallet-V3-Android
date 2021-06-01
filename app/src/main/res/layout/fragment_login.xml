@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:clickable="true"
+    android:focusable="true"
+    android:animateLayoutChanges="true" >
 
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/back_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginTop="@dimen/standard_margin"
         android:background="@android:color/transparent"
         android:padding="@dimen/tiny_margin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/login_title"
         app:layout_constraintBottom_toTopOf="@+id/email_text_layout"
+        app:layout_constraintVertical_bias="0"
         app:srcCompat="@drawable/ic_arrow_back_blue" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -42,13 +48,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/login_title"
         app:layout_constraintBottom_toTopOf="@+id/login_or_label"
-        android:hint="@string/login_email_hint">
+        style="@style/LightDataInputAppearance"
+        android:hint="@string/login_email_hint"
+        android:layout_margin="@dimen/standard_margin">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/login_email_text"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/standard_margin" />
+            android:layout_height="wrap_content" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -62,19 +69,19 @@
         app:layout_constraintTop_toBottomOf="@+id/email_text_layout"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="@dimen/standard_margin"
-        app:layout_constraintVertical_bias="1"
         android:text="@string/common_continue"
+        app:layout_constraintVertical_bias="1"
         android:enabled="false"
-        android:visibility="invisible" />
+        android:visibility="gone" />
 
     <View
         android:id="@+id/login_or_separator_left"
         style="@style/HalfSeparatorWithoutMargins"
-        android:paddingTop="@dimen/tiny_margin"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/email_text_layout"
         app:layout_constraintEnd_toStartOf="@+id/login_or_label"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toTopOf="@+id/scan_pairing_button"
+         />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/login_or_label"
@@ -87,16 +94,15 @@
         android:layout_marginStart="@dimen/tiny_margin"
         android:layout_marginEnd="@dimen/tiny_margin"
         style="@style/Text.Semibold.14"
-        android:text="@string/common_or"/>
+        android:text="@string/common_or" />
 
     <View
         android:id="@+id/login_or_separator_right"
         style="@style/HalfSeparatorWithoutMargins"
-        android:paddingTop="@dimen/tiny_margin"
         app:layout_constraintStart_toEndOf="@+id/login_or_label"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/email_text_layout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toTopOf="@+id/scan_pairing_button" />
 
     <ProgressBar
         android:id="@+id/progress_bar"
@@ -117,9 +123,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/login_or_label"
         app:layout_constraintBottom_toTopOf="@id/continue_with_google_button"
-        app:layout_constraintVertical_bias="1"
+        app:layout_constraintVertical_bias="0"
         app:layout_constraintVertical_chainStyle="packed"
-        android:layout_marginTop="@dimen/epic_margin"
+        android:layout_marginTop="@dimen/standard_margin"
         android:layout_marginBottom="@dimen/standard_margin"
         android:contentDescription="@string/btn_scan_pairing_code"
         android:text="@string/btn_scan_pairing_code"
@@ -139,6 +145,7 @@
         android:text="@string/continue_with_google"
         android:textColor="@color/black"
         android:visibility="gone"
+        tools:visibility="visible"
         android:drawableStart="@drawable/ic_google" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

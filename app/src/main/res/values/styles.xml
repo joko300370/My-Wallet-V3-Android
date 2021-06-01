@@ -332,6 +332,17 @@
         <item name="errorTextAppearance">@style/ErrorText</item>
     </style>
 
+    <style name="LightEditTextThemeOverlay" parent="ThemeOverlay.AppCompat">
+        <item name="colorAccent">@color/blue_600</item>
+        <item name="colorPrimary">@color/blue_600</item>
+    </style>
+
+    <style name="LightDataInputAppearance" parent="CommonDataInputAppearance">
+        <item name="colorControlNormal">@color/grey_100</item>
+        <item name="boxStrokeColor">@color/blue_600</item>
+        <item name="theme">@style/LightEditTextThemeOverlay</item>
+    </style>
+
     <style name="FloatingBottomSheet" parent="BottomSheetDialog">
         <item name="android:windowIsFloating">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>

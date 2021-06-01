@@ -133,13 +133,37 @@ class AuthService(private val walletApi: WalletApi, rxBus: RxBus) {
         }
 
     /**
-     * Send email to verify device
+     * Create a session ID for the given email for authorization
      *
      * @param email The user's email
-     * @return An [Observable] wrapping the result
+     * @return A [Single] wrapping the result
      */
-    fun sendEmailForDeviceVerification(email: String): Single<ResponseBody> =
+    fun createSessionId(email: String): Single<ResponseBody> =
         rxPinning.callSingle {
-            walletApi.sendEmailForVerification(email)
+            walletApi.createSessionId(email)
+        }
+
+    /**
+     * Authorize the request for the given session ID
+     *
+     * @param authToken The token required for auth from the email
+     * @param sessionId The current session ID
+     * @return A [Single] wrapping the result
+     */
+    fun authorizeSession(authToken: String, sessionId: String): Single<Response<ResponseBody>> =
+        rxPinning.callSingle {
+            walletApi.authorizeSession(authToken, sessionId)
+        }
+
+    /**
+     * Send email to verify device
+     *
+     * @param sessionId The token for the current session
+     * @param email The user's email
+     * @return A [Single] wrapping the result
+     */
+    fun sendEmailForDeviceVerification(sessionId: String, email: String): Single<ResponseBody> =
+        rxPinning.callSingle {
+            walletApi.sendEmailForVerification(sessionId, email)
         }
 }

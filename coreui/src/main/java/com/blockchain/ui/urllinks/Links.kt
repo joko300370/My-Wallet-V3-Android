@@ -60,3 +60,6 @@ const val NETWORK_ERC20_EXPLANATION = "https://www.blockchain-status.com"
 const val EXCHANGE_SWAP_RATE_EXPLANATION = "https://www.blockchain-status.com"
 const val CHECKOUT_PRICE_EXPLANATION = "https://www.blockchain-status.com"
 const val CHECKOUT_REFUND_POLICY = "https://www.blockchain.com/legal/terms"
+
+// updated login TODO update with real urls
+const val SECOND_PASSWORD_EXPLANATION = "https://www.blockchain-status.com"

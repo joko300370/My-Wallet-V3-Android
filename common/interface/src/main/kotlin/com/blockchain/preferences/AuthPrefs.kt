@@ -12,4 +12,7 @@ interface AuthPrefs {
     var walletGuid: String
     var encryptedPassword: String
     var pinFails: Int
+    var sessionId: String
+
+    fun clearSessionId()
 }

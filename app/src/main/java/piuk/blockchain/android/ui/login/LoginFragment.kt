@@ -60,7 +60,7 @@ class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState, Fragment
             continueButton.setOnClickListener {
                 loginEmailText.text?.let { emailInputText ->
                     if (emailInputText.isNotBlank()) {
-                        model.process(LoginIntents.SendEmail(emailInputText.toString()))
+                        model.process(LoginIntents.ObtainSessionIdForEmail(emailInputText.toString()))
                     }
                 }
             }
@@ -96,7 +96,8 @@ class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState, Fragment
                     }
                 )
             }
-            LoginStep.VERIFY_DEVICE -> navigateToVerifyDevice(newState.email)
+            LoginStep.VERIFY_DEVICE -> navigateToVerifyDevice()
+            LoginStep.SHOW_SESSION_ERROR -> toast(R.string.login_failed_session_id_error, ToastCustom.TYPE_ERROR)
             LoginStep.SHOW_EMAIL_ERROR -> toast(R.string.login_send_email_error, ToastCustom.TYPE_ERROR)
             else -> {}
         }
@@ -113,7 +114,7 @@ class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState, Fragment
             try {
                 val task = GoogleSignIn.getSignedInAccountFromIntent(data)
                 task.result.email?.let { email ->
-                    model.process(LoginIntents.SendEmail(email))
+                    model.process(LoginIntents.ObtainSessionIdForEmail(email))
                 } ?: toast(R.string.login_google_email_not_found, ToastCustom.TYPE_GENERAL)
             } catch (apiException: ApiException) {
                 Timber.e(apiException)
@@ -124,23 +125,23 @@ class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState, Fragment
 
     private fun updateUI(newState: LoginState) {
         with(binding) {
-            progressBar.visibleIf { newState.isLoggingIn }
-            loginOrLabel.visibleIf { !newState.isTypingEmail && !newState.isLoggingIn }
-            loginOrSeparatorLeft.visibleIf { !newState.isTypingEmail && !newState.isLoggingIn }
-            loginOrSeparatorRight.visibleIf { !newState.isTypingEmail && !newState.isLoggingIn }
-            scanPairingButton.visibleIf { !newState.isTypingEmail }
+            progressBar.visibleIf { newState.isLoading }
+            loginOrLabel.visibleIf { !newState.isTypingEmail && !newState.isLoading }
+            loginOrSeparatorLeft.visibleIf { !newState.isTypingEmail && !newState.isLoading }
+            loginOrSeparatorRight.visibleIf { !newState.isTypingEmail && !newState.isLoading }
+            scanPairingButton.visibleIf { !newState.isTypingEmail && !newState.isLoading }
             // TODO enable Google auth once ready
             continueButton.visibleIf { newState.isTypingEmail }
             continueButton.isEnabled = newState.isTypingEmail && emailRegex.matches(newState.email)
         }
     }
 
-    private fun navigateToVerifyDevice(loginEmail: String) {
+    private fun navigateToVerifyDevice() {
         parentFragmentManager.run {
             beginTransaction()
                 .replace(
                     R.id.content_frame,
-                    VerifyDeviceFragment.newInstance(loginEmail),
+                    VerifyDeviceFragment(),
                     VerifyDeviceFragment::class.simpleName
                 )
                 .addToBackStack(VerifyDeviceFragment::class.simpleName)

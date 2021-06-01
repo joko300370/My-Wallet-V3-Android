@@ -1,6 +1,8 @@
 package piuk.blockchain.android.ui.login
 
 import io.reactivex.Completable
+import io.reactivex.Single
+import okhttp3.ResponseBody
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.data.auth.AuthService
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -27,8 +29,13 @@ class LoginInteractor(
             .doOnError { appUtil.clearCredentials() }
     }
 
-    fun sendEmailForVerification(email: String): Completable {
-        return authService.sendEmailForDeviceVerification(email)
+    fun obtainSessionId(email: String): Single<ResponseBody> {
+        return authService.createSessionId(email)
+    }
+
+    fun sendEmailForVerification(sessionId: String, email: String): Completable {
+        prefs.sessionId = sessionId
+        return authService.sendEmailForDeviceVerification(sessionId, email)
             .ignoreElement()
     }
 }

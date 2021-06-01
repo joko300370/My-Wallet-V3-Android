@@ -431,6 +431,14 @@ class PrefsUtil(
         removeValue(KEY_ENCRYPTED_PIN_CODE)
     }
 
+    override var sessionId: String
+        get() = getValue(SESSION_ID, "")
+        set(value) = setValue(SESSION_ID, value)
+
+    override fun clearSessionId() {
+        removeValue(SESSION_ID)
+    }
+
     private fun encodeToBase64(data: String) =
         Base64.encodeToString(data.toByteArray(charset("UTF-8")), Base64.DEFAULT)
 
@@ -680,6 +688,7 @@ class PrefsUtil(
         private const val KEY_SHARED_KEY = "sharedKey"
         private const val KEY_ENCRYPTED_PASSWORD = "encrypted_password"
         const val KEY_PIN_FAILS = "pin_fails"
+        const val SESSION_ID = "session_id"
     }
 }
 
