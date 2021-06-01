@@ -118,7 +118,7 @@ open class CustodialTradingAccount(
             }
             .flatMap {
                 appendSendActivity(custodialWalletManager, asset, it)
-            }
+            }.filterActivityStates()
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
             .onErrorReturn { emptyList() }
 
