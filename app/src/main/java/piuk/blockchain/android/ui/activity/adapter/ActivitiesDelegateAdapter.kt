@@ -33,6 +33,7 @@ class ActivitiesDelegateAdapter(
             addAdapterDelegate(CustodialFiatActivityItemDelegate(onFiatItemClicked))
             addAdapterDelegate(CustodialInterestActivityItemDelegate(prefs, assetResources, onCryptoItemClicked))
             addAdapterDelegate(CustodialRecurringBuyActivityItemDelegate(assetResources, onCryptoItemClicked))
+            addAdapterDelegate(CustodialSendActivityItemDelegate(prefs, assetResources, onCryptoItemClicked))
         }
     }
 }

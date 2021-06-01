@@ -1,13 +1,13 @@
 package piuk.blockchain.android.coincore
 
 import com.blockchain.nabu.datamanagers.CurrencyPair
+import com.blockchain.nabu.datamanagers.CustodialOrderState
 import com.blockchain.nabu.datamanagers.InterestState
 import com.blockchain.nabu.datamanagers.OrderState
-import com.blockchain.nabu.datamanagers.TransferDirection
-import com.blockchain.nabu.datamanagers.CustodialOrderState
 import com.blockchain.nabu.datamanagers.RecurringBuyActivityState
 import com.blockchain.nabu.datamanagers.TransactionState
 import com.blockchain.nabu.datamanagers.TransactionType
+import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import info.blockchain.balance.CryptoCurrency
@@ -148,6 +148,24 @@ data class CustodialTradingActivitySummaryItem(
     val paymentMethodType: PaymentMethodType,
     val depositPaymentId: String
 ) : CryptoActivitySummaryItem()
+
+data class CustodialSendActivitySummaryItem(
+    override val cryptoCurrency: CryptoCurrency,
+    override val exchangeRates: ExchangeRateDataManager,
+    override val txId: String,
+    override val timeStampMs: Long,
+    override val value: Money,
+    override val account: SingleAccount,
+    val fee: Money,
+    val recipientAddress: String,
+    val txHash: String,
+    val state: TransactionState,
+    val fiatValue: FiatValue
+) : CryptoActivitySummaryItem() {
+    val isConfirmed: Boolean by lazy {
+        state == TransactionState.COMPLETED
+    }
+}
 
 abstract class NonCustodialActivitySummaryItem : CryptoActivitySummaryItem() {
 

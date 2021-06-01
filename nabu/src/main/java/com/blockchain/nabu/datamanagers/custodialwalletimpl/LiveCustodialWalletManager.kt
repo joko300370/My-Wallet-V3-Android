@@ -14,6 +14,7 @@ import com.blockchain.nabu.datamanagers.BuySellOrder
 import com.blockchain.nabu.datamanagers.BuySellPair
 import com.blockchain.nabu.datamanagers.BuySellPairs
 import com.blockchain.nabu.datamanagers.CardToBeActivated
+import com.blockchain.nabu.datamanagers.CryptoTransaction
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialOrder
 import com.blockchain.nabu.datamanagers.CustodialOrderState
@@ -79,7 +80,6 @@ import com.blockchain.nabu.models.responses.interest.InterestWithdrawalBody
 import com.blockchain.nabu.models.responses.nabu.AddAddressRequest
 import com.blockchain.nabu.models.responses.nabu.State
 import com.blockchain.nabu.models.responses.simplebuy.AddNewCardBodyRequest
-import com.blockchain.nabu.models.responses.simplebuy.AmountResponse
 import com.blockchain.nabu.models.responses.simplebuy.BankAccountResponse
 import com.blockchain.nabu.models.responses.simplebuy.BuyOrderListResponse
 import com.blockchain.nabu.models.responses.simplebuy.BuySellOrderResponse
@@ -292,13 +292,16 @@ class LiveCustodialWalletManager(
             }.distinct()
         }
 
-    override fun getTransactions(currency: String): Single<List<FiatTransaction>> =
+    override fun getCustodialFiatTransactions(
+        currency: String,
+        product: Product
+    ): Single<List<FiatTransaction>> =
         authenticator.authenticate { token ->
-            nabuService.getTransactions(token, currency).map { response ->
+            nabuService.getTransactions(token, currency, product.toRequestString()).map { response ->
                 response.items.map {
                     FiatTransaction(
                         id = it.id,
-                        amount = it.amount.toFiat(),
+                        amount = FiatValue.fromMinor(it.amount.symbol, it.amountMinor.toLong()),
                         date = it.insertedAt.fromIso8601ToUtc()?.toLocalTime() ?: Date(),
                         state = it.state.toTransactionState(),
                         type = it.type.toTransactionType()
@@ -308,8 +311,34 @@ class LiveCustodialWalletManager(
             }
         }
 
-    private fun AmountResponse.toFiat() =
-        FiatValue.fromMajor(symbol, value)
+    override fun getCustodialCryptoTransactions(
+        currency: String,
+        product: Product,
+        type: String
+    ): Single<List<CryptoTransaction>> =
+        authenticator.authenticate { token ->
+            nabuService.getTransactions(token, currency, product.toRequestString(), type).map { response ->
+                response.items.mapNotNull {
+                    val crypto = CryptoCurrency.fromNetworkTicker(it.amount.symbol)
+                    crypto?.let { asset ->
+                        CryptoTransaction(
+                            id = it.id,
+                            amount = CryptoValue.fromMinor(asset, it.amountMinor.toBigInteger()),
+                            date = it.insertedAt.fromIso8601ToUtc()?.toLocalTime() ?: Date(),
+                            state = it.state.toTransactionState(),
+                            type = it.type.toTransactionType(),
+                            fee = it.feeMinor?.let { fee ->
+                                CryptoValue.fromMinor(asset, fee.toBigInteger())
+                            } ?: CryptoValue.zero(asset),
+                            receivingAddress = it.extraAttributes.beneficiary.accountRef,
+                            txHash = it.txHash.orEmpty(),
+                            currency = currencyPrefs.selectedFiatCurrency
+                        )
+                    }
+                }
+                    .filter { it.state != TransactionState.UNKNOWN && it.type != TransactionType.UNKNOWN }
+            }
+        }
 
     override fun getPredefinedAmounts(currency: String): Single<List<FiatValue>> =
         authenticator.authenticate {
@@ -1439,7 +1468,8 @@ fun String.toCustodialOrderState(): CustodialOrderState =
 
 private fun String.toTransactionType(): TransactionType =
     when (this) {
-        TransactionResponse.DEPOSIT, TransactionResponse.CHARGE -> TransactionType.DEPOSIT
+        TransactionResponse.DEPOSIT,
+        TransactionResponse.CHARGE -> TransactionType.DEPOSIT
         TransactionResponse.WITHDRAWAL -> TransactionType.WITHDRAWAL
         else -> TransactionType.UNKNOWN
     }

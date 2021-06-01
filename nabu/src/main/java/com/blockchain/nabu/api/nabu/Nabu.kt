@@ -247,7 +247,8 @@ internal interface Nabu {
     fun getTransactions(
         @Header("authorization") authorization: String,
         @Query("currency") currency: String,
-        @Query("product") product: String = "SIMPLEBUY"
+        @Query("product") product: String,
+        @Query("type") type: String?
     ): Single<TransactionsResponse>
 
     @GET(NABU_SIMPLE_QUOTE)

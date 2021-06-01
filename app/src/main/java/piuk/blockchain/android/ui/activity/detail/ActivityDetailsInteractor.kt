@@ -22,6 +22,7 @@ import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
+import piuk.blockchain.android.coincore.CustodialSendActivitySummaryItem
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
@@ -149,6 +150,21 @@ class ActivityDetailsInteractor(
         }
     }
 
+    fun loadCustodialSendItems(
+        summaryItem: CustodialSendActivitySummaryItem
+    ): Single<List<ActivityDetailsType>> =
+        Single.just(
+            listOf(
+                TransactionId(summaryItem.txId),
+                Created(Date(summaryItem.timeStampMs)),
+                From(summaryItem.account.label),
+                To(summaryItem.recipientAddress),
+                Amount(summaryItem.value),
+                Value(summaryItem.fiatValue),
+                NetworkFee(summaryItem.fee)
+            )
+        )
+
     fun loadSwapItems(
         item: TradeActivitySummaryItem
     ): Single<List<ActivityDetailsType>> {
@@ -260,6 +276,15 @@ class ActivityDetailsInteractor(
             cryptoCurrency,
             txHash
         ) as? CustodialInterestActivitySummaryItem
+
+    fun getCustodialSendActivityDetails(
+        cryptoCurrency: CryptoCurrency,
+        txHash: String
+    ): CustodialSendActivitySummaryItem? =
+        assetActivityRepository.findCachedItem(
+            cryptoCurrency,
+            txHash
+        ) as? CustodialSendActivitySummaryItem
 
     fun getTradeActivityDetails(
         cryptoCurrency: CryptoCurrency,

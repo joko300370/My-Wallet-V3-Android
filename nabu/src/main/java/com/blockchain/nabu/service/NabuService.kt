@@ -332,10 +332,14 @@ class NabuService(retrofit: Retrofit) {
 
     internal fun getTransactions(
         sessionToken: NabuSessionTokenResponse,
-        currency: String
+        currency: String,
+        product: String,
+        type: String? = null
     ): Single<TransactionsResponse> = service.getTransactions(
         sessionToken.authHeader,
-        currency
+        currency,
+        product,
+        type
     ).wrapErrorMessage()
 
     internal fun isEligibleForSimpleBuy(

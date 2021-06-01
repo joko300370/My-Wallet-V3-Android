@@ -91,6 +91,7 @@ class ActivityDetailsModel(
                     CryptoActivityType.NON_CUSTODIAL -> loadNonCustodialActivityDetails(intent)
                     CryptoActivityType.CUSTODIAL_TRADING -> loadCustodialTradingActivityDetails(intent)
                     CryptoActivityType.CUSTODIAL_INTEREST -> loadCustodialInterestActivityDetails(intent)
+                    CryptoActivityType.CUSTODIAL_SEND -> loadCustodialSendActivityDetails(intent)
                     CryptoActivityType.SWAP -> loadSwapActivityDetails(intent)
                     CryptoActivityType.SELL -> loadSellActivityDetails(intent)
                     CryptoActivityType.UNKNOWN -> {
@@ -135,7 +136,8 @@ class ActivityDetailsModel(
             is LoadCustodialInterestHeaderDataIntent,
             is LoadSwapHeaderDataIntent,
             is LoadSellHeaderDataIntent,
-            is LoadNonCustodialHeaderDataIntent -> null
+            is LoadNonCustodialHeaderDataIntent,
+            is LoadCustodialSendHeaderDataIntent -> null
         }
     }
 
@@ -206,6 +208,21 @@ class ActivityDetailsModel(
         )?.let {
             process(LoadCustodialInterestHeaderDataIntent(it))
             interactor.loadCustodialInterestItems(it).subscribeBy(
+                onSuccess = { activityList ->
+                    process(ListItemsLoadedIntent(activityList))
+                },
+                onError = {
+                    process(ListItemsFailedToLoadIntent)
+                })
+        } ?: process(ActivityDetailsLoadFailedIntent)
+
+    private fun loadCustodialSendActivityDetails(intent: LoadActivityDetailsIntent) =
+        interactor.getCustodialSendActivityDetails(
+            cryptoCurrency = intent.cryptoCurrency,
+            txHash = intent.txHash
+        )?.let {
+            process(LoadCustodialSendHeaderDataIntent(it))
+            interactor.loadCustodialSendItems(it).subscribeBy(
                 onSuccess = { activityList ->
                     process(ListItemsLoadedIntent(activityList))
                 },

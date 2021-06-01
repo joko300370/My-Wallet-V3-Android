@@ -117,9 +117,16 @@ interface CustodialWalletManager {
         currency: String
     ): Single<List<FiatValue>>
 
-    fun getTransactions(
-        currency: String
+    fun getCustodialFiatTransactions(
+        currency: String,
+        product: Product
     ): Single<List<FiatTransaction>>
+
+    fun getCustodialCryptoTransactions(
+        currency: String,
+        product: Product,
+        type: String
+    ): Single<List<CryptoTransaction>>
 
     fun getBankAccountDetails(
         currency: String
@@ -407,6 +414,18 @@ data class FiatTransaction(
     val date: Date,
     val type: TransactionType,
     val state: TransactionState
+)
+
+data class CryptoTransaction(
+    val amount: Money,
+    val id: String,
+    val date: Date,
+    val type: TransactionType,
+    val state: TransactionState,
+    val receivingAddress: String,
+    val fee: Money,
+    val txHash: String,
+    val currency: String
 )
 
 enum class TransactionType {

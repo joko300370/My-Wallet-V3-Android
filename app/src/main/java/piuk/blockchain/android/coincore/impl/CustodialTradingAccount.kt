@@ -2,6 +2,7 @@ package piuk.blockchain.android.coincore.impl
 
 import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.BuySellOrder
+import com.blockchain.nabu.datamanagers.CryptoTransaction
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialOrderState
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
@@ -23,6 +24,7 @@ import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.CustodialSendActivitySummaryItem
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.RecurringBuyActivitySummaryItem
@@ -114,16 +116,16 @@ open class CustodialTradingAccount(
             .flatMap { (buySellList, recurringBuyList) ->
                 appendTradeActivity(custodialWalletManager, asset, buySellList + recurringBuyList)
             }
-            .filterActivityStates()
+            .flatMap {
+                appendSendActivity(custodialWalletManager, asset, it)
+            }
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
             .onErrorReturn { emptyList() }
 
-    override
-    val isFunded: Boolean
+    override val isFunded: Boolean
         get() = hasFunds.get()
 
-    override
-    val isDefault: Boolean =
+    override val isDefault: Boolean =
         false // Default is, presently, only ever a non-custodial account.
 
     override
@@ -139,8 +141,7 @@ open class CustodialTradingAccount(
             }
         }
 
-    override
-    val actions: Single<AvailableActions>
+    override val actions: Single<AvailableActions>
         get() =
             Singles.zip(
                 accountBalance.map { it.isPositive },
@@ -162,6 +163,32 @@ open class CustodialTradingAccount(
                     activity, send, swap, sell, interest, receive
                 )
             }
+
+    private fun appendSendActivity(
+        custodialWalletManager: CustodialWalletManager,
+        asset: CryptoCurrency,
+        summaryList: List<ActivitySummaryItem>
+    ) = custodialWalletManager.getCustodialCryptoTransactions(asset.networkTicker, Product.BUY, transactionType)
+        .map { txs ->
+            txs.map {
+                it.toSummaryItem()
+            } + summaryList
+        }
+
+    private fun CryptoTransaction.toSummaryItem() =
+        CustodialSendActivitySummaryItem(
+            cryptoCurrency = asset,
+            exchangeRates = exchangeRates,
+            txId = id,
+            timeStampMs = date.time,
+            value = amount,
+            account = this@CustodialTradingAccount,
+            fee = fee,
+            recipientAddress = receivingAddress,
+            txHash = txHash,
+            state = state,
+            fiatValue = (amount as CryptoValue).toFiat(exchangeRates, currency)
+        )
 
     private fun orderToSummary(order: BuySellOrder): ActivitySummaryItem =
         if (order.type == OrderType.BUY) {
@@ -248,6 +275,8 @@ open class CustodialTradingAccount(
             CustodialOrderState.PENDING_DEPOSIT,
             CustodialOrderState.PENDING_EXECUTION
         )
+
+        private val transactionType = "WITHDRAWAL"
     }
 }
 

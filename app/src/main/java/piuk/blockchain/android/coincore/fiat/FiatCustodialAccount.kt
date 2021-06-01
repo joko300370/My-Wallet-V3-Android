@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.fiat
 
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.Product
 import com.blockchain.nabu.datamanagers.TransactionState
 import com.blockchain.nabu.datamanagers.TransactionType
 import com.blockchain.nabu.datamanagers.repositories.CustodialAssetWalletsBalancesRepository
@@ -64,7 +65,7 @@ internal class FiatCustodialAccount(
         private set
 
     override val activity: Single<ActivitySummaryList>
-        get() = custodialWalletManager.getTransactions(fiatCurrency)
+        get() = custodialWalletManager.getCustodialFiatTransactions(fiatCurrency, Product.BUY)
             .doOnSuccess {
                 setHasTransactions(it.isEmpty().not())
             }.map {
@@ -83,7 +84,7 @@ internal class FiatCustodialAccount(
             }
 
     override fun canWithdrawFunds(): Single<Boolean> =
-        custodialWalletManager.getTransactions(fiatCurrency).map {
+        custodialWalletManager.getCustodialFiatTransactions(fiatCurrency, Product.BUY).map {
             it.filter { tx -> tx.type == TransactionType.WITHDRAWAL && tx.state == TransactionState.PENDING }
         }.map {
             it.isEmpty()

@@ -5,6 +5,7 @@ import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
+import piuk.blockchain.android.coincore.CustodialSendActivitySummaryItem
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.TradeActivitySummaryItem
@@ -84,6 +85,21 @@ class LoadCustodialInterestHeaderDataIntent(
             isFeeTransaction = false,
             confirmations = summaryItem.confirmations,
             totalConfirmations = summaryItem.account.asset.requiredConfirmations
+        )
+    }
+}
+
+class LoadCustodialSendHeaderDataIntent(
+    private val summaryItem: CustodialSendActivitySummaryItem
+) : ActivityDetailsIntents() {
+    override fun reduce(oldState: ActivityDetailState): ActivityDetailState {
+        return oldState.copy(
+            transactionType = TransactionSummary.TransactionType.SENT,
+            amount = summaryItem.value,
+            isPending = !summaryItem.isConfirmed,
+            isFeeTransaction = false,
+            confirmations = 0,
+            totalConfirmations = 0
         )
     }
 }
