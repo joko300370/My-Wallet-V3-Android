@@ -43,6 +43,8 @@ import com.blockchain.nabu.datamanagers.repositories.RecurringBuyRepository
 import com.blockchain.nabu.datamanagers.repositories.WithdrawLocksRepository
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestAvailabilityProvider
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestAvailabilityProviderImpl
+import com.blockchain.nabu.datamanagers.repositories.interest.InterestBalancesProvider
+import com.blockchain.nabu.datamanagers.repositories.interest.InterestBalancesProviderImpl
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestEligibilityProvider
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestEligibilityProviderImpl
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestLimitsProvider
@@ -168,6 +170,13 @@ val nabuModule = module {
         }.bind(InterestEligibilityProvider::class)
 
         factory {
+            InterestBalancesProviderImpl(
+                nabuService = get(),
+                authenticator = get()
+            )
+        }.bind(InterestBalancesProvider::class)
+
+        factory {
             BalanceProviderImpl(
                 nabuService = get(),
                 authenticator = get()
@@ -262,7 +271,8 @@ val nabuModule = module {
             InterestRepository(
                 interestAvailabilityProvider = get(),
                 interestEligibilityProvider = get(),
-                interestLimitsProvider = get()
+                interestLimitsProvider = get(),
+                interestAccountBalancesProvider = get()
             )
         }
 

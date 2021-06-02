@@ -410,11 +410,6 @@ internal interface Nabu {
         @Header("authorization") authorization: String
     ): Single<AllAssetBalancesResponse>
 
-    @GET(NABU_INTEREST_BALANCES)
-    fun getInterestWalletBalanceForAllAssets(
-        @Header("authorization") authorization: String
-    ): Single<AllAssetBalancesResponse>
-
     @Headers("blockchain-origin: simplebuy")
     @POST(NABU_SIMPLE_BUY_BALANCE_TRANSFER)
     fun transferFunds(

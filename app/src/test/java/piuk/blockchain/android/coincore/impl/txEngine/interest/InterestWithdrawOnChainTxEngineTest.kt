@@ -172,7 +172,7 @@ class InterestWithdrawOnChainTxEngineTest {
         verify(custodialWalletManager).getInterestLimits(ASSET)
         verify(custodialWalletManager).fetchCryptoWithdrawFeeAndMinLimit(ASSET, Product.SAVINGS)
         verify(currencyPrefs).selectedFiatCurrency
-        verify(sourceAccount).accountBalance
+        verify(sourceAccount).actionableBalance
 
         noMoreInteractions(sourceAccount, txTarget)
     }
@@ -203,7 +203,7 @@ class InterestWithdrawOnChainTxEngineTest {
 
         verify(custodialWalletManager).getInterestLimits(ASSET)
         verify(custodialWalletManager).fetchCryptoWithdrawFeeAndMinLimit(ASSET, Product.SAVINGS)
-        verify(sourceAccount).accountBalance
+        verify(sourceAccount).actionableBalance
 
         noMoreInteractions(sourceAccount, txTarget)
     }
@@ -234,7 +234,7 @@ class InterestWithdrawOnChainTxEngineTest {
 
         verify(custodialWalletManager).getInterestLimits(ASSET)
         verify(custodialWalletManager).fetchCryptoWithdrawFeeAndMinLimit(ASSET, Product.SAVINGS)
-        verify(sourceAccount).accountBalance
+        verify(sourceAccount).actionableBalance
 
         noMoreInteractions(sourceAccount, txTarget)
     }

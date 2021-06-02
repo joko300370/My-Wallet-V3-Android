@@ -13,9 +13,4 @@ class BalanceProviderImpl(
         authenticator.authenticate {
             nabuService.getCustodialWalletBalanceForAllAssets(it)
         }
-
-    override fun getInterestWalletBalanceForAllAssets(): Single<AllAssetBalancesResponse> =
-        authenticator.authenticate {
-            nabuService.getInterestWalletBalanceForAllAssets(it)
-        }
 }

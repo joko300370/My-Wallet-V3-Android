@@ -9,8 +9,8 @@ class TimedCacheRequest<T>(
     private val cacheLifetimeSeconds: Long,
     private val refreshFn: () -> Single<T>
 ) {
-    val expired = AtomicBoolean(true)
-    var current = refreshFn.invoke()
+    private val expired = AtomicBoolean(true)
+    private var current = refreshFn.invoke()
 
     fun getCachedSingle(): Single<T> =
         Single.defer {
@@ -26,12 +26,12 @@ class TimedCacheRequest<T>(
         }
 }
 
-class ParameteredTimedCacheRequest<INPUT, OUTPUT>(
+class ParameteredSingleTimedCacheRequest<INPUT, OUTPUT>(
     private val cacheLifetimeSeconds: Long,
     private val refreshFn: (INPUT) -> Single<OUTPUT>
 ) {
-    val expired = hashMapOf<INPUT, Boolean>()
-    lateinit var current: Single<OUTPUT>
+    private val expired = hashMapOf<INPUT, Boolean>()
+    private lateinit var current: Single<OUTPUT>
 
     fun getCachedSingle(input: INPUT): Single<OUTPUT> =
         Single.defer {
@@ -47,4 +47,35 @@ class ParameteredTimedCacheRequest<INPUT, OUTPUT>(
             }
             current
         }
+
+    fun invalidate(input: INPUT) {
+        expired[input] = true
+    }
+}
+
+class ParameteredMappedSinglesTimedRequests<INPUT, OUTPUT>(
+    private val cacheLifetimeSeconds: Long,
+    private val refreshFn: (INPUT) -> Single<OUTPUT>
+) {
+    private val expired = hashMapOf<INPUT, Boolean>()
+    private val values = hashMapOf<INPUT, Single<OUTPUT>>()
+
+    fun getCachedSingle(input: INPUT): Single<OUTPUT> =
+        Single.defer {
+            if (expired[input] != false) {
+                values[input] = refreshFn.invoke(input).cache().doOnSuccess {
+                    expired[input] = false
+                }.doOnError {
+                    expired[input] = true
+                }
+
+                Single.timer(cacheLifetimeSeconds, TimeUnit.SECONDS)
+                    .subscribeBy(onSuccess = { expired[input] = true })
+            }
+            values[input]
+        }
+
+    fun invalidate(input: INPUT) {
+        expired[input] = true
+    }
 }

@@ -5,5 +5,4 @@ import io.reactivex.Single
 
 interface BalancesProvider {
     fun getCustodialWalletBalanceForAllAssets(): Single<AllAssetBalancesResponse>
-    fun getInterestWalletBalanceForAllAssets(): Single<AllAssetBalancesResponse>
 }

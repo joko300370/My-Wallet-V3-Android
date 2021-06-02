@@ -203,9 +203,11 @@ interface CustodialWalletManager {
         isBankPartner: Boolean?
     ): Single<BuySellOrder>
 
-    fun getInterestAccountBalance(crypto: CryptoCurrency): Maybe<CryptoValue>
+    fun getInterestAccountBalance(crypto: CryptoCurrency): Single<CryptoValue>
 
-    fun getPendingInterestAccountBalance(crypto: CryptoCurrency): Maybe<CryptoValue>
+    fun getPendingInterestAccountBalance(crypto: CryptoCurrency): Single<CryptoValue>
+
+    fun getActionableInterestAccountBalance(crypto: CryptoCurrency): Single<CryptoValue>
 
     fun getInterestAccountDetails(crypto: CryptoCurrency): Single<InterestAccountDetails>
 
@@ -225,7 +227,7 @@ interface CustodialWalletManager {
 
     fun startInterestWithdrawal(cryptoCurrency: CryptoCurrency, amount: Money, address: String): Completable
 
-    fun getInterestActionableBalanceForAsset(crypto: CryptoCurrency): Maybe<CryptoValue>
+    fun invalidateInterestBalanceForAsset(crypto: CryptoCurrency)
 
     fun getSupportedFundsFiats(fiatCurrency: String = defaultFiatCurrency): Single<List<String>>
 
@@ -345,7 +347,9 @@ enum class InterestState {
 data class InterestAccountDetails(
     val balance: CryptoValue,
     val pendingInterest: CryptoValue,
-    val totalInterest: CryptoValue
+    val pendingDeposit: CryptoValue,
+    val totalInterest: CryptoValue,
+    val lockedBalance: CryptoValue
 )
 
 data class BuySellOrder(

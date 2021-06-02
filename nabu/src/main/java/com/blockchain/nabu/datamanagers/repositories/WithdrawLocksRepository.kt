@@ -2,14 +2,14 @@ package com.blockchain.nabu.datamanagers.repositories
 
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
-import com.blockchain.rx.ParameteredTimedCacheRequest
+import com.blockchain.rx.ParameteredSingleTimedCacheRequest
 import io.reactivex.Single
 import timber.log.Timber
 import java.math.BigInteger
 
 class WithdrawLocksRepository(custodialWalletManager: CustodialWalletManager) {
 
-    private val cache = ParameteredTimedCacheRequest<WithdrawalData, BigInteger>(
+    private val cache = ParameteredSingleTimedCacheRequest<WithdrawalData, BigInteger>(
         cacheLifetimeSeconds = 100L,
         refreshFn = { data ->
             custodialWalletManager.fetchWithdrawLocksTime(

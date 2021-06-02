@@ -74,23 +74,16 @@ internal class CryptoInterestAccount(
 
     override val accountBalance: Single<Money>
         get() = custodialWalletManager.getInterestAccountBalance(asset)
-            .switchIfEmpty(
-                Single.just(CryptoValue.zero(asset))
-            ).doOnSuccess { hasFunds.set(it.isPositive) }
+            .doOnSuccess { hasFunds.set(it.isPositive) }
             .map { it }
 
     override val pendingBalance: Single<Money>
         get() = custodialWalletManager.getPendingInterestAccountBalance(asset)
-            .switchIfEmpty(
-                Single.just(CryptoValue.zero(asset))
-            ).map { it }
+            .map { it }
 
     override val actionableBalance: Single<Money>
-        get() = custodialWalletManager.getInterestActionableBalanceForAsset(asset)
-            .toSingle(CryptoValue.zero(asset))
-            .onErrorReturn {
-                CryptoValue.zero(asset)
-            }.map { it }
+        get() = custodialWalletManager.getActionableInterestAccountBalance(asset)
+            .map { it }
 
     override val activity: Single<ActivitySummaryList>
         get() = custodialWalletManager.getInterestActivity(asset)

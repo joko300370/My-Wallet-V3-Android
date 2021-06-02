@@ -843,29 +843,15 @@ class LiveCustodialWalletManager(
 
     override fun getInterestAccountBalance(
         crypto: CryptoCurrency
-    ): Maybe<CryptoValue> =
-        authenticator.authenticateMaybe { sessionToken ->
-            nabuService.getInterestAccountBalance(sessionToken, crypto.networkTicker)
-                .map { accountDetailsResponse ->
-                    CryptoValue.fromMinor(
-                        currency = crypto,
-                        minor = accountDetailsResponse.balance.toBigInteger()
-                    )
-                }
-        }
+    ): Single<CryptoValue> = interestRepository.getInterestAccountBalance(crypto)
 
     override fun getPendingInterestAccountBalance(
         crypto: CryptoCurrency
-    ): Maybe<CryptoValue> =
-        authenticator.authenticateMaybe { sessionToken ->
-            nabuService.getInterestAccountBalance(sessionToken, crypto.networkTicker)
-                .map { accountDetailsResponse ->
-                    CryptoValue.fromMinor(
-                        currency = crypto,
-                        minor = accountDetailsResponse.pendingDeposit.toBigInteger()
-                    )
-                }
-        }
+    ): Single<CryptoValue> = interestRepository.getInterestPendingBalance(crypto)
+
+    override fun getActionableInterestAccountBalance(
+        crypto: CryptoCurrency
+    ): Single<CryptoValue> = interestRepository.getInterestActionableBalance(crypto)
 
     override fun getInterestAccountDetails(
         crypto: CryptoCurrency
@@ -925,11 +911,14 @@ class LiveCustodialWalletManager(
                     amount = amount.toBigInteger().toString(),
                     currency = cryptoCurrency.networkTicker
                 )
-            )
+            ).doOnComplete {
+                interestRepository.clearBalanceForAsset(cryptoCurrency)
+            }
         }
 
-    override fun getInterestActionableBalanceForAsset(crypto: CryptoCurrency) =
-        custodialAssetWalletsBalancesRepository.getInterestActionableBalance(crypto)
+    override fun invalidateInterestBalanceForAsset(crypto: CryptoCurrency) {
+        interestRepository.clearBalanceForAsset(crypto)
+    }
 
     override fun getSupportedFundsFiats(
         fiatCurrency: String
@@ -1228,7 +1217,9 @@ class LiveCustodialWalletManager(
                     origin = origin.toRequestString(),
                     destination = destination.name
                 )
-            )
+            ).doOnComplete {
+                interestRepository.clearBalanceForAsset(amount.currencyCode)
+            }
         }
 
     private fun CardResponse.toCardPaymentMethod(cardLimits: PaymentLimits) =
@@ -1598,7 +1589,9 @@ private fun InterestAccountDetailsResponse.toInterestAccountDetails(cryptoCurren
     InterestAccountDetails(
         balance = CryptoValue.fromMinor(cryptoCurrency, balance.toBigInteger()),
         pendingInterest = CryptoValue.fromMinor(cryptoCurrency, pendingInterest.toBigInteger()),
-        totalInterest = CryptoValue.fromMinor(cryptoCurrency, totalInterest.toBigInteger())
+        pendingDeposit = CryptoValue.fromMinor(cryptoCurrency, pendingDeposit.toBigInteger()),
+        totalInterest = CryptoValue.fromMinor(cryptoCurrency, totalInterest.toBigInteger()),
+        lockedBalance = CryptoValue.fromMinor(cryptoCurrency, locked.toBigInteger())
     )
 
 interface PaymentAccountMapper {

@@ -18,21 +18,6 @@ class CustodialAssetWalletsBalancesRepository(balancesProvider: BalancesProvider
         }
     )
 
-    private val interestBalancesCache = TimedCacheRequest(
-        cacheLifetimeSeconds = CACHE_LIFETIME,
-        refreshFn = {
-            balancesProvider.getInterestWalletBalanceForAllAssets()
-                .doOnSuccess { Timber.d("Interest balance response: $it") }
-        }
-    )
-
-    fun getInterestActionableBalance(ccy: CryptoCurrency): Maybe<CryptoValue> =
-        interestBalancesCache.getCachedSingle().flatMapMaybe {
-            it[ccy]?.let { response ->
-                Maybe.just(CryptoValue.fromMinor(ccy, response.actionable.toBigInteger()))
-            } ?: Maybe.empty()
-        }.onErrorResumeNext(Maybe.empty())
-
     fun getCustodialTotalBalanceForAsset(ccy: CryptoCurrency): Maybe<CryptoValue> =
         custodialBalancesCache.getCachedSingle().flatMapMaybe {
             it[ccy]?.let { response ->

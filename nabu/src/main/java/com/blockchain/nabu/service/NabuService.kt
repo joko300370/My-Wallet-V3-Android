@@ -529,12 +529,6 @@ class NabuService(retrofit: Retrofit) {
         sessionToken.authHeader
     ).wrapErrorMessage()
 
-    fun getInterestWalletBalanceForAllAssets(
-        sessionToken: NabuSessionTokenResponse
-    ) = service.getInterestWalletBalanceForAllAssets(
-        sessionToken.authHeader
-    ).wrapErrorMessage()
-
     fun transferFunds(
         sessionToken: NabuSessionTokenResponse,
         request: TransferRequest
@@ -634,7 +628,7 @@ class NabuService(retrofit: Retrofit) {
         when (it.code()) {
             200 -> Single.just(it.body())
             204 -> Single.just(
-                InterestAccountDetailsResponse("0", "0", "0", "0")
+                InterestAccountDetailsResponse("0", "0", "0", "0", "0", "0")
             )
             else -> Single.error(HttpException(it))
         }

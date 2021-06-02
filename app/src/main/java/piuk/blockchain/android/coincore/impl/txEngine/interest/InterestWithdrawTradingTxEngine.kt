@@ -24,7 +24,7 @@ class InterestWithdrawTradingTxEngine(
     private val walletManager: CustodialWalletManager
 ) : InterestBaseEngine(walletManager) {
     private val availableBalance: Single<Money>
-        get() = sourceAccount.accountBalance
+        get() = sourceAccount.actionableBalance
 
     override fun assertInputsValid() {
         check(sourceAccount is InterestAccount)

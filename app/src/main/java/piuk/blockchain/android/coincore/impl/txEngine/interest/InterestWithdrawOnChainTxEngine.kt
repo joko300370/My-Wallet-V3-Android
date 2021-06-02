@@ -25,7 +25,7 @@ class InterestWithdrawOnChainTxEngine(
 ) : InterestBaseEngine(walletManager) {
 
     private val availableBalance: Single<Money>
-        get() = sourceAccount.accountBalance
+        get() = sourceAccount.actionableBalance
 
     override fun assertInputsValid() {
         check(sourceAccount is InterestAccount)
