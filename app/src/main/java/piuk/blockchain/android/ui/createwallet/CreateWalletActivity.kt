@@ -18,11 +18,10 @@ import com.blockchain.ui.urllinks.URL_TOS_POLICY
 import com.blockchain.wallet.DefaultLabels
 import com.jakewharton.rxbinding2.widget.RxTextView
 import info.blockchain.balance.CryptoCurrency
-import kotlinx.android.synthetic.main.activity_create_wallet.*
-import kotlinx.android.synthetic.main.toolbar_general.*
-import kotlinx.android.synthetic.main.view_password_strength.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.ActivityCreateWalletBinding
+import piuk.blockchain.android.databinding.ViewPasswordStrengthBinding
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
@@ -49,67 +48,77 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
         intent.getStringExtra(RECOVERY_PHRASE) ?: ""
     }
 
+    private val binding: ActivityCreateWalletBinding by lazy {
+        ActivityCreateWalletBinding.inflate(layoutInflater)
+    }
+
+    private val passwordStrengthBinding: ViewPasswordStrengthBinding by lazy {
+        ViewPasswordStrengthBinding.inflate(layoutInflater, binding.root, false)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_create_wallet)
-        applyConstraintSet.clone(mainConstraintLayout)
+        setContentView(binding.root)
+        applyConstraintSet.clone(binding.mainConstraintLayout)
 
         if (recoveryPhrase.isNotEmpty()) {
-            setupToolbar(toolbar_general, R.string.recover_funds)
-            command_next.setText(R.string.dialog_continue)
+            setupToolbar(binding.toolbarGeneral.toolbarGeneral, R.string.recover_funds)
+            binding.commandNext.setText(R.string.dialog_continue)
         } else {
-            setupToolbar(toolbar_general, R.string.new_account_title)
-            command_next.setText(R.string.new_account_cta_text)
+            setupToolbar(binding.toolbarGeneral.toolbarGeneral, R.string.new_account_title)
+            binding.commandNext.setText(R.string.new_account_cta_text)
         }
 
-        tos.movementMethod = LinkMovementMethod.getInstance() // make link clickable
-        command_next.isClickable = false
-        entropy_container.pass_strength_bar.max = 100 * 10
+        with(binding) {
+            tos.movementMethod = LinkMovementMethod.getInstance() // make link clickable
+            commandNext.isClickable = false
+            passwordStrengthBinding.passStrengthBar.max = 100 * 10
 
-        wallet_pass.onFocusChangeListener = this
-        RxTextView.afterTextChangeEvents(wallet_pass)
-            .doOnNext {
-                showEntropyContainer()
-                presenter.logEventPasswordOneClicked()
-                presenter.calculateEntropy(it.editable().toString())
+            walletPass.onFocusChangeListener = this@CreateWalletActivity
+            RxTextView.afterTextChangeEvents(walletPass)
+                .doOnNext {
+                    showEntropyContainer()
+                    presenter.logEventPasswordOneClicked()
+                    presenter.calculateEntropy(it.editable().toString())
+                    hideShowCreateButton(
+                        it.editable().toString().length,
+                        walletPassConfirm.getTextString().length,
+                        walletPasswordCheckbox.isChecked
+                    )
+                }
+                .emptySubscribe()
+
+            RxTextView.afterTextChangeEvents(walletPassConfirm)
+                .doOnNext {
+                    presenter.logEventPasswordTwoClicked()
+                    hideShowCreateButton(
+                        walletPass.getTextString().length,
+                        it.editable().toString().length,
+                        walletPasswordCheckbox.isChecked
+                    )
+                }
+                .emptySubscribe()
+
+            walletPasswordCheckbox.setOnCheckedChangeListener { _, isChecked ->
                 hideShowCreateButton(
-                    it.editable().toString().length,
-                    wallet_pass_confirm.getTextString().length,
-                    wallet_password_checkbox.isChecked
+                    walletPass.getTextString().length, walletPassConfirm.getTextString().length, isChecked
                 )
             }
-            .emptySubscribe()
 
-        RxTextView.afterTextChangeEvents(wallet_pass_confirm)
-            .doOnNext {
-                presenter.logEventPasswordTwoClicked()
-                hideShowCreateButton(
-                    wallet_pass.getTextString().length,
-                    it.editable().toString().length,
-                    wallet_password_checkbox.isChecked
-                )
+            emailAddress.setOnClickListener { presenter.logEventEmailClicked() }
+            commandNext.setOnClickListener { onNextClicked() }
+
+            updateTosAndPrivacyLinks()
+            updatePasswordDisclaimer()
+
+            walletPassConfirm.setOnEditorActionListener { _, i, _ ->
+                consume { if (i == EditorInfo.IME_ACTION_GO) onNextClicked() }
             }
-            .emptySubscribe()
 
-        wallet_password_checkbox.setOnCheckedChangeListener { _, isChecked ->
-            hideShowCreateButton(
-                wallet_pass.getTextString().length, wallet_pass_confirm.getTextString().length, isChecked
-            )
+            hideEntropyContainer()
+
+            onViewReady()
         }
-
-        email_address.setOnClickListener { presenter.logEventEmailClicked() }
-        command_next.setOnClickListener { onNextClicked() }
-
-        updateTosAndPrivacyLinks()
-        updatePasswordDisclaimer()
-
-        wallet_pass_confirm.setOnEditorActionListener { _, i, _ ->
-            consume { if (i == EditorInfo.IME_ACTION_GO) onNextClicked() }
-        }
-
-        hideEntropyContainer()
-
-        onViewReady()
     }
 
     private fun updateTosAndPrivacyLinks() {
@@ -124,8 +133,10 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
             this
         )
 
-        tos.text = tosText
-        tos.movementMethod = LinkMovementMethod.getInstance()
+        binding.tos.apply {
+            text = tosText
+            movementMethod = LinkMovementMethod.getInstance()
+        }
     }
 
     private fun updatePasswordDisclaimer() {
@@ -139,8 +150,10 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
             this
         )
 
-        wallet_password_blurb.text = tosText
-        wallet_password_blurb.movementMethod = LinkMovementMethod.getInstance()
+        binding.walletPasswordBlurb.apply {
+            text = tosText
+            movementMethod = LinkMovementMethod.getInstance()
+        }
     }
 
     private fun hideShowCreateButton(password1Length: Int, password2Length: Int, isChecked: Boolean) {
@@ -163,27 +176,27 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
     }
 
     private fun hideEntropyContainer() {
-        TransitionManager.beginDelayedTransition(mainConstraintLayout)
+        TransitionManager.beginDelayedTransition(binding.mainConstraintLayout)
         applyConstraintSet.setVisibility(R.id.entropy_container, ConstraintSet.GONE)
-        applyConstraintSet.applyTo(mainConstraintLayout)
+        applyConstraintSet.applyTo(binding.mainConstraintLayout)
     }
 
     private fun showEntropyContainer() {
-        TransitionManager.beginDelayedTransition(mainConstraintLayout)
+        TransitionManager.beginDelayedTransition(binding.mainConstraintLayout)
         applyConstraintSet.setVisibility(R.id.entropy_container, ConstraintSet.VISIBLE)
-        applyConstraintSet.applyTo(mainConstraintLayout)
+        applyConstraintSet.applyTo(binding.mainConstraintLayout)
     }
 
     private fun showCreateWalletButton() {
-        TransitionManager.beginDelayedTransition(mainConstraintLayout)
+        TransitionManager.beginDelayedTransition(binding.mainConstraintLayout)
         applyConstraintSet.setVisibility(R.id.command_next, ConstraintSet.VISIBLE)
-        applyConstraintSet.applyTo(mainConstraintLayout)
+        applyConstraintSet.applyTo(binding.mainConstraintLayout)
     }
 
     private fun hideCreateWalletButton() {
-        TransitionManager.beginDelayedTransition(mainConstraintLayout)
+        TransitionManager.beginDelayedTransition(binding.mainConstraintLayout)
         applyConstraintSet.setVisibility(R.id.command_next, ConstraintSet.GONE)
-        applyConstraintSet.applyTo(mainConstraintLayout)
+        applyConstraintSet.applyTo(binding.mainConstraintLayout)
     }
 
     override fun onFocusChange(v: View?, hasFocus: Boolean) = when {
@@ -192,11 +205,11 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
     }
 
     override fun setEntropyStrength(score: Int) {
-        entropy_container.setStrengthProgress(score)
+        binding.entropyContainer.setStrengthProgress(score)
     }
 
     override fun setEntropyLevel(level: Int) {
-        entropy_container.updateLevelUI(level)
+        binding.entropyContainer.updateLevelUI(level)
     }
 
     override fun showError(message: Int) =
@@ -207,9 +220,11 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
             .setTitle(R.string.app_name)
             .setMessage(R.string.weak_password)
             .setPositiveButton(R.string.common_retry) { _, _ ->
-                wallet_pass.setText("")
-                wallet_pass_confirm.setText("")
-                wallet_pass.requestFocus()
+                binding.apply {
+                    walletPass.setText("")
+                    walletPassConfirm.setText("")
+                    walletPass.requestFocus()
+                }
             }.show()
     }
 
@@ -239,12 +254,14 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
     override fun enforceFlagSecure() = true
 
     private fun onNextClicked() {
-        val email = email_address.text.toString().trim()
-        val password1 = wallet_pass.text.toString()
-        val password2 = wallet_pass_confirm.text.toString()
+        with(binding) {
+            val email = emailAddress.text.toString().trim()
+            val password1 = walletPass.text.toString()
+            val password2 = walletPassConfirm.text.toString()
 
-        if (wallet_password_checkbox.isChecked && presenter.validateCredentials(email, password1, password2)) {
-            presenter.createOrRestoreWallet(email, password1, recoveryPhrase)
+            if (walletPasswordCheckbox.isChecked && presenter.validateCredentials(email, password1, password2)) {
+                presenter.createOrRestoreWallet(email, password1, recoveryPhrase)
+            }
         }
     }
 

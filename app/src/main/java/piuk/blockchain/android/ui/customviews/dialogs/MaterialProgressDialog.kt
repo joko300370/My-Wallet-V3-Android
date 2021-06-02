@@ -5,11 +5,11 @@ import android.content.DialogInterface
 import android.content.res.TypedArray
 import android.graphics.PorterDuff
 import android.os.Build
-import android.view.View
+import android.view.LayoutInflater
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
-import kotlinx.android.synthetic.main.progress_dialog_compat.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.ProgressDialogCompatBinding
 
 /**
  * Creates an [AlertDialog] with a custom view for emulating a Material Design progress
@@ -20,7 +20,7 @@ import piuk.blockchain.android.R
 class MaterialProgressDialog(context: Context) {
 
     private val dialog: AlertDialog
-    private val layout: View = View.inflate(context, R.layout.progress_dialog_compat, null)
+    private val binding: ProgressDialogCompatBinding = ProgressDialogCompatBinding.inflate(LayoutInflater.from(context))
 
     val isShowing: Boolean
         get() = dialog.isShowing
@@ -28,7 +28,7 @@ class MaterialProgressDialog(context: Context) {
     init {
         dialog = AlertDialog.Builder(context, R.style.AlertDialogStyle)
             .setTitle(context.getString(R.string.app_name))
-            .setView(layout)
+            .setView(binding.root)
             .create()
 
         val a: TypedArray = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -37,17 +37,17 @@ class MaterialProgressDialog(context: Context) {
             context.theme.obtainStyledAttributes(intArrayOf(R.attr.colorAccent))
         }
 
-        layout.progress_bar.indeterminateDrawable.setColorFilter(
+        binding.progressBar.indeterminateDrawable.setColorFilter(
             a.getColor(0, 0),
             PorterDuff.Mode.SRC_IN
         )
     }
 
     fun setMessage(message: String) {
-        layout.txt_message.text = message
+        binding.txtMessage.text = message
     }
 
-    fun setMessage(@StringRes message: Int) = layout.txt_message.setText(message)
+    fun setMessage(@StringRes message: Int) = binding.txtMessage.setText(message)
 
     fun setTitle(title: String) = dialog.setTitle(title)
 

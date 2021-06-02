@@ -1,15 +1,14 @@
 package piuk.blockchain.android.ui.interest
 
-import android.view.View
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_interest_dashboard_verification.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.ItemInterestDashboardVerificationBinding
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.customviews.ButtonOptions
 import piuk.blockchain.android.ui.customviews.VerifyIdentityNumericBenefitItem
-import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.context
 
 class InterestDashboardVerificationItem<in T>(
     private val verificationClicked: () -> Unit
@@ -21,7 +20,7 @@ class InterestDashboardVerificationItem<in T>(
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
         InterestAssetVerificationViewHolder(
-            parent.inflate(R.layout.item_interest_dashboard_verification)
+            ItemInterestDashboardVerificationBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
 
     override fun onBindViewHolder(
@@ -33,30 +32,27 @@ class InterestDashboardVerificationItem<in T>(
     )
 }
 
-private class InterestAssetVerificationViewHolder(val parent: View) :
-    RecyclerView.ViewHolder(parent),
-    LayoutContainer {
-
-    override val containerView: View?
-        get() = itemView
+private class InterestAssetVerificationViewHolder(
+    private val binding: ItemInterestDashboardVerificationBinding
+) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(
         verificationClicked: () -> Unit
     ) {
-        itemView.item_verification.initWithBenefits(
+        binding.itemVerification.initWithBenefits(
             benefits = listOf(
                 VerifyIdentityNumericBenefitItem(
-                    parent.context.getString(R.string.interest_dashboard_verify_point_one_title),
-                    parent.context.getString(R.string.interest_dashboard_verify_point_one_label)),
+                    context.getString(R.string.interest_dashboard_verify_point_one_title),
+                    context.getString(R.string.interest_dashboard_verify_point_one_label)),
                 VerifyIdentityNumericBenefitItem(
-                    parent.context.getString(R.string.interest_dashboard_verify_point_two_title),
-                    parent.context.getString(R.string.interest_dashboard_verify_point_two_label)),
+                    context.getString(R.string.interest_dashboard_verify_point_two_title),
+                    context.getString(R.string.interest_dashboard_verify_point_two_label)),
                 VerifyIdentityNumericBenefitItem(
-                    parent.context.getString(R.string.interest_dashboard_verify_point_three_title),
-                    parent.context.getString(R.string.interest_dashboard_verify_point_three_label))
+                    context.getString(R.string.interest_dashboard_verify_point_three_title),
+                    context.getString(R.string.interest_dashboard_verify_point_three_label))
             ),
-            title = parent.context.getString(R.string.interest_dashboard_verify_title),
-            description = parent.context.getString(R.string.interest_dashboard_verify_label),
+            title = context.getString(R.string.interest_dashboard_verify_title),
+            description = context.getString(R.string.interest_dashboard_verify_label),
             icon = R.drawable.ic_interest_blue_circle,
             primaryButton = ButtonOptions(true, cta = verificationClicked),
             secondaryButton = ButtonOptions(false),

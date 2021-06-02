@@ -1,12 +1,10 @@
 package piuk.blockchain.android.simplebuy
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_simple_buy_checkout_info.view.*
-import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.ItemSimpleBuyCheckoutInfoBinding
 import kotlin.properties.Delegates
 
 class CheckoutAdapter : RecyclerView.Adapter<CheckoutAdapter.ViewHolder>() {
@@ -17,19 +15,19 @@ class CheckoutAdapter : RecyclerView.Adapter<CheckoutAdapter.ViewHolder>() {
         }
     }
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val key: TextView = itemView.title
-        val value: TextView = itemView.description
+    class ViewHolder(binding: ItemSimpleBuyCheckoutInfoBinding) : RecyclerView.ViewHolder(binding.root) {
+        val key: TextView = binding.title
+        val value: TextView = binding.description
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val layout = LayoutInflater.from(parent.context).inflate(
-            R.layout.item_simple_buy_checkout_info,
-            parent,
-            false
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+        ViewHolder(
+            ItemSimpleBuyCheckoutInfoBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
         )
-        return ViewHolder(layout)
-    }
 
     override fun getItemCount(): Int =
         items.size

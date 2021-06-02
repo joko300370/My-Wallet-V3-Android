@@ -7,34 +7,31 @@ import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintSet
 import com.blockchain.extensions.px
 import com.blockchain.koin.scopedInject
+import com.blockchain.nabu.models.responses.nabu.KycTierState
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.logEvent
-import com.blockchain.nabu.models.responses.nabu.KycTierState
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.databinding.ActivityKycStatusBinding
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
+import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
-import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
-import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.visible
-import kotlinx.android.synthetic.main.activity_kyc_status.button_kyc_status_next as buttonNext
-import kotlinx.android.synthetic.main.activity_kyc_status.constraint_layout_kyc_status as constraintLayout
-import kotlinx.android.synthetic.main.activity_kyc_status.image_view_kyc_status as imageView
-import kotlinx.android.synthetic.main.activity_kyc_status.text_view_kyc_status_no_thanks as buttonNoThanks
-import kotlinx.android.synthetic.main.activity_kyc_status.text_view_verification_message as textViewMessage
-import kotlinx.android.synthetic.main.activity_kyc_status.text_view_verification_state as textViewStatus
-import kotlinx.android.synthetic.main.activity_kyc_status.text_view_verification_subtitle as textViewSubtitle
-import kotlinx.android.synthetic.main.activity_kyc_status.toolbar_kyc as toolBar
 
 class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), KycStatusView, DialogFlow.FlowHost {
+
+    private val binding: ActivityKycStatusBinding by lazy {
+        ActivityKycStatusBinding.inflate(layoutInflater)
+    }
 
     private val presenter: KycStatusPresenter by scopedInject()
     private val campaignType by unsafeLazy { intent.getSerializableExtra(EXTRA_CAMPAIGN_TYPE) as CampaignType }
@@ -42,7 +39,7 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_kyc_status)
+        setContentView(binding.root)
         logEvent(AnalyticsEvents.KycComplete)
 
         val title = when (campaignType) {
@@ -55,7 +52,7 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
             CampaignType.None,
             CampaignType.Interest -> R.string.identity_verification
         }
-        setupToolbar(toolBar, title)
+        setupToolbar(binding.toolbarKyc, title)
 
         onViewReady()
     }
@@ -88,79 +85,87 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
     }
 
     private fun onPending() {
-        imageView.setImageDrawable(
-            getResolvedDrawable(
-                if (campaignType == CampaignType.Sunriver) {
-                    R.drawable.vector_xlm_check
-                } else {
-                    R.drawable.vector_in_progress
-                }
+        with(binding) {
+            imageViewKycStatus.setImageDrawable(
+                getResolvedDrawable(
+                    if (campaignType == CampaignType.Sunriver) {
+                        R.drawable.vector_xlm_check
+                    } else {
+                        R.drawable.vector_in_progress
+                    }
+                )
             )
-        )
-        textViewSubtitle.visible()
-        textViewStatus.setTextColor(getResolvedColor(R.color.kyc_in_progress))
-        textViewStatus.setText(R.string.kyc_status_title_in_progress)
-        displayNotificationButton()
-        val message = when (campaignType) {
-            CampaignType.Swap,
-            CampaignType.None,
-            CampaignType.Resubmission -> R.string.kyc_status_message_in_progress
-            CampaignType.Blockstack,
-            CampaignType.SimpleBuy,
-            CampaignType.Sunriver,
-            CampaignType.FiatFunds,
-            CampaignType.Interest -> R.string.sunriver_status_message
+            textViewVerificationSubtitle.visible()
+            textViewVerificationState.setTextColor(getResolvedColor(R.color.kyc_in_progress))
+            textViewVerificationState.setText(R.string.kyc_status_title_in_progress)
+            displayNotificationButton()
+            val message = when (campaignType) {
+                CampaignType.Swap,
+                CampaignType.None,
+                CampaignType.Resubmission -> R.string.kyc_status_message_in_progress
+                CampaignType.Blockstack,
+                CampaignType.SimpleBuy,
+                CampaignType.Sunriver,
+                CampaignType.FiatFunds,
+                CampaignType.Interest -> R.string.sunriver_status_message
+            }
+            textViewVerificationMessage.setText(message)
         }
-        textViewMessage.setText(message)
     }
 
     private fun onInReview() {
-        imageView.setImageDrawable(getResolvedDrawable(R.drawable.vector_in_progress))
-        textViewStatus.setTextColor(getResolvedColor(R.color.kyc_in_progress))
-        textViewStatus.setText(R.string.kyc_status_title_in_review)
-        textViewMessage.setText(R.string.kyc_status_message_under_review)
-        displayNotificationButton()
+        with(binding) {
+            imageViewKycStatus.setImageDrawable(getResolvedDrawable(R.drawable.vector_in_progress))
+            textViewVerificationState.setTextColor(getResolvedColor(R.color.kyc_in_progress))
+            textViewVerificationState.setText(R.string.kyc_status_title_in_review)
+            textViewVerificationMessage.setText(R.string.kyc_status_message_under_review)
+            displayNotificationButton()
+        }
     }
 
     private fun displayNotificationButton() {
-        buttonNext.apply {
+        binding.buttonKycStatusNext.apply {
             setText(R.string.kyc_status_button_notify_me)
             setOnClickListener { presenter.onClickNotifyUser() }
             visible()
         }
-        buttonNoThanks.apply {
+        binding.textViewKycStatusNoThanks.apply {
             visible()
             setOnClickListener { finish() }
         }
     }
 
     private fun onFailed() {
-        imageView.setImageDrawable(getResolvedDrawable(R.drawable.vector_failed))
-        textViewStatus.setTextColor(getResolvedColor(R.color.product_red_medium))
-        textViewStatus.setText(R.string.kyc_status_title_failed)
-        textViewMessage.setText(R.string.kyc_status_message_failed)
-        buttonNext.gone()
+        with(binding) {
+            imageViewKycStatus.setImageDrawable(getResolvedDrawable(R.drawable.vector_failed))
+            textViewVerificationState.setTextColor(getResolvedColor(R.color.product_red_medium))
+            textViewVerificationState.setText(R.string.kyc_status_title_failed)
+            textViewVerificationMessage.setText(R.string.kyc_status_message_failed)
+            buttonKycStatusNext.gone()
+        }
     }
 
     private fun onVerified() {
-        imageView.setImageDrawable(getResolvedDrawable(R.drawable.vector_verified))
-        textViewStatus.setTextColor(getResolvedColor(R.color.kyc_progress_green))
-        textViewStatus.setText(R.string.kyc_settings_status_verified)
-        textViewMessage.setText(R.string.kyc_status_message_verified)
-        buttonNext.apply {
-            setText(R.string.kyc_status_button_get_started)
-            setOnClickListener { presenter.onClickContinue() }
-            ConstraintSet().apply {
-                clone(constraintLayout)
-                setMargin(
-                    R.id.button_kyc_status_next,
-                    ConstraintSet.BOTTOM,
-                    32.px
-                )
-                applyTo(constraintLayout)
-            }
+        with(binding) {
+            imageViewKycStatus.setImageDrawable(getResolvedDrawable(R.drawable.vector_verified))
+            textViewVerificationState.setTextColor(getResolvedColor(R.color.kyc_progress_green))
+            textViewVerificationState.setText(R.string.kyc_settings_status_verified)
+            textViewVerificationMessage.setText(R.string.kyc_status_message_verified)
+            buttonKycStatusNext.apply {
+                setText(R.string.kyc_status_button_get_started)
+                setOnClickListener { presenter.onClickContinue() }
+                ConstraintSet().apply {
+                    clone(constraintLayoutKycStatus)
+                    setMargin(
+                        R.id.button_kyc_status_next,
+                        ConstraintSet.BOTTOM,
+                        32.px
+                    )
+                    applyTo(constraintLayoutKycStatus)
+                }
 
-            visible()
+                visible()
+            }
         }
     }
 

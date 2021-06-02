@@ -1138,7 +1138,7 @@ Inténtelo de nuevo más tarde.</string>
     <string name="enable_cloud_backup">Habilitar copias de seguridad en la nube</string>
     <string name="enable_cloud_backup_summary">Si estuviera disponible, guarde la copia de seguridad encriptada en su cuenta de Google Drive.
 Esto le permitirá restaurar su Wallet si perdiera este dispositivo.</string>
-    <string name="tx_title_interest">Interés obtenido</string>
+    <string name="tx_title_interest">%1$s Interés obtenido</string>
     <string name="dashboard_asset_actions_send_dsc">Realice una transferencia %1$s a cualquier Wallet</string>
     <string name="dashboard_asset_actions_receive_dsc">Acepte o comparta su dirección de %1$s</string>
     <string name="dashboard_asset_actions_swap_dsc">Haga un intercambio de %1$s otro tipo de criptomonedas</string>
@@ -1177,7 +1177,7 @@ Esto le permitirá restaurar su Wallet si perdiera este dispositivo.</string>
     <string name="send_confirmation_deposit_cta_button">Confirmar transferencia</string>
     <string name="send_confirmation_interest_tos_pp">He leído y acepto las <annotation link="interest_tos">Condiciones de servicio</annotation> y <annotation link="interest_pp"> la Política de privacidad</annotation>.</string>
     <string name="send_confirmation_interest_holding_period_1">Al aceptar esto, usted acepta transferir </string>
-    <string name="send_confirmation_interest_holding_period_2">(%1$s) desde su Wallet Bitcoin a su Cuenta de Intereses. Se aplicará un período de retención inicial de 7 días a sus fondos.</string>
+    <string name="send_confirmation_interest_holding_period_2">(%1$s) desde su Wallet %2$s a su Cuenta de Intereses. Se aplicará un período de retención inicial de 7 días a sus fondos.</string>
     <string name="send_confirmation_progress_title">Transfiriendo %1$s</string>
     <string name="send_confirmation_progress_message">Estamos transfiriendo su %1$s ahora mismo.</string>
     <string name="send_confirmation_success_title">%1$s Transferido</string>

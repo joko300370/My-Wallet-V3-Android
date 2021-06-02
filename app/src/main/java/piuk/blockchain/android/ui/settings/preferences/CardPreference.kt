@@ -4,16 +4,17 @@ import android.content.Context
 import android.graphics.Typeface
 import android.text.TextUtils
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
-import kotlinx.android.synthetic.main.preference_cards_layout.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.cards.icon
-import piuk.blockchain.android.util.loadInterMedium
 import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.loadInterMedium
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import java.text.SimpleDateFormat
@@ -48,10 +49,10 @@ class CardPreference(
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
         super.onBindViewHolder(holder)
         val titleView = holder.findViewById(android.R.id.title) as? TextView
-        val endDigits = holder.itemView.end_digits
-        val expDate = holder.itemView.exp_date
-        val expired = holder.itemView.expired
-        val addCard = holder.itemView.add_card
+        val endDigits = holder.itemView.findViewById(R.id.end_digits) as AppCompatTextView
+        val expDate = holder.itemView.findViewById(R.id.exp_date) as AppCompatTextView
+        val expired = holder.itemView.findViewById(R.id.expired) as AppCompatTextView
+        val addCard = holder.itemView.findViewById(R.id.add_card) as AppCompatImageView
         (card as? PaymentMethod.Card)?.let {
             endDigits.text = card.dottedEndDigits()
             expDate.text =

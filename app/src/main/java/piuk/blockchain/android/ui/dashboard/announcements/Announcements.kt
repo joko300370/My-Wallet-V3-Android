@@ -27,7 +27,6 @@ interface AnnouncementHost {
     fun startSetup2Fa()
     fun startVerifyEmail()
     fun startEnableFingerprintLogin()
-    fun startIntroTourGuide()
     fun startTransferCrypto()
 
     fun startStxReceivedDetail()

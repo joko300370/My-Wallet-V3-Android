@@ -6,7 +6,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <include layout="@layout/toolbar_general" />
+    <include
+        android:id="@+id/toolbar_general"
+        layout="@layout/toolbar_general" />
 
     <TextView
         android:id="@+id/bullet_one"

@@ -16,12 +16,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.subjects.ReplaySubject
-import kotlinx.android.synthetic.main.fragment_kyc_country_selection.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.FragmentKycCountrySelectionBinding
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.customviews.toast
+import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
 import piuk.blockchain.android.ui.kyc.countryselection.adapter.CountryCodeAdapter
 import piuk.blockchain.android.ui.kyc.countryselection.models.CountrySelectionState
 import piuk.blockchain.android.ui.kyc.countryselection.util.CountryDisplayModel
@@ -30,12 +31,14 @@ import piuk.blockchain.android.ui.kyc.navigate
 import piuk.blockchain.android.ui.kyc.search.filterCountries
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
-import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
-import piuk.blockchain.android.util.inflate
 import java.util.concurrent.TimeUnit
 
 internal class KycCountrySelectionFragment :
     BaseFragment<KycCountrySelectionView, KycCountrySelectionPresenter>(), KycCountrySelectionView {
+
+    private var _binding: FragmentKycCountrySelectionBinding? = null
+    private val binding: FragmentKycCountrySelectionBinding
+        get() = _binding!!
 
     override val regionType by unsafeLazy {
         arguments?.getSerializable(ARGUMENT_STATE_OR_COUNTRY) as? RegionType ?: RegionType.Country
@@ -57,12 +60,15 @@ internal class KycCountrySelectionFragment :
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = container?.inflate(R.layout.fragment_kyc_country_selection)
+    ): View {
+        _binding = FragmentKycCountrySelectionBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        country_selection.apply {
+        binding.countrySelection.apply {
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
             adapter = countryCodeAdapter
@@ -86,18 +92,23 @@ internal class KycCountrySelectionFragment :
 
         compositeDisposable += countryList
             .filterCountries(
-                search_view.queryTextChanges().debounce(100, TimeUnit.MILLISECONDS)
+                binding.searchView.queryTextChanges().debounce(100, TimeUnit.MILLISECONDS)
             )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 countryCodeAdapter.items = it
-                country_selection.scrollToPosition(0)
+                binding.countrySelection.scrollToPosition(0)
             }
     }
 
     override fun onPause() {
         super.onPause()
         compositeDisposable.clear()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun continueFlow(countryCode: String, stateCode: String?, stateName: String?) {

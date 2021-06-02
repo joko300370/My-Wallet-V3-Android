@@ -2,29 +2,41 @@ package piuk.blockchain.android.ui.onboarding
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.fragment_email_prompt.*
-import piuk.blockchain.android.R
-import java.lang.NullPointerException
+import androidx.fragment.app.Fragment
+import piuk.blockchain.android.databinding.FragmentEmailPromptBinding
 
 class EmailPromptFragment : Fragment() {
 
     private var listener: OnFragmentInteractionListener? = null
 
+    private var _binding: FragmentEmailPromptBinding? = null
+    private val binding: FragmentEmailPromptBinding
+        get() = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_email_prompt, container, false)
+    ): View {
+        _binding = FragmentEmailPromptBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        button_enable?.setOnClickListener { listener?.onVerifyEmailClicked() }
-        email_address?.text = arguments?.emailAddress
+        with(binding) {
+            buttonEnable.setOnClickListener { listener?.onVerifyEmailClicked() }
+            emailAddress.text = arguments?.emailAddress
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onAttach(context: Context) {

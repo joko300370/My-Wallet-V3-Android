@@ -9,14 +9,13 @@ import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.blockchain.koin.scopedInject
-import kotlinx.android.synthetic.main.fragment_backup_wallet_verify.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.FragmentBackupWalletVerifyBinding
 import piuk.blockchain.android.ui.backup.completed.BackupWalletCompletedFragment
 import piuk.blockchain.android.ui.backup.start.BackupWalletStartingFragment
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
-import piuk.blockchain.android.util.inflate
 
 class BackupWalletVerifyFragment : BaseFragment<BackupVerifyView, BackupVerifyPresenter>(),
     BackupVerifyView {
@@ -25,30 +24,41 @@ class BackupWalletVerifyFragment : BaseFragment<BackupVerifyView, BackupVerifyPr
 
     private var progressDialog: MaterialProgressDialog? = null
 
+    private var _binding: FragmentBackupWalletVerifyBinding? = null
+    private val binding: FragmentBackupWalletVerifyBinding
+        get() = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = container?.inflate(R.layout.fragment_backup_wallet_verify)
+    ): View {
+        _binding = FragmentBackupWalletVerifyBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         onViewReady()
 
-        button_verify.setOnClickListener {
-            presenter.onVerifyClicked(
-                edittext_first_word.text.toString(),
-                edittext_second_word.text.toString(),
-                edittext_third_word.text.toString()
-            )
+        with(binding) {
+            buttonVerify.setOnClickListener {
+                presenter.onVerifyClicked(
+                    edittextFirstWord.text.toString(),
+                    edittextSecondWord.text.toString(),
+                    edittextThirdWord.text.toString()
+                )
+            }
         }
     }
 
     override fun showWordHints(hints: List<Int>) {
         val mnemonicRequestHint = resources.getStringArray(R.array.mnemonic_word_requests)
-        edittext_first_word.hint = mnemonicRequestHint[hints[0]]
-        edittext_second_word.hint = mnemonicRequestHint[hints[1]]
-        edittext_third_word.hint = mnemonicRequestHint[hints[2]]
+        with(binding) {
+            edittextFirstWord.hint = mnemonicRequestHint[hints[0]]
+            edittextSecondWord.hint = mnemonicRequestHint[hints[1]]
+            edittextThirdWord.hint = mnemonicRequestHint[hints[2]]
+        }
     }
 
     override fun getPageBundle(): Bundle? = arguments
@@ -97,6 +107,7 @@ class BackupWalletVerifyFragment : BaseFragment<BackupVerifyView, BackupVerifyPr
                 imm.hideSoftInputFromWindow(view.windowToken, 0)
             }
         }
+        _binding = null
     }
 
     private fun popAllAndStartFragment(fragment: Fragment, tag: String) {

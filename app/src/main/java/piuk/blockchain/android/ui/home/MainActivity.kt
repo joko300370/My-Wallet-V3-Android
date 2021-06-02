@@ -10,7 +10,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -35,11 +34,10 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.toolbar_general.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
@@ -49,6 +47,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoTarget
 import piuk.blockchain.android.coincore.NullCryptoAccount
+import piuk.blockchain.android.databinding.ActivityMainBinding
 import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.android.scan.QrScanResultProcessor
 import piuk.blockchain.android.simplebuy.BuySellClicked
@@ -58,8 +57,10 @@ import piuk.blockchain.android.simplebuy.SmallSimpleBuyNavigator
 import piuk.blockchain.android.ui.activity.ActivitiesFragment
 import piuk.blockchain.android.ui.addresses.AccountActivity
 import piuk.blockchain.android.ui.airdrops.AirdropCentreActivity
+import piuk.blockchain.android.ui.auth.newlogin.AuthNewLoginSheet
 import piuk.blockchain.android.ui.backup.BackupWalletActivity
 import piuk.blockchain.android.ui.base.MvpActivity
+import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.dashboard.DashboardFragment
 import piuk.blockchain.android.ui.home.analytics.SideNavEvent
@@ -75,50 +76,51 @@ import piuk.blockchain.android.ui.linkbank.BankLinkingInfo
 import piuk.blockchain.android.ui.linkbank.FiatTransactionState
 import piuk.blockchain.android.ui.linkbank.yapily.FiatTransactionBottomSheet
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity
+import piuk.blockchain.android.ui.pairingcode.PairingBottomSheet
 import piuk.blockchain.android.ui.scan.QrExpected
 import piuk.blockchain.android.ui.scan.QrScanActivity
 import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
-import piuk.blockchain.android.ui.auth.newlogin.AuthNewLoginSheet
-import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
-import piuk.blockchain.android.ui.pairingcode.PairingBottomSheet
 import piuk.blockchain.android.ui.sell.BuySellFragment
 import piuk.blockchain.android.ui.settings.SettingsActivity
 import piuk.blockchain.android.ui.swap.SwapFragment
 import piuk.blockchain.android.ui.thepit.PitLaunchBottomDialog
 import piuk.blockchain.android.ui.thepit.PitPermissionsActivity
-import piuk.blockchain.android.ui.tour.IntroTourAnalyticsEvent
-import piuk.blockchain.android.ui.tour.IntroTourHost
-import piuk.blockchain.android.ui.tour.IntroTourStep
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.transactionflow.analytics.SwapAnalyticsEvents
 import piuk.blockchain.android.ui.transfer.TransferFragment
 import piuk.blockchain.android.ui.transfer.analytics.TransferAnalyticsEvent
 import piuk.blockchain.android.ui.transfer.receive.ReceiveSheet
-import piuk.blockchain.android.ui.upsell.UpsellHost
 import piuk.blockchain.android.ui.upsell.KycUpgradePromptManager
+import piuk.blockchain.android.ui.upsell.UpsellHost
 import piuk.blockchain.android.util.AndroidUtils
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.android.util.getAccount
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
 import timber.log.Timber
 
 class MainActivity : MvpActivity<MainView, MainPresenter>(),
     HomeNavigator,
     MainView,
-    IntroTourHost,
     DialogFlow.FlowHost,
     SlidingModalBottomDialog.Host,
     UpsellHost,
     AuthNewLoginSheet.Host,
     SmallSimpleBuyNavigator {
 
+    private val binding: ActivityMainBinding by lazy {
+        ActivityMainBinding.inflate(layoutInflater)
+    }
+
     override val presenter: MainPresenter by scopedInject()
     private val qrProcessor: QrScanResultProcessor by scopedInject()
     private val assetResources: AssetResources by scopedInject()
     private val mwaFF: FeatureFlag by inject(mwaFeatureFlag)
+    private val compositeDisposable = CompositeDisposable()
 
     private var isMWAEnabled: Boolean = false
 
@@ -166,7 +168,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                         startTransferFragment()
                     }
                 }
-                ViewUtils.setElevation(appbar_layout, 4f)
+                ViewUtils.setElevation(binding.appbarLayout, 4f)
             }
             true
         }
@@ -178,11 +180,11 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         get() = this
 
     private val menu: Menu
-        get() = navigation_view.menu
+        get() = binding.navigationView.menu
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(binding.root)
 
         if (intent.hasExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION) &&
             intent.getBooleanExtra(NotificationsUtil.INTENT_FROM_NOTIFICATION, false)
@@ -190,7 +192,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
             analytics.logEvent(NotificationAppOpened)
         }
 
-        drawer_layout.addDrawerListener(object : DrawerLayout.DrawerListener {
+        binding.drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
                 // No-op
             }
@@ -210,14 +212,16 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         })
 
         // Set up toolbar_constraint
-        toolbar_general.navigationIcon = ContextCompat.getDrawable(this, R.drawable.vector_menu)
-        toolbar_general.title = ""
-        setSupportActionBar(toolbar_general)
+        with(binding.toolbarGeneral.toolbarGeneral) {
+            navigationIcon = this@MainActivity.getResolvedDrawable(R.drawable.vector_menu)
+            title = ""
+            setSupportActionBar(this)
+        }
         // Styling
-        bottom_navigation.apply {
+        binding.bottomNavigation.apply {
             addItems(toolbarNavigationItems())
-            accentColor = ContextCompat.getColor(context, R.color.bottom_toolbar_icon_active)
-            inactiveColor = ContextCompat.getColor(context, R.color.bottom_toolbar_icon_inactive)
+            accentColor = context.getResolvedColor(R.color.bottom_toolbar_icon_active)
+            inactiveColor = context.getResolvedColor(R.color.bottom_toolbar_icon_inactive)
 
             titleState = AHBottomNavigation.TitleState.ALWAYS_SHOW
             isForceTint = true
@@ -252,14 +256,15 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 )
             }
         }
-        val compositeDisposable = mwaFF.enabled.observeOn(Schedulers.io()).subscribe(
+
+        compositeDisposable.add(mwaFF.enabled.observeOn(Schedulers.io()).subscribe(
             { result ->
                 isMWAEnabled = result
             },
             {
                 isMWAEnabled = false
             }
-        )
+        ))
     }
 
     override fun onResume() {
@@ -268,7 +273,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
             activityResultAction = {}
         }
         // This can null out in low memory situations, so reset here
-        navigation_view.setNavigationItemSelectedListener { menuItem ->
+        binding.navigationView.setNavigationItemSelectedListener { menuItem ->
             selectDrawerItem(menuItem)
             true
         }
@@ -281,6 +286,11 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         handlingResult = false
     }
 
+    override fun onDestroy() {
+        compositeDisposable.clear()
+        super.onDestroy()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main_activity, menu)
         return super.onCreateOptionsMenu(menu)
@@ -289,7 +299,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                drawer_layout.openDrawer(GravityCompat.START)
+                binding.drawerLayout.openDrawer(GravityCompat.START)
                 true
             }
             R.id.action_qr_main -> {
@@ -317,7 +327,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 KYC_STARTED -> {
                     replaceContentFragment(DashboardFragment.newInstance())
                     // Reset state in case of changing currency etc
-                    bottom_navigation.currentItem = ITEM_HOME
+                    binding.bottomNavigation.currentItem = ITEM_HOME
 
                     // Pass this result to balance fragment
                     for (fragment in supportFragmentManager.fragments) {
@@ -367,13 +377,10 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     }
 
     override fun onBackPressed() {
-        if (tour_guide.isActive) {
-            tour_guide.stop()
-        }
         val f = currentFragment
         val backHandled = when {
             drawerOpen -> {
-                drawer_layout.closeDrawers()
+                binding.drawerLayout.closeDrawers()
                 true
             }
 
@@ -416,15 +423,15 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
             R.id.nav_logout -> showLogoutDialog()
             R.id.nav_interest -> launchInterestDashboard()
         }
-        drawer_layout.closeDrawers()
+        binding.drawerLayout.closeDrawers()
     }
 
     override fun showLoading() {
-        progress.visible()
+        binding.progress.visible()
     }
 
     override fun hideLoading() {
-        progress.gone()
+        binding.progress.gone()
     }
 
     override fun launchThePitLinking(linkId: String) {
@@ -482,10 +489,10 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     }
 
     private fun resetUi() {
-        toolbar_general.title = ""
+        binding.toolbarGeneral.toolbarGeneral.title = ""
 
         // Set selected appropriately.
-        with(bottom_navigation) {
+        with(binding.bottomNavigation) {
             when (currentFragment) {
                 is DashboardFragment -> currentItem = ITEM_HOME
                 is ActivitiesFragment -> currentItem = ITEM_ACTIVITY
@@ -535,10 +542,12 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     }
 
     override fun enableSwapButton(isEnabled: Boolean) {
-        if (isEnabled) {
-            bottom_navigation.enableItemAtPosition(ITEM_SWAP)
-        } else {
-            bottom_navigation.disableItemAtPosition(ITEM_SWAP)
+        with(binding.bottomNavigation) {
+            if (isEnabled) {
+                enableItemAtPosition(ITEM_SWAP)
+            } else {
+                disableItemAtPosition(ITEM_SWAP)
+            }
         }
     }
 
@@ -644,7 +653,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         viewToShow: TransferFragment.TransferViewType = TransferFragment.TransferViewType.TYPE_SEND
     ) {
         setCurrentTabItem(ITEM_TRANSFER)
-        toolbar_general.title = getString(R.string.transfer)
+        binding.toolbarGeneral.toolbarGeneral.title = getString(R.string.transfer)
 
         val transferFragment = TransferFragment.newInstance(viewToShow)
         replaceContentFragment(transferFragment)
@@ -653,7 +662,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     private fun startSwapFlow(sourceAccount: CryptoAccount? = null, destinationAccount: CryptoAccount? = null) {
         if (sourceAccount == null && destinationAccount == null) {
             setCurrentTabItem(ITEM_SWAP)
-            toolbar_general.title = getString(R.string.common_swap)
+            binding.toolbarGeneral.toolbarGeneral.title = getString(R.string.common_swap)
             val swapFragment = SwapFragment.newInstance()
             replaceContentFragment(swapFragment)
         } else if (sourceAccount != null) {
@@ -674,7 +683,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     }
 
     override fun gotoDashboard() {
-        bottom_navigation.currentItem = ITEM_HOME
+        binding.bottomNavigation.currentItem = ITEM_HOME
     }
 
     private fun startDashboardFragment() {
@@ -714,7 +723,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         setCurrentTabItem(ITEM_ACTIVITY)
         val fragment = ActivitiesFragment.newInstance(account)
         replaceContentFragment(fragment)
-        toolbar_general.title = ""
+        binding.toolbarGeneral.toolbarGeneral.title = ""
         analytics.logEvent(activityShown(account?.label ?: "All Wallets"))
     }
 
@@ -738,7 +747,7 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     /*** Silently switch the current tab in the tab_bar */
     private fun setCurrentTabItem(item: Int) {
-        bottom_navigation.apply {
+        binding.bottomNavigation.apply {
             removeOnTabSelectedListener()
             currentItem = item
             setOnTabSelectedListener(tabSelectedListener)
@@ -801,44 +810,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 context.startActivity(this)
             }
         }
-    }
-
-    override fun launchIntroTour() {
-
-        bottom_navigation.restoreBottomNavigation(false)
-
-        val tourSteps = listOf(
-            IntroTourStep(
-                name = "Step_One",
-                lookupTriggerView = { bottom_navigation.getViewAtPosition(ITEM_HOME) },
-                analyticsEvent = IntroTourAnalyticsEvent.IntroPortfolioViewedAnalytics,
-                msgIcon = R.drawable.ic_vector_toolbar_home,
-                msgTitle = R.string.tour_step_one_title,
-                msgBody = R.string.tour_step_one_body_1,
-                msgButton = R.string.tour_step_one_btn
-            ),
-            // TODO how will we show these two steps in the future?
-            IntroTourStep(
-                name = "Step_Two",
-                lookupTriggerView = { bottom_navigation.getViewAtPosition(ITEM_TRANSFER) },
-                analyticsEvent = IntroTourAnalyticsEvent.IntroSendViewedAnalytics,
-                msgIcon = R.drawable.ic_vector_toolbar_transfer,
-                msgTitle = R.string.tour_step_two_title,
-                msgBody = R.string.tour_step_two_body,
-                msgButton = R.string.tour_step_two_btn
-            ),
-            IntroTourStep(
-                name = "Step_Three",
-                lookupTriggerView = { bottom_navigation.getViewAtPosition(ITEM_TRANSFER) },
-                analyticsEvent = IntroTourAnalyticsEvent.IntroRequestViewedAnalytics,
-                msgIcon = R.drawable.ic_vector_toolbar_receive,
-                msgTitle = R.string.tour_step_three_title,
-                msgBody = R.string.tour_step_three_body,
-                msgButton = R.string.tour_step_three_btn
-            )
-        )
-
-        tour_guide.start(this, tourSteps)
     }
 
     override fun launchSimpleBuySell(viewType: BuySellFragment.BuySellViewType) {
@@ -962,16 +933,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         ToastCustom.makeText(
             this, getString(R.string.open_banking_deeplink_error), Toast.LENGTH_LONG, ToastCustom.TYPE_ERROR
         )
-    }
-
-    override fun onTourFinished() {
-        drawer_layout.closeDrawers()
-        startDashboardFragment()
-    }
-
-    override fun showTourDialog(dlg: BottomSheetDialogFragment) {
-        val fm = supportFragmentManager
-        dlg.show(fm, "TOUR_SHEET")
     }
 
     override fun onFlowFinished() {

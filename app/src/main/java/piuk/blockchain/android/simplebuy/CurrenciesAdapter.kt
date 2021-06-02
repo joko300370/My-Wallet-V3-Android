@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.currency_selection_item.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.CurrencySelectionItemBinding
 import kotlin.properties.Delegates
 
 class CurrenciesAdapter(
@@ -27,24 +27,23 @@ class CurrenciesAdapter(
         }
     }
 
-    class CurrenciesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val title: TextView = itemView.name
-        val symbol: TextView = itemView.symbol
-        val checkIcon: ImageView = itemView.ic_check
-        val rootView: ViewGroup = itemView.root_view
-        val cellDivider: View = itemView.cell_divider
-        val sectionDivider: View = itemView.section_separator
+    class CurrenciesViewHolder(binding: CurrencySelectionItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        val title: TextView = binding.name
+        val symbol: TextView = binding.symbol
+        val checkIcon: ImageView = binding.icCheck
+        val rootView: ViewGroup = binding.rootView
+        val cellDivider: View = binding.cellDivider
+        val sectionDivider: View = binding.sectionSeparator
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrenciesViewHolder {
-
-        val layout = LayoutInflater.from(parent.context).inflate(
-            R.layout.currency_selection_item,
-            parent,
-            false
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrenciesViewHolder =
+        CurrenciesViewHolder(
+            CurrencySelectionItemBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
         )
-        return CurrenciesViewHolder(layout)
-    }
 
     override fun getItemCount(): Int = items.size
 

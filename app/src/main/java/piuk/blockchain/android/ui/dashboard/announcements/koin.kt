@@ -14,7 +14,6 @@ import piuk.blockchain.android.ui.dashboard.announcements.rule.FiatFundsKycAnnou
 import piuk.blockchain.android.ui.dashboard.announcements.rule.FiatFundsNoKycAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.IncreaseLimitsAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.InterestAvailableAnnouncement
-import piuk.blockchain.android.ui.dashboard.announcements.rule.IntroTourAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycIncompleteAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycMoreInfoAnnouncement
 import piuk.blockchain.android.ui.dashboard.announcements.rule.KycResubmissionAnnouncement
@@ -82,14 +81,6 @@ val dashboardAnnouncementsModule = module {
             KycMoreInfoAnnouncement(
                 tierService = get(),
                 dismissRecorder = get()
-            )
-        }.bind(AnnouncementRule::class)
-
-        factory {
-            IntroTourAnnouncement(
-                dismissRecorder = get(),
-                prefs = get(),
-                analytics = get()
             )
         }.bind(AnnouncementRule::class)
 

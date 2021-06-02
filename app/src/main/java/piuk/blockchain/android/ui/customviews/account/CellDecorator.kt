@@ -9,9 +9,9 @@ import androidx.constraintlayout.widget.ConstraintSet
 import info.blockchain.balance.Money
 import io.reactivex.Maybe
 import io.reactivex.Single
-import kotlinx.android.synthetic.main.pending_balance_row.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.databinding.PendingBalanceRowBinding
 
 interface CellDecorator {
     fun view(context: Context): Maybe<View>
@@ -34,13 +34,10 @@ class PendingBalanceAccountDecorator(
     }
 
     private fun composePendingBalanceView(context: Context, balance: Money): View {
-        val view = LayoutInflater.from(context).inflate(
-            R.layout.pending_balance_row,
-            null,
-            false
-        )
-        view.pending_balance.text = balance.toStringWithSymbol()
-        return view
+        val binding = PendingBalanceRowBinding.inflate(LayoutInflater.from(context), null, false)
+
+        binding.pendingBalance.text = balance.toStringWithSymbol()
+        return binding.root
     }
 }
 

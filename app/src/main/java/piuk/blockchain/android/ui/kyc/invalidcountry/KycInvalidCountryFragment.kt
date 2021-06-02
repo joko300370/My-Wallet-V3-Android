@@ -6,20 +6,20 @@ import android.view.View
 import android.view.ViewGroup
 import com.blockchain.koin.scopedInject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.FragmentKycInvalidCountryBinding
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
+import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpFragment
-import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
-import piuk.blockchain.android.util.inflate
-import kotlinx.android.synthetic.main.fragment_kyc_invalid_country.button_kyc_invalid_country_message_me as buttonMessageMe
-import kotlinx.android.synthetic.main.fragment_kyc_invalid_country.text_view_kyc_invalid_country_header as textViewHeader
-import kotlinx.android.synthetic.main.fragment_kyc_invalid_country.text_view_kyc_invalid_country_message as textViewMessage
-import kotlinx.android.synthetic.main.fragment_kyc_invalid_country.text_view_kyc_no_thanks as buttonNoThanks
 
 class KycInvalidCountryFragment :
     BaseMvpFragment<KycInvalidCountryView, KycInvalidCountryPresenter>(),
     KycInvalidCountryView {
+
+    private var _binding: FragmentKycInvalidCountryBinding? = null
+    private val binding: FragmentKycInvalidCountryBinding
+        get() = _binding!!
 
     override val displayModel by unsafeLazy {
         KycInvalidCountryFragmentArgs.fromBundle(arguments ?: Bundle()).countryDisplayModel
@@ -34,23 +34,31 @@ class KycInvalidCountryFragment :
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = container?.inflate(R.layout.fragment_kyc_invalid_country)
+    ): View {
+        _binding = FragmentKycInvalidCountryBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         progressListener.setHostTitle(R.string.kyc_country_selection_title_1)
 
-        textViewHeader.text = getString(R.string.kyc_invalid_country_header, displayModel.name)
-        textViewMessage.text = getString(R.string.kyc_invalid_country_message, displayModel.name)
-
-        buttonNoThanks.setOnClickListener { presenter.onNoThanks() }
-        buttonMessageMe.setOnClickListener { presenter.onNotifyMe() }
-
+        with(binding) {
+            textViewKycInvalidCountryHeader.text = getString(R.string.kyc_invalid_country_header, displayModel.name)
+            textViewKycInvalidCountryMessage.text = getString(R.string.kyc_invalid_country_message, displayModel.name)
+            textViewKycNoThanks.setOnClickListener { presenter.onNoThanks() }
+            buttonKycInvalidCountryMessageMe.setOnClickListener { presenter.onNotifyMe() }
+        }
         onViewReady()
     }
 
     override fun finishPage() {
         requireActivity().finish()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun showProgressDialog() {

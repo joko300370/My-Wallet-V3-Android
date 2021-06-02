@@ -2,15 +2,14 @@ package piuk.blockchain.android.cards
 
 import android.content.Intent
 import android.os.Bundle
-import com.blockchain.preferences.SimpleBuyPrefs
 import com.blockchain.nabu.datamanagers.PaymentMethod
-import kotlinx.android.synthetic.main.activity_card_details.*
-import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
+import com.blockchain.preferences.SimpleBuyPrefs
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.ActivityCardDetailsBinding
 import piuk.blockchain.android.ui.base.BlockchainActivity
-import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 
 class CardDetailsActivity : BlockchainActivity(), AddCardNavigator, CardDetailsPersistence {
@@ -20,10 +19,14 @@ class CardDetailsActivity : BlockchainActivity(), AddCardNavigator, CardDetailsP
     private var cardData: CardData? = null
     private val simpleBuyPrefs: SimpleBuyPrefs by inject()
 
+    private val binding: ActivityCardDetailsBinding by lazy {
+        ActivityCardDetailsBinding.inflate(layoutInflater)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_card_details)
-        setSupportActionBar(toolbar_general)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbarGeneral.toolbarGeneral)
 
         if (savedInstanceState == null) {
             simpleBuyPrefs.clearCardState()
@@ -34,11 +37,11 @@ class CardDetailsActivity : BlockchainActivity(), AddCardNavigator, CardDetailsP
     }
 
     override fun showLoading() {
-        progress.visible()
+        binding.progress.visible()
     }
 
     override fun hideLoading() {
-        progress.gone()
+        binding.progress.gone()
     }
 
     override fun onSupportNavigateUp(): Boolean = consume {

@@ -1,16 +1,13 @@
 package piuk.blockchain.android.ui.transactionflow.flow.adapter
 
-import android.view.View
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_send_confirm_details.view.*
-import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
+import piuk.blockchain.android.databinding.ItemSendConfirmDetailsBinding
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapper
-import piuk.blockchain.android.util.inflate
 
 class ConfirmInfoItemDelegate<in T>(private val mapper: TxConfirmReadOnlyMapper) :
     AdapterDelegate<T> {
@@ -20,7 +17,7 @@ class ConfirmInfoItemDelegate<in T>(private val mapper: TxConfirmReadOnlyMapper)
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
         InfoItemViewHolder(
-            parent.inflate(R.layout.item_send_confirm_details),
+            ItemSendConfirmDetailsBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             mapper
         )
 
@@ -33,17 +30,18 @@ class ConfirmInfoItemDelegate<in T>(private val mapper: TxConfirmReadOnlyMapper)
     )
 }
 
-class InfoItemViewHolder(val parent: View, private val mapper: TxConfirmReadOnlyMapper) :
-    RecyclerView.ViewHolder(parent),
-    LayoutContainer {
-
-    override val containerView: View?
-        get() = itemView
+class InfoItemViewHolder(
+    private val binding: ItemSendConfirmDetailsBinding,
+    private val mapper: TxConfirmReadOnlyMapper
+) :
+    RecyclerView.ViewHolder(binding.root) {
 
     fun bind(item: TxConfirmationValue) {
         mapper.map(item).let { (title, value) ->
-            itemView.confirmation_item_label.text = title
-            itemView.confirmation_item_value.text = value
+            with(binding) {
+                confirmationItemLabel.text = title
+                confirmationItemValue.text = value
+            }
         }
     }
 }

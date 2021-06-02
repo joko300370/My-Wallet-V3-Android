@@ -2,14 +2,16 @@ package piuk.blockchain.android.ui.customviews
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.LayoutInflater
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_SUPPORT_PORTAL
-import kotlinx.android.synthetic.main.view_empty_state.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.ViewEmptyStateBinding
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.android.util.visibleIf
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
 
 class EmptyStateView @JvmOverloads constructor(
     context: Context,
@@ -17,9 +19,7 @@ class EmptyStateView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-    init {
-        inflate(context, R.layout.view_empty_state, this)
-    }
+    private val binding: ViewEmptyStateBinding = ViewEmptyStateBinding.inflate(LayoutInflater.from(context), this, true)
 
     fun setDetails(
         @StringRes title: Int = R.string.common_empty_title,
@@ -29,20 +29,20 @@ class EmptyStateView @JvmOverloads constructor(
         contactSupportEnabled: Boolean = false,
         action: () -> Unit
     ) {
-        view_empty_title.text = context.getString(title)
-        view_empty_desc.text = context.getString(description)
-        view_empty_icon.setImageDrawable(context.getDrawable(icon))
-        view_empty_cta.text = context.getString(ctaText)
-        view_empty_cta.setOnClickListener {
-            action()
-        }
-
-        view_empty_support_cta.visibleIf {
-            contactSupportEnabled
-        }
-
-        view_empty_support_cta.setOnClickListener {
-            calloutToExternalSupportLinkDlg(context, URL_BLOCKCHAIN_SUPPORT_PORTAL)
+        with(binding) {
+            viewEmptyTitle.text = context.getString(title)
+            viewEmptyDesc.text = context.getString(description)
+            viewEmptyIcon.setImageDrawable(context.getResolvedDrawable(icon))
+            viewEmptyCta.text = context.getString(ctaText)
+            viewEmptyCta.setOnClickListener {
+                action()
+            }
+            viewEmptySupportCta.visibleIf {
+                contactSupportEnabled
+            }
+            viewEmptySupportCta.setOnClickListener {
+                calloutToExternalSupportLinkDlg(context, URL_BLOCKCHAIN_SUPPORT_PORTAL)
+            }
         }
     }
 }

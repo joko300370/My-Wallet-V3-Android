@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.customviews
 import android.content.Context
 import android.text.Editable
 import android.util.AttributeSet
+import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.CurrencyPrefs
@@ -18,10 +19,10 @@ import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.subjects.PublishSubject
-import kotlinx.android.synthetic.main.enter_fiat_crypto_layout.view.*
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.EnterFiatCryptoLayoutBinding
 import piuk.blockchain.android.ui.customviews.inputview.DecimalDigitsInputFilter
 import piuk.blockchain.android.util.AfterTextChangedWatcher
 import piuk.blockchain.android.util.afterMeasured
@@ -36,8 +37,11 @@ import kotlin.properties.Delegates
 
 class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs), KoinComponent {
 
+    private val binding: EnterFiatCryptoLayoutBinding =
+        EnterFiatCryptoLayoutBinding.inflate(LayoutInflater.from(context), this, true)
+
     val onImeAction: Observable<PrefixedOrSuffixedEditText.ImeOptions> by lazy {
-        enter_amount.onImeAction
+        binding.enterAmount.onImeAction
     }
 
     private val amountSubject: PublishSubject<Money> = PublishSubject.create()
@@ -82,30 +86,30 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
     private val compositeDisposable = CompositeDisposable()
 
     init {
-        inflate(context, R.layout.enter_fiat_crypto_layout, this)
-
-        compositeDisposable += enter_amount.textSize.subscribe { textSize ->
-            if (enter_amount.text.toString() == enter_amount.configuration.prefixOrSuffix) {
-                placeFakeHint(textSize, enter_amount.configuration.isPrefix)
-            } else
-                fake_hint.gone()
-        }
-
-        enter_amount.addTextChangedListener(object : AfterTextChangedWatcher() {
-            override fun afterTextChanged(s: Editable?) {
-                updateExchangeAmountAndOutput()
+        with(binding) {
+            compositeDisposable += enterAmount.textSize.subscribe { textSize ->
+                if (enterAmount.text.toString() == enterAmount.configuration.prefixOrSuffix) {
+                    placeFakeHint(textSize, enterAmount.configuration.isPrefix)
+                } else
+                    fakeHint.gone()
             }
-        })
 
-        currency_swap.setOnClickListener {
-            configuration =
-                configuration.copy(
-                    inputCurrency = configuration.exchangeCurrency,
-                    outputCurrency = configuration.exchangeCurrency,
-                    exchangeCurrency = configuration.inputCurrency,
-                    predefinedAmount = internalExchangeRate.convert(getLastEnteredAmount(configuration))
-                )
-            inputToggleSubject.onNext(configuration.inputCurrency)
+            enterAmount.addTextChangedListener(object : AfterTextChangedWatcher() {
+                override fun afterTextChanged(s: Editable?) {
+                    updateExchangeAmountAndOutput()
+                }
+            })
+
+            currencySwap.setOnClickListener {
+                configuration =
+                    configuration.copy(
+                        inputCurrency = configuration.exchangeCurrency,
+                        outputCurrency = configuration.exchangeCurrency,
+                        exchangeCurrency = configuration.inputCurrency,
+                        predefinedAmount = internalExchangeRate.convert(getLastEnteredAmount(configuration))
+                    )
+                inputToggleSubject.onNext(configuration.inputCurrency)
+            }
         }
     }
 
@@ -113,18 +117,20 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
         private set
 
     private fun placeFakeHint(textSize: Int, hasPrefix: Boolean) {
-        fake_hint.visible()
-        fake_hint.afterMeasured {
-            it.translationX =
-                if (hasPrefix) (enter_amount.width / 2f + textSize / 2f) +
-                    resources.getDimensionPixelOffset(R.dimen.smallest_margin) else
-                    enter_amount.width / 2f - textSize / 2f - it.width -
-                        resources.getDimensionPixelOffset(R.dimen.smallest_margin)
+        with(binding) {
+            fakeHint.visible()
+            fakeHint.afterMeasured {
+                it.translationX =
+                    if (hasPrefix) (enterAmount.width / 2f + textSize / 2f) +
+                        resources.getDimensionPixelOffset(R.dimen.smallest_margin) else
+                        enterAmount.width / 2f - textSize / 2f - it.width -
+                            resources.getDimensionPixelOffset(R.dimen.smallest_margin)
+            }
         }
     }
 
     private fun getLastEnteredAmount(configuration: FiatCryptoViewConfiguration): Money =
-        enter_amount.bigDecimalValue?.let { enterAmount ->
+        binding.enterAmount.bigDecimalValue?.let { enterAmount ->
             when (configuration.inputCurrency) {
                 is CurrencyType.Fiat -> FiatValue.fromMajor(configuration.inputCurrency.fiatCurrency, enterAmount)
                 is CurrencyType.Crypto -> CryptoValue.fromMajor(configuration.inputCurrency.cryptoCurrency, enterAmount)
@@ -140,65 +146,71 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
     ) { _, oldValue, newValue ->
         if (oldValue != newValue || !configured) {
             configured = true
-            enter_amount.filters = emptyArray()
+            with(binding) {
+                enterAmount.filters = emptyArray()
 
-            val inputSymbol = newValue.inputCurrency.symbol()
+                val inputSymbol = newValue.inputCurrency.symbol()
 
-            currency_swap.visibleIf { newValue.swapEnabled }
+                currencySwap.visibleIf { newValue.swapEnabled }
 
-            exchange_amount.visibleIf { !newValue.inputIsSameAsExchange }
+                exchangeAmount.visibleIf { !newValue.inputIsSameAsExchange }
 
-            maxLimit?.let { updateFilters(inputSymbol, it.toInputCurrency()) }
-            fake_hint.text = newValue.inputCurrency.zeroValue().toStringWithoutSymbol()
+                maxLimit?.let { updateFilters(inputSymbol, it.toInputCurrency()) }
+                fakeHint.text = newValue.inputCurrency.zeroValue().toStringWithoutSymbol()
 
-            enter_amount.configuration = Configuration(
-                prefixOrSuffix = inputSymbol,
-                isPrefix = newValue.inputCurrency is CurrencyType.Fiat,
-                initialText = newValue.predefinedAmount.toStringWithoutSymbol()
-                    .replace(DecimalFormatSymbols(Locale.getDefault()).groupingSeparator.toString(), "")
-                    .removeSuffix("${DecimalFormatSymbols(Locale.getDefault()).decimalSeparator}00")
-            )
+                enterAmount.configuration = Configuration(
+                    prefixOrSuffix = inputSymbol,
+                    isPrefix = newValue.inputCurrency is CurrencyType.Fiat,
+                    initialText = newValue.predefinedAmount.toStringWithoutSymbol()
+                        .replace(DecimalFormatSymbols(Locale.getDefault()).groupingSeparator.toString(), "")
+                        .removeSuffix("${DecimalFormatSymbols(Locale.getDefault()).decimalSeparator}00")
+                )
 
-            enter_amount.resetForTyping()
+                enterAmount.resetForTyping()
+            }
         }
     }
 
     var maxLimit by Delegates.observable<Money?>(null) { _, oldValue, newValue ->
         if (newValue != oldValue && newValue != null)
-            updateFilters(enter_amount.configuration.prefixOrSuffix, newValue.toInputCurrency())
+            updateFilters(binding.enterAmount.configuration.prefixOrSuffix, newValue.toInputCurrency())
     }
 
     fun showError(errorMessage: String, shouldDisableInput: Boolean = false) {
-        error.text = errorMessage
-        error.visible()
-        info.gone()
-        hideExchangeAmount()
-        exchange_amount.isEnabled = !shouldDisableInput
+        with(binding) {
+            error.text = errorMessage
+            error.visible()
+            info.gone()
+            hideExchangeAmount()
+            exchangeAmount.isEnabled = !shouldDisableInput
+        }
     }
 
     fun showInfo(infoMessage: String, onClick: () -> Unit) {
-        info.text = infoMessage
-        error.gone()
-        info.visible()
-        info.setOnClickListener {
-            onClick()
+        with(binding) {
+            info.text = infoMessage
+            error.gone()
+            info.visible()
+            info.setOnClickListener {
+                onClick()
+            }
+            hideExchangeAmount()
         }
-        hideExchangeAmount()
     }
 
     private fun hideExchangeAmount() {
-        exchange_amount.gone()
+        binding.exchangeAmount.gone()
     }
 
     fun hideLabels() {
-        error.gone()
-        info.gone()
+        binding.error.gone()
+        binding.info.gone()
         showExchangeAmount()
     }
 
     private fun showExchangeAmount() {
         if (!configuration.inputIsSameAsExchange) {
-            exchange_amount.visible()
+            binding.exchangeAmount.visible()
         }
     }
 
@@ -211,7 +223,7 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
     private fun updateFilters(prefixOrSuffix: String, value: Money) {
         val maxDecimalDigitsForAmount = value.userDecimalPlaces
         val maxIntegerDigitsForAmount = value.toStringParts().major.length
-        enter_amount.addFilter(maxDecimalDigitsForAmount, maxIntegerDigitsForAmount, prefixOrSuffix)
+        binding.enterAmount.addFilter(maxDecimalDigitsForAmount, maxIntegerDigitsForAmount, prefixOrSuffix)
     }
 
     private fun PrefixedOrSuffixedEditText.addFilter(
@@ -231,37 +243,39 @@ class FiatCryptoInputView(context: Context, attrs: AttributeSet) : ConstraintLay
     private fun updateExchangeAmountAndOutput() {
         val config = configuration.inputCurrency
 
-        if (config is CurrencyType.Fiat) {
-            val enteredAmount = enter_amount.bigDecimalValue?.let { amount ->
-                FiatValue.fromMajor(config.fiatCurrency, amount)
-            } ?: FiatValue.zero(config.fiatCurrency)
+        with(binding) {
+            if (config is CurrencyType.Fiat) {
+                val enteredAmount = enterAmount.bigDecimalValue?.let { amount ->
+                    FiatValue.fromMajor(config.fiatCurrency, amount)
+                } ?: FiatValue.zero(config.fiatCurrency)
 
-            val output = inputToOutputExchangeRate.convert(enteredAmount)
-            val internalExchangeAmount = internalExchangeRate.convert(enteredAmount)
-            exchange_amount.text = internalExchangeAmount.toStringWithSymbol()
-            if (output.isZero) {
-                updateValue(output)
+                val output = inputToOutputExchangeRate.convert(enteredAmount)
+                val internalExchangeAmount = internalExchangeRate.convert(enteredAmount)
+                exchangeAmount.text = internalExchangeAmount.toStringWithSymbol()
+                if (output.isZero) {
+                    updateValue(output)
+                }
+                amountSubject.onNext(output)
+            } else if (config is CurrencyType.Crypto) {
+
+                val cryptoAmount = enterAmount.bigDecimalValue?.let { amount ->
+                    CryptoValue.fromMajor(config.cryptoCurrency, amount)
+                } ?: CryptoValue.zero(config.cryptoCurrency)
+
+                val output = inputToOutputExchangeRate.convert(cryptoAmount)
+                val internalExchangeAmount = internalExchangeRate.convert(cryptoAmount)
+
+                exchangeAmount.text = internalExchangeAmount.toStringWithSymbol()
+                if (output.isZero) {
+                    updateValue(output)
+                }
+                amountSubject.onNext(output)
             }
-            amountSubject.onNext(output)
-        } else if (config is CurrencyType.Crypto) {
-
-            val cryptoAmount = enter_amount.bigDecimalValue?.let { amount ->
-                CryptoValue.fromMajor(config.cryptoCurrency, amount)
-            } ?: CryptoValue.zero(config.cryptoCurrency)
-
-            val output = inputToOutputExchangeRate.convert(cryptoAmount)
-            val internalExchangeAmount = internalExchangeRate.convert(cryptoAmount)
-
-            exchange_amount.text = internalExchangeAmount.toStringWithSymbol()
-            if (output.isZero) {
-                updateValue(output)
-            }
-            amountSubject.onNext(output)
         }
     }
 
     fun fixExchange(it: Money) {
-        exchange_amount.text = it.toStringWithSymbol()
+        binding.exchangeAmount.text = it.toStringWithSymbol()
     }
 
     override fun onDetachedFromWindow() {

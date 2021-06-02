@@ -1,20 +1,19 @@
 package piuk.blockchain.android.ui.activity.adapter
 
 import android.graphics.Color
-import android.view.View
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.nabu.datamanagers.TransactionState
 import com.blockchain.nabu.datamanagers.TransactionType
 import com.blockchain.utils.toFormattedDate
-import kotlinx.android.synthetic.main.layout_fiat_activity_item.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
+import piuk.blockchain.android.databinding.LayoutFiatActivityItemBinding
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.android.util.inflate
-
+import piuk.blockchain.android.util.context
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import java.util.Date
 
 class CustodialFiatActivityItemDelegate<in T>(
@@ -25,7 +24,9 @@ class CustodialFiatActivityItemDelegate<in T>(
         items[position] is FiatActivitySummaryItem
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        FiatActivityItemViewHolder(parent.inflate(R.layout.layout_fiat_activity_item))
+        FiatActivityItemViewHolder(
+            LayoutFiatActivityItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        )
 
     override fun onBindViewHolder(items: List<T>, position: Int, holder: RecyclerView.ViewHolder) {
         (holder as FiatActivityItemViewHolder).bind(
@@ -36,32 +37,31 @@ class CustodialFiatActivityItemDelegate<in T>(
 }
 
 private class FiatActivityItemViewHolder(
-    itemView: View
-) : RecyclerView.ViewHolder(itemView) {
+    private val binding: LayoutFiatActivityItemBinding
+) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(
         tx: FiatActivitySummaryItem,
         onAccountClicked: (String, String) -> Unit
     ) {
-        with(itemView) {
-
+        with(binding) {
             if (tx.state.isPending()) {
                 renderPending()
             } else {
                 renderComplete(tx)
             }
 
-            tx_type.setTxLabel(tx.currency, tx.type)
+            txType.setTxLabel(tx.currency, tx.type)
 
-            status_date.text = Date(tx.timeStampMs).toFormattedDate()
+            statusDate.text = Date(tx.timeStampMs).toFormattedDate()
 
-            asset_balance_fiat.text = tx.value.toStringWithSymbol()
+            assetBalanceFiat.text = tx.value.toStringWithSymbol()
 
-            setOnClickListener { onAccountClicked(tx.currency, tx.txId) }
+            txRoot.setOnClickListener { onAccountClicked(tx.currency, tx.txId) }
         }
     }
 
-    private fun View.renderComplete(tx: FiatActivitySummaryItem) {
+    private fun LayoutFiatActivityItemBinding.renderComplete(tx: FiatActivitySummaryItem) {
         icon.apply {
             setImageResource(
                 if (tx.type == TransactionType.DEPOSIT)
@@ -69,19 +69,19 @@ private class FiatActivityItemViewHolder(
                     R.drawable.ic_tx_sell
             )
             setBackgroundResource(R.drawable.bkgd_tx_circle)
-            background.setTint(ContextCompat.getColor(context, R.color.green_500_fade_15))
-            setColorFilter(ContextCompat.getColor(context, R.color.green_500))
+            background.setTint(context.getResolvedColor(R.color.green_500_fade_15))
+            setColorFilter(context.getResolvedColor(R.color.green_500))
         }
 
-        tx_type.setTextColor(ContextCompat.getColor(context, R.color.black))
-        status_date.setTextColor(ContextCompat.getColor(context, R.color.grey_600))
-        asset_balance_fiat.setTextColor(ContextCompat.getColor(context, R.color.grey_600))
+        txType.setTextColor(context.getResolvedColor(R.color.black))
+        statusDate.setTextColor(context.getResolvedColor(R.color.grey_600))
+        assetBalanceFiat.setTextColor(context.getResolvedColor(R.color.grey_600))
     }
 
-    private fun View.renderPending() {
-        tx_type.setTextColor(ContextCompat.getColor(context, R.color.grey_400))
-        status_date.setTextColor(ContextCompat.getColor(context, R.color.grey_400))
-        asset_balance_fiat.setTextColor(ContextCompat.getColor(context, R.color.grey_400))
+    private fun LayoutFiatActivityItemBinding.renderPending() {
+        txType.setTextColor(context.getResolvedColor(R.color.grey_400))
+        statusDate.setTextColor(context.getResolvedColor(R.color.grey_400))
+        assetBalanceFiat.setTextColor(context.getResolvedColor(R.color.grey_400))
         icon.apply {
             setImageResource(R.drawable.ic_tx_confirming)
             background = null

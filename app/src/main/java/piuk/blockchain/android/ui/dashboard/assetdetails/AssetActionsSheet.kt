@@ -1,7 +1,6 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.Lifecycle
@@ -17,7 +16,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.item_asset_action.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetResources
@@ -26,6 +24,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.databinding.DialogAssetActionsSheetBinding
+import piuk.blockchain.android.databinding.ItemAssetActionBinding
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.customviews.ToastCustom
@@ -36,7 +35,7 @@ import piuk.blockchain.android.ui.customviews.account.StatusDecorator
 import piuk.blockchain.android.ui.customviews.account.addViewToBottomWithConstraints
 import piuk.blockchain.android.ui.customviews.account.removePossibleBottomView
 import piuk.blockchain.android.ui.transfer.analytics.TransferAnalyticsEvent
-import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.context
 import piuk.blockchain.android.util.setAssetIconColours
 import timber.log.Timber
 
@@ -294,7 +293,9 @@ private class AssetActionAdapter(
     private val assetResources: AssetResources = payloadScope.get()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ActionItemViewHolder =
-        ActionItemViewHolder(compositeDisposable, parent.inflate(R.layout.item_asset_action))
+        ActionItemViewHolder(
+            compositeDisposable, ItemAssetActionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        )
 
     override fun getItemCount(): Int = itemList.size
 
@@ -306,8 +307,10 @@ private class AssetActionAdapter(
         compositeDisposable.clear()
     }
 
-    private class ActionItemViewHolder(private val compositeDisposable: CompositeDisposable, private val view: View) :
-        RecyclerView.ViewHolder(view) {
+    private class ActionItemViewHolder(
+        private val compositeDisposable: CompositeDisposable,
+        private val binding: ItemAssetActionBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(
             item: AssetActionItem,
             statusDecorator: StatusDecorator,
@@ -315,14 +318,14 @@ private class AssetActionAdapter(
         ) {
             addDecorator(item, statusDecorator)
 
-            view.apply {
-                item_action_icon.setImageResource(item.icon)
-                item_action_icon.setAssetIconColours(
+            binding.apply {
+                itemActionIcon.setImageResource(item.icon)
+                itemActionIcon.setAssetIconColours(
                     tintColor = assetResources.assetTint(item.asset),
                     filterColor = assetResources.assetFilter(item.asset)
                 )
-                item_action_title.text = item.title
-                item_action_label.text = item.description
+                itemActionTitle.text = item.title
+                itemActionLabel.text = item.description
             }
         }
 
@@ -335,14 +338,16 @@ private class AssetActionAdapter(
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(
                         onSuccess = { enabled ->
-                            if (enabled) {
-                                view.item_action_holder.alpha = 1f
-                                view.item_action_holder.setOnClickListener {
-                                    item.actionCta()
+                            with(binding.itemActionHolder) {
+                                if (enabled) {
+                                    alpha = 1f
+                                    setOnClickListener {
+                                        item.actionCta()
+                                    }
+                                } else {
+                                    alpha = .6f
+                                    setOnClickListener {}
                                 }
-                            } else {
-                                view.item_action_holder.alpha = .6f
-                                view.item_action_holder.setOnClickListener {}
                             }
                         },
                         onError = {
@@ -350,18 +355,18 @@ private class AssetActionAdapter(
                         }
                     )
 
-                view.item_action_holder.removePossibleBottomView()
-                compositeDisposable += statusDecorator(account).view(view.context)
+                binding.itemActionHolder.removePossibleBottomView()
+                compositeDisposable += statusDecorator(account).view(context)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
-                        view.item_action_holder.addViewToBottomWithConstraints(
+                        binding.itemActionHolder.addViewToBottomWithConstraints(
                             it,
-                            bottomOfView = view.item_action_label,
-                            startOfView = view.item_action_icon,
+                            bottomOfView = binding.itemActionLabel,
+                            startOfView = binding.itemActionIcon,
                             endOfView = null
                         )
                     }
-            } ?: view.item_action_holder.setOnClickListener {
+            } ?: binding.itemActionHolder.setOnClickListener {
                 item.actionCta()
             }
         }

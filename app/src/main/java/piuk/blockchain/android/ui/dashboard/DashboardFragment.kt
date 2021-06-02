@@ -517,8 +517,6 @@ class DashboardFragment :
 
         override fun startEnableFingerprintLogin() = navigator().launchSetupFingerprintLogin()
 
-        override fun startIntroTourGuide() = navigator().launchIntroTour()
-
         override fun startTransferCrypto() {
             analytics.logEvent(
                 TransferAnalyticsEvent.TransferClicked(

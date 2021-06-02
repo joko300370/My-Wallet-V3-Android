@@ -1,21 +1,21 @@
 package piuk.blockchain.android.ui.dashboard.adapter
 
 import android.content.Context
-import android.view.View
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_dashboard_funds.view.*
-import kotlinx.android.synthetic.main.item_dashboard_funds_bordered.view.*
-import kotlinx.android.synthetic.main.item_dashboard_funds_parent.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.databinding.ItemDashboardFundsBinding
+import piuk.blockchain.android.databinding.ItemDashboardFundsBorderedBinding
+import piuk.blockchain.android.databinding.ItemDashboardFundsParentBinding
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.dashboard.FiatAssetState
 import piuk.blockchain.android.ui.dashboard.FiatBalanceInfo
+import piuk.blockchain.android.util.context
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.visibleIf
 
 class FundsCardDelegate<in T>(
@@ -26,12 +26,15 @@ class FundsCardDelegate<in T>(
     override fun isForViewType(items: List<T>, position: Int): Boolean =
         items[position] is FiatAssetState
 
-    override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        FundsCardViewHolder(
-            parent.inflate(R.layout.item_dashboard_funds_parent),
+    override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
+        val binding = ItemDashboardFundsParentBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return FundsCardViewHolder(
+            binding,
+            ItemDashboardFundsBinding.inflate(LayoutInflater.from(parent.context), binding.root, true),
             onFundsItemClicked,
             selectedFiat
         )
+    }
 
     override fun onBindViewHolder(
         items: List<T>,
@@ -41,10 +44,11 @@ class FundsCardDelegate<in T>(
 }
 
 private class FundsCardViewHolder(
-    itemView: View,
+    private val binding: ItemDashboardFundsParentBinding,
+    private val singleLayoutBinding: ItemDashboardFundsBinding,
     private val onFundsItemClicked: (FiatAccount) -> Unit,
     private val selectedFiat: String
-) : RecyclerView.ViewHolder(itemView) {
+) : RecyclerView.ViewHolder(binding.root) {
     private val multipleFundsAdapter: MultipleFundsAdapter by lazy {
         MultipleFundsAdapter(onFundsItemClicked, selectedFiat)
     }
@@ -53,33 +57,35 @@ private class FundsCardViewHolder(
         if (funds.fiatAccounts.size == 1) {
             showSingleAsset(funds.fiatAccounts[0])
         } else {
-            itemView.funds_single_item.gone()
-            itemView.funds_list.apply {
-                layoutManager =
-                    LinearLayoutManager(itemView.context, LinearLayoutManager.HORIZONTAL, false)
-                adapter = multipleFundsAdapter
+            with(binding) {
+                fundsSingleItem.gone()
+                fundsList.apply {
+                    layoutManager =
+                        LinearLayoutManager(itemView.context, LinearLayoutManager.HORIZONTAL, false)
+                    adapter = multipleFundsAdapter
+                }
+                multipleFundsAdapter.items = funds.fiatAccounts
             }
-            multipleFundsAdapter.items = funds.fiatAccounts
         }
     }
 
     private fun showSingleAsset(assetInfo: FiatBalanceInfo) {
         val ticker = assetInfo.account.fiatCurrency
-        itemView.apply {
-            funds_user_fiat_balance.visibleIf { selectedFiat != ticker }
-            funds_user_fiat_balance.text = assetInfo.balance.toStringWithSymbol()
-            funds_list.gone()
-            funds_single_item.setOnClickListener {
+        singleLayoutBinding.apply {
+            fundsUserFiatBalance.visibleIf { selectedFiat != ticker }
+            fundsUserFiatBalance.text = assetInfo.balance.toStringWithSymbol()
+            binding.fundsList.gone()
+            binding.fundsSingleItem.setOnClickListener {
                 onFundsItemClicked(assetInfo.account)
             }
-            funds_title.setStringFromTicker(context, ticker)
-            funds_fiat_ticker.text = ticker
-            funds_balance.text = if (selectedFiat == ticker) {
+            fundsTitle.setStringFromTicker(context, ticker)
+            fundsFiatTicker.text = ticker
+            fundsBalance.text = if (selectedFiat == ticker) {
                 assetInfo.balance.toStringWithSymbol()
             } else {
                 assetInfo.userFiat.toStringWithSymbol()
             }
-            funds_icon.setIcon(ticker)
+            fundsIcon.setIcon(ticker)
         }
     }
 }
@@ -96,8 +102,10 @@ private class MultipleFundsAdapter(
         }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
-        SingleFundsViewHolder(parent.inflate(R.layout.item_dashboard_funds_bordered),
-            onFundsItemClicked, selectedFiat)
+        SingleFundsViewHolder(
+            ItemDashboardFundsBorderedBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            onFundsItemClicked, selectedFiat
+        )
 
     override fun getItemCount(): Int = items.size
 
@@ -107,28 +115,28 @@ private class MultipleFundsAdapter(
     ) = (holder as SingleFundsViewHolder).bind(items[position])
 
     private class SingleFundsViewHolder(
-        itemView: View,
+        private val binding: ItemDashboardFundsBorderedBinding,
         private val onFundsItemClicked: (FiatAccount) -> Unit,
         private val selectedFiat: String
-    ) : RecyclerView.ViewHolder(itemView) {
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(assetInfo: FiatBalanceInfo) {
             val ticker = assetInfo.account.fiatCurrency
-            itemView.apply {
-                bordered_funds_balance_other_fiat.visibleIf { selectedFiat != ticker }
-                bordered_funds_balance_other_fiat.text = assetInfo.balance.toStringWithSymbol()
+            binding.apply {
+                borderedFundsBalanceOtherFiat.visibleIf { selectedFiat != ticker }
+                borderedFundsBalanceOtherFiat.text = assetInfo.balance.toStringWithSymbol()
 
-                bordered_funds_parent.setOnClickListener {
+                borderedFundsParent.setOnClickListener {
                     onFundsItemClicked(assetInfo.account)
                 }
-                bordered_funds_title.setStringFromTicker(context, ticker)
-                bordered_funds_fiat_ticker.text = ticker
-                bordered_funds_balance.text = if (selectedFiat == ticker) {
+                borderedFundsTitle.setStringFromTicker(context, ticker)
+                borderedFundsFiatTicker.text = ticker
+                borderedFundsBalance.text = if (selectedFiat == ticker) {
                     assetInfo.balance.toStringWithSymbol()
                 } else {
                     assetInfo.userFiat.toStringWithSymbol()
                 }
-                bordered_funds_icon.setIcon(ticker)
+                borderedFundsIcon.setIcon(ticker)
             }
         }
     }

@@ -3,20 +3,19 @@ package piuk.blockchain.android.ui.customviews
 import android.content.Context
 import android.os.Parcelable
 import android.util.AttributeSet
+import android.view.LayoutInflater
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.parcel.Parcelize
-import kotlinx.android.synthetic.main.verify_identity_benefits_layout.view.*
-import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.VerifyIdentityBenefitsLayoutBinding
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visibleIf
 
 class VerifyIdentityBenefitsView(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs) {
 
-    init {
-        inflate(context, R.layout.verify_identity_benefits_layout, this)
-    }
+    private val binding: VerifyIdentityBenefitsLayoutBinding = VerifyIdentityBenefitsLayoutBinding.inflate(
+        LayoutInflater.from(context), this, true)
 
     fun initWithBenefits(
         benefits: List<VerifyIdentityItem>,
@@ -28,37 +27,39 @@ class VerifyIdentityBenefitsView(context: Context, attrs: AttributeSet) : Constr
         footerText: String = "",
         showSheetIndicator: Boolean = true
     ) {
-        kyc_benefits_intro_title.text = title
-        kyc_benefits_intro_description.text = description
-        kyc_benefits_default_symbol.setImageResource(icon)
-        kyc_benefits_negative_action.visibleIf { secondaryButton.visible }
-        kyc_benefits_positive_action.visibleIf { primaryButton.visible }
-        kyc_benefits_positive_action.setOnClickListener {
-            primaryButton.cta()
-        }
-        primaryButton.text?.let {
-            kyc_benefits_positive_action.text = it
-        }
+        with(binding) {
+            kycBenefitsIntroTitle.text = title
+            kycBenefitsIntroDescription.text = description
+            kycBenefitsDefaultSymbol.setImageResource(icon)
+            kycBenefitsNegativeAction.visibleIf { secondaryButton.visible }
+            kycBenefitsPositiveAction.visibleIf { primaryButton.visible }
+            kycBenefitsPositiveAction.setOnClickListener {
+                primaryButton.cta()
+            }
+            primaryButton.text?.let {
+                kycBenefitsPositiveAction.text = it
+            }
 
-        secondaryButton.text?.let {
-            kyc_benefits_negative_action.text = it
-        }
+            secondaryButton.text?.let {
+                kycBenefitsNegativeAction.text = it
+            }
 
-        kyc_benefits_negative_action.setOnClickListener {
-            secondaryButton.cta()
-        }
-        footer_text.visibleIf { footerText.isNotEmpty() }
-        footer_text.text = footerText
+            kycBenefitsNegativeAction.setOnClickListener {
+                secondaryButton.cta()
+            }
+            this.footerText.visibleIf { footerText.isNotEmpty() }
+            this.footerText.text = footerText
 
-        val adapter = BenefitsDelegateAdapter().apply {
-            items = benefits
-        }
+            val adapter = BenefitsDelegateAdapter().apply {
+                items = benefits
+            }
 
-        rv_benefits.layoutManager = LinearLayoutManager(context)
-        rv_benefits.adapter = adapter
+            rvBenefits.layoutManager = LinearLayoutManager(context)
+            rvBenefits.adapter = adapter
 
-        if (!showSheetIndicator) {
-            kyc_benefits_sheet_indicator.gone()
+            if (!showSheetIndicator) {
+                kycBenefitsSheetIndicator.gone()
+            }
         }
     }
 }

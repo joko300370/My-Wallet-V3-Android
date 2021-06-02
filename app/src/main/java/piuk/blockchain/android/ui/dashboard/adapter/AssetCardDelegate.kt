@@ -1,21 +1,21 @@
 package piuk.blockchain.android.ui.dashboard.adapter
 
-import android.view.View
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.preferences.CurrencyPrefs
 import com.robinhood.spark.SparkAdapter
 import info.blockchain.balance.CryptoCurrency
-import kotlinx.android.synthetic.main.item_dashboard_asset_card.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetResources
+import piuk.blockchain.android.databinding.ItemDashboardAssetCardBinding
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.dashboard.CryptoAssetState
 import piuk.blockchain.android.ui.dashboard.asDeltaPercent
 import piuk.blockchain.android.ui.dashboard.format
 import piuk.blockchain.android.ui.dashboard.showLoading
+import piuk.blockchain.android.util.context
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.invisible
 import piuk.blockchain.android.util.setImageDrawable
 import piuk.blockchain.android.util.setOnClickListenerDebounced
@@ -33,7 +33,7 @@ class AssetCardDelegate<in T>(
         items[position] is CryptoAssetState
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        AssetCardViewHolder(parent.inflate(R.layout.item_dashboard_asset_card))
+        AssetCardViewHolder(ItemDashboardAssetCardBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 
     override fun onBindViewHolder(
         items: List<T>,
@@ -48,8 +48,8 @@ class AssetCardDelegate<in T>(
 }
 
 private class AssetCardViewHolder(
-    itemView: View
-) : RecyclerView.ViewHolder(itemView) {
+    private val binding: ItemDashboardAssetCardBinding
+) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(
         state: CryptoAssetState,
@@ -57,9 +57,9 @@ private class AssetCardViewHolder(
         assetResources: AssetResources,
         onCardClicked: (CryptoCurrency) -> Unit
     ) {
-        with(itemView) {
-            fiat_balance.contentDescription = "$FIAT_BALANCE_ID${state.currency.networkTicker}"
-            crypto_balance.contentDescription = "$CRYPTO_BALANCE_ID${state.currency.networkTicker}"
+        with(binding) {
+            fiatBalance.contentDescription = "$FIAT_BALANCE_ID${state.currency.networkTicker}"
+            cryptoBalance.contentDescription = "$CRYPTO_BALANCE_ID${state.currency.networkTicker}"
 
             icon.setImageDrawable(assetResources.drawableResFilled(state.currency))
             currency.setText(assetResources.assetNameRes(state.currency))
@@ -73,17 +73,17 @@ private class AssetCardViewHolder(
     }
 
     private fun renderLoading() {
-        with(itemView) {
+        with(binding) {
             cardLayout.isEnabled = false
-            setOnClickListener { }
+            root.setOnClickListener { }
 
             showContent()
 
-            fiat_balance.showLoading()
-            crypto_balance.showLoading()
+            fiatBalance.showLoading()
+            cryptoBalance.showLoading()
             price.showLoading()
-            price_delta.showLoading()
-            price_delta_interval.showLoading()
+            priceDelta.showLoading()
+            priceDeltaInterval.showLoading()
             sparkview.invisible()
         }
     }
@@ -94,19 +94,19 @@ private class AssetCardViewHolder(
         assetResources: AssetResources,
         onCardClicked: (CryptoCurrency) -> Unit
     ) {
-        with(itemView) {
+        with(binding) {
             cardLayout.isEnabled = true
-            setOnClickListenerDebounced { onCardClicked(state.currency) }
+            root.setOnClickListenerDebounced { onCardClicked(state.currency) }
 
             showContent()
 
-            fiat_balance.text = state.fiatBalance.format(fiatSymbol)
-            crypto_balance.text = state.balance.format(state.currency)
+            fiatBalance.text = state.fiatBalance.format(fiatSymbol)
+            cryptoBalance.text = state.balance.format(state.currency)
 
             price.text = state.price?.price().format(fiatSymbol)
 
-            price_delta.asDeltaPercent(state.priceDelta)
-            price_delta_interval.text = context.getString(R.string.asset_card_rate_period)
+            priceDelta.asDeltaPercent(state.priceDelta)
+            priceDeltaInterval.text = context.getString(R.string.asset_card_rate_period)
 
             if (state.priceTrend.isNotEmpty()) {
                 sparkview.lineColor = assetResources.chartLineColour(state.currency, context)
@@ -121,40 +121,37 @@ private class AssetCardViewHolder(
     private fun renderError(state: CryptoAssetState) {
         showError()
 
-        with(itemView) {
+        with(binding) {
             cardLayout.isEnabled = false
-            setOnClickListener { }
+            root.setOnClickListener { }
 
-            val text = resources.getString(R.string.dashboard_asset_error, state.currency.displayTicker)
-            error_msg.text = text
+            errorMsg.text = context.resources.getString(R.string.dashboard_asset_error, state.currency.displayTicker)
         }
     }
 
     private fun showContent() {
-        with(itemView) {
-            fiat_balance.visible()
-            crypto_balance.visible()
+        with(binding) {
+            fiatBalance.visible()
+            cryptoBalance.visible()
             sparkview.visible()
             separator.visible()
             price.visible()
-            price_delta.visible()
-            price_delta_interval.visible()
-
-            error_msg.invisible()
+            priceDelta.visible()
+            priceDeltaInterval.visible()
+            errorMsg.invisible()
         }
     }
 
     private fun showError() {
-        with(itemView) {
-            fiat_balance.invisible()
-            crypto_balance.invisible()
+        with(binding) {
+            fiatBalance.invisible()
+            cryptoBalance.invisible()
             sparkview.invisible()
             separator.invisible()
             price.invisible()
-            price_delta.invisible()
-            price_delta_interval.invisible()
-
-            error_msg.visible()
+            priceDelta.invisible()
+            priceDeltaInterval.invisible()
+            errorMsg.visible()
         }
     }
 

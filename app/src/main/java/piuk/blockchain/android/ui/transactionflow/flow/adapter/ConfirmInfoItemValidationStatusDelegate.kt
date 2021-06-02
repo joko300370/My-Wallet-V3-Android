@@ -1,18 +1,16 @@
 package piuk.blockchain.android.ui.transactionflow.flow.adapter
 
 import android.content.Context
-import android.view.View
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_send_confirm_error_notice.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.ValidationState
+import piuk.blockchain.android.databinding.ItemSendConfirmErrorNoticeBinding
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.context
-import piuk.blockchain.android.util.inflate
 
 class ConfirmInfoItemValidationStatusDelegate<in T> :
     AdapterDelegate<T> {
@@ -21,7 +19,9 @@ class ConfirmInfoItemValidationStatusDelegate<in T> :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        ViewHolder(parent.inflate(R.layout.item_send_confirm_error_notice), parent)
+        ViewHolder(
+            ItemSendConfirmErrorNoticeBinding.inflate(LayoutInflater.from(parent.context), parent, false), parent
+        )
 
     override fun onBindViewHolder(
         items: List<T>,
@@ -32,18 +32,15 @@ class ConfirmInfoItemValidationStatusDelegate<in T> :
     )
 
     class ViewHolder(
-        val parent: View,
+        private val binding: ItemSendConfirmErrorNoticeBinding,
         private val parentView: ViewGroup
-    ) : RecyclerView.ViewHolder(parent), LayoutContainer {
-
-        override val containerView: View?
-            get() = itemView
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: TxConfirmationValue.ErrorNotice) {
             if (parentView is RecyclerView) {
                 parentView.smoothScrollToPosition(parentView.adapter!!.itemCount - 1)
             }
-            itemView.error_msg.text = item.toText(context)
+            binding.errorMsg.text = item.toText(context)
         }
 
         // By the time we are on the confirmation screen most of these possible error should have been

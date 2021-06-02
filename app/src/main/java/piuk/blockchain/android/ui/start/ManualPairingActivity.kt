@@ -9,13 +9,12 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.StringRes
-import androidx.appcompat.widget.Toolbar
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.WalletStatus
-import kotlinx.android.synthetic.main.activity_manual_pairing.*
 import org.json.JSONObject
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.ActivityManualPairingBinding
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.base.MvpActivity
 import piuk.blockchain.android.ui.customviews.ToastCustom
@@ -24,8 +23,11 @@ import piuk.blockchain.android.ui.start.PasswordRequiredActivity.Companion.TWO_F
 import piuk.blockchain.android.ui.start.PasswordRequiredActivity.Companion.TWO_FA_STEP
 import piuk.blockchain.android.util.ViewUtils
 
-class ManualPairingActivity : MvpActivity<ManualPairingView, ManualPairingPresenter>(),
-    ManualPairingView {
+class ManualPairingActivity : MvpActivity<ManualPairingView, ManualPairingPresenter>(), ManualPairingView {
+
+    private val binding: ActivityManualPairingBinding by lazy {
+        ActivityManualPairingBinding.inflate(layoutInflater)
+    }
 
     override val view: ManualPairingView = this
     override val presenter: ManualPairingPresenter by scopedInject()
@@ -46,24 +48,25 @@ class ManualPairingActivity : MvpActivity<ManualPairingView, ManualPairingPresen
     }
 
     private val guid: String
-        get() = wallet_id.text.toString()
+        get() = binding.walletId.text.toString()
     private val password: String
-        get() = wallet_pass.text.toString()
+        get() = binding.walletPass.text.toString()
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_manual_pairing)
+        setContentView(binding.root)
 
-        val toolbar = findViewById<Toolbar>(R.id.toolbar_general)
-        setupToolbar(toolbar, R.string.manual_pairing)
+        setupToolbar(binding.toolbarGeneral.toolbarGeneral, R.string.manual_pairing)
 
-        command_next.setOnClickListener { presenter.onContinueClicked(guid, password) }
+        with(binding) {
+            commandNext.setOnClickListener { presenter.onContinueClicked(guid, password) }
 
-        wallet_pass.setOnEditorActionListener { _, i, _ ->
-            if (i == EditorInfo.IME_ACTION_GO) {
-                presenter.onContinueClicked(guid, password)
+            walletPass.setOnEditorActionListener { _, i, _ ->
+                if (i == EditorInfo.IME_ACTION_GO) {
+                    presenter.onContinueClicked(guid, password)
+                }
+                true
             }
-            true
         }
     }
 
@@ -102,7 +105,8 @@ class ManualPairingActivity : MvpActivity<ManualPairingView, ManualPairingPresen
         ViewUtils.hideKeyboard(this)
 
         val dialog = getTwoFactorDialog(this, authType, walletPrefs, positiveAction = {
-            presenter.submitTwoFactorCode(responseObject,
+            presenter.submitTwoFactorCode(
+                responseObject,
                 sessionId,
                 guid,
                 password,
@@ -112,8 +116,10 @@ class ManualPairingActivity : MvpActivity<ManualPairingView, ManualPairingPresen
             if (!limitReached) {
                 presenter.requestNew2FaCode(password, guid)
             } else {
-                ToastCustom.makeText(this, getString(R.string.two_factor_retries_exceeded),
-                    Toast.LENGTH_SHORT, ToastCustom.TYPE_ERROR)
+                ToastCustom.makeText(
+                    this, getString(R.string.two_factor_retries_exceeded),
+                    Toast.LENGTH_SHORT, ToastCustom.TYPE_ERROR
+                )
                 if (!isTwoFATimerRunning) {
                     twoFATimer.start()
                 }
@@ -125,7 +131,7 @@ class ManualPairingActivity : MvpActivity<ManualPairingView, ManualPairingPresen
 
     override fun resetPasswordField() {
         if (!isFinishing)
-            wallet_pass.setText("")
+            binding.walletPass.setText("")
     }
 
     public override fun onDestroy() {

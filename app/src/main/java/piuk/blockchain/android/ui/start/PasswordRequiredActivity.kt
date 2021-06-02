@@ -9,10 +9,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import com.blockchain.koin.scopedInject
 import com.blockchain.preferences.WalletStatus
-import kotlinx.android.synthetic.main.activity_password_required.*
 import org.json.JSONObject
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.ActivityPasswordRequiredBinding
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.base.MvpActivity
 import piuk.blockchain.android.ui.customviews.ToastCustom
@@ -23,6 +23,9 @@ import piuk.blockchain.android.util.ViewUtils
 
 class PasswordRequiredActivity : MvpActivity<PasswordRequiredView, PasswordRequiredPresenter>(),
     PasswordRequiredView {
+    private val binding: ActivityPasswordRequiredBinding by lazy {
+        ActivityPasswordRequiredBinding.inflate(layoutInflater)
+    }
 
     override val presenter: PasswordRequiredPresenter by scopedInject()
     override val view: PasswordRequiredView = this
@@ -45,15 +48,17 @@ class PasswordRequiredActivity : MvpActivity<PasswordRequiredView, PasswordRequi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_password_required)
+        setContentView(binding.root)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar_general)
         setupToolbar(toolbar, R.string.confirm_password)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
-        button_continue.setOnClickListener { presenter.onContinueClicked(field_password.text.toString()) }
-        button_forget.setOnClickListener { presenter.onForgetWalletClicked() }
-        button_recover.setOnClickListener { launchRecoveryFlow() }
+        with(binding) {
+            buttonContinue.setOnClickListener { presenter.onContinueClicked(binding.fieldPassword.text.toString()) }
+            buttonForget.setOnClickListener { presenter.onForgetWalletClicked() }
+            buttonRecover.setOnClickListener { launchRecoveryFlow() }
+        }
     }
 
     override fun onResume() {
@@ -76,11 +81,11 @@ class PasswordRequiredActivity : MvpActivity<PasswordRequiredView, PasswordRequi
     }
 
     override fun resetPasswordField() {
-        if (!isFinishing) field_password.setText("")
+        if (!isFinishing) binding.fieldPassword.setText("")
     }
 
     override fun showWalletGuid(guid: String) {
-        wallet_identifier.text = guid
+        binding.walletIdentifier.text = guid
     }
 
     override fun goToPinPage() {

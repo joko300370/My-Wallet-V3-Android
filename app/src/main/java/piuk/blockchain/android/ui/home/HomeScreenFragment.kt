@@ -39,7 +39,6 @@ interface HomeNavigator {
     fun launchSend()
     fun performAssetActionFor(action: AssetAction, account: BlockchainAccount)
 
-    fun launchIntroTour()
     fun launchSimpleBuySell(viewType: BuySellFragment.BuySellViewType = BuySellFragment.BuySellViewType.TYPE_BUY)
     fun launchOpenBankingLinking(bankLinkingInfo: BankLinkingInfo)
     fun launchSimpleBuyFromDeepLinkApproval()

@@ -1181,7 +1181,7 @@
     <string name="send_confirmation_deposit_cta_button">Подтвердить перевод</string>
     <string name="send_confirmation_interest_tos_pp">Я прочитал и принимаю <annotation link="interest_tos">Условия обслуживания</annotation> и <annotation link="interest_pp">Политику конфиденциальности</annotation>.</string>
     <string name="send_confirmation_interest_holding_period_1">Принимая это, вы соглашаетесь перевести </string>
-    <string name="send_confirmation_interest_holding_period_2">  (%1$s) из вашего биткойн-кошелька на ваш процентный счет. К вашим средствам будет применен первоначальный период удержания в размере 7 дней.</string>
+    <string name="send_confirmation_interest_holding_period_2">  (%1$s) из вашего %2$s-кошелька на ваш процентный счет. К вашим средствам будет применен первоначальный период удержания в размере 7 дней.</string>
     <string name="send_confirmation_progress_title">Перевод %1$s</string>
     <string name="send_confirmation_progress_message">Сейчас мы выполняем перевод ваших %1$s.</string>
     <string name="send_confirmation_success_title">%1$s переведены</string>

@@ -10,19 +10,23 @@ import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import com.blockchain.koin.scopedInject
 import io.reactivex.Single
-import kotlinx.android.synthetic.main.fragment_transfer_account_selector.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.databinding.FragmentTransferAccountSelectorBinding
 import piuk.blockchain.android.ui.customviews.IntroHeaderView
-import piuk.blockchain.android.ui.customviews.account.StatusDecorator
 import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.account.StatusDecorator
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 
 abstract class AccountSelectorFragment : Fragment() {
+
+    private var _binding: FragmentTransferAccountSelectorBinding? = null
+    private val binding: FragmentTransferAccountSelectorBinding
+        get() = _binding!!
 
     private val coincore: Coincore by scopedInject()
     private val accountsSorting: AccountsSorting by inject()
@@ -31,13 +35,18 @@ abstract class AccountSelectorFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = inflater.inflate(R.layout.fragment_transfer_account_selector, container, false)
+    ): View {
+        _binding = FragmentTransferAccountSelectorBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        account_selector_account_list.onLoadError = ::doOnLoadError
-        account_selector_account_list.onListLoaded = ::doOnListLoaded
+        with(binding.accountSelectorAccountList) {
+            onLoadError = ::doOnLoadError
+            onListLoaded = ::doOnListLoaded
+        }
     }
 
     fun initialiseAccountSelectorWithHeader(
@@ -50,16 +59,23 @@ abstract class AccountSelectorFragment : Fragment() {
         val introHeaderView = IntroHeaderView(requireContext())
         introHeaderView.setDetails(title, label, icon)
 
-        account_selector_account_list.onAccountSelected = onAccountSelected
-        account_selector_account_list.initialise(
-            accounts(),
-            statusDecorator,
-            introHeaderView
-        )
+        with(binding.accountSelectorAccountList) {
+            this.onAccountSelected = onAccountSelected
+            initialise(
+                accounts(),
+                statusDecorator,
+                introHeaderView
+            )
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     fun refreshItems() {
-        account_selector_account_list.loadItems(
+        binding.accountSelectorAccountList.loadItems(
             accounts()
         )
     }
@@ -77,7 +93,7 @@ abstract class AccountSelectorFragment : Fragment() {
         @StringRes ctaText: Int,
         action: () -> Unit
     ) {
-        account_selector_empty_view.setDetails(
+        binding.accountSelectorEmptyView.setDetails(
             title = title, description = label, ctaText = ctaText
         ) {
             action()
@@ -86,14 +102,18 @@ abstract class AccountSelectorFragment : Fragment() {
 
     @CallSuper
     protected open fun doOnEmptyList() {
-        account_selector_account_list.gone()
-        account_selector_empty_view.visible()
+        with(binding) {
+            accountSelectorAccountList.gone()
+            accountSelectorEmptyView.visible()
+        }
     }
 
     @CallSuper
     protected open fun doOnListLoaded() {
-        account_selector_account_list.visible()
-        account_selector_empty_view.gone()
+        with(binding) {
+            accountSelectorAccountList.visible()
+            accountSelectorEmptyView.gone()
+        }
     }
 
     private fun doOnLoadError(t: Throwable) {

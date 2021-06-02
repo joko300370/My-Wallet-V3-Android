@@ -7,8 +7,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.everypay_authorise_3ds.*
-import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.EverypayAuthorise3dsBinding
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
 import java.util.Locale
@@ -23,27 +22,33 @@ class CardAuthoriseWebViewActivity : AppCompatActivity() {
         intent.getStringExtra(AUTH_LINK) ?: throw IllegalStateException("")
     }
 
+    private val binding: EverypayAuthorise3dsBinding by lazy {
+        EverypayAuthorise3dsBinding.inflate(layoutInflater)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.everypay_authorise_3ds)
+        setContentView(binding.root)
         initWebView()
     }
 
     private fun initWebView() {
-        val settings: WebSettings = webview.settings
-        settings.apply {
-            javaScriptEnabled = true
-            domStorageEnabled = true
-            setSupportMultipleWindows(true)
-            loadsImagesAutomatically = true
-            javaScriptCanOpenWindowsAutomatically = true
-            cacheMode = WebSettings.LOAD_NO_CACHE
-        }
-        webview.loadUrl(startAuthLink)
-        webview.webViewClient = WebClientImpl(exitLink) {
-            val data = Intent()
-            setResult(RESULT_OK, data)
-            finish()
+        with(binding) {
+            val settings: WebSettings = webview.settings
+            settings.apply {
+                javaScriptEnabled = true
+                domStorageEnabled = true
+                setSupportMultipleWindows(true)
+                loadsImagesAutomatically = true
+                javaScriptCanOpenWindowsAutomatically = true
+                cacheMode = WebSettings.LOAD_NO_CACHE
+            }
+            webview.loadUrl(startAuthLink)
+            webview.webViewClient = WebClientImpl(exitLink) {
+                val data = Intent()
+                setResult(RESULT_OK, data)
+                finish()
+            }
         }
     }
 

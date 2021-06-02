@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.backup.wordlist
 
-import androidx.fragment.app.FragmentTransaction
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,15 +8,15 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
+import androidx.fragment.app.FragmentTransaction
 import com.blockchain.koin.scopedInject
-import kotlinx.android.synthetic.main.fragment_backup_word_list.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.FragmentBackupWordListBinding
 import piuk.blockchain.android.ui.backup.verify.BackupWalletVerifyFragment
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.ui.base.BaseFragment
-import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.invisible
 import piuk.blockchain.android.util.visible
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 
 class BackupWalletWordListFragment :
     BaseFragment<BackupWalletWordListView, BackupWalletWordListPresenter>(),
@@ -62,21 +61,30 @@ class BackupWalletWordListFragment :
 
     var currentWordIndex = 0
 
+    private var _binding: FragmentBackupWordListBinding? = null
+    private val binding: FragmentBackupWordListBinding
+        get() = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = container?.inflate(R.layout.fragment_backup_word_list)
+    ): View {
+        _binding = FragmentBackupWordListBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         onViewReady()
 
-        textview_word_counter.text = getFormattedPositionString()
-        textview_current_word.text = presenter.getWordForIndex(currentWordIndex)
+        with(binding) {
+            textviewWordCounter.text = getFormattedPositionString()
+            textviewCurrentWord.text = presenter.getWordForIndex(currentWordIndex)
 
-        button_next.setOnClickListener { onNextClicked() }
-        button_previous.setOnClickListener { onPreviousClicked() }
+            buttonNext.setOnClickListener { onNextClicked() }
+            buttonPrevious.setOnClickListener { onPreviousClicked() }
+        }
     }
 
     override fun getPageBundle(): Bundle? = arguments
@@ -90,13 +98,57 @@ class BackupWalletWordListFragment :
     }
 
     private fun onNextClicked() {
-        if (currentWordIndex >= 0) button_previous.visible() else button_previous.invisible()
+        with(binding) {
+            if (currentWordIndex >= 0) {
+                buttonPrevious.visible()
+            } else {
+                buttonPrevious.invisible()
+            }
 
-        if (currentWordIndex < presenter.getMnemonicSize() - 1) {
-            animExitToLeft.setAnimationListener(object : Animation.AnimationListener {
+            if (currentWordIndex < presenter.getMnemonicSize() - 1) {
+                animExitToLeft.setAnimationListener(object : Animation.AnimationListener {
+                    override fun onAnimationStart(animation: Animation) {
+                        textviewCurrentWord.text = ""
+                        textviewWordCounter.text = getFormattedPositionString()
+                    }
+
+                    override fun onAnimationRepeat(animation: Animation) {
+                        // No-op
+                    }
+
+                    override fun onAnimationEnd(animation: Animation) {
+                        cardLayout.startAnimation(animEnterFromRight)
+                        textviewCurrentWord.text = presenter.getWordForIndex(currentWordIndex)
+                    }
+                })
+
+                cardLayout.startAnimation(animExitToLeft)
+            }
+
+            currentWordIndex++
+
+            if (currentWordIndex == presenter.getMnemonicSize()) {
+                currentWordIndex = 0
+                launchVerifyFragment()
+            } else {
+                if (currentWordIndex == presenter.getMnemonicSize() - 1) {
+                    buttonNext.text = getString(R.string.backup_done)
+                }
+            }
+        }
+    }
+
+    private fun onPreviousClicked() {
+        with(binding) {
+            buttonNext.text = getString(R.string.backup_next_word)
+            if (currentWordIndex == 1) {
+                buttonPrevious.invisible()
+            }
+
+            animExitToRight.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationStart(animation: Animation) {
-                    textview_current_word.text = ""
-                    textview_word_counter.text = getFormattedPositionString()
+                    textviewCurrentWord.text = ""
+                    textviewWordCounter.text = getFormattedPositionString()
                 }
 
                 override fun onAnimationRepeat(animation: Animation) {
@@ -104,50 +156,14 @@ class BackupWalletWordListFragment :
                 }
 
                 override fun onAnimationEnd(animation: Animation) {
-                    card_layout?.startAnimation(animEnterFromRight)
-                    textview_current_word?.text = presenter.getWordForIndex(currentWordIndex)
+                    cardLayout.startAnimation(animEnterFromLeft)
+                    textviewCurrentWord.text = presenter.getWordForIndex(currentWordIndex)
                 }
             })
 
-            card_layout.startAnimation(animExitToLeft)
+            cardLayout.startAnimation(animExitToRight)
+            currentWordIndex--
         }
-
-        currentWordIndex++
-
-        if (currentWordIndex == presenter.getMnemonicSize()) {
-            currentWordIndex = 0
-            launchVerifyFragment()
-        } else {
-            if (currentWordIndex == presenter.getMnemonicSize() - 1) {
-                button_next.text = getString(R.string.backup_done)
-            }
-        }
-    }
-
-    private fun onPreviousClicked() {
-        button_next.text = getString(R.string.backup_next_word)
-        if (currentWordIndex == 1) {
-            button_previous.invisible()
-        }
-
-        animExitToRight.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation) {
-                textview_current_word.text = ""
-                textview_word_counter.text = getFormattedPositionString()
-            }
-
-            override fun onAnimationRepeat(animation: Animation) {
-                // No-op
-            }
-
-            override fun onAnimationEnd(animation: Animation) {
-                card_layout?.startAnimation(animEnterFromLeft)
-                textview_current_word?.text = presenter.getWordForIndex(currentWordIndex)
-            }
-        })
-
-        card_layout.startAnimation(animExitToRight)
-        currentWordIndex--
     }
 
     private fun launchVerifyFragment() {
@@ -178,6 +194,7 @@ class BackupWalletWordListFragment :
                 imm.hideSoftInputFromWindow(view.windowToken, 0)
             }
         }
+        _binding = null
     }
 
     companion object {

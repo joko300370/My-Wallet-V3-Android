@@ -10,10 +10,9 @@ import com.blockchain.ui.urllinks.URL_THE_PIT_LANDING_LEARN_MORE
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.activity_pit_kyc_promo_layout.*
-import kotlinx.android.synthetic.main.toolbar_general.*
 import org.koin.android.ext.android.get
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.ActivityPitKycPromoLayoutBinding
 import piuk.blockchain.android.thepit.PitAnalyticsEvent
 import piuk.blockchain.android.ui.customviews.ErrorBottomDialog
 import piuk.blockchain.android.util.launchUrlInBrowser
@@ -29,22 +28,26 @@ class PitPermissionsActivity : PitPermissionsView, BaseMvpActivity<PitPermission
 
     private val compositeDisposable = CompositeDisposable()
 
+    private val binding: ActivityPitKycPromoLayoutBinding by lazy {
+        ActivityPitKycPromoLayoutBinding.inflate(layoutInflater)
+    }
+
     override fun promptForEmailVerification(email: String) {
         PitVerifyEmailActivity.start(this, email, REQUEST_VERIFY_EMAIL)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_pit_kyc_promo_layout)
+        setContentView(binding.root)
 
-        setupToolbar(toolbar_general, R.string.the_exchange_title)
+        setupToolbar(binding.toolbarGeneral.toolbarGeneral, R.string.the_exchange_title)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        connect_now.setOnClickListener {
+        binding.connectNow.setOnClickListener {
             doLinkClickHandler()
         }
 
-        compositeDisposable += learn_more.throttledClicks()
+        compositeDisposable += binding.learnMore.throttledClicks()
             .subscribeBy(
                 onNext = {
                     analytics.logEvent(PitAnalyticsEvent.LearnMoreEvent)

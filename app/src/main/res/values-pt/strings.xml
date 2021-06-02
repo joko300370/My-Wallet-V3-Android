@@ -1180,7 +1180,7 @@ se disponível. Isso permite que restaure a sua carteira e perder este dispositi
     <string name="send_confirmation_deposit_cta_button">Confirmar transferência</string>
     <string name="send_confirmation_interest_tos_pp">Li e concordo com os <annotation link="interest_tos"> Termos de Serviço </annotation> e a <annotation link="interest_pp"> Política de Privacidade </annotation>.</string>
     <string name="send_confirmation_interest_holding_period_1">Ao aceitar isso, concorda em transferir</string>
-    <string name="send_confirmation_interest_holding_period_2">(%1$s) da sua carteira Bitcoin para a sua conta de juros. Um período inicial de retenção de 7 dias será aplicado nos seus fundos.</string>
+    <string name="send_confirmation_interest_holding_period_2">(%1$s) da sua carteira %2$s para a sua conta de juros. Um período inicial de retenção de 7 dias será aplicado nos seus fundos.</string>
     <string name="send_confirmation_progress_title">Transferindo %1$s</string>
     <string name="send_confirmation_progress_message">Estamos a transferir o seu %1$s agora.</string>
     <string name="send_confirmation_success_title">%1$s transferido</string>
