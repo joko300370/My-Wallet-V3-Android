@@ -5,8 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="@dimen/standard_margin"
-    android:layout_marginEnd="@dimen/standard_margin"
     android:paddingTop="@dimen/small_margin"
     android:paddingBottom="@dimen/small_margin">
 
@@ -15,6 +13,7 @@
         style="@style/Text.Standard.14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/grid_6"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -26,6 +25,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/very_small_margin"
+        android:layout_marginEnd="@dimen/grid_6"
         android:ellipsize="end"
         android:gravity="end"
         android:maxLines="2"
@@ -41,6 +41,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/very_small_margin"
+        android:layout_marginEnd="@dimen/grid_6"
         android:ellipsize="end"
         android:gravity="end"
         android:maxLines="2"
