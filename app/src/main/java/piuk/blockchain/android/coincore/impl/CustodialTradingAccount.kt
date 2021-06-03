@@ -9,6 +9,7 @@ import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.Product
 import com.blockchain.nabu.datamanagers.RecurringBuyTransaction
+import com.blockchain.nabu.datamanagers.TransactionState
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import info.blockchain.balance.CryptoCurrency
@@ -118,7 +119,7 @@ open class CustodialTradingAccount(
             }
             .flatMap {
                 appendSendActivity(custodialWalletManager, asset, it)
-            }
+            }.filterActivityStates()
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
             .onErrorReturn { emptyList() }
 
@@ -250,11 +251,11 @@ open class CustodialTradingAccount(
             list.filter {
                 (it is CustodialTradingActivitySummaryItem && displayedStates.contains(
                     it.status
-                )) or
-                    (it is TradeActivitySummaryItem && displayedStates.contains(
-                        it.state
-                    )) or
-                    (it is RecurringBuyActivitySummaryItem)
+                )) or (it is CustodialSendActivitySummaryItem && displayedStates.contains(
+                    it.state
+                )) or (it is TradeActivitySummaryItem && displayedStates.contains(
+                    it.state
+                )) or (it is RecurringBuyActivitySummaryItem)
             }
         }.toList()
     }
@@ -272,6 +273,8 @@ open class CustodialTradingAccount(
             OrderState.AWAITING_FUNDS,
             OrderState.PENDING_EXECUTION,
             CustodialOrderState.FINISHED,
+            TransactionState.COMPLETED,
+            TransactionState.PENDING,
             CustodialOrderState.PENDING_DEPOSIT,
             CustodialOrderState.PENDING_EXECUTION
         )

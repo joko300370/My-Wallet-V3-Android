@@ -35,6 +35,7 @@ class SelectSourceAccountSheet : TransactionFlowSheet<DialogSheetAccountSelector
 
         availableSources = newState.availableSources
         linkingBankState = newState.linkBankState
+        cacheState(newState)
     }
 
     private fun handleBankLinking(
