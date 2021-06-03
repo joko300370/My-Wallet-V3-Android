@@ -51,7 +51,7 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/cancel_order"
-            style="@style/CtaButton.NoMargin.Blue"
+            style="@style/CtaButton.NoMargin.Red"
             android:layout_marginStart="@dimen/tiny_margin"
             android:layout_marginEnd="@dimen/standard_margin"
             android:layout_width="0dp"
