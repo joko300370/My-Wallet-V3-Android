@@ -51,15 +51,13 @@ const val WEB_WALLET_LOGIN_URI = "login.blockchain.com"
 
 const val WALLET_STATUS_URL = "https://www.blockchain-status.com"
 
-// updated checkouts TODO update with real urls
-const val ORDER_PRICE_EXPLANATION = "https://www.blockchain-status.com"
-const val CARD_FEE_EXPLANATION = "https://www.blockchain-status.com"
-const val PRIVATE_KEY_EXPLANATION = "https://www.blockchain-status.com"
+const val ORDER_PRICE_EXPLANATION = "https://support.blockchain.com/hc/en-us/articles/360061672651"
+const val PRIVATE_KEY_EXPLANATION = "https://support.blockchain.com/hc/en-us/articles/360061675191"
 const val NETWORK_FEE_EXPLANATION = "https://support.blockchain.com/hc/en-us/articles/360000939903-Transaction-fees"
-const val NETWORK_ERC20_EXPLANATION = "https://www.blockchain-status.com"
-const val EXCHANGE_SWAP_RATE_EXPLANATION = "https://www.blockchain-status.com"
-const val CHECKOUT_PRICE_EXPLANATION = "https://www.blockchain-status.com"
-const val CHECKOUT_REFUND_POLICY = "https://www.blockchain.com/legal/terms"
+const val NETWORK_ERC20_EXPLANATION = "https://support.blockchain.com/hc/en-us/articles/360061258732"
+const val EXCHANGE_SWAP_RATE_EXPLANATION = "https://support.blockchain.com/hc/en-us/articles/360061672651"
+const val CHECKOUT_PRICE_EXPLANATION = "https://support.blockchain.com/hc/en-us/articles/360061672651"
+const val CHECKOUT_REFUND_POLICY = "https://support.blockchain.com/hc/en-us/articles/360061942111"
 
 // updated login TODO update with real urls
 const val SECOND_PASSWORD_EXPLANATION = "https://www.blockchain-status.com"
