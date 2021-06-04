@@ -2,9 +2,10 @@ package piuk.blockchain.android.ui.transactionflow.engine
 
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.nabu.datamanagers.repositories.swap.CustodialRepository
 import com.blockchain.nabu.models.data.LinkBankTransfer
+import com.blockchain.preferences.BankLinkingPrefs
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
@@ -23,6 +24,7 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.ReceiveAddress
@@ -34,6 +36,10 @@ import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.fiat.LinkedBanksFactory
+import piuk.blockchain.android.ui.linkbank.BankAuthDeepLinkState
+import piuk.blockchain.android.ui.linkbank.BankAuthFlowState
+import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
+import piuk.blockchain.android.ui.linkbank.toPreferencesValue
 import piuk.blockchain.android.ui.transfer.AccountsSorting
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import timber.log.Timber
@@ -44,9 +50,10 @@ class TransactionInteractor(
     private val custodialRepository: CustodialRepository,
     private val custodialWalletManager: CustodialWalletManager,
     private val currencyPrefs: CurrencyPrefs,
-    private val eligibilityProvider: EligibilityProvider,
+    private val eligibilityProvider: SimpleBuyEligibilityProvider,
     private val accountsSorting: AccountsSorting,
-    private val linkedBanksFactory: LinkedBanksFactory
+    private val linkedBanksFactory: LinkedBanksFactory,
+    private val bankLinkingPrefs: BankLinkingPrefs
 ) {
     private var transactionProcessor: TransactionProcessor? = null
     private val invalidate = PublishSubject.create<Unit>()
@@ -153,7 +160,7 @@ class TransactionInteractor(
                 }
         }
 
-    fun getAvailableSourceAccounts(action: AssetAction) =
+    fun getAvailableSourceAccounts(action: AssetAction, targetAccount: TransactionTarget) =
         when (action) {
             AssetAction.Swap -> {
                 coincore.allWalletsWithActions(setOf(action), accountsSorting.sorter())
@@ -166,6 +173,15 @@ class TransactionInteractor(
                     }.map {
                         it.map { account -> account as CryptoAccount }
                     }
+            }
+            AssetAction.InterestDeposit -> {
+                require(targetAccount is InterestAccount)
+                require(targetAccount is CryptoAccount)
+                coincore.allWalletsWithActions(setOf(action), accountsSorting.sorter()).map {
+                    it.filter { acc ->
+                        acc is CryptoAccount && acc.asset == targetAccount.asset
+                    }
+                }
             }
             AssetAction.FiatDeposit -> {
                 linkedBanksFactory.getNonWireTransferBanks()
@@ -198,6 +214,18 @@ class TransactionInteractor(
     }
 
     fun linkABank(selectedFiat: String): Single<LinkBankTransfer> = custodialWalletManager.linkToABank(selectedFiat)
+
+    fun updateFiatDepositState(bankPaymentData: BankPaymentApproval) {
+        bankLinkingPrefs.setBankLinkingState(
+            BankAuthDeepLinkState(
+                bankAuthFlow = BankAuthFlowState.BANK_APPROVAL_PENDING,
+                bankPaymentData = bankPaymentData
+            ).toPreferencesValue()
+        )
+
+        val sanitisedUrl = bankPaymentData.linkedBank.callbackPath.removePrefix("nabu-gateway/")
+        bankLinkingPrefs.setDynamicOneTimeTokenUrl(sanitisedUrl)
+    }
 }
 
 private fun CryptoAccount.isAvailableToSwapFrom(pairs: List<CurrencyPair.CryptoCurrencyPair>): Boolean =

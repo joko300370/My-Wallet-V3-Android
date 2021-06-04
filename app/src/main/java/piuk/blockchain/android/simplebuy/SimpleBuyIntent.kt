@@ -11,6 +11,8 @@ import com.blockchain.nabu.datamanagers.UndefinedPaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
+import com.blockchain.nabu.models.data.RecurringBuyFrequency
+import com.blockchain.nabu.models.data.RecurringBuyState
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
@@ -53,6 +55,11 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
             oldState.copy(everypayAuthOptions = EverypayAuthOptions(paymentLink, exitLink))
     }
 
+    class AuthorisePaymentExternalUrl(private val url: String, private val linkedBank: LinkedBank) : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
+            oldState.copy(authorisePaymentUrl = url, linkedBank = linkedBank)
+    }
+
     class ExchangeRateUpdated(private val price: FiatValue) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(exchangePrice = price)
@@ -60,6 +67,10 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
     class PaymentMethodChangeRequested(val paymentMethod: PaymentMethod) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState
+    }
+
+    class FetchPaymentDetails(val fiatCurrency: String, val selectedPaymentMethodId: String) : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState.copy(isLoading = true)
     }
 
     class PaymentMethodsUpdated(
@@ -84,6 +95,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
             }
 
             return oldState.copy(
+                isLoading = false,
                 selectedPaymentMethod = selectedPaymentMethod?.let {
                     SelectedPaymentMethod(
                         selectedPaymentMethod.id,
@@ -108,8 +120,15 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
             when {
                 preselectedId != null -> availablePaymentMethods.firstOrNull { it.id == preselectedId }?.id
                 oldStateId != null -> availablePaymentMethods.firstOrNull { it.id == oldStateId }?.id
-                else -> availablePaymentMethods.firstOrNull { it.isEligible }?.id
-                    ?: availablePaymentMethods.firstIfSizeOne()
+                else -> {
+                    // we skip undefined funds cause this payment method should trigger a bottom sheet
+                    // and it should always be actioned before
+                    val paymentMethodsThatCanBePreselected =
+                        availablePaymentMethods.filter { it !is PaymentMethod.UndefinedFunds }
+                    paymentMethodsThatCanBePreselected.firstOrNull { it.isEligible && it.canUsedForPaying() }?.id
+                        ?: paymentMethodsThatCanBePreselected.firstOrNull { it.isEligible }?.id
+                        ?: paymentMethodsThatCanBePreselected.firstIfSizeOne()
+                }
             }
 
         private fun List<PaymentMethod>.firstIfSizeOne(): String? =
@@ -161,76 +180,6 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState {
             return oldState.copy(isLoading = true)
         }
-    }
-
-    object ProviderAccountIdUpdateError : SimpleBuyIntent() {
-        override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState.copy(
-            errorState = ErrorState.BankLinkingUpdateFailed,
-            isLoading = false
-        )
-    }
-
-    class LinkedBankStateSuccess(private val linkedBank: LinkedBank) : SimpleBuyIntent() {
-        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(
-                isLoading = false,
-                selectedPaymentMethod = SelectedPaymentMethod(
-                    id = linkedBank.id,
-                    paymentMethodType = PaymentMethodType.BANK_TRANSFER,
-                    label = linkedBank.name,
-                    isEligible = true
-                )
-            )
-    }
-
-    object LinkedBankStateError : SimpleBuyIntent() {
-        override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState.copy(
-            errorState = ErrorState.BankLinkingFailed,
-            isLoading = false
-        )
-    }
-
-    object LinkedBankStateAlreadyLinked : SimpleBuyIntent() {
-        override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState.copy(
-            errorState = ErrorState.LinkedBankAlreadyLinked,
-            isLoading = false
-        )
-    }
-
-    object LinkedBankStateNamesMissMatch : SimpleBuyIntent() {
-        override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState.copy(
-            errorState = ErrorState.LinkedBankNamesMismatched,
-            isLoading = false
-        )
-    }
-
-    object LinkedBankStateUnsupportedAccount : SimpleBuyIntent() {
-        override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState.copy(
-            errorState = ErrorState.LinkedBankAccountUnsupported,
-            isLoading = false
-        )
-    }
-
-    object LinkedBankStateTimeout : SimpleBuyIntent() {
-        override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState.copy(
-            errorState = ErrorState.BankLinkingTimeout,
-            isLoading = false
-        )
-    }
-
-    class UpdateAccountProvider(
-        val accountProviderId: String,
-        val accountId: String,
-        val linkingBankId: String
-    ) : SimpleBuyIntent() {
-        override fun reduce(oldState: SimpleBuyState): SimpleBuyState = oldState.copy(
-            isLoading = true
-        )
-    }
-
-    data class StartPollingForLinkStatus(val bankId: String) : SimpleBuyIntent() {
-        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(isLoading = true)
     }
 
     object ClearAnySelectedPaymentMethods : SimpleBuyIntent() {
@@ -305,6 +254,14 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
     object CancelOrder : SimpleBuyIntent() {
         override fun isValidFor(oldState: SimpleBuyState) = true
+    }
+
+    object CancelOrderAndResetAuthorisation : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
+            oldState.copy(
+                authorisePaymentUrl = null,
+                linkedBank = null
+            )
     }
 
     object ClearState : SimpleBuyIntent() {
@@ -382,7 +339,8 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
     class OrderCreated(
         private val buyOrder: BuySellOrder,
-        private val showInAppRating: Boolean = false
+        private val showInAppRating: Boolean = false,
+        private val recurringBuyState: RecurringBuyState = RecurringBuyState.UNINITIALISED
     ) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(
@@ -394,7 +352,8 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
                 orderExchangePrice = buyOrder.price,
                 paymentSucceeded = buyOrder.state == OrderState.FINISHED,
                 isLoading = false,
-                showRating = showInAppRating
+                showRating = showInAppRating,
+                recurringBuyState = recurringBuyState
             )
     }
 
@@ -448,6 +407,11 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
             oldState.copy(isLoading = true)
     }
 
+    class GetAuthorisationUrl(val orderId: String) : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
+            oldState.copy(isLoading = true)
+    }
+
     object CheckOrderStatus : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(isLoading = true)
@@ -463,7 +427,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
             oldState.copy(shouldShowUnlockHigherFunds = true)
     }
 
-    object CardPaymentPending : SimpleBuyIntent() {
+    object PaymentPending : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(paymentPending = true, isLoading = false)
     }
@@ -481,5 +445,15 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     object AddNewPaymentMethodHandled : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(newPaymentMethodToBeAdded = null)
+    }
+
+    class RecurringBuyIntervalUpdated(private val recurringBuyFrequency: RecurringBuyFrequency) : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
+            oldState.copy(recurringBuyFrequency = recurringBuyFrequency)
+    }
+
+    class RecurringBuyEligibilityUpdated(private val eligibleMethods: List<PaymentMethodType>) : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
+            oldState.copy(recurringBuyEligiblePaymentMethods = eligibleMethods)
     }
 }

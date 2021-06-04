@@ -7,8 +7,8 @@ import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.CustodialOrderState
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.LiveCustodialWalletManager.Companion.SUPPORTED_FUNDS_CURRENCIES
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.toCustodialOrderState
-import com.blockchain.nabu.extensions.fromIso8601ToUtc
-import com.blockchain.nabu.extensions.toLocalTime
+import com.blockchain.utils.fromIso8601ToUtc
+import com.blockchain.utils.toLocalTime
 import com.blockchain.nabu.service.NabuService
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money

@@ -15,6 +15,7 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.NeedsApprovalException
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
@@ -25,6 +26,7 @@ import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.fiat.LinkedBankAccount
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
+import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import timber.log.Timber
 import java.util.Stack
@@ -70,6 +72,7 @@ sealed class TxExecutionStatus {
     object NotStarted : TxExecutionStatus()
     object InProgress : TxExecutionStatus()
     object Completed : TxExecutionStatus()
+    class ApprovalRequired(val approvalData: BankPaymentApproval) : TxExecutionStatus()
     data class Error(val exception: Throwable) : TxExecutionStatus()
 }
 
@@ -162,8 +165,15 @@ class TransactionModel(
                 intent.fromAccount,
                 intent.action
             )
-            is TransactionIntent.InitialiseWithNoSourceOrTargetAccount -> processSourceAccountsListUpdate(intent.action)
-            is TransactionIntent.InitialiseWithTargetAndNoSource -> processSourceAccountsListUpdate(intent.action)
+            is TransactionIntent.InitialiseWithNoSourceOrTargetAccount -> processSourceAccountsListUpdate(
+                intent.action, NullAddress
+            )
+            is TransactionIntent.InitialiseWithTargetAndNoSource -> processSourceAccountsListUpdate(
+                intent.action, intent.target
+            )
+            is TransactionIntent.ReInitialiseWithTargetAndNoSource -> processSourceAccountsListUpdate(
+                intent.action, intent.target, true
+            )
             is TransactionIntent.ValidatePassword -> processPasswordValidation(intent.password)
             is TransactionIntent.UpdatePasswordIsValidated -> null
             is TransactionIntent.UpdatePasswordNotValidated -> null
@@ -219,7 +229,6 @@ class TransactionModel(
             is TransactionIntent.SetFeeLevel -> processSetFeeLevel(intent)
             is TransactionIntent.InvalidateTransaction -> processInvalidateTransaction()
             is TransactionIntent.InvalidateTransactionKeepingTarget -> processInvalidationAndNavigate(previousState)
-            is TransactionIntent.ClearBackStack -> null
             is TransactionIntent.ResetFlow -> {
                 interactor.reset()
                 null
@@ -227,8 +236,12 @@ class TransactionModel(
             is TransactionIntent.StartLinkABank -> processLinkABank(previousState)
             is TransactionIntent.LinkBankInfoSuccess -> null
             is TransactionIntent.LinkBankFailed -> null
-            is TransactionIntent.RefreshSourceAccounts -> processSourceAccountsListUpdate(previousState.action)
+            is TransactionIntent.RefreshSourceAccounts -> processSourceAccountsListUpdate(
+                previousState.action, previousState.selectedTarget
+            )
+            is TransactionIntent.ClearBackStack -> null
             is TransactionIntent.NavigateBackFromEnterAmount -> processTransactionInvalidation(previousState.action)
+            is TransactionIntent.ApprovalRequired -> null
         }
     }
 
@@ -270,14 +283,23 @@ class TransactionModel(
             null
         }
 
-    private fun processSourceAccountsListUpdate(action: AssetAction): Disposable =
-        interactor.getAvailableSourceAccounts(action).subscribeBy(
+    private fun processSourceAccountsListUpdate(
+        action: AssetAction,
+        transactionTarget: TransactionTarget,
+        shouldResetBackStack: Boolean = false
+    ): Disposable =
+        interactor.getAvailableSourceAccounts(action, transactionTarget).subscribeBy(
             onSuccess = {
                 process(
                     TransactionIntent.AvailableSourceAccountsListUpdated(it)
                 )
+                if (shouldResetBackStack) {
+                    process(TransactionIntent.ClearBackStack)
+                }
             },
-            onError = { }
+            onError = {
+                Timber.e("Error getting available accounts for action $action")
+            }
         )
 
     override fun onScanLoopError(t: Throwable) {
@@ -306,11 +328,10 @@ class TransactionModel(
             .subscribeBy(
                 onComplete = {
                     process(
-                        TransactionIntent.InitialiseWithTargetAndNoSource(
+                        TransactionIntent.ReInitialiseWithTargetAndNoSource(
                             state.action, state.selectedTarget, state.passwordRequired
                         )
                     )
-                    process(TransactionIntent.ClearBackStack)
                 },
                 onError = { t ->
                     errorLogger.log(TxFlowLogError.ResetFail(t))
@@ -413,9 +434,14 @@ class TransactionModel(
                     process(TransactionIntent.UpdateTransactionComplete)
                 },
                 onError = {
-                    Timber.d("!TRANSACTION!> Unable to execute transaction: $it")
-                    errorLogger.log(TxFlowLogError.ExecuteFail(it))
-                    process(TransactionIntent.FatalTransactionError(it))
+                    if (it is NeedsApprovalException) {
+                        interactor.updateFiatDepositState(it.bankPaymentData)
+                        process(TransactionIntent.ApprovalRequired(it.bankPaymentData))
+                    } else {
+                        Timber.d("!TRANSACTION!> Unable to execute transaction: $it")
+                        errorLogger.log(TxFlowLogError.ExecuteFail(it))
+                        process(TransactionIntent.FatalTransactionError(it))
+                    }
                 }
             )
 

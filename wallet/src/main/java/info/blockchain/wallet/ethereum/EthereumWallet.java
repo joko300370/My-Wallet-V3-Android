@@ -8,14 +8,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.bitcoinj.crypto.DeterministicKey;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import info.blockchain.balance.CryptoCurrency;
+import info.blockchain.wallet.keys.MasterKey;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -43,13 +42,13 @@ public class EthereumWallet {
      * @param labelsMap       list of default labels for assets
      */
     public EthereumWallet(
-        DeterministicKey walletMasterKey,
+        MasterKey walletMasterKey,
         Map<CryptoCurrency, String> labelsMap
     ) {
         ArrayList<EthereumAccount> accounts = new ArrayList<>();
         accounts.add(
             EthereumAccount.Companion.deriveAccount(
-                walletMasterKey,
+                walletMasterKey.toDeterministicKey(),
                 ACCOUNT_INDEX,
                 labelsMap.get(CryptoCurrency.ETHER)
             )

@@ -161,6 +161,7 @@ enum class CryptoCurrency(
         const val MULTI_WALLET = 0x00000002L
         const val CUSTODIAL_ONLY = 0x0000004L
         const val IS_ERC20 = 0x00000008L
+        const val CUSTODIAL_MEMO = 0x00000010L
 
         const val STUB_ASSET = 0x10000000L
 

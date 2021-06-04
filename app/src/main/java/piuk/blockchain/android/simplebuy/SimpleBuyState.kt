@@ -8,6 +8,9 @@ import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.LinkBankTransfer
+import com.blockchain.nabu.models.data.LinkedBank
+import com.blockchain.nabu.models.data.RecurringBuyFrequency
+import com.blockchain.nabu.models.data.RecurringBuyState
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
@@ -48,6 +51,8 @@ data class SimpleBuyState(
     @Transient val exchangePrice: FiatValue? = null,
     @Transient val isLoading: Boolean = false,
     @Transient val everypayAuthOptions: EverypayAuthOptions? = null,
+    @Transient val authorisePaymentUrl: String? = null,
+    @Transient val linkedBank: LinkedBank? = null,
     val paymentSucceeded: Boolean = false,
     val showRating: Boolean = false,
     @Transient val shouldShowUnlockHigherFunds: Boolean = false,
@@ -57,7 +62,10 @@ data class SimpleBuyState(
     @Transient val transferLimits: TransferLimits? = null,
     // we use this flag to avoid navigating back and forth, reset after navigating
     @Transient val confirmationActionRequested: Boolean = false,
-    @Transient val newPaymentMethodToBeAdded: PaymentMethod? = null
+    @Transient val newPaymentMethodToBeAdded: PaymentMethod? = null,
+    val recurringBuyFrequency: RecurringBuyFrequency = RecurringBuyFrequency.ONE_TIME,
+    val recurringBuyState: RecurringBuyState = RecurringBuyState.UNINITIALISED,
+    @Transient private val recurringBuyEligiblePaymentMethods: List<PaymentMethodType> = emptyList()
 ) : MviState {
 
     @delegate:Transient
@@ -119,6 +127,14 @@ data class SimpleBuyState(
         return exchangeRate.convert(minFiatAmount)
     }
 
+    fun isSelectedPaymentMethodRecurringBuyEligible(): Boolean =
+        when (selectedPaymentMethodDetails) {
+            is PaymentMethod.Funds -> recurringBuyEligiblePaymentMethods.contains(PaymentMethodType.FUNDS)
+            is PaymentMethod.Bank -> recurringBuyEligiblePaymentMethods.contains(PaymentMethodType.BANK_TRANSFER)
+            is PaymentMethod.Card -> recurringBuyEligiblePaymentMethods.contains(PaymentMethodType.PAYMENT_CARD)
+            else -> false
+        }
+
     private fun PaymentMethod?.maxLimit(): Money? = this?.limits?.max
     private fun PaymentMethod?.minLimit(): Money? = this?.limits?.min
 
@@ -139,6 +155,9 @@ data class SimpleBuyState(
             }
         }
     }
+
+    fun shouldLaunchExternalFlow(): Boolean =
+        authorisePaymentUrl != null && linkedBank != null && id != null
 }
 
 enum class KycState {
@@ -181,6 +200,15 @@ sealed class ErrorState : Serializable {
     object LinkedBankAccountUnsupported : ErrorState()
     object LinkedBankNamesMismatched : ErrorState()
     object LinkedBankNotSupported : ErrorState()
+    object LinkedBankRejected : ErrorState()
+    object LinkedBankExpired : ErrorState()
+    object LinkedBankFailure : ErrorState()
+    object LinkedBankInvalid : ErrorState()
+    object ApprovedBankDeclined : ErrorState()
+    object ApprovedBankRejected : ErrorState()
+    object ApprovedBankFailed : ErrorState()
+    object ApprovedBankExpired : ErrorState()
+    object ApprovedGenericError : ErrorState()
     object DailyLimitExceeded : ErrorState()
     object WeeklyLimitExceeded : ErrorState()
     object YearlyLimitExceeded : ErrorState()

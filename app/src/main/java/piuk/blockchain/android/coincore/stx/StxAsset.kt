@@ -1,9 +1,9 @@
 package piuk.blockchain.android.coincore.stx
 
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
@@ -16,8 +16,8 @@ import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.thepit.PitLinking
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -32,8 +32,8 @@ internal class StxAsset(
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
-    environmentConfig: EnvironmentConfig,
-    eligibilityProvider: EligibilityProvider,
+    identity: UserIdentity,
+    features: InternalFeatureFlagApi,
     offlineAccounts: OfflineAccountUpdater
 ) : CryptoAssetBase(
     payloadManager,
@@ -44,9 +44,9 @@ internal class StxAsset(
     custodialManager,
     pitLinking,
     crashLogger,
-    environmentConfig,
-    eligibilityProvider,
-    offlineAccounts
+    offlineAccounts,
+    identity,
+    features
 ) {
 
     override val asset: CryptoCurrency
@@ -70,14 +70,15 @@ internal class StxAsset(
             label = "STX Account",
             address = stxAccount.bitcoinSerializedBase58Address,
             exchangeRates = exchangeRates,
-            custodialWalletManager = custodialManager
+            custodialWalletManager = custodialManager,
+            identity = identity
         )
     }
 
-    override fun parseAddress(address: String): Maybe<ReceiveAddress> =
+    override fun parseAddress(address: String, label: String?): Maybe<ReceiveAddress> =
         Maybe.fromCallable {
             if (isValidAddress(address)) {
-                StxAddress(address)
+                StxAddress(address, label ?: address)
             } else {
                 null
             }

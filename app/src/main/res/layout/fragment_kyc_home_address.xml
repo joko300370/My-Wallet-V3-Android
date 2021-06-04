@@ -178,7 +178,6 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-
         <Button
             android:id="@+id/button_kyc_address_next"
             style="@style/CtaButton.Blue"

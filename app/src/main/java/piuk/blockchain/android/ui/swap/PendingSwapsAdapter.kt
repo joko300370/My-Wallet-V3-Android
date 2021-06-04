@@ -4,13 +4,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.nabu.datamanagers.CustodialOrder
+import com.blockchain.utils.toFormattedDate
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import kotlinx.android.synthetic.main.swap_pending_item_layout.view.*
 import kotlinx.android.synthetic.main.swap_pending_item_layout.view.icon
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetResources
-import piuk.blockchain.android.util.toFormattedDate
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.inflate
 

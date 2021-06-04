@@ -7,6 +7,7 @@ import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.ui.base.mvi.MviIntent
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
@@ -285,9 +286,18 @@ class LaunchSendFlow(
 }
 
 class LaunchInterestDepositFlow(
-    val toAccount: SingleAccount,
-    val fromAccount: SingleAccount,
-    val action: AssetAction
+    val toAccount: InterestAccount
+) : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState =
+        oldState.copy(
+            dashboardNavigationAction = null,
+            activeFlow = null,
+            backupSheetDetails = null
+        )
+}
+
+class LaunchInterestWithdrawFlow(
+    val fromAccount: InterestAccount
 ) : DashboardIntent() {
     override fun reduce(oldState: DashboardState): DashboardState =
         oldState.copy(
@@ -329,6 +339,20 @@ class UpdateLaunchDialogFlow(
             dashboardNavigationAction = null,
             activeFlow = flow,
             backupSheetDetails = null
+        )
+}
+
+object LongCallStarted : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState =
+        oldState.copy(
+            hasLongCallInProgress = true
+        )
+}
+
+object LongCallEnded : DashboardIntent() {
+    override fun reduce(oldState: DashboardState): DashboardState =
+        oldState.copy(
+            hasLongCallInProgress = false
         )
 }
 

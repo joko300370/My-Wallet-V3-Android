@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:id="@+id/pairing_wallet_header_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_info_banner_background"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/pairing_sheet_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/tiny_margin"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/vector_sheet_indicator_small" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/pairing_header_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_margin="@dimen/standard_margin"
+            app:srcCompat="@drawable/ic_new_device" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/pairing_wallet_header_title"
+            style="@style/Text.Semibold.20"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:text="@string/pairing_wallet_title" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/pairing_wallet_header_label"
+            style="@style/Text.Light.14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/large_margin"
+            android:layout_marginBottom="@dimen/small_margin"
+            android:text="@string/pairing_wallet_description" />
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/qr_code"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pairing_wallet_header_parent"
+        app:layout_constraintBottom_toTopOf="@+id/pairing_qr_image_label"
+        android:visibility="gone" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/blockchain_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@+id/qr_code"
+        app:layout_constraintEnd_toEndOf="@+id/qr_code"
+        app:layout_constraintTop_toBottomOf="@+id/qr_code"
+        app:layout_constraintBottom_toTopOf="@+id/qr_code"
+        android:visibility="gone"/>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/step_one"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pairing_wallet_header_parent"
+        app:layout_constraintBottom_toTopOf="@+id/step_two"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:drawablePadding="@dimen/small_margin"
+        android:drawableStart="@drawable/ic_step_one_circle"
+        style="@style/Text.Light.14"
+        android:text="@string/pairing_wallet_instruction_1"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/step_two"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/step_one"
+        app:layout_constraintBottom_toTopOf="@+id/step_three"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:drawablePadding="@dimen/small_margin"
+        android:drawableStart="@drawable/ic_step_two_circle"
+        style="@style/Text.Light.14"
+        android:text="@string/pairing_wallet_instruction_2"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/step_three"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/step_two"
+        app:layout_constraintBottom_toTopOf="@+id/pairing_qr_image_label"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:layout_margin="@dimen/standard_margin"
+        android:drawablePadding="@dimen/small_margin"
+        android:drawableStart="@drawable/ic_step_three_circle"
+        style="@style/Text.Light.14"
+        android:text="@string/pairing_wallet_instruction_3"/>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/vertical_barrier"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="qr_code, blockchain_icon, step_one, step_two, step_three"
+        app:barrierDirection="bottom"
+        />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/pairing_qr_image_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/vertical_barrier"
+        app:layout_constraintBottom_toTopOf="@+id/connect_qr_notice"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        app:layout_constraintVertical_chainStyle="packed"
+        style="@style/Text.Standard.Centered.14"
+        android:text="@string/pairing_wallet_qr_code_description"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/connect_qr_notice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pairing_qr_image_label"
+        app:layout_constraintBottom_toTopOf="@+id/show_qr_button"
+        android:layout_marginStart="@dimen/large_margin"
+        android:layout_marginEnd="@dimen/large_margin"
+        android:text="@string/pairing_wallet_warning"
+        style="@style/Text.Standard.Centered.14"
+        android:textColor="@color/red_400" />
+
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/show_qr_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/connect_qr_notice"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="@dimen/tiny_margin"
+        android:layout_marginBottom="@dimen/tiny_margin"
+        style="@style/CtaButton.Blue"
+        android:text="@string/pairing_wallet_show_qr"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

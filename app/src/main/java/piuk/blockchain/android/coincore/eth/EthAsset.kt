@@ -1,11 +1,11 @@
 package piuk.blockchain.android.coincore.eth
 
 import com.blockchain.annotations.CommonCode
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.util.FormatsUtil
@@ -21,7 +21,6 @@ import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.impl.CryptoAssetBase
 import piuk.blockchain.android.thepit.PitLinking
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
@@ -29,6 +28,7 @@ import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.android.coincore.SimpleOfflineCacheItem
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
+import piuk.blockchain.android.identity.UserIdentity
 
 internal class EthAsset(
     payloadManager: PayloadDataManager,
@@ -42,9 +42,9 @@ internal class EthAsset(
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
-    environmentConfig: EnvironmentConfig,
-    eligibilityProvider: EligibilityProvider,
-    offlineAccounts: OfflineAccountUpdater
+    identity: UserIdentity,
+    offlineAccounts: OfflineAccountUpdater,
+    features: InternalFeatureFlagApi
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -54,9 +54,9 @@ internal class EthAsset(
     custodialManager,
     pitLinking,
     crashLogger,
-    environmentConfig,
-    eligibilityProvider,
-    offlineAccounts
+    offlineAccounts,
+    identity,
+    features
 ) {
 
     private val labelList = mapOf(
@@ -84,7 +84,8 @@ internal class EthAsset(
                     jsonAccount = it.account,
                     walletPreferences = walletPrefs,
                     exchangeRates = exchangeRates,
-                    custodialWalletManager = custodialManager
+                    custodialWalletManager = custodialManager,
+                    identity = identity
                 )
             }.doOnSuccess {
                 updateOfflineCache(it)
@@ -108,14 +109,14 @@ internal class EthAsset(
     }
 
     @CommonCode("Exists in UsdtAsset and PaxAsset")
-    override fun parseAddress(address: String): Maybe<ReceiveAddress> =
+    override fun parseAddress(address: String, label: String?): Maybe<ReceiveAddress> =
         Single.just(isValidAddress(address)).flatMapMaybe { isValid ->
             if (isValid) {
                 ethDataManager.isContractAddress(address).flatMapMaybe { isContract ->
                     if (isContract) {
                         throw AddressParseError(ETH_UNEXPECTED_CONTRACT_ADDRESS)
                     } else {
-                        Maybe.just(EthAddress(address))
+                        Maybe.just(EthAddress(address, label ?: address))
                     }
                 }
             } else {

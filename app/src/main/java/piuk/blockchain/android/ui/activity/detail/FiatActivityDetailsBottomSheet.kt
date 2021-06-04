@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.TransactionState
 import com.blockchain.nabu.datamanagers.TransactionType
+import com.blockchain.utils.toFormattedString
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.databinding.DialogSheetActivityDetailsBinding
@@ -17,7 +18,6 @@ import piuk.blockchain.android.ui.activity.detail.adapter.FiatDetailsSheetAdapte
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.toFormattedString
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.util.Date
 

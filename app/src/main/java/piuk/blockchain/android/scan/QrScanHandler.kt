@@ -4,11 +4,13 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.appcompat.app.AlertDialog
 import com.blockchain.koin.payloadScope
+import com.blockchain.remoteconfig.FeatureFlag
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.MaybeSubject
 import io.reactivex.subjects.SingleSubject
 import piuk.blockchain.android.R
@@ -45,6 +47,10 @@ sealed class ScanResult(
     class ImportedWallet(
         val keyPair: KeyPair
     ) : ScanResult(false)
+
+    class SecuredChannelLogin(
+        val handshake: String
+    ) : ScanResult(false)
 }
 
 class QrScanError(val errorCode: ErrorCode, msg: String) : Exception(msg) {
@@ -55,8 +61,22 @@ class QrScanError(val errorCode: ErrorCode, msg: String) : Exception(msg) {
 }
 
 class QrScanResultProcessor(
-    private val bitPayDataManager: BitPayDataManager
+    private val bitPayDataManager: BitPayDataManager,
+    mwaFeatureFlag: FeatureFlag
 ) {
+    private var isMWAEnabled: Boolean = false
+
+    init {
+        val compositeDisposable = mwaFeatureFlag.enabled.observeOn(Schedulers.io()).subscribe(
+            { result ->
+                isMWAEnabled = result
+            },
+            {
+                isMWAEnabled = false
+            }
+        )
+    }
+
     fun processScan(scanResult: String, isDeeplinked: Boolean = false): Single<ScanResult> =
         when {
             scanResult.isHttpUri() -> Single.just(ScanResult.HttpUri(scanResult, isDeeplinked))
@@ -64,6 +84,7 @@ class QrScanResultProcessor(
                 .map {
                     ScanResult.TxTarget(setOf(it), isDeeplinked)
                 }
+            isMWAEnabled && scanResult.isJson() -> Single.just(ScanResult.SecuredChannelLogin(scanResult))
             else -> {
                 val addressParser: AddressFactory = payloadScope.get()
                 addressParser.parse(scanResult)
@@ -200,3 +221,5 @@ private fun String.isBitpayUri(): Boolean {
     val paymentRequestUrl = FormatsUtil.getPaymentRequestUrl(this)
     return amount == "0.0000" && paymentRequestUrl.contains(bitpayInvoiceUrl)
 }
+
+private fun String.isJson(): Boolean = FormatsUtil.isValidJson(this)

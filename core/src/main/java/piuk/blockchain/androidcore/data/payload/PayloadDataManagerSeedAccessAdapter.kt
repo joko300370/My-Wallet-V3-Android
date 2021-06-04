@@ -31,18 +31,12 @@ internal class PayloadDataManagerSeedAccessAdapter(
                     validatedSecondPassword
                 )
             }
-            val hdWallet = payloadDataManager.wallet?.hdWallets?.get(0)
+            val hdWallet = payloadDataManager.wallet?.walletBody
             val hdSeed = hdWallet?.hdSeed
-            val masterKey = hdWallet?.masterKey?.privKeyBytes
-            return if (hdSeed == null || masterKey == null) {
+            return if (hdSeed == null) {
                 Maybe.empty()
             } else {
-                Maybe.just(
-                    Seed(
-                        hdSeed = hdSeed,
-                        masterKey = masterKey
-                    )
-                )
+                Maybe.just(Seed(hdSeed = hdSeed))
             }
         } catch (hd: HDWalletException) {
             return Maybe.empty()

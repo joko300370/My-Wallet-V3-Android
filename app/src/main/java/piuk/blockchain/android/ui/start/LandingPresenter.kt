@@ -13,7 +13,6 @@ import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import timber.log.Timber
 
 interface LandingView : MvpView {
-    fun showDebugMenu()
     fun showToast(message: String, @ToastCustom.ToastType toastType: String)
     fun showIsRootedWarning()
     fun showApiOutageMessage()
@@ -36,7 +35,6 @@ class LandingPresenter(
                     "Current environment: ${environmentSettings.environment.getName()}",
                     ToastCustom.TYPE_GENERAL
                 )
-                it.showDebugMenu()
             }
         }
         checkApiStatus()

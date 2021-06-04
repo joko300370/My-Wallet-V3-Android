@@ -16,17 +16,12 @@ class AppUtil(
 ) {
     val isSane: Boolean
         get() {
-            val guid = prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, "")
-            val encryptedPassword = prefs.getValue(PersistentPrefs.KEY_ENCRYPTED_PASSWORD, "")
+            val guid = prefs.walletGuid
+            val encryptedPassword = prefs.encryptedPassword
             val pinID = prefs.pinId
 
             return guid.isValidGuid() && encryptedPassword.isNotEmpty() && pinID.isNotEmpty()
         }
-
-    @Deprecated("Use prefs directly")
-    var sharedKey: String
-        get() = prefs.getValue(PersistentPrefs.KEY_SHARED_KEY, "")
-        set(sharedKey) = prefs.setValue(PersistentPrefs.KEY_SHARED_KEY, sharedKey)
 
     var activityIndicator: ActivityIndicator? = null
 

@@ -43,7 +43,7 @@ class AssetDetailsInteractorTest {
 
     @Before
     fun setUp() {
-        interactor = AssetDetailsInteractor(featureFlagMock, mock(), mock())
+        interactor = AssetDetailsInteractor(featureFlagMock, mock(), mock(), mock())
 
         whenever(asset.accountGroup(AssetFilter.All)).thenReturn(Maybe.just(totalGroup))
         whenever(asset.accountGroup(AssetFilter.NonCustodial)).thenReturn(Maybe.just(nonCustodialGroup))
@@ -60,9 +60,9 @@ class AssetDetailsInteractorTest {
         val price = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 56478.99.toBigDecimal())
 
         val walletCrypto = CryptoValue(CryptoCurrency.BTC, 548621.toBigInteger())
-        val custodialCrypto = CryptoValue.ZeroBtc
-        val interestCrypto = CryptoValue.ZeroBtc
-        val pendingCrypto = CryptoValue.ZeroBtc
+        val custodialCrypto = CryptoValue.zero(CryptoCurrency.BTC)
+        val interestCrypto = CryptoValue.zero(CryptoCurrency.BTC)
+        val pendingCrypto = CryptoValue.zero(CryptoCurrency.BTC)
 
         val walletFiat = FiatValue.fromMinor("USD", 30985)
         val custodialFiat = FiatValue.fromMinor("USD", 0)
@@ -126,8 +126,8 @@ class AssetDetailsInteractorTest {
         whenever(asset.exchangeRate()).thenReturn(Single.error(Throwable()))
 
         val walletCrypto = CryptoValue(CryptoCurrency.BTC, 548621.toBigInteger())
-        val custodialCrypto = CryptoValue.ZeroBtc
-        val interestCrypto = CryptoValue.ZeroBtc
+        val custodialCrypto = CryptoValue.zero(CryptoCurrency.BTC)
+        val interestCrypto = CryptoValue.zero(CryptoCurrency.BTC)
 
         whenever(nonCustodialGroup.accountBalance).thenReturn(Single.just(walletCrypto))
         whenever(custodialGroup.accountBalance).thenReturn(Single.just(custodialCrypto))
@@ -143,7 +143,7 @@ class AssetDetailsInteractorTest {
     @Test
     fun `cryptoBalance & fiatBalance never return if interest fails`() {
         val walletCrypto = CryptoValue(CryptoCurrency.BTC, 548621.toBigInteger())
-        val custodialCrypto = CryptoValue.ZeroBtc
+        val custodialCrypto = CryptoValue.zero(CryptoCurrency.BTC)
 
         val price = ExchangeRate.CryptoToFiat(CryptoCurrency.BTC, "USD", 5647899.toBigDecimal())
 

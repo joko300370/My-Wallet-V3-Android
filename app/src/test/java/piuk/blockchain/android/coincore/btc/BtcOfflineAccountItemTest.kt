@@ -31,11 +31,11 @@ class BtcOfflineAccountItemTest {
     fun getNextIsAvailable() {
         // Arrange
         val balanceMap = mapOf(
-            ADDRESS_1 to CryptoValue.ZeroBtc,
-            ADDRESS_2 to CryptoValue.ZeroBtc,
-            ADDRESS_3 to CryptoValue.ZeroBtc,
-            ADDRESS_4 to CryptoValue.ZeroBtc,
-            ADDRESS_5 to CryptoValue.ZeroBtc
+            ADDRESS_1 to CryptoValue.zero(CryptoCurrency.BTC),
+            ADDRESS_2 to CryptoValue.zero(CryptoCurrency.BTC),
+            ADDRESS_3 to CryptoValue.zero(CryptoCurrency.BTC),
+            ADDRESS_4 to CryptoValue.zero(CryptoCurrency.BTC),
+            ADDRESS_5 to CryptoValue.zero(CryptoCurrency.BTC)
         )
 
         val balanceCall: OfflineBalanceCall = mock {

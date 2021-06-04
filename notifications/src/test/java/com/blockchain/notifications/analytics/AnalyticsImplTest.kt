@@ -25,7 +25,10 @@ class AnalyticsImplTest {
     fun `should log custom event`() {
         val mockStore = mock<SharedPreferences>()
 
-        AnalyticsImpl(mockFirebase, mockStore).logEvent(event)
+        AnalyticsImpl(
+            firebaseAnalytics = mockFirebase, store = mockStore,
+            nabuAnalytics = mock()
+        ).logEvent(event)
 
         verify(mockFirebase).logEvent(event.event, null)
     }
@@ -39,7 +42,11 @@ class AnalyticsImplTest {
 
         whenever(mockEditor.putBoolean(any(), any())).thenReturn(mockEditor)
 
-        AnalyticsImpl(mockFirebase, mockStore).logEventOnce(event)
+        AnalyticsImpl(
+            firebaseAnalytics = mockFirebase,
+            store = mockStore,
+            nabuAnalytics = mock()
+        ).logEventOnce(event)
         verify(mockFirebase).logEvent(event.event, null)
     }
 
@@ -50,7 +57,11 @@ class AnalyticsImplTest {
             on { edit() } doReturn mockEditor
         }
 
-        AnalyticsImpl(mockFirebase, mockStore).logEventOnce(event)
+        AnalyticsImpl(
+            firebaseAnalytics = mockFirebase,
+            store = mockStore,
+            nabuAnalytics = mock()
+        ).logEventOnce(event)
         verify(mockFirebase, never()).logEvent(event.event, null)
     }
 }

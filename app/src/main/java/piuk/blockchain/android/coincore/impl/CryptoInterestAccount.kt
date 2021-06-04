@@ -1,11 +1,13 @@
 package piuk.blockchain.android.coincore.impl
 
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.InterestActivityItem
 import com.blockchain.nabu.datamanagers.InterestState
 import com.blockchain.nabu.datamanagers.Product
-import com.blockchain.nabu.models.responses.interest.DisabledReason
 import com.blockchain.nabu.datamanagers.TransferDirection
+import com.blockchain.nabu.models.responses.interest.DisabledReason
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -22,7 +24,6 @@ import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxSourceState
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.mapList
 import java.util.concurrent.atomic.AtomicBoolean
@@ -30,9 +31,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 internal class CryptoInterestAccount(
     override val asset: CryptoCurrency,
     override val label: String,
-    val custodialWalletManager: CustodialWalletManager,
+    private val custodialWalletManager: CustodialWalletManager,
     override val exchangeRates: ExchangeRateDataManager,
-    private val environmentConfig: EnvironmentConfig
+    private val features: InternalFeatureFlagApi
 ) : CryptoAccountBase(), InterestAccount {
 
     private val hasFunds = AtomicBoolean(false)
@@ -43,7 +44,6 @@ internal class CryptoInterestAccount(
                 asset = asset,
                 address = it,
                 label = label,
-                environmentConfig = environmentConfig,
                 postTransactions = onTxCompleted
             )
         }
@@ -56,7 +56,7 @@ internal class CryptoInterestAccount(
                 custodialWalletManager.createPendingDeposit(
                     crypto = txResult.amount.currency,
                     address = receiveAddress.address,
-                    hash = txResult.txHash,
+                    hash = txResult.txId,
                     amount = txResult.amount,
                     product = Product.SAVINGS
                 )
@@ -86,7 +86,11 @@ internal class CryptoInterestAccount(
             ).map { it }
 
     override val actionableBalance: Single<Money>
-        get() = accountBalance // TODO This will need updating when we support transfer out of an interest account
+        get() = custodialWalletManager.getInterestActionableBalanceForAsset(asset)
+            .toSingle(CryptoValue.zero(asset))
+            .onErrorReturn {
+                CryptoValue.zero(asset)
+            }.map { it }
 
     override val activity: Single<ActivitySummaryList>
         get() = custodialWalletManager.getInterestActivity(asset)
@@ -147,7 +151,15 @@ internal class CryptoInterestAccount(
             }
 
     override val actions: Single<AvailableActions> =
-        Single.just(setOf(AssetAction.InterestDeposit, AssetAction.Summary, AssetAction.ViewActivity))
+        actionableBalance.map {
+            setOfNotNull(
+                if (features.isFeatureEnabled(GatedFeature.INTEREST_WITHDRAWAL) && it.isPositive) {
+                    AssetAction.InterestWithdraw
+                } else {
+                    null
+                }, AssetAction.Summary, AssetAction.ViewActivity
+            )
+        }
 
     companion object {
         private val displayedStates = setOf(

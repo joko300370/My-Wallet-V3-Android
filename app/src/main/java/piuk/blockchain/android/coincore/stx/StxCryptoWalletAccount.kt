@@ -8,6 +8,7 @@ import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
@@ -16,8 +17,9 @@ class StxCryptoWalletAccount(
     custodialWalletManager: CustodialWalletManager,
     override val label: String,
     private val address: String,
-    override val exchangeRates: ExchangeRateDataManager
-) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.STX, custodialWalletManager) {
+    override val exchangeRates: ExchangeRateDataManager,
+    identity: UserIdentity
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.STX, custodialWalletManager, identity) {
 
     override val isFunded: Boolean
         get() = false

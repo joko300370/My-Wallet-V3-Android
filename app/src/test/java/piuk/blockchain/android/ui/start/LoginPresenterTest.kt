@@ -7,7 +7,6 @@ import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
-import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.verifyZeroInteractions
@@ -61,9 +60,9 @@ class LoginPresenterTest {
         verify(view).dismissProgressDialog()
         verify(view).startPinEntryActivity()
         verifyNoMoreInteractions(view)
-        verify(appUtil).sharedKey = sharedKey
         verifyNoMoreInteractions(appUtil)
-        verify(prefsUtil).setValue(PersistentPrefs.KEY_WALLET_GUID, guid)
+        verify(prefsUtil).sharedKey = sharedKey
+        verify(prefsUtil).walletGuid = guid
         verify(prefsUtil).setValue(PersistentPrefs.KEY_EMAIL_VERIFIED, true)
         verify(prefsUtil).setValue(PersistentPrefs.KEY_ONBOARDING_COMPLETE, true)
         verify(analytics).logEvent(AnalyticsEvents.WalletAutoPairing)

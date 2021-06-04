@@ -52,7 +52,7 @@ class Coincore internal constructor(
     val fiatAssets: Asset
         get() = fiatAsset
 
-    val cryptoAssets: Iterable<Asset>
+    val cryptoAssets: Iterable<CryptoAsset>
         get() = assetMap.values.filter { it.isEnabled }
 
     val allAssets: Iterable<Asset>
@@ -141,6 +141,11 @@ class Coincore internal constructor(
                     it !is FiatAccount
                 }
             }
+            AssetAction.InterestWithdraw -> {
+                {
+                    it is CryptoAccount && it.asset == sourceAccount.asset
+                }
+            }
             else -> {
                 { true }
             }
@@ -159,15 +164,15 @@ class Coincore internal constructor(
         accountGroup.map {
             it.accounts
         }.flattenAsObservable { it }
-            .flatMapSingle { a ->
-                a.receiveAddress
+            .flatMapSingle { account ->
+                account.receiveAddress
                     .map { it as CryptoAddress }
                     .onErrorReturn { NullCryptoAddress }
-                    .map { ca ->
-                        if (ca.address.equals(address, true)) {
-                            a
-                        } else {
-                            NullCryptoAccount()
+                    .map { cryptoAccount ->
+                        when {
+                            cryptoAccount.address.equals(address, true) -> account
+                            account.doesAddressBelongToWallet(address) -> account
+                            else -> NullCryptoAccount()
                         }
                     }
             }.filter { it != NullCryptoAccount() }

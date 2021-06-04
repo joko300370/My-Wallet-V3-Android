@@ -1,16 +1,21 @@
 package piuk.blockchain.android.coincore.impl.txEngine.sell
 
+import com.blockchain.featureflags.GatedFeature
 import com.blockchain.nabu.datamanagers.CustodialOrder
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.Product
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.nabu.service.TierService
+import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRate
+import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.PendingTx
@@ -22,15 +27,13 @@ import piuk.blockchain.android.coincore.impl.txEngine.PricedQuote
 import piuk.blockchain.android.coincore.impl.txEngine.QuotedEngine
 import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.android.coincore.updateTxValidity
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import java.math.RoundingMode
 
 abstract class SellTxEngineBase(
     private val walletManager: CustodialWalletManager,
     kycTierService: TierService,
-    quotesEngine: TransferQuotesEngine,
-    environmentConfig: EnvironmentConfig
-) : QuotedEngine(quotesEngine, kycTierService, walletManager, environmentConfig) {
+    quotesEngine: TransferQuotesEngine
+) : QuotedEngine(quotesEngine, kycTierService, walletManager, Product.SELL) {
 
     val target: FiatAccount
         get() = txTarget as FiatAccount
@@ -66,10 +69,10 @@ abstract class SellTxEngineBase(
             if (pendingTx.amount <= balance) {
                 if (pendingTx.maxLimit != null && pendingTx.minLimit != null) {
                     when {
-                        pendingTx.amount < pendingTx.minLimit -> throw TxValidationFailure(
+                        pendingTx.amount + pendingTx.feeAmount < pendingTx.minLimit -> throw TxValidationFailure(
                             ValidationState.UNDER_MIN_LIMIT
                         )
-                        pendingTx.amount > pendingTx.maxLimit -> throw TxValidationFailure(
+                        pendingTx.amount + pendingTx.feeAmount > pendingTx.maxLimit -> throw TxValidationFailure(
                             ValidationState.OVER_MAX_LIMIT
                         )
                         else -> Completable.complete()
@@ -83,6 +86,72 @@ abstract class SellTxEngineBase(
         }
     }
 
+    private fun buildNewFee(feeAmount: Money, exchangeAmount: Money): TxConfirmationValue? {
+        return if (!feeAmount.isZero) {
+            TxConfirmationValue.NewNetworkFee(
+                feeAmount = feeAmount as CryptoValue,
+                exchange = exchangeAmount,
+                asset = sourceAsset.disambiguateERC20()
+            )
+        } else null
+    }
+
+    private fun CryptoCurrency.disambiguateERC20() = if (this.hasFeature(CryptoCurrency.IS_ERC20)) {
+        CryptoCurrency.ETHER
+    } else this
+
+    private fun buildNewConfirmation(
+        pendingTx: PendingTx,
+        latestQuoteExchangeRate: ExchangeRate,
+        pricedQuote: PricedQuote
+    ): PendingTx =
+        pendingTx.copy(
+            confirmations = listOfNotNull(
+                TxConfirmationValue.NewExchangePriceConfirmation(pricedQuote.price, sourceAsset),
+                TxConfirmationValue.NewTo(
+                    txTarget,
+                    AssetAction.Sell
+                ),
+                TxConfirmationValue.NewSale(
+                    amount = pendingTx.amount,
+                    exchange = latestQuoteExchangeRate.convert(pendingTx.amount)
+                ),
+                buildNewFee(pendingTx.feeAmount, latestQuoteExchangeRate.convert(pendingTx.feeAmount)),
+                TxConfirmationValue.NewTotal(
+                    totalWithFee = (pendingTx.amount as CryptoValue).plus(
+                        pendingTx.feeAmount as CryptoValue
+                    ),
+                    exchange = latestQuoteExchangeRate.convert(
+                        pendingTx.amount.plus(pendingTx.feeAmount)
+                    )
+                )
+            )
+        )
+
+    private fun buildOldConfirmations(
+        pendingTx: PendingTx,
+        latestQuoteExchangeRate: ExchangeRate,
+        pricedQuote: PricedQuote
+    ): PendingTx =
+        pendingTx.copy(
+            confirmations = listOf(
+                TxConfirmationValue.ExchangePriceConfirmation(pricedQuote.price, sourceAsset),
+                TxConfirmationValue.From(sourceAccount.label),
+                TxConfirmationValue.To(txTarget.label),
+                TxConfirmationValue.NetworkFee(
+                    txFee = TxFee(
+                        fee = pendingTx.feeAmount,
+                        type = TxFee.FeeType.DEPOSIT_FEE,
+                        asset = sourceAsset.disambiguateERC20()
+                    )
+                ),
+                TxConfirmationValue.Total(
+                    total = pendingTx.amount,
+                    exchange = latestQuoteExchangeRate.convert(pendingTx.amount)
+                )
+            )
+        )
+
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         quotesEngine.pricedQuote
             .firstOrError()
@@ -92,25 +161,53 @@ abstract class SellTxEngineBase(
                     to = userFiat,
                     _rate = pricedQuote.price.toBigDecimal()
                 )
-                pendingTx.copy(
-                    confirmations = listOf(
-                        TxConfirmationValue.ExchangePriceConfirmation(pricedQuote.price, sourceAsset),
-                        TxConfirmationValue.From(sourceAccount.label),
-                        TxConfirmationValue.To(txTarget.label),
-                        TxConfirmationValue.NetworkFee(
-                            txFee = TxFee(
-                                fee = pendingTx.feeAmount,
-                                type = TxFee.FeeType.DEPOSIT_FEE,
-                                asset = sourceAsset
-                            )
-                        ),
-                        TxConfirmationValue.Total(
-                            total = pendingTx.amount,
-                            exchange = latestQuoteExchangeRate.convert(pendingTx.amount)
-                        )
+                if (internalFeatureFlagApi.isFeatureEnabled(GatedFeature.CHECKOUT)) {
+                    buildNewConfirmation(pendingTx, latestQuoteExchangeRate, pricedQuote)
+                } else {
+                    buildOldConfirmations(pendingTx, latestQuoteExchangeRate, pricedQuote)
+                }
+            }
+
+    private fun addOrRefreshNewConfirmations(
+        pendingTx: PendingTx,
+        pricedQuote: PricedQuote,
+        latestQuoteExchangeRate: ExchangeRate
+    ): PendingTx =
+        pendingTx.apply {
+            addOrReplaceOption(
+                TxConfirmationValue.NewExchangePriceConfirmation(pricedQuote.price, sourceAsset)
+            )
+            addOrReplaceOption(
+                TxConfirmationValue.NewTotal(
+                    totalWithFee = (pendingTx.amount as CryptoValue).plus(
+                        pendingTx.feeAmount as CryptoValue
+                    ),
+                    exchange = latestQuoteExchangeRate.convert(
+                        pendingTx.amount.plus(pendingTx.feeAmount)
                     )
                 )
-            }
+            )
+        }
+
+    private fun addOrRefreshConfirmations(
+        pendingTx: PendingTx,
+        pricedQuote: PricedQuote,
+        latestQuoteExchangeRate: ExchangeRate
+    ): PendingTx =
+        pendingTx.apply {
+            addOrReplaceOption(
+                TxConfirmationValue.ExchangePriceConfirmation(
+                    pricedQuote.price,
+                    sourceAsset
+                )
+            )
+            addOrReplaceOption(
+                TxConfirmationValue.Total(
+                    total = pendingTx.amount,
+                    exchange = latestQuoteExchangeRate.convert(pendingTx.amount)
+                )
+            )
+        }
 
     override fun doRefreshConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         quotesEngine.pricedQuote
@@ -121,19 +218,11 @@ abstract class SellTxEngineBase(
                     to = userFiat,
                     _rate = pricedQuote.price.toBigDecimal()
                 )
-                pendingTx.apply {
-                    addOrReplaceOption(
-                        TxConfirmationValue.ExchangePriceConfirmation(
-                            pricedQuote.price,
-                            sourceAsset
-                        )
-                    )
-                    addOrReplaceOption(
-                        TxConfirmationValue.Total(
-                            total = pendingTx.amount,
-                            exchange = latestQuoteExchangeRate.convert(pendingTx.amount)
-                        )
-                    )
+
+                if (internalFeatureFlagApi.isFeatureEnabled(GatedFeature.CHECKOUT)) {
+                    addOrRefreshNewConfirmations(pendingTx, pricedQuote, latestQuoteExchangeRate)
+                } else {
+                    addOrRefreshConfirmations(pendingTx, pricedQuote, latestQuoteExchangeRate)
                 }
             }
 

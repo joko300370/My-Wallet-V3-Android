@@ -1,10 +1,10 @@
 package info.blockchain.wallet.api;
 
+import info.blockchain.api.ApiException;
 import info.blockchain.wallet.ApiCode;
 import info.blockchain.wallet.BaseIntegTest;
 import info.blockchain.wallet.BlockchainFramework;
 import info.blockchain.wallet.api.data.Status;
-import info.blockchain.wallet.exceptions.ApiException;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -31,15 +31,11 @@ public final class WalletApiIntegTest extends BaseIntegTest {
     private String sharedKey = "b4ff6bf5-17a9-4905-b54b-a526816aa100";
 
     private WalletApi walletApi = new WalletApi(
-            BlockchainFramework.getRetrofitExplorerInstance()
-                    .create(WalletExplorerEndpoints.class),
-            new ApiCode() {
-                @NotNull
-                @Override
-                public String getApiCode() {
-                    return BlockchainFramework.getApiCode();
-                }
-            }
+        getRetrofit(
+            "https://explorer.staging.blockchain.info/",
+            getOkHttpClient()
+        ).create(WalletExplorerEndpoints.class),
+        BlockchainFramework::getApiCode
     );
 
     @Test

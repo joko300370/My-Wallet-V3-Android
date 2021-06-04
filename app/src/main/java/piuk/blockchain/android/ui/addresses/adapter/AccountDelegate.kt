@@ -7,13 +7,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import io.reactivex.Maybe
 import io.reactivex.Single
-import kotlinx.android.synthetic.main.item_accounts_row.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.databinding.ItemAccountsRowBinding
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.visible
 
 class AccountDelegate(
@@ -21,7 +20,9 @@ class AccountDelegate(
 ) : AdapterDelegate<AccountListItem> {
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        AccountViewHolder(parent.inflate(R.layout.item_accounts_row))
+        AccountViewHolder(
+            ItemAccountsRowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        )
 
     override fun onBindViewHolder(
         items: List<AccountListItem>,
@@ -36,33 +37,35 @@ class AccountDelegate(
         (items[position] is AccountListItem.Account)
 
     private class AccountViewHolder(
-        itemView: View
-    ) : RecyclerView.ViewHolder(itemView) {
+        private val binding: ItemAccountsRowBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(
             item: AccountListItem.Account,
             listener: AccountAdapter.Listener
         ) {
-            if (item.account.isArchived) {
-                // Show the archived item
-                itemView.account_details.gone()
-                itemView.account_details_archived.visible()
-                itemView.account_details_archived.updateAccount(
-                    item.account
-                ) { listener.onAccountClicked(it) }
-                itemView.account_details.contentDescription = ""
-                itemView.account_details_archived.contentDescription = item.account.label
-            } else {
-                // Show the normal item
-                itemView.account_details_archived.gone()
-                itemView.account_details.visible()
-                itemView.account_details.updateAccount(
-                    item.account,
-                    { listener.onAccountClicked(it) },
-                    DefaultAccountCellDecorator(item.account)
-                )
-                itemView.account_details_archived.contentDescription = ""
-                itemView.account_details.contentDescription = item.account.label
+            with(binding) {
+                if (item.account.isArchived) {
+                    // Show the archived item
+                    accountDetails.gone()
+                    accountDetailsArchived.visible()
+                    accountDetailsArchived.updateAccount(
+                        item.account
+                    ) { listener.onAccountClicked(it) }
+                    accountDetails.contentDescription = ""
+                    accountDetailsArchived.contentDescription = item.account.label
+                } else {
+                    // Show the normal item
+                    accountDetailsArchived.gone()
+                    accountDetails.visible()
+                    accountDetails.updateAccount(
+                        item.account,
+                        { listener.onAccountClicked(it) },
+                        DefaultAccountCellDecorator(item.account)
+                    )
+                    accountDetailsArchived.contentDescription = ""
+                    accountDetails.contentDescription = item.account.label
+                }
             }
         }
     }

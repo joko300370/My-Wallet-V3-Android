@@ -7,6 +7,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.CryptoActivitySummaryItem
 import piuk.blockchain.android.ui.activity.CryptoActivityType
@@ -20,7 +21,7 @@ class ActivitiesDelegateAdapter(
     assetResources: AssetResources,
     onCryptoItemClicked: (CryptoCurrency, String, CryptoActivityType) -> Unit,
     onFiatItemClicked: (String, String) -> Unit
-) : DelegationAdapter<Any>(AdapterDelegatesManager(), emptyList()) {
+) : DelegationAdapter<ActivitySummaryItem>(AdapterDelegatesManager(), emptyList()) {
 
     init {
         // Add all necessary AdapterDelegate objects here
@@ -31,6 +32,8 @@ class ActivitiesDelegateAdapter(
             addAdapterDelegate(SellActivityItemDelegate(assetResources, onCryptoItemClicked))
             addAdapterDelegate(CustodialFiatActivityItemDelegate(onFiatItemClicked))
             addAdapterDelegate(CustodialInterestActivityItemDelegate(prefs, assetResources, onCryptoItemClicked))
+            addAdapterDelegate(CustodialRecurringBuyActivityItemDelegate(assetResources, onCryptoItemClicked))
+            addAdapterDelegate(CustodialSendActivityItemDelegate(prefs, assetResources, onCryptoItemClicked))
         }
     }
 }

@@ -26,6 +26,10 @@
             android:key="the_pit"
             android:title="@string/setting_the_exchange"
             app:iconSpaceReserved="false" />
+        <piuk.blockchain.android.ui.settings.preferences.CustomPreference
+            android:key="qr_connect"
+            android:title="@string/settings_pair_wallet"
+            app:iconSpaceReserved="false" />
     </piuk.blockchain.android.ui.settings.preferences.CustomPreferenceCategory>
 
     <piuk.blockchain.android.ui.settings.preferences.CustomPreferenceCategory
@@ -72,10 +76,12 @@
             android:key="fingerprint"
             android:title="@string/enable_fingerprint"
             app:iconSpaceReserved="false" />
+
         <piuk.blockchain.android.ui.settings.preferences.CustomPreference
             android:key="backup"
             android:title="@string/backup_subtitle"
             app:iconSpaceReserved="false" />
+
         <piuk.blockchain.android.ui.settings.preferences.CustomSwitchPreference
             android:key="2fa"
             android:summary="@string/two_fa_summary"

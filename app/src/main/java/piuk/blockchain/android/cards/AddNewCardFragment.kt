@@ -15,19 +15,19 @@ import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.fragment_add_new_card.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.FragmentAddNewCardBinding
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.AfterTextChangedWatcher
 import java.util.Calendar
 import java.util.Date
 
-class AddNewCardFragment : MviFragment<CardModel, CardIntent, CardState>(), AddCardFlowFragment {
+class AddNewCardFragment :
+    MviFragment<CardModel, CardIntent, CardState, FragmentAddNewCardBinding>(), AddCardFlowFragment {
 
     override val model: CardModel by scopedInject()
 
@@ -44,58 +44,61 @@ class AddNewCardFragment : MviFragment<CardModel, CardIntent, CardState>(), AddC
         get() = (activity as? CardDetailsPersistence)
             ?: throw IllegalStateException("Parent must implement CardDetailsPersistence")
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_add_new_card)
-
     private val textWatcher = object : AfterTextChangedWatcher() {
         override fun afterTextChanged(s: Editable?) {
-            btn_next.isEnabled =
-                card_name.isValid && card_number.isValid && cvv.isValid && expiry_date.isValid
+            with(binding) {
+                btnNext.isEnabled = cardName.isValid && cardNumber.isValid && cvv.isValid && expiryDate.isValid
+            }
             hideError()
         }
     }
 
     private fun hideError() {
-        same_card_error.gone()
+        binding.sameCardError.gone()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
 
-        card_name.addTextChangedListener(textWatcher)
-        card_number.addTextChangedListener(textWatcher)
-        cvv.addTextChangedListener(textWatcher)
-        expiry_date.addTextChangedListener(textWatcher)
-        btn_next.apply {
-            isEnabled = false
-            setOnClickListener {
-                if (cardHasAlreadyBeenAdded()) {
-                    showError()
-                } else {
-                    cardDetailsPersistence.setCardData(CardData(
-                        fullName = card_name.text.toString(),
-                        number = card_number.text.toString().replace(" ", ""),
-                        month = expiry_date.month.toInt(),
-                        year = expiry_date.year.toInt(),
-                        cvv = cvv.text.toString()
-                    ))
-                    activity.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        with(binding) {
+            cardName.addTextChangedListener(textWatcher)
+            cardNumber.addTextChangedListener(textWatcher)
+            cvv.addTextChangedListener(textWatcher)
+            expiryDate.addTextChangedListener(textWatcher)
+            btnNext.apply {
+                isEnabled = false
+                setOnClickListener {
+                    if (cardHasAlreadyBeenAdded()) {
+                        showError()
+                    } else {
+                        cardDetailsPersistence.setCardData(
+                            CardData(
+                                fullName = cardName.text.toString(),
+                                number = cardNumber.text.toString().replace(" ", ""),
+                                month = expiryDate.month.toInt(),
+                                year = expiryDate.year.toInt(),
+                                cvv = cvv.text.toString()
+                            )
+                        )
+                        activity.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
-                    navigator.navigateToBillingDetails()
-                    analytics.logEvent(SimpleBuyAnalytics.CARD_INFO_SET)
+                        navigator.navigateToBillingDetails()
+                        analytics.logEvent(SimpleBuyAnalytics.CARD_INFO_SET)
+                    }
                 }
             }
-        }
 
-        compositeDisposable += custodialWalletManager.fetchUnawareLimitsCards(listOf(CardStatus.PENDING,
-            CardStatus.ACTIVE)).subscribeBy(onSuccess = {
-            availableCards = it
-        })
-        card_number.displayCardTypeIcon(false)
+            compositeDisposable += custodialWalletManager.fetchUnawareLimitsCards(
+                listOf(
+                    CardStatus.PENDING,
+                    CardStatus.ACTIVE
+                )
+            ).subscribeBy(onSuccess = {
+                availableCards = it
+            })
+            cardNumber.displayCardTypeIcon(false)
+        }
         activity.setupToolbar(R.string.add_card_title)
         analytics.logEvent(SimpleBuyAnalytics.ADD_CARD)
 
@@ -104,29 +107,33 @@ class AddNewCardFragment : MviFragment<CardModel, CardIntent, CardState>(), AddC
 
     private fun setupCardInfo() {
         if (simpleBuyPrefs.addCardInfoDismissed) {
-            card_info_group.gone()
+            binding.cardInfoGroup.gone()
         } else {
-            card_info_close.setOnClickListener {
+            binding.cardInfoClose.setOnClickListener {
                 simpleBuyPrefs.addCardInfoDismissed = true
-                card_info_group.gone()
+                binding.cardInfoGroup.gone()
             }
         }
     }
 
     private fun cardHasAlreadyBeenAdded(): Boolean {
-        availableCards.forEach {
-            if (it.expireDate.hasSameMonthAndYear(month = expiry_date.month.toInt(),
-                    year = expiry_date.year.toInt().asCalendarYear()) &&
-                card_number.text?.toString()?.takeLast(4) == it.endDigits &&
-                card_number.cardType == it.cardType
-            )
-                return true
+        with(binding) {
+            availableCards.forEach {
+                if (it.expireDate.hasSameMonthAndYear(
+                        month = expiryDate.month.toInt(),
+                        year = expiryDate.year.toInt().asCalendarYear()
+                    ) &&
+                    cardNumber.text?.toString()?.takeLast(4) == it.endDigits &&
+                    cardNumber.cardType == it.cardType
+                )
+                    return true
+            }
+            return false
         }
-        return false
     }
 
     private fun showError() {
-        same_card_error.visible()
+        binding.sameCardError.visible()
     }
 
     override fun render(newState: CardState) {}
@@ -147,4 +154,7 @@ class AddNewCardFragment : MviFragment<CardModel, CardIntent, CardState>(), AddC
 
     private fun Int.asCalendarYear(): Int =
         if (this < 100) 2000 + this else this
+
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentAddNewCardBinding =
+        FragmentAddNewCardBinding.inflate(inflater, container, false)
 }

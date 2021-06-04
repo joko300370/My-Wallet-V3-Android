@@ -20,8 +20,8 @@ import com.blockchain.nabu.service.RetailWalletTokenService
 import com.blockchain.nabu.stores.NabuSessionTokenStore
 import com.blockchain.utils.Optional
 import com.blockchain.veriff.VeriffApplicantAndToken
+import info.blockchain.api.ApiException
 import info.blockchain.balance.CryptoCurrency
-import info.blockchain.wallet.exceptions.ApiException
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.MaybeSource

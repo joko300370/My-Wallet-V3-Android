@@ -15,6 +15,7 @@ import com.blockchain.koin.modules.xlmModule
 import com.blockchain.network.modules.apiModule
 import com.blockchain.network.modules.okHttpModule
 import com.blockchain.notifications.koin.notificationModule
+import info.blockchain.api.blockchainApiModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
@@ -28,6 +29,8 @@ import piuk.blockchain.android.ui.activity.activitiesModule
 import piuk.blockchain.android.ui.dashboard.announcements.dashboardAnnouncementsModule
 import piuk.blockchain.android.ui.kyc.koin.kycUiModule
 import piuk.blockchain.android.ui.kyc.koin.kycUiNabuModule
+import piuk.blockchain.android.ui.auth.newlogin.secureChannelModule
+import piuk.blockchain.android.ui.login.loginUiModule
 import piuk.blockchain.android.ui.start.startupUiModule
 import piuk.blockchain.android.ui.transactionflow.transactionModule
 import piuk.blockchain.com.internalFeatureFlagsModule
@@ -47,6 +50,7 @@ object KoinStarter {
                 activitiesModule,
                 apiInterceptorsModule,
                 apiModule,
+                blockchainApiModule,
                 applicationModule,
                 campaignModule,
                 coincoreModule,
@@ -61,10 +65,12 @@ object KoinStarter {
                 authenticationModule,
                 kycUiModule,
                 kycUiNabuModule,
+                loginUiModule,
                 moshiModule,
                 nabuModule,
                 nabuUrlModule,
                 notificationModule,
+                secureChannelModule,
                 serviceModule,
                 startupUiModule,
                 sunriverModule,

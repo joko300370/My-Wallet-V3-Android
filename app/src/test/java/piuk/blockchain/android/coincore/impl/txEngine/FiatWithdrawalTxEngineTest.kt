@@ -2,7 +2,7 @@ package piuk.blockchain.android.coincore.impl.txEngine
 
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.models.data.WithdrawalFeeAndLimit
+import com.blockchain.nabu.models.data.FiatWithdrawalFeeAndLimit
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
@@ -101,7 +101,7 @@ class FiatWithdrawalTxEngineTest {
             on { accountBalance } itReturns Single.just(expectedAccountBalance)
         }
 
-        val expectedMinAmountAndFee = WithdrawalFeeAndLimit(
+        val expectedMinAmountAndFee = FiatWithdrawalFeeAndLimit(
             minLimit = FiatValue.fromMinor(TGT_ASSET, 100L),
             fee = FiatValue.fromMinor(TGT_ASSET, 1000L)
         )

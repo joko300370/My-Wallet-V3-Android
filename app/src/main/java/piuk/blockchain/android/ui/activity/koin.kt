@@ -50,7 +50,8 @@ val activitiesModule = module {
                 assetActivityRepository = get(),
                 custodialWalletManager = get(),
                 stringUtils = get(),
-                coincore = get()
+                coincore = get(),
+                defaultLabels = get()
             )
         }
 
@@ -61,7 +62,6 @@ val activitiesModule = module {
                 stringUtils = get(),
                 bchDataManager = get(),
                 xlmDataManager = get(),
-                environmentSettings = get(),
                 coincore = get()
             )
         }

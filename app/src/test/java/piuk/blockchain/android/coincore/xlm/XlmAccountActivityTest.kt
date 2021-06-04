@@ -58,7 +58,8 @@ class XlmAccountActivityTest {
             xlmFeesFetcher = xlmFeesFetcher,
             walletOptionsDataManager = walletOptionsDataManager,
             walletPreferences = walletPreferences,
-            custodialWalletManager = custodialWalletManager
+            custodialWalletManager = custodialWalletManager,
+            identity = mock()
         )
 
     @get:Rule
@@ -97,9 +98,9 @@ class XlmAccountActivityTest {
             "sendingAddress",
             "receivingAddress",
             CustodialOrderState.FINISHED,
-            CryptoValue.ZeroXlm,
-            CryptoValue.ZeroBtc,
-            CryptoValue.ZeroBtc,
+            CryptoValue.zero(CryptoCurrency.XLM),
+            CryptoValue.zero(CryptoCurrency.BTC),
+            CryptoValue.zero(CryptoCurrency.BTC),
             CurrencyPair.CryptoCurrencyPair(CryptoCurrency.XLM, CryptoCurrency.BTC),
             FiatValue.zero("USD"),
             "USD"
@@ -182,9 +183,9 @@ class XlmAccountActivityTest {
             "sendingAddress",
             "receivingAddress",
             CustodialOrderState.FINISHED,
-            CryptoValue.ZeroXlm,
-            CryptoValue.ZeroBtc,
-            CryptoValue.ZeroBtc,
+            CryptoValue.zero(CryptoCurrency.XLM),
+            CryptoValue.zero(CryptoCurrency.BTC),
+            CryptoValue.zero(CryptoCurrency.BTC),
             CurrencyPair.CryptoCurrencyPair(CryptoCurrency.XLM, CryptoCurrency.BTC),
             FiatValue.zero("USD"),
             "USD"
@@ -260,9 +261,9 @@ class XlmAccountActivityTest {
             "sendingAddress",
             "receivingAddress",
             CustodialOrderState.FINISHED,
-            CryptoValue.ZeroXlm,
-            CryptoValue.ZeroBtc,
-            CryptoValue.ZeroBtc,
+            CryptoValue.zero(CryptoCurrency.XLM),
+            CryptoValue.zero(CryptoCurrency.BTC),
+            CryptoValue.zero(CryptoCurrency.BTC),
             CurrencyPair.CryptoCurrencyPair(CryptoCurrency.XLM, CryptoCurrency.BTC),
             FiatValue.zero("USD"),
             "USD"

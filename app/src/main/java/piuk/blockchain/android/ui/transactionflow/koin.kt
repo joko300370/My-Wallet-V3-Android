@@ -12,25 +12,35 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TxFlowErrorReporting
 import piuk.blockchain.android.ui.transactionflow.flow.ActiveTransactionFlow
+import piuk.blockchain.android.ui.transactionflow.flow.CompoundNetworkFeeFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.EstimatedCompletionPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.ExchangePriceFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.FeedTotalFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.FiatFeePropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.FromPropertyFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.NewExchangePriceFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.NewFromPropertyFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.NewNetworkFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.NewSalePropertyFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.NewSwapExchangeRateFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.NewToPropertyFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.NewTotalFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.SwapDestinationPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.SwapExchangeRateFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.SwapReceiveFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.SwapSourcePropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.ToPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.TotalFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionFlowCustomiser
-import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionFlowCustomiserImpl
 import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapper
+import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapperNewCheckout
 import piuk.blockchain.android.ui.transactionflow.flow.TxOptionsFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.TxOptionsFormatterNewCheckout
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.SourceSelectionCustomisations
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.TargetSelectionCustomisations
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionConfirmationCustomisations
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionFlowCustomiser
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionFlowCustomiserImpl
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionProgressCustomisations
 
 val transactionFlowScope = named("TransactionScope")
@@ -40,7 +50,9 @@ val transactionModule = module {
     factory {
         TransactionFlowCustomiserImpl(
             resources = get<Context>().resources,
-            assetResources = get()
+            assetResources = get(),
+            stringUtils = get(),
+            features = get()
         )
     }.bind(TransactionFlowCustomiser::class)
         .bind(EnterAmountCustomisations::class)
@@ -48,6 +60,58 @@ val transactionModule = module {
         .bind(TargetSelectionCustomisations::class)
         .bind(TransactionConfirmationCustomisations::class)
         .bind(TransactionProgressCustomisations::class)
+
+    factory {
+        NewExchangePriceFormatter(
+            context = get()
+        )
+    }.bind(TxOptionsFormatterNewCheckout::class)
+
+    factory {
+        NewToPropertyFormatter(
+            context = get(),
+            defaultLabel = get()
+        )
+    }.bind(TxOptionsFormatterNewCheckout::class)
+
+    factory {
+        NewFromPropertyFormatter(
+            context = get(),
+            defaultLabel = get()
+        )
+    }.bind(TxOptionsFormatterNewCheckout::class)
+
+    factory {
+        NewSalePropertyFormatter(
+            context = get()
+        )
+    }.bind(TxOptionsFormatterNewCheckout::class)
+
+    factory {
+        NewSwapExchangeRateFormatter(
+            context = get()
+        )
+    }.bind(TxOptionsFormatterNewCheckout::class)
+
+    factory {
+        NewNetworkFormatter(
+            context = get(),
+            assetResources = get()
+        )
+    }.bind(TxOptionsFormatterNewCheckout::class)
+
+    factory {
+        CompoundNetworkFeeFormatter(
+            context = get(),
+            assetResources = get()
+        )
+    }.bind(TxOptionsFormatterNewCheckout::class)
+
+    factory {
+        NewTotalFormatter(
+            context = get()
+        )
+    }.bind(TxOptionsFormatterNewCheckout::class)
 
     factory {
         ExchangePriceFormatter(
@@ -122,6 +186,12 @@ val transactionModule = module {
     }
 
     factory {
+        TxConfirmReadOnlyMapperNewCheckout(
+            formatters = getAll()
+        )
+    }
+
+    factory {
         TxFlowAnalytics(
             analytics = get()
         )
@@ -144,7 +214,8 @@ val transactionModule = module {
                 currencyPrefs = get(),
                 eligibilityProvider = payloadScope.get(),
                 accountsSorting = get(),
-                linkedBanksFactory = payloadScope.get()
+                linkedBanksFactory = payloadScope.get(),
+                bankLinkingPrefs = payloadScope.get()
             )
         }
 

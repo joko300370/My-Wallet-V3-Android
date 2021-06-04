@@ -1,16 +1,16 @@
 package piuk.blockchain.androidcore.data.payments
 
 import com.blockchain.logging.LastTxUpdater
-import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.wallet.keys.SigningKey
+import info.blockchain.wallet.payload.data.XPubs
+import info.blockchain.wallet.payload.model.Utxo
+import info.blockchain.wallet.payment.OutputType
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import io.reactivex.Observable
 import io.reactivex.Single
-import org.bitcoinj.core.ECKey
-import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.core.Transaction
-import org.bitcoinj.crypto.BIP38PrivateKey
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.data.rxjava.RxPinning
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
@@ -23,7 +23,7 @@ class SendDataManager(
 ) {
     data class MaxAvailable(
         val maxSpendable: CryptoValue,
-        val forForMax: CryptoValue
+        val feeForMax: CryptoValue
     )
 
     private val rxPinning: RxPinning = RxPinning(rxBus)
@@ -42,7 +42,7 @@ class SendDataManager(
      */
     fun submitBtcPayment(
         unspentOutputBundle: SpendableUnspentOutputs,
-        keys: List<ECKey>,
+        keys: List<SigningKey>,
         toAddress: String,
         changeAddress: String,
         bigIntFee: BigInteger,
@@ -57,7 +57,8 @@ class SendDataManager(
                 bigIntFee,
                 bigIntAmount
             )
-        }.logLastTx().applySchedulers()
+        }.logLastTx()
+            .applySchedulers()
     }
 
     fun submitBtcPayment(
@@ -72,7 +73,7 @@ class SendDataManager(
 
     fun createAndSignBtcTransaction(
         unspentOutputBundle: SpendableUnspentOutputs,
-        keys: List<ECKey>,
+        keys: List<SigningKey>,
         toAddress: String,
         changeAddress: String,
         bigIntFee: BigInteger,
@@ -97,7 +98,7 @@ class SendDataManager(
      */
     fun submitBchPayment(
         unspentOutputBundle: SpendableUnspentOutputs,
-        keys: List<ECKey>,
+        keys: List<SigningKey>,
         toAddress: String,
         changeAddress: String,
         bigIntFee: BigInteger,
@@ -118,52 +119,40 @@ class SendDataManager(
     }
 
     /**
-     * Returns an Elliptic Curve Key from a BIP38 private key.
+     * Returns an [Utxo] object containing all the unspent outputs for a given
+     * Account.
      *
-     * @param password The password for the BIP-38 encrypted key
-     * @param scanData A private key in Base-58
-     * @param networkParameters The current Network Parameters
-     * @return An [ECKey]
+     * @param xpubs The Bitcoin Account you wish to query
+     * @return An [Observable] wrapping an [Utxo] object
      */
-    fun getEcKeyFromBip38(
-        password: String,
-        scanData: String,
-        networkParameters: NetworkParameters
-    ): Observable<ECKey> = Observable.fromCallable {
-        BIP38PrivateKey.fromBase58(networkParameters, scanData).run { decrypt(password) }
-    }.applySchedulers()
 
-    /**
-     * Returns an [UnspentOutputs] object containing all the unspent outputs for a given
-     * Bitcoin address.
-     *
-     * @param address The Bitcoin address you wish to query, as a String
-     * @return An [Observable] wrapping an [UnspentOutputs] object
-     */
-    fun getUnspentBtcOutputs(address: String): Observable<UnspentOutputs> =
-        rxPinning.call<UnspentOutputs> {
-            paymentService.getUnspentBtcOutputs(address)
+    fun getUnspentBtcOutputs(xpubs: XPubs): Single<List<Utxo>> =
+        rxPinning.callSingle {
+            paymentService.getUnspentBtcOutputs(xpubs)
         }.applySchedulers()
 
     /**
-     * Returns an [UnspentOutputs] object containing all the unspent outputs for a given
+     * Returns an [Utxo] object containing all the unspent outputs for a given
      * Bitcoin Cash address. Please note that this method only accepts a valid Base58 (ie Legacy)
      * BCH address. BECH32 is not accepted by the endpoint.
      *
      * @param address The Bitcoin Cash address you wish to query, as a Base58 address String
-     * @return An [Observable] wrapping an [UnspentOutputs] object
+     * @return An [Observable] wrapping an [Utxo] object
      */
-    fun getUnspentBchOutputs(address: String): Observable<UnspentOutputs> =
-        rxPinning.call<UnspentOutputs> { paymentService.getUnspentBchOutputs(address) }
-            .applySchedulers()
+    fun getUnspentBchOutputs(address: String): Single<List<Utxo>> =
+        rxPinning.callSingle {
+            paymentService.getUnspentBchOutputs(address)
+        }.applySchedulers()
 
     /**
-     * Returns a [SpendableUnspentOutputs] object from a given [UnspentOutputs] object,
+     * Returns a [SpendableUnspentOutputs] object from a given [Utxo] object,
      * given the payment amount and the current fee per kB. This method selects the minimum number
      * of inputs necessary to allow a successful payment by selecting from the largest inputs
      * first.
      *
-     * @param unspentCoins The addresses' [UnspentOutputs]
+     * @param unspentCoins The addresses' [Utxo]
+     * @param targetOutputType Destination output type
+     * @param changeOutputType Change output type
      * @param paymentAmount The amount you wish to send, as a [CryptoValue]
      * @param feePerKb The current fee per kB, as a [BigInteger]
      * an extra input and therefore affects the transaction fee.
@@ -171,39 +160,46 @@ class SendDataManager(
      * for the given inputs
      */
     fun getSpendableCoins(
-        unspentCoins: UnspentOutputs,
+        unspentCoins: List<Utxo>,
+        targetOutputType: OutputType,
+        changeOutputType: OutputType,
         paymentAmount: CryptoValue,
         feePerKb: CryptoValue
     ): SpendableUnspentOutputs = paymentService.getSpendableCoins(
         unspentCoins,
+        targetOutputType,
+        changeOutputType,
         paymentAmount.toBigInteger(),
         feePerKb.toBigInteger(),
         paymentAmount.currency == CryptoCurrency.BCH
     )
 
     /**
-     * Calculates the total amount of bitcoin or bitcoin cash that can be swept from an [UnspentOutputs]
+     * Calculates the total amount of bitcoin or bitcoin cash that can be swept from an [Utxo]
      * object and returns the amount that can be recovered, accounting for fees
      *
      * @param cryptoCurrency The currency for which you wish to calculate the max available.
-     * @param unspentCoins An [UnspentOutputs] object that you wish to sweep
+     * @param unspentCoins An [Utxo] object that you wish to sweep
+     * @param targetOutputType Destination output type
      * @param feePerKb The current fee per kB on the network
      * @return the sweepable amount as a CryptoValue
      */
     fun getMaximumAvailable(
         cryptoCurrency: CryptoCurrency,
-        unspentCoins: UnspentOutputs,
+        unspentCoins: List<Utxo>,
+        targetOutputType: OutputType,
         feePerKb: CryptoValue
     ): MaxAvailable {
         val available = paymentService.getMaximumAvailable(
             unspentCoins,
+            targetOutputType,
             feePerKb.toBigInteger(),
             cryptoCurrency == CryptoCurrency.BCH
         )
 
         return MaxAvailable(
-            maxSpendable = CryptoValue.fromMinor(cryptoCurrency, available.left),
-            forForMax = CryptoValue.fromMinor(cryptoCurrency, available.right)
+            maxSpendable = CryptoValue.fromMinor(cryptoCurrency, available.first),
+            feeForMax = CryptoValue.fromMinor(cryptoCurrency, available.second)
         )
     }
 
@@ -212,32 +208,33 @@ class SendDataManager(
      * transaction.
      *
      * @param inputs The number of inputs
-     * @param outputs The number of outputs
+     * @param outputs List of output types (P2PKH, P2WPKH)
      * @param absoluteFee The absolute fee as a [BigInteger]
      * @return True if the fee is adequate, false if not
      */
-    fun isAdequateFee(inputs: Int, outputs: Int, absoluteFee: BigInteger): Boolean =
+    fun isAdequateFee(inputs: List<Utxo>, outputs: List<OutputType>, absoluteFee: BigInteger): Boolean =
         paymentService.isAdequateFee(inputs, outputs, absoluteFee)
 
     /**
      * Returns the estimated size of the transaction in kB.
      *
      * @param inputs The number of inputs
-     * @param outputs The number of outputs
+     * @param outputs List of output types (P2PKH, P2WPKH)
      * @return The estimated size of the transaction in kB
      */
-    fun estimateSize(inputs: Int, outputs: Int): Int = paymentService.estimateSize(inputs, outputs)
+    fun estimateSize(inputs: List<Utxo>, outputs: List<OutputType>): Double =
+        paymentService.estimateSize(inputs, outputs)
 
     /**
      * Returns an estimated absolute fee in satoshis (as a [BigInteger] for a given number of
      * inputs and outputs.
      *
      * @param inputs The number of inputs
-     * @param outputs The number of outputs
+     * @param outputs List of output types (P2PKH, P2WPKH)
      * @param feePerKb The current fee per kB om the network
      * @return A [BigInteger] representing the absolute fee
      */
-    fun estimatedFee(inputs: Int, outputs: Int, feePerKb: BigInteger): BigInteger =
+    fun estimatedFee(inputs: List<Utxo>, outputs: List<OutputType>, feePerKb: BigInteger): BigInteger =
         paymentService.estimateFee(inputs, outputs, feePerKb)
 
     private fun Observable<String>.logLastTx(): Observable<String> =

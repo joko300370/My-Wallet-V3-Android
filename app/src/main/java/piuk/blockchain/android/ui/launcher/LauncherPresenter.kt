@@ -5,9 +5,9 @@ import android.content.Intent
 import com.blockchain.logging.CrashLogger
 import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.wallet.api.Environment
-import com.blockchain.notifications.analytics.AnalyticsEvents
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.exceptions.HDWalletException
 import info.blockchain.wallet.exceptions.InvalidCredentialsException
@@ -18,6 +18,8 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.R
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.identity.Feature
 import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.sdd.SDDAnalytics
@@ -27,8 +29,6 @@ import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
-import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.androidcore.data.metadata.MetadataInitException
 import timber.log.Timber
 
@@ -68,10 +68,7 @@ class LauncherPresenter(
         }
 
         // Store incoming Contacts URI if needed
-        if (action != null && Intent.ACTION_VIEW == action && intentData != null && intentData.contains(
-                "blockchain"
-            )
-        ) {
+        if (action != null && Intent.ACTION_VIEW == action && intentData?.contains("blockchain") == true) {
             prefs.setValue(PersistentPrefs.KEY_METADATA_URI, intentData)
         }
 
@@ -90,17 +87,15 @@ class LauncherPresenter(
 
         when {
             // No GUID and no backup? Treat as new installation
-            prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, "").isEmpty() && !hasBackup -> view.onNoGuid()
+            prefs.walletGuid.isEmpty() && !hasBackup -> view.onNoGuid()
             // No GUID but a backup. Show PIN entry page to populate other values
-            prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, "").isEmpty() && hasBackup -> view.onRequestPin()
+            prefs.walletGuid.isEmpty() && hasBackup -> view.onRequestPin()
             // User has logged out recently. Show password reentry page
             hasLoggedOut -> view.onReEnterPassword()
             // No PIN ID? Treat as installed app without confirmed PIN
             pin.isEmpty() -> view.onRequestPin()
             // Installed app, check sanity
             !appUtil.isSane -> view.onCorruptPayload()
-            // Legacy app has not been prompted for upgrade
-            isPinValidated && upgradeNeeded() -> promptUpgrade()
             // App has been PIN validated
             isPinValidated || accessState.isLoggedIn -> initSettings()
             // Something odd has happened, re-request PIN
@@ -108,20 +103,8 @@ class LauncherPresenter(
         }
     }
 
-    private fun upgradeNeeded(): Boolean =
-        payloadDataManager.wallet?.isUpgraded == false
-
     fun clearCredentialsAndRestart() =
         appUtil.clearCredentialsAndRestart(LauncherActivity::class.java)
-
-    private fun promptUpgrade() {
-        accessState.isLoggedIn = true
-        view.onRequestUpgrade()
-    }
-
-    fun clearLoginState() {
-        accessState.logout()
-    }
 
     /**
      * Init of the [SettingsDataManager] must complete here so that we can access the [Settings]
@@ -221,7 +204,9 @@ class LauncherPresenter(
                     },
                     onComplete = {
                         view.updateProgressVisibility(false)
-                        appUtil.restartApp(piuk.blockchain.android.ui.launcher.LauncherActivity::class.java)
+                        appUtil.restartAppWithVerifiedPin(
+                            piuk.blockchain.android.ui.launcher.LauncherActivity::class.java
+                        )
                     }
                 )
         }

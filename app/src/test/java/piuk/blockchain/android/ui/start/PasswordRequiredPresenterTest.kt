@@ -30,7 +30,7 @@ class PasswordRequiredPresenterTest : RxTest() {
 
     @Before
     fun setUp() {
-        whenever(prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, "")).thenReturn(GUID)
+        whenever(prefs.walletGuid).thenReturn(GUID)
 
         whenever(payloadDataManager.wallet).thenReturn(wallet)
         whenever(payloadDataManager.wallet!!.sharedKey).thenReturn("shared_key")
@@ -50,7 +50,7 @@ class PasswordRequiredPresenterTest : RxTest() {
     @Test
     fun onContinueClickedNoPassword() {
         // Arrange
-        whenever(prefs.getValue(PersistentPrefs.KEY_WALLET_GUID, "")).thenReturn("")
+        whenever(prefs.walletGuid).thenReturn("")
 
         // Act
         subject.onContinueClicked("")

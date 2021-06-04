@@ -14,6 +14,7 @@ import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxSourceState
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.androidcore.data.erc20.FeedErc20Transfer
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -31,8 +32,9 @@ class Erc20NonCustodialAccount(
     override val label: String,
     override val exchangeRates: ExchangeRateDataManager,
     private val walletPreferences: WalletStatus,
-    private val custodialWalletManager: CustodialWalletManager
-) : CryptoNonCustodialAccount(payloadManager, asset, custodialWalletManager) {
+    private val custodialWalletManager: CustodialWalletManager,
+    identity: UserIdentity
+) : CryptoNonCustodialAccount(payloadManager, asset, custodialWalletManager, identity) {
 
     private val hasFunds = AtomicBoolean(false)
 

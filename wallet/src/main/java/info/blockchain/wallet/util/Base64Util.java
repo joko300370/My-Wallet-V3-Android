@@ -2,6 +2,8 @@ package info.blockchain.wallet.util;
 
 import com.lambdaworks.codec.Base64;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+
 import javax.annotation.Nonnull;
 
 public final class Base64Util {
@@ -48,11 +50,6 @@ public final class Base64Util {
     }
 
     private static String newUtf8String(final byte[] bytes) {
-        try {
-            return bytes == null ? null : new String(bytes, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return bytes == null ? null : new String(bytes, StandardCharsets.UTF_8);
     }
 }

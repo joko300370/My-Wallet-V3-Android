@@ -33,8 +33,10 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.biometrics.BiometricsController
+import piuk.blockchain.android.scan.QrScanResultProcessor
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.thepit.PitLinkingState
+import piuk.blockchain.android.ui.auth.newlogin.SecureChannelManager
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
 import piuk.blockchain.android.ui.tiers
 import piuk.blockchain.androidcore.data.access.AccessState
@@ -79,6 +81,8 @@ class SettingsPresenterTest {
     private val pitLinking: PitLinking = mock()
     private val pitLinkState: PitLinkingState = mock()
     private val ratingPrefs: RatingPrefs = mock()
+    private val qrProcessor: QrScanResultProcessor = mock()
+    private val secureChannelManager: SecureChannelManager = mock()
 
     private val featureFlag: FeatureFlag = mock()
 
@@ -104,7 +108,9 @@ class SettingsPresenterTest {
             pitLinking = pitLinking,
             analytics = analytics,
             biometricsController = biometricsController,
-            ratingPrefs = ratingPrefs
+            ratingPrefs = ratingPrefs,
+            qrProcessor = qrProcessor,
+            secureChannelManager = secureChannelManager
         )
         subject.initView(activity)
         whenever(prefsUtil.selectedFiatCurrency).thenReturn("USD")
@@ -564,7 +570,7 @@ class SettingsPresenterTest {
         // Act
         subject.pinCodeValidatedForChange()
         // Assert
-        verify(prefsUtil).removeValue(PersistentPrefs.KEY_PIN_FAILS)
+        verify(prefsUtil).pinFails = 0
         verify(prefsUtil).pinId = ""
         verify(activity).goToPinEntryPage()
         verifyNoMoreInteractions(activity)

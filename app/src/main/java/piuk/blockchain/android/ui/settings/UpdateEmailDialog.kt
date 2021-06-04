@@ -6,16 +6,17 @@ import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
 import androidx.appcompat.widget.AppCompatEditText
-import info.blockchain.wallet.util.FormatsUtil
 import piuk.blockchain.android.R
 import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.util.FormatChecker
 import piuk.blockchain.android.util.ViewUtils
 
 internal fun showUpdateEmailDialog(
     activity: Context,
     settingsPresenter: SettingsPresenter,
     currentEmail: String,
-    isEmailVerified: Boolean
+    isEmailVerified: Boolean,
+    formatChecker: FormatChecker
 ) {
     val editText = AppCompatEditText(activity)
         .apply {
@@ -31,7 +32,7 @@ internal fun showUpdateEmailDialog(
         .setCancelable(false)
         .setPositiveButton(R.string.update) { _, _ ->
             val newEmail = editText.text.toString()
-            if (!FormatsUtil.isValidEmailAddress(newEmail)) {
+            if (!formatChecker.isValidEmailAddress(newEmail)) {
                 ToastCustom.makeText(
                     activity,
                     activity.getString(R.string.invalid_email),
@@ -62,7 +63,7 @@ internal fun showUpdateEmailDialog(
         override fun afterTextChanged(s: Editable) {
             val email = s.toString()
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled =
-                email != currentEmail && FormatsUtil.isValidEmailAddress(email)
+                email != currentEmail && formatChecker.isValidEmailAddress(email)
         }
 
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}

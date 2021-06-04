@@ -5,11 +5,12 @@ import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
+import info.blockchain.wallet.bch.BchMainNetParams
+import info.blockchain.wallet.bch.CashAddress
 import info.blockchain.wallet.coin.GenericMetadataAccount
 import io.reactivex.Completable
 import io.reactivex.Single
-import org.bitcoinj.core.Address
-import org.bitcoinj.core.NetworkParameters
+import org.bitcoinj.core.LegacyAddress
 import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.ReceiveAddress
@@ -18,6 +19,7 @@ import piuk.blockchain.android.coincore.impl.AccountRefreshTrigger
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.transactionFetchCount
 import piuk.blockchain.android.coincore.impl.transactionFetchOffset
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
@@ -33,14 +35,14 @@ internal class BchCryptoWalletAccount private constructor(
     // Used to lookup the account in payloadDataManager to fetch receive address
     private val addressIndex: Int,
     override val exchangeRates: ExchangeRateDataManager,
-    private val networkParams: NetworkParameters,
     private val feeDataManager: FeeDataManager,
     private val sendDataManager: SendDataManager,
     private val internalAccount: GenericMetadataAccount,
     private val walletPreferences: WalletStatus,
     private val custodialWalletManager: CustodialWalletManager,
-    private val refreshTrigger: AccountRefreshTrigger
-) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BCH, custodialWalletManager) {
+    private val refreshTrigger: AccountRefreshTrigger,
+    identity: UserIdentity
+) : CryptoNonCustodialAccount(payloadManager, CryptoCurrency.BCH, custodialWalletManager, identity) {
 
     private val hasFunds = AtomicBoolean(false)
 
@@ -57,10 +59,10 @@ internal class BchCryptoWalletAccount private constructor(
         get() = hasFunds.get()
 
     override val accountBalance: Single<Money>
-        get() = bchManager.getBalance(xpubAddress)
+        get() = bchManager.getBalance(internalAccount.xpubs())
             .map { CryptoValue.fromMinor(CryptoCurrency.BCH, it) }
             .doOnSuccess {
-                hasFunds.set(it > CryptoValue.ZeroBch)
+                hasFunds.set(it > CryptoValue.zero(CryptoCurrency.BCH))
             }
             .map { it }
 
@@ -71,8 +73,9 @@ internal class BchCryptoWalletAccount private constructor(
         get() = bchManager.getNextReceiveAddress(
             addressIndex
         ).map {
-            val address = Address.fromBase58(networkParams, it)
-            address.toCashAddress()
+            val networkParams = BchMainNetParams.get()
+            val address = LegacyAddress.fromBase58(networkParams, it)
+            CashAddress.fromLegacyAddress(address)
         }.singleOrError()
             .map {
                 BchAddress(address_ = it, label = label)
@@ -88,7 +91,8 @@ internal class BchCryptoWalletAccount private constructor(
                 BchActivitySummaryItem(
                     it,
                     exchangeRates,
-                    account = this
+                    account = this,
+                    payloadDataManager = payloadDataManager
                 )
             }.flatMap {
                 appendTradeActivity(custodialWalletManager, asset, it)
@@ -97,7 +101,6 @@ internal class BchCryptoWalletAccount private constructor(
     override fun createTxEngine(): TxEngine =
         BchOnChainTxEngine(
             feeManager = feeDataManager,
-            networkParams = networkParams,
             sendDataManager = sendDataManager,
             bchDataManager = bchManager,
             payloadDataManager = payloadDataManager,
@@ -145,7 +148,7 @@ internal class BchCryptoWalletAccount private constructor(
     }
 
     override val xpubAddress: String
-        get() = internalAccount.xpub
+        get() = internalAccount.xpubs().default.address
 
     override fun matches(other: CryptoAccount): Boolean =
         other is BchCryptoWalletAccount && other.xpubAddress == xpubAddress
@@ -157,6 +160,9 @@ internal class BchCryptoWalletAccount private constructor(
         refreshTrigger.forceAccountsRefresh()
     }
 
+    override fun doesAddressBelongToWallet(address: String): Boolean =
+        payloadDataManager.isOwnHDAddress(address)
+
     companion object {
         fun createBchAccount(
             payloadManager: PayloadDataManager,
@@ -164,24 +170,24 @@ internal class BchCryptoWalletAccount private constructor(
             bchManager: BchDataManager,
             addressIndex: Int,
             exchangeRates: ExchangeRateDataManager,
-            networkParams: NetworkParameters,
             feeDataManager: FeeDataManager,
             sendDataManager: SendDataManager,
             walletPreferences: WalletStatus,
             custodialWalletManager: CustodialWalletManager,
-            refreshTrigger: AccountRefreshTrigger
+            refreshTrigger: AccountRefreshTrigger,
+            identity: UserIdentity
         ) = BchCryptoWalletAccount(
             payloadManager = payloadManager,
             bchManager = bchManager,
             addressIndex = addressIndex,
             exchangeRates = exchangeRates,
-            networkParams = networkParams,
             feeDataManager = feeDataManager,
             sendDataManager = sendDataManager,
             internalAccount = jsonAccount,
             walletPreferences = walletPreferences,
             custodialWalletManager = custodialWalletManager,
-            refreshTrigger = refreshTrigger
+            refreshTrigger = refreshTrigger,
+            identity = identity
         )
     }
 }

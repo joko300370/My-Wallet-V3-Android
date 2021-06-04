@@ -7,5 +7,6 @@ enum class InterestAnalytics(
     INTEREST_ANNOUNCEMENT_CTA("earn_banner_clicked"),
     INTEREST_DASHBOARD_KYC("earn_verify_identity_clicked"),
     INTEREST_DASHBOARD_ACTION("earn_interest_clicked"),
-    INTEREST_SUMMARY_DEPOSIT_CTA("earn_deposit_clicked")
+    INTEREST_SUMMARY_DEPOSIT_CTA("earn_deposit_clicked"),
+    INTEREST_SUMMARY_WITHDRAW_CTA("earn_withdraw_clicked")
 }

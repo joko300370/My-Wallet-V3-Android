@@ -1,5 +1,7 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
+import com.blockchain.nabu.models.data.RecurringBuy
+import com.blockchain.nabu.models.data.RecurringBuyState
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.prices.data.PriceDatum
 import piuk.blockchain.android.coincore.AssetAction
@@ -14,8 +16,7 @@ sealed class AssetDetailsIntent : MviIntent<AssetDetailsState>
 class ShowAssetActionsIntent(
     val account: BlockchainAccount
 ) : AssetDetailsIntent() {
-    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
-        oldState
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState = oldState
 }
 
 class AccountActionsLoaded(
@@ -28,7 +29,7 @@ class AccountActionsLoaded(
             errorState = AssetDetailsError.NONE,
             actions = actions,
             assetDetailsCurrentStep = AssetDetailsStep.ASSET_ACTIONS
-        )
+        ).updateBackstack(oldState)
 }
 
 class LoadAsset(
@@ -39,18 +40,6 @@ class LoadAsset(
             asset = asset,
             assetDisplayMap = mapOf()
         )
-}
-
-object LoadAssetDisplayDetails : AssetDetailsIntent() {
-    override fun reduce(oldState: AssetDetailsState): AssetDetailsState = oldState
-}
-
-object LoadAssetFiatValue : AssetDetailsIntent() {
-    override fun reduce(oldState: AssetDetailsState): AssetDetailsState = oldState
-}
-
-object LoadHistoricPrices : AssetDetailsIntent() {
-    override fun reduce(oldState: AssetDetailsState): AssetDetailsState = oldState
 }
 
 class UpdateTimeSpan(
@@ -71,7 +60,7 @@ object SelectAccount : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(
             assetDetailsCurrentStep = AssetDetailsStep.SELECT_ACCOUNT
-        )
+        ).updateBackstack(oldState)
 }
 
 object ChartLoading : AssetDetailsIntent() {
@@ -126,6 +115,20 @@ object AssetExchangeRateFailed : AssetDetailsIntent() {
         )
 }
 
+class RecurringBuyDataLoaded(private val items: Map<String, RecurringBuy>) : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(
+            recurringBuys = items
+        )
+}
+
+object RecurringBuyDataFailed : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(
+            errorState = AssetDetailsError.NO_RECURRING_BUYS
+        )
+}
+
 object ShowCustodyIntroSheetIntent : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(assetDetailsCurrentStep = AssetDetailsStep.CUSTODY_INTRO_SHEET)
@@ -133,7 +136,7 @@ object ShowCustodyIntroSheetIntent : AssetDetailsIntent() {
 
 object ShowAssetDetailsIntent : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
-        oldState.copy(assetDetailsCurrentStep = AssetDetailsStep.ASSET_DETAILS)
+        oldState.copy(assetDetailsCurrentStep = AssetDetailsStep.ASSET_DETAILS).updateBackstack(oldState)
 }
 
 object CustodialSheetFinished : AssetDetailsIntent() {
@@ -158,6 +161,18 @@ object ClearActionStates : AssetDetailsIntent() {
         )
 }
 
+object ClearSelectedRecurringBuy : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(
+            errorState = AssetDetailsError.NONE,
+            selectedRecurringBuy = null
+        )
+}
+
+object DeleteRecurringBuy : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState = oldState
+}
+
 object ShowInterestDashboard : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
         oldState.copy(navigateToInterestDashboard = true)
@@ -166,21 +181,53 @@ object ShowInterestDashboard : AssetDetailsIntent() {
 class ShowRelevantAssetDetailsSheet(
     val cryptoCurrency: CryptoCurrency
 ) : AssetDetailsIntent() {
-    override fun reduce(oldState: AssetDetailsState): AssetDetailsState = oldState
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState = oldState.updateBackstack(oldState)
+}
+
+class ShowRecurringBuySheet(private val recurringBuy: RecurringBuy) : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(
+            assetDetailsCurrentStep = AssetDetailsStep.RECURRING_BUY_DETAILS,
+            selectedRecurringBuy = recurringBuy
+        ).updateBackstack(oldState)
+}
+
+object UpdateRecurringBuy : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(
+            selectedRecurringBuy = oldState.selectedRecurringBuy?.copy(state = RecurringBuyState.NOT_ACTIVE)
+        )
+}
+
+object UpdateRecurringBuyError : AssetDetailsIntent() {
+    override fun reduce(oldState: AssetDetailsState): AssetDetailsState =
+        oldState.copy(
+            errorState = AssetDetailsError.RECURRING_BUY_DELETE
+        )
 }
 
 object ReturnToPreviousStep : AssetDetailsIntent() {
     override fun reduce(oldState: AssetDetailsState): AssetDetailsState {
-        val steps = AssetDetailsStep.values()
-        val currentStep = oldState.assetDetailsCurrentStep.ordinal
-        if (currentStep == 0) {
-            throw IllegalStateException("Cannot go back")
-        }
-        val previousStep = steps[currentStep - 1]
-
+        val stack = oldState.stepsBackStack
+        require(stack.isNotEmpty())
+        val previousStep = stack.pop()
         return oldState.copy(
+            stepsBackStack = stack,
+            assetDetailsCurrentStep = previousStep,
             hostAction = null,
-            assetDetailsCurrentStep = previousStep
+            errorState = AssetDetailsError.NONE
         )
     }
 }
+
+fun AssetDetailsState.updateBackstack(oldState: AssetDetailsState) =
+    if (oldState.assetDetailsCurrentStep != this.assetDetailsCurrentStep &&
+        oldState.assetDetailsCurrentStep.addToBackStack
+    ) {
+        val updatedStack = oldState.stepsBackStack
+        updatedStack.push(oldState.assetDetailsCurrentStep)
+
+        this.copy(stepsBackStack = updatedStack)
+    } else {
+        this
+    }

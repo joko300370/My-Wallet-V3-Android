@@ -16,7 +16,6 @@ import com.blockchain.serialization.BigIntegerAdapter
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.squareup.moshi.Moshi
-import io.reactivex.schedulers.Schedulers
 import okhttp3.CertificatePinner
 import okhttp3.Interceptor
 import org.koin.dsl.module
@@ -38,8 +37,6 @@ val apiModule = module {
     }
 
     single { JacksonConverterFactory.create(ObjectMapper().registerKotlinModule()) }
-
-    single { RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()) }
 
     single {
         CertificatePinner.Builder()
@@ -66,14 +63,9 @@ val apiModule = module {
      * This instance converts to Kotlin data classes ONLY; it will break if used to parse data models
      * written with Java + Jackson.
      */
-
-    /**
-     * This instance converts to Kotlin data classes ONLY; it will break if used to parse data models
-     * written with Java + Jackson.
-     */
     single(moshiExplorerRetrofit) {
         Retrofit.Builder()
-            .baseUrl(get<EnvironmentUrls>().explorerUrl)
+            .baseUrl(getProperty<String>("explorer-api"))
             .client(get())
             .addConverterFactory(get<MoshiConverterFactory>())
             .addCallAdapterFactory(get<RxJava2CallAdapterFactory>())
@@ -109,7 +101,7 @@ val apiModule = module {
 
     single(apiRetrofit) {
         Retrofit.Builder()
-            .baseUrl(get<EnvironmentUrls>().apiUrl)
+            .baseUrl(getProperty<String>("blockchain-api"))
             .client(get())
             .addConverterFactory(get<JacksonConverterFactory>())
             .addCallAdapterFactory(get<RxJava2CallAdapterFactory>())
@@ -118,7 +110,7 @@ val apiModule = module {
 
     single(explorerRetrofit) {
         Retrofit.Builder()
-            .baseUrl(get<EnvironmentUrls>().explorerUrl)
+            .baseUrl(getProperty<String>("explorer-api"))
             .client(get())
             .addConverterFactory(get<JacksonConverterFactory>())
             .addCallAdapterFactory(get<RxJava2CallAdapterFactory>())

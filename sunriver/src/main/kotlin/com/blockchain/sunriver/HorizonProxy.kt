@@ -265,10 +265,10 @@ private val AccountResponse?.balance: CryptoValue
         this?.balances?.firstOrNull {
             it.assetType == "native" && it.assetCode == null
         }?.balance?.let { CryptoValue.fromMajor(CryptoCurrency.XLM, it.toBigDecimal()) }
-            ?: CryptoValue.ZeroXlm
+            ?: CryptoValue.zero(CryptoCurrency.XLM)
 
 private fun AccountResponse?.minBalance(minReserve: CryptoValue): CryptoValue =
-    this?.let { minBalance(minReserve, subentryCount) } ?: CryptoValue.ZeroXlm
+    this?.let { minBalance(minReserve, subentryCount) } ?: CryptoValue.zero(CryptoCurrency.XLM)
 
 private fun minBalance(minReserve: CryptoValue, subentryCount: Int) =
     CryptoValue.fromMajor(CryptoCurrency.XLM, (2 + subentryCount).toBigDecimal() * minReserve.toBigDecimal())

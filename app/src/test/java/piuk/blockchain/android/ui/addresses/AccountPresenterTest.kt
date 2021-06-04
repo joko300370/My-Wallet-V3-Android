@@ -189,7 +189,7 @@ class AccountPresenterTest {
         // Arrange
         val sendingAccount: BtcCryptoWalletAccount = mock()
 
-        val cryptoValue = CryptoValue.ZeroBtc
+        val cryptoValue = CryptoValue.zero(CryptoCurrency.BTC)
         whenever(sendingAccount.actionableBalance).thenReturn(Single.just(cryptoValue))
 
         // Act

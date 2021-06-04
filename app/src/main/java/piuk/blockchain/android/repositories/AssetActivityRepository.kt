@@ -23,6 +23,7 @@ import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.android.coincore.impl.CryptoInterestAccount
 import piuk.blockchain.androidcore.data.access.AuthEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
+import timber.log.Timber
 
 class AssetActivityRepository(
     private val coincore: Coincore,
@@ -70,6 +71,11 @@ class AssetActivityRepository(
                 } else {
                     filteredList
                 }.sorted()
+            }.map { list ->
+                Timber.d("Activity list size: ${list.size}")
+                val pruned = list.distinct()
+                Timber.d("Activity list pruned size: ${pruned.size}")
+                pruned
             }
     }
 

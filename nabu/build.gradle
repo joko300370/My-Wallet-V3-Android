@@ -25,6 +25,8 @@ android {
     }
 
     compileOptions {
+        coreLibraryDesugaringEnabled true
+
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -33,9 +35,11 @@ android {
         release {
             consumerProguardFiles 'proguard-rules.pro'
             manifestPlaceholders = [PLACES_KEY: buildProperties.secrets['placesReleaseKey'].string]
+            buildConfigString "DEEP_LINK_HOST", buildProperties.secrets['prodDynamicLink']
         }
         debug {
             manifestPlaceholders = [PLACES_KEY: buildProperties.secrets['placesDebugKey'].string]
+            buildConfigString "DEEP_LINK_HOST", buildProperties.secrets['stagingDynamicLink']
         }
     }
 
@@ -65,16 +69,19 @@ dependencies {
     implementation project(':common:interface')
     implementation project(':balance')
     implementation project(':wallet')
+    implementation project(':blockchainApi')
 
     api project(':notifications')
     implementation project(':veriff')
 
+    coreLibraryDesugaring Libraries.desugaring
     implementation Libraries.kotlin
     implementation Libraries.moshiKotlin
     implementation Libraries.retrofitRxMoshiConverter
     implementation Libraries.retrofitRxJavaAdapter
     implementation Libraries.koin
     implementation Libraries.rxKotlin
+    implementation Libraries.kotlinJson
     implementation Libraries.retrofit
     implementation Libraries.cardForm
 
@@ -95,22 +102,3 @@ dependencies {
         ['kotlin-stdlib', 'kotlin-reflect'].each { exclude module: it }
     }
 }
-
-/*
-test {
-    testLogging {
-        events 'skipped', 'failed', 'standardOut', 'standardError'
-    }
-}
-
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = Versions.kotlinJvmTarget
-    }
-}
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = Versions.kotlinJvmTarget
-    }
-}
-*/

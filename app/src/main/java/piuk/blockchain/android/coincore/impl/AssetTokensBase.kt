@@ -1,9 +1,9 @@
 package piuk.blockchain.android.coincore.impl
 
 import androidx.annotation.VisibleForTesting
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
@@ -18,12 +18,13 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
+import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
 import piuk.blockchain.android.coincore.TradingAccount
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.thepit.PitLinking
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.exchangerate.PriceSeries
@@ -47,9 +48,9 @@ internal abstract class CryptoAssetBase(
     protected val custodialManager: CustodialWalletManager,
     private val pitLinking: PitLinking,
     protected val crashLogger: CrashLogger,
-    protected val environmentConfig: EnvironmentConfig,
-    private val eligibilityProvider: EligibilityProvider,
-    protected val offlineAccounts: OfflineAccountUpdater
+    protected val offlineAccounts: OfflineAccountUpdater,
+    protected val identity: UserIdentity,
+    protected val features: InternalFeatureFlagApi
 ) : CryptoAsset, AccountRefreshTrigger {
 
     private val activeAccounts: ActiveAccountList by unsafeLazy {
@@ -135,7 +136,7 @@ internal abstract class CryptoAssetBase(
                             labels.getDefaultInterestWalletLabel(asset),
                             custodialManager,
                             exchangeRates,
-                            environmentConfig
+                            features
                         )
                     )
                 } else {
@@ -153,8 +154,8 @@ internal abstract class CryptoAssetBase(
                     label = labels.getDefaultCustodialWalletLabel(asset),
                     exchangeRates = exchangeRates,
                     custodialWalletManager = custodialManager,
-                    environmentConfig = environmentConfig,
-                    eligibilityProvider = eligibilityProvider
+                    identity = identity,
+                    features = features
                 )
             )
         )
@@ -209,8 +210,7 @@ internal abstract class CryptoAssetBase(
                         asset = asset,
                         label = labels.getDefaultExchangeWalletLabel(),
                         address = address,
-                        exchangeRates = exchangeRates,
-                        environmentConfig = environmentConfig
+                        exchangeRates = exchangeRates
                     )
                 )
             }
@@ -250,7 +250,14 @@ internal abstract class CryptoAssetBase(
         require(account.asset == asset)
 
         return when (account) {
-            is TradingAccount -> getNonCustodialTargets().toSingle(emptyList())
+            is TradingAccount -> Maybe.concat(
+                listOf(
+                    getNonCustodialTargets(),
+                    getInterestTargets()
+                )
+            ).toList()
+                .map { ll -> ll.flatten() }
+                .onErrorReturnItem(emptyList())
             is NonCustodialAccount ->
                 Maybe.concat(
                     listOf(
@@ -262,6 +269,14 @@ internal abstract class CryptoAssetBase(
                 ).toList()
                     .map { ll -> ll.flatten() }
                     .onErrorReturnItem(emptyList())
+            is InterestAccount -> {
+                Maybe.concat(
+                    getCustodialTargets(),
+                    getNonCustodialTargets()
+                ).toList()
+                    .map { ll -> ll.flatten() }
+                    .onErrorReturnItem(emptyList())
+            }
             else -> Single.just(emptyList())
         }
     }

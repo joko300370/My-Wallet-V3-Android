@@ -1,24 +1,31 @@
 package piuk.blockchain.android.simplebuy
 
+import com.blockchain.extensions.exhaustive
 import com.blockchain.logging.CrashLogger
+import com.blockchain.nabu.datamanagers.ApprovalErrorStatus
 import com.blockchain.nabu.datamanagers.BuySellOrder
 import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.datamanagers.RecurringBuyOrder
 import com.blockchain.nabu.datamanagers.UndefinedPaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
-import com.blockchain.nabu.models.data.LinkedBankErrorState
-import com.blockchain.nabu.models.data.LinkedBankState
+import com.blockchain.nabu.models.data.BankPartner.Companion.YAPILY_DEEPLINK_PAYMENT_APPROVAL_URL
+import com.blockchain.nabu.models.data.RecurringBuyState
 import com.blockchain.nabu.models.responses.nabu.NabuApiException
 import com.blockchain.nabu.models.responses.nabu.NabuErrorCodes
 import com.blockchain.nabu.models.responses.simplebuy.EverypayPaymentAttrs
+import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyConfirmationAttributes
 import com.blockchain.preferences.RatingPrefs
 import com.blockchain.preferences.SimpleBuyPrefs
 import com.google.gson.Gson
+import info.blockchain.balance.FiatValue
 import io.reactivex.Completable
 import io.reactivex.Scheduler
 import io.reactivex.disposables.Disposable
+import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.cards.partners.CardActivator
 import piuk.blockchain.android.cards.partners.EverypayCardActivator
+import piuk.blockchain.android.networking.PollResult
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
@@ -63,7 +70,8 @@ class SimpleBuyModel(
                         onSuccess = { process(it) },
                         onError = { process(SimpleBuyIntent.ErrorIntent()) }
                     )
-            is SimpleBuyIntent.CancelOrder -> (previousState.id?.let {
+            is SimpleBuyIntent.CancelOrder,
+            is SimpleBuyIntent.CancelOrderAndResetAuthorisation -> (previousState.id?.let {
                 interactor.cancelOrder(it)
             } ?: Completable.complete())
                 .subscribeBy(
@@ -126,60 +134,6 @@ class SimpleBuyModel(
                     }
                 )
             }
-
-            is SimpleBuyIntent.UpdateAccountProvider -> {
-                interactor.updateAccountProviderId(
-                    linkingId = intent.linkingBankId,
-                    providerAccountId = intent.accountProviderId,
-                    accountId = intent.accountId
-                ).subscribeBy(
-                    onComplete = {
-                        process(SimpleBuyIntent.StartPollingForLinkStatus(intent.linkingBankId))
-                    },
-                    onError = {
-                        process(SimpleBuyIntent.ProviderAccountIdUpdateError)
-                    }
-                )
-            }
-
-            is SimpleBuyIntent.StartPollingForLinkStatus -> {
-                interactor.pollForLinkedBankState(intent.bankId).subscribeBy(
-                    onSuccess = {
-                        when (it.state) {
-                            LinkedBankState.ACTIVE -> {
-                                process(SimpleBuyIntent.LinkedBankStateSuccess(it))
-                            }
-                            LinkedBankState.BLOCKED,
-                            LinkedBankState.UNKNOWN -> {
-                                when (it.errorStatus) {
-                                    LinkedBankErrorState.ACCOUNT_ALREADY_LINKED -> {
-                                        process(SimpleBuyIntent.LinkedBankStateAlreadyLinked)
-                                    }
-                                    LinkedBankErrorState.UNKNOWN -> {
-                                        process(SimpleBuyIntent.LinkedBankStateError)
-                                    }
-                                    LinkedBankErrorState.ACCOUNT_TYPE_UNSUPPORTED -> {
-                                        process(SimpleBuyIntent.LinkedBankStateUnsupportedAccount)
-                                    }
-                                    LinkedBankErrorState.NAMES_MISS_MATCHED -> {
-                                        process(SimpleBuyIntent.LinkedBankStateNamesMissMatch)
-                                    }
-                                    LinkedBankErrorState.NONE -> {
-                                        // do nothing
-                                    }
-                                }
-                            }
-                            LinkedBankState.PENDING -> {
-                                process(SimpleBuyIntent.LinkedBankStateTimeout)
-                            }
-                        }
-                    },
-                    onError = {
-                        process(SimpleBuyIntent.LinkedBankStateError)
-                    }
-                )
-            }
-
             is SimpleBuyIntent.UpdateExchangeRate -> interactor.exchangeRate(intent.currency)
                 .subscribeBy(
                     onSuccess = { process(it) },
@@ -193,7 +147,8 @@ class SimpleBuyModel(
             is SimpleBuyIntent.FetchWithdrawLockTime -> {
                 require(previousState.selectedPaymentMethod != null)
                 interactor.fetchWithdrawLockTime(
-                    previousState.selectedPaymentMethod.paymentMethodType
+                    previousState.selectedPaymentMethod.paymentMethodType,
+                    previousState.fiatCurrency
                 )
                     .subscribeBy(
                         onSuccess = { process(it) },
@@ -206,18 +161,12 @@ class SimpleBuyModel(
                     onError = { process(SimpleBuyIntent.ErrorIntent()) }
                 )
 
-            is SimpleBuyIntent.FetchSuggestedPaymentMethod -> interactor.eligiblePaymentMethods(
-                intent.fiatCurrency,
-                intent.selectedPaymentMethodId
-            )
-                .subscribeBy(
-                    onSuccess = {
-                        process(it)
-                    },
-                    onError = {
-                        process(SimpleBuyIntent.ErrorIntent())
-                    }
-                )
+            is SimpleBuyIntent.FetchSuggestedPaymentMethod ->
+                processGetPaymentMethod(intent.fiatCurrency, intent.selectedPaymentMethodId)
+
+            is SimpleBuyIntent.FetchPaymentDetails ->
+                processGetPaymentMethod(intent.fiatCurrency, intent.selectedPaymentMethodId)
+
             is SimpleBuyIntent.PaymentMethodChangeRequested -> {
                 if (intent.paymentMethod.isEligible && intent.paymentMethod is UndefinedPaymentMethod) {
                     process(SimpleBuyIntent.AddNewPaymentMethodRequested(intent.paymentMethod))
@@ -232,12 +181,33 @@ class SimpleBuyModel(
                         process(SimpleBuyIntent.ErrorIntent())
                     }, {
                         process(SimpleBuyIntent.OrderPriceUpdated(it.price))
-                        if (it.paymentMethodType == PaymentMethodType.PAYMENT_CARD) {
-                            handleCardPayment(it)
+                        if (it.attributes != null) {
+                            handleOrderAttrs(it)
                         } else {
                             pollForOrderStatus()
                         }
                     })
+            is SimpleBuyIntent.GetAuthorisationUrl ->
+                interactor.pollForAuthorisationUrl(intent.orderId)
+                    .subscribeBy(
+                        onSuccess = {
+                            when (it) {
+                                is PollResult.FinalResult -> {
+                                    it.value.attributes?.authorisationUrl?.let { url ->
+                                        handleBankAuthorisationPayment(it.value.paymentMethodId, url)
+                                    }
+                                }
+                                is PollResult.TimeOut -> process(
+                                    SimpleBuyIntent.ErrorIntent(
+                                        ErrorState.BankLinkingTimeout
+                                    )
+                                )
+                                is PollResult.Cancel -> process(SimpleBuyIntent.ErrorIntent())
+                            }
+                        },
+                        onError = {
+                            process(SimpleBuyIntent.ErrorIntent())
+                        })
             is SimpleBuyIntent.UpdatePaymentMethodsAndAddTheFirstEligible -> interactor.eligiblePaymentMethods(
                 intent.fiatCurrency, null
             ).subscribeBy(
@@ -260,8 +230,14 @@ class SimpleBuyModel(
                         updatePersistingCountersForCompletedOrders()
                         process(SimpleBuyIntent.PaymentSucceeded)
                     } else if (it.state == OrderState.AWAITING_FUNDS || it.state == OrderState.PENDING_EXECUTION) {
-                        process(SimpleBuyIntent.CardPaymentPending)
-                    } else process(SimpleBuyIntent.ErrorIntent())
+                        process(SimpleBuyIntent.PaymentPending)
+                    } else {
+                        if (it.approvalErrorStatus != ApprovalErrorStatus.NONE) {
+                            handleApprovalErrorState(it)
+                        } else {
+                            process(SimpleBuyIntent.ErrorIntent())
+                        }
+                    }
                 },
                 onError = {
                     process(SimpleBuyIntent.ErrorIntent())
@@ -281,29 +257,104 @@ class SimpleBuyModel(
                 ratingPrefs.hasSeenRatingDialog = true
                 null
             }
+
             else -> null
         }
 
-    private fun processConfirmOrder(previousState: SimpleBuyState) =
-        interactor.confirmOrder(
-            previousState.id ?: throw IllegalStateException("Order Id not available"),
-            previousState.selectedPaymentMethod?.takeIf { it.isBank() }?.concreteId(),
-            cardActivators.firstOrNull {
-                previousState.selectedPaymentMethod?.partner == it.partner
-            }?.paymentAttributes()
-        )
-            .subscribeBy(
-                onSuccess = {
-                    val orderCreatedSuccessfully = it.state == OrderState.FINISHED
-                    if (orderCreatedSuccessfully) updatePersistingCountersForCompletedOrders()
-                    process(SimpleBuyIntent.OrderCreated(it, shouldShowAppRating(orderCreatedSuccessfully)))
+    private fun handleApprovalErrorState(it: BuySellOrder) {
+        when (it.approvalErrorStatus) {
+            ApprovalErrorStatus.FAILED -> process(
+                SimpleBuyIntent.ErrorIntent(ErrorState.ApprovedBankFailed)
+            )
+            ApprovalErrorStatus.REJECTED -> process(
+                SimpleBuyIntent.ErrorIntent(ErrorState.ApprovedBankRejected)
+            )
+            ApprovalErrorStatus.DECLINED -> process(
+                SimpleBuyIntent.ErrorIntent(ErrorState.ApprovedBankDeclined)
+            )
+            ApprovalErrorStatus.EXPIRED -> process(
+                SimpleBuyIntent.ErrorIntent(ErrorState.ApprovedBankExpired)
+            )
+            ApprovalErrorStatus.UNKNOWN -> process(
+                SimpleBuyIntent.ErrorIntent(ErrorState.ApprovedGenericError)
+            )
+            ApprovalErrorStatus.NONE -> {
+                // do nothing
+            }
+        }.exhaustive
+    }
+
+    private fun processGetPaymentMethod(fiatCurrency: String, selectedPaymentMethodId: String?) =
+        interactor.eligiblePaymentMethods(
+            fiatCurrency,
+            selectedPaymentMethodId
+        ).flatMap { intent ->
+            interactor.getRecurringBuyEligibility()
+                .map { intent to it }
+                .onErrorReturn { intent to emptyList() }
+        }.subscribeBy(
+                onSuccess = { (intent, eligibility) ->
+                    process(SimpleBuyIntent.RecurringBuyEligibilityUpdated(eligibility))
+                    process(intent)
                 },
                 onError = {
-                    processErrors(it)
+                    process(SimpleBuyIntent.ErrorIntent())
                 }
             )
 
-    private fun processErrors(it: Throwable) {
+    private fun handleOrderAttrs(order: BuySellOrder) {
+        order.attributes?.everypay?.let {
+            handleCardPayment(order)
+        } ?: kotlin.run {
+            if (!order.fiat.isOpenBankingCurrency()) {
+                process(SimpleBuyIntent.CheckOrderStatus)
+            } else {
+                order.attributes?.authorisationUrl?.let {
+                    handleBankAuthorisationPayment(order.paymentMethodId, it)
+                } ?: process(SimpleBuyIntent.GetAuthorisationUrl(order.id))
+            }
+        }
+    }
+
+    private fun FiatValue.isOpenBankingCurrency() =
+        this.currencyCode == "EUR" || this.currencyCode == "GBP"
+
+    private fun processConfirmOrder(previousState: SimpleBuyState): Disposable {
+        val isBankPayment = previousState.selectedPaymentMethod?.isBank()
+        return interactor.confirmOrder(
+            previousState.id ?: throw IllegalStateException("Order Id not available"),
+            previousState.selectedPaymentMethod?.takeIf { it.isBank() }?.concreteId(),
+            if (isBankPayment == true) {
+                SimpleBuyConfirmationAttributes(callback = YAPILY_DEEPLINK_PAYMENT_APPROVAL_URL)
+            } else {
+                cardActivators.firstOrNull {
+                    previousState.selectedPaymentMethod?.partner == it.partner
+                }?.paymentAttributes()
+            },
+            isBankPayment
+        ).flatMap { buySellOrder ->
+            interactor.createRecurringBuyOrder(previousState)
+                .map { buySellOrder to it }
+                .onErrorReturn { buySellOrder to RecurringBuyOrder(RecurringBuyState.NOT_ACTIVE) }
+        }.subscribeBy(
+            onSuccess = { (buySellOrder, recurringBuy) ->
+                val orderCreatedSuccessfully = buySellOrder.state == OrderState.FINISHED
+                if (orderCreatedSuccessfully) {
+                    updatePersistingCountersForCompletedOrders()
+                }
+                process(
+                    SimpleBuyIntent.OrderCreated(
+                        buySellOrder, shouldShowAppRating(orderCreatedSuccessfully), recurringBuy.state
+                    )
+                )
+            },
+            onError = {
+                processOrderErrors(it)
+            }
+        )
+    }
+
+    private fun processOrderErrors(it: Throwable) {
         if (it is NabuApiException) {
             when (it.getErrorCode()) {
                 NabuErrorCodes.DailyLimitExceeded -> process(
@@ -356,6 +407,20 @@ class SimpleBuyModel(
         } ?: kotlin.run {
             process(SimpleBuyIntent.ErrorIntent()) // todo handle case of partner not supported
         }
+    }
+
+    private fun handleBankAuthorisationPayment(
+        paymentMethodId: String,
+        authorisationUrl: String
+    ) {
+        disposables += interactor.getLinkedBankInfo(paymentMethodId).subscribeBy(
+            onSuccess = { linkedBank ->
+                process(SimpleBuyIntent.AuthorisePaymentExternalUrl(authorisationUrl, linkedBank))
+            },
+            onError = {
+                process(SimpleBuyIntent.ErrorIntent())
+            }
+        )
     }
 
     override fun onStateUpdate(s: SimpleBuyState) {

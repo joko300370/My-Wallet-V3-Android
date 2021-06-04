@@ -5,28 +5,32 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.api.data.Balance
-import info.blockchain.wallet.exceptions.ApiException
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.ImportedAddress
 import info.blockchain.wallet.payload.data.Wallet
 import org.amshove.kluent.mock
-import org.bitcoinj.core.ECKey
-import org.bitcoinj.params.BitcoinMainNetParams
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import com.blockchain.android.testutils.rxInit
-import java.util.LinkedHashMap
+import info.blockchain.api.ApiException
+import info.blockchain.wallet.keys.SigningKey
+import info.blockchain.wallet.payload.data.XPub
+import info.blockchain.wallet.payload.data.XPubs
+import info.blockchain.wallet.payload.model.Balance
+import io.reactivex.Single
+import org.amshove.kluent.itReturns
 
 @Suppress("IllegalIdentifier")
 class PayloadServiceTest {
 
     private lateinit var subject: PayloadService
     private val mockPayloadManager: PayloadManager = mock(defaultAnswer = RETURNS_DEEP_STUBS)
-    private val networkParameters = BitcoinMainNetParams.get()
+    private val versionController: PayloadVersionController = mock {
+        on { isFullRolloutV4 } itReturns false
+    }
 
     @Suppress("unused")
     @get:Rule
@@ -37,7 +41,7 @@ class PayloadServiceTest {
 
     @Before
     fun setUp() {
-        subject = PayloadService(mockPayloadManager)
+        subject = PayloadService(mockPayloadManager, versionController)
     }
 
     @Test
@@ -47,10 +51,9 @@ class PayloadServiceTest {
         val password = "PASSWORD"
         // Act
         val testObserver =
-            subject.initializeFromPayload(networkParameters, payload, password).test()
+            subject.initializeFromPayload(payload, password).test()
         // Assert
         verify(mockPayloadManager).initializeAndDecryptFromPayload(
-            networkParameters,
             payload,
             password
         )
@@ -59,102 +62,169 @@ class PayloadServiceTest {
     }
 
     @Test
-    fun restoreHdWallet() {
+    fun restoreHdWallet_v3() {
         // Arrange
         val mnemonic = "MNEMONIC"
         val walletName = "WALLET_NAME"
         val email = "EMAIL"
         val password = "PASSWORD"
         val mockWallet: Wallet = mock()
-        whenever(mockPayloadManager.recoverFromMnemonic(mnemonic, walletName, email, password))
+        val v4Enabled = false
+        whenever(mockPayloadManager.recoverFromMnemonic(mnemonic, walletName, email, password, v4Enabled))
             .thenReturn(mockWallet)
+
         // Act
         val testObserver = subject.restoreHdWallet(mnemonic, walletName, email, password).test()
+
         // Assert
-        verify(mockPayloadManager).recoverFromMnemonic(mnemonic, walletName, email, password)
+        verify(mockPayloadManager).recoverFromMnemonic(mnemonic, walletName, email, password, v4Enabled)
         verifyNoMoreInteractions(mockPayloadManager)
         testObserver.assertComplete()
         testObserver.assertValue(mockWallet)
     }
 
     @Test
-    fun createHdWallet() {
+    fun restoreHdWallet_v4() {
+        // Arrange
+        val mnemonic = "MNEMONIC"
+        val walletName = "WALLET_NAME"
+        val email = "EMAIL"
+        val password = "PASSWORD"
+        val mockWallet: Wallet = mock()
+        val v4Enabled = true
+        whenever(versionController.isFullRolloutV4).thenReturn(true)
+        whenever(mockPayloadManager.recoverFromMnemonic(mnemonic, walletName, email, password, v4Enabled))
+            .thenReturn(mockWallet)
+
+        // Act
+        val testObserver = subject.restoreHdWallet(mnemonic, walletName, email, password).test()
+
+        // Assert
+        verify(mockPayloadManager).recoverFromMnemonic(mnemonic, walletName, email, password, v4Enabled)
+        verifyNoMoreInteractions(mockPayloadManager)
+        testObserver.assertComplete()
+        testObserver.assertValue(mockWallet)
+    }
+
+    @Test
+    fun createHdWallet_v3() {
         // Arrange
         val password = "PASSWORD"
         val walletName = "WALLET_NAME"
         val email = "EMAIL"
         val mockWallet: Wallet = mock()
-        whenever(mockPayloadManager.create(walletName, email, password)).thenReturn(mockWallet)
+        val v4Enabled = false
+
+        whenever(mockPayloadManager.create(walletName, email, password, v4Enabled))
+            .thenReturn(mockWallet)
+
         // Act
         val testObserver = subject.createHdWallet(password, walletName, email).test()
+
         // Assert
-        verify(mockPayloadManager).create(walletName, email, password)
+        verify(mockPayloadManager).create(walletName, email, password, v4Enabled)
         verifyNoMoreInteractions(mockPayloadManager)
         testObserver.assertComplete()
         testObserver.assertValue(mockWallet)
     }
 
     @Test
-    fun initializeAndDecrypt() {
+    fun createHdWallet_v4() {
+        // Arrange
+        val password = "PASSWORD"
+        val walletName = "WALLET_NAME"
+        val email = "EMAIL"
+        val mockWallet: Wallet = mock()
+        val v4Enabled = true
+        whenever(versionController.isFullRolloutV4).thenReturn(true)
+        whenever(mockPayloadManager.create(walletName, email, password, v4Enabled)).thenReturn(mockWallet)
+        // Act
+        val testObserver = subject.createHdWallet(password, walletName, email).test()
+        // Assert
+        verify(mockPayloadManager).create(walletName, email, password, v4Enabled)
+        verifyNoMoreInteractions(mockPayloadManager)
+        testObserver.assertComplete()
+        testObserver.assertValue(mockWallet)
+    }
+
+    @Test
+    fun initializeAndDecrypt_v3() {
         // Arrange
         val sharedKey = "SHARED_KEY"
         val guid = "GUID"
         val password = "PASSWORD"
+        val v4Enabled = false
+        whenever(versionController.isV4Enabled(guid, sharedKey))
+            .thenReturn(Single.just(v4Enabled))
+
         // Act
-        val testObserver =
-            subject.initializeAndDecrypt(networkParameters, sharedKey, guid, password).test()
+        val testObserver = subject.initializeAndDecrypt(sharedKey, guid, password)
+            .test()
+
         // Assert
         verify(mockPayloadManager).initializeAndDecrypt(
-            networkParameters,
             sharedKey,
             guid,
-            password
+            password,
+            v4Enabled
         )
         verifyNoMoreInteractions(mockPayloadManager)
         testObserver.assertComplete()
     }
 
     @Test
-    fun handleQrCode() {
+    fun initializeAndDecrypt_v4() {
+        // Arrange
+        val sharedKey = "SHARED_KEY"
+        val guid = "GUID"
+        val password = "PASSWORD"
+        val v4Enabled = true
+        whenever(versionController.isV4Enabled(guid, sharedKey))
+            .thenReturn(Single.just(v4Enabled))
+
+        // Act
+        val testObserver = subject.initializeAndDecrypt(sharedKey, guid, password)
+            .test()
+
+        // Assert
+        verify(mockPayloadManager).initializeAndDecrypt(
+            sharedKey,
+            guid,
+            password,
+            v4Enabled
+        )
+        verifyNoMoreInteractions(mockPayloadManager)
+        testObserver.assertComplete()
+    }
+
+    @Test
+    fun handleQrCode_v3() {
         // Arrange
         val qrString = "QR_STRING"
+        val v4Enabled = false
+
         // Act
-        val testObserver = subject.handleQrCode(networkParameters, qrString).test()
+        val testObserver = subject.handleQrCode(qrString).test()
         // Assert
-        verify(mockPayloadManager).initializeAndDecryptFromQR(networkParameters, qrString)
+        verify(mockPayloadManager).initializeAndDecryptFromQR(qrString, v4Enabled)
         verifyNoMoreInteractions(mockPayloadManager)
         testObserver.assertComplete()
     }
 
     @Test
-    fun `upgradeV2toV3 successful`() {
+    fun handleQrCode_v4() {
         // Arrange
-        val secondPassword = "SECOND_PASSWORD"
-        val defaultAccountName = "DEFAULT_ACCOUNT_NAME"
-        whenever(mockPayloadManager.upgradeV2PayloadToV3(secondPassword, defaultAccountName))
-            .thenReturn(true)
+        val qrString = "QR_STRING"
+        val v4Enabled = true
+        whenever(versionController.isFullRolloutV4).thenReturn(true)
+
         // Act
-        val testObserver = subject.upgradeV2toV3(secondPassword, defaultAccountName).test()
+        val testObserver = subject.handleQrCode(qrString).test()
+
         // Assert
-        verify(mockPayloadManager).upgradeV2PayloadToV3(secondPassword, defaultAccountName)
+        verify(mockPayloadManager).initializeAndDecryptFromQR(qrString, v4Enabled)
         verifyNoMoreInteractions(mockPayloadManager)
         testObserver.assertComplete()
-    }
-
-    @Test
-    fun `upgradeV2toV3 failed`() {
-        // Arrange
-        val secondPassword = "SECOND_PASSWORD"
-        val defaultAccountName = "DEFAULT_ACCOUNT_NAME"
-        whenever(mockPayloadManager.upgradeV2PayloadToV3(secondPassword, defaultAccountName))
-            .thenReturn(false)
-        // Act
-        val testObserver = subject.upgradeV2toV3(secondPassword, defaultAccountName).test()
-        // Assert
-        verify(mockPayloadManager).upgradeV2PayloadToV3(secondPassword, defaultAccountName)
-        verifyNoMoreInteractions(mockPayloadManager)
-        testObserver.assertNotComplete()
-        testObserver.assertError(Throwable::class.java)
     }
 
     @Test
@@ -232,49 +302,25 @@ class PayloadServiceTest {
     }
 
     @Test
-    fun getBalanceOfAddresses() {
-        // Arrange
-        val addresses = listOf("address_one", "address_two", "address_three")
-        val map = mapOf(
-            Pair(
-                "address_one", Balance()
-            ),
-            Pair("address_two", Balance()),
-            Pair("address_three", Balance())
-        )
-        val linkedMap = LinkedHashMap(map)
-        whenever(mockPayloadManager.getBalanceOfBtcAddresses(addresses))
-            .thenReturn(linkedMap)
-        // Act
-        val testObserver = subject.getBalanceOfBtcAddresses(addresses).test()
-        // Assert
-        verify(mockPayloadManager).getBalanceOfBtcAddresses(addresses)
-        verifyNoMoreInteractions(mockPayloadManager)
-        testObserver.assertComplete()
-        testObserver.assertValue(linkedMap)
-    }
-
-    @Test
     fun getBalanceOfBchAddresses() {
         // Arrange
         val addresses = listOf("address_one", "address_two", "address_three")
         val map = mapOf(
-            Pair(
-                "address_one", Balance()
-            ),
-            Pair("address_two", Balance()),
-            Pair("address_three", Balance())
+            Pair("address_one", mock(Balance::class)),
+            Pair("address_two", mock(Balance::class)),
+            Pair("address_three", mock(Balance::class))
         )
-        val linkedMap = LinkedHashMap(map)
-        whenever(mockPayloadManager.getBalanceOfBchAddresses(addresses))
-            .thenReturn(linkedMap)
+
+        val xpubs = addresses.map { XPubs(XPub(it, XPub.Format.LEGACY)) }
+        whenever(mockPayloadManager.getBalanceOfBchAccounts(xpubs))
+            .thenReturn(map)
         // Act
-        val testObserver = subject.getBalanceOfBchAddresses(addresses).test()
+        val testObserver = subject.getBalanceOfBchAccounts(xpubs).test()
         // Assert
-        verify(mockPayloadManager).getBalanceOfBchAddresses(addresses)
+        verify(mockPayloadManager).getBalanceOfBchAccounts(xpubs)
         verifyNoMoreInteractions(mockPayloadManager)
         testObserver.assertComplete()
-        testObserver.assertValue(linkedMap)
+        testObserver.assertValue(map)
     }
 
     @Test
@@ -301,15 +347,14 @@ class PayloadServiceTest {
         val mockAccount: Account = mock()
         whenever(
             mockPayloadManager.addAccount(
-                networkParameters,
                 label,
                 secondPassword
             )
         ).thenReturn(mockAccount)
         // Act
-        val testObserver = subject.createNewAccount(networkParameters, label, secondPassword).test()
+        val testObserver = subject.createNewAccount(label, secondPassword).test()
         // Assert
-        verify(mockPayloadManager).addAccount(networkParameters, label, secondPassword)
+        verify(mockPayloadManager).addAccount(label, secondPassword)
         verifyNoMoreInteractions(mockPayloadManager)
         testObserver.assertComplete()
         testObserver.assertValue(mockAccount)
@@ -318,15 +363,15 @@ class PayloadServiceTest {
     @Test
     fun setKeyForImportedAddress() {
         // Arrange
-        val mockEcKey: ECKey = mock()
+        val mockKey: SigningKey = mock()
         val secondPassword = "SECOND_PASSWORD"
         val mockImportedAddress: ImportedAddress = mock()
-        whenever(mockPayloadManager.setKeyForImportedAddress(mockEcKey, secondPassword))
+        whenever(mockPayloadManager.setKeyForImportedAddress(mockKey, secondPassword))
             .thenReturn(mockImportedAddress)
         // Act
-        val testObserver = subject.setKeyForImportedAddress(mockEcKey, secondPassword).test()
+        val testObserver = subject.setKeyForImportedAddress(mockKey, secondPassword).test()
         // Assert
-        verify(mockPayloadManager).setKeyForImportedAddress(mockEcKey, secondPassword)
+        verify(mockPayloadManager).setKeyForImportedAddress(mockKey, secondPassword)
         verifyNoMoreInteractions(mockPayloadManager)
         testObserver.assertComplete()
         testObserver.assertValue(mockImportedAddress)

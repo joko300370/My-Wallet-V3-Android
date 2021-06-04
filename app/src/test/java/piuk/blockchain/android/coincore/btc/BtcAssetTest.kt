@@ -1,31 +1,32 @@
 package piuk.blockchain.android.coincore.btc
 
 import com.blockchain.android.testutils.rxInit
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
 import com.blockchain.wallet.DefaultLabels
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
+import info.blockchain.wallet.keys.SigningKey
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.ImportedAddress
+import info.blockchain.wallet.payload.data.XPub
+import info.blockchain.wallet.payload.data.XPubs
 import info.blockchain.wallet.util.PrivateKeyFactory
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.amshove.kluent.itReturns
-import org.bitcoinj.core.ECKey
-import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.crypto.BIP38PrivateKey.BadPassphraseException
 import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
+import piuk.blockchain.android.identity.NabuUserIdentity
 import piuk.blockchain.android.thepit.PitLinking
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
@@ -52,13 +53,10 @@ class BtcAssetTest {
     private val labels: DefaultLabels = mock()
     private val pitLinking: PitLinking = mock()
     private val crashLogger: CrashLogger = mock()
-    private val btcParams: NetworkParameters = mock()
-    private val environmentConfig: EnvironmentConfig = mock {
-        on { bitcoinNetworkParameters } itReturns btcParams
-    }
     private val walletPreferences: WalletStatus = mock()
-    private val eligibilityProvider: EligibilityProvider = mock()
+    private val identity: NabuUserIdentity = mock()
     private val offlineCache: OfflineAccountUpdater = mock()
+    private val features: InternalFeatureFlagApi = mock()
 
     private val subject = BtcAsset(
         payloadManager = payloadManager,
@@ -72,16 +70,16 @@ class BtcAssetTest {
         labels = labels,
         pitLinking = pitLinking,
         crashLogger = crashLogger,
-        environmentConfig = environmentConfig,
         offlineAccounts = offlineCache,
         walletPreferences = walletPreferences,
-        eligibilityProvider = eligibilityProvider
+        identity = identity,
+        features = features
     )
 
     @Test
     fun createAccountSuccessNoSecondPassword() {
         val mockInternalAccount: Account = mock {
-            on { xpub } itReturns NEW_XPUB
+            on { xpubs } itReturns XPubs(listOf(XPub(NEW_XPUB, XPub.Format.LEGACY)))
         }
 
         whenever(payloadManager.createNewAccount(TEST_LABEL, null)).thenReturn(
@@ -115,8 +113,8 @@ class BtcAssetTest {
 
     @Test
     fun importNonBip38Success() {
-        val ecKey: ECKey = mock {
-            on { hasPrivKey() } itReturns true
+        val ecKey: SigningKey = mock {
+            on { hasPrivKey } itReturns true
         }
 
         val internalAccount: ImportedAddress = mock {
@@ -141,8 +139,8 @@ class BtcAssetTest {
 
     @Test
     fun importNonBip38NoPrivateKey() {
-        val ecKey: ECKey = mock {
-            on { hasPrivKey() } itReturns true
+        val ecKey: SigningKey = mock {
+            on { hasPrivKey } itReturns true
         }
 
         whenever(payloadManager.getKeyFromImportedData(NON_BIP38_FORMAT, KEY_DATA))
@@ -169,8 +167,8 @@ class BtcAssetTest {
 
     @Test
     fun importBip38Success() {
-        val ecKey: ECKey = mock {
-            on { hasPrivKey() } itReturns true
+        val ecKey: SigningKey = mock {
+            on { hasPrivKey } itReturns true
         }
 
         val internalAccount: ImportedAddress = mock {

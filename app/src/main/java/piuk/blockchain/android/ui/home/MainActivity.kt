@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
@@ -16,25 +17,30 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem
+import com.blockchain.extensions.exhaustive
+import com.blockchain.koin.mwaFeatureFlag
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.NotificationsUtil
 import com.blockchain.notifications.analytics.AnalyticsEvents
+import com.blockchain.notifications.analytics.LaunchOrigin
 import com.blockchain.notifications.analytics.NotificationAppOpened
 import com.blockchain.notifications.analytics.RequestAnalyticsEvents
 import com.blockchain.notifications.analytics.SendAnalytics
-import com.blockchain.notifications.analytics.SwapAnalyticsEvents
 import com.blockchain.notifications.analytics.TransactionsAnalyticsEvents
 import com.blockchain.notifications.analytics.activityShown
+import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_SUPPORT_PORTAL
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.snackbar.Snackbar
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.FiatValue
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar_general.*
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
@@ -45,23 +51,36 @@ import piuk.blockchain.android.coincore.CryptoTarget
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.android.scan.QrScanResultProcessor
+import piuk.blockchain.android.simplebuy.BuySellClicked
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
+import piuk.blockchain.android.simplebuy.SimpleBuyState
+import piuk.blockchain.android.simplebuy.SmallSimpleBuyNavigator
 import piuk.blockchain.android.ui.activity.ActivitiesFragment
 import piuk.blockchain.android.ui.addresses.AccountActivity
 import piuk.blockchain.android.ui.airdrops.AirdropCentreActivity
 import piuk.blockchain.android.ui.backup.BackupWalletActivity
 import piuk.blockchain.android.ui.base.MvpActivity
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.dashboard.DashboardFragment
 import piuk.blockchain.android.ui.home.analytics.SideNavEvent
 import piuk.blockchain.android.ui.interest.InterestDashboardActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.kyc.status.KycStatusActivity
 import piuk.blockchain.android.ui.launcher.LauncherActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthActivity.Companion.LINKED_BANK_CURRENCY
+import piuk.blockchain.android.ui.linkbank.BankAuthActivity.Companion.LINKED_BANK_ID_KEY
+import piuk.blockchain.android.ui.linkbank.BankAuthSource
+import piuk.blockchain.android.ui.linkbank.BankLinkingInfo
+import piuk.blockchain.android.ui.linkbank.FiatTransactionState
+import piuk.blockchain.android.ui.linkbank.yapily.FiatTransactionBottomSheet
 import piuk.blockchain.android.ui.onboarding.OnboardingActivity
-import piuk.blockchain.android.ui.pairingcode.PairingCodeActivity
 import piuk.blockchain.android.ui.scan.QrExpected
 import piuk.blockchain.android.ui.scan.QrScanActivity
 import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
+import piuk.blockchain.android.ui.auth.newlogin.AuthNewLoginSheet
+import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.pairingcode.PairingBottomSheet
 import piuk.blockchain.android.ui.sell.BuySellFragment
 import piuk.blockchain.android.ui.settings.SettingsActivity
 import piuk.blockchain.android.ui.swap.SwapFragment
@@ -72,12 +91,16 @@ import piuk.blockchain.android.ui.tour.IntroTourHost
 import piuk.blockchain.android.ui.tour.IntroTourStep
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.ui.transactionflow.analytics.SwapAnalyticsEvents
 import piuk.blockchain.android.ui.transfer.TransferFragment
+import piuk.blockchain.android.ui.transfer.analytics.TransferAnalyticsEvent
+import piuk.blockchain.android.ui.transfer.receive.ReceiveSheet
+import piuk.blockchain.android.ui.upsell.UpsellHost
+import piuk.blockchain.android.ui.upsell.KycUpgradePromptManager
 import piuk.blockchain.android.util.AndroidUtils
+import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.calloutToExternalSupportLinkDlg
 import piuk.blockchain.android.util.getAccount
-import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import timber.log.Timber
@@ -86,11 +109,18 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     HomeNavigator,
     MainView,
     IntroTourHost,
-    DialogFlow.FlowHost {
+    DialogFlow.FlowHost,
+    SlidingModalBottomDialog.Host,
+    UpsellHost,
+    AuthNewLoginSheet.Host,
+    SmallSimpleBuyNavigator {
 
     override val presenter: MainPresenter by scopedInject()
     private val qrProcessor: QrScanResultProcessor by scopedInject()
     private val assetResources: AssetResources by scopedInject()
+    private val mwaFF: FeatureFlag by inject(mwaFeatureFlag)
+
+    private var isMWAEnabled: Boolean = false
 
     override val view: MainView = this
 
@@ -107,9 +137,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     private val tabSelectedListener =
         AHBottomNavigation.OnTabSelectedListener { position, wasSelected ->
-
-            presenter.doTestnetCheck()
-
             if (!wasSelected) {
                 when (position) {
                     ITEM_HOME -> {
@@ -122,12 +149,20 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                     ITEM_SWAP -> {
                         tryTolaunchSwap()
                         analytics.logEvent(SwapAnalyticsEvents.SwapTabItemClick)
+                        analytics.logEvent(SwapAnalyticsEvents.SwapClickedEvent(LaunchOrigin.NAVIGATION))
                     }
                     ITEM_BUY_SELL -> {
                         launchSimpleBuySell()
                         analytics.logEvent(RequestAnalyticsEvents.TabItemClicked)
+                        analytics.logEvent(BuySellClicked(origin = LaunchOrigin.NAVIGATION))
                     }
                     ITEM_TRANSFER -> {
+                        analytics.logEvent(
+                            TransferAnalyticsEvent.TransferClicked(
+                                origin = LaunchOrigin.NAVIGATION,
+                                type = TransferAnalyticsEvent.AnalyticsTransferType.RECEIVE
+                            )
+                        )
                         startTransferFragment()
                     }
                 }
@@ -203,7 +238,28 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
         if (intent.hasExtra(SHOW_SWAP) && intent.getBooleanExtra(SHOW_SWAP, false)) {
             startSwapFlow()
+        } else if (intent.hasExtra(LAUNCH_AUTH_FLOW) && intent.getBooleanExtra(LAUNCH_AUTH_FLOW, false)) {
+            intent.extras?.let {
+                showBottomSheet(
+                    AuthNewLoginSheet.newInstance(
+                        pubKeyHash = it.getString(AuthNewLoginSheet.PUB_KEY_HASH),
+                        messageInJson = it.getString(AuthNewLoginSheet.MESSAGE),
+                        forcePin = it.getBoolean(AuthNewLoginSheet.FORCE_PIN),
+                        originIP = it.getString(AuthNewLoginSheet.ORIGIN_IP),
+                        originLocation = it.getString(AuthNewLoginSheet.ORIGIN_LOCATION),
+                        originBrowser = it.getString(AuthNewLoginSheet.ORIGIN_BROWSER)
+                    )
+                )
+            }
         }
+        val compositeDisposable = mwaFF.enabled.observeOn(Schedulers.io()).subscribe(
+            { result ->
+                isMWAEnabled = result
+            },
+            {
+                isMWAEnabled = false
+            }
+        )
     }
 
     override fun onResume() {
@@ -278,8 +334,35 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                         }
                     }
                 }
+                BANK_DEEP_LINK_SIMPLE_BUY -> {
+                    if (resultCode == RESULT_OK) {
+                        launchBuy(data?.getStringExtra(LINKED_BANK_ID_KEY))
+                    }
+                }
+                BANK_DEEP_LINK_SETTINGS -> {
+                    if (resultCode == RESULT_OK) {
+                        startActivity(Intent(this, SettingsActivity::class.java))
+                    }
+                }
+                BANK_DEEP_LINK_DEPOSIT -> {
+                    if (resultCode == RESULT_OK) {
+                        launchDashboardFlow(AssetAction.FiatDeposit, data?.getStringExtra(LINKED_BANK_CURRENCY))
+                    }
+                }
+                BANK_DEEP_LINK_WITHDRAW -> {
+                    if (resultCode == RESULT_OK) {
+                        launchDashboardFlow(AssetAction.Withdraw, data?.getStringExtra(LINKED_BANK_CURRENCY))
+                    }
+                }
                 else -> super.onActivityResult(requestCode, resultCode, data)
             }
+        }
+    }
+
+    private fun launchDashboardFlow(action: AssetAction, currency: String?) {
+        currency?.let {
+            val fragment = DashboardFragment.newInstance(action, it)
+            replaceContentFragment(fragment)
         }
     }
 
@@ -314,11 +397,21 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         when (menuItem.itemId) {
             R.id.nav_the_exchange -> presenter.onThePitMenuClicked()
             R.id.nav_airdrops -> AirdropCentreActivity.start(this)
-            R.id.nav_addresses -> startActivityForResult(Intent(this, AccountActivity::class.java),
-                ACCOUNT_EDIT)
-            R.id.login_web_wallet -> PairingCodeActivity.start(this)
-            R.id.nav_settings -> startActivityForResult(Intent(this, SettingsActivity::class.java),
-                SETTINGS_EDIT)
+            R.id.nav_addresses -> startActivityForResult(
+                Intent(this, AccountActivity::class.java),
+                ACCOUNT_EDIT
+            )
+            R.id.login_web_wallet -> {
+                if (isMWAEnabled) {
+                    QrScanActivity.start(this, QrExpected.MAIN_ACTIVITY_QR)
+                } else {
+                    showBottomSheet(PairingBottomSheet())
+                }
+            }
+            R.id.nav_settings -> startActivityForResult(
+                Intent(this, SettingsActivity::class.java),
+                SETTINGS_EDIT
+            )
             R.id.nav_support -> onSupportClicked()
             R.id.nav_logout -> showLogoutDialog()
             R.id.nav_interest -> launchInterestDashboard()
@@ -363,8 +456,12 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         OnboardingActivity.launchForFingerprints(this)
     }
 
-    override fun launchTransfer() {
+    override fun launchReceive() {
         startTransferFragment(TransferFragment.TransferViewType.TYPE_RECEIVE)
+    }
+
+    override fun launchSend() {
+        startTransferFragment(TransferFragment.TransferViewType.TYPE_SEND)
     }
 
     private fun showLogoutDialog() {
@@ -427,10 +524,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         startSwapFlow(sourceAccount, targetAccount)
     }
 
-    override fun launchSwap(sourceAccount: CryptoAccount?, targetAccount: CryptoAccount?) {
-        startSwapFlow(sourceAccount, targetAccount)
-    }
-
     override fun getStartIntent(): Intent {
         return intent
     }
@@ -439,17 +532,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         if (AndroidUtils.is25orHigher()) {
             getSystemService(ShortcutManager::class.java)!!.removeAllDynamicShortcuts()
         }
-    }
-
-    override fun showTestnetWarning() {
-        val snack = Snackbar.make(
-            parent_constraint_layout,
-            R.string.testnet_warning,
-            Snackbar.LENGTH_SHORT
-        )
-        val view = snack.view
-        view.setBackgroundColor(ContextCompat.getColor(this, R.color.product_red_medium))
-        snack.show()
     }
 
     override fun enableSwapButton(isEnabled: Boolean) {
@@ -508,6 +590,15 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         )
     }
 
+    private fun launchBuy(linkedBankId: String?) {
+        startActivity(
+            SimpleBuyActivity.newInstance(
+                context = activity,
+                preselectedPaymentMethodId = linkedBankId
+            )
+        )
+    }
+
     @SuppressLint("CheckResult")
     private fun disambiguateSendScan(targets: Collection<CryptoTarget>) {
         qrProcessor.disambiguateScan(this, targets, assetResources)
@@ -524,6 +615,29 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
 
     override fun goToTransfer() {
         startTransferFragment()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (intent.getBooleanExtra(LAUNCH_AUTH_FLOW, false)) {
+            intent.extras?.let {
+                showBottomSheet(
+                    AuthNewLoginSheet.newInstance(
+                        pubKeyHash = it.getString(AuthNewLoginSheet.PUB_KEY_HASH),
+                        messageInJson = it.getString(AuthNewLoginSheet.MESSAGE),
+                        forcePin = it.getBoolean(AuthNewLoginSheet.FORCE_PIN),
+                        originIP = it.getString(AuthNewLoginSheet.ORIGIN_IP),
+                        originLocation = it.getString(AuthNewLoginSheet.ORIGIN_LOCATION),
+                        originBrowser = it.getString(AuthNewLoginSheet.ORIGIN_BROWSER)
+                    )
+                )
+            }
+        }
+    }
+
+    override fun navigateToBottomSheet(bottomSheet: BottomSheetDialogFragment) {
+        clearBottomSheet()
+        showBottomSheet(bottomSheet)
     }
 
     private fun startTransferFragment(
@@ -567,9 +681,6 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         val fragment = DashboardFragment.newInstance()
         replaceContentFragment(fragment)
     }
-
-    override fun gotoActivityFor(account: BlockchainAccount?) =
-        startActivitiesFragment(account)
 
     override fun resumeSimpleBuyKyc() {
         startActivity(
@@ -639,10 +750,15 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         val TAG: String = MainActivity::class.java.simpleName
         const val START_BUY_SELL_INTRO_KEY = "START_BUY_SELL_INTRO_KEY"
         const val SHOW_SWAP = "SHOW_SWAP"
+        const val LAUNCH_AUTH_FLOW = "LAUNCH_AUTH_FLOW"
         const val ACCOUNT_EDIT = 2008
         const val SETTINGS_EDIT = 2009
         const val KYC_STARTED = 2011
         const val INTEREST_DASHBOARD = 2012
+        const val BANK_DEEP_LINK_SIMPLE_BUY = 2013
+        const val BANK_DEEP_LINK_SETTINGS = 2014
+        const val BANK_DEEP_LINK_DEPOSIT = 2015
+        const val BANK_DEEP_LINK_WITHDRAW = 2021
 
         // Keep these constants - the position of the toolbar items - and the generation of the toolbar items
         // together.
@@ -653,27 +769,29 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         private const val ITEM_TRANSFER = 4
 
         private fun toolbarNavigationItems(): List<AHBottomNavigationItem> =
-            listOf(AHBottomNavigationItem(
-                R.string.toolbar_cmd_activity,
-                R.drawable.ic_vector_toolbar_activity,
-                R.color.white
-            ), AHBottomNavigationItem(
-                R.string.toolbar_cmd_swap,
-                R.drawable.ic_vector_toolbar_swap,
-                R.color.white
-            ), AHBottomNavigationItem(
-                R.string.toolbar_cmd_home,
-                R.drawable.ic_vector_toolbar_home,
-                R.color.white
-            ), AHBottomNavigationItem(
-                R.string.buy_and_sell,
-                R.drawable.ic_tab_cart,
-                R.color.white
-            ), AHBottomNavigationItem(
-                R.string.toolbar_cmd_transfer,
-                R.drawable.ic_vector_toolbar_transfer,
-                R.color.white
-            ))
+            listOf(
+                AHBottomNavigationItem(
+                    R.string.toolbar_cmd_activity,
+                    R.drawable.ic_vector_toolbar_activity,
+                    R.color.white
+                ), AHBottomNavigationItem(
+                    R.string.toolbar_cmd_swap,
+                    R.drawable.ic_vector_toolbar_swap,
+                    R.color.white
+                ), AHBottomNavigationItem(
+                    R.string.toolbar_cmd_home,
+                    R.drawable.ic_vector_toolbar_home,
+                    R.color.white
+                ), AHBottomNavigationItem(
+                    R.string.buy_and_sell,
+                    R.drawable.ic_tab_cart,
+                    R.color.white
+                ), AHBottomNavigationItem(
+                    R.string.toolbar_cmd_transfer,
+                    R.drawable.ic_vector_toolbar_transfer,
+                    R.color.white
+                )
+            )
 
         fun start(context: Context, bundle: Bundle) {
             Intent(context, MainActivity::class.java).apply {
@@ -730,6 +848,122 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         replaceContentFragment(buySellFragment)
     }
 
+    override fun performAssetActionFor(action: AssetAction, account: BlockchainAccount) =
+        presenter.validateAccountAction(action, account)
+
+    override fun launchUpsellAssetAction(
+        upsell: KycUpgradePromptManager.Type,
+        action: AssetAction,
+        account: BlockchainAccount
+    ) = replaceBottomSheet(KycUpgradePromptManager.getUpsellSheet(upsell))
+
+    override fun launchAssetAction(
+        action: AssetAction,
+        account: BlockchainAccount
+    ) = when (action) {
+        AssetAction.Receive -> replaceBottomSheet(ReceiveSheet.newInstance(account as CryptoAccount))
+        AssetAction.Swap -> tryTolaunchSwap(sourceAccount = account as CryptoAccount)
+        AssetAction.ViewActivity -> startActivitiesFragment(account)
+        else -> {
+        }
+    }
+
+    override fun launchOpenBankingLinking(bankLinkingInfo: BankLinkingInfo) {
+        startActivityForResult(
+            BankAuthActivity.newInstance(bankLinkingInfo.linkingId, bankLinkingInfo.bankAuthSource, this),
+            when (bankLinkingInfo.bankAuthSource) {
+                BankAuthSource.SIMPLE_BUY -> BANK_DEEP_LINK_SIMPLE_BUY
+                BankAuthSource.SETTINGS -> BANK_DEEP_LINK_SETTINGS
+                BankAuthSource.DEPOSIT -> BANK_DEEP_LINK_DEPOSIT
+                BankAuthSource.WITHDRAW -> BANK_DEEP_LINK_WITHDRAW
+            }.exhaustive
+        )
+    }
+
+    override fun launchSimpleBuyFromDeepLinkApproval() {
+        startActivity(SimpleBuyActivity.newInstance(this, launchFromApprovalDeepLink = true))
+    }
+
+    override fun handlePaymentForCancelledOrder(state: SimpleBuyState) =
+        replaceBottomSheet(
+            FiatTransactionBottomSheet.newInstance(
+                state.fiatCurrency, getString(R.string.yapily_payment_to_fiat_wallet_title, state.fiatCurrency),
+                getString(
+                    R.string.yapily_payment_to_fiat_wallet_subtitle,
+                    state.selectedCryptoCurrency?.displayTicker ?: getString(
+                        R.string.yapily_payment_to_fiat_wallet_default
+                    ),
+                    state.fiatCurrency
+                ),
+                FiatTransactionState.SUCCESS
+            )
+        )
+
+    override fun handleApprovalDepositComplete(
+        orderValue: FiatValue,
+        estimatedTransactionCompletionTime: String
+    ) =
+        replaceBottomSheet(
+            FiatTransactionBottomSheet.newInstance(
+                orderValue.currencyCode,
+                getString(R.string.deposit_confirmation_success_title, orderValue.toStringWithSymbol()),
+                getString(
+                    R.string.yapily_fiat_deposit_success_subtitle, orderValue.toStringWithSymbol(),
+                    orderValue.currencyCode,
+                    estimatedTransactionCompletionTime
+                ),
+                FiatTransactionState.SUCCESS
+            )
+        )
+
+    override fun handleApprovalDepositError(currency: String) =
+        replaceBottomSheet(
+            FiatTransactionBottomSheet.newInstance(
+                currency,
+                getString(R.string.deposit_confirmation_error_title),
+                getString(
+                    R.string.deposit_confirmation_error_subtitle
+                ),
+                FiatTransactionState.ERROR
+            )
+        )
+
+    override fun handleBuyApprovalError() {
+        ToastCustom.makeText(
+            this, getString(R.string.simple_buy_confirmation_error), Toast.LENGTH_LONG, ToastCustom.TYPE_ERROR
+        )
+    }
+
+    override fun handleApprovalDepositInProgress(amount: FiatValue) =
+        replaceBottomSheet(
+            FiatTransactionBottomSheet.newInstance(
+                amount.currencyCode,
+                getString(R.string.deposit_confirmation_pending_title),
+                getString(
+                    R.string.deposit_confirmation_pending_subtitle
+                ),
+                FiatTransactionState.PENDING
+            )
+        )
+
+    override fun handleApprovalDepositTimeout(currencyCode: String) =
+        replaceBottomSheet(
+            FiatTransactionBottomSheet.newInstance(
+                currencyCode,
+                getString(R.string.deposit_confirmation_pending_title),
+                getString(
+                    R.string.deposit_confirmation_pending_subtitle
+                ),
+                FiatTransactionState.ERROR
+            )
+        )
+
+    override fun showOpenBankingDeepLinkError() {
+        ToastCustom.makeText(
+            this, getString(R.string.open_banking_deeplink_error), Toast.LENGTH_LONG, ToastCustom.TYPE_ERROR
+        )
+    }
+
     override fun onTourFinished() {
         drawer_layout.closeDrawers()
         startDashboardFragment()
@@ -741,5 +975,18 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     }
 
     override fun onFlowFinished() {
+        Timber.d("On finished")
+    }
+
+    override fun onSheetClosed() {
+        Timber.d("On closed")
+    }
+
+    override fun startUpsellKyc() {
+        launchKyc(CampaignType.None)
+    }
+
+    override fun exitSimpleBuyFlow() {
+        launchSimpleBuySell()
     }
 }

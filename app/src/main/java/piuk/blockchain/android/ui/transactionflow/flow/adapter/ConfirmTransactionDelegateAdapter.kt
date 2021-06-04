@@ -3,11 +3,13 @@ package piuk.blockchain.android.ui.transactionflow.flow.adapter
 import android.app.Activity
 import info.blockchain.balance.ExchangeRates
 import piuk.blockchain.android.coincore.AssetResources
+import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
 import piuk.blockchain.android.ui.adapters.DelegationAdapter
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapper
+import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapperNewCheckout
 import piuk.blockchain.android.util.StringUtils
 
 class ConfirmTransactionDelegateAdapter(
@@ -16,13 +18,20 @@ class ConfirmTransactionDelegateAdapter(
     model: TransactionModel,
     analytics: TxFlowAnalytics,
     mapper: TxConfirmReadOnlyMapper,
+    mapperNewCheckout: TxConfirmReadOnlyMapperNewCheckout,
     exchangeRates: ExchangeRates,
     selectedCurrency: String,
     assetResources: AssetResources
-) : DelegationAdapter<Any>(AdapterDelegatesManager(), emptyList()) {
+) : DelegationAdapter<TxConfirmationValue>(AdapterDelegatesManager(), emptyList()) {
     init {
         // Add all necessary AdapterDelegate objects here
         with(delegatesManager) {
+            // New checkout screens:
+            addAdapterDelegate(SimpleConfirmationCheckoutDelegate(mapperNewCheckout))
+            addAdapterDelegate(ComplexConfirmationCheckoutDelegate(mapperNewCheckout))
+            addAdapterDelegate(ExpandableSimpleConfirmationCheckout(mapperNewCheckout))
+            addAdapterDelegate(ExpandableComplexConfirmationCheckout(mapperNewCheckout))
+            addAdapterDelegate(CompoundExpandableFeeConfirmationCheckoutDelegate(mapperNewCheckout))
             addAdapterDelegate(ConfirmInfoItemDelegate(mapper))
             addAdapterDelegate(ConfirmNoteItemDelegate(model))
             addAdapterDelegate(ConfirmXlmMemoItemDelegate(model, stringUtils, activityContext))

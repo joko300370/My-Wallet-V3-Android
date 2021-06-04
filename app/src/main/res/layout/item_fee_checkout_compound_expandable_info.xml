@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/grid_6"
+    android:layout_marginTop="@dimen/grid_2"
+    android:layout_marginEnd="@dimen/grid_6"
+    android:layout_marginBottom="@dimen/grid_2"
+    android:background="@drawable/bkgd_grey_000_rounded_small_padding"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/compound_item_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bkgd_white_rounded"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/compound_item_label"
+            style="@style/Text.Standard.14"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/grid_4"
+            android:layout_marginTop="@dimen/grid_4"
+            android:layout_marginEnd="@dimen/grid_2"
+            android:gravity="start"
+            android:text="@string/checkout_item_network_fee_label"
+            app:layout_constraintEnd_toStartOf="@+id/compound_item_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/compound_item_title"
+            style="@style/Text.Standard.14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="@dimen/grid_4"
+            android:layout_marginEnd="@dimen/grid_3"
+            android:paddingBottom="@dimen/grid_4"
+            app:layout_constraintEnd_toStartOf="@id/compound_item_icon"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="~ $66.66" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/compound_item_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="@dimen/grid_4"
+            android:layout_marginEnd="@dimen/grid_4"
+            android:drawableEnd="@drawable/ic_question"
+            android:drawablePadding="@dimen/miniscule_margin"
+            android:paddingBottom="@dimen/grid_4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@drawable/ic_arrow_down" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/compound_item_sending_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="header_separator, compound_item_sending_label, compound_item_sending_subtitle, compound_item_sending_title"
+            tools:visibility="visible" />
+
+        <View
+            android:id="@+id/header_separator"
+            style="@style/SeparatorWithoutMargins"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/compound_item_icon" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/compound_item_sending_label"
+            style="@style/Text.Standard.12"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/grid_4"
+            android:layout_marginEnd="@dimen/grid_2"
+            app:layout_constraintBottom_toBottomOf="@id/compound_item_sending_subtitle"
+            app:layout_constraintEnd_toStartOf="@+id/compound_item_sending_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/compound_item_sending_title"
+            tools:text="ETH network fee" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/compound_item_sending_title"
+            style="@style/Text.Standard.12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/grid_4"
+            android:layout_marginEnd="@dimen/grid_4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/header_separator"
+            tools:text="0.0000012 ETH" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/compound_item_sending_subtitle"
+            style="@style/Text.Light.12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@id/compound_item_sending_title"
+            app:layout_constraintTop_toBottomOf="@id/compound_item_sending_title"
+            tools:text="$5" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/compound_item_receiving_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="item_separator, compound_item_receiving_label, compound_item_receiving_subtitle, compound_item_receiving_title"
+            tools:visibility="visible" />
+
+        <View
+            android:id="@+id/item_separator"
+            style="@style/SeparatorWithoutMargins"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/grid_4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/compound_item_sending_subtitle" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/compound_item_receiving_label"
+            style="@style/Text.Standard.12"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/grid_4"
+            android:layout_marginEnd="@dimen/grid_2"
+            app:layout_constraintBottom_toBottomOf="@id/compound_item_receiving_subtitle"
+            app:layout_constraintEnd_toStartOf="@+id/compound_item_receiving_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/compound_item_receiving_title"
+            tools:text="BTC network fee" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/compound_item_receiving_title"
+            style="@style/Text.Standard.12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/grid_4"
+            android:layout_marginEnd="@dimen/grid_4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/item_separator"
+            tools:text="0.0000012 BTC" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/compound_item_receiving_subtitle"
+            style="@style/Text.Light.12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/grid_3"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/compound_item_receiving_title"
+            app:layout_constraintTop_toBottomOf="@id/compound_item_receiving_title"
+            tools:text="$15" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/compound_item_note"
+        style="@style/Text.Light.12"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/grid_4"
+        tools:text="@string/checkout_dual_fee_note" />
+
+</LinearLayout>

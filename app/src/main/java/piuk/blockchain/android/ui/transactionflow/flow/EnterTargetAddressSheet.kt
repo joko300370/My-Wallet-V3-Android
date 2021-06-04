@@ -20,6 +20,7 @@ import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.databinding.DialogTxFlowEnterAddressBinding
 import piuk.blockchain.android.scan.QrScanResultProcessor
+import piuk.blockchain.android.ui.customviews.EditTextUpdateThrottle
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.scan.QrExpected
 import piuk.blockchain.android.ui.scan.QrScanActivity
@@ -29,7 +30,6 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.TargetAddressSheetState
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.TargetSelectionCustomisations
 import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
-import piuk.blockchain.android.util.AfterTextChangedWatcher
 import piuk.blockchain.android.util.getTextString
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.invisible
@@ -48,22 +48,20 @@ class EnterTargetAddressSheet : TransactionFlowSheet<DialogTxFlowEnterAddressBin
     override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogTxFlowEnterAddressBinding =
         DialogTxFlowEnterAddressBinding.inflate(inflater, container, false)
 
-    private val addressTextWatcher = object : AfterTextChangedWatcher() {
-        override fun afterTextChanged(s: Editable?) {
-            val address = s.toString()
+    private fun onAddressEditUpdated(s: Editable?) {
+        val address = s.toString()
 
-            if (address.isEmpty()) {
-                model.process(TransactionIntent.EnteredAddressReset)
+        if (address.isEmpty()) {
+            model.process(TransactionIntent.EnteredAddressReset)
+        } else {
+            if (customiser.enterTargetAddressSheetState(state) is
+                    TargetAddressSheetState.SelectAccountWhenOverMaxLimitSurpassed
+            ) {
+                binding.selectAnAccount.visible()
             } else {
-                if (customiser.enterTargetAddressSheetState(state) is
-                        TargetAddressSheetState.SelectAccountWhenOverMaxLimitSurpassed
-                ) {
-                    binding.selectAnAccount.visible()
-                } else {
-                    binding.walletSelect.clearSelectedAccount()
-                }
-                addressEntered(address, state.sendingAsset)
+                binding.walletSelect.clearSelectedAccount()
             }
+            addressEntered(address, state.sendingAsset)
         }
     }
 
@@ -80,6 +78,8 @@ class EnterTargetAddressSheet : TransactionFlowSheet<DialogTxFlowEnterAddressBin
                 setupTransferList(customiser.enterTargetAddressSheetState(newState))
                 setupLabels(newState)
             }
+
+            upsellGroup.visibleIf { customiser.shouldShowCustodialUpsell(newState) }
 
             if (customiser.enterTargetAddressSheetState(newState) is
                     TargetAddressSheetState.SelectAccountWhenOverMaxLimitSurpassed
@@ -150,7 +150,7 @@ class EnterTargetAddressSheet : TransactionFlowSheet<DialogTxFlowEnterAddressBin
 
     private fun showManualAddressEntry(newState: TransactionState) {
         val address = if (newState.selectedTarget is CryptoAddress) {
-            newState.selectedTarget.address
+            newState.selectedTarget.label
         } else {
             ""
         }
@@ -301,8 +301,14 @@ class EnterTargetAddressSheet : TransactionFlowSheet<DialogTxFlowEnterAddressBin
         model.process(TransactionIntent.TargetSelected)
     }
 
+    private val addressTextWatcher = EditTextUpdateThrottle(
+        updateFn = ::onAddressEditUpdated,
+        updateDelayMillis = ADDRESS_UPDATE_INTERVAL
+    )
+
     companion object {
         private const val NONCUSTODIAL_INPUT = 0
         private const val CUSTODIAL_INPUT = 1
+        private const val ADDRESS_UPDATE_INTERVAL = 500L
     }
 }

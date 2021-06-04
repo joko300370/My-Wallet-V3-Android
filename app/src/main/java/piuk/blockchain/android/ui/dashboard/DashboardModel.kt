@@ -129,7 +129,8 @@ data class DashboardState(
     val selectedCryptoAccount: SingleAccount? = null,
     val selectedAsset: CryptoCurrency? = null,
     val backupSheetDetails: BackupDetails? = null,
-    val linkablePaymentMethodsForAction: LinkablePaymentMethodsForAction? = null
+    val linkablePaymentMethodsForAction: LinkablePaymentMethodsForAction? = null,
+    val hasLongCallInProgress: Boolean = false
 ) : MviState, BalanceState, KoinComponent {
 
     // If ALL the assets are refreshing, then report true. Else false
@@ -271,7 +272,9 @@ class DashboardModel(
             is CancelSimpleBuyOrder -> interactor.cancelSimpleBuyOrder(intent.orderId)
             is LaunchAssetDetailsFlow -> interactor.getAssetDetailsFlow(this, intent.cryptoCurrency)
             is LaunchInterestDepositFlow ->
-                interactor.getInterestDepositFlow(this, intent.fromAccount, intent.toAccount, intent.action)
+                interactor.getInterestDepositFlow(this, intent.toAccount)
+            is LaunchInterestWithdrawFlow ->
+                interactor.getInterestWithdrawFlow(this, intent.fromAccount)
             is LaunchBankTransferFlow -> processBankTransferFlow(intent)
             is LaunchSendFlow -> interactor.getSendFlow(this, intent.fromAccount, intent.action)
             is FiatBalanceUpdate,
@@ -289,7 +292,9 @@ class DashboardModel(
             is UpdateDashboardCurrencies,
             is LaunchBankLinkFlow,
             is ResetDashboardNavigation,
-            is ShowLinkablePaymentMethodsSheet -> null
+            is ShowLinkablePaymentMethodsSheet,
+            is LongCallStarted,
+            is LongCallEnded -> null
         }
     }
 

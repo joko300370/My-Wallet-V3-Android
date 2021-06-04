@@ -11,9 +11,6 @@ import com.blockchain.nabu.datamanagers.BalanceProviderImpl
 import com.blockchain.nabu.datamanagers.BalancesProvider
 import com.blockchain.nabu.datamanagers.CreateNabuTokenAdapter
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
-import com.blockchain.nabu.datamanagers.ExtraAttributesProvider
-import com.blockchain.nabu.datamanagers.ExtraAttributesProviderImpl
 import com.blockchain.nabu.datamanagers.NabuAuthenticator
 import com.blockchain.nabu.datamanagers.NabuCachedEligibilityProvider
 import com.blockchain.nabu.datamanagers.NabuDataManager
@@ -22,18 +19,27 @@ import com.blockchain.nabu.datamanagers.NabuDataUserProvider
 import com.blockchain.nabu.datamanagers.NabuDataUserProviderNabuDataManagerAdapter
 import com.blockchain.nabu.datamanagers.NabuUserReporter
 import com.blockchain.nabu.datamanagers.NabuUserSyncUpdateUserWalletInfoWithJWT
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.nabu.datamanagers.TransactionErrorMapper
 import com.blockchain.nabu.datamanagers.UniqueAnalyticsNabuUserReporter
 import com.blockchain.nabu.datamanagers.UniqueAnalyticsWalletReporter
 import com.blockchain.nabu.datamanagers.WalletReporter
+import com.blockchain.nabu.datamanagers.analytics.AnalyticsContextProvider
+import com.blockchain.nabu.datamanagers.analytics.AnalyticsContextProviderImpl
+import com.blockchain.nabu.datamanagers.analytics.AnalyticsFileLocalPersistence
+import com.blockchain.nabu.datamanagers.analytics.AnalyticsLocalPersistence
+import com.blockchain.nabu.datamanagers.analytics.NabuAnalytics
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.LiveCustodialWalletManager
 import com.blockchain.nabu.datamanagers.featureflags.BankLinkingEnabledProvider
 import com.blockchain.nabu.datamanagers.featureflags.BankLinkingEnabledProviderImpl
 import com.blockchain.nabu.datamanagers.featureflags.FeatureEligibility
 import com.blockchain.nabu.datamanagers.featureflags.KycFeatureEligibility
-import com.blockchain.nabu.datamanagers.repositories.AssetBalancesRepository
+import com.blockchain.nabu.datamanagers.repositories.CustodialAssetWalletsBalancesRepository
 import com.blockchain.nabu.datamanagers.repositories.NabuUserRepository
 import com.blockchain.nabu.datamanagers.repositories.QuotesProvider
+import com.blockchain.nabu.datamanagers.repositories.RecurringBuyEligibilityProvider
+import com.blockchain.nabu.datamanagers.repositories.RecurringBuyEligibilityProviderImpl
+import com.blockchain.nabu.datamanagers.repositories.RecurringBuyRepository
 import com.blockchain.nabu.datamanagers.repositories.WithdrawLocksRepository
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestAvailabilityProvider
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestAvailabilityProviderImpl
@@ -64,8 +70,11 @@ import com.blockchain.nabu.service.TierService
 import com.blockchain.nabu.service.TierUpdater
 import com.blockchain.nabu.status.KycTiersQueries
 import com.blockchain.nabu.stores.NabuSessionTokenStore
+import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.operations.AppStartUpFlushable
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import piuk.blockchain.androidcore.utils.PersistentPrefs
 import retrofit2.Retrofit
 
 val nabuModule = module {
@@ -106,12 +115,14 @@ val nabuModule = module {
                 achDepositWithdrawFeatureFlag = get(achDepositWithdrawFeatureFlag),
                 sddFeatureFlag = get(sddFeatureFlag),
                 kycFeatureEligibility = get(),
-                assetBalancesRepository = get(),
+                custodialAssetWalletsBalancesRepository = get(),
                 interestRepository = get(),
                 custodialRepository = get(),
                 bankLinkingEnabledProvider = get(),
                 transactionErrorMapper = get(),
-                currencyPrefs = get()
+                currencyPrefs = get(),
+                recurringBuysRepository = get(),
+                features = get()
             )
         }.bind(CustodialWalletManager::class)
 
@@ -120,13 +131,8 @@ val nabuModule = module {
         }
 
         factory {
-            ExtraAttributesProviderImpl()
-        }.bind(ExtraAttributesProvider::class)
-
-        factory {
             BankLinkingEnabledProviderImpl(
-                achFF = get(achFeatureFlag),
-                globalLinkingFF = get(bankLinkingFeatureFlag)
+                obFF = get(obFeatureFlag)
             )
         }.bind(BankLinkingEnabledProvider::class)
 
@@ -136,7 +142,7 @@ val nabuModule = module {
                 authenticator = get(),
                 currencyPrefs = get()
             )
-        }.bind(EligibilityProvider::class)
+        }.bind(SimpleBuyEligibilityProvider::class)
 
         factory {
             InterestLimitsProviderImpl(
@@ -183,6 +189,14 @@ val nabuModule = module {
                 exchangeRates = get()
             )
         }.bind(SwapActivityProvider::class)
+
+        factory {
+            RecurringBuyEligibilityProviderImpl(
+                nabuService = get(),
+                authenticator = get(),
+                features = get()
+            )
+        }.bind(RecurringBuyEligibilityProvider::class)
 
         factory(uniqueUserAnalytics) {
             UniqueAnalyticsNabuUserReporter(
@@ -234,7 +248,7 @@ val nabuModule = module {
         }
 
         scoped {
-            AssetBalancesRepository(balancesProvider = get())
+            CustodialAssetWalletsBalancesRepository(balancesProvider = get())
         }
 
         scoped {
@@ -254,6 +268,10 @@ val nabuModule = module {
 
         scoped {
             WithdrawLocksRepository(custodialWalletManager = get())
+        }
+
+        scoped {
+            RecurringBuyRepository(recurringBuyEligibilityProvider = get())
         }
 
         factory {
@@ -280,7 +298,7 @@ val nabuModule = module {
 
     single {
         RetailWalletTokenService(
-            environmentConfig = get(),
+            explorerPath = getProperty("explorer-api"),
             apiCode = getProperty("api-code"),
             retrofit = get(moshiExplorerRetrofit)
         )
@@ -296,6 +314,29 @@ val nabuModule = module {
             .add(CampaignStateMoshiAdapter())
             .add(CampaignTransactionStateMoshiAdapter())
     }
+
+    single(nabu) {
+        NabuAnalytics(
+            analyticsService = get(),
+            prefs = lazy { get<PersistentPrefs>() },
+            analyticsContextProvider = get(),
+            localAnalyticsPersistence = get(),
+            crashLogger = get(),
+            tokenStore = get()
+        )
+    }
+        .bind(AppStartUpFlushable::class)
+        .bind(Analytics::class)
+
+    factory {
+        AnalyticsContextProviderImpl()
+    }.bind(AnalyticsContextProvider::class)
+
+    single {
+        AnalyticsFileLocalPersistence(
+            context = get()
+        )
+    }.bind(AnalyticsLocalPersistence::class)
 }
 
 val authenticationModule = module {

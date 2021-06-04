@@ -1,6 +1,6 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
-import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import io.reactivex.Single
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
@@ -13,7 +13,7 @@ import piuk.blockchain.android.ui.dashboard.announcements.StandardAnnouncementCa
 
 class SwapAnnouncement(
     private val queries: AnnouncementQueries,
-    private val eligibilityProvider: EligibilityProvider,
+    private val eligibilityProvider: SimpleBuyEligibilityProvider,
     dismissRecorder: DismissRecorder
 ) : AnnouncementRule(dismissRecorder) {
 

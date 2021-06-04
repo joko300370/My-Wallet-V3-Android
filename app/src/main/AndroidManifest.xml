@@ -10,8 +10,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <!-- force the removal of these two permissions, which may be added by 3rd party libs -->
+    <uses-permission android:name="android.permission.CAMERA" /> <!-- force the removal of these two permissions, which may be added by 3rd party libs -->
     <uses-permission
         android:name="android.permission.READ_PHONE_STATE"
         tools:node="remove" />
@@ -31,11 +30,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup">
-
         <activity
             android:name=".ui.launcher.LauncherActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask">
+            <meta-data android:name="android.app.shortcuts"
+                android:resource="@xml/debug_shortcuts" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -74,18 +75,22 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
+
         <activity
-            android:name=".ui.transfer.receive.activity.ReceiveActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
+            android:name="piuk.blockchain.com.FeatureFlagsHandlingActivity"
+            android:clearTaskOnLaunch="true"
+            android:screenOrientation="portrait"
+            android:taskAffinity="piuk.blockchain.com.FeatureFlagsHandlingActivity"
+            android:theme="@style/AppTheme"/>
+
         <activity
             android:name=".ui.home.MainActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/AppTheme.MainActivity"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name="piuk.blockchain.android.ui.scan.QrScanActivity"
+            android:name=".ui.scan.QrScanActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
-
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
@@ -94,7 +99,8 @@
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".ui.start.LandingActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.start.LoginActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -111,9 +117,6 @@
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".ui.backup.BackupWalletActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.upgrade.UpgradeWalletActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".ui.start.ManualPairingActivity"
@@ -135,9 +138,6 @@
             android:theme="@style/AppTheme.ReceiveQrWindow" />
         <activity
             android:name=".ui.onboarding.OnboardingActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ui.pairingcode.PairingCodeActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".ui.ssl.SSLVerifyActivity"
@@ -171,7 +171,10 @@
             android:name=".ui.interest.InterestDashboardActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.linkbank.LinkBankActivity"
+            android:name=".ui.linkbank.BankAuthActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.recurringbuy.RecurringBuyOnboardingActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <meta-data
@@ -184,7 +187,6 @@
              Set color used with incoming notification messages. This is used when no color is set for the incoming
              notification message.
         -->
-
         <meta-data
             android:name="com.sec.android.support.multiwindow"
             android:value="false" />
@@ -194,7 +196,6 @@
         <meta-data
             android:name="com.samsung.android.sdk.multiwindow.penwindow.enable"
             android:value="false" />
-
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
@@ -223,6 +224,10 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <receiver
+            android:name=".ui.linkbank.ChooserReceiver"
+            android:exported="false" />
     </application>
 
 </manifest>

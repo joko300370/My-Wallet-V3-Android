@@ -7,4 +7,9 @@ interface AuthPrefs {
     fun clearEncodedPin()
 
     val encodedKeyName: String
+
+    var sharedKey: String
+    var walletGuid: String
+    var encryptedPassword: String
+    var pinFails: Int
 }

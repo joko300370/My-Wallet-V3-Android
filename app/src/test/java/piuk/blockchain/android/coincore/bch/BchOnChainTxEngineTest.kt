@@ -7,22 +7,23 @@ import com.blockchain.preferences.WalletStatus
 import com.blockchain.testutils.bitcoinCash
 import com.blockchain.testutils.satoshiCash
 import com.nhaarman.mockito_kotlin.atLeastOnce
+import com.nhaarman.mockito_kotlin.atMost
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.api.data.UnspentOutput
-import info.blockchain.api.data.UnspentOutputs
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import info.blockchain.wallet.api.data.FeeOptions
+import info.blockchain.wallet.payload.data.XPub
+import info.blockchain.wallet.payload.model.Utxo
+import info.blockchain.wallet.payment.OutputType
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.amshove.kluent.itReturns
 import org.amshove.kluent.mock
-import org.bitcoinj.core.NetworkParameters
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -54,9 +55,11 @@ class BchOnChainTxEngineTest {
     }
 
     private val bchDataManager: BchDataManager = mock()
-    private val payloadDataManager: PayloadDataManager = mock()
+    private val payloadDataManager: PayloadDataManager = mock {
+        on { getAddressOutputType(TARGET_ADDRESS) } itReturns OutputType.P2PKH
+        on { getXpubFormatOutputType(XPub.Format.LEGACY) } itReturns OutputType.P2PKH
+    }
     private val sendDataManager: SendDataManager = mock()
-    private val bchNetworkParams: NetworkParameters = mock()
 
     private val bchFeeOptions: FeeOptions = mock {
         on { regularFee } itReturns FEE_REGULAR
@@ -79,7 +82,6 @@ class BchOnChainTxEngineTest {
         bchDataManager = bchDataManager,
         payloadDataManager = payloadDataManager,
         sendDataManager = sendDataManager,
-        networkParams = bchNetworkParams,
         feeManager = feeManager,
         requireSecondPassword = false,
         walletPreferences = walletPreferences
@@ -244,16 +246,18 @@ class BchOnChainTxEngineTest {
 
         whenever(bchDataManager.getAddressBalance(SOURCE_XPUB)).thenReturn(totalBalance)
 
-        val unspentOutputs: UnspentOutputs = mock {
-            on { unspentOutputs } itReturns arrayListOf<UnspentOutput>(mock(), mock())
-        }
+        val unspentOutputs = listOf<Utxo>(
+            mock(), mock()
+        )
+
         whenever(sendDataManager.getUnspentBchOutputs(SOURCE_XPUB))
-            .thenReturn(Observable.just(unspentOutputs))
+            .thenReturn(Single.just(unspentOutputs))
 
         whenever(
             sendDataManager.getMaximumAvailable(
                 ASSET,
                 unspentOutputs,
+                TARGET_OUTPUT_TYPE,
                 feePerKb
             )
         ).thenReturn(
@@ -269,6 +273,8 @@ class BchOnChainTxEngineTest {
 
         whenever(sendDataManager.getSpendableCoins(
             unspentOutputs,
+            TARGET_OUTPUT_TYPE,
+            CHANGE_OUTPUT_TYPE,
             inputAmount,
             feePerKb
         )).thenReturn(utxoBundle)
@@ -309,17 +315,18 @@ class BchOnChainTxEngineTest {
             .assertComplete()
             .assertNoErrors()
 
+        verify(txTarget, atMost(2)).address
         verify(sourceAccount, atLeastOnce()).asset
         verify(sourceAccount).xpubAddress
         verify(sourceAccount).accountBalance
         verify(bchDataManager).getAddressBalance(SOURCE_XPUB)
         verify(feeManager).bchFeeOptions
         verify(bchFeeOptions).regularFee
-        verify(unspentOutputs).unspentOutputs
         verify(sendDataManager).getUnspentBchOutputs(SOURCE_XPUB)
-        verify(sendDataManager).getMaximumAvailable(ASSET, unspentOutputs, feePerKb)
+        verify(sendDataManager).getMaximumAvailable(ASSET, unspentOutputs, TARGET_OUTPUT_TYPE, feePerKb)
         verify(utxoBundle).absoluteFee
-        verify(sendDataManager).getSpendableCoins(unspentOutputs, inputAmount, feePerKb)
+        verify(sendDataManager)
+            .getSpendableCoins(unspentOutputs, TARGET_OUTPUT_TYPE, CHANGE_OUTPUT_TYPE, inputAmount, feePerKb)
 
         noMoreInteractions(sourceAccount, txTarget)
     }
@@ -537,7 +544,6 @@ class BchOnChainTxEngineTest {
         verifyNoMoreInteractions(txTarget)
         verifyNoMoreInteractions(bchDataManager)
         verifyNoMoreInteractions(sendDataManager)
-        verifyNoMoreInteractions(bchNetworkParams)
         verifyNoMoreInteractions(feeManager)
         verifyNoMoreInteractions(bchFeeOptions)
         verifyNoMoreInteractions(walletPreferences)
@@ -554,6 +560,9 @@ class BchOnChainTxEngineTest {
         private const val FEE_REGULAR = 5L
         private const val FEE_PRIORITY = 11L
         private const val SELECTED_FIAT = "INR"
+
+        private val TARGET_OUTPUT_TYPE = OutputType.P2PKH
+        private val CHANGE_OUTPUT_TYPE = OutputType.P2PKH
 
         private val EXPECTED_AVAILABLE_FEE_LEVELS = setOf(FeeLevel.Regular)
     }

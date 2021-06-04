@@ -11,11 +11,11 @@ import com.squareup.moshi.Json;
 
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.ECKey;
-
+import org.bitcoinj.core.LegacyAddress;
+import org.bitcoinj.params.MainNetParams;
 import java.io.IOException;
 
 import info.blockchain.wallet.BlockchainFramework;
-import info.blockchain.wallet.api.PersistentUrls;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(fieldVisibility = Visibility.NONE,
@@ -142,11 +142,20 @@ public class ImportedAddress implements JsonSerializableAccount {
         importedAddress.setPrivateKeyFromBytes(ecKey.getPrivKeyBytes());
         importedAddress.setLabel("");
 
-        importedAddress.setAddress(ecKey.toAddress(PersistentUrls.getInstance().getBitcoinParams()).toBase58());
+        importedAddress.setAddress(
+            LegacyAddress.fromKey(
+                MainNetParams.get(),
+                ecKey
+            ).toBase58()
+        );
         importedAddress.setCreatedDeviceName(BlockchainFramework.getDevice());
         importedAddress.setCreatedTime(System.currentTimeMillis());
         importedAddress.setCreatedDeviceVersion(BlockchainFramework.getAppVersion());
 
         return importedAddress;
+    }
+
+    public XPubs xpubs() {
+        return new XPubs(new XPub(address, XPub.Format.LEGACY));
     }
 }

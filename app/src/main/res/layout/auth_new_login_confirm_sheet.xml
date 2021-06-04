@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/new_login_sheet_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/tiny_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/vector_sheet_indicator_small" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/vertical_guideline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.35"/>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/new_login_device_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/vertical_guideline"
+        app:layout_constraintBottom_toBottomOf="@+id/vertical_guideline"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintVertical_bias="0"
+        android:layout_margin="@dimen/standard_margin"
+        app:srcCompat="@drawable/ic_login_approved" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/title"
+        style="@style/Text.Semibold.Centered.20"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/new_login_device_icon"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/small_margin"
+        android:text="@string/auth_new_login_approved_title" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/label"
+        style="@style/Text.Light.Centered.14"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title"
+        app:layout_constraintBottom_toTopOf="@+id/ok_button"
+        app:layout_constraintVertical_chainStyle="spread_inside"
+        android:layout_marginStart="@dimen/huge_margin"
+        android:layout_marginEnd="@dimen/huge_margin"
+        android:layout_marginTop="@dimen/small_margin"
+        android:text="@string/auth_new_login_approved_description" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/ok_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/label"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.9"
+        android:layout_marginTop="@dimen/tiny_margin"
+        android:layout_marginBottom="@dimen/standard_margin"
+        style="@style/CtaButton.Blue"
+        android:text="@string/common_ok"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,10 +3,12 @@ package piuk.blockchain.android.ui.addresses
 import android.annotation.TargetApi
 import android.content.Context
 import android.graphics.Outline
+import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewOutlineProvider
 import android.view.animation.AlphaAnimation
@@ -27,10 +29,11 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetResources
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.util.invisible
 import piuk.blockchain.android.util.setAnimationListener
 import piuk.blockchain.android.util.visible
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 
 class ExpandableCurrencyHeader @JvmOverloads constructor(
     context: Context,
@@ -41,6 +44,7 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
 
     private val analytics: Analytics by inject()
     private val assetResources: AssetResources by scopedInject()
+    private val coincore: Coincore by scopedInject()
 
     private var expanded = false
     private var firstOpen = true
@@ -61,7 +65,9 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
     init {
         // Inflate layout
         LayoutInflater.from(getContext()).inflate(R.layout.view_expanding_currency_header, this, true)
-        CryptoCurrency.values().filter { it.hasFeature(CryptoCurrency.MULTI_WALLET) }
+        coincore.cryptoAssets
+            .map { it.asset }
+            .filter { it.hasFeature(CryptoCurrency.MULTI_WALLET) }
             .forEach { currency ->
                 textView(currency)?.apply {
                     setOnClickListener { closeLayout(currency) }
@@ -230,5 +236,11 @@ class ExpandableCurrencyHeader @JvmOverloads constructor(
         }
 
         override fun willChangeBounds(): Boolean = true
+    }
+
+    fun isTouchOutside(event: MotionEvent): Boolean {
+        val viewRect = Rect()
+        getGlobalVisibleRect(viewRect)
+        return !viewRect.contains(event.rawX.toInt(), event.rawY.toInt())
     }
 }

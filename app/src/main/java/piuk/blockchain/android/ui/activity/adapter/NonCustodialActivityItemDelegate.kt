@@ -9,6 +9,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.utils.toFormattedDate
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.disposables.CompositeDisposable
@@ -18,7 +19,6 @@ import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.android.util.toFormattedDate
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.inflate

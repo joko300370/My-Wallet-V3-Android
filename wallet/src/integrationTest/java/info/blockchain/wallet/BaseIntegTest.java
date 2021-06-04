@@ -7,9 +7,7 @@ import io.reactivex.functions.Function;
 import io.reactivex.internal.schedulers.TrampolineScheduler;
 import io.reactivex.plugins.RxJavaPlugins;
 import okhttp3.OkHttpClient;
-import org.bitcoinj.core.NetworkParameters;
-import org.bitcoinj.params.BitcoinCashMainNetParams;
-import org.bitcoinj.params.BitcoinMainNetParams;
+import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -29,25 +27,11 @@ public abstract class BaseIntegTest {
             }
 
             @Override
-            public Retrofit getRetrofitExplorerInstance() {
-                return getRetrofit(PersistentUrls.EXPLORER_URL, getOkHttpClient());
-            }
-
-            @Override
             public Environment getEnvironment() {
                 return Environment.PRODUCTION;
             }
 
-            @Override
-            public NetworkParameters getBitcoinParams() {
-                return BitcoinMainNetParams.get();
-            }
-
-            @Override
-            public NetworkParameters getBitcoinCashParams() {
-                return BitcoinCashMainNetParams.get();
-            }
-
+            @NotNull
             @Override
             public String getApiCode() {
                 return "Android-Integration-test";

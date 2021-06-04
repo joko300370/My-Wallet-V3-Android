@@ -5,8 +5,8 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.ExchangeRate
 import info.blockchain.balance.Money
 import piuk.blockchain.android.coincore.AssetAction
-import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.BlockchainAccount
+import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.InvoiceTarget
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.NullCryptoAccount
@@ -16,6 +16,7 @@ import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.ui.base.mvi.MviIntent
+import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
 import java.util.Stack
 
 sealed class TransactionIntent : MviIntent<TransactionState> {
@@ -109,9 +110,26 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
             )
     }
 
-    object ClearBackStack : TransactionIntent() {
+    data class ReInitialiseWithTargetAndNoSource(
+        val action: AssetAction,
+        val target: TransactionTarget,
+        private val passwordRequired: Boolean
+    ) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
-            oldState.copy(stepsBackStack = Stack())
+            oldState.copy(
+                action = action,
+                selectedTarget = target,
+                errorState = TransactionErrorState.NONE,
+                passwordRequired = passwordRequired,
+                nextEnabled = false,
+                stepsBackStack = Stack()
+            )
+    }
+
+    object ClearBackStack : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState = oldState.copy(
+            stepsBackStack = Stack()
+        )
     }
 
     object ResetFlow : TransactionIntent() {
@@ -368,6 +386,16 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
                 nextEnabled = true,
                 currentStep = TransactionStep.IN_PROGRESS,
                 executionStatus = TxExecutionStatus.Error(error)
+            ).updateBackstack(oldState)
+    }
+
+    class ApprovalRequired(
+        private val bankApprovalData: BankPaymentApproval
+    ) : TransactionIntent() {
+        override fun reduce(oldState: TransactionState): TransactionState =
+            oldState.copy(
+                currentStep = TransactionStep.IN_PROGRESS,
+                executionStatus = TxExecutionStatus.ApprovalRequired(bankApprovalData)
             ).updateBackstack(oldState)
     }
 

@@ -22,19 +22,23 @@ class EmailVeriffModel(
             EmailVeriffIntent.FetchEmail -> interactor.fetchEmail().subscribeBy(
                 onSuccess = {
                     process(EmailVeriffIntent.EmailUpdated(it))
-                }, onError = {}
+                }, onError = {
+                    process(EmailVeriffIntent.ErrorEmailVerification)
+                }
             )
             EmailVeriffIntent.CancelEmailVerification -> interactor.cancelPolling().subscribeBy(
                 onComplete = {},
                 onError = {}
             )
             EmailVeriffIntent.StartEmailVerification -> interactor.fetchEmail().flatMapObservable {
-                if (!it.verified) {
+                if (!it.isVerified) {
                     interactor.pollForEmailStatus().toObservable().startWith(it)
                 } else Observable.just(it)
             }.subscribeBy(onNext = {
                 process(EmailVeriffIntent.EmailUpdated(it))
-            }, onError = {})
+            }, onError = {
+                process(EmailVeriffIntent.ErrorEmailVerification)
+            })
 
             EmailVeriffIntent.ResendEmail -> interactor.fetchEmail().flatMap { interactor.resendEmail(it.address) }
                 .subscribeBy(onSuccess = {

@@ -32,9 +32,6 @@ fun walletApiServiceTestModule(server: DefaultMockServer) = module {
     single {
         object : EnvironmentUrls {
 
-            override val explorerUrl: String
-                get() = throw NotImplementedError()
-
             override val apiUrl: String
                 get() = server.url("")
 

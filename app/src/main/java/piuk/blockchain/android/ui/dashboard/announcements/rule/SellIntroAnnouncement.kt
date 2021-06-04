@@ -2,7 +2,7 @@ package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import androidx.annotation.VisibleForTesting
 import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
 import piuk.blockchain.android.R
@@ -18,7 +18,7 @@ import piuk.blockchain.android.ui.sell.SellAnalytics
 
 class SellIntroAnnouncement(
     dismissRecorder: DismissRecorder,
-    private val eligibilityProvider: EligibilityProvider,
+    private val eligibilityProvider: SimpleBuyEligibilityProvider,
     private val coincore: Coincore,
     private val analytics: Analytics
 ) : AnnouncementRule(dismissRecorder) {

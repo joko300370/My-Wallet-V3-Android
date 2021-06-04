@@ -17,17 +17,15 @@ import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
 import piuk.blockchain.android.coincore.updateTxValidity
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 
 class OnChainSwapTxEngine(
     quotesEngine: TransferQuotesEngine,
     walletManager: CustodialWalletManager,
     kycTierService: TierService,
-    private val engine: OnChainTxEngineBase,
-    environmentConfig: EnvironmentConfig
+    private val engine: OnChainTxEngineBase
 ) : SwapTxEngineBase(
-    quotesEngine, walletManager, kycTierService, environmentConfig
+    quotesEngine, walletManager, kycTierService
 ) {
     override val direction: TransferDirection by unsafeLazy {
         when (txTarget) {
@@ -64,7 +62,7 @@ class OnChainSwapTxEngine(
                     }
             }.map { px ->
                 px.copy(
-                    feeSelection = px.feeSelection.copy(selectedLevel = defaultFeeLevel(px))
+                    feeSelection = defaultFeeSelection(px)
                 )
             }.handlePendingOrdersError(
                 PendingTx(
@@ -78,11 +76,22 @@ class OnChainSwapTxEngine(
                 )
             )
 
-    private fun defaultFeeLevel(pendingTx: PendingTx): FeeLevel =
-        if (pendingTx.feeSelection.availableLevels.contains(FeeLevel.Priority))
-            FeeLevel.Priority
-        else
-            pendingTx.feeSelection.selectedLevel
+    private fun defaultFeeSelection(pendingTx: PendingTx): FeeSelection =
+        when {
+            pendingTx.feeSelection.availableLevels.contains(FeeLevel.Priority) -> {
+                pendingTx.feeSelection.copy(
+                    selectedLevel = FeeLevel.Priority,
+                    availableLevels = setOf(FeeLevel.Priority)
+                )
+            }
+            pendingTx.feeSelection.availableLevels.contains(FeeLevel.Regular) -> {
+                pendingTx.feeSelection.copy(
+                    selectedLevel = FeeLevel.Regular,
+                    availableLevels = setOf(FeeLevel.Regular)
+                )
+            }
+            else -> throw Exception("Not supported")
+        }
 
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> {
         return engine.doUpdateAmount(amount, pendingTx)
@@ -94,8 +103,7 @@ class OnChainSwapTxEngine(
         pendingTx: PendingTx,
         level: FeeLevel,
         customFeeAmount: Long
-    ): Single<PendingTx> =
-        engine.doUpdateFeeLevel(pendingTx, level, customFeeAmount)
+    ): Single<PendingTx> = Single.just(pendingTx)
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> {
         return engine.doValidateAmount(pendingTx)

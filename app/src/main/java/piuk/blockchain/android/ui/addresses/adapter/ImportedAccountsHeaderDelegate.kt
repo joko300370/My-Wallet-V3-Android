@@ -1,15 +1,14 @@
 package piuk.blockchain.android.ui.addresses.adapter
 
+import android.view.LayoutInflater
 import androidx.recyclerview.widget.RecyclerView
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import kotlinx.android.synthetic.main.item_accounts_row_header.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.ItemAccountsRowHeaderBinding
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.visible
 
 class ImportedAccountsHeaderDelegate(
@@ -17,7 +16,9 @@ class ImportedAccountsHeaderDelegate(
 ) : AdapterDelegate<AccountListItem> {
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        HeaderViewHolder(parent.inflate(R.layout.item_accounts_row_header))
+        HeaderViewHolder(
+            ItemAccountsRowHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        )
 
     override fun onBindViewHolder(
         items: List<AccountListItem>,
@@ -31,13 +32,14 @@ class ImportedAccountsHeaderDelegate(
     override fun isForViewType(items: List<AccountListItem>, position: Int): Boolean =
         items[position] is AccountListItem.ImportedHeader
 
-    private class HeaderViewHolder internal constructor(itemView: View) :
-        RecyclerView.ViewHolder(itemView) {
+    private class HeaderViewHolder constructor(
+        binding: ItemAccountsRowHeaderBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
 
-        private val header: TextView = itemView.header_name
-        private val plus: ImageView = itemView.imageview_plus
+        private val header: TextView = binding.headerName
+        private val plus: ImageView = binding.imageviewPlus
 
-        internal fun bind(item: AccountListItem.ImportedHeader, listener: AccountAdapter.Listener) {
+        fun bind(item: AccountListItem.ImportedHeader, listener: AccountAdapter.Listener) {
             header.setText(R.string.imported_addresses)
 
             if (item.enableImport) {

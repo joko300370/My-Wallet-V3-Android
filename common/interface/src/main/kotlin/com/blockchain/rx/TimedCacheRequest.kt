@@ -15,7 +15,9 @@ class TimedCacheRequest<T>(
     fun getCachedSingle(): Single<T> =
         Single.defer {
             if (expired.compareAndSet(true, false)) {
-                current = refreshFn.invoke().cache()
+                current = refreshFn.invoke().cache().doOnError {
+                    expired.set(true)
+                }
 
                 Single.timer(cacheLifetimeSeconds, TimeUnit.SECONDS)
                     .subscribeBy(onSuccess = { expired.set(true) })
@@ -36,6 +38,8 @@ class ParameteredTimedCacheRequest<INPUT, OUTPUT>(
             if (expired[input] != false) {
                 current = refreshFn.invoke(input).cache().doOnSuccess {
                     expired[input] = false
+                }.doOnError {
+                    expired[input] = true
                 }
 
                 Single.timer(cacheLifetimeSeconds, TimeUnit.SECONDS)

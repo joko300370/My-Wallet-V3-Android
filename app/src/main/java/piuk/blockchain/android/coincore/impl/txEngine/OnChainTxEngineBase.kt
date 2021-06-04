@@ -26,7 +26,7 @@ abstract class OnChainTxEngineBase(
         check(sourceAsset == tgt.asset)
     }
 
-    override fun doPostExecute(txResult: TxResult): Completable =
+    override fun doPostExecute(pendingTx: PendingTx, txResult: TxResult): Completable =
         txTarget.onTxCompleted(txResult)
 
     protected fun mapSavedFeeToFeeLevel(feeType: Int?): FeeLevel =

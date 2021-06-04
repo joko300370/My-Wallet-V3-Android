@@ -225,6 +225,9 @@ class TransactionFlowIntentMapper(
             AssetAction.InterestDeposit -> {
                 handleInterestDeposit(passwordRequired)
             }
+            AssetAction.InterestWithdraw -> {
+                handleInterestWithdraw(passwordRequired)
+            }
             AssetAction.Receive,
             AssetAction.ViewActivity,
             AssetAction.Summary -> throw IllegalStateException(
@@ -241,8 +244,25 @@ class TransactionFlowIntentMapper(
                 target,
                 passwordRequired
             )
+            target.isDefinedTarget() -> TransactionIntent.InitialiseWithTargetAndNoSource(
+                action = action,
+                target = target,
+                passwordRequired = passwordRequired
+            )
             else -> throw IllegalStateException(
                 "Calling interest deposit without source and target is not supported"
+            )
+        }
+
+    private fun handleInterestWithdraw(passwordRequired: Boolean) =
+        when {
+            sourceAccount.isDefinedCryptoAccount() -> TransactionIntent.InitialiseWithSourceAccount(
+                action,
+                sourceAccount,
+                passwordRequired
+            )
+            else -> throw IllegalStateException(
+                "Calling interest withdraw without source is not supported"
             )
         }
 

@@ -2,8 +2,8 @@ package piuk.blockchain.android.cards.partners
 
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.Partner
-import com.blockchain.nabu.models.responses.simplebuy.CardPartnerAttributes
 import com.blockchain.nabu.models.responses.simplebuy.EveryPayAttrs
+import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyConfirmationAttributes
 import io.reactivex.Single
 import piuk.blockchain.android.cards.CardData
 import piuk.blockchain.android.everypay.models.CardDetailRequest
@@ -11,14 +11,14 @@ import piuk.blockchain.android.everypay.models.CardDetailResponse
 import piuk.blockchain.android.everypay.models.CcDetails
 import piuk.blockchain.android.everypay.service.EveryPayService
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 import java.util.Random
-import java.util.Date
 
 interface CardActivator {
     val partner: Partner
     fun activateCard(cardData: CardData, cardId: String): Single<out CompleteCardActivation>
-    fun paymentAttributes(): CardPartnerAttributes
+    fun paymentAttributes(): SimpleBuyConfirmationAttributes
 }
 
 class EverypayCardActivator(
@@ -29,10 +29,12 @@ class EverypayCardActivator(
     override val partner: Partner = Partner.EVERYPAY
 
     override fun activateCard(cardData: CardData, cardId: String):
-            Single<CompleteCardActivation.EverypayCompleteCardActivationDetails> =
-        custodialWalletManager.activateCard(cardId, CardPartnerAttributes(
-            EveryPayAttrs(redirectUrl)
-        )).flatMap { credentials ->
+        Single<CompleteCardActivation.EverypayCompleteCardActivationDetails> =
+        custodialWalletManager.activateCard(
+            cardId, SimpleBuyConfirmationAttributes(
+                everypay = EveryPayAttrs(redirectUrl)
+            )
+        ).flatMap { credentials ->
             credentials.everypay?.let { everyPay ->
                 submitCard(cardData, everyPay.apiUsername, everyPay.mobileToken).map {
                     CompleteCardActivation.EverypayCompleteCardActivationDetails(
@@ -46,8 +48,8 @@ class EverypayCardActivator(
                 )
         }
 
-    override fun paymentAttributes(): CardPartnerAttributes =
-        CardPartnerAttributes(EveryPayAttrs(redirectUrl))
+    override fun paymentAttributes(): SimpleBuyConfirmationAttributes =
+        SimpleBuyConfirmationAttributes(everypay = EveryPayAttrs(redirectUrl))
 
     private fun submitCard(cardData: CardData, apiUserName: String, mobileToken: String): Single<CardDetailResponse> =
         submitCardService.getCardDetail(

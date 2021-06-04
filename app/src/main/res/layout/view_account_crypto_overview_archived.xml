@@ -9,8 +9,8 @@
 
     <ImageView
         android:id="@+id/icon"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="@dimen/asset_icon_size"
+        android:layout_height="@dimen/asset_icon_size"
         android:layout_marginStart="@dimen/standard_margin"
         android:importantForAccessibility="no"
         app:layout_constraintLeft_toLeftOf="parent"

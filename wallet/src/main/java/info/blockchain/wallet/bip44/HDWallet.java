@@ -1,8 +1,5 @@
 package info.blockchain.wallet.bip44;
 
-import com.google.common.base.Joiner;
-
-import org.apache.commons.codec.binary.Hex;
 import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.crypto.*;
@@ -10,10 +7,14 @@ import org.bitcoinj.crypto.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import info.blockchain.wallet.keys.MasterKey;
+import info.blockchain.wallet.keys.MasterKeyImpl;
+import info.blockchain.wallet.payload.data.Derivation;
 import info.blockchain.wallet.stx.STXAccount;
+import info.blockchain.wallet.util.HexUtils;
 
 /**
- * HDWallet.java : BIP44 wallet
+ * HDWalletx.java : BIP44 wallet
  */
 public class HDWallet {
 
@@ -25,12 +26,12 @@ public class HDWallet {
     private DeterministicKey dkKey = null;
     private DeterministicKey dkRoot = null;
 
-    private ArrayList<HDAccount> accounts;
+    private final ArrayList<HDAccount> accounts;
 
     private String strPath = null;
     private STXAccount stxAccount = null;
 
-    private NetworkParameters params;
+    private final NetworkParameters params;
 
     /**
      * Constructor for wallet.
@@ -39,8 +40,16 @@ public class HDWallet {
      * @param seed       seed for this wallet
      * @param passphrase optional BIP39 passphrase
      * @param nbAccounts number of accounts to create
+     * @param purpose    BIP43 purpose
      */
-    public HDWallet(MnemonicCode mc, NetworkParameters params, byte[] seed, String passphrase, int nbAccounts) throws MnemonicException.MnemonicLengthException {
+    public HDWallet(
+        MnemonicCode mc,
+        NetworkParameters params,
+        byte[] seed,
+        String passphrase,
+        int nbAccounts,
+        int purpose
+    ) throws MnemonicException.MnemonicLengthException {
         this.params = params;
         this.seed = seed;
         strPassphrase = passphrase;
@@ -48,7 +57,9 @@ public class HDWallet {
         wordList = mc.toMnemonic(seed);
         hd_seed = MnemonicCode.toSeed(wordList, strPassphrase);
         dkKey = HDKeyDerivation.createMasterPrivateKey(hd_seed);
-        DeterministicKey dKey = HDKeyDerivation.deriveChildKey(dkKey, 44 | ChildNumber.HARDENED_BIT);
+        DeterministicKey dKey = HDKeyDerivation.deriveChildKey(
+            dkKey, purpose | ChildNumber.HARDENED_BIT
+        );
         dkRoot = HDKeyDerivation.deriveChildKey(dKey, ChildNumber.HARDENED_BIT);
 
         accounts = new ArrayList<>();
@@ -56,8 +67,9 @@ public class HDWallet {
             accounts.add(new HDAccount(params, dkRoot, i));
         }
 
-        stxAccount = new STXAccount(params, dKey);
-
+        if (purpose == Derivation.LEGACY_PURPOSE) {
+            stxAccount = new STXAccount(params, dKey);
+        }
         strPath = dKey.getPathAsString();
     }
 
@@ -66,7 +78,10 @@ public class HDWallet {
      *
      * @param xpubs arrayList of XPUB strings
      */
-    public HDWallet(NetworkParameters params, List<String> xpubs) throws AddressFormatException {
+    public HDWallet(
+        NetworkParameters params,
+        List<String> xpubs
+    ) throws AddressFormatException {
 
         this.params = params;
         accounts = new ArrayList<>();
@@ -95,17 +110,7 @@ public class HDWallet {
      * @return String
      */
     public String getSeedHex() {
-        return new String(Hex.encodeHex(seed));
-    }
-
-    /**
-     * Return wallet BIP39 mnemonic as string containing space separated words.
-     *
-     * @return String
-     */
-    @Deprecated
-    public String getMnemonicOld() {
-        return Joiner.on(" ").join(wordList);
+        return HexUtils.encodeHexString(seed);
     }
 
     public List<String> getMnemonic() {
@@ -162,9 +167,8 @@ public class HDWallet {
         return stxAccount;
     }
 
-
-    public DeterministicKey getMasterKey() {
-        return dkKey;
+    public MasterKey getMasterKey() {
+        return new MasterKeyImpl(dkKey);
     }
 
     public byte[] getHdSeed() {

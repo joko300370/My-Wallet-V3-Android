@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.transactionflow.flow
 
+import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +16,7 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
 import piuk.blockchain.android.ui.transactionflow.flow.adapter.ConfirmTransactionDelegateAdapter
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionConfirmationCustomisations
+import piuk.blockchain.android.ui.transactionflow.plugin.TxFlowWidget
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
@@ -26,8 +28,11 @@ class ConfirmTransactionSheet : TransactionFlowSheet<DialogTxFlowConfirmBinding>
     private val exchangeRates: ExchangeRates by scopedInject()
     private val prefs: CurrencyPrefs by scopedInject()
     private val mapper: TxConfirmReadOnlyMapper by scopedInject()
+    private val mapperNewCheckout: TxConfirmReadOnlyMapperNewCheckout by scopedInject()
     private val customiser: TransactionConfirmationCustomisations by inject()
     private val assetResources: AssetResources by scopedInject()
+
+    private var headerSlot: TxFlowWidget? = null
 
     private val listAdapter: ConfirmTransactionDelegateAdapter by lazy {
         ConfirmTransactionDelegateAdapter(
@@ -36,6 +41,7 @@ class ConfirmTransactionSheet : TransactionFlowSheet<DialogTxFlowConfirmBinding>
             activityContext = requireActivity(),
             analytics = analyticsHooks,
             mapper = mapper,
+            mapperNewCheckout = mapperNewCheckout,
             selectedCurrency = prefs.selectedFiatCurrency,
             exchangeRates = exchangeRates,
             assetResources = assetResources
@@ -53,8 +59,6 @@ class ConfirmTransactionSheet : TransactionFlowSheet<DialogTxFlowConfirmBinding>
         newState.pendingTx?.let {
             listAdapter.items = newState.pendingTx.confirmations.toList()
             listAdapter.notifyDataSetChanged()
-            binding.amount.text = newState.pendingTx.amount.toStringWithSymbol()
-            binding.amount.visibleIf { customiser.amountHeaderConfirmationVisible(newState) }
         }
 
         with(binding) {
@@ -64,11 +68,29 @@ class ConfirmTransactionSheet : TransactionFlowSheet<DialogTxFlowConfirmBinding>
             confirmSheetBack.visibleIf { newState.canGoBack }
 
             if (customiser.confirmDisclaimerVisibility(newState.action)) {
-                confirmDisclaimer.visible()
-                confirmDisclaimer.text = customiser.confirmDisclaimerBlurb(newState.action)
+                confirmDisclaimer.apply {
+                    text = customiser.confirmDisclaimerBlurb(newState.action, requireContext())
+                    visible()
+                    movementMethod = LinkMovementMethod.getInstance()
+                }
+            }
+            initialiseHeaderSlotIfNeeded(newState)
+        }
+
+        headerSlot?.update(newState)
+        cacheState(newState)
+    }
+
+    private fun DialogTxFlowConfirmBinding.initialiseHeaderSlotIfNeeded(state: TransactionState) {
+        if (headerSlot == null) {
+            headerSlot = customiser.confirmInstallHeaderView(
+                requireContext(),
+                confirmHeaderSlot,
+                state
+            ).apply {
+                initControl(model, customiser, analyticsHooks)
             }
         }
-        cacheState(newState)
     }
 
     override fun initControls(binding: DialogTxFlowConfirmBinding) {

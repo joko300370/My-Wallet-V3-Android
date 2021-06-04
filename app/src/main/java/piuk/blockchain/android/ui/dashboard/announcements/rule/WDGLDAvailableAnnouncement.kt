@@ -1,7 +1,6 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import androidx.annotation.VisibleForTesting
-import com.blockchain.remoteconfig.FeatureFlag
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import piuk.blockchain.android.R
@@ -12,8 +11,7 @@ import piuk.blockchain.android.ui.dashboard.announcements.DismissRule
 import piuk.blockchain.android.ui.dashboard.announcements.StandardAnnouncementCard
 
 class WDGLDAvailableAnnouncement(
-    dismissRecorder: DismissRecorder,
-    private val dgldFeatureFlag: FeatureFlag
+    dismissRecorder: DismissRecorder
 ) : AnnouncementRule(dismissRecorder) {
 
     private var cta: (AnnouncementHost) -> Unit = {}
@@ -24,7 +22,7 @@ class WDGLDAvailableAnnouncement(
             return Single.just(false)
         }
 
-        return dgldFeatureFlag.enabled
+        return Single.just(true)
     }
 
     override fun show(host: AnnouncementHost) {

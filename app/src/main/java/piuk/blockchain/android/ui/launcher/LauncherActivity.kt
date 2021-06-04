@@ -10,6 +10,8 @@ import androidx.appcompat.widget.AppCompatEditText
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.NotificationsUtil
 import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.notifications.analytics.KYCAnalyticsEvents
+import com.blockchain.notifications.analytics.LaunchOrigin
 import com.blockchain.notifications.analytics.NotificationAppOpened
 import kotlinx.android.synthetic.main.activity_launcher.*
 import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
@@ -22,7 +24,6 @@ import piuk.blockchain.android.ui.kyc.email.entry.EmailEntryHost
 import piuk.blockchain.android.ui.kyc.email.entry.KycEmailEntryFragment
 import piuk.blockchain.android.ui.start.LandingActivity
 import piuk.blockchain.android.ui.start.PasswordRequiredActivity
-import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.gone
@@ -74,11 +75,6 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
             .show()
     }
 
-    override fun onRequestUpgrade() {
-        startActivity(Intent(this, UpgradeWalletActivity::class.java))
-        finish()
-    }
-
     override fun onStartMainActivity(uri: Uri?, launchBuySellIntro: Boolean) {
         val intent = Intent(this, MainActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -89,6 +85,7 @@ class LauncherActivity : BaseMvpActivity<LauncherView, LauncherPresenter>(), Lau
     }
 
     override fun launchEmailVerification() {
+        analytics.logEvent(KYCAnalyticsEvents.EmailVeriffRequested(LaunchOrigin.SIGN_UP))
         supportFragmentManager.beginTransaction()
             .replace(R.id.content_frame, KycEmailEntryFragment(), KycEmailEntryFragment::class.simpleName)
             .commitAllowingStateLoss()

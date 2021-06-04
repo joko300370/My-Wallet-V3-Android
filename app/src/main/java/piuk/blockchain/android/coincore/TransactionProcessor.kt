@@ -2,8 +2,8 @@ package piuk.blockchain.android.coincore
 
 import androidx.annotation.CallSuper
 import androidx.annotation.VisibleForTesting
-import com.blockchain.annotations.CommonCode
 import com.blockchain.extensions.replace
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.payloadScope
 import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.CurrencyPrefs
@@ -17,6 +17,8 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 import org.koin.core.KoinComponent
+import org.koin.core.inject
+import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -44,6 +46,7 @@ enum class ValidationState {
 }
 
 class TxValidationFailure(val state: ValidationState) : TransferError("Invalid Send Tx: $state")
+class NeedsApprovalException(val bankPaymentData: BankPaymentApproval) : Throwable()
 
 enum class FeeLevel {
     None,
@@ -128,84 +131,17 @@ enum class TxConfirmation {
     AGREEMENT_INTEREST_T_AND_C,
     AGREEMENT_INTEREST_TRANSFER,
     READ_ONLY,
+    SIMPLE_READ_ONLY,
+    COMPLEX_READ_ONLY,
+    EXPANDABLE_SIMPLE_READ_ONLY,
+    EXPANDABLE_COMPLEX_READ_ONLY,
+    COMPOUND_EXPANDABLE_READ_ONLY,
     MEMO,
     LARGE_TRANSACTION_WARNING,
     FEE_SELECTION,
     ERROR_NOTICE,
     INVOICE_COUNTDOWN,
     NETWORK_FEE
-}
-
-sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
-
-    data class ExchangePriceConfirmation(val money: Money, val asset: CryptoCurrency) :
-        TxConfirmationValue(TxConfirmation.READ_ONLY)
-
-    data class FeedTotal(
-        val amount: Money,
-        val fee: Money,
-        val exchangeAmount: Money? = null,
-        val exchangeFee: Money? = null
-    ) : TxConfirmationValue(TxConfirmation.READ_ONLY)
-
-    data class SwapExchangeRate(
-        val unitCryptoCurrency: Money,
-        val price: Money
-    ) : TxConfirmationValue(TxConfirmation.READ_ONLY)
-
-    data class SwapReceiveValue(
-        val receiveAmount: Money
-    ) : TxConfirmationValue(TxConfirmation.READ_ONLY)
-
-    data class From(val from: String) : TxConfirmationValue(TxConfirmation.READ_ONLY)
-
-    data class To(val to: String) : TxConfirmationValue(TxConfirmation.READ_ONLY)
-
-    data class Total(val total: Money, val exchange: Money? = null) : TxConfirmationValue(TxConfirmation.READ_ONLY)
-
-    data class FiatTxFee(val fee: Money) : TxConfirmationValue(TxConfirmation.READ_ONLY)
-
-    object EstimatedDepositCompletion : TxConfirmationValue(TxConfirmation.READ_ONLY)
-
-    object EstimatedWithdrawalCompletion : TxConfirmationValue(TxConfirmation.READ_ONLY)
-
-    @CommonCode("This structure is repeated in non-confirmation FEeSelection. They should be merged")
-    data class FeeSelection(
-        val feeDetails: FeeState? = null,
-        val exchange: Money? = null,
-        val selectedLevel: FeeLevel,
-        val customFeeAmount: Long = -1L,
-        val availableLevels: Set<FeeLevel> = emptySet(),
-        val feeInfo: FeeLevelRates? = null,
-        val asset: CryptoCurrency
-    ) : TxConfirmationValue(TxConfirmation.FEE_SELECTION)
-
-    data class BitPayCountdown(
-        val timeRemainingSecs: Long
-    ) : TxConfirmationValue(TxConfirmation.INVOICE_COUNTDOWN)
-
-    data class ErrorNotice(val status: ValidationState, val money: Money? = null) :
-        TxConfirmationValue(TxConfirmation.ERROR_NOTICE)
-
-    data class Description(val text: String = "") : TxConfirmationValue(TxConfirmation.DESCRIPTION)
-
-    data class Memo(val text: String?, val isRequired: Boolean, val id: Long?, val editable: Boolean = true) :
-        TxConfirmationValue(TxConfirmation.MEMO)
-
-    data class NetworkFee(
-        val txFee: TxFee
-    ) : TxConfirmationValue(TxConfirmation.NETWORK_FEE)
-
-    data class TxBooleanConfirmation<T>(
-        override val confirmation: TxConfirmation,
-        val data: T? = null,
-        val value: Boolean = false
-    ) : TxConfirmationValue(confirmation)
-
-    data class SwapSourceValue(val swappingAssetValue: CryptoValue) : TxConfirmationValue(TxConfirmation.READ_ONLY)
-
-    data class SwapDestinationValue(val receivingAssetValue: CryptoValue) :
-        TxConfirmationValue(TxConfirmation.READ_ONLY)
 }
 
 sealed class FeeState {
@@ -239,9 +175,21 @@ abstract class TxEngine : KoinComponent {
     protected val exchangeRates: ExchangeRateDataManager
         get() = _exchangeRates
 
+    protected val internalFeatureFlagApi: InternalFeatureFlagApi by inject()
+
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     fun refreshConfirmations(revalidate: Boolean = false) =
         _refresh.refreshConfirmations(revalidate).emptySubscribe()
+
+    fun buildNewFee(feeAmount: Money, exchangeAmount: Money, asset: CryptoCurrency): TxConfirmationValue? {
+        return if (!feeAmount.isZero) {
+            TxConfirmationValue.NewNetworkFee(
+                feeAmount = feeAmount as CryptoValue,
+                exchange = exchangeAmount,
+                asset = asset
+            )
+        } else null
+    }
 
     @CallSuper
     open fun start(
@@ -366,7 +314,7 @@ abstract class TxEngine : KoinComponent {
 
     // Action to be executed once the transaction has been executed, it will have been validated before this is called, so the expectation
     // is that it will succeed.
-    open fun doPostExecute(txResult: TxResult): Completable = Completable.complete()
+    open fun doPostExecute(pendingTx: PendingTx, txResult: TxResult): Completable = Completable.complete()
 
     // Action to be executed when confirmations have been built and we want to start checking for updates on them
     open fun startConfirmationsUpdate(pendingTx: PendingTx): Single<PendingTx> =
@@ -507,7 +455,7 @@ class TransactionProcessor(
         when (this) {
             ValidationState.CAN_EXECUTE -> {
                 engine.doExecute(pendingTx, secondPassword).flatMapCompletable { result ->
-                    engine.doPostExecute(result)
+                    engine.doPostExecute(pendingTx, result)
                 }
             }
             ValidationState.UNINITIALISED -> Completable.error(TransactionError.UnexpectedError)
@@ -596,7 +544,7 @@ private fun updateOptionsWithValidityWarning(pendingTx: PendingTx): PendingTx =
     }
 
 sealed class TxResult(val amount: Money) {
-    class HashedTxResult(val txHash: String, amount: Money) : TxResult(amount)
+    class HashedTxResult(val txId: String, amount: Money) : TxResult(amount)
     class UnHashedTxResult(amount: Money) : TxResult(amount)
 }
 

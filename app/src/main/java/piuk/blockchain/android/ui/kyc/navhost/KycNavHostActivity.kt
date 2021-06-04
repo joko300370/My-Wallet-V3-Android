@@ -10,6 +10,10 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.blockchain.koin.scopedInject
+import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.notifications.analytics.KYCAnalyticsEvents
+import com.blockchain.notifications.analytics.LaunchOrigin
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.KycNavXmlDirections
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
@@ -41,6 +45,7 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
     KycProgressListener, KycNavHostView {
 
     private val presenter: KycNavHostPresenter by scopedInject()
+    private val analytics: Analytics by inject()
     private var navInitialDestination: NavDestination? = null
     private val navController by unsafeLazy { findNavController(navHostFragment) }
     private val currentFragment: Fragment?
@@ -58,7 +63,7 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
         setContentView(R.layout.activity_kyc_nav_host)
         val title = R.string.identity_verification
         setupToolbar(toolBar, title)
-
+        analytics.logEvent(KYCAnalyticsEvents.UpgradeKycVeriffClicked(campaignType.toLaunchOrigin()))
         navController.setGraph(R.navigation.kyc_nav, intent.extras)
 
         onViewReady()
@@ -204,6 +209,18 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
             resultCode == RESULT_KYC_FOR_SDD_COMPLETE || resultCode == RESULT_KYC_FOR_TIER_COMPLETE
     }
 }
+
+private fun CampaignType.toLaunchOrigin(): LaunchOrigin =
+    when (this) {
+        CampaignType.Swap -> LaunchOrigin.SWAP
+        CampaignType.Blockstack,
+        CampaignType.Sunriver -> LaunchOrigin.AIRDROP
+        CampaignType.Resubmission -> LaunchOrigin.RESUBMISSION
+        CampaignType.SimpleBuy -> LaunchOrigin.SIMPLETRADE
+        CampaignType.FiatFunds -> LaunchOrigin.FIAT_FUNDS
+        CampaignType.Interest -> LaunchOrigin.SAVINGS
+        CampaignType.None -> LaunchOrigin.SETTINGS
+    }
 
 interface KycProgressListener : EmailEntryHost {
 

@@ -36,7 +36,7 @@ public class QrCodeDataManager {
 
     /**
      * Generates a pairing QR code in Bitmap format from a given password, sharedkey and encryption
-     * phrase to specified dimensions, wrapped in an Observable. Will throw an error if the Bitmap
+     * phrase to specified dimensions, wrapped in a Single. Will throw an error if the Bitmap
      * is null.
      *
      * @param password         Wallet's plain text password
@@ -44,8 +44,8 @@ public class QrCodeDataManager {
      * @param encryptionPhrase The pairing encryption password
      * @param dimensions       The dimensions of the QR code to be returned
      */
-    public Observable<Bitmap> generatePairingCode(String guid, String password, String sharedKey, String encryptionPhrase, int dimensions) {
-        return generatePairingCodeObservable(guid, password, sharedKey, encryptionPhrase, dimensions)
+    public Single<Bitmap> generatePairingCode(String guid, String password, String sharedKey, String encryptionPhrase, int dimensions) {
+        return generatePairingCodeSingle(guid, password, sharedKey, encryptionPhrase, dimensions)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -64,12 +64,12 @@ public class QrCodeDataManager {
         });
     }
 
-    private Observable<Bitmap> generatePairingCodeObservable(String guid,
-                                                             String password,
-                                                             String sharedKey,
-                                                             String encryptionPhrase,
-                                                             int dimensions) {
-        return Observable.fromCallable(() -> {
+    private Single<Bitmap> generatePairingCodeSingle(String guid,
+                                                     String password,
+                                                     String sharedKey,
+                                                     String encryptionPhrase,
+                                                     int dimensions) {
+        return Single.fromCallable(() -> {
             String pwHex = Hex.toHexString(password.getBytes(StandardCharsets.UTF_8));
             String encrypted = AESUtil.encrypt(sharedKey + "|" + pwHex, encryptionPhrase, PAIRING_CODE_PBKDF2_ITERATIONS);
             String qrData = "1|" + guid + "|" + encrypted;

@@ -47,21 +47,6 @@ data class CryptoValue(
             replaceWith = ReplaceWith("CryptoValue.zero(CryptoCurrency.BTC)")
         )
         val ZeroBtc = CryptoValue(CryptoCurrency.BTC, BigInteger.ZERO)
-        @Deprecated(
-            message = "As we add more assets, this will become a maintenance headache, prefer the zero(asset) method",
-            replaceWith = ReplaceWith("CryptoValue.zero(CryptoCurrency.BCH)")
-        )
-        val ZeroBch = CryptoValue(CryptoCurrency.BCH, BigInteger.ZERO)
-        @Deprecated(
-            message = "As we add more assets, this will become a maintenance headache, prefer the zero(asset) method",
-            replaceWith = ReplaceWith("CryptoValue.zero(CryptoCurrency.ETHER)")
-        )
-        val ZeroEth = CryptoValue(CryptoCurrency.ETHER, BigInteger.ZERO)
-        @Deprecated(
-            message = "As we add more assets, this will become a maintenance headache, prefer the zero(asset) method",
-            replaceWith = ReplaceWith("CryptoValue.zero(CryptoCurrency.XLM)")
-        )
-        val ZeroXlm = CryptoValue(CryptoCurrency.XLM, BigInteger.ZERO)
 
         fun zero(asset: CryptoCurrency) =
             CryptoValue(asset, BigInteger.ZERO)

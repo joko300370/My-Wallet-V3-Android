@@ -14,6 +14,7 @@ import info.blockchain.balance.Money
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.schedulers.Schedulers
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
@@ -191,6 +192,8 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
 
         compositeDisposable += binding.amountSheetInput.amount
             .debounce(AMOUNT_DEBOUNCE_TIME_MS, TimeUnit.MILLISECONDS)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
             .subscribe { amount ->
                 state.fiatRate?.let { rate ->
                     check(state.pendingTx != null) { "Px is not initialised yet" }
@@ -210,6 +213,8 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
 
         compositeDisposable += binding.amountSheetInput
             .onImeAction
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
             .subscribe {
                 when (it) {
                     PrefixedOrSuffixedEditText.ImeOptions.NEXT -> {

@@ -27,6 +27,5 @@ interface SeedAccess : SeedAccessWithoutPrompt {
 }
 
 class Seed(
-    val hdSeed: ByteArray,
-    val masterKey: ByteArray
+    val hdSeed: ByteArray
 )

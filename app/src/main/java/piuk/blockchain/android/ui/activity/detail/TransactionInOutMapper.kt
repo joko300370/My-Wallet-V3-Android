@@ -12,7 +12,6 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 
@@ -22,7 +21,6 @@ class TransactionInOutMapper(
     private val stringUtils: StringUtils,
     private val bchDataManager: BchDataManager,
     private val xlmDataManager: XlmDataManager,
-    private val environmentSettings: EnvironmentConfig,
     private val coincore: Coincore
 ) {
 
@@ -101,8 +99,7 @@ class TransactionInOutMapper(
 
     private fun handleBchToAndFrom(activitySummaryItem: NonCustodialActivitySummaryItem) =
         Single.fromCallable {
-            val (inputs, outputs) = transactionHelper.filterNonChangeBchAddresses(
-                activitySummaryItem)
+            val (inputs, outputs) = transactionHelper.filterNonChangeBchAddresses(activitySummaryItem)
             setToAndFrom(CryptoCurrency.BCH, inputs, outputs)
         }
 
@@ -142,13 +139,12 @@ class TransactionInOutMapper(
         currency: CryptoCurrency
     ): MutableList<TransactionDetailModel> {
         val inputs = mutableListOf<TransactionDetailModel>()
-        for ((key, value) in inputMap) {
+        for ((address, value) in inputMap) {
             val label = if (currency == CryptoCurrency.BTC) {
-                payloadDataManager.addressToLabel(key)
+                payloadDataManager.addressToLabel(address)
             } else {
-                bchDataManager.getLabelFromBchAddress(key)
-                    ?: FormatsUtil.toShortCashAddress(
-                        environmentSettings.bitcoinCashNetworkParameters, key)
+                bchDataManager.getLabelFromBchAddress(address)
+                    ?: FormatsUtil.toShortCashAddress(address)
             }
 
             val transactionDetailModel = buildTransactionDetailModel(label, value, currency)

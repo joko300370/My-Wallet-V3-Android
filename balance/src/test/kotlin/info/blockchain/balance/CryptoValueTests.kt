@@ -20,7 +20,7 @@ class CryptoValueTests {
 
     @Test
     fun `zero bch function`() {
-        CryptoValue.zero(CryptoCurrency.BCH) `should equal` CryptoValue.ZeroBch
+        CryptoValue.zero(CryptoCurrency.BCH) `should equal` CryptoValue.zero(CryptoCurrency.BCH)
     }
 
     @Test

@@ -10,17 +10,16 @@ import android.view.ViewGroup
 import androidx.annotation.UiThread
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
-import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.notifications.analytics.AnalyticsEvents
+import com.blockchain.notifications.analytics.LaunchOrigin
 import com.blockchain.preferences.CurrencyPrefs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
-import kotlinx.android.synthetic.main.fragment_dashboard.*
+import io.reactivex.rxkotlin.subscribeBy
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
@@ -32,9 +31,12 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.SingleAccount
-import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
+import piuk.blockchain.android.databinding.FragmentDashboardBinding
+import piuk.blockchain.android.simplebuy.BuySellClicked
+import piuk.blockchain.android.simplebuy.BuySellType
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import piuk.blockchain.android.simplebuy.SimpleBuyCancelOrderBottomSheet
 import piuk.blockchain.android.ui.airdrops.AirdropStatusSheet
@@ -45,22 +47,27 @@ import piuk.blockchain.android.ui.dashboard.adapter.DashboardDelegateAdapter
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementCard
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementHost
 import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementList
+import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsAnalytics
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsFlow
+import piuk.blockchain.android.ui.dashboard.assetdetails.assetActionEvent
+import piuk.blockchain.android.ui.dashboard.assetdetails.fiatAssetAction
 import piuk.blockchain.android.ui.dashboard.sheets.FiatFundsDetailSheet
 import piuk.blockchain.android.ui.dashboard.sheets.ForceBackupForSendSheet
-import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankMethodChooserBottomSheet
+import piuk.blockchain.android.ui.dashboard.sheets.WireTransferAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.interest.InterestSummarySheet
-import piuk.blockchain.android.ui.linkbank.LinkBankActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthSource
 import piuk.blockchain.android.ui.sell.BuySellFragment
 import piuk.blockchain.android.ui.settings.BankLinkingHost
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
-import piuk.blockchain.android.ui.transfer.receive.activity.ReceiveActivity
-import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.ui.transactionflow.analytics.SwapAnalyticsEvents
+import piuk.blockchain.android.ui.transfer.analytics.TransferAnalyticsEvent
 import piuk.blockchain.android.util.launchUrlInBrowser
+import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -70,7 +77,8 @@ class EmptyDashboardItem : DashboardItem
 
 private typealias RefreshFn = () -> Unit
 
-class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent, DashboardState>(),
+class DashboardFragment :
+    HomeScreenMviFragment<DashboardModel, DashboardIntent, DashboardState, FragmentDashboardBinding>(),
     ForceBackupForSendSheet.Host,
     FiatFundsDetailSheet.Host,
     KycBenefitsBottomSheet.Host,
@@ -108,6 +116,14 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         rxBus.register(ActionEvent::class.java)
     }
 
+    private val flowToLaunch: AssetAction? by unsafeLazy {
+        arguments?.getSerializable(FLOW_TO_LAUNCH) as? AssetAction
+    }
+
+    private val flowCurrency: String? by unsafeLazy {
+        arguments?.getString(FLOW_FIAT_CURRENCY)
+    }
+
     private var state: DashboardState? =
         null // Hold the 'current' display state, to enable optimising of state updates
 
@@ -123,7 +139,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     @UiThread
     private fun doRender(newState: DashboardState) {
 
-        swipe.isRefreshing = false
+        binding.swipe.isRefreshing = false
 
         if (newState.assets.isNotEmpty()) {
             if (displayList.isEmpty()) {
@@ -154,6 +170,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
 
         updateAnalytics(this.state, newState)
+
+        binding.dashboardProgress.visibleIf { newState.hasLongCallInProgress }
 
         this.state = newState
     }
@@ -208,19 +226,32 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                 model.process(ResetDashboardNavigation)
             }
             state.dashboardNavigationAction is LinkBankNavigationAction -> {
-                startBankLinking(state.dashboardNavigationAction.linkBankTransfer)
+                startBankLinking(state.dashboardNavigationAction)
             }
         }
     }
 
-    private fun startBankLinking(linkBankTransfer: LinkBankTransfer) {
-        startActivityForResult(
-            LinkBankActivity.newInstance(
-                linkBankTransfer,
-                requireContext()
-            ),
-            LinkBankActivity.LINK_BANK_REQUEST_CODE
-        )
+    private fun startBankLinking(action: DashboardNavigationAction) {
+        (action as? DashboardNavigationAction.LinkBankWithPartner)?.let {
+            startActivityForResult(
+                BankAuthActivity.newInstance(
+                    action.linkBankTransfer,
+                    when (it.assetAction) {
+                        AssetAction.FiatDeposit -> {
+                            BankAuthSource.DEPOSIT
+                        }
+                        AssetAction.Withdraw -> {
+                            BankAuthSource.WITHDRAW
+                        }
+                        else -> {
+                            throw IllegalStateException("Attempting to link from an unsupported action")
+                        }
+                    },
+                    requireContext()
+                ),
+                BankAuthActivity.LINK_BANK_REQUEST_CODE
+            )
+        }
     }
 
     private fun handleBottomSheet(state: DashboardState) {
@@ -242,8 +273,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                 )
                 DashboardNavigationAction.LinkOrDeposit -> {
                     state.selectedFiatAccount?.let {
-                        LinkBankAccountDetailsBottomSheet.newInstance(it)
-                    } ?: LinkBankAccountDetailsBottomSheet.newInstance()
+                        WireTransferAccountDetailsBottomSheet.newInstance(it)
+                    } ?: WireTransferAccountDetailsBottomSheet.newInstance()
                 }
                 DashboardNavigationAction.PaymentMethods -> {
                     state.linkablePaymentMethodsForAction?.let {
@@ -309,11 +340,8 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
     override fun onBackPressed(): Boolean = false
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_dashboard)
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentDashboardBinding =
+        FragmentDashboardBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -322,12 +350,39 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
         setupSwipeRefresh()
         setupRecycler()
+
+        if (flowToLaunch != null && flowCurrency != null) {
+            compositeDisposable += coincore.fiatAssets.accountGroup().subscribeBy(
+                onSuccess = { fiatGroup ->
+                    val selectedAccount = fiatGroup.accounts.first {
+                        (it as FiatAccount).fiatCurrency == flowCurrency
+                    }
+
+                    when (flowToLaunch) {
+                        AssetAction.FiatDeposit -> model.process(
+                            LaunchBankTransferFlow(
+                                selectedAccount, AssetAction.FiatDeposit, false
+                            )
+                        )
+                        AssetAction.Withdraw -> model.process(
+                            LaunchBankTransferFlow(
+                                selectedAccount, AssetAction.Withdraw, false
+                            )
+                        )
+                        else -> throw IllegalStateException("Unsupported flow launch for action $flowToLaunch")
+                    }
+                },
+                onError = {
+                    // TODO
+                }
+            )
+        }
     }
 
     private fun setupRecycler() {
         theLayoutManager = SafeLayoutManager(requireContext())
 
-        recycler_view.apply {
+        binding.recyclerView.apply {
             layoutManager = theLayoutManager
             adapter = theAdapter
 
@@ -343,16 +398,17 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     }
 
     private fun setupSwipeRefresh() {
+        with(binding) {
+            swipe.setOnRefreshListener { model.process(RefreshAllIntent) }
 
-        swipe.setOnRefreshListener { model.process(RefreshAllIntent) }
-
-        // Configure the refreshing colors
-        swipe.setColorSchemeResources(
-            R.color.blue_800,
-            R.color.blue_600,
-            R.color.blue_400,
-            R.color.blue_200
-        )
+            // Configure the refreshing colors
+            swipe.setColorSchemeResources(
+                R.color.blue_800,
+                R.color.blue_600,
+                R.color.blue_400,
+                R.color.blue_200
+            )
+        }
     }
 
     override fun onResume() {
@@ -401,7 +457,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
                     model.process(CheckBackupStatus(it.account, it.action))
                 }
             }
-            LinkBankActivity.LINK_BANK_REQUEST_CODE -> {
+            BankAuthActivity.LINK_BANK_REQUEST_CODE -> {
                 if (resultCode == RESULT_OK) {
                     state?.selectedFiatAccount?.let { fiatAccount ->
                         (state?.dashboardNavigationAction as? DashboardNavigationAction.LinkBankWithPartner)?.let {
@@ -422,10 +478,12 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
     }
 
     private fun onAssetClicked(cryptoCurrency: CryptoCurrency) {
+        analytics.logEvent(assetActionEvent(AssetDetailsAnalytics.WALLET_DETAILS, cryptoCurrency.networkTicker))
         model.process(LaunchAssetDetailsFlow(cryptoCurrency))
     }
 
     private fun onFundsClicked(fiatAccount: FiatAccount) {
+        analytics.logEvent(fiatAssetAction(AssetDetailsAnalytics.FIAT_DETAIL_CLICKED, fiatAccount.fiatCurrency))
         model.process(ShowFiatAssetDetails(fiatAccount))
     }
 
@@ -444,7 +502,10 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
         override fun startKyc(campaignType: CampaignType) = navigator().launchKyc(campaignType)
 
-        override fun startSwap() = navigator().tryTolaunchSwap()
+        override fun startSwap() {
+            analytics.logEvent(SwapAnalyticsEvents.SwapClickedEvent(LaunchOrigin.DASHBOARD_PROMO))
+            navigator().tryTolaunchSwap()
+        }
 
         override fun startPitLinking() = navigator().launchThePitLinking()
 
@@ -458,7 +519,14 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
 
         override fun startIntroTourGuide() = navigator().launchIntroTour()
 
-        override fun startTransferCrypto() = navigator().launchTransfer()
+        override fun startTransferCrypto() {
+            analytics.logEvent(
+                TransferAnalyticsEvent.TransferClicked(
+                    origin = LaunchOrigin.DASHBOARD_PROMO, type = TransferAnalyticsEvent.AnalyticsTransferType.RECEIVE
+                )
+            )
+            navigator().launchReceive()
+        }
 
         override fun startStxReceivedDetail() =
             model.process(ShowDashboardSheet(DashboardNavigationAction.StxAirdropComplete))
@@ -472,11 +540,30 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
 
         override fun startBuy() {
+            analytics.logEvent(
+                BuySellClicked(
+                    origin = LaunchOrigin.DASHBOARD_PROMO, type = BuySellType.BUY
+                )
+            )
             navigator().launchSimpleBuySell()
         }
 
         override fun startSell() {
+            analytics.logEvent(
+                BuySellClicked(
+                    origin = LaunchOrigin.DASHBOARD_PROMO, type = BuySellType.SELL
+                )
+            )
             navigator().launchSimpleBuySell(BuySellFragment.BuySellViewType.TYPE_SELL)
+        }
+
+        override fun startSend() {
+            analytics.logEvent(
+                TransferAnalyticsEvent.TransferClicked(
+                    origin = LaunchOrigin.DASHBOARD_PROMO, type = TransferAnalyticsEvent.AnalyticsTransferType.SEND
+                )
+            )
+            navigator().launchSend()
         }
 
         override fun startInterestDashboard() {
@@ -535,7 +622,7 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         model.process(ClearBottomSheet)
     }
 
-    override fun launchNewSendFor(account: SingleAccount, action: AssetAction) {
+    private fun launchSendFor(account: SingleAccount, action: AssetAction) {
         if (account is CustodialTradingAccount) {
             model.process(CheckBackupStatus(account, action))
         } else {
@@ -543,24 +630,23 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
     }
 
-    override fun goToReceiveFor(account: SingleAccount) =
-        when (account) {
-            is CryptoNonCustodialAccount -> {
-                clearBottomSheet()
-                startOldReceiveFor(account)
-            }
-            else -> throw IllegalStateException("The Send action is invalid for account: ${account.label}")
-        }.exhaustive
+    override fun performAssetActionFor(action: AssetAction, account: BlockchainAccount) {
+        clearBottomSheet()
+        when (action) {
+            AssetAction.Send -> launchSendFor(account as SingleAccount, action)
+            else -> navigator().performAssetActionFor(action, account)
+        }
+    }
 
     override fun gotoActivityFor(account: BlockchainAccount) =
-        navigator().gotoActivityFor(account)
+        navigator().performAssetActionFor(AssetAction.ViewActivity, account)
 
-    override fun goToDeposit(
-        fromAccount: SingleAccount,
-        toAccount: SingleAccount,
-        action: AssetAction
-    ) {
-        model.process(LaunchInterestDepositFlow(toAccount, fromAccount, action))
+    override fun goToInterestDeposit(toAccount: InterestAccount) {
+        model.process(LaunchInterestDepositFlow(toAccount))
+    }
+
+    override fun goToInterestWithdraw(fromAccount: InterestAccount) {
+        model.process(LaunchInterestWithdrawFlow(fromAccount))
     }
 
     override fun goToSummary(account: SingleAccount, asset: CryptoCurrency) {
@@ -580,13 +666,6 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         }
     }
 
-    override fun gotoSwap(account: SingleAccount) {
-        require(account is CryptoAccount)
-
-        clearBottomSheet()
-        navigator().tryTolaunchSwap(sourceAccount = account)
-    }
-
     override fun goToInterestDashboard() {
         navigator().startInterestDashboard()
     }
@@ -599,13 +678,19 @@ class DashboardFragment : HomeScreenMviFragment<DashboardModel, DashboardIntent,
         model.process(LaunchSendFlow(account, action))
     }
 
-    private fun startOldReceiveFor(account: SingleAccount) {
-        require(account is CryptoAccount)
-        ReceiveActivity.start(requireContext(), account)
-    }
-
     companion object {
         fun newInstance() = DashboardFragment()
+
+        fun newInstance(flowToLaunch: AssetAction, fiatCurrency: String) =
+            DashboardFragment().apply {
+                arguments = Bundle().apply {
+                    putSerializable(FLOW_TO_LAUNCH, flowToLaunch)
+                    putString(FLOW_FIAT_CURRENCY, fiatCurrency)
+                }
+            }
+
+        private const val FLOW_TO_LAUNCH = "FLOW_TO_LAUNCH"
+        private const val FLOW_FIAT_CURRENCY = "FLOW_FIAT_CURRENCY"
 
         private const val IDX_CARD_ANNOUNCE = 0
         private const val IDX_CARD_BALANCE = 1

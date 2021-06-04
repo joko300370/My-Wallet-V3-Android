@@ -33,6 +33,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
+import com.blockchain.koin.mwaFeatureFlag
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.Bank
 import com.blockchain.nabu.datamanagers.PaymentMethod
@@ -44,6 +45,7 @@ import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.SettingsAnalyticsEvents
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.ui.urllinks.URL_PRIVACY_POLICY
 import com.blockchain.ui.urllinks.URL_TOS_POLICY
 import com.google.android.play.core.review.ReviewInfo
@@ -51,10 +53,10 @@ import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.mukesh.countrypicker.CountryPicker
 import info.blockchain.wallet.api.data.Settings
-import info.blockchain.wallet.util.FormatsUtil
 import info.blockchain.wallet.util.PasswordUtil
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.schedulers.Schedulers
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
@@ -70,6 +72,7 @@ import piuk.blockchain.android.data.biometrics.BiometricKeysInvalidated
 import piuk.blockchain.android.data.biometrics.BiometricsCallback
 import piuk.blockchain.android.data.biometrics.BiometricsController
 import piuk.blockchain.android.data.biometrics.BiometricsNoSuitableMethods
+import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.android.simplebuy.RemoveLinkedBankBottomSheet
 import piuk.blockchain.android.simplebuy.RemovePaymentMethodBottomSheetHost
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
@@ -84,10 +87,14 @@ import piuk.blockchain.android.ui.customviews.PasswordStrengthView
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.dashboard.LinkablePaymentMethodsForAction
-import piuk.blockchain.android.ui.dashboard.sheets.LinkBankAccountDetailsBottomSheet
+import piuk.blockchain.android.ui.dashboard.sheets.WireTransferAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankMethodChooserBottomSheet
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
-import piuk.blockchain.android.ui.linkbank.LinkBankActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthSource
+import piuk.blockchain.android.ui.pairingcode.PairingBottomSheet
+import piuk.blockchain.android.ui.scan.QrScanActivity
+import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
 import piuk.blockchain.android.ui.settings.preferences.BankPreference
 import piuk.blockchain.android.ui.settings.preferences.CardPreference
 import piuk.blockchain.android.ui.settings.preferences.KycStatusPreference
@@ -96,6 +103,7 @@ import piuk.blockchain.android.ui.thepit.PitLaunchBottomDialog
 import piuk.blockchain.android.ui.thepit.PitPermissionsActivity
 import piuk.blockchain.android.util.AfterTextChangedWatcher
 import piuk.blockchain.android.util.AndroidUtils
+import piuk.blockchain.android.util.FormatChecker
 import piuk.blockchain.android.util.RootUtil
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.androidcore.data.events.ActionEvent
@@ -128,6 +136,9 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
     private val thePit by lazy {
         findPreference<ThePitStatusPreference>("the_pit")
+    }
+    private val qrConnectPref by lazy {
+        findPreference<Preference>("qr_connect")
     }
     private val banksPref by lazy {
         findPreference<PreferenceCategory>("banks")
@@ -175,6 +186,10 @@ class SettingsFragment : PreferenceFragmentCompat(),
     private val currencyPrefs: CurrencyPrefs by inject()
     private val analytics: Analytics by inject()
     private val rxBus: RxBus by inject()
+    private val formatChecker: FormatChecker by inject()
+    private val mwaFF: FeatureFlag by inject(mwaFeatureFlag)
+
+    private var isMWAEnabled: Boolean = false
 
     private var pwStrength = 0
     private var progressDialog: MaterialProgressDialog? = null
@@ -192,6 +207,15 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
         analytics.logEvent(AnalyticsEvents.Settings)
         Logging.logContentView(javaClass.simpleName)
+
+        val compositeDisposable = mwaFF.enabled.observeOn(Schedulers.io()).subscribe(
+            { result ->
+                isMWAEnabled = result
+            },
+            {
+                isMWAEnabled = false
+            }
+        )
 
         initReviews()
     }
@@ -230,6 +254,9 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
         thePit.onClick { settingsPresenter.onThePitClicked() }
         thePit?.isVisible = true
+
+        qrConnectPref?.isVisible = isMWAEnabled
+        qrConnectPref.onClick { PairingBottomSheet().show(childFragmentManager, BOTTOM_SHEET) }
 
         // Preferences
         fiatPref.onClick { showDialogFiatUnits() }
@@ -362,7 +389,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
 
     override fun showEmailDialog(currentEmail: String, emailVerified: Boolean) {
-        showUpdateEmailDialog(settingsActivity, settingsPresenter, currentEmail, emailVerified)
+        showUpdateEmailDialog(settingsActivity, settingsPresenter, currentEmail, emailVerified, formatChecker)
     }
 
     override fun hideProgress() {
@@ -376,6 +403,15 @@ class SettingsFragment : PreferenceFragmentCompat(),
             getString(message),
             ToastCustom.LENGTH_SHORT,
             ToastCustom.TYPE_ERROR
+        )
+    }
+
+    override fun showScanTargetError(error: QrScanError) {
+        showError(
+            message = when (error.errorCode) {
+                QrScanError.ErrorCode.ScanFailed -> R.string.error_scan_failed_general
+                QrScanError.ErrorCode.BitPayScanFailed -> R.string.error_scan_failed_bitpay
+            }
         )
     }
 
@@ -536,8 +572,8 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
 
     override fun onBankWireTransferSelected(currency: String) {
-        LinkBankAccountDetailsBottomSheet.newInstance(currency).show(childFragmentManager, BOTTOM_SHEET)
-        analytics.logEvent(linkBankEventWithCurrency(SimpleBuyAnalytics.LINK_BANK_CLICKED, currency))
+        WireTransferAccountDetailsBottomSheet.newInstance(currency).show(childFragmentManager, BOTTOM_SHEET)
+        analytics.logEvent(linkBankEventWithCurrency(SimpleBuyAnalytics.WIRE_TRANSFER_CLICKED, currency))
     }
 
     private fun linkBank(linkablePaymentMethods: LinkablePaymentMethods) {
@@ -850,7 +886,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
                 positive.setOnClickListener {
                     val sms = countryTextView.text.toString() + mobileNumber.text.toString()
 
-                    if (!FormatsUtil.isValidMobileNumber(sms)) {
+                    if (!formatChecker.isValidMobileNumber(sms)) {
                         showCustomToast(R.string.invalid_mobile)
                     } else {
                         settingsPresenter.updateSms(sms)
@@ -955,11 +991,16 @@ class SettingsFragment : PreferenceFragmentCompat(),
                         )
                     )
                 }
-                LinkBankActivity.LINK_BANK_REQUEST_CODE -> {
+                BankAuthActivity.LINK_BANK_REQUEST_CODE -> {
                     settingsPresenter.updateBanks()
                 }
                 REQUEST_CODE_BIOMETRIC_ENROLLMENT -> {
                     settingsPresenter.onFingerprintClicked()
+                }
+                QrScanActivity.SCAN_URI_RESULT -> {
+                    data.getRawScanData()?.let { scanData ->
+                        settingsPresenter.processScanResult(scanData)
+                    }
                 }
             }
         } else if (resultCode == RESULT_FIRST_USER || resultCode == RESULT_CANCELED) {
@@ -1239,7 +1280,12 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
     override fun linkBankWithPartner(linkBankTransfer: LinkBankTransfer) {
         startActivityForResult(
-            LinkBankActivity.newInstance(linkBankTransfer, requireContext()), LinkBankActivity.LINK_BANK_REQUEST_CODE
+            BankAuthActivity.newInstance(
+                linkBankTransfer,
+                BankAuthSource.SETTINGS,
+                requireContext()
+            ),
+            BankAuthActivity.LINK_BANK_REQUEST_CODE
         )
     }
 }

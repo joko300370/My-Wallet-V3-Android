@@ -11,44 +11,31 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.blockchain.koin.scopedInject
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.EmailVerificationArgs
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.FragmentKycAddEmailBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
-import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.data.settings.Email
+import java.lang.IllegalStateException
 
-class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, EmailVeriffState>(),
-    SlidingModalBottomDialog.Host, ResendOrChangeEmailBottomSheet.ResendOrChangeEmailHost {
+class KycEmailEntryFragment :
+    MviFragment<EmailVeriffModel, EmailVeriffIntent, EmailVeriffState, FragmentKycAddEmailBinding>(),
+    SlidingModalBottomDialog.Host,
+    ResendOrChangeEmailBottomSheet.ResendOrChangeEmailHost {
 
     private val emailEntryHost: EmailEntryHost by ParentActivityDelegate(
         this
     )
-    private val stringUtils: StringUtils by inject()
 
     private val emailMustBeValidated by lazy {
         if (arguments?.containsKey("mustBeValidated") == true)
             EmailVerificationArgs.fromBundle(arguments ?: Bundle()).mustBeValidated
         else false
-    }
-
-    private var _binding: FragmentKycAddEmailBinding? = null
-
-    private val binding get() = _binding!!
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentKycAddEmailBinding.inflate(inflater, container, false)
-        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -64,35 +51,49 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentKycAddEmailBinding =
+        FragmentKycAddEmailBinding.inflate(inflater, container, false)
 
     override val model: EmailVeriffModel by scopedInject()
 
     override fun render(newState: EmailVeriffState) {
-        if (newState.email.verified) {
-            drawVerifiedEmailUi()
-        } else {
-            drawUnVerifiedEmailUi(newState.email)
+        when {
+            !newState.email.isVerified -> drawUnVerifiedEmailUi(newState.email)
+            newState.email.isVerified -> drawVerifiedEmailUi()
+            newState.emailChanged -> drawUnVerifiedEmailUi(newState.email)
+            newState.hasError -> drawErrorMessage()
+            else -> throw IllegalStateException("Not a valid state")
         }
     }
 
-    private fun drawVerifiedEmailUi() {
-        binding.emailInstructions.text = getString(R.string.success_email_veriff)
-        binding.emailStatusText.text = getString(R.string.email_verified)
-        binding.skip.gone()
-        binding.txStateIndicator.setImageResource(R.drawable.ic_check_circle)
-        binding.txStateIndicator.visible()
-        binding.ctaPrimary.apply {
-            visible()
-            text = getString(R.string.next)
-            setOnClickListener {
-                emailEntryHost.onEmailVerified()
-            }
+    private fun drawErrorMessage() {
+        with(binding) {
+            txStateIndicator.setImageResource(R.drawable.ic_alert_white_bkgd)
+            emailStatusText.text = getString(R.string.error_email_veriff_title)
+            emailInstructions.text = getString(R.string.error_email_veriff)
+            skip.gone()
         }
-        binding.ctaSecondary.gone()
+        setUpPrimaryCta()
+        setUpSecondaryCta()
+        model.process(EmailVeriffIntent.StartEmailVerification)
+    }
+
+    private fun drawVerifiedEmailUi() {
+        with(binding) {
+            emailInstructions.text = getString(R.string.success_email_veriff)
+            emailStatusText.text = getString(R.string.email_verified)
+            skip.gone()
+            txStateIndicator.setImageResource(R.drawable.ic_check_circle)
+            txStateIndicator.visible()
+            ctaPrimary.apply {
+                visible()
+                text = getString(R.string.next)
+                setOnClickListener {
+                    emailEntryHost.onEmailVerified()
+                }
+            }
+            ctaSecondary.gone()
+        }
     }
 
     private fun drawUnVerifiedEmailUi(email: Email) {
@@ -115,20 +116,28 @@ class KycEmailEntryFragment : MviFragment<EmailVeriffModel, EmailVeriffIntent, E
             emailStatusText.text = getString(R.string.email_verify)
             skip.visibleIf { !emailMustBeValidated }
             txStateIndicator.gone()
-            ctaPrimary.apply {
-                visible()
-                text = getString(R.string.check_my_inbox)
-                setOnClickListener {
-                    openInbox()
-                }
+        }
+        setUpPrimaryCta()
+        setUpSecondaryCta()
+    }
+
+    private fun setUpPrimaryCta() {
+        binding.ctaPrimary.apply {
+            visible()
+            text = getString(R.string.check_my_inbox)
+            setOnClickListener {
+                openInbox()
             }
-            ctaSecondary.apply {
-                visible()
-                text = getString(R.string.did_not_get_email)
-                setOnClickListener {
-                    model.process(EmailVeriffIntent.CancelEmailVerification)
-                    ResendOrChangeEmailBottomSheet().show(childFragmentManager, BOTTOM_SHEET)
-                }
+        }
+    }
+
+    private fun setUpSecondaryCta() {
+        binding.ctaSecondary.apply {
+            visible()
+            text = getString(R.string.did_not_get_email)
+            setOnClickListener {
+                model.process(EmailVeriffIntent.CancelEmailVerification)
+                ResendOrChangeEmailBottomSheet().show(childFragmentManager, BOTTOM_SHEET)
             }
         }
     }

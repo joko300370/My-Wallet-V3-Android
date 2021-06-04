@@ -5,21 +5,31 @@ import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
+import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionConfirmationCustomisations
 
-interface TxFlowWidget {
-
+interface EnterAmountWidget : TxFlowWidget {
     fun initControl(
         model: TransactionModel,
         customiser: EnterAmountCustomisations,
         analytics: TxFlowAnalytics
     )
+}
 
+interface ConfirmSheetWidget : TxFlowWidget {
+    fun initControl(
+        model: TransactionModel,
+        customiser: TransactionConfirmationCustomisations,
+        analytics: TxFlowAnalytics
+    )
+}
+
+interface TxFlowWidget {
     fun update(state: TransactionState)
 
     fun setVisible(isVisible: Boolean)
 }
 
-interface ExpandableTxFlowWidget : TxFlowWidget {
+interface ExpandableTxFlowWidget : EnterAmountWidget {
 
     val expanded: Observable<Boolean>
 }

@@ -63,14 +63,16 @@ class TransactionProgressView(context: Context, attrs: AttributeSet) :
 
     fun showPendingTx(
         title: String,
-        subtitle: SpannableStringBuilder
+        subtitle: String,
+        locksNote: SpannableStringBuilder
     ) {
         tx_state_indicator.setImageResource(R.drawable.ic_check_circle)
         tx_state_indicator.visible()
         showEndStateUi()
         tx_title.text = title
-        tx_subtitle.run {
-            setText(subtitle, TextView.BufferType.SPANNABLE)
+        tx_subtitle.text = subtitle
+        tx_note_locks.run {
+            setText(locksNote, TextView.BufferType.SPANNABLE)
             movementMethod = LinkMovementMethod.getInstance()
         }
     }
@@ -81,6 +83,36 @@ class TransactionProgressView(context: Context, attrs: AttributeSet) :
         showEndStateUi()
         setText(title, subtitle)
     }
+
+    fun showFiatTxSuccess(title: String, subtitle: String, currency: String) {
+        setFiatAssetIcon(currency)
+        tx_state_indicator.setImageResource(R.drawable.ic_tx_deposit_w_green_bkgd)
+        tx_state_indicator.visible()
+        showEndStateUi()
+        setText(title, subtitle)
+    }
+
+    fun showFiatTxPending(title: String, subtitle: String, currency: String) {
+        setFiatAssetIcon(currency)
+        showTxInProgress(title, subtitle)
+    }
+
+    fun showFiatTxError(title: String, subtitle: String, currency: String) {
+        setFiatAssetIcon(currency)
+        tx_icon.setImageResource(R.drawable.ic_alert)
+        tx_state_indicator.gone()
+        showEndStateUi()
+        setText(title, subtitle)
+    }
+
+    private fun setFiatAssetIcon(currency: String) =
+        setAssetIcon(
+            when (currency) {
+                "EUR" -> R.drawable.ic_funds_euro_masked
+                "GBP" -> R.drawable.ic_funds_euro_masked
+                else -> R.drawable.ic_funds_usd_masked
+            }
+        )
 
     private fun showEndStateUi() {
         progress.gone()

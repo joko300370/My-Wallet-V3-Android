@@ -6,20 +6,21 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import androidx.appcompat.app.AlertDialog
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.scopedInject
 import com.blockchain.ui.urllinks.WALLET_STATUS_URL
-import kotlinx.android.synthetic.main.activity_landing.*
-import kotlinx.android.synthetic.main.warning_layout.view.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.connectivity.ConnectivityStatus
+import piuk.blockchain.android.databinding.ActivityLandingBinding
 import piuk.blockchain.android.ui.base.MvpActivity
 import piuk.blockchain.android.ui.createwallet.CreateWalletActivity
-import piuk.blockchain.android.ui.debug.DebugOptionsBottomDialog
 import piuk.blockchain.android.ui.recover.RecoverFundsActivity
 import piuk.blockchain.android.util.copyHashOnLongClick
 import piuk.blockchain.android.ui.customviews.toast
+import piuk.blockchain.android.ui.login.LoginFragment
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.visible
 
@@ -27,26 +28,42 @@ class LandingActivity : MvpActivity<LandingView, LandingPresenter>(), LandingVie
 
     override val presenter: LandingPresenter by scopedInject()
     private val stringUtils: StringUtils by inject()
+    private val internalFlags: InternalFeatureFlagApi by inject()
     override val view: LandingView = this
+
+    private val binding: ActivityLandingBinding by lazy {
+        ActivityLandingBinding.inflate(layoutInflater)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_landing)
+        setContentView(binding.root)
 
-        btn_create.setOnClickListener { launchCreateWalletActivity() }
-        btn_login.setOnClickListener { launchLoginActivity() }
-        btn_recover.setOnClickListener { showFundRecoveryWarning() }
+        with(binding) {
+            btnCreate.setOnClickListener { launchCreateWalletActivity() }
+            btnLogin.setOnClickListener {
+                if (internalFlags.isFeatureEnabled(GatedFeature.SINGLE_SIGN_ON)) {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.content_frame, LoginFragment(), LoginFragment::class.simpleName)
+                        .addToBackStack(LoginFragment::class.simpleName)
+                        .commitAllowingStateLoss()
+                } else {
+                    launchLoginActivity()
+                }
+            }
+            btnRecover.setOnClickListener { showFundRecoveryWarning() }
 
-        if (!ConnectivityStatus.hasConnectivity(this)) {
-            showConnectivityWarning()
-        } else {
-            presenter.checkForRooted()
+            if (!ConnectivityStatus.hasConnectivity(this@LandingActivity)) {
+                showConnectivityWarning()
+            } else {
+                presenter.checkForRooted()
+            }
+
+            textVersion.text =
+                "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) ${BuildConfig.COMMIT_HASH}"
+
+            textVersion.copyHashOnLongClick(this@LandingActivity)
         }
-
-        text_version.text =
-            "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) ${BuildConfig.COMMIT_HASH}"
-
-        text_version.copyHashOnLongClick(this)
     }
 
     private fun launchCreateWalletActivity() = CreateWalletActivity.start(this)
@@ -87,20 +104,13 @@ class LandingActivity : MvpActivity<LandingView, LandingPresenter>(), LandingVie
         )
 
     override fun showApiOutageMessage() {
-        layout_warning.visible()
+        binding.layoutWarning.root.visible()
         val learnMoreMap = mapOf<String, Uri>("learn_more" to Uri.parse(WALLET_STATUS_URL))
-        layout_warning.warning_message.apply {
+        binding.layoutWarning.warningMessage.apply {
             movementMethod = LinkMovementMethod.getInstance()
             text = stringUtils.getStringWithMappedAnnotations(
                 R.string.wallet_outage_message, learnMoreMap, this@LandingActivity
             )
-        }
-    }
-
-    override fun showDebugMenu() {
-        btn_settings.visible()
-        btn_settings.setOnClickListener {
-            DebugOptionsBottomDialog.show(supportFragmentManager)
         }
     }
 

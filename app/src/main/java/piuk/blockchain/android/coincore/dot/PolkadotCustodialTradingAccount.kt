@@ -1,13 +1,13 @@
 package piuk.blockchain.android.coincore.dot
 
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.impl.CustodialTradingAccount
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 class PolkadotCustodialTradingAccount(
@@ -15,15 +15,15 @@ class PolkadotCustodialTradingAccount(
     label: String,
     exchangeRates: ExchangeRateDataManager,
     custodialWalletManager: CustodialWalletManager,
-    environmentConfig: EnvironmentConfig,
-    eligibilityProvider: EligibilityProvider
+    identity: UserIdentity,
+    features: InternalFeatureFlagApi
 ) : CustodialTradingAccount(
     asset = cryptoCurrency,
     label = label,
     exchangeRates = exchangeRates,
     custodialWalletManager = custodialWalletManager,
-    environmentConfig = environmentConfig,
-    eligibilityProvider = eligibilityProvider
+    identity = identity,
+    features = features
 ) {
     override val actions: Single<AvailableActions>
         get() = super.actions.map {

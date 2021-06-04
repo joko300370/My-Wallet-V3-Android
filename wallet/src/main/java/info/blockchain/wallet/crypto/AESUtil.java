@@ -3,6 +3,7 @@ package info.blockchain.wallet.crypto;
 import info.blockchain.wallet.exceptions.DecryptionException;
 import info.blockchain.wallet.exceptions.EncryptionException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import javax.annotation.Nullable;
 import org.apache.commons.codec.binary.Base64;
@@ -23,8 +24,6 @@ import org.spongycastle.crypto.params.KeyParameter;
 import org.spongycastle.crypto.params.ParametersWithIV;
 
 public class AESUtil {
-
-//    private static Logger mLogger = LoggerFactory.getLogger(AESUtil.class);
 
     // The encryption mode that we use (AES CBC) is not particularly well suited to
     // encrypt different values with the same key. To provide some additional defense
@@ -48,13 +47,15 @@ public class AESUtil {
 
     // AES 256 PBKDF2 CBC iso10126 decryption
     // 16 byte IV must be prepended to ciphertext - Compatible with crypto-js
-    public static String decrypt(String ciphertext, String password, int iterations) throws UnsupportedEncodingException, InvalidCipherTextException, DecryptionException {
+    public static String decrypt(String ciphertext, String password, int iterations) throws InvalidCipherTextException, DecryptionException {
 
         return decryptWithSetMode(ciphertext, password, iterations, MODE_CBC, new ISO10126d2Padding());
     }
 
-    public static String decryptWithSetMode(String ciphertext, String password, int iterations, int mode, @Nullable BlockCipherPadding padding) throws InvalidCipherTextException, UnsupportedEncodingException, DecryptionException {
-
+    public static String decryptWithSetMode(String ciphertext, String password, int iterations, int mode, @Nullable BlockCipherPadding padding)
+        throws InvalidCipherTextException,
+        DecryptionException
+    {
         byte[] cipherdata = Base64.decodeBase64(ciphertext.getBytes());
 
         //Separate the IV and cipher data
@@ -96,7 +97,7 @@ public class AESUtil {
         System.arraycopy(buf, 0, out, 0, len);
 
         // return string representation of decoded bytes
-        String result = new String(out, "UTF-8");
+        String result = new String(out, StandardCharsets.UTF_8);
         if (result.isEmpty()) {
             throw new DecryptionException("Decrypted string is empty.");
         }
@@ -106,24 +107,30 @@ public class AESUtil {
 
     // AES 256 PBKDF2 CBC iso10126 encryption
     public static String encrypt(String cleartext, String password, int iterations)
-        throws EncryptionException, UnsupportedEncodingException {
+        throws EncryptionException {
 
         return encryptWithSetMode(cleartext, password, iterations, MODE_CBC, new ISO10126d2Padding());
     }
 
-    public static String encryptWithSetMode(String cleartext, String password, int iterations, int mode, @Nullable BlockCipherPadding padding)
-        throws EncryptionException, UnsupportedEncodingException {
+    public static String encryptWithSetMode(
+        String cleartext,
+        String password,
+        int iterations,
+        int mode,
+        @Nullable BlockCipherPadding padding
+    )
+        throws EncryptionException {
 
         if (password == null) {
-            throw  new EncryptionException("Password null");
+            throw new EncryptionException("Password null");
         }
 
         // Use secure random to generate a 16 byte iv
         SecureRandom random = new SecureRandom();
-        byte iv[] = new byte[AESBlockSize * 4];
+        byte[] iv = new byte[AESBlockSize * 4];
         random.nextBytes(iv);
 
-        byte[] clearbytes = cleartext.getBytes("UTF-8");
+        byte[] clearbytes = cleartext.getBytes(StandardCharsets.UTF_8);
 
         PBEParametersGenerator generator = new PKCS5S2ParametersGenerator();
         generator.init(PBEParametersGenerator.PKCS5PasswordToUTF8Bytes(password.toCharArray()), iv, iterations);
@@ -183,12 +190,11 @@ public class AESUtil {
 
     /**
      * Use secure random to generate a 16 byte iv
-     * @return
      */
     private static byte[] getSalt() {
 
         SecureRandom random = new SecureRandom();
-        byte iv[] = new byte[AESBlockSize * 4];
+        byte[] iv = new byte[AESBlockSize * 4];
         random.nextBytes(iv);
 
         return iv;
@@ -198,13 +204,11 @@ public class AESUtil {
      *
      * @param key AES key (256 bit Buffer)
      * @param data e.g. "{'aaa':'bbb'}"
-     * @return
-     * @throws InvalidCipherTextException
      */
-    public static byte[] encryptWithKey(byte[] key, String data) throws InvalidCipherTextException, UnsupportedEncodingException {
+    public static byte[] encryptWithKey(byte[] key, String data) {
 
         byte[] iv = getSalt();
-        byte[] dataBytes = data.getBytes("utf-8");
+        byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
 
         KeyParameter keyParam = new KeyParameter(key);
         CipherParameters params = new ParametersWithIV(keyParam, iv);
@@ -227,16 +231,12 @@ public class AESUtil {
     }
 
     /**
-     *
      * @param key AES key (256 bit Buffer)
      * @param ciphertext Base64 encoded concatenated payload + iv
-     * @return
-     * @throws InvalidCipherTextException
-     * @throws UnsupportedEncodingException
      */
-    public static String decryptWithKey(byte[] key, String ciphertext) throws InvalidCipherTextException, UnsupportedEncodingException {
+    public static String decryptWithKey(byte[] key, String ciphertext) throws InvalidCipherTextException {
 
-        byte[] dataBytesB64 = Base64.decodeBase64(ciphertext.getBytes("utf-8"));
+        byte[] dataBytesB64 = Base64.decodeBase64(ciphertext.getBytes(StandardCharsets.UTF_8));
 
         //Separate the IV and cipher data
         byte[] iv = copyOfRange(dataBytesB64, 0, AESBlockSize * 4);
@@ -259,12 +259,12 @@ public class AESUtil {
         byte[] out = new byte[len];
         System.arraycopy(buf, 0, out, 0, len);
 
-        return new String(out, "UTF-8");
+        return new String(out, StandardCharsets.UTF_8);
     }
 
     public static byte[] stringToKey(String string, int iterations) throws UnsupportedEncodingException {
 
-        byte[] salt = "salt".getBytes("utf-8");
+        byte[] salt = "salt".getBytes(StandardCharsets.UTF_8);
 
         PBEParametersGenerator generator = new PKCS5S2ParametersGenerator();
         generator.init(PBEParametersGenerator.PKCS5PasswordToUTF8Bytes(string.toCharArray()), salt, iterations);

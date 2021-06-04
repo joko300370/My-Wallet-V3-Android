@@ -105,6 +105,10 @@
         <item name="android:textSize">20sp</item>
     </style>
 
+    <style name="Text.Blue.Semibold.32">
+        <item name="android:textSize">32sp</item>
+    </style>
+
     <style name="Text.Blue.Semibold.Centered">
         <item name="android:gravity">center</item>
     </style>
@@ -147,6 +151,10 @@
 
     <style name="Text.Light.16">
         <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="Text.Light.20">
+        <item name="android:textSize">20sp</item>
     </style>
 
     <style name="Text.Standard.Centered.20">

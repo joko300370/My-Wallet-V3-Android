@@ -44,6 +44,8 @@ interface SingleAccount : BlockchainAccount, TransactionTarget {
 
     // Is this account currently able to operate as a transaction source
     val sourceState: Single<TxSourceState>
+
+    fun doesAddressBelongToWallet(address: String): Boolean = false
 }
 
 enum class TxSourceState {

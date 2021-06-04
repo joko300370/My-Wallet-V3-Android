@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="@dimen/standard_margin">
+    android:padding="@dimen/standard_margin">
 
     <LinearLayout
         android:id="@+id/nested_parent"
@@ -17,5 +17,167 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/standard_margin"
             android:text="Local feature flags" />
+
+        <TextView
+            android:id="@+id/device_currency"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="2dp"
+            android:gravity="center"
+            android:text="Device Currency" />
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/radio_usd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="USD" />
+
+            <RadioButton
+                android:id="@+id/radio_eur"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="EUR" />
+
+            <RadioButton
+                android:id="@+id/radio_gbp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="GBP" />
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/clear_simple_buy_state"
+            style="@style/CtaButton.Blue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"
+            android:text="Clear SB order" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="2dp"
+            android:gravity="center"
+            android:text="Randomise device ID per installation, to avoid pre-IDV banning of test devices" />
+
+        <Button
+            android:id="@+id/btn_rnd_device_id"
+            style="@style/CtaButton.Blue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"
+            android:text="Randomise Device Id" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="2dp"
+            android:gravity="center"
+            android:text="Log out and completely reset this app." />
+
+        <Button
+            android:id="@+id/btn_reset_wallet"
+            style="@style/CtaButton.Blue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"
+            android:text="Reset Wallet" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="2dp"
+            android:gravity="center"
+            android:text="Reset all announcement cards and tour popups to unshown state" />
+
+        <Button
+            android:id="@+id/btn_reset_announce"
+            style="@style/CtaButton.Blue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"
+            android:text="Reset Announcements" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="2dp"
+            android:gravity="center"
+            android:text="Reset various device timers and saved states, such as warning dialogs, onboarding etc" />
+
+        <Button
+            android:id="@+id/btn_reset_prefs"
+            style="@style/CtaButton.Blue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"
+            android:text="Reset Preferences" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="2dp"
+            android:gravity="center"
+            android:text="Persist a pit to wallet link ID for pit linking testing" />
+
+        <Button
+            android:id="@+id/btn_store_linkId"
+            style="@style/CtaButton.Blue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"
+            android:text="StoreLinkId" />
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="2dp"
+            android:gravity="center"
+            android:text="Firebase Token:" />
+
+        <TextView
+            android:id="@+id/firebase_token"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:textColor="@color/blue_800"
+            android:textIsSelectable="true" />
     </LinearLayout>
 </ScrollView>

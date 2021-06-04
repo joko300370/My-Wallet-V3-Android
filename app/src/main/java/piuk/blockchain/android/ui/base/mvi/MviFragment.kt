@@ -1,5 +1,9 @@
 package piuk.blockchain.android.ui.base.mvi
 
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.annotation.UiThread
 import androidx.appcompat.app.AlertDialog
@@ -14,11 +18,15 @@ import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import timber.log.Timber
 
-abstract class MviFragment<M : MviModel<S, I>, I : MviIntent<S>, S : MviState> : Fragment() {
+abstract class MviFragment<M : MviModel<S, I>, I : MviIntent<S>, S : MviState, E : ViewBinding> : Fragment() {
 
     protected abstract val model: M
 
     var subscription: Disposable? = null
+
+    private var _binding: E? = null
+
+    val binding get() = _binding!!
 
     override fun onResume() {
         super.onResume()
@@ -41,10 +49,18 @@ abstract class MviFragment<M : MviModel<S, I>, I : MviIntent<S>, S : MviState> :
         super.onPause()
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        _binding = initBinding(inflater, container)
+        return binding.root
+    }
+
     override fun onDestroy() {
         model.destroy()
         super.onDestroy()
+        _binding = null
     }
+
+    abstract fun initBinding(inflater: LayoutInflater, container: ViewGroup?): E
 
     protected abstract fun render(newState: S)
 

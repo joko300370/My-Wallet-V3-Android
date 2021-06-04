@@ -5,10 +5,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.notifications.analytics.InterestAnalytics
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.utils.secondsToDays
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
@@ -17,18 +20,20 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
-import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
+import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.databinding.DialogSheetInterestDetailsBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
-import piuk.blockchain.android.util.secondsToDays
 import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -37,11 +42,8 @@ import java.util.Locale
 class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetailsBinding>() {
     interface Host : SlidingModalBottomDialog.Host {
         fun gotoActivityFor(account: BlockchainAccount)
-        fun goToDeposit(
-            fromAccount: SingleAccount,
-            toAccount: SingleAccount,
-            action: AssetAction
-        )
+        fun goToInterestDeposit(toAccount: InterestAccount)
+        fun goToInterestWithdraw(fromAccount: InterestAccount)
     }
 
     override val host: Host by lazy {
@@ -62,6 +64,7 @@ class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetails
     private val currencyPrefs: CurrencyPrefs by scopedInject()
     private val coincore: Coincore by scopedInject()
     private val assetResources: AssetResources by scopedInject()
+    private val features: InternalFeatureFlagApi by inject()
 
     private val listAdapter: InterestSummaryAdapter by lazy { InterestSummaryAdapter() }
 
@@ -76,25 +79,25 @@ class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetails
             interestDetailsTitle.text = account.label
             interestDetailsSheetHeader.text = getString(assetResources.assetNameRes(cryptoCurrency))
             interestDetailsLabel.text = getString(assetResources.assetNameRes(cryptoCurrency))
-            interestDetailsAssetIcon.setImageResource(assetResources.drawableResFilled(cryptoCurrency))
+
+            interestDetailsAssetWithIcon.updateIcon(account as CryptoAccount)
 
             interestDetailsActivityCta.setOnClickListener {
                 host.gotoActivityFor(account as BlockchainAccount)
             }
-            disposables += account.actions
-                .map { it.contains(AssetAction.InterestDeposit) }
-                .onErrorReturn { false }
-                .subscribeBy {
-                    if (it) {
+            disposables += coincore.allWalletsWithActions(setOf(AssetAction.InterestDeposit)).map { accounts ->
+                accounts.filter { account -> account is CryptoAccount && account.asset == cryptoCurrency }
+            }
+                .onErrorReturn { emptyList() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy { accounts ->
+                    if (accounts.isNotEmpty()) {
+                        interestDetailsDepositCta.visible()
                         interestDetailsDepositCta.text =
                             getString(R.string.tx_title_deposit, cryptoCurrency.displayTicker)
                         interestDetailsDepositCta.setOnClickListener {
-                            // TODO how do we select accounts from here? For now choose default non-custodial
-                            disposables += coincore[cryptoCurrency].accountGroup(AssetFilter.NonCustodial).subscribe {
-                                val defaultAccount = it.accounts.first { acc -> acc.isDefault }
-                                analytics.logEvent(InterestAnalytics.INTEREST_SUMMARY_DEPOSIT_CTA)
-                                host.goToDeposit(defaultAccount, account, AssetAction.InterestDeposit)
-                            }
+                            analytics.logEvent(InterestAnalytics.INTEREST_SUMMARY_DEPOSIT_CTA)
+                            host.goToInterestDeposit(account as InterestAccount)
                         }
                     } else {
                         interestDetailsDepositCta.gone()
@@ -127,6 +130,23 @@ class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetails
     }
 
     private fun compositeToView(composite: CompositeInterestDetails) {
+        if (features.isFeatureEnabled(GatedFeature.INTEREST_WITHDRAWAL) && composite.balance.isPositive) {
+            with(binding) {
+                interestDetailsDisclaimer.gone()
+                interestDetailsActivityCta.gone()
+                interestDetailsWithdrawCta.text = getString(R.string.tx_title_withdraw, cryptoCurrency.displayTicker)
+                interestDetailsWithdrawCta.visible()
+                interestDetailsWithdrawCta.setOnClickListener {
+                    analytics.logEvent(InterestAnalytics.INTEREST_SUMMARY_WITHDRAW_CTA)
+                    host.goToInterestWithdraw(account as InterestAccount)
+                }
+            }
+        } else {
+            with(binding) {
+                interestDetailsDisclaimer.visible()
+                interestDetailsActivityCta.visible()
+            }
+        }
         val itemList = mutableListOf<InterestSummaryInfoItem>()
         itemList.apply {
             add(

@@ -13,7 +13,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.EligibilityProvider
+import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.service.TierService
 import com.blockchain.notifications.analytics.Analytics
@@ -35,6 +35,8 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.simplebuy.BuySellType
+import piuk.blockchain.android.simplebuy.BuySellViewedEvent
 import piuk.blockchain.android.ui.customviews.ButtonOptions
 import piuk.blockchain.android.ui.customviews.IntroHeaderView
 import piuk.blockchain.android.ui.customviews.VerifyIdentityNumericBenefitItem
@@ -63,7 +65,7 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     private val tierService: TierService by scopedInject()
     private val coincore: Coincore by scopedInject()
     private val custodialWalletManager: CustodialWalletManager by scopedInject()
-    private val eligibilityProvider: EligibilityProvider by scopedInject()
+    private val eligibilityProvider: SimpleBuyEligibilityProvider by scopedInject()
     private val currencyPrefs: CurrencyPrefs by inject()
     private val analytics: Analytics by inject()
     private val accountsSorting: AccountsSorting by inject()
@@ -258,6 +260,7 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
                 host = this@SellIntroFragment
             )
         }
+        analytics.logEvent(BuySellViewedEvent(BuySellType.SELL))
     }
 
     private fun supportedCryptoCurrencies(): Single<List<CryptoCurrency>> {

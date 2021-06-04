@@ -3,12 +3,10 @@ package piuk.blockchain.android.ui.transactionflow.flow.adapter
 import android.app.Activity
 import android.graphics.Typeface
 import android.net.Uri
-import android.text.Editable
 import android.text.InputFilter
 import android.text.InputType
 import android.text.SpannableStringBuilder
 import android.text.Spanned
-import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
 import android.text.style.StyleSpan
 import android.view.View
@@ -28,13 +26,12 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.ui.activity.detail.adapter.INPUT_FIELD_FLAGS
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
+import piuk.blockchain.android.ui.customviews.installUpdateThrottle
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.visible
-import java.util.Timer
-import java.util.TimerTask
 
 class ConfirmXlmMemoItemDelegate<in T>(
     private val model: TransactionModel,
@@ -71,9 +68,6 @@ private class XlmMemoItemViewHolder(
 
     override val containerView: View
         get() = itemView
-
-    private lateinit var timer: Timer
-    private val savingDelay = 300L
 
     init {
         itemView.apply {
@@ -156,47 +150,25 @@ private class XlmMemoItemViewHolder(
         model: TransactionModel,
         item: TxConfirmationValue.Memo
     ) {
-
-        addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                // do nothing
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (::timer.isInitialized) {
-                    timer.cancel()
-                }
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                if (::timer.isInitialized) {
-                    timer.cancel()
-                }
-
-                timer = Timer()
-                timer.schedule(object : TimerTask() {
-                    override fun run() {
-                        if (text?.isNotEmpty() == true) {
-                            if (itemView.confirm_details_memo_spinner.selectedItemPosition == TEXT_INDEX) {
-                                if (haveContentsChanged(s?.toString(), item.text)) {
-                                    model.process(
-                                        TransactionIntent.ModifyTxOption(item.copy(text = text.toString()))
-                                    )
-                                }
-                            } else {
-                                if (haveContentsChanged(s?.toString(), item.id?.toString())) {
-                                    model.process(
-                                        TransactionIntent.ModifyTxOption(
-                                            item.copy(id = text.toString().toLong())
-                                        )
-                                    )
-                                }
-                            }
+        installUpdateThrottle { newText ->
+            if (text?.isNotEmpty() == true) {
+                if (itemView.confirm_details_memo_spinner.selectedItemPosition == TEXT_INDEX) {
+                    if (haveContentsChanged(newText?.toString(), item.text)) {
+                            model.process(
+                                TransactionIntent.ModifyTxOption(item.copy(text = text.toString()))
+                            )
+                        }
+                    } else {
+                        if (haveContentsChanged(newText?.toString(), item.id?.toString())) {
+                            model.process(
+                                TransactionIntent.ModifyTxOption(
+                                    item.copy(id = text.toString().toLong())
+                                )
+                            )
                         }
                     }
-                }, savingDelay)
+                }
             }
-        })
     }
 
     private fun AppCompatSpinner.setupSpinner() {

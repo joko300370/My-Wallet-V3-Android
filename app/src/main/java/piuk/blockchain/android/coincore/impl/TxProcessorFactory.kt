@@ -11,6 +11,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FiatAccount
+import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.coincore.TransactionProcessor
 import piuk.blockchain.android.coincore.TransactionTarget
@@ -19,16 +20,18 @@ import piuk.blockchain.android.coincore.fiat.LinkedBankAccount
 import piuk.blockchain.android.coincore.impl.txEngine.BitpayTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.FiatDepositTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.FiatWithdrawalTxEngine
-import piuk.blockchain.android.coincore.impl.txEngine.InterestDepositTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.impl.txEngine.TradingToOnChainTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.TransferQuotesEngine
+import piuk.blockchain.android.coincore.impl.txEngine.interest.InterestDepositOnChainTxEngine
+import piuk.blockchain.android.coincore.impl.txEngine.interest.InterestDepositTradingEngine
+import piuk.blockchain.android.coincore.impl.txEngine.interest.InterestWithdrawOnChainTxEngine
+import piuk.blockchain.android.coincore.impl.txEngine.interest.InterestWithdrawTradingTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.sell.OnChainSellTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.sell.TradingSellTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.swap.OnChainSwapTxEngine
 import piuk.blockchain.android.coincore.impl.txEngine.swap.TradingToTradingSwapTxEngine
 import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 class TxProcessorFactory(
@@ -38,8 +41,7 @@ class TxProcessorFactory(
     private val walletPrefs: WalletStatus,
     private val quotesEngine: TransferQuotesEngine,
     private val analytics: Analytics,
-    private val kycTierService: TierService,
-    private val environmentConfig: EnvironmentConfig
+    private val kycTierService: TierService
 ) {
     fun createProcessor(
         source: BlockchainAccount,
@@ -49,9 +51,43 @@ class TxProcessorFactory(
         when (source) {
             is CryptoNonCustodialAccount -> createOnChainProcessor(source, target, action)
             is CustodialTradingAccount -> createTradingProcessor(source, target, action)
+            is CryptoInterestAccount -> createInterestWithdrawalProcessor(source, target, action)
             is BankAccount -> createFiatDepositProcessor(source, target, action)
             is FiatAccount -> createFiatWithdrawalProcessor(source, target, action)
             else -> Single.error(NotImplementedError())
+        }
+
+    private fun createInterestWithdrawalProcessor(
+        source: CryptoInterestAccount,
+        target: TransactionTarget,
+        action: AssetAction
+    ): Single<TransactionProcessor> =
+        when (target) {
+            is CustodialTradingAccount -> {
+                Single.just(
+                    TransactionProcessor(
+                        exchangeRates = exchangeRates,
+                        sourceAccount = source,
+                        txTarget = target,
+                        engine = InterestWithdrawTradingTxEngine(
+                            walletManager = walletManager
+                        )
+                    )
+                )
+            }
+            is CryptoNonCustodialAccount -> {
+                Single.just(
+                    TransactionProcessor(
+                        exchangeRates = exchangeRates,
+                        sourceAccount = source,
+                        txTarget = target,
+                        engine = InterestWithdrawOnChainTxEngine(
+                            walletManager = walletManager
+                        )
+                    )
+                )
+            }
+            else -> Single.error(IllegalStateException("$target is not supported yet"))
         }
 
     private fun createFiatDepositProcessor(
@@ -128,7 +164,7 @@ class TxProcessorFactory(
                             exchangeRates = exchangeRates,
                             sourceAccount = source,
                             txTarget = it,
-                            engine = InterestDepositTxEngine(
+                            engine = InterestDepositOnChainTxEngine(
                                 walletManager = walletManager,
                                 onChainEngine = engine
                             )
@@ -161,8 +197,7 @@ class TxProcessorFactory(
                                 quotesEngine = quotesEngine,
                                 walletManager = walletManager,
                                 kycTierService = kycTierService,
-                                engine = engine,
-                                environmentConfig = environmentConfig
+                                engine = engine
                             )
                         )
                     )
@@ -176,8 +211,7 @@ class TxProcessorFactory(
                         quotesEngine = quotesEngine,
                         walletManager = walletManager,
                         kycTierService = kycTierService,
-                        engine = engine,
-                        environmentConfig = environmentConfig
+                        engine = engine
                     )
                 )
             )
@@ -202,6 +236,17 @@ class TxProcessorFactory(
                     )
                 )
             )
+        is InterestAccount ->
+            Single.just(
+                TransactionProcessor(
+                    exchangeRates = exchangeRates,
+                    sourceAccount = source,
+                    txTarget = target,
+                    engine = InterestDepositTradingEngine(
+                        walletManager = walletManager
+                    )
+                )
+            )
         is TradingAccount ->
             Single.just(
                 TransactionProcessor(
@@ -211,8 +256,7 @@ class TxProcessorFactory(
                     engine = TradingToTradingSwapTxEngine(
                         walletManager = walletManager,
                         quotesEngine = quotesEngine,
-                        kycTierService = kycTierService,
-                        environmentConfig = environmentConfig
+                        kycTierService = kycTierService
                     )
                 )
             )
@@ -237,8 +281,7 @@ class TxProcessorFactory(
                     engine = TradingSellTxEngine(
                         walletManager = walletManager,
                         quotesEngine = quotesEngine,
-                        kycTierService = kycTierService,
-                        environmentConfig = environmentConfig
+                        kycTierService = kycTierService
                     )
                 )
             )

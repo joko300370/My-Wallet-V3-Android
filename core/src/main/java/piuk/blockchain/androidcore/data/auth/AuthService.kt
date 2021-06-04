@@ -1,9 +1,9 @@
 package piuk.blockchain.androidcore.data.auth
 
+import info.blockchain.api.ApiException
 import info.blockchain.wallet.api.WalletApi
 import info.blockchain.wallet.api.data.Status
 import info.blockchain.wallet.api.data.WalletOptions
-import info.blockchain.wallet.exceptions.ApiException
 import info.blockchain.wallet.exceptions.InvalidCredentialsException
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -130,5 +130,16 @@ class AuthService(private val walletApi: WalletApi, rxBus: RxBus) {
     fun getSignedJwt(guid: String, sharedKey: String, partner: String): Single<String> =
         rxPinning.callSingle {
             walletApi.getSignedJsonToken(guid, sharedKey, partner)
+        }
+
+    /**
+     * Send email to verify device
+     *
+     * @param email The user's email
+     * @return An [Observable] wrapping the result
+     */
+    fun sendEmailForDeviceVerification(email: String): Single<ResponseBody> =
+        rxPinning.callSingle {
+            walletApi.sendEmailForVerification(email)
         }
 }

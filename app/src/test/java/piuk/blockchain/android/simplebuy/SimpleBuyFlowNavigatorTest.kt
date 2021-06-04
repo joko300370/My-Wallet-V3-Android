@@ -1,9 +1,9 @@
 package piuk.blockchain.android.simplebuy
 
-import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.models.responses.nabu.KycTierState
 import com.blockchain.nabu.service.TierService
+import com.blockchain.preferences.CurrencyPrefs
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
@@ -35,7 +35,10 @@ class SimpleBuyFlowNavigatorTest {
         whenever(custodialWalletManager.getSupportedFiatCurrencies()).thenReturn(Single.just(listOf("GBP,EUR")))
 
         val test =
-            subject.navigateTo(startedFromKycResume = false, startedFromDashboard = true, preselectedCrypto = null)
+            subject.navigateTo(
+                startedFromKycResume = false, startedFromDashboard = true, startedFromApprovalDeepLink = false,
+                preselectedCrypto = null
+            )
                 .test()
         test.assertValueAt(0, BuyNavigation.CurrencySelection(listOf("GBP,EUR")))
     }
@@ -49,9 +52,25 @@ class SimpleBuyFlowNavigatorTest {
             subject.navigateTo(
                 startedFromKycResume = false,
                 startedFromDashboard = true,
+                startedFromApprovalDeepLink = false,
                 preselectedCrypto = CryptoCurrency.BTC
             ).test()
         test.assertValueAt(0, BuyNavigation.FlowScreenWithCurrency(FlowScreen.ENTER_AMOUNT, CryptoCurrency.BTC))
+    }
+
+    @Test
+    fun `if currency is supported and state is clear and startedFromApprovalDeepLink then screen should be payment`() {
+        mockCurrencyIsSupported(true)
+        whenever(simpleBuyModel.state).thenReturn(Observable.just(SimpleBuyState()))
+
+        val test =
+            subject.navigateTo(
+                startedFromKycResume = false,
+                startedFromDashboard = false,
+                startedFromApprovalDeepLink = true,
+                preselectedCrypto = CryptoCurrency.BTC
+            ).test()
+        test.assertValueAt(0, BuyNavigation.OrderInProgressScreen)
     }
 
     // KYC tests
@@ -66,6 +85,7 @@ class SimpleBuyFlowNavigatorTest {
             subject.navigateTo(
                 startedFromKycResume = false,
                 startedFromDashboard = true,
+                startedFromApprovalDeepLink = false,
                 preselectedCrypto = CryptoCurrency.BTC
             ).test()
         test.assertValueAt(0, BuyNavigation.FlowScreenWithCurrency(FlowScreen.ENTER_AMOUNT, CryptoCurrency.BTC))
@@ -82,6 +102,7 @@ class SimpleBuyFlowNavigatorTest {
             subject.navigateTo(
                 startedFromKycResume = false,
                 startedFromDashboard = true,
+                startedFromApprovalDeepLink = false,
                 preselectedCrypto = CryptoCurrency.BTC
             ).test()
         test.assertValueAt(
@@ -101,6 +122,7 @@ class SimpleBuyFlowNavigatorTest {
             subject.navigateTo(
                 startedFromKycResume = false,
                 startedFromDashboard = true,
+                startedFromApprovalDeepLink = false,
                 preselectedCrypto = CryptoCurrency.BTC
             ).test()
         test.assertValueAt(
@@ -110,8 +132,10 @@ class SimpleBuyFlowNavigatorTest {
     }
 
     private fun mockCurrencyIsSupported(supported: Boolean) {
-        whenever(custodialWalletManager
-            .isCurrencySupportedForSimpleBuy("USD")).thenReturn(Single.just(supported))
+        whenever(
+            custodialWalletManager
+                .isCurrencySupportedForSimpleBuy("USD")
+        ).thenReturn(Single.just(supported))
         whenever(currencyPrefs.selectedFiatCurrency).thenReturn(("USD"))
     }
 }

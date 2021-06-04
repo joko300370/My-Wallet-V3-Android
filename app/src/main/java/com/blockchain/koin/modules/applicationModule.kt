@@ -6,22 +6,22 @@ import com.blockchain.koin.explorerRetrofit
 import com.blockchain.koin.gbp
 import com.blockchain.koin.interestAccountFeatureFlag
 import com.blockchain.koin.moshiExplorerRetrofit
+import com.blockchain.koin.mwaFeatureFlag
 import com.blockchain.koin.payloadScope
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.koin.usd
 import com.blockchain.logging.DigitalTrust
-import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentAccountMapper
 import com.blockchain.network.websocket.Options
 import com.blockchain.network.websocket.autoRetry
 import com.blockchain.network.websocket.debugLog
 import com.blockchain.network.websocket.newBlockchainWebSocket
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentAccountMapper
 import com.blockchain.ui.password.SecondPasswordHandler
 import com.blockchain.wallet.DefaultLabels
 import com.google.gson.GsonBuilder
 import info.blockchain.wallet.metadata.MetadataDerivation
 import io.reactivex.android.schedulers.AndroidSchedulers
 import okhttp3.OkHttpClient
-import org.bitcoinj.params.BitcoinMainNetParams
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import piuk.blockchain.android.BuildConfig
@@ -42,9 +42,10 @@ import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService
 import piuk.blockchain.android.data.coinswebsocket.strategy.CoinsWebSocketStrategy
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerificationDeepLinkHelper
-import piuk.blockchain.android.identity.UserIdentity
+import piuk.blockchain.android.deeplink.OpenBankingDeepLinkParser
 import piuk.blockchain.android.identity.NabuUserIdentity
 import piuk.blockchain.android.identity.SiftDigitalTrust
+import piuk.blockchain.android.identity.UserIdentity
 import piuk.blockchain.android.kyc.KycDeepLinkHelper
 import piuk.blockchain.android.remoteconfig.AssetOrderingRemoteConfig
 import piuk.blockchain.android.scan.QrCodeDataManager
@@ -91,11 +92,16 @@ import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
 import piuk.blockchain.android.ui.launcher.DeepLinkPersistence
 import piuk.blockchain.android.ui.launcher.LauncherPresenter
 import piuk.blockchain.android.ui.launcher.Prerequisites
+import piuk.blockchain.android.ui.linkbank.BankAuthModel
+import piuk.blockchain.android.ui.linkbank.BankAuthState
 import piuk.blockchain.android.ui.onboarding.OnboardingPresenter
-import piuk.blockchain.android.ui.pairingcode.PairingCodePresenter
 import piuk.blockchain.android.ui.recover.RecoverFundsPresenter
+import piuk.blockchain.android.ui.auth.newlogin.SecureChannelManager
+import piuk.blockchain.android.ui.pairingcode.PairingModel
+import piuk.blockchain.android.ui.pairingcode.PairingState
 import piuk.blockchain.android.ui.sell.BuySellFlowNavigator
 import piuk.blockchain.android.ui.settings.SettingsPresenter
+import piuk.blockchain.android.ui.transfer.receive.ReceiveIntentHelper
 import piuk.blockchain.android.ui.shortcuts.receive.ReceiveQrPresenter
 import piuk.blockchain.android.ui.ssl.SSLVerifyPresenter
 import piuk.blockchain.android.ui.swipetoreceive.LocalOfflineAccountCache
@@ -104,11 +110,13 @@ import piuk.blockchain.android.ui.thepit.PitPermissionsPresenter
 import piuk.blockchain.android.ui.thepit.PitVerifyEmailPresenter
 import piuk.blockchain.android.ui.transfer.AccountsSorting
 import piuk.blockchain.android.ui.transfer.DefaultAccountsSorting
-import piuk.blockchain.android.ui.transfer.receive.activity.ReceivePresenter
-import piuk.blockchain.android.ui.upgrade.UpgradeWalletPresenter
+import piuk.blockchain.android.ui.transfer.receive.ReceiveModel
+import piuk.blockchain.android.ui.transfer.receive.ReceiveState
+import piuk.blockchain.android.ui.upsell.KycUpgradePromptManager
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.BackupWalletUtil
 import piuk.blockchain.android.util.CurrentContextAccess
+import piuk.blockchain.android.util.FormatChecker
 import piuk.blockchain.android.util.OSUtil
 import piuk.blockchain.android.util.PrngHelper
 import piuk.blockchain.android.util.ResourceDefaultLabels
@@ -167,7 +175,6 @@ val applicationModule = module {
                 erc20DataStore = get(),
                 walletOptionsDataManager = get(),
                 metadataManager = get(),
-                environmentSettings = get(),
                 lastTxUpdater = get(),
                 rxBus = get()
             )
@@ -177,8 +184,7 @@ val applicationModule = module {
             BchDataManager(
                 payloadDataManager = get(),
                 bchDataStore = get(),
-                environmentSettings = get(),
-                blockExplorer = get(),
+                bitcoinApi = get(),
                 defaultLabels = get(),
                 metadataManager = get(),
                 rxBus = get()
@@ -212,17 +218,28 @@ val applicationModule = module {
                 payloadDataManager = get(),
                 exchangeRateFactory = get(),
                 qrProcessor = get(),
-                environmentSettings = get(),
                 kycStatusHelper = get(),
                 deepLinkProcessor = get(),
                 sunriverCampaignRegistration = get(),
                 xlmDataManager = get(),
                 pitLinking = get(),
-                nabuDataManager = get(),
-                nabuToken = get(),
                 simpleBuySync = get(),
                 crashLogger = get(),
-                analytics = get()
+                analytics = get(),
+                bankLinkingPrefs = get(),
+                custodialWalletManager = get(),
+                upsellManager = get(),
+                secureChannelManager = get(),
+                payloadManager = get()
+            )
+        }
+
+        scoped {
+            SecureChannelManager(
+                secureChannelPrefs = get(),
+                authPrefs = get(),
+                payloadManager = get(),
+                walletApi = get()
             )
         }
 
@@ -261,23 +278,16 @@ val applicationModule = module {
         factory {
             OkHttpClient()
                 .newBlockchainWebSocket(options = Options(url = BuildConfig.COINS_WEBSOCKET_URL))
-                .autoRetry().debugLog("COIN_SOCKET")
+                .autoRetry()
+                .debugLog("COIN_SOCKET")
         }
 
         factory {
-            UpgradeWalletPresenter(
-                prefs = get(),
-                appUtil = get(),
-                accessState = get(),
-                defaultLabels = get(),
-                authDataManager = get(),
-                payloadDataManager = get(),
-                crashLogger = get()
-            )
-        }
-
-        factory {
-            PairingCodePresenter(
+            PairingModel(
+                initialState = PairingState(),
+                mainScheduler = AndroidSchedulers.mainThread(),
+                environmentConfig = get(),
+                crashLogger = get(),
                 qrCodeDataManager = get(),
                 payloadDataManager = get(),
                 authDataManager = get()
@@ -287,7 +297,9 @@ val applicationModule = module {
         factory {
             NabuUserIdentity(
                 custodialWalletManager = get(),
-                tierService = get()
+                tierService = get(),
+                simpleBuyEligibilityProvider = get(),
+                interestEligibilityProvider = get()
             )
         }.bind(UserIdentity::class)
 
@@ -300,7 +312,8 @@ val applicationModule = module {
                 prngFixer = get(),
                 analytics = get(),
                 walletPrefs = get(),
-                environmentConfig = get()
+                environmentConfig = get(),
+                formatChecker = get()
             )
         }
 
@@ -309,7 +322,7 @@ val applicationModule = module {
                 payloadDataManager = get(),
                 prefs = get(),
                 metadataInteractor = get(),
-                metadataDerivation = MetadataDerivation(BitcoinMainNetParams.get()),
+                metadataDerivation = MetadataDerivation(),
                 moshi = get(),
                 analytics = get()
             )
@@ -327,8 +340,7 @@ val applicationModule = module {
 
         factory {
             BackupWalletUtil(
-                payloadDataManager = get(),
-                environmentConfig = get()
+                payloadDataManager = get()
             )
         }
 
@@ -364,13 +376,19 @@ val applicationModule = module {
                 kycDeepLinkHelper = get(),
                 sunriverDeepLinkHelper = get(),
                 emailVerifiedLinkHelper = get(),
-                thePitDeepLinkParser = get()
+                thePitDeepLinkParser = get(),
+                openBankingDeepLinkParser = get()
             )
+        }
+
+        factory {
+            OpenBankingDeepLinkParser()
         }
 
         scoped {
             QrScanResultProcessor(
-                bitPayDataManager = get()
+                bitPayDataManager = get(),
+                mwaFeatureFlag = get(mwaFeatureFlag)
             )
         }
 
@@ -430,7 +448,8 @@ val applicationModule = module {
             AssetDetailsInteractor(
                 interestFeatureFlag = get(interestAccountFeatureFlag),
                 dashboardPrefs = get(),
-                coincore = get()
+                coincore = get(),
+                custodialWalletManager = get()
             )
         }
 
@@ -441,8 +460,10 @@ val applicationModule = module {
                 custodialWalletManager = get(),
                 appUtil = get(),
                 coincore = get(),
+                eligibilityProvider = get(),
+                bankLinkingPrefs = get(),
                 analytics = get(),
-                eligibilityProvider = get()
+                featureFlagApi = get()
             )
         }
 
@@ -457,6 +478,16 @@ val applicationModule = module {
                 cardActivators = listOf(
                     EverypayCardActivator(get(), get())
                 ),
+                environmentConfig = get(),
+                crashLogger = get()
+            )
+        }
+
+        factory {
+            BankAuthModel(
+                interactor = get(),
+                scheduler = AndroidSchedulers.mainThread(),
+                initialState = BankAuthState(),
                 environmentConfig = get(),
                 crashLogger = get()
             )
@@ -515,10 +546,19 @@ val applicationModule = module {
         }
 
         factory {
-            ReceivePresenter(
-                prefs = get(),
+            ReceiveModel(
+                initialState = ReceiveState(),
+                observeScheduler = AndroidSchedulers.mainThread(),
+                environmentConfig = get(),
+                crashLogger = get(),
                 qrCodeDataManager = get(),
-                exchangeRates = get()
+                receiveIntentHelper = get()
+            )
+        }
+
+        factory {
+            KycUpgradePromptManager(
+                identity = get()
             )
         }
 
@@ -538,7 +578,9 @@ val applicationModule = module {
                 pitLinking = get(),
                 analytics = get(),
                 biometricsController = get(),
-                ratingPrefs = get()
+                ratingPrefs = get(),
+                qrProcessor = get(),
+                secureChannelManager = get()
             )
         }
 
@@ -551,7 +593,6 @@ val applicationModule = module {
                 defaultLabels = get(),
                 accessState = get(),
                 walletOptionsDataManager = get(),
-                environmentSettings = get(),
                 prngFixer = get(),
                 mobileNoticeRemoteConfig = get(),
                 crashLogger = get(),
@@ -645,6 +686,7 @@ val applicationModule = module {
                 crashLogger = get(),
                 simpleBuySync = get(),
                 rxBus = get(),
+                flushables = getAll(),
                 walletCredentialsUpdater = get()
             )
         }
@@ -705,7 +747,7 @@ val applicationModule = module {
 
     factory {
         OfflineBalanceCall(
-            blockExplorer = get()
+            bitcoinApi = get()
         )
     }
 
@@ -769,4 +811,13 @@ val applicationModule = module {
             resources = get()
         )
     }.bind(AssetResources::class)
+
+    factory {
+        ReceiveIntentHelper(
+            context = get(),
+            assetResources = get()
+        )
+    }
+
+    factory { FormatChecker() }
 }

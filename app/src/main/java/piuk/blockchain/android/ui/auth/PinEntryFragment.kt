@@ -20,10 +20,11 @@ import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.databinding.DataBindingUtil
 import com.blockchain.koin.scopedInject
+import com.blockchain.koin.scopedInjectActivity
+import com.blockchain.ui.password.SecondPasswordHandler
 import com.blockchain.ui.urllinks.APP_STORE_URI
 import com.blockchain.ui.urllinks.APP_STORE_URL
 import com.blockchain.ui.urllinks.WALLET_STATUS_URL
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -37,7 +38,6 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
@@ -53,11 +53,9 @@ import piuk.blockchain.android.databinding.FragmentPinEntryBinding
 import piuk.blockchain.android.ui.customviews.PinEntryKeypad
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
-import piuk.blockchain.android.ui.debug.DebugOptionsBottomDialog
 import piuk.blockchain.android.ui.home.MobileNoticeDialogFragment
 import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.ui.start.PasswordRequiredActivity
-import piuk.blockchain.android.ui.upgrade.UpgradeWalletActivity
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.ViewUtils
@@ -68,7 +66,6 @@ import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.utils.annotations.Thunk
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
-import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 
 internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(),
     PinEntryView, BiometricsEnrollmentBottomSheet.Host {
@@ -78,6 +75,8 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
     private val stringUtils: StringUtils by inject()
     private val biometricsController: BiometricsController by scopedInject()
     private val appUtil: AppUtil by inject()
+
+    private val secondPasswordHandler: SecondPasswordHandler by scopedInjectActivity()
 
     private val _pinBoxList = mutableListOf<ImageView>()
     override val pinBoxList: List<ImageView>
@@ -151,23 +150,17 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
                 ToastCustom.LENGTH_SHORT,
                 ToastCustom.TYPE_GENERAL
             )
-
-            binding?.buttonSettings?.visibility = View.VISIBLE
-            binding?.buttonSettings?.setOnClickListener {
-                if (activity != null) {
-                    DebugOptionsBottomDialog.show(requireFragmentManager())
-                }
-            }
         }
 
-        binding?.textViewVersionCode?.text = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
-
+        binding?.textViewVersionCode?.text = getVersionText()
         binding?.pinEntryLogout?.setOnClickListener {
             presenter.resetApp()
         }
 
         return binding?.root
     }
+
+    private fun getVersionText() = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -325,12 +318,8 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
                 .setTitle(R.string.app_name)
                 .setMessage(R.string.password_or_wipe)
                 .setCancelable(true)
-                .setPositiveButton(
-                    R.string.use_password
-                ) { _, _ -> showValidationDialog() }
-                .setNegativeButton(
-                    R.string.common_cancel
-                ) { di, _ -> di.dismiss() }
+                .setPositiveButton(R.string.use_password) { _, _ -> showValidationDialog() }
+                .setNegativeButton(R.string.common_cancel) { di, _ -> di.dismiss() }
                 .show()
         }
     }
@@ -366,7 +355,6 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
     }
 
     private fun restartApp() {
-        val appUtil: AppUtil = get()
         appUtil.restartApp(LauncherActivity::class.java)
     }
 
@@ -380,10 +368,41 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         startActivity(intent)
     }
 
-    override fun goToUpgradeWalletActivity() {
-        val intent = Intent(context, UpgradeWalletActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(intent)
+    override fun walletUpgradeRequired(triesRemaining: Int) {
+        secondPasswordHandler.validate(
+            this.requireContext(),
+            object : SecondPasswordHandler.ResultListener {
+                override fun onNoSecondPassword() {
+                    presenter.doUpgradeWallet(null)
+                }
+
+                override fun onSecondPasswordValidated(validatedSecondPassword: String) {
+                    presenter.doUpgradeWallet(validatedSecondPassword)
+                }
+
+                override fun onCancelled() {
+                    handleIncorrectPassword(triesRemaining)
+                }
+            }
+        )
+    }
+
+    private fun handleIncorrectPassword(triesRemaining: Int) {
+        if (triesRemaining > 0) {
+            walletUpgradeRequired(triesRemaining - 1)
+        } else {
+            // TODO: Handle can't remember
+        }
+    }
+
+    override fun onWalletUpgradeFailed() {
+        AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle)
+            .setTitle(R.string.upgrade_fail_heading)
+            .setMessage(R.string.upgrade_fail_info)
+            .setCancelable(false)
+            .setPositiveButton(R.string.exit) { _, _ -> presenter.clearLoginState() }
+            .setNegativeButton(R.string.logout) { _, _ -> presenter.clearLoginState(); restartApp() }
+            .show()
     }
 
     override fun setTitleString(@StringRes title: Int) {
@@ -489,27 +508,22 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         }
     }
 
-    override fun showProgressDialog(@StringRes messageId: Int, suffix: String?) {
+    override fun showProgressDialog(@StringRes messageId: Int) {
         dismissProgressDialog()
         materialProgressDialog = MaterialProgressDialog(requireContext()).apply {
             setCancelable(false)
-            if (suffix != null) {
-                setMessage(getString(messageId) + suffix)
-            } else {
-                setMessage(getString(messageId))
-            }
-
-            if (isNotFinishing()) {
-                show()
-            }
+            setMessage(getString(messageId))
+        }
+        if (isNotFinishing()) {
+            materialProgressDialog?.show()
         }
     }
 
     override fun dismissProgressDialog() {
-        if (materialProgressDialog != null && materialProgressDialog!!.isShowing) {
-            materialProgressDialog!!.dismiss()
-            materialProgressDialog = null
+        if (materialProgressDialog?.isShowing == true) {
+            materialProgressDialog?.dismiss()
         }
+        materialProgressDialog = null
     }
 
     override fun onResume() {
@@ -517,6 +531,12 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         isPaused = false
         presenter.clearPinBoxes()
         presenter.checkFingerprintStatus()
+    }
+
+    override fun finishWithPayloadDecrypted() {
+        val intent = Intent()
+        activity?.setResult(RESULT_OK, intent)
+        activity?.finish()
     }
 
     override fun finishWithResultOk(pin: String) {
@@ -690,19 +710,6 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         }
     }
 
-    override fun showTestnetWarning() {
-        if (activity != null && !requireActivity().isFinishing) {
-            val snack = Snackbar.make(
-                requireActivity().findViewById(android.R.id.content),
-                R.string.testnet_warning,
-                Snackbar.LENGTH_LONG
-            )
-            val view = snack.view
-            view.setBackgroundColor(requireContext().getResolvedColor(R.color.product_red_medium))
-            snack.show()
-        }
-    }
-
     override fun restartAppWithVerifiedPin() {
         appUtil.restartAppWithVerifiedPin(LauncherActivity::class.java, isAfterWalletCreation)
     }
@@ -747,5 +754,7 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
 }
 
 const val KEY_VALIDATING_PIN_FOR_RESULT = "validating_pin"
+const val KEY_VALIDATING_PIN_FOR_RESULT_AND_PAYLOAD = "validating_pin_and_payload"
 const val KEY_VALIDATED_PIN = "validated_pin"
 const val REQUEST_CODE_VALIDATE_PIN = 88
+const val REQUEST_CODE_VALIDATE_PIN_AND_PAYLOAD = 89

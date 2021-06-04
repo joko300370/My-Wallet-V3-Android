@@ -19,6 +19,7 @@ public class MetadataUtilTest {
 
         byte[] magic = MetadataUtil.INSTANCE.magic(message.getBytes(), null);
         byte[] nextResult = MetadataUtil.INSTANCE.message(message.getBytes(), magic);
+
         Assert.assertEquals(expected2, new String(Base64.encode(nextResult)));
     }
 

@@ -8,12 +8,13 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.nabu.datamanagers.TransactionState
 import com.blockchain.nabu.datamanagers.TransactionType
+import com.blockchain.utils.toFormattedDate
 import kotlinx.android.synthetic.main.layout_fiat_activity_item.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.inflate
-import piuk.blockchain.android.util.toFormattedDate
+
 import java.util.Date
 
 class CustodialFiatActivityItemDelegate<in T>(

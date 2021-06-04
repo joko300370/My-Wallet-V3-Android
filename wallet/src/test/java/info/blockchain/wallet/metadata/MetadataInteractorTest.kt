@@ -4,7 +4,6 @@ import info.blockchain.wallet.metadata.data.MetadataResponse
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import org.bitcoinj.params.BitcoinMainNetParams
 import org.junit.Before
 import org.junit.Test
 import retrofit2.HttpException
@@ -29,13 +28,11 @@ class MetadataInteractorTest {
     )
 
     private val mockWebServer = MockWebServer()
-    private val metadataDerivation = MetadataDerivation(BitcoinMainNetParams.get())
+    private val metadataDerivation = MetadataDerivation()
     private val fakeMetadata = Metadata.newInstance(
         metaDataHDNode = metadataDerivation.deserializeMetadataNode("xprv9vM7oGsuM9zGW2tneNriS8NJF6DNrZEK" +
                 "vYMXSwP8SJNJRUuX6iXjZLQCCy52cXJKKb6XwWF3vr6mQCyy9d5msL9TrycrBmbPibKd2LhzjDW"),
         type = 6,
-        isEncrypted = true,
-        encryptionKey = null,
         metadataDerivation = metadataDerivation
     )
 

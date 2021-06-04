@@ -37,6 +37,7 @@ const val URL_SUPPORT_BALANCE_LOCKED = "https://support.blockchain.com/hc/en-us/
 const val URL_XLM_MIN_BALANCE =
     "https://support.blockchain.com/hc/en-us/articles/360019105471-" +
         "Why-do-Stellar-addresses-have-a-minimum-balance-requirement-"
+const val URL_XLM_MEMO = "https://support.blockchain.com/hc/en-us/articles/360018797312"
 
 const val URL_TX_FEES = "https://support.blockchain.com/hc/en-us/articles/360000939903-Transaction-fees"
 
@@ -49,3 +50,13 @@ const val APP_STORE_URL = "https://play.google.com/store/apps/details?id="
 const val WEB_WALLET_LOGIN_URI = "login.blockchain.com"
 
 const val WALLET_STATUS_URL = "https://www.blockchain-status.com"
+
+// updated checkouts TODO update with real urls
+const val ORDER_PRICE_EXPLANATION = "https://www.blockchain-status.com"
+const val CARD_FEE_EXPLANATION = "https://www.blockchain-status.com"
+const val PRIVATE_KEY_EXPLANATION = "https://www.blockchain-status.com"
+const val NETWORK_FEE_EXPLANATION = "https://support.blockchain.com/hc/en-us/articles/360000939903-Transaction-fees"
+const val NETWORK_ERC20_EXPLANATION = "https://www.blockchain-status.com"
+const val EXCHANGE_SWAP_RATE_EXPLANATION = "https://www.blockchain-status.com"
+const val CHECKOUT_PRICE_EXPLANATION = "https://www.blockchain-status.com"
+const val CHECKOUT_REFUND_POLICY = "https://www.blockchain.com/legal/terms"

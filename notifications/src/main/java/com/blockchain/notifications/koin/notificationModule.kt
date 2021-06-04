@@ -2,6 +2,7 @@ package com.blockchain.notifications.koin
 
 import android.app.NotificationManager
 import android.content.Context
+import com.blockchain.koin.nabu
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.notifications.NotificationService
 import com.blockchain.notifications.NotificationTokenManager
@@ -20,13 +21,15 @@ import org.koin.dsl.module
 val notificationModule = module {
 
     scope(payloadScopeQualifier) {
-        scoped { NotificationTokenManager(
-            notificationService = get(),
-            payloadManager = get(),
-            prefs = get(),
-            firebaseInstanceId = get(),
-            rxBus = get()
-        ) }
+        scoped {
+            NotificationTokenManager(
+                notificationService = get(),
+                payloadManager = get(),
+                prefs = get(),
+                firebaseInstanceId = get(),
+                rxBus = get()
+            )
+        }
     }
 
     single { FirebaseInstanceId.getInstance() }
@@ -44,7 +47,9 @@ val notificationModule = module {
     factory {
         AnalyticsImpl(
             firebaseAnalytics = get(),
-            store = get())
+            nabuAnalytics = get(nabu),
+            store = get()
+        )
     }.bind(Analytics::class)
 
     factory { UserAnalyticsImpl(get()) }

@@ -48,7 +48,9 @@ class LauncherShortcutHelper(
         val payloadDataManager: PayloadDataManager = get()
         val receiveAccountName = payloadDataManager.defaultAccount.label
 
-        payloadDataManager.getNextReceiveAddress(payloadDataManager.defaultAccountIndex)
+        payloadDataManager.getNextReceiveAddress(
+            payloadDataManager.defaultAccountIndex
+        )
             .subscribeOn(Schedulers.computation())
             .observeOn(Schedulers.newThread())
             .subscribeBy(
@@ -74,30 +76,29 @@ class LauncherShortcutHelper(
             ctx,
             SHORTCUT_ID_COPY
         )
-        .setShortLabel(ctx.getString(R.string.shortcut_receive_copy_short))
-        .setLongLabel(ctx.getString(R.string.shortcut_receive_copy_long))
-        .setIcon(
-            Icon.createWithResource(
-                ctx,
-                R.drawable.ic_receive_copy
+            .setShortLabel(ctx.getString(R.string.shortcut_receive_copy_short))
+            .setLongLabel(ctx.getString(R.string.shortcut_receive_copy_long))
+            .setIcon(
+                Icon.createWithResource(
+                    ctx,
+                    R.drawable.ic_receive_copy
+                )
             )
-        )
-        .setIntent(
-            Intent().apply {
-                action = Intent.ACTION_SEND
-                type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, receiveAddress)
-            }
-        )
-        .build()
+            .setIntent(
+                Intent().apply {
+                    action = Intent.ACTION_SEND
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, receiveAddress)
+                }
+            )
+            .build()
 
     @RequiresApi(api = Build.VERSION_CODES.N_MR1)
     private fun makeQrShortcut(receiveAddress: String, receiveAccountName: String) =
         ShortcutInfo.Builder(
             ctx,
             SHORTCUT_ID_QR
-        )
-        .setShortLabel(ctx.getString(R.string.shortcut_receive_qr_short))
+        ).setShortLabel(ctx.getString(R.string.shortcut_receive_qr_short))
         .setLongLabel(ctx.getString(R.string.shortcut_receive_qr_long))
         .setIcon(
             Icon.createWithResource(

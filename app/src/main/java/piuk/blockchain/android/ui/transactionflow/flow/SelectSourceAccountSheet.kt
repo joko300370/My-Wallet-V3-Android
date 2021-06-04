@@ -11,7 +11,7 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.databinding.DialogSheetAccountSelectorBinding
 import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.ui.linkbank.LinkBankActivity
+import piuk.blockchain.android.ui.linkbank.BankAuthActivity
 import piuk.blockchain.android.ui.transactionflow.engine.BankLinkingState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
@@ -35,6 +35,7 @@ class SelectSourceAccountSheet : TransactionFlowSheet<DialogSheetAccountSelector
 
         availableSources = newState.availableSources
         linkingBankState = newState.linkBankState
+        cacheState(newState)
     }
 
     private fun handleBankLinking(
@@ -44,8 +45,12 @@ class SelectSourceAccountSheet : TransactionFlowSheet<DialogSheetAccountSelector
 
         if (newState.linkBankState is BankLinkingState.Success) {
             startActivityForResult(
-                LinkBankActivity.newInstance(newState.linkBankState.bankTransferInfo, requireActivity()),
-                LinkBankActivity.LINK_BANK_REQUEST_CODE
+                BankAuthActivity.newInstance(
+                    newState.linkBankState.bankTransferInfo,
+                    customiser.getLinkingSourceForAction(newState),
+                    requireActivity()
+                ),
+                BankAuthActivity.LINK_BANK_REQUEST_CODE
             )
         } else {
             ToastCustom.makeText(
@@ -71,7 +76,7 @@ class SelectSourceAccountSheet : TransactionFlowSheet<DialogSheetAccountSelector
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == LinkBankActivity.LINK_BANK_REQUEST_CODE && resultCode == RESULT_OK) {
+        if (requestCode == BankAuthActivity.LINK_BANK_REQUEST_CODE && resultCode == RESULT_OK) {
             binding.progress.visible()
             model.process(
                 TransactionIntent.RefreshSourceAccounts
@@ -86,6 +91,7 @@ class SelectSourceAccountSheet : TransactionFlowSheet<DialogSheetAccountSelector
         binding.apply {
             accountList.onAccountSelected = {
                 model.process(TransactionIntent.SourceAccountSelected(it))
+                analyticsHooks.onSourceAccountSelected(it, state)
             }
             accountListBack.setOnClickListener {
                 model.process(TransactionIntent.ReturnToPreviousStep)

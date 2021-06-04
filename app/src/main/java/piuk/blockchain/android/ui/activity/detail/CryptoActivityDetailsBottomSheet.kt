@@ -10,8 +10,9 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.ActivityAnalytics
 import com.blockchain.nabu.datamanagers.InterestState
+import com.blockchain.notifications.analytics.ActivityAnalytics
+import com.blockchain.notifications.analytics.LaunchOrigin
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -20,6 +21,8 @@ import io.reactivex.rxkotlin.plusAssign
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.databinding.DialogSheetActivityDetailsBinding
+import piuk.blockchain.android.simplebuy.BuySellClicked
+import piuk.blockchain.android.simplebuy.BuySellType
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.ui.activity.CryptoActivityType
@@ -33,11 +36,6 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
     ActivityDetailsIntents,
     ActivityDetailState,
     DialogSheetActivityDetailsBinding>() {
-
-    override val host: Host by lazy {
-        super.host as? Host
-            ?: throw IllegalStateException("Host fragment is not a ActivityDetailsBottomSheet.Host")
-    }
 
     override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogSheetActivityDetailsBinding =
         DialogSheetActivityDetailsBinding.inflate(inflater, container, false)
@@ -168,6 +166,9 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
                 AndroidSchedulers.mainThread()
             )
                 .subscribe {
+                    analytics.logEvent(
+                        BuySellClicked(origin = LaunchOrigin.TRANSACTION_DETAILS, type = BuySellType.BUY)
+                    )
                     startActivity(SimpleBuyActivity.newInstance(requireContext(), arguments.cryptoCurrency, true))
                     dismiss()
                 }

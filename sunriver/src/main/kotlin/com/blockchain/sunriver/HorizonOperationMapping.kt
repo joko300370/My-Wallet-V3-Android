@@ -47,7 +47,14 @@ private fun CreateAccountOperationResponse.mapCreate(
         // There's a bug in the xlm sdk (horizonProxy.getTransaction()) which throws a
         // NoSuchMethodError when parsing a int memo on pre jdk 1.8 devices
         // In this case, we can't know the fee but everything else is known, so:
-        toXlmTransaction(usersAccountId, startingBalance, Memo.none(), account, funder, CryptoValue.ZeroXlm)
+        toXlmTransaction(
+            usersAccountId,
+            startingBalance,
+            Memo.none(),
+            account,
+            funder,
+            CryptoValue.zero(CryptoCurrency.XLM)
+        )
     }
 }
 
@@ -64,7 +71,7 @@ private fun PaymentOperationResponse.mapPayment(
         // There's a bug in the xlm sdk (horizonProxy.getTransaction()) which throws a
         // NoSuchMethodError when parsing a int memo on pre jdk 1.8 devices
         // In this case, we can't know the fee but everything else is known, so:
-        toXlmTransaction(usersAccountId, amount, Memo.none(), to, from, CryptoValue.ZeroXlm)
+        toXlmTransaction(usersAccountId, amount, Memo.none(), to, from, CryptoValue.zero(CryptoCurrency.XLM))
     }
 }
 

@@ -15,8 +15,8 @@ class STXAccount(params: NetworkParameters, wKey: DeterministicKey) {
     private val addressDerivationKey =
         HDKeyDerivation.deriveChildKey(accountDerivationKey, 0)
 
-    val address = HDAddress(params, addressDerivationKey, 0)
+    val address = HDAddress(params, addressDerivationKey, 0, 44)
 
     val bitcoinSerializedBase58Address: String
-        get() = address.addressBase58
+        get() = address.formattedAddress
 }

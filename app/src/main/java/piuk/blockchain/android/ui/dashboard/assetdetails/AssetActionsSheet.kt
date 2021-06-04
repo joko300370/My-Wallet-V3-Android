@@ -11,6 +11,7 @@ import com.blockchain.koin.payloadScope
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.service.TierService
+import com.blockchain.notifications.analytics.LaunchOrigin
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -23,6 +24,7 @@ import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.databinding.DialogAssetActionsSheetBinding
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
@@ -33,6 +35,7 @@ import piuk.blockchain.android.ui.customviews.account.PendingBalanceAccountDecor
 import piuk.blockchain.android.ui.customviews.account.StatusDecorator
 import piuk.blockchain.android.ui.customviews.account.addViewToBottomWithConstraints
 import piuk.blockchain.android.ui.customviews.account.removePossibleBottomView
+import piuk.blockchain.android.ui.transfer.analytics.TransferAnalyticsEvent
 import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.setAssetIconColours
 import timber.log.Timber
@@ -107,20 +110,28 @@ class AssetActionsSheet :
         }
 
     private fun showAssetBalances(state: AssetDetailsState) {
-        binding.assetActionsAccountDetails.updateAccount(
-            state.selectedAccount.selectFirstAccount(),
-            {},
-            PendingBalanceAccountDecorator(state.selectedAccount.selectFirstAccount())
-        )
+        with(binding.assetActionsAccountDetails) {
+            updateAccount(
+                state.selectedAccount.selectFirstAccount(),
+                {},
+                PendingBalanceAccountDecorator(state.selectedAccount.selectFirstAccount())
+            )
+        }
     }
 
+    // we want to display Interest deposit only for Interest accounts and not for the accounts that
+    // have the InterestDeposit as an available action (can be used as source account for interest deposit)
     private fun mapActions(
         account: BlockchainAccount,
         actions: AvailableActions
     ): List<AssetActionItem> {
-        val firstAccount = account.selectFirstAccount()
-        return actions.map {
-            mapAction(it, firstAccount.asset, firstAccount)
+        return when (val firstAccount = account.selectFirstAccount()) {
+            is InterestAccount -> actions.toMutableList().apply {
+                add(0, AssetAction.InterestDeposit)
+            }.map { mapAction(it, firstAccount.asset, firstAccount) }
+            else -> actions.toMutableList().apply {
+                remove(AssetAction.InterestDeposit)
+            }.map { mapAction(it, firstAccount.asset, firstAccount) }
         }
     }
 
@@ -138,6 +149,7 @@ class AssetActionsSheet :
                     getString(R.string.fiat_funds_detail_activity_details), asset,
                     action
                 ) {
+                    logActionEvent(AssetDetailsAnalytics.ACTIVITY_CLICKED, asset)
                     processAction(AssetAction.ViewActivity)
                 }
             AssetAction.Send ->
@@ -148,7 +160,14 @@ class AssetActionsSheet :
                         asset.displayTicker
                     ), asset, action
                 ) {
+                    logActionEvent(AssetDetailsAnalytics.SEND_CLICKED, asset)
                     processAction(AssetAction.Send)
+                    analytics.logEvent(
+                        TransferAnalyticsEvent.TransferClicked(
+                            LaunchOrigin.CURRENCY_PAGE,
+                            type = TransferAnalyticsEvent.AnalyticsTransferType.SEND
+                        )
+                    )
                 }
             AssetAction.Receive ->
                 AssetActionItem(
@@ -158,7 +177,14 @@ class AssetActionsSheet :
                         asset.displayTicker
                     ), asset, action
                 ) {
+                    logActionEvent(AssetDetailsAnalytics.RECEIVE_CLICKED, asset)
                     processAction(AssetAction.Receive)
+                    analytics.logEvent(
+                        TransferAnalyticsEvent.TransferClicked(
+                            LaunchOrigin.CURRENCY_PAGE,
+                            type = TransferAnalyticsEvent.AnalyticsTransferType.SEND
+                        )
+                    )
                 }
             AssetAction.Swap -> AssetActionItem(
                 account, getString(R.string.common_swap),
@@ -166,6 +192,7 @@ class AssetActionsSheet :
                 getString(R.string.dashboard_asset_actions_swap_dsc, asset.displayTicker),
                 asset, action
             ) {
+                logActionEvent(AssetDetailsAnalytics.SWAP_CLICKED, asset)
                 processAction(AssetAction.Swap)
             }
             AssetAction.Summary -> AssetActionItem(
@@ -176,14 +203,21 @@ class AssetActionsSheet :
             ) {
                 goToSummary()
             }
-
             AssetAction.InterestDeposit -> AssetActionItem(
                 getString(R.string.common_transfer),
                 R.drawable.ic_tx_deposit_arrow,
                 getString(R.string.dashboard_asset_actions_deposit_dsc, asset.displayTicker),
                 asset, action
             ) {
-                goToDeposit()
+                goToInterestDeposit()
+            }
+            AssetAction.InterestWithdraw -> AssetActionItem(
+                getString(R.string.common_withdraw),
+                R.drawable.ic_tx_withdraw,
+                getString(R.string.dashboard_asset_actions_withdraw_dsc, asset.displayTicker),
+                asset, action
+            ) {
+                goToInterestWithdraw()
             }
             AssetAction.Sell -> AssetActionItem(
                 getString(R.string.common_sell),
@@ -191,16 +225,23 @@ class AssetActionsSheet :
                 getString(R.string.convert_your_crypto_to_cash),
                 asset, action
             ) {
+                logActionEvent(AssetDetailsAnalytics.SELL_CLICKED, asset)
                 processAction(AssetAction.Sell)
             }
             AssetAction.Withdraw -> throw IllegalStateException("Cannot Withdraw a non-fiat currency")
             AssetAction.FiatDeposit -> throw IllegalStateException("Cannot Deposit a non-fiat currency to Fiat")
         }
 
-    private fun goToDeposit() {
-        checkForKycStatus {
-            model.process(HandleActionIntent(AssetAction.InterestDeposit))
-        }
+    private fun logActionEvent(event: AssetDetailsAnalytics, asset: CryptoCurrency) {
+        analytics.logEvent(assetActionEvent(event, asset.networkTicker))
+    }
+
+    private fun goToInterestDeposit() {
+        model.process(HandleActionIntent(AssetAction.InterestDeposit))
+    }
+
+    private fun goToInterestWithdraw() {
+        model.process(HandleActionIntent(AssetAction.InterestWithdraw))
     }
 
     private fun goToSummary() {

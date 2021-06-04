@@ -104,6 +104,7 @@ class KycNavHostPresenter(
                 (view.campaignType == CampaignType.None && !view.showTiersLimitsSplash) ||
                 view.campaignType == CampaignType.Swap -> {
                 compositeDisposable += kycNavigator.findNextStep()
+                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(
                         onError = { Timber.e(it) },
                         onSuccess = { view.navigate(it) }

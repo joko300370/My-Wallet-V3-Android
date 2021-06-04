@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.settings
 
 import android.annotation.SuppressLint
+import com.blockchain.extensions.exhaustive
 import com.blockchain.nabu.datamanagers.Bank
 import com.blockchain.nabu.datamanagers.BankState
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
@@ -26,9 +27,13 @@ import io.reactivex.rxkotlin.zipWith
 import io.reactivex.schedulers.Schedulers
 import piuk.blockchain.android.R
 import piuk.blockchain.android.data.biometrics.BiometricsController
+import piuk.blockchain.android.scan.QrScanError
+import piuk.blockchain.android.scan.QrScanResultProcessor
+import piuk.blockchain.android.scan.ScanResult
 import piuk.blockchain.android.simplebuy.SimpleBuyModel
 import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.android.thepit.PitLinkingState
+import piuk.blockchain.android.ui.auth.newlogin.SecureChannelManager
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
 import piuk.blockchain.android.util.AndroidUtils
 import piuk.blockchain.androidcore.data.access.AccessState
@@ -58,7 +63,9 @@ class SettingsPresenter(
     private val pitLinking: PitLinking,
     private val analytics: Analytics,
     private val biometricsController: BiometricsController,
-    private val ratingPrefs: RatingPrefs
+    private val ratingPrefs: RatingPrefs,
+    private val qrProcessor: QrScanResultProcessor,
+    private val secureChannelManager: SecureChannelManager
 ) : BasePresenter<SettingsView>() {
 
     private val fiatUnit: String
@@ -183,7 +190,9 @@ class SettingsPresenter(
         }
 
     private fun linkedBanks(): Single<Set<Bank>> =
-        custodialWalletManager.getBanks().map { banks -> banks.filter { it.state == BankState.ACTIVE } }.map { banks ->
+        custodialWalletManager.getBanks().map { banks ->
+            banks.filter { it.state == BankState.ACTIVE }
+        }.map { banks ->
             banks.toSet()
         }
 
@@ -486,7 +495,7 @@ class SettingsPresenter(
      * PIN code validated, take user to PIN change page
      */
     fun pinCodeValidatedForChange() {
-        prefs.removeValue(PersistentPrefs.KEY_PIN_FAILS)
+        prefs.pinFails = 0
         prefs.pinId = ""
         view?.goToPinEntryPage()
     }
@@ -574,6 +583,26 @@ class SettingsPresenter(
 
     fun onThePitClicked() {
         pitClickedListener()
+    }
+
+    fun processScanResult(scanData: String) {
+        compositeDisposable += qrProcessor.processScan(scanData)
+            .subscribeBy(
+                onSuccess = {
+                    when (it) {
+                        is ScanResult.SecuredChannelLogin -> secureChannelManager.sendHandshake(it.handshake)
+                        else -> {}
+                    }.exhaustive
+                },
+                onError = {
+                    when (it) {
+                        is QrScanError -> view?.showScanTargetError(it)
+                        else -> {
+                            Timber.d("Scan failed")
+                        }
+                    }
+                }
+            )
     }
 
     fun onTwoStepVerificationRequested() {

@@ -34,6 +34,14 @@ public interface WalletExplorerEndpoints {
 
     @FormUrlEncoded
     @POST("wallet")
+    Observable<ResponseBody> postSecureChannel(
+            @Field("method") String method,
+            @Field("payload") String payload,
+            @Field("length") int length,
+            @Field("api_code") String apiCode);
+
+    @FormUrlEncoded
+    @POST("wallet")
     Observable<Settings> fetchSettings(
             @Field("method") String method,
             @Field("guid") String guid,
@@ -91,6 +99,7 @@ public interface WalletExplorerEndpoints {
             @Field("payload") String payload,
             @Field("length") int length,
             @Field("checksum") String checksum,
+            @Field("active") String active,
             @Field("email") String email,
             @Field("device") String device,
             @Field("old_checksum") String old_checksum,
@@ -140,4 +149,14 @@ public interface WalletExplorerEndpoints {
             @Query("fields") String fields,
             @Query("partner") String partner,
             @Query("api_code") String apiCode);
+
+    @GET("wallet/get-ip")
+    Single<WalletApi.IPResponse> getExternalIP();
+
+    @FormUrlEncoded
+    @POST("wallet")
+    Single<ResponseBody> sendEmailForVerification(
+        @Field("method") String method,
+        @Field("email") String email
+    );
 }

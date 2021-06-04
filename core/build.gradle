@@ -43,6 +43,7 @@ dependencies {
     api project(':sunriver')
     api project(':common:network')
     api project(':common:interface')
+    implementation project(':blockchainApi')
 
     // Networking
     api(Libraries.retrofit) { exclude module: 'okhttp' }
@@ -51,6 +52,8 @@ dependencies {
     api Libraries.retrofitRxJavaAdapter
     api Libraries.okHttpInterceptor
     api Libraries.koin
+
+    implementation Libraries.kotlinJson
 
     // RxJava
     api Libraries.rxJava
@@ -65,12 +68,12 @@ dependencies {
     }
 
     // Unit Test dependencies
-    testImplementation Libraries.json
     testImplementation Libraries.junit
     testImplementation Libraries.mockito
     testImplementation Libraries.hamcrestJunit
     testImplementation Libraries.kotlinJunit
     testImplementation Libraries.kluent
+    testImplementation Libraries.jacksonKotlin
     testImplementation(Libraries.mockitoKotlin) {
         ['kotlin-stdlib', 'kotlin-reflect'].each { exclude module: it }
     }

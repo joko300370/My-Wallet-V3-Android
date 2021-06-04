@@ -56,7 +56,8 @@ class EthAccountActivityTest {
                 fees = feeDataManager,
                 exchangeRates = exchangeRates,
                 walletPreferences = walletPrefs,
-                custodialWalletManager = custodialWalletManager
+                custodialWalletManager = custodialWalletManager,
+                identity = mock()
             )
         )
 
@@ -100,9 +101,9 @@ class EthAccountActivityTest {
             "sendingAddress",
             "receivingAddress",
             CustodialOrderState.FINISHED,
-            CryptoValue.ZeroEth,
-            CryptoValue.ZeroBtc,
-            CryptoValue.ZeroBtc,
+            CryptoValue.zero(CryptoCurrency.ETHER),
+            CryptoValue.zero(CryptoCurrency.BTC),
+            CryptoValue.zero(CryptoCurrency.BTC),
             CurrencyPair.CryptoCurrencyPair(CryptoCurrency.ETHER, CryptoCurrency.BTC),
             FiatValue.zero("USD"),
             "USD"
@@ -168,9 +169,9 @@ class EthAccountActivityTest {
             "sendingAddress",
             "receivingAddress",
             CustodialOrderState.FINISHED,
-            CryptoValue.ZeroEth,
-            CryptoValue.ZeroBtc,
-            CryptoValue.ZeroBtc,
+            CryptoValue.zero(CryptoCurrency.ETHER),
+            CryptoValue.zero(CryptoCurrency.BTC),
+            CryptoValue.zero(CryptoCurrency.BTC),
             CurrencyPair.CryptoCurrencyPair(CryptoCurrency.ETHER, CryptoCurrency.BTC),
             FiatValue.zero("USD"),
             "USD"

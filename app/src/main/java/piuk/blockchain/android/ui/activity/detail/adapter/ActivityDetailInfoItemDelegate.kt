@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.utils.toFormattedString
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import kotlinx.android.extensions.LayoutContainer
@@ -32,7 +33,6 @@ import piuk.blockchain.android.ui.activity.detail.Value
 import piuk.blockchain.android.ui.activity.detail.XlmMemo
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.inflate
-import piuk.blockchain.android.util.toFormattedString
 
 class ActivityDetailInfoItemDelegate<in T> : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
@@ -127,18 +127,16 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
                 when (infoType.transactionType) {
                     TransactionSummary.TransactionType.SENT -> parent.context.getString(
                         R.string.activity_details_transaction_fee_send,
-                        infoType.cryptoValue.toStringWithSymbol()
-                    )
+                        infoType.cryptoValue.toStringWithSymbol())
                     else -> parent.context.getString(
-                        R.string.activity_details_transaction_fee_unknown
-                    )
+                        R.string.activity_details_transaction_fee_unknown)
                 }
             }
             is BuyFee -> infoType.feeValue.toStringWithSymbol()
             is BuyPurchaseAmount -> infoType.fundedFiat.toStringWithSymbol()
             is TransactionId -> infoType.txId
             is BuyCryptoWallet -> parent.context.getString(
-                R.string.custodial_wallet_default_label_1
+                R.string.custodial_wallet_default_label_2, infoType.crypto.displayTicker
             )
             is SellCryptoWallet -> parent.context.getString(
                 R.string.fiat_currency_funds_wallet_name_1, infoType.currency
@@ -148,7 +146,6 @@ private class InfoItemViewHolder(var parent: View) : RecyclerView.ViewHolder(par
                 when {
                     infoType.paymentDetails.endDigits != null &&
                         infoType.paymentDetails.label != null -> {
-
                         with(parent.context) {
                             infoType.paymentDetails.accountType?.let {
                                 val accType = getString(

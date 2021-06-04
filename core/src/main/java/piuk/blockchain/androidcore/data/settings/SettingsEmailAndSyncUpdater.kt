@@ -24,7 +24,7 @@ internal class SettingsEmailAndSyncUpdater(
     private fun doUpdateEmailAndSync(email: String, context: String?): Single<Email> {
         return email()
             .flatMap { existing ->
-                if (!existing.verified || existing.address != email) {
+                if (!existing.isVerified || existing.address != email) {
                     settingsDataManager.updateEmail(email, context)
                         .flatMapSingle { settings ->
                             nabuUserSync

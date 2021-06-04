@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.blockchain.koin.payloadScope
 import com.blockchain.koin.scopedInject
+import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.ui.trackProgress
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -18,6 +19,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.fragment_buy_sell.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.simplebuy.BuySellViewedEvent
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.simplebuy.SimpleBuyCheckoutFragment
 import piuk.blockchain.android.simplebuy.SimpleBuySelectCurrencyFragment
@@ -38,6 +40,7 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
 
     private val compositeDisposable = CompositeDisposable()
     private val appUtil: AppUtil by inject()
+    private val analytics: Analytics by inject()
     private val simpleBuySync: SimpleBuySyncFactory by scopedInject()
     private val buySellFlowNavigator: BuySellFlowNavigator
         get() = payloadScope.get()
@@ -56,6 +59,7 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity?.setupToolbar(R.string.buy_and_sell)
+        analytics.logEvent(BuySellViewedEvent())
     }
 
     private fun subscribeForNavigation() {
@@ -91,10 +95,12 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
                     renderNotEligibleUi()
                 }
             }
-            else -> startActivity(SimpleBuyActivity.newInstance(
-                context = activity as Context,
-                launchFromNavigationBar = true, launchKycResume = false
-            ))
+            else -> startActivity(
+                SimpleBuyActivity.newInstance(
+                    context = activity as Context,
+                    launchFromNavigationBar = true, launchKycResume = false
+                )
+            )
         }
     }
 
@@ -128,9 +134,11 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
             pager.adapter = pagerAdapter
             when (showView) {
                 BuySellViewType.TYPE_BUY -> pager.setCurrentItem(
-                    BuySellViewType.TYPE_BUY.ordinal, true)
+                    BuySellViewType.TYPE_BUY.ordinal, true
+                )
                 BuySellViewType.TYPE_SELL -> pager.setCurrentItem(
-                    BuySellViewType.TYPE_SELL.ordinal, true)
+                    BuySellViewType.TYPE_SELL.ordinal, true
+                )
             }
         }
 
@@ -153,11 +161,12 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
     companion object {
         private const val VIEW_TYPE = "VIEW_TYPE"
 
-        fun newInstance(viewType: BuySellViewType = BuySellViewType.TYPE_BUY) = BuySellFragment().apply {
-            arguments = Bundle().apply {
-                putSerializable(VIEW_TYPE, viewType)
+        fun newInstance(viewType: BuySellViewType = BuySellViewType.TYPE_BUY) =
+            BuySellFragment().apply {
+                arguments = Bundle().apply {
+                    putSerializable(VIEW_TYPE, viewType)
+                }
             }
-        }
     }
 
     enum class BuySellViewType {
@@ -165,17 +174,11 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
         TYPE_SELL
     }
 
-    override fun onSheetClosed() {
-        subscribeForNavigation()
-    }
+    override fun onSheetClosed() = subscribeForNavigation()
 
-    override fun onSellFinished() {
-        subscribeForNavigation()
-    }
+    override fun onSellFinished() = subscribeForNavigation()
 
-    override fun onSellInfoClicked() {
-        navigator().goToTransfer()
-    }
+    override fun onSellInfoClicked() = navigator().goToTransfer()
 
     override fun onSellListEmptyCta() {
         pager.setCurrentItem(BuySellViewType.TYPE_BUY.ordinal, true)
@@ -198,6 +201,7 @@ internal class ViewPagerAdapter(
 ) : FragmentPagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     override fun getCount(): Int = titlesList.size
+
     override fun getPageTitle(position: Int): CharSequence =
         titlesList[position]
 

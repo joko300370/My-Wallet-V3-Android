@@ -26,7 +26,6 @@ import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.copyAndPut
 import piuk.blockchain.android.coincore.impl.makeExternalAssetAddress
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import piuk.blockchain.androidcore.utils.extensions.thenSingle
@@ -40,7 +39,7 @@ abstract class QuotedEngine(
     protected val quotesEngine: TransferQuotesEngine,
     private val kycTierService: TierService,
     private val walletManager: CustodialWalletManager,
-    private val environmentConfig: EnvironmentConfig
+    private val productType: Product
 ) : TxEngine() {
     protected abstract val direction: TransferDirection
 
@@ -49,7 +48,7 @@ abstract class QuotedEngine(
     protected fun updateLimits(pendingTx: PendingTx, pricedQuote: PricedQuote): Single<PendingTx> =
         Singles.zip(
             kycTierService.tiers(),
-            walletManager.getProductTransferLimits(userFiat, Product.TRADE)
+            walletManager.getProductTransferLimits(userFiat, productType, direction)
         ) { tier, limits ->
             onLimitsForTierFetched(tier, limits, pendingTx, pricedQuote)
         }
@@ -128,8 +127,7 @@ abstract class QuotedEngine(
             sourceAccount = this@QuotedEngine.sourceAccount,
             txTarget = makeExternalAssetAddress(
                 asset = this@QuotedEngine.sourceAsset,
-                address = quote.transferQuote.sampleDepositAddress,
-                environmentConfig = environmentConfig
+                address = quote.transferQuote.sampleDepositAddress
             ),
             exchangeRates = this@QuotedEngine.exchangeRates
         )
@@ -140,7 +138,6 @@ abstract class QuotedEngine(
             txTarget = makeExternalAssetAddress(
                 asset = sourceAsset,
                 address = order.depositAddress ?: throw IllegalStateException("Missing deposit address"),
-                environmentConfig = environmentConfig,
                 postTransactions = { Completable.complete() }
             ),
             pendingTx = pendingTx
