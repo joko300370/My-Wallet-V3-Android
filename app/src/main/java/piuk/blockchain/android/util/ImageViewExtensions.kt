@@ -1,6 +1,7 @@
 package piuk.blockchain.android.util
 
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.widget.ImageView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
@@ -19,3 +20,19 @@ fun ImageView.setAssetIconColours(@ColorRes tintColor: Int, @ColorRes filterColo
         ColorStateList.valueOf(ContextCompat.getColor(context, tintColor)))
     setColorFilter(ContextCompat.getColor(context, filterColor))
 }
+
+fun ImageView.setTransactionHasFailed() =
+    this.apply {
+        setImageResource(R.drawable.ic_close)
+        setAssetIconColours(
+            tintColor = R.color.red_200,
+            filterColor = R.color.red_600
+        )
+    }
+
+fun ImageView.setTransactionIsConfirming() =
+    this.apply {
+        setImageResource(R.drawable.ic_tx_confirming)
+        background = null
+        setColorFilter(Color.TRANSPARENT)
+    }

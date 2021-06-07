@@ -1,6 +1,5 @@
 package piuk.blockchain.android.ui.activity.adapter
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -20,6 +19,7 @@ import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.context
 import piuk.blockchain.android.util.setAssetIconColours
+import piuk.blockchain.android.util.setTransactionHasFailed
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import java.util.Date
 
@@ -64,14 +64,19 @@ private class CustodialTradingActivityItemViewHolder(
         disposables.clear()
         with(binding) {
             icon.setIcon(tx.status, tx.type)
-            if (tx.status.isPending().not()) {
-                icon.setAssetIconColours(
-                    tintColor = assetResources.assetTint(tx.cryptoCurrency),
-                    filterColor = assetResources.assetFilter(tx.cryptoCurrency)
-                )
-            } else {
-                icon.background = null
-                icon.setColorFilter(Color.TRANSPARENT)
+            when {
+                tx.status.isPending().not() -> {
+                    icon.setAssetIconColours(
+                        tintColor = assetResources.assetTint(tx.cryptoCurrency),
+                        filterColor = assetResources.assetFilter(tx.cryptoCurrency)
+                    )
+                }
+                tx.status.hasFailed() -> icon.setTransactionHasFailed()
+
+                else -> {
+                    icon.background = null
+                    icon.setColorFilter(android.graphics.Color.TRANSPARENT)
+                }
             }
 
             txType.setTxLabel(tx.cryptoCurrency, tx.type)
@@ -91,7 +96,7 @@ private class CustodialTradingActivityItemViewHolder(
 
     private fun setTextColours(txStatus: OrderState) {
         with(binding) {
-            if (txStatus == OrderState.FINISHED) {
+            if (txStatus.isFinished()) {
                 txType.setTextColor(context.getResolvedColor(R.color.black))
                 statusDate.setTextColor(context.getResolvedColor(R.color.grey_600))
                 assetBalanceFiat.setTextColor(context.getResolvedColor(R.color.grey_600))
@@ -110,6 +115,10 @@ private fun OrderState.isPending(): Boolean =
     this == OrderState.PENDING_CONFIRMATION ||
         this == OrderState.PENDING_EXECUTION ||
         this == OrderState.AWAITING_FUNDS
+
+private fun OrderState.hasFailed(): Boolean = this == OrderState.FAILED
+
+private fun OrderState.isFinished(): Boolean = this == OrderState.FINISHED
 
 private fun ImageView.setIcon(status: OrderState, type: OrderType) =
     setImageResource(

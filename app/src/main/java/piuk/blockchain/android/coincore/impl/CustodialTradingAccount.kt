@@ -272,11 +272,13 @@ open class CustodialTradingAccount(
             OrderState.FINISHED,
             OrderState.AWAITING_FUNDS,
             OrderState.PENDING_EXECUTION,
+            OrderState.FAILED,
             CustodialOrderState.FINISHED,
             TransactionState.COMPLETED,
             TransactionState.PENDING,
             CustodialOrderState.PENDING_DEPOSIT,
-            CustodialOrderState.PENDING_EXECUTION
+            CustodialOrderState.PENDING_EXECUTION,
+            CustodialOrderState.FAILED
         )
 
         private val transactionType = "WITHDRAWAL"

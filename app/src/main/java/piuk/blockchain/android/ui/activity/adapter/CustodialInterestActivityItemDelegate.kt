@@ -19,8 +19,9 @@ import piuk.blockchain.android.databinding.DialogActivitiesTxItemBinding
 import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.context
-import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.setAssetIconColours
+import piuk.blockchain.android.util.setTransactionHasFailed
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import java.util.Date
 
@@ -65,14 +66,18 @@ private class CustodialInterestActivityItemViewHolder(
         disposables.clear()
         with(binding) {
             icon.setIcon(tx.isPending(), tx.type)
-            if (tx.status.isPending().not()) {
-                icon.setAssetIconColours(
-                    tintColor = assetResources.assetTint(tx.cryptoCurrency),
-                    filterColor = assetResources.assetFilter(tx.cryptoCurrency)
-                )
-            } else {
-                icon.background = null
-                icon.setColorFilter(Color.TRANSPARENT)
+            when {
+                tx.status.isPending().not() -> {
+                    icon.setAssetIconColours(
+                        tintColor = assetResources.assetTint(tx.cryptoCurrency),
+                        filterColor = assetResources.assetFilter(tx.cryptoCurrency)
+                    )
+                }
+                tx.status.hasFailed() -> icon.setTransactionHasFailed()
+                else -> {
+                    icon.background = null
+                    icon.setColorFilter(Color.TRANSPARENT)
+                }
             }
 
             assetBalanceFiat.gone()
@@ -91,7 +96,7 @@ private class CustodialInterestActivityItemViewHolder(
 
     private fun setTextColours(txStatus: InterestState) {
         with(binding) {
-            if (txStatus == InterestState.COMPLETE) {
+            if (txStatus.isCompleted()) {
                 txType.setTextColor(context.getResolvedColor(R.color.black))
                 statusDate.setTextColor(context.getResolvedColor(R.color.grey_600))
                 assetBalanceFiat.setTextColor(context.getResolvedColor(R.color.grey_600))
@@ -110,6 +115,12 @@ private fun InterestState.isPending(): Boolean =
     this == InterestState.PENDING ||
         this == InterestState.PROCESSING ||
         this == InterestState.MANUAL_REVIEW
+
+private fun InterestState.hasFailed(): Boolean =
+    this == InterestState.FAILED
+
+private fun InterestState.isCompleted(): Boolean =
+    this == InterestState.COMPLETE
 
 private fun ImageView.setIcon(txPending: Boolean, type: TransactionSummary.TransactionType) =
     setImageResource(

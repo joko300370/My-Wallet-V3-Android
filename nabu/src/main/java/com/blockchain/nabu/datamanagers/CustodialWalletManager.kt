@@ -441,6 +441,7 @@ enum class TransactionType {
 enum class TransactionState {
     COMPLETED,
     PENDING,
+    FAILED,
     UNKNOWN
 }
 
@@ -477,6 +478,12 @@ enum class CustodialOrderState {
 
     val isPending: Boolean
         get() = pendingState.contains(this)
+
+    private val failedState: Set<CustodialOrderState>
+        get() = setOf(FAILED)
+
+    val hasFailed: Boolean
+        get() = failedState.contains(this)
 
     val displayableState: Boolean
         get() = isPending || this == FINISHED

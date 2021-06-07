@@ -16,6 +16,7 @@ import piuk.blockchain.android.databinding.DialogActivitiesTxItemBinding
 import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.setAssetIconColours
+import piuk.blockchain.android.util.setTransactionHasFailed
 import java.util.Date
 
 class CustodialRecurringBuyActivityItemDelegate(
@@ -53,11 +54,17 @@ private class CustodialRecurringBuyActivityViewHolder(
     ) {
         val context = binding.root.context
         with(binding) {
-            icon.setImageResource(R.drawable.ic_tx_recurring_buy)
-            icon.setAssetIconColours(
-                assetResources.assetTint(tx.cryptoCurrency),
-                assetResources.assetFilter(tx.cryptoCurrency)
-            )
+            when (tx.state) {
+                RecurringBuyActivityState.PENDING,
+                RecurringBuyActivityState.COMPLETED -> {
+                    icon.setImageResource(R.drawable.ic_tx_recurring_buy)
+                    icon.setAssetIconColours(
+                        assetResources.assetTint(tx.cryptoCurrency),
+                        assetResources.assetFilter(tx.cryptoCurrency)
+                    )
+                }
+                else -> icon.setTransactionHasFailed()
+            }
 
             txType.text = context.resources.getString(R.string.tx_title_buy, tx.cryptoCurrency)
             statusDate.setTxStatus(tx)
@@ -85,8 +92,8 @@ private class CustodialRecurringBuyActivityViewHolder(
                 }
                 RecurringBuyActivityState.FAILED -> {
                     txType.setTextColor(ContextCompat.getColor(context, R.color.black))
-                    statusDate.setTextColor(ContextCompat.getColor(context, R.color.grey_600))
-                    assetBalanceFiat.setTextColor(ContextCompat.getColor(context, R.color.red_400))
+                    statusDate.setTextColor(ContextCompat.getColor(context, R.color.red_600))
+                    assetBalanceFiat.setTextColor(ContextCompat.getColor(context, R.color.grey_600))
                     assetBalanceCrypto.setTextColor(ContextCompat.getColor(context, R.color.black))
                 }
                 RecurringBuyActivityState.PENDING,

@@ -582,7 +582,7 @@
     <string name="tx_title_receive">Receive %1s</string>
     <string name="tx_title_sell">Sell %1s</string>
     <string name="tx_title_buy">Buy %1s</string>
-    <string name="tx_title_deposit">Transfer %1s</string>
+    <string name="tx_title_deposit">Deposit %1s</string>
     <string name="tx_title_withdraw">Withdraw %1s</string>
     <string name="tx_title_swap">Swap %1$s → %2$s</string>
     <string name="tx_title_transfer">Transfer %1s</string>
@@ -1465,6 +1465,7 @@
     <string name="activity_details_label_manual_review">Manual Review</string>
     <string name="activity_details_label_processing">Processing</string>
     <string name="activity_details_label_complete">Complete</string>
+    <string name="activity_details_label_failed">Failed</string>
     <string name="activity_details_title_transferred">Transfer</string>
     <string name="activity_details_title_received">Receive</string>
     <string name="activity_details_title_sent">Send</string>

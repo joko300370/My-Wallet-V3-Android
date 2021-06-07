@@ -1434,6 +1434,7 @@ private fun String.toCryptoCurrencyPair(): CurrencyPair.CryptoCurrencyPair? {
 fun String.toTransactionState(): TransactionState =
     when (this) {
         TransactionResponse.COMPLETE -> TransactionState.COMPLETED
+        TransactionResponse.FAILED -> TransactionState.FAILED
         TransactionResponse.PENDING,
         TransactionResponse.CLEARED,
         TransactionResponse.FRAUD_REVIEW,

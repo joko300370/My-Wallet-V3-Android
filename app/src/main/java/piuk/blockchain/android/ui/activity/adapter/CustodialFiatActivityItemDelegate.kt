@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.nabu.datamanagers.TransactionState
 import com.blockchain.nabu.datamanagers.TransactionType
@@ -13,6 +14,7 @@ import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.databinding.LayoutFiatActivityItemBinding
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.context
+import piuk.blockchain.android.util.setTransactionHasFailed
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import java.util.Date
 
@@ -45,10 +47,11 @@ private class FiatActivityItemViewHolder(
         onAccountClicked: (String, String) -> Unit
     ) {
         with(binding) {
-            if (tx.state.isPending()) {
-                renderPending()
-            } else {
-                renderComplete(tx)
+            when {
+                tx.state.isPending() -> renderPending()
+                tx.state.hasFailed() -> renderFailed()
+                tx.state.hasCompleted() -> renderComplete(tx)
+                else -> throw IllegalArgumentException("TransactionState not valid")
             }
 
             txType.setTxLabel(tx.currency, tx.type)
@@ -89,8 +92,21 @@ private class FiatActivityItemViewHolder(
         }
     }
 
+    private fun LayoutFiatActivityItemBinding.renderFailed() {
+        txType.setTextColor(ContextCompat.getColor(context, R.color.black))
+        statusDate.setTextColor(ContextCompat.getColor(context, R.color.grey_600))
+        assetBalanceFiat.setTextColor(ContextCompat.getColor(context, R.color.grey_600))
+        icon.setTransactionHasFailed()
+    }
+
     private fun TransactionState.isPending() =
         this == TransactionState.PENDING
+
+    private fun TransactionState.hasFailed() =
+        this == TransactionState.FAILED
+
+    private fun TransactionState.hasCompleted() =
+        this == TransactionState.COMPLETED
 }
 
 private fun AppCompatTextView.setTxLabel(currency: String, type: TransactionType) {

@@ -1,10 +1,7 @@
 package piuk.blockchain.android.ui.activity.adapter
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.utils.toFormattedDate
@@ -17,6 +14,8 @@ import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.context
 import piuk.blockchain.android.util.setAssetIconColours
+import piuk.blockchain.android.util.setTransactionHasFailed
+import piuk.blockchain.android.util.setTransactionIsConfirming
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import java.util.Date
@@ -57,7 +56,6 @@ private class SwapActivityItemViewHolder(
         onAccountClicked: (CryptoCurrency, String, CryptoActivityType) -> Unit
     ) {
         with(binding) {
-
             statusDate.text = Date(tx.timeStampMs).toFormattedDate()
             (tx.currencyPair as? CurrencyPair.CryptoCurrencyPair)?.let {
                 txType.text = context.resources.getString(
@@ -66,22 +64,30 @@ private class SwapActivityItemViewHolder(
                     it.destination.displayTicker
                 )
                 if (tx.state.isPending) {
-                    icon.setIsConfirming()
-                } else {
-                    icon.setImageResource(R.drawable.ic_tx_swap)
-                    icon.setAssetIconColours(
-                        tintColor = assetResources.assetTint(it.source),
-                        filterColor = assetResources.assetFilter(it.source)
-                    )
+                    when {
+                        tx.state.isPending -> icon.setTransactionIsConfirming()
+                        tx.state.hasFailed -> icon.setTransactionHasFailed()
+                        else -> {
+                            icon.setImageResource(R.drawable.ic_tx_swap)
+                            icon.setAssetIconColours(
+                                tintColor = assetResources.assetTint(it.source),
+                                filterColor = assetResources.assetFilter(it.source)
+                            )
+                        }
+                    }
+                    txRoot.setOnClickListener {
+                        onAccountClicked(
+                            tx.currencyPair.source, tx.txId, CryptoActivityType.SWAP
+                        )
+                    }
                 }
-                txRoot.setOnClickListener { onAccountClicked(tx.currencyPair.source, tx.txId, CryptoActivityType.SWAP) }
+
+                setTextColours(tx.state.isPending)
+
+                assetBalanceCrypto.text = tx.value.toStringWithSymbol()
+                assetBalanceFiat.text = tx.fiatValue.toStringWithSymbol()
+                assetBalanceFiat.visible()
             }
-
-            setTextColours(tx.state.isPending)
-
-            assetBalanceCrypto.text = tx.value.toStringWithSymbol()
-            assetBalanceFiat.text = tx.fiatValue.toStringWithSymbol()
-            assetBalanceFiat.visible()
         }
     }
 
@@ -101,15 +107,3 @@ private class SwapActivityItemViewHolder(
         }
     }
 }
-
-private fun ImageView.setIsConfirming() =
-    apply {
-        setImageDrawable(
-            AppCompatResources.getDrawable(
-                context,
-                R.drawable.ic_tx_confirming
-            )
-        )
-        background = null
-        setColorFilter(Color.TRANSPARENT)
-    }

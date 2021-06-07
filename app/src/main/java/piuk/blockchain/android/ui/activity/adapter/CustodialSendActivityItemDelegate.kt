@@ -1,10 +1,7 @@
 package piuk.blockchain.android.ui.activity.adapter
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.utils.toFormattedDate
@@ -20,6 +17,7 @@ import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.context
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.setAssetIconColours
+import piuk.blockchain.android.util.setTransactionIsConfirming
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import java.util.Date
 
@@ -70,7 +68,7 @@ private class CustodialSendActivityItemViewHolder(
                     filterColor = assetResources.assetFilter(tx.cryptoCurrency)
                 )
             } else {
-                icon.setIsConfirming()
+                icon.setTransactionIsConfirming()
             }
 
             setTextColours(tx.isConfirmed)
@@ -107,15 +105,3 @@ private class CustodialSendActivityItemViewHolder(
         }
     }
 }
-
-private fun ImageView.setIsConfirming() =
-    apply {
-        setImageDrawable(
-            AppCompatResources.getDrawable(
-                context,
-                R.drawable.ic_tx_confirming
-            )
-        )
-        background = null
-        setColorFilter(Color.TRANSPARENT)
-    }

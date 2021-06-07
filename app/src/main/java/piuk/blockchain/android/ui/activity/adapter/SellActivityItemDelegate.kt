@@ -1,10 +1,7 @@
 package piuk.blockchain.android.ui.activity.adapter
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.utils.toFormattedDate
@@ -17,6 +14,8 @@ import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.context
 import piuk.blockchain.android.util.setAssetIconColours
+import piuk.blockchain.android.util.setTransactionHasFailed
+import piuk.blockchain.android.util.setTransactionIsConfirming
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import java.util.Date
@@ -63,14 +62,18 @@ private class SellActivityItemViewHolder(
                     R.string.tx_title_sell,
                     it.source.displayTicker
                 )
-                if (tx.state.isPending) {
-                    icon.setIsConfirming()
-                } else {
-                    icon.setImageResource(R.drawable.ic_tx_sell)
-                    icon.setAssetIconColours(
-                        tintColor = assetResources.assetTint(it.source),
-                        filterColor = assetResources.assetFilter(it.source)
-                    )
+                when {
+                    tx.state.isPending -> icon.setTransactionIsConfirming()
+                    tx.state.hasFailed -> icon.setTransactionHasFailed()
+                    else -> {
+                        icon.apply {
+                            setImageResource(R.drawable.ic_tx_sell)
+                            setAssetIconColours(
+                                tintColor = assetResources.assetTint(it.source),
+                                filterColor = assetResources.assetFilter(it.source)
+                            )
+                        }
+                    }
                 }
                 txRoot.setOnClickListener { onAccountClicked(tx.currencyPair.source, tx.txId, CryptoActivityType.SELL) }
             }
@@ -97,15 +100,3 @@ private class SellActivityItemViewHolder(
         }
     }
 }
-
-private fun ImageView.setIsConfirming() =
-    apply {
-        setImageDrawable(
-            AppCompatResources.getDrawable(
-                context,
-                R.drawable.ic_tx_confirming
-            )
-        )
-        background = null
-        setColorFilter(Color.TRANSPARENT)
-    }

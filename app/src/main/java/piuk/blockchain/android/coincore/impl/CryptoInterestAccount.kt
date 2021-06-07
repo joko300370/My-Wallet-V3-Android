@@ -159,7 +159,8 @@ internal class CryptoInterestAccount(
             InterestState.COMPLETE,
             InterestState.PROCESSING,
             InterestState.PENDING,
-            InterestState.MANUAL_REVIEW
+            InterestState.MANUAL_REVIEW,
+            InterestState.FAILED
         )
     }
 }
