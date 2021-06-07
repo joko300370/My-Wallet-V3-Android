@@ -187,7 +187,8 @@ val applicationModule = module {
                 bitcoinApi = get(),
                 defaultLabels = get(),
                 metadataManager = get(),
-                rxBus = get()
+                rxBus = get(),
+                crashLogger = get()
             )
         }
 

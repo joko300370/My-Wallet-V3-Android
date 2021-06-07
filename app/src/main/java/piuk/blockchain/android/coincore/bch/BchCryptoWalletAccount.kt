@@ -59,7 +59,8 @@ internal class BchCryptoWalletAccount private constructor(
         get() = hasFunds.get()
 
     override val accountBalance: Single<Money>
-        get() = bchManager.getBalance(internalAccount.xpubs())
+        get() = Single.fromCallable { internalAccount.xpubs() }
+            .flatMap { xpub -> bchManager.getBalance(xpub) }
             .map { CryptoValue.fromMinor(CryptoCurrency.BCH, it) }
             .doOnSuccess {
                 hasFunds.set(it > CryptoValue.zero(CryptoCurrency.BCH))

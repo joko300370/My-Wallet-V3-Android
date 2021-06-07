@@ -65,17 +65,6 @@ public class GenericMetadataAccount implements JsonSerializableAccount {
         this.xpub = xpub;
     }
 
-    public String toJson() throws JsonProcessingException {
-        // This is done to avoid storing the xPub in Metadata, but allowing serialization to take
-        // place in-app.
-        final GenericMetadataAccount safeCopy = new GenericMetadataAccount(this.label, this.archived);
-        return new ObjectMapper().writeValueAsString(safeCopy);
-    }
-
-    public static GenericMetadataAccount fromJson(String json) throws IOException {
-        return new ObjectMapper().readValue(json, GenericMetadataAccount.class);
-    }
-
     public XPubs xpubs() {
         return new XPubs(new XPub(xpub, XPub.Format.LEGACY));
     }

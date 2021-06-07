@@ -1,6 +1,7 @@
 package piuk.blockchain.androidcore.data.payload
 
 import com.blockchain.annotations.BurnCandidate
+import com.blockchain.logging.CrashLogger
 import info.blockchain.api.ApiException
 import info.blockchain.wallet.exceptions.DecryptionException
 import info.blockchain.wallet.exceptions.HDWalletException
@@ -24,7 +25,8 @@ import java.util.LinkedHashMap
 // into PayloadManager
 internal class PayloadService(
     private val payloadManager: PayloadManager,
-    private val versionController: PayloadVersionController
+    private val versionController: PayloadVersionController,
+    private val crashLogger: CrashLogger
 ) {
 
     // /////////////////////////////////////////////////////////////////////////
@@ -112,6 +114,7 @@ internal class PayloadService(
         guid: String,
         password: String
     ): Completable = versionController.isV4Enabled(guid, sharedKey)
+        .doOnSuccess { crashLogger.logState("Segwit enabled", it.toString()) }
         .flatMapCompletable { v4Enabled ->
             Completable.fromCallable {
                 payloadManager.initializeAndDecrypt(

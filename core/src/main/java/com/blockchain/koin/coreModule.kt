@@ -92,7 +92,8 @@ val coreModule = module {
         factory {
             PayloadService(
                 payloadManager = get(),
-                versionController = get()
+                versionController = get(),
+                crashLogger = get()
             )
         }
 

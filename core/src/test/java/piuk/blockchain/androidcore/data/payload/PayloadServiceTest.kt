@@ -41,7 +41,11 @@ class PayloadServiceTest {
 
     @Before
     fun setUp() {
-        subject = PayloadService(mockPayloadManager, versionController)
+        subject = PayloadService(
+            payloadManager = mockPayloadManager,
+            versionController = versionController,
+            crashLogger = mock()
+        )
     }
 
     @Test
