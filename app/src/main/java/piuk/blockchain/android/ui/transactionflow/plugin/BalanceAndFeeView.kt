@@ -14,6 +14,7 @@ import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.databinding.ViewTxFlowFeeAndBalanceBinding
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
@@ -31,8 +32,7 @@ class BalanceAndFeeView @JvmOverloads constructor(
     ctx: Context,
     attr: AttributeSet? = null,
     defStyle: Int = 0
-) : ConstraintLayout(ctx, attr, defStyle),
-    ExpandableTxFlowWidget {
+) : ConstraintLayout(ctx, attr, defStyle), ExpandableTxFlowWidget {
 
     private lateinit var model: TransactionModel
     private lateinit var customiser: EnterAmountCustomisations
@@ -74,6 +74,7 @@ class BalanceAndFeeView @JvmOverloads constructor(
 
         updateMaxGroup(state)
         updateBalance(state)
+
         state.pendingTx?.let {
             if (it.feeSelection.selectedLevel == FeeLevel.None) {
                 binding.feeEdit.gone()
@@ -89,19 +90,27 @@ class BalanceAndFeeView @JvmOverloads constructor(
     }
 
     private fun updateBalance(state: TransactionState) {
-        val availableBalance = state.availableBalance
-        binding.maxAvailableValue.text = makeAmountString(availableBalance, state)
-        binding.feeForFullAvailableLabel.text = customiser.enterAmountMaxNetworkFeeLabel(state)
+        with(binding) {
+            val availableBalance = state.availableBalance
+            maxAvailableValue.text = makeAmountString(availableBalance, state)
+            feeForFullAvailableLabel.text = customiser.enterAmountMaxNetworkFeeLabel(state)
 
-        state.pendingTx?.totalBalance?.let {
-            binding.totalAvailableValue.text = makeAmountString(it, state)
-        }
+            state.pendingTx?.totalBalance?.let {
+                totalAvailableValue.text = makeAmountString(it, state)
+            }
 
-        state.pendingTx?.feeAmount?.let {
-            binding.networkFeeValue.text = makeAmountString(it, state)
-        }
-        state.pendingTx?.feeForFullAvailable?.let {
-            binding.feeForFullAvailableValue.text = makeAmountString(it, state)
+            if (customiser.shouldNotDisplayNetworkFee(state)) {
+                networkFeeValue.text = context.getString(R.string.fee_calculated_at_checkout)
+                feeForFullAvailableValue.text = context.getString(R.string.fee_calculated_at_checkout)
+            } else {
+                state.pendingTx?.feeAmount?.let {
+                    networkFeeValue.text = makeAmountString(it, state)
+                }
+
+                state.pendingTx?.feeForFullAvailable?.let {
+                    feeForFullAvailableValue.text = makeAmountString(it, state)
+                }
+            }
         }
     }
 

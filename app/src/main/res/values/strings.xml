@@ -2147,4 +2147,5 @@
     <string name="recurring_buy_cancel_dialog_desc">Are you sure you want to cancel this Recurring Buy?</string>
     <string name="recurring_buy_activity_failed">Failed. Low balance.</string>
     <string name="recurring_buy_activity_pending">Pending</string>
+    <string name="fee_calculated_at_checkout">Calculated at checkout</string>
 </resources>

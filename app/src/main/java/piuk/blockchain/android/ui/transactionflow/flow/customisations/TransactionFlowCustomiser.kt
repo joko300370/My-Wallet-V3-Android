@@ -282,6 +282,10 @@ class TransactionFlowCustomiserImpl(
             else -> throw java.lang.IllegalStateException("Max network fee label not configured for ${state.action}")
         }
 
+    override fun shouldNotDisplayNetworkFee(state: TransactionState): Boolean =
+        state.action == AssetAction.Swap &&
+            state.sendingAccount is NonCustodialAccount && state.selectedTarget is NonCustodialAccount
+
     override fun confirmTitle(state: TransactionState): String =
         when (state.action) {
             AssetAction.Send -> resources.getString(R.string.send_confirmation_title)
