@@ -30,11 +30,9 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        maven { url "https://dl.bintray.com/ethereum/maven/" }
         maven { url "https://jitpack.io" }
         maven { url 'https://onfido.bintray.com/maven/' }
 
-        maven { url "http://dl.bintray.com/argo/sdk" } // probity
         maven { url "https://cdn.veriff.me/android/" } // veriff
         jcenter()
     }

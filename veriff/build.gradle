@@ -47,7 +47,6 @@ dependencies {
     implementation Libraries.appCompat
     implementation Libraries.constraintLayout
     implementation Libraries.design
-    implementation Libraries.probity
     implementation Libraries.jjwt
     implementation Libraries.timber
     implementation(Libraries.retrofit) { exclude module: 'okhttp' }
