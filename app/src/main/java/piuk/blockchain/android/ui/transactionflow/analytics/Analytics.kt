@@ -20,6 +20,7 @@ import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmationValue
+import piuk.blockchain.android.coincore.fiat.LinkedBankAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
@@ -204,6 +205,23 @@ class TxFlowAnalytics(
                     )
                 )
             }
+            AssetAction.Sell -> {
+                require(account is CryptoAccount)
+                analytics.logEvent(
+                    SellSourceAccountSelected(
+                        sourceAccountType = TxFlowAnalyticsAccountType.fromAccount(state.sendingAccount),
+                        inputCurrency = account.asset.networkTicker
+                    )
+                )
+            }
+            AssetAction.FiatDeposit -> {
+                require(account is LinkedBankAccount)
+                analytics.logEvent(
+                    DepositAnalytics.DepositMethodSelected(
+                        currency = account.fiatCurrency
+                    )
+                )
+            }
             else -> {
             }
         }
@@ -257,6 +275,15 @@ class TxFlowAnalytics(
                     )
                 )
             }
+            AssetAction.Sell -> {
+                analytics.logEvent(
+                    MaxAmountClicked(
+                        sourceAccountType = TxFlowAnalyticsAccountType.fromAccount(state.sendingAccount),
+                        inputCurrency = state.sendingAsset.networkTicker,
+                        outputCurrency = (state.selectedTarget as FiatAccount).fiatCurrency
+                    )
+                )
+            }
             else -> {
             }
         }
@@ -275,7 +302,7 @@ class TxFlowAnalytics(
         when (state.action) {
             AssetAction.Send ->
                 analytics.logEvent(SendAnalyticsEvent.EnterAmountCtaClick)
-            AssetAction.Sell ->
+            AssetAction.Sell -> {
                 analytics.logEvent(
                     SellAnalyticsEvent(
                         event = SellAnalytics.EnterAmountCtaClick,
@@ -283,6 +310,14 @@ class TxFlowAnalytics(
                         source = state.sendingAccount.toCategory()
                     )
                 )
+                analytics.logEvent(
+                    AmountEntered(
+                        sourceAccountType = TxFlowAnalyticsAccountType.fromAccount(state.sendingAccount),
+                        amount = state.amount,
+                        outputCurrency = (state.selectedTarget as FiatAccount).fiatCurrency
+                    )
+                )
+            }
             AssetAction.InterestDeposit ->
                 analytics.logEvent(InterestDepositAnalyticsEvent.EnterAmountCtaClick(state.sendingAsset))
             AssetAction.Swap -> {
@@ -307,6 +342,11 @@ class TxFlowAnalytics(
                         WithdrawAnalytics.WITHDRAW_CONFIRM, (state.sendingAccount as FiatAccount).fiatCurrency
                     )
                 )
+            AssetAction.FiatDeposit -> analytics.logEvent(
+                DepositAnalytics.DepositAmountEntered(
+                    currency = (state.sendingAccount as FiatAccount).fiatCurrency
+                )
+            )
             else -> {
             }
         }
@@ -340,7 +380,7 @@ class TxFlowAnalytics(
                         state.sendingAsset
                     )
                 )
-            AssetAction.Sell ->
+            AssetAction.Sell -> {
                 analytics.logEvent(
                     SellAnalyticsEvent(
                         event = SellAnalytics.ConfirmTransaction,
@@ -348,6 +388,14 @@ class TxFlowAnalytics(
                         source = state.sendingAccount.toCategory()
                     )
                 )
+                analytics.logEvent(
+                    MaxAmountClicked(
+                        sourceAccountType = TxFlowAnalyticsAccountType.fromAccount(state.sendingAccount),
+                        inputCurrency = state.sendingAsset.networkTicker,
+                        outputCurrency = (state.selectedTarget as FiatAccount).fiatCurrency
+                    )
+                )
+            }
             AssetAction.Swap ->
                 analytics.logEvent(
                     SwapAnalyticsEvents.SwapConfirmCta(

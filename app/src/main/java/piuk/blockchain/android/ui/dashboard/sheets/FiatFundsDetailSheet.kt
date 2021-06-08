@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import com.blockchain.koin.scopedInject
+import com.blockchain.notifications.analytics.LaunchOrigin
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.balance.ExchangeRates
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -23,6 +24,7 @@ import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.dashboard.assetdetails.AssetDetailsAnalytics
 import piuk.blockchain.android.ui.dashboard.assetdetails.fiatAssetAction
+import piuk.blockchain.android.ui.transactionflow.analytics.DepositAnalytics
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
@@ -85,6 +87,7 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog<DialogSheetFiatFundsDetail
 
             fundsDepositHolder.setOnClickListener {
                 analytics.logEvent(fiatAssetAction(AssetDetailsAnalytics.FIAT_DEPOSIT_CLICKED, account.fiatCurrency))
+                analytics.logEvent(DepositAnalytics.DepositClicked(LaunchOrigin.CURRENCY_PAGE))
                 dismiss()
                 host.startDepositFlow(account)
             }
@@ -106,7 +109,7 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog<DialogSheetFiatFundsDetail
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
                 binding.fundsSheetProgress.visible()
-            }.doOnTerminate {
+            }.doFinally {
                 binding.fundsSheetProgress.gone()
             }.subscribeBy(
                 onSuccess = {

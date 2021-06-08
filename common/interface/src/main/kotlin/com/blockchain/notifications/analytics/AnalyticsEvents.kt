@@ -110,6 +110,12 @@ enum class AnalyticsNames(val eventName: String) {
     SEND_RECEIVE_VIEWED("Send Receive Viewed"),
     RECEIVE_ACCOUNT_SELECTED("Receive Currency Selected"),
     RECEIVE_ADDRESS_COPIED("Receive Details Copied"),
+    SELL_AMOUNT_ENTERED("Sell Amount Entered"),
+    SELL_SOURCE_SELECTED("Sell From Selected"),
+    SELL_AMOUNT_MAX_CLICKED("Sell Amount Max Clicked"),
+    DEPOSIT_CLICKED("Deposit Clicked"),
+    DEPOSIT_AMOUNT_ENTERED("Deposit Amount Entered"),
+    DEPOSIT_METHOD_SELECTED("Deposit Method Selected"),
     EMAIL_VERIFF_REQUESTED("Email Verification Requested");
 }
 

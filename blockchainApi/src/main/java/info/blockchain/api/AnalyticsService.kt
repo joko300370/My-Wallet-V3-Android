@@ -1,4 +1,5 @@
 @file:UseSerializers(BigDecimalSerializer::class)
+
 package info.blockchain.api
 
 import info.blockchain.api.analytics.AnalyticsApiInterface
@@ -18,6 +19,7 @@ class AnalyticsService(retrofit: Retrofit) {
         events: List<NabuAnalyticsEvent>,
         id: String,
         analyticsContext: AnalyticsContext,
+        platform: String,
         authorization: String?
     ): Completable {
 
@@ -25,6 +27,7 @@ class AnalyticsService(retrofit: Retrofit) {
             authorization,
             AnalyticsRequestBody(
                 id = id,
+                platform = platform,
                 events = events,
                 context = analyticsContext
             )

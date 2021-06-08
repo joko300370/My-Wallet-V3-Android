@@ -19,6 +19,7 @@ interface AnalyticsApiInterface {
 class AnalyticsRequestBody(
     val id: String,
     val context: AnalyticsContext,
+    val platform: String,
     val events: List<NabuAnalyticsEvent>
 )
 

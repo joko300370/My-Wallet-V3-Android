@@ -95,7 +95,11 @@ class NabuAnalytics(
     private fun postEvents(events: List<NabuAnalyticsEvent>): Completable =
         tokenStore.getAccessToken().firstOrError().flatMapCompletable {
             analyticsService.postEvents(
-                events, id, analyticsContextProvider.context(), if (it is Optional.Some) it.element.authHeader else null
+                events = events,
+                id = id,
+                analyticsContext = analyticsContextProvider.context(),
+                platform = "WALLET",
+                authorization = if (it is Optional.Some) it.element.authHeader else null
             )
         }
 
