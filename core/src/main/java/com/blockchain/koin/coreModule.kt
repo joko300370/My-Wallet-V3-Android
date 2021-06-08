@@ -103,7 +103,8 @@ val coreModule = module {
                 privateKeyFactory = get(),
                 bitcoinApi = get(),
                 payloadManager = get(),
-                rxBus = get()
+                rxBus = get(),
+                crashLogger = get()
             )
         }
 

@@ -1,6 +1,7 @@
 package piuk.blockchain.androidcore.data.payload
 
 import com.blockchain.annotations.MoveCandidate
+import com.blockchain.logging.CrashLogger
 import info.blockchain.api.BitcoinApi
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.bip44.HDWalletFactory
@@ -25,7 +26,6 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.exceptions.Exceptions
 import io.reactivex.schedulers.Schedulers
 import org.bitcoinj.core.AddressFormatException
 import org.bitcoinj.core.LegacyAddress
@@ -41,12 +41,21 @@ import piuk.blockchain.androidcore.utils.extensions.applySchedulers
 import java.math.BigInteger
 import java.util.LinkedHashMap
 
+class WalletUpgradeFailure(
+    msg: String,
+    cause: Throwable? = null
+) : Exception(
+    "$msg (cause: ${cause?.message})",
+    cause
+)
+
 class PayloadDataManager internal constructor(
     private val payloadService: PayloadService,
     private val bitcoinApi: BitcoinApi,
     @MoveCandidate("Move this down to the PayloadManager layer, with the other crypto tools")
     private val privateKeyFactory: PrivateKeyFactory,
     private val payloadManager: PayloadManager,
+    private val crashLogger: CrashLogger,
     rxBus: RxBus
 ) {
 
@@ -235,19 +244,33 @@ class PayloadDataManager internal constructor(
     fun upgradeWalletPayload(secondPassword: String?, defaultAccountName: String): Completable =
         rxPinning.call {
             Completable.fromCallable {
+                logWalletUpgradeStats()
                 if (payloadManager.isV3UpgradeRequired) {
-                    if (!payloadManager.upgradeV2PayloadToV3(secondPassword, defaultAccountName)) {
-                        throw Exceptions.propagate(Throwable("Upgrade wallet failed"))
+                    try {
+                        payloadManager.upgradeV2PayloadToV3(secondPassword, defaultAccountName)
+                    } catch (t: Throwable) {
+                        throw WalletUpgradeFailure("v2 -> v3 failed", t)
                     }
                 }
                 if (payloadManager.isV4UpgradeRequired) {
-                    if (!payloadManager.upgradeV3PayloadToV4(secondPassword)) {
-                        throw Exceptions.propagate(Throwable("Upgrade wallet failed"))
+                    try {
+                        payloadManager.upgradeV3PayloadToV4(secondPassword)
+                    } catch (t: Throwable) {
+                        throw WalletUpgradeFailure("v3 -> v4 failed", t)
                     }
                 }
             }
         }.applySchedulers()
 
+    private fun logWalletUpgradeStats() {
+        payloadManager.payload?.let { payload ->
+            crashLogger.logState("doubleEncrypt", payload.isDoubleEncryption.toString())
+            // There should only ever be one wallet body, but there have been historical bugs, so check:
+            crashLogger.logState("body count", (payload.walletBodies?.size ?: 0).toString())
+            crashLogger.logState("account count", (payload.walletBody?.accounts?.size ?: 0).toString())
+            crashLogger.logState("imported count", payload.importedAddressList.size.toString())
+        }
+    }
     // /////////////////////////////////////////////////////////////////////////
     // SYNC METHODS
     // /////////////////////////////////////////////////////////////////////////
