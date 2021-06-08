@@ -48,6 +48,12 @@ class YapilyBankSelectionFragment : Fragment() {
             onBankItemClicked = {
                 analytics.logEvent(bankAuthEvent(BankAuthAnalytics.SELECT_BANK, authSource))
                 navigator().yapilyInstitutionSelected(it, attributes.entity)
+                analytics.logEvent(
+                    BankAuthAnalytics.BankSelected(
+                        bankName = it.name,
+                        provider = attributes.entity
+                    )
+                )
             },
             onAddNewBankClicked = {
                 analytics.logEvent(bankAuthEvent(BankAuthAnalytics.SELECT_TRANSFER_DETAILS, authSource))

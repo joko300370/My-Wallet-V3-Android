@@ -36,10 +36,10 @@ fun String.fromIso8601ToUtc(): Date? {
     }
 }
 
-fun Date.toUtcIso8601(): String {
-    val s = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+fun Date.toUtcIso8601(locale: Locale = Locale.getDefault()): String {
+    val s = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", locale)
     s.timeZone = TimeZone.getTimeZone("UTC")
-    return s.format(Date())
+    return s.format(this)
 }
 
 fun Date.toLocalTime(): Date {

@@ -19,6 +19,7 @@ import piuk.blockchain.androidcore.utils.extensions.emptySubscribe
 import piuk.blockchain.androidcore.utils.extensions.then
 import java.math.BigDecimal
 import java.util.Date
+import java.util.Locale
 
 class NabuAnalytics(
     private val analyticsService: AnalyticsService,
@@ -116,7 +117,7 @@ private fun AnalyticsEvent.toNabuAnalyticsEvent(): NabuAnalyticsEvent =
     NabuAnalyticsEvent(
         name = this.event,
         type = "EVENT",
-        originalTimestamp = Date().toUtcIso8601(),
+        originalTimestamp = Date().toUtcIso8601(Locale.ENGLISH),
         properties = this.params.filter { it.value is String }.mapValues { it.value.toString() }
             .plusOriginIfAvailable(this.origin),
         numericProperties = this.params.filter { it.value is Number }.mapValues { BigDecimal(it.value.toString()) }

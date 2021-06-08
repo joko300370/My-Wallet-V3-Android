@@ -8,11 +8,13 @@ import androidx.annotation.StringRes
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.notifications.analytics.LaunchOrigin
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.LinkBankMethodChooserSheetLayoutBinding
 import piuk.blockchain.android.databinding.LinkBankMethodItemBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.dashboard.LinkablePaymentMethodsForAction
+import piuk.blockchain.android.ui.linkbank.BankAuthAnalytics
 import piuk.blockchain.android.ui.settings.BankLinkingHost
 import piuk.blockchain.android.util.visibleIf
 
@@ -30,12 +32,21 @@ class LinkBankMethodChooserBottomSheet : SlidingModalBottomDialog<LinkBankMethod
         get() = parentFragment as? BankLinkingHost
             ?: throw IllegalStateException("Host is not a BankLinkingHost")
 
+    private fun launchOrigin(): LaunchOrigin {
+        return when (paymentMethods) {
+            is LinkablePaymentMethodsForAction.LinkablePaymentMethodsForSettings -> LaunchOrigin.SETTINGS
+            is LinkablePaymentMethodsForAction.LinkablePaymentMethodsForDeposit -> LaunchOrigin.DEPOSIT
+            is LinkablePaymentMethodsForAction.LinkablePaymentMethodsForWithdraw -> LaunchOrigin.WITHDRAWAL
+        }
+    }
+
     override fun initControls(binding: LinkBankMethodChooserSheetLayoutBinding) {
         with(binding) {
             recycler.layoutManager = LinearLayoutManager(activity)
             recycler.adapter = LinkBankMethodChooserAdapter(
                 paymentMethods.linkablePaymentMethods.linkMethods, isForPayment
             ) {
+                analytics.logEvent(BankAuthAnalytics.LinkBankSelected(launchOrigin()))
                 when (it) {
                     PaymentMethodType.BANK_TRANSFER -> kotlin.run {
                         host.onLinkBankSelected(

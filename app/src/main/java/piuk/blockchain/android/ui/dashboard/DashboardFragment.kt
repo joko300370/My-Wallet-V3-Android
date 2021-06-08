@@ -278,7 +278,9 @@ class DashboardFragment :
                 }
                 DashboardNavigationAction.PaymentMethods -> {
                     state.linkablePaymentMethodsForAction?.let {
-                        LinkBankMethodChooserBottomSheet.newInstance(it)
+                        LinkBankMethodChooserBottomSheet.newInstance(
+                            it
+                        )
                     }
                 }
                 DashboardNavigationAction.FiatFundsNoKyc -> showFiatFundsKyc()

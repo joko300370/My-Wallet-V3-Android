@@ -26,6 +26,7 @@ import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
 import java.io.Serializable
+import java.lang.IllegalArgumentException
 import java.util.Locale
 
 const val WALLET_TYPE_NON_CUSTODIAL = "non_custodial"
@@ -94,6 +95,12 @@ class TxFlowAnalytics(
                 SwapAnalyticsEvents.SwapTargetAccountSelected(
                     (account as CryptoAccount).asset.networkTicker,
                     TxFlowAnalyticsAccountType.fromAccount(account)
+                )
+            )
+            AssetAction.Withdraw -> analytics.logEvent(
+                WithdrawAnalytics.WithdrawMethodSelected(
+                    (state.sendingAccount as FiatAccount).fiatCurrency,
+                    (account as LinkedBankAccount).type
                 )
             )
             else -> {
@@ -275,6 +282,12 @@ class TxFlowAnalytics(
                     )
                 )
             }
+            AssetAction.Withdraw -> analytics.logEvent(
+                WithdrawAnalytics.WithdrawalMaxClicked(
+                    currency = (state.sendingAccount as FiatAccount).fiatCurrency,
+                    paymentMethodType = (state.sendingAccount as LinkedBankAccount).type
+                )
+            )
             AssetAction.Sell -> {
                 analytics.logEvent(
                     MaxAmountClicked(
@@ -336,12 +349,22 @@ class TxFlowAnalytics(
                     )
                 )
             }
-            AssetAction.Withdraw ->
+            AssetAction.Withdraw -> {
                 analytics.logEvent(
                     withdrawEvent(
                         WithdrawAnalytics.WITHDRAW_CONFIRM, (state.sendingAccount as FiatAccount).fiatCurrency
                     )
                 )
+                val amount = state.pendingTx?.amount ?: throw IllegalArgumentException("Amount is missing")
+                val fee = state.pendingTx.feeAmount
+                analytics.logEvent(
+                    WithdrawAnalytics.WithdrawalAmountEntered(
+                        netAmount = amount - fee,
+                        grossAmount = amount,
+                        paymentMethodType = (state.selectedTarget as LinkedBankAccount).type
+                    )
+                )
+            }
             AssetAction.FiatDeposit -> analytics.logEvent(
                 DepositAnalytics.DepositAmountEntered(
                     currency = (state.sendingAccount as FiatAccount).fiatCurrency
