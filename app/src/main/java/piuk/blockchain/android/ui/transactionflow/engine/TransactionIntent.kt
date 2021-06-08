@@ -16,6 +16,7 @@ import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.ui.base.mvi.MviIntent
+import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
 import java.util.Stack
 
@@ -351,11 +352,11 @@ sealed class TransactionIntent : MviIntent<TransactionState> {
     }
 
     class DisplayModeChanged(
-        private val displayMode: DisplayMode
+        private val currencyType: CurrencyType
     ) : TransactionIntent() {
         override fun reduce(oldState: TransactionState): TransactionState =
             oldState.copy(
-                displayMode = displayMode
+                currencyType = currencyType
             )
     }
 

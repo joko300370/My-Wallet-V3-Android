@@ -26,6 +26,7 @@ import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.fiat.LinkedBankAccount
 import piuk.blockchain.android.ui.base.mvi.MviModel
 import piuk.blockchain.android.ui.base.mvi.MviState
+import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import timber.log.Timber
@@ -101,7 +102,7 @@ data class TransactionState(
     val executionStatus: TxExecutionStatus = TxExecutionStatus.NotStarted,
     val stepsBackStack: Stack<TransactionStep> = Stack(),
     val availableTargets: List<TransactionTarget> = emptyList(),
-    val displayMode: DisplayMode = DisplayMode.Crypto,
+    val currencyType: CurrencyType? = null,
     val availableSources: List<BlockchainAccount> = emptyList(),
     val linkBankState: BankLinkingState = BankLinkingState.NotStarted
 ) : MviState {
@@ -510,8 +511,4 @@ fun <T> Observable<T>.doOnFirst(onAction: (T) -> Unit): Observable<T> {
             firstCall = false
         }
     }
-}
-
-enum class DisplayMode {
-    Fiat, Crypto
 }
