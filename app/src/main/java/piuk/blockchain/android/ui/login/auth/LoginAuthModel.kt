@@ -35,7 +35,7 @@ class LoginAuthModel(
                     } else {
                         previousState.payloadJson
                     },
-                    password = previousState.password
+                    password = intent.password
                 )
             is LoginAuthIntents.SubmitTwoFactorCode ->
                 submitCode(
