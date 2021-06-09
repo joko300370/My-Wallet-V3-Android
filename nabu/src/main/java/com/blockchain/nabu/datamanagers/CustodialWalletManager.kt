@@ -119,13 +119,14 @@ interface CustodialWalletManager {
 
     fun getCustodialFiatTransactions(
         currency: String,
-        product: Product
+        product: Product,
+        type: String? = null
     ): Single<List<FiatTransaction>>
 
     fun getCustodialCryptoTransactions(
         currency: String,
         product: Product,
-        type: String
+        type: String? = null
     ): Single<List<CryptoTransaction>>
 
     fun getBankAccountDetails(
@@ -434,15 +435,13 @@ data class CryptoTransaction(
 
 enum class TransactionType {
     DEPOSIT,
-    WITHDRAWAL,
-    UNKNOWN
+    WITHDRAWAL
 }
 
 enum class TransactionState {
     COMPLETED,
     PENDING,
-    FAILED,
-    UNKNOWN
+    FAILED
 }
 
 enum class RecurringBuyActivityState {

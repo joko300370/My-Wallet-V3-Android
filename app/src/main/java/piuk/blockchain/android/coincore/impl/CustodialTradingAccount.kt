@@ -25,8 +25,8 @@ import piuk.blockchain.android.coincore.ActivitySummaryList
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AvailableActions
 import piuk.blockchain.android.coincore.CryptoAccount
-import piuk.blockchain.android.coincore.CustodialSendActivitySummaryItem
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
+import piuk.blockchain.android.coincore.CustodialTransferActivitySummaryItem
 import piuk.blockchain.android.coincore.ReceiveAddress
 import piuk.blockchain.android.coincore.RecurringBuyActivitySummaryItem
 import piuk.blockchain.android.coincore.TradeActivitySummaryItem
@@ -118,7 +118,7 @@ open class CustodialTradingAccount(
                 appendTradeActivity(custodialWalletManager, asset, buySellList + recurringBuyList)
             }
             .flatMap {
-                appendSendActivity(custodialWalletManager, asset, it)
+                appendTransferActivity(custodialWalletManager, asset, it)
             }.filterActivityStates()
             .doOnSuccess { setHasTransactions(it.isNotEmpty()) }
             .onErrorReturn { emptyList() }
@@ -165,11 +165,11 @@ open class CustodialTradingAccount(
                 )
             }
 
-    private fun appendSendActivity(
+    private fun appendTransferActivity(
         custodialWalletManager: CustodialWalletManager,
         asset: CryptoCurrency,
         summaryList: List<ActivitySummaryItem>
-    ) = custodialWalletManager.getCustodialCryptoTransactions(asset.networkTicker, Product.BUY, transactionType)
+    ) = custodialWalletManager.getCustodialCryptoTransactions(asset.networkTicker, Product.BUY)
         .map { txs ->
             txs.map {
                 it.toSummaryItem()
@@ -177,7 +177,7 @@ open class CustodialTradingAccount(
         }
 
     private fun CryptoTransaction.toSummaryItem() =
-        CustodialSendActivitySummaryItem(
+        CustodialTransferActivitySummaryItem(
             cryptoCurrency = asset,
             exchangeRates = exchangeRates,
             txId = id,
@@ -188,6 +188,7 @@ open class CustodialTradingAccount(
             recipientAddress = receivingAddress,
             txHash = txHash,
             state = state,
+            type = type,
             fiatValue = (amount as CryptoValue).toFiat(exchangeRates, currency)
         )
 
@@ -251,7 +252,7 @@ open class CustodialTradingAccount(
             list.filter {
                 (it is CustodialTradingActivitySummaryItem && displayedStates.contains(
                     it.status
-                )) or (it is CustodialSendActivitySummaryItem && displayedStates.contains(
+                )) or (it is CustodialTransferActivitySummaryItem && displayedStates.contains(
                     it.state
                 )) or (it is TradeActivitySummaryItem && displayedStates.contains(
                     it.state
@@ -280,8 +281,6 @@ open class CustodialTradingAccount(
             CustodialOrderState.PENDING_EXECUTION,
             CustodialOrderState.FAILED
         )
-
-        private val transactionType = "WITHDRAWAL"
     }
 }
 

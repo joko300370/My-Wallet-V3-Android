@@ -334,7 +334,7 @@ class NabuService(retrofit: Retrofit) {
         sessionToken: NabuSessionTokenResponse,
         currency: String,
         product: String,
-        type: String? = null
+        type: String?
     ): Single<TransactionsResponse> = service.getTransactions(
         sessionToken.authHeader,
         currency,

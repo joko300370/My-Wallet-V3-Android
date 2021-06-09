@@ -295,11 +295,11 @@ data class TransactionResponse(
 }
 
 data class TransactionAttributesResponse(
-    val beneficiary: TransactionBeneficiaryResponse
+    val beneficiary: TransactionBeneficiaryResponse?
 )
 
 data class TransactionBeneficiaryResponse(
-    val accountRef: String
+    val accountRef: String?
 )
 
 data class AmountResponse(

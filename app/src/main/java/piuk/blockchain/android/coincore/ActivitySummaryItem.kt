@@ -149,7 +149,7 @@ data class CustodialTradingActivitySummaryItem(
     val depositPaymentId: String
 ) : CryptoActivitySummaryItem()
 
-data class CustodialSendActivitySummaryItem(
+data class CustodialTransferActivitySummaryItem(
     override val cryptoCurrency: CryptoCurrency,
     override val exchangeRates: ExchangeRateDataManager,
     override val txId: String,
@@ -160,7 +160,8 @@ data class CustodialSendActivitySummaryItem(
     val recipientAddress: String,
     val txHash: String,
     val state: TransactionState,
-    val fiatValue: FiatValue
+    val fiatValue: FiatValue,
+    val type: TransactionType
 ) : CryptoActivitySummaryItem() {
     val isConfirmed: Boolean by lazy {
         state == TransactionState.COMPLETED

@@ -4,6 +4,7 @@ import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.PaymentLimits
 import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.TransactionType
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
@@ -22,8 +23,8 @@ import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
-import piuk.blockchain.android.coincore.CustodialSendActivitySummaryItem
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
+import piuk.blockchain.android.coincore.CustodialTransferActivitySummaryItem
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.NullCryptoAccount
@@ -150,15 +151,45 @@ class ActivityDetailsInteractor(
         }
     }
 
-    fun loadCustodialSendItems(
-        summaryItem: CustodialSendActivitySummaryItem
+    fun loadCustodialTransferItems(
+        summaryItem: CustodialTransferActivitySummaryItem
     ): Single<List<ActivityDetailsType>> =
         Single.just(
-            listOf(
+            listOfNotNull(
                 TransactionId(summaryItem.txId),
                 Created(Date(summaryItem.timeStampMs)),
-                From(summaryItem.account.label),
-                To(summaryItem.recipientAddress),
+                when (summaryItem.type) {
+                    TransactionType.DEPOSIT -> {
+                        when {
+                            summaryItem.recipientAddress.isBlank() -> {
+                                null
+                            }
+                            else -> {
+                                From(summaryItem.recipientAddress)
+                            }
+                        }
+                    }
+                    TransactionType.WITHDRAWAL -> {
+                        From(summaryItem.account.label)
+                    }
+                    else -> null
+                },
+                when (summaryItem.type) {
+                    TransactionType.DEPOSIT -> {
+                        To(summaryItem.account.label)
+                    }
+                    TransactionType.WITHDRAWAL -> {
+                        when {
+                            summaryItem.recipientAddress.isBlank() -> {
+                                null
+                            }
+                            else -> {
+                                To(summaryItem.recipientAddress)
+                            }
+                        }
+                    }
+                    else -> null
+                },
                 Amount(summaryItem.value),
                 Value(summaryItem.fiatValue),
                 NetworkFee(summaryItem.fee)
@@ -277,14 +308,14 @@ class ActivityDetailsInteractor(
             txHash
         ) as? CustodialInterestActivitySummaryItem
 
-    fun getCustodialSendActivityDetails(
+    fun getCustodialTransferActivityDetails(
         cryptoCurrency: CryptoCurrency,
         txHash: String
-    ): CustodialSendActivitySummaryItem? =
+    ): CustodialTransferActivitySummaryItem? =
         assetActivityRepository.findCachedItem(
             cryptoCurrency,
             txHash
-        ) as? CustodialSendActivitySummaryItem
+        ) as? CustodialTransferActivitySummaryItem
 
     fun getTradeActivityDetails(
         cryptoCurrency: CryptoCurrency,

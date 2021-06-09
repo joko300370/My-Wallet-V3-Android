@@ -294,49 +294,52 @@ class LiveCustodialWalletManager(
 
     override fun getCustodialFiatTransactions(
         currency: String,
-        product: Product
+        product: Product,
+        type: String?
     ): Single<List<FiatTransaction>> =
         authenticator.authenticate { token ->
-            nabuService.getTransactions(token, currency, product.toRequestString()).map { response ->
-                response.items.map {
+            nabuService.getTransactions(token, currency, product.toRequestString(), type).map { response ->
+                response.items.mapNotNull {
+                    val state = it.state.toTransactionState() ?: return@mapNotNull null
+                    val txType = it.type.toTransactionType() ?: return@mapNotNull null
+
                     FiatTransaction(
                         id = it.id,
                         amount = FiatValue.fromMinor(it.amount.symbol, it.amountMinor.toLong()),
                         date = it.insertedAt.fromIso8601ToUtc()?.toLocalTime() ?: Date(),
-                        state = it.state.toTransactionState(),
-                        type = it.type.toTransactionType()
+                        state = state,
+                        type = txType
                     )
                 }
-                    .filter { it.state != TransactionState.UNKNOWN && it.type != TransactionType.UNKNOWN }
             }
         }
 
     override fun getCustodialCryptoTransactions(
         currency: String,
         product: Product,
-        type: String
+        type: String?
     ): Single<List<CryptoTransaction>> =
         authenticator.authenticate { token ->
             nabuService.getTransactions(token, currency, product.toRequestString(), type).map { response ->
                 response.items.mapNotNull {
-                    val crypto = CryptoCurrency.fromNetworkTicker(it.amount.symbol)
-                    crypto?.let { asset ->
-                        CryptoTransaction(
-                            id = it.id,
-                            amount = CryptoValue.fromMinor(asset, it.amountMinor.toBigInteger()),
-                            date = it.insertedAt.fromIso8601ToUtc()?.toLocalTime() ?: Date(),
-                            state = it.state.toTransactionState(),
-                            type = it.type.toTransactionType(),
-                            fee = it.feeMinor?.let { fee ->
-                                CryptoValue.fromMinor(asset, fee.toBigInteger())
-                            } ?: CryptoValue.zero(asset),
-                            receivingAddress = it.extraAttributes.beneficiary.accountRef,
-                            txHash = it.txHash.orEmpty(),
-                            currency = currencyPrefs.selectedFiatCurrency
-                        )
-                    }
+                    val crypto = CryptoCurrency.fromNetworkTicker(it.amount.symbol) ?: return@mapNotNull null
+                    val state = it.state.toTransactionState() ?: return@mapNotNull null
+                    val txType = it.type.toTransactionType() ?: return@mapNotNull null
+
+                    CryptoTransaction(
+                        id = it.id,
+                        amount = CryptoValue.fromMinor(crypto, it.amountMinor.toBigInteger()),
+                        date = it.insertedAt.fromIso8601ToUtc()?.toLocalTime() ?: Date(),
+                        state = state,
+                        type = txType,
+                        fee = it.feeMinor?.let { fee ->
+                            CryptoValue.fromMinor(crypto, fee.toBigInteger())
+                        } ?: CryptoValue.zero(crypto),
+                        receivingAddress = it.extraAttributes.beneficiary?.accountRef.orEmpty(),
+                        txHash = it.txHash.orEmpty(),
+                        currency = currencyPrefs.selectedFiatCurrency
+                    )
                 }
-                    .filter { it.state != TransactionState.UNKNOWN && it.type != TransactionType.UNKNOWN }
             }
         }
 
@@ -483,7 +486,9 @@ class LiveCustodialWalletManager(
             response.partner.toLinkingBankPartner(supportedPartners)?.let {
                 val attributes =
                     response.attributes
-                        ?: return@flatMap Single.error<LinkBankTransfer>(IllegalStateException("Missing attributes"))
+                        ?: return@flatMap Single.error<LinkBankTransfer>(
+                            IllegalStateException("Missing attributes")
+                        )
                 Single.just(
                     LinkBankTransfer(
                         response.id,
@@ -524,7 +529,9 @@ class LiveCustodialWalletManager(
         fetchSddLimits: Boolean,
         onlyEligible: Boolean
     ): Single<List<PaymentMethod>> =
-        paymentMethods(fiatCurrency = fiatCurrency, onlyEligible = onlyEligible, fetchSdddLimits = fetchSddLimits)
+        paymentMethods(
+            fiatCurrency = fiatCurrency, onlyEligible = onlyEligible, fetchSdddLimits = fetchSddLimits
+        )
 
     private val updateSupportedCards: (List<PaymentMethodResponse>) -> Unit = { paymentMethods ->
         val cardTypes =
@@ -556,21 +563,22 @@ class LiveCustodialWalletManager(
         }
     }
 
-    override fun getBankTransferLimits(fiatCurrency: String, onlyEligible: Boolean) = authenticator.authenticate {
-        nabuService.paymentMethods(it, fiatCurrency, onlyEligible, null).map { methods ->
-            methods.filter { method -> method.eligible || !onlyEligible }
+    override fun getBankTransferLimits(fiatCurrency: String, onlyEligible: Boolean) =
+        authenticator.authenticate {
+            nabuService.paymentMethods(it, fiatCurrency, onlyEligible, null).map { methods ->
+                methods.filter { method -> method.eligible || !onlyEligible }
+            }
+        }.map {
+            it.filter { response ->
+                response.type == PaymentMethodResponse.BANK_TRANSFER && response.currency == fiatCurrency
+            }.map { paymentMethod ->
+                PaymentLimits(
+                    min = paymentMethod.limits.min,
+                    max = paymentMethod.limits.daily?.available ?: paymentMethod.limits.max,
+                    currency = fiatCurrency
+                )
+            }.first()
         }
-    }.map {
-        it.filter { response ->
-            response.type == PaymentMethodResponse.BANK_TRANSFER && response.currency == fiatCurrency
-        }.map { paymentMethod ->
-            PaymentLimits(
-                min = paymentMethod.limits.min,
-                max = paymentMethod.limits.daily?.available ?: paymentMethod.limits.max,
-                currency = fiatCurrency
-            )
-        }.first()
-    }
 
     private fun paymentMethods(fiatCurrency: String, onlyEligible: Boolean, fetchSdddLimits: Boolean = false) =
         authenticator.authenticate {
@@ -592,7 +600,8 @@ class LiveCustodialWalletManager(
 
                 paymentMethods.forEach { paymentMethod ->
                     if (paymentMethod.type == PaymentMethodResponse.PAYMENT_CARD) {
-                        val cardLimits = PaymentLimits(paymentMethod.limits.min, paymentMethod.limits.max, fiatCurrency)
+                        val cardLimits =
+                            PaymentLimits(paymentMethod.limits.min, paymentMethod.limits.max, fiatCurrency)
                         cardsResponse.takeIf { cards -> cards.isNotEmpty() }?.filter { it.state.isActive() }
                             ?.forEach { cardResponse: CardResponse ->
                                 availablePaymentMethods.add(
@@ -629,7 +638,8 @@ class LiveCustodialWalletManager(
                         paymentMethod.type == PaymentMethodResponse.BANK_TRANSFER &&
                         linkedBanks.isNotEmpty()
                     ) {
-                        val bankLimits = PaymentLimits(paymentMethod.limits.min, paymentMethod.limits.max, fiatCurrency)
+                        val bankLimits =
+                            PaymentLimits(paymentMethod.limits.min, paymentMethod.limits.max, fiatCurrency)
                         linkedBanks.filter { linkedBank ->
                             linkedBank.state == BankState.ACTIVE
                         }.forEach { linkedBank: Bank ->
@@ -973,7 +983,9 @@ class LiveCustodialWalletManager(
     override fun canTransactWithBankMethods(fiatCurrency: String): Single<Boolean> {
         if (!fiatCurrency.isSupportedCurrency())
             return Single.just(false)
-        return getSupportedCurrenciesForBankTransactions(fiatCurrency).zipWith(achDepositWithdrawFeatureFlag.enabled)
+        return getSupportedCurrenciesForBankTransactions(fiatCurrency).zipWith(
+            achDepositWithdrawFeatureFlag.enabled
+        )
             .map { (supportedCurrencies, achEnabled) ->
                 val currencies = supportedCurrencies.filter { achEnabled || it != ACH_CURRENCY }
                 currencies.contains(fiatCurrency)
@@ -1431,7 +1443,7 @@ private fun String.toCryptoCurrencyPair(): CurrencyPair.CryptoCurrencyPair? {
     return CurrencyPair.CryptoCurrencyPair(source, destination)
 }
 
-fun String.toTransactionState(): TransactionState =
+fun String.toTransactionState(): TransactionState? =
     when (this) {
         TransactionResponse.COMPLETE -> TransactionState.COMPLETED
         TransactionResponse.FAILED -> TransactionState.FAILED
@@ -1439,7 +1451,7 @@ fun String.toTransactionState(): TransactionState =
         TransactionResponse.CLEARED,
         TransactionResponse.FRAUD_REVIEW,
         TransactionResponse.MANUAL_REVIEW -> TransactionState.PENDING
-        else -> TransactionState.UNKNOWN
+        else -> null
     }
 
 fun String.toCustodialOrderState(): CustodialOrderState =
@@ -1458,12 +1470,12 @@ fun String.toCustodialOrderState(): CustodialOrderState =
         else -> CustodialOrderState.UNKNOWN
     }
 
-private fun String.toTransactionType(): TransactionType =
+private fun String.toTransactionType(): TransactionType? =
     when (this) {
         TransactionResponse.DEPOSIT,
         TransactionResponse.CHARGE -> TransactionType.DEPOSIT
         TransactionResponse.WITHDRAWAL -> TransactionType.WITHDRAWAL
-        else -> TransactionType.UNKNOWN
+        else -> null
     }
 
 private fun String.toSupportedPartner(): Partner =

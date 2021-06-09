@@ -1,12 +1,13 @@
 package piuk.blockchain.android.ui.activity.detail
 
 import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.datamanagers.TransactionType
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
-import piuk.blockchain.android.coincore.CustodialSendActivitySummaryItem
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
+import piuk.blockchain.android.coincore.CustodialTransferActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.ui.activity.CryptoActivityType
@@ -90,11 +91,15 @@ class LoadCustodialInterestHeaderDataIntent(
 }
 
 class LoadCustodialSendHeaderDataIntent(
-    private val summaryItem: CustodialSendActivitySummaryItem
+    private val summaryItem: CustodialTransferActivitySummaryItem
 ) : ActivityDetailsIntents() {
     override fun reduce(oldState: ActivityDetailState): ActivityDetailState {
         return oldState.copy(
-            transactionType = TransactionSummary.TransactionType.SENT,
+            transactionType = if (summaryItem.type == TransactionType.DEPOSIT) {
+                TransactionSummary.TransactionType.RECEIVED
+            } else {
+                TransactionSummary.TransactionType.SENT
+            },
             amount = summaryItem.value,
             isPending = !summaryItem.isConfirmed,
             isFeeTransaction = false,
