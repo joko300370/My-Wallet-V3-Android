@@ -299,10 +299,12 @@ class SimpleBuyCheckoutFragment :
                     state.recurringBuyFrequency.toHumanReadableRecurringDate(requireContext())
                 )
             } else null,
-            SimpleBuyCheckoutItem.SimpleCheckoutItem(
-                getString(R.string.purchase),
-                state.order.amount.addStringWithSymbolOrDefault(state.fiatCurrency)
-            ),
+            if (state.fee != null && state.fee.isPositive) {
+                SimpleBuyCheckoutItem.SimpleCheckoutItem(
+                    getString(R.string.purchase),
+                    state.order.amount.addStringWithSymbolOrDefault(state.fiatCurrency)
+                )
+            } else null,
             buildPaymentFee(
                 state, StringUtils.getStringWithMappedAnnotations(
                     requireContext(),
@@ -346,7 +348,7 @@ class SimpleBuyCheckoutFragment :
 
     private fun buildPaymentFee(state: SimpleBuyState, feeExplanation: CharSequence): SimpleBuyCheckoutItem? =
         state.fee?.let { fee ->
-            if (!fee.isZero) {
+            if (fee.isPositive) {
                 SimpleBuyCheckoutItem.ExpandableCheckoutItem(
                     if (state.selectedPaymentMethod?.paymentMethodType == PaymentMethodType.PAYMENT_CARD) {
                         getString(R.string.card_fee)
