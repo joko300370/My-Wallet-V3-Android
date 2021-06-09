@@ -2063,6 +2063,7 @@
     <string name="checkout_fee_link"><annotation link="learn_more_link">Learn more about fees.</annotation></string>
     <string name="checkout_fee_free">When using Trading Accounts, there are no network fees</string>
     <string name="private_key_wallet_explanation">%s Private Key wallets, send, and receive are not supported at this time.</string>
+    <string name="checkout_interest_confirmation_disclaimer">After confirming this withdrawal, you will not continue to earn interest on the amount withdrawn.\n\nYour %1$s will be available in your \"%2$s\" Account within 2 days.</string>
 
     <!-- New pairing -->
     <string name="pairing_wallet_title">Pair your wallet</string>

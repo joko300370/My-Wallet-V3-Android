@@ -338,8 +338,8 @@ class TransactionFlowCustomiserImpl(
         }
     }
 
-    override fun confirmDisclaimerBlurb(assetAction: AssetAction, context: Context): CharSequence =
-        when (assetAction) {
+    override fun confirmDisclaimerBlurb(state: TransactionState, context: Context): CharSequence =
+        when (state.action) {
             AssetAction.Swap -> {
                 val map = mapOf("refund_policy" to Uri.parse(CHECKOUT_REFUND_POLICY))
                 stringUtils.getStringWithMappedAnnotations(
@@ -348,12 +348,17 @@ class TransactionFlowCustomiserImpl(
                     context
                 )
             }
-            else -> throw IllegalStateException("Disclaimer not set for asset action $assetAction")
+            AssetAction.InterestWithdraw -> resources.getString(
+                R.string.checkout_interest_confirmation_disclaimer, state.sendingAsset.displayTicker,
+                state.selectedTarget.label
+            )
+            else -> throw IllegalStateException("Disclaimer not set for asset action ${state.action}")
         }
 
     override fun confirmDisclaimerVisibility(assetAction: AssetAction): Boolean =
         when (assetAction) {
-            AssetAction.Swap -> true
+            AssetAction.Swap,
+            AssetAction.InterestWithdraw -> true
             else -> false
         }
 
@@ -478,7 +483,8 @@ class TransactionFlowCustomiserImpl(
             AssetAction.Send -> resources.getString(R.string.common_receive)
             AssetAction.Sell -> resources.getString(R.string.sell)
             AssetAction.FiatDeposit -> resources.getString(R.string.common_deposit)
-            AssetAction.Withdraw -> resources.getString(R.string.withdraw_target_select_title)
+            AssetAction.Withdraw,
+            AssetAction.InterestWithdraw -> resources.getString(R.string.withdraw_target_select_title)
             else -> ""
         }
     }
