@@ -11,7 +11,7 @@
     <dimen name="small_margin">16dp</dimen>
     <dimen name="very_small_margin">12dp</dimen>
     <dimen name="tiny_margin">8dp</dimen>
-    <dimen name="miniscule_margin">6dp</dimen>
+    <dimen name="minuscule_margin">6dp</dimen>
     <dimen name="smallest_margin">4dp</dimen>
 
     <dimen name="size_massive">64dp</dimen>
@@ -25,15 +25,6 @@
     <dimen name="asset_icon_size">32dp</dimen>
 
     <dimen name="grid_0.25">1dp</dimen>
-    <dimen name="grid_1">4dp</dimen>
-    <dimen name="grid_1.5">6dp</dimen>
-    <dimen name="grid_2">8dp</dimen>
-    <dimen name="grid_3">12dp</dimen>
-    <dimen name="grid_4">16dp</dimen>
-    <dimen name="grid_5">20dp</dimen>
-    <dimen name="grid_6">24dp</dimen>
-    <dimen name="grid_8">32dp</dimen>
-    <dimen name="grid_10">40dp</dimen>
     <dimen name="grid_12">48dp</dimen>
     <dimen name="grid_13">52dp</dimen>
     <dimen name="grid_14">56dp</dimen>

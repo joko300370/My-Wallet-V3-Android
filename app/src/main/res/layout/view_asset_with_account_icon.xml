@@ -17,8 +17,8 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/account_icon"
-        android:layout_width="@dimen/grid_4"
-        android:layout_height="@dimen/grid_4"
+        android:layout_width="@dimen/small_margin"
+        android:layout_height="@dimen/small_margin"
         android:background="@drawable/white_circle"
         android:padding="1dp"
         app:layout_constraintCircle="@id/asset_icon"

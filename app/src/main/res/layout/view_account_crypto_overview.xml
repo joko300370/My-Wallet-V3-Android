@@ -12,7 +12,7 @@
         style="@style/Text.Semibold.16"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/grid_4"
+        android:layout_marginTop="@dimen/small_margin"
         android:text="@string/common_wallets"
         app:layout_constraintBottom_toTopOf="@id/wallets_label_separator"
         app:layout_constraintStart_toStartOf="@id/asset_with_account"
@@ -23,7 +23,7 @@
         style="@style/SeparatorWithoutMargins"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:layout_marginTop="@dimen/grid_2"
+        android:layout_marginTop="@dimen/tiny_margin"
         app:layout_constraintBottom_toTopOf="@+id/asset_with_account"
         app:layout_constraintEnd_toEndOf="@id/wallet_balance_fiat"
         app:layout_constraintStart_toStartOf="@id/asset_with_account"
@@ -41,8 +41,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        android:layout_marginStart="@dimen/grid_6"
-        android:layout_marginTop="@dimen/grid_4"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/small_margin"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/wallets_label_separator" />
 

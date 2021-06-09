@@ -31,7 +31,7 @@
         style="@style/Text.Semibold.20"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/grid_4"
+        android:layout_marginStart="@dimen/small_margin"
         android:layout_marginEnd="@dimen/standard_margin"
         app:layout_constraintBottom_toBottomOf="@id/rb_sheet_back"
         app:layout_constraintEnd_toEndOf="parent"

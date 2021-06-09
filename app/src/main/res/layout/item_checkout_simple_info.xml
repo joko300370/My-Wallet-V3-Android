@@ -11,7 +11,7 @@
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/simple_item_label"
         style="@style/Text.Standard.14"
-        android:layout_marginStart="@dimen/grid_6"
+        android:layout_marginStart="@dimen/standard_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,7 +23,7 @@
         style="@style/Text.Standard.14"
         android:layout_width="0dp"
         android:gravity="end"
-        android:layout_marginEnd="@dimen/grid_6"
+        android:layout_marginEnd="@dimen/standard_margin"
         android:layout_marginStart="@dimen/very_small_margin"
         android:ellipsize="end"
         android:maxLines="1"

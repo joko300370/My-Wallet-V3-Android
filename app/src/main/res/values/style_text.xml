@@ -241,6 +241,7 @@
         <item name="android:textColor">@color/red_600</item>
         <item name="android:textSize">14sp</item>
         <item name="android:background">@drawable/rounded_error_text_background</item>
+        <item name="android:gravity">center</item>
     </style>
 
     <style name="Text.Info">
