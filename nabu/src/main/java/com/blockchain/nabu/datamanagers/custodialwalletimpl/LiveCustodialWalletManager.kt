@@ -865,12 +865,7 @@ class LiveCustodialWalletManager(
 
     override fun getInterestAccountDetails(
         crypto: CryptoCurrency
-    ): Single<InterestAccountDetails> =
-        authenticator.authenticate { sessionToken ->
-            nabuService.getInterestAccountDetails(sessionToken, crypto.networkTicker).map {
-                it.toInterestAccountDetails(crypto)
-            }
-        }
+    ): Single<InterestAccountDetails> = interestRepository.getInterestAccountDetails(crypto)
 
     override fun getInterestAccountAddress(crypto: CryptoCurrency): Single<String> =
         authenticator.authenticate { sessionToken ->

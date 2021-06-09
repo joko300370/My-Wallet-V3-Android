@@ -42,6 +42,9 @@ class InterestRepository(
             (it.balance - it.lockedBalance) as CryptoValue
         }
 
+    fun getInterestAccountDetails(asset: CryptoCurrency) =
+        interestAccountBalancesProvider.getBalanceForAsset(asset)
+
     fun clearBalanceForAsset(asset: CryptoCurrency) = interestAccountBalancesProvider.clearBalanceForAsset(asset)
 
     fun clearBalanceForAsset(ticker: String) = interestAccountBalancesProvider.clearBalanceForAsset(ticker)

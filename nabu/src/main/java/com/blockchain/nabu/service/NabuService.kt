@@ -8,7 +8,6 @@ import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentBody
 import com.blockchain.nabu.models.responses.banktransfer.CreateLinkBankRequestBody
 import com.blockchain.nabu.models.responses.banktransfer.OpenBankingTokenBody
 import com.blockchain.nabu.models.responses.banktransfer.UpdateProviderAccountBody
-import com.blockchain.nabu.models.responses.interest.InterestAccountDetailsResponse
 import com.blockchain.nabu.models.responses.interest.InterestWithdrawalBody
 import com.blockchain.nabu.models.responses.nabu.AddAddressRequest
 import com.blockchain.nabu.models.responses.nabu.AirdropStatusList
@@ -615,22 +614,6 @@ class NabuService(retrofit: Retrofit) {
             200 -> Maybe.just(it.body())
             204 -> Maybe.empty()
             else -> Maybe.error(HttpException(it))
-        }
-    }.wrapErrorMessage()
-
-    fun getInterestAccountDetails(
-        sessionToken: NabuSessionTokenResponse,
-        currency: String
-    ) = service.getInterestAccountDetails(
-        authorization = sessionToken.authHeader,
-        cryptoSymbol = currency
-    ).flatMap {
-        when (it.code()) {
-            200 -> Single.just(it.body())
-            204 -> Single.just(
-                InterestAccountDetailsResponse("0", "0", "0", "0", "0", "0")
-            )
-            else -> Single.error(HttpException(it))
         }
     }.wrapErrorMessage()
 

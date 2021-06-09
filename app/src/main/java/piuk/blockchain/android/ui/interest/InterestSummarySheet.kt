@@ -109,19 +109,19 @@ class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetails
             custodialWalletManager.getInterestAccountDetails(cryptoCurrency),
             custodialWalletManager.getInterestLimits(cryptoCurrency).toSingle(),
             custodialWalletManager.getInterestAccountRates(cryptoCurrency)
-        ) { details, limits, interestRate ->
-            CompositeInterestDetails(
-                totalInterest = details.totalInterest,
-                pendingInterest = details.pendingInterest,
-                balance = details.balance,
-                lockupDuration = limits.interestLockUpDuration.secondsToDays(),
-                interestRate = interestRate,
-                nextInterestPayment = limits.nextInterestPayment
-            )
-        }.observeOn(AndroidSchedulers.mainThread())
+        ).observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = {
-                    compositeToView(it)
+                onSuccess = { (details, limits, interestRate) ->
+                    compositeToView(
+                        CompositeInterestDetails(
+                            totalInterest = details.totalInterest,
+                            pendingInterest = details.pendingInterest,
+                            balance = (details.balance - details.lockedBalance) as CryptoValue,
+                            lockupDuration = limits.interestLockUpDuration.secondsToDays(),
+                            interestRate = interestRate,
+                            nextInterestPayment = limits.nextInterestPayment
+                        )
+                    )
                 },
                 onError = {
                     Timber.e("Error loading interest summary details: $it")
@@ -130,19 +130,20 @@ class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetails
     }
 
     private fun compositeToView(composite: CompositeInterestDetails) {
-        if (features.isFeatureEnabled(GatedFeature.INTEREST_WITHDRAWAL) && composite.balance.isPositive) {
-            with(binding) {
+        with(binding) {
+            if (features.isFeatureEnabled(GatedFeature.INTEREST_WITHDRAWAL)) {
                 interestDetailsDisclaimer.gone()
                 interestDetailsActivityCta.gone()
-                interestDetailsWithdrawCta.text = getString(R.string.tx_title_withdraw, cryptoCurrency.displayTicker)
-                interestDetailsWithdrawCta.visible()
-                interestDetailsWithdrawCta.setOnClickListener {
-                    analytics.logEvent(InterestAnalytics.INTEREST_SUMMARY_WITHDRAW_CTA)
-                    host.goToInterestWithdraw(account as InterestAccount)
+                if (composite.balance.isPositive) {
+                    interestDetailsWithdrawCta.text =
+                        getString(R.string.tx_title_withdraw, cryptoCurrency.displayTicker)
+                    interestDetailsWithdrawCta.visible()
+                    interestDetailsWithdrawCta.setOnClickListener {
+                        analytics.logEvent(InterestAnalytics.INTEREST_SUMMARY_WITHDRAW_CTA)
+                        host.goToInterestWithdraw(account as InterestAccount)
+                    }
                 }
-            }
-        } else {
-            with(binding) {
+            } else {
                 interestDetailsDisclaimer.visible()
                 interestDetailsActivityCta.visible()
             }
