@@ -151,17 +151,16 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
             (lowerSlot as? ExpandableTxFlowWidget)?.let {
                 it.expanded.observeOn(AndroidSchedulers.mainThread()).subscribe { expanded ->
                     upperSlot?.setVisible(!expanded)
-                    configureCtaButton(expanded)
+                    configureCtaButton()
                 }
             }
         }
     }
 
-    private fun configureCtaButton(expanded: Boolean) {
+    private fun configureCtaButton() {
         val layoutParams: ViewGroup.MarginLayoutParams =
             binding.amountSheetCtaButton.layoutParams as ViewGroup.MarginLayoutParams
-        layoutParams.bottomMargin =
-            if (expanded) resources.getDimension(R.dimen.xhuge_margin).toInt() else 0
+        layoutParams.bottomMargin = resources.getDimension(R.dimen.medium_margin).toInt()
         binding.amountSheetCtaButton.layoutParams = layoutParams
     }
 
