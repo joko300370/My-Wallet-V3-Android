@@ -2090,15 +2090,16 @@
     <string name="open_email_cta">Open Email App</string>
     <string name="login_wallet_id_text">Wallet: %s</string>
     <string name="login_password_hint">Password</string>
-    <string name="forgot_password_label">Forgot password?</string>
+    <string name="forgot_password_label">Trouble logging in?</string>
     <string name="two_factor_auth_title">Authorize login</string>
     <string name="two_factor_code_hint">2FA code</string>
     <string name="invalid_two_fa_code">Invalid 2FA code</string>
     <string name="auth_required">Authorization required, please check your email.</string>
+    <string name="lost_2fa_notice">Lost access to your 2FA device? <annotation link="reset_2fa">Reset your 2FA</annotation></string>
     <string name="hardware_key_hint">Verify with your |HARDWARE KEY|</string>
     <string name="tap_hardware_key_label">Tap |HARDWARE KEY| to verify</string>
     <string name="second_password_hint">Second password</string>
-    <string name="second_password_notice">We’re moving away from 2nd passwords. Enable 2FA under security settings. </string>
+    <string name="second_password_notice">We’re moving away from 2nd passwords. Enable 2FA under security settings. <annotation link="learn_more">Learn more</annotation></string>
 
     <!-- Recurring buy screens -->
     <string name="recurring_buy_toolbar">Recurring Buys</string>

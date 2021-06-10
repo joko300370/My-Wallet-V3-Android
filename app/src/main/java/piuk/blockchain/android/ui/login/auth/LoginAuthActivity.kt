@@ -1,15 +1,18 @@
 package piuk.blockchain.android.ui.login.auth
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
 import android.text.method.DigitsKeyListener
+import android.text.method.LinkMovementMethod
 import android.util.Base64
 import androidx.annotation.StringRes
 import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
+import com.blockchain.ui.urllinks.RESET_2FA
 import com.blockchain.ui.urllinks.SECOND_PASSWORD_EXPLANATION
 import com.google.android.material.textfield.TextInputLayout
 import org.json.JSONObject
@@ -130,25 +133,44 @@ class LoginAuthActivity :
                 TwoFAMethod.SMS -> {
                     codeTextLayout.visible()
                     codeTextLayout.hint = getString(R.string.two_factor_code_hint)
+                    setup2FANotice(
+                        textId = R.string.lost_2fa_notice,
+                        annotationForLink = RESET_2FA_LINK_ANNOTATION,
+                        url = RESET_2FA
+                    )
                 }
                 TwoFAMethod.GOOGLE_AUTHENTICATOR -> {
                     codeTextLayout.visible()
                     codeTextLayout.hint = getString(R.string.two_factor_code_hint)
                     codeText.inputType = InputType.TYPE_NUMBER_VARIATION_NORMAL
                     codeText.keyListener = DigitsKeyListener.getInstance(DIGITS)
+                    setup2FANotice(
+                        textId = R.string.lost_2fa_notice,
+                        annotationForLink = RESET_2FA_LINK_ANNOTATION,
+                        url = RESET_2FA
+                    )
                 }
                 TwoFAMethod.SECOND_PASSWORD -> {
                     codeTextLayout.visible()
                     codeTextLayout.hint = getString(R.string.second_password_hint)
                     forgotSecondPasswordButton.visible()
                     forgotSecondPasswordButton.setOnClickListener { launchPasswordRecoveryFlow() }
-                    secondPasswordNotice.visible()
-                    secondPasswordNotice.text = StringUtils.getResolvedStringWithAppendedMappedLearnMore(
-                        getString(R.string.second_password_notice), R.string.common_linked_learn_more,
-                        SECOND_PASSWORD_EXPLANATION, this@LoginAuthActivity, R.color.blue_600
+                    setup2FANotice(
+                        textId = R.string.second_password_notice,
+                        annotationForLink = SECOND_PASSWORD_LINK_ANNOTATION,
+                        url = SECOND_PASSWORD_EXPLANATION
                     )
                 }
             }.exhaustive
+        }
+    }
+
+    private fun setup2FANotice(@StringRes textId: Int, annotationForLink: String, url: String) {
+        binding.twoFaNotice.apply {
+            visible()
+            val links = mapOf(annotationForLink to Uri.parse(url))
+            text = StringUtils.getStringWithMappedAnnotations(context, textId, links)
+            movementMethod = LinkMovementMethod.getInstance()
         }
     }
 
@@ -177,6 +199,8 @@ class LoginAuthActivity :
         private const val EMAIL = "email"
         private const val EMAIL_CODE = "email_code"
         private const val DIGITS = "1234567890"
+        private const val SECOND_PASSWORD_LINK_ANNOTATION = "learn_more"
+        private const val RESET_2FA_LINK_ANNOTATION = "reset_2fa"
     }
 
     private fun TextInputLayout.setErrorState(errorMessage: String) {
