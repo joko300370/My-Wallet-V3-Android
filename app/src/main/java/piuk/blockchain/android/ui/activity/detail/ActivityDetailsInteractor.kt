@@ -137,13 +137,11 @@ class ActivityDetailsInteractor(
                 summaryItem.account.asset,
                 summaryItem.accountRef
             ).map {
-                list.add(
-                    if (it !is NullCryptoAccount) {
-                        getToField(it.label, it.label, summaryItem.cryptoCurrency.displayTicker)
-                    } else {
-                        To(summaryItem.accountRef)
-                    }
-                )
+                if (it !is NullCryptoAccount) {
+                    list.add(getToField(it.label, it.label, summaryItem.cryptoCurrency.displayTicker))
+                } else if (summaryItem.accountRef.isNotBlank()) {
+                    list.add(To(summaryItem.accountRef))
+                }
                 list.toList()
             }.toSingle()
         } else {

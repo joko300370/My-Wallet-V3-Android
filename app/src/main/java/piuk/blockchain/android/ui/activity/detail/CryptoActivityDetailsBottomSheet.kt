@@ -93,8 +93,6 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
             amount.text = newState.amount?.toStringWithSymbol()
 
             newState.transactionType?.let {
-                showTransactionTypeUi(newState)
-
                 renderCompletedPendingOrFailed(
                     newState.isPending,
                     newState.isPendingExecution,
@@ -103,6 +101,8 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
                     newState.transactionType,
                     newState.isFeeTransaction
                 )
+
+                showTransactionTypeUi(newState)
             }
         }
 
@@ -133,6 +133,8 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
             if (newState.transactionType == TransactionSummary.TransactionType.DEPOSIT) {
                 showConfirmationUi(newState.confirmations, newState.totalConfirmations)
             }
+        } else if (newState.interestState == InterestState.FAILED) {
+            showFailedPill()
         } else {
             showCompletePill()
         }
