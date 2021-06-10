@@ -1,7 +1,6 @@
 package piuk.blockchain.android.coincore.impl.txEngine.swap
 
 import androidx.annotation.VisibleForTesting
-import com.blockchain.featureflags.GatedFeature
 import com.blockchain.nabu.datamanagers.CustodialOrder
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.Product
@@ -21,7 +20,6 @@ import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmationValue
-import piuk.blockchain.android.coincore.TxFee
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.copyAndPut
@@ -35,6 +33,9 @@ import java.math.RoundingMode
 
 @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
 const val USER_TIER = "USER_TIER"
+
+const val RECEIVE_AMOUNT = "RECEIVE_AMOUNT"
+const val OUTGOING_FEE = "OUTGOING_FEE"
 
 private val PendingTx.userTier: KycTiers
     get() = (this.engineState[USER_TIER] as KycTiers)
@@ -115,7 +116,7 @@ abstract class SwapTxEngineBase(
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =
         validateAmount(pendingTx).updateTxValidity(pendingTx)
 
-    private fun buildNewConfirmations(pendingTx: PendingTx, pricedQuote: PricedQuote): PendingTx =
+    private fun buildConfirmations(pendingTx: PendingTx, pricedQuote: PricedQuote): PendingTx =
         pendingTx.copy(
             confirmations = listOfNotNull(
                 TxConfirmationValue.NewSwapExchange(
@@ -141,53 +142,16 @@ abstract class SwapTxEngineBase(
                         )
                 )
             )
-        )
-
-    private fun buildOldConfirmations(pendingTx: PendingTx, pricedQuote: PricedQuote): PendingTx =
-        pendingTx.copy(
-            confirmations = listOf(
-                TxConfirmationValue.SwapSourceValue(
-                    swappingAssetValue = pendingTx.amount as CryptoValue
-                ),
-                TxConfirmationValue.SwapReceiveValue(
-                    receiveAmount = CryptoValue.fromMajor(
-                        target.asset,
-                        pendingTx.amount.toBigDecimal().times(pricedQuote.price.toBigDecimal())
-                    )
-                ),
-                TxConfirmationValue.SwapExchangeRate(
-                    CryptoValue.fromMajor(sourceAsset, BigDecimal.ONE),
-                    CryptoValue.fromMajor(target.asset, pricedQuote.price.toBigDecimal())
-                ),
-                TxConfirmationValue.From(from = sourceAccount.label),
-                TxConfirmationValue.To(to = txTarget.label),
-                TxConfirmationValue.NetworkFee(
-                    txFee = TxFee(
-                        fee = pricedQuote.transferQuote.networkFee,
-                        type = TxFee.FeeType.WITHDRAWAL_FEE,
-                        asset = target.asset
-                    )
-                ),
-                TxConfirmationValue.NetworkFee(
-                    txFee = TxFee(
-                        fee = pendingTx.feeAmount,
-                        type = TxFee.FeeType.DEPOSIT_FEE,
-                        asset = sourceAsset
-                    )
-                )
-            ),
-            minLimit = minLimit(pricedQuote.price)
-        )
+        ).also {
+            it.engineState.copyAndPut(RECEIVE_AMOUNT, pricedQuote.price.toBigDecimal())
+            it.engineState.copyAndPut(OUTGOING_FEE, pricedQuote.transferQuote.networkFee)
+        }
 
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         quotesEngine.pricedQuote
             .firstOrError()
             .map { pricedQuote ->
-                if (internalFeatureFlagApi.isFeatureEnabled(GatedFeature.CHECKOUT)) {
-                    buildNewConfirmations(pendingTx, pricedQuote)
-                } else {
-                    buildOldConfirmations(pendingTx, pricedQuote)
-                }
+                buildConfirmations(pendingTx, pricedQuote)
             }
 
     private fun minLimit(price: Money): Money {
@@ -198,7 +162,7 @@ abstract class SwapTxEngineBase(
         return minApiLimit.plus(minAmountToPayFees).withUserDpRounding(RoundingMode.CEILING)
     }
 
-    private fun addOrReplaceNewConfirmations(pendingTx: PendingTx, pricedQuote: PricedQuote): PendingTx =
+    private fun addOrReplaceConfirmations(pendingTx: PendingTx, pricedQuote: PricedQuote): PendingTx =
         pendingTx.copy(
             minLimit = minLimit(pricedQuote.price)
         ).apply {
@@ -230,42 +194,9 @@ abstract class SwapTxEngineBase(
             )
         }
 
-    private fun addOrReplaceConfirmations(pendingTx: PendingTx, pricedQuote: PricedQuote): PendingTx =
-        pendingTx.copy(
-            minLimit = minLimit(pricedQuote.price)
-        ).apply {
-            addOrReplaceOption(
-                TxConfirmationValue.NetworkFee(
-                    txFee = TxFee(
-                        fee = quotesEngine.getLatestQuote().transferQuote.networkFee,
-                        type = TxFee.FeeType.WITHDRAWAL_FEE,
-                        asset = target.asset
-                    )
-                )
-            )
-            addOrReplaceOption(
-                TxConfirmationValue.SwapExchangeRate(
-                    CryptoValue.fromMajor(sourceAsset, BigDecimal.ONE),
-                    pricedQuote.price
-                )
-            )
-            addOrReplaceOption(
-                TxConfirmationValue.SwapReceiveValue(
-                    receiveAmount = CryptoValue.fromMajor(
-                        target.asset,
-                        pendingTx.amount.toBigDecimal().times(pricedQuote.price.toBigDecimal())
-                    )
-                )
-            )
-        }
-
     override fun doRefreshConfirmations(pendingTx: PendingTx): Single<PendingTx> {
         return quotesEngine.pricedQuote.firstOrError().map { pricedQuote ->
-            if (internalFeatureFlagApi.isFeatureEnabled(GatedFeature.CHECKOUT)) {
-                addOrReplaceNewConfirmations(pendingTx, pricedQuote)
-            } else {
-                addOrReplaceConfirmations(pendingTx, pricedQuote)
-            }
+            addOrReplaceConfirmations(pendingTx, pricedQuote)
         }
     }
 

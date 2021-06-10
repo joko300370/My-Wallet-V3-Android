@@ -1,6 +1,5 @@
 package piuk.blockchain.android.coincore.impl
 
-import com.blockchain.featureflags.GatedFeature
 import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.InterestActivityItem
@@ -146,7 +145,7 @@ internal class CryptoInterestAccount(
     override val actions: Single<AvailableActions> =
         actionableBalance.map {
             setOfNotNull(
-                if (features.isFeatureEnabled(GatedFeature.INTEREST_WITHDRAWAL) && it.isPositive) {
+                if (it.isPositive) {
                     AssetAction.InterestWithdraw
                 } else {
                     null

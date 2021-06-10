@@ -1,6 +1,5 @@
 package piuk.blockchain.android.coincore.impl.txEngine.interest
 
-import com.blockchain.featureflags.GatedFeature
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestLimits
 import info.blockchain.balance.Money
@@ -9,7 +8,6 @@ import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxEngine
-import piuk.blockchain.android.coincore.TxFee
 
 abstract class InterestBaseEngine(private val walletManager: CustodialWalletManager) : TxEngine() {
 
@@ -18,21 +16,7 @@ abstract class InterestBaseEngine(private val walletManager: CustodialWalletMana
         termsChecked: Boolean = getTermsOptionValue(pendingTx),
         agreementChecked: Boolean = getTermsOptionValue(pendingTx)
     ): PendingTx =
-        if (internalFeatureFlagApi.isFeatureEnabled(GatedFeature.CHECKOUT)) {
-            pendingTx.modifyNewCheckout(termsChecked, agreementChecked)
-        } else {
-            pendingTx.modifyNewCheckout(termsChecked, agreementChecked)
-                .removeOption(TxConfirmation.FEE_SELECTION)
-                .addOrReplaceOption(
-                    TxConfirmationValue.NetworkFee(
-                        txFee = TxFee(
-                            pendingTx.feeAmount,
-                            TxFee.FeeType.DEPOSIT_FEE,
-                            sourceAsset
-                        )
-                    )
-                )
-        }
+        pendingTx.modifyNewCheckout(termsChecked, agreementChecked)
 
     private fun PendingTx.modifyNewCheckout(termsChecked: Boolean, agreementChecked: Boolean): PendingTx =
         removeOption(TxConfirmation.DESCRIPTION)

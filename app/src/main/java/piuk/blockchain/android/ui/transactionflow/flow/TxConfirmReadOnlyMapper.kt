@@ -365,27 +365,6 @@ class FromPropertyFormatter(private val resources: Resources) : TxOptionsFormatt
         else null
 }
 
-class FeedTotalFormatter(private val resources: Resources) : TxOptionsFormatter {
-    override fun format(property: TxConfirmationValue): Pair<String, String>? =
-        if (property is TxConfirmationValue.FeedTotal)
-            resources.getString(R.string.common_total) to totalAmount(
-                property.amount,
-                property.fee,
-                property.exchangeAmount,
-                property.exchangeFee
-            )
-        else null
-
-    private fun totalAmount(money: Money, fee: Money, exchangeAmount: Money?, exchangeFee: Money?): String {
-        return if (money.symbol == fee.symbol) {
-            (money + fee).formatWithExchange(exchangeAmount)
-        } else {
-            money.formatWithExchange(exchangeAmount).plus(System.lineSeparator())
-                .plus(fee.formatWithExchange(exchangeFee))
-        }
-    }
-}
-
 class ExchangePriceFormatter(private val resources: Resources) : TxOptionsFormatter {
     override fun format(property: TxConfirmationValue): Pair<String, String>? =
         if (property is TxConfirmationValue.ExchangePriceConfirmation) {
@@ -393,27 +372,6 @@ class ExchangePriceFormatter(private val resources: Resources) : TxOptionsFormat
                 R.string.quote_price,
                 property.asset.displayTicker
             ) to property.money.toStringWithSymbol()
-        } else {
-            null
-        }
-}
-
-class SwapExchangeRateFormatter(private val resources: Resources) : TxOptionsFormatter {
-    override fun format(property: TxConfirmationValue): Pair<String, String>? =
-        if (property is TxConfirmationValue.SwapExchangeRate) {
-            resources.getString(R.string.exchange_rate) to resources.getString(
-                R.string.current_unit_price,
-                property.unitCryptoCurrency.toStringWithSymbol(), property.price.toStringWithSymbol()
-            )
-        } else {
-            null
-        }
-}
-
-class SwapReceiveFormatter(private val resources: Resources) : TxOptionsFormatter {
-    override fun format(property: TxConfirmationValue): Pair<String, String>? =
-        if (property is TxConfirmationValue.SwapReceiveValue) {
-            resources.getString(R.string.receive) to property.receiveAmount.toStringWithSymbol()
         } else {
             null
         }

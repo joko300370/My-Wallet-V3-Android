@@ -1,6 +1,5 @@
 package piuk.blockchain.android.coincore.btc
 
-import com.blockchain.featureflags.GatedFeature
 import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
@@ -216,7 +215,12 @@ class BtcOnChainTxEngine(
             .then { validateSufficientFunds(pendingTx) }
             .updateTxValidity(pendingTx)
 
-    private fun buildNewConfirmation(pendingTx: PendingTx): PendingTx =
+    override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
+        Single.just(
+            buildConfirmations(pendingTx)
+        )
+
+    private fun buildConfirmations(pendingTx: PendingTx): PendingTx =
         pendingTx.copy(
             confirmations = listOfNotNull(
                 TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
@@ -245,39 +249,6 @@ class BtcOnChainTxEngine(
                     )
                 } else null
             )
-        )
-
-    private fun buildOldConfirmation(pendingTx: PendingTx): PendingTx =
-        pendingTx.copy(
-            confirmations = mutableListOf(
-                TxConfirmationValue.From(from = sourceAccount.label),
-                TxConfirmationValue.To(to = txTarget.label),
-                makeFeeSelectionOption(pendingTx),
-                TxConfirmationValue.FeedTotal(
-                    amount = pendingTx.amount,
-                    fee = pendingTx.feeAmount,
-                    exchangeFee = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
-                    exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
-                ),
-                TxConfirmationValue.Description()
-            ).apply {
-                if (isLargeTransaction(pendingTx)) {
-                    add(
-                        TxConfirmationValue.TxBooleanConfirmation<Unit>(
-                            TxConfirmation.LARGE_TRANSACTION_WARNING
-                        )
-                    )
-                }
-            }.toList()
-        )
-
-    override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
-        Single.just(
-            if (internalFeatureFlagApi.isFeatureEnabled(GatedFeature.CHECKOUT)) {
-                buildNewConfirmation(pendingTx)
-            } else {
-                buildOldConfirmation(pendingTx)
-            }
         )
 
     override fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =

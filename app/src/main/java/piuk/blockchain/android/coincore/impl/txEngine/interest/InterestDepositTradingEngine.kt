@@ -1,6 +1,5 @@
 package piuk.blockchain.android.coincore.impl.txEngine.interest
 
-import com.blockchain.featureflags.GatedFeature
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.Product
 import info.blockchain.balance.CryptoValue
@@ -76,7 +75,14 @@ class InterestDepositTradingEngine(private val walletManager: CustodialWalletMan
         return Single.just(pendingTx)
     }
 
-    private fun buildNewConfirmation(pendingTx: PendingTx): PendingTx =
+    override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
+        Single.just(
+            buildConfirmations(pendingTx)
+        ).map {
+            modifyEngineConfirmations(it)
+        }
+
+    private fun buildConfirmations(pendingTx: PendingTx): PendingTx =
         pendingTx.copy(
             confirmations = listOfNotNull(
                 TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
@@ -92,29 +98,6 @@ class InterestDepositTradingEngine(private val walletManager: CustodialWalletMan
                 )
             )
         )
-
-    private fun buildOldConfirmation(pendingTx: PendingTx): PendingTx =
-        pendingTx.copy(
-            confirmations = listOf(
-                TxConfirmationValue.From(from = sourceAccount.label),
-                TxConfirmationValue.To(to = txTarget.label),
-                TxConfirmationValue.Total(
-                    total = pendingTx.amount,
-                    exchange = pendingTx.amount.toFiat(exchangeRates, userFiat)
-                )
-            )
-        )
-
-    override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
-        Single.just(
-            if (internalFeatureFlagApi.isFeatureEnabled(GatedFeature.CHECKOUT)) {
-                buildNewConfirmation(pendingTx)
-            } else {
-                buildOldConfirmation(pendingTx)
-            }
-        ).map {
-            modifyEngineConfirmations(it)
-        }
 
     override fun doValidateAmount(pendingTx: PendingTx): Single<PendingTx> =
         availableBalance.flatMapCompletable { balance ->

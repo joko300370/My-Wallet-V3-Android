@@ -5,6 +5,8 @@ import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.blockchain.notifications.analytics.AnalyticsNames
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.Money
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BankAccount
 import piuk.blockchain.android.coincore.BlockchainAccount
@@ -19,14 +21,15 @@ import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.TradingAccount
 import piuk.blockchain.android.coincore.TransactionTarget
-import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.fiat.LinkedBankAccount
 import piuk.blockchain.android.coincore.impl.CryptoNonCustodialAccount
+import piuk.blockchain.android.coincore.impl.txEngine.swap.OUTGOING_FEE
+import piuk.blockchain.android.coincore.impl.txEngine.swap.RECEIVE_AMOUNT
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionStep
 import java.io.Serializable
-import java.lang.IllegalArgumentException
+import java.math.BigDecimal
 import java.util.Locale
 
 const val WALLET_TYPE_NON_CUSTODIAL = "non_custodial"
@@ -470,7 +473,7 @@ class TxFlowAnalytics(
                 if (
                     state.sendingAccount is CryptoNonCustodialAccount &&
                     state.selectedTarget is CryptoNonCustodialAccount
-                )
+                ) {
                     analytics.logEvent(
                         SwapAnalyticsEvents.OnChainSwapRequested(
                             exchangeRate = state.targetRate?.rate ?: throw IllegalStateException(
@@ -478,12 +481,15 @@ class TxFlowAnalytics(
                             ),
                             amount = state.pendingTx.amount,
                             inputNetworkFee = state.pendingTx.feeAmount,
-                            outputNetworkFee = state.pendingTx.confirmations
-                                .filterIsInstance<TxConfirmationValue.NetworkFee>()[0].txFee.fee,
-                            outputAmount = state.pendingTx.confirmations
-                                .filterIsInstance<TxConfirmationValue.SwapReceiveValue>()[0].receiveAmount
+                            outputNetworkFee = state.pendingTx.engineState[OUTGOING_FEE]?.let {
+                                it as Money
+                            } ?: CryptoValue.zero(state.selectedTarget.asset),
+                            outputAmount = state.pendingTx.engineState[RECEIVE_AMOUNT]?.let {
+                                CryptoValue.fromMajor(state.sendingAsset, it as BigDecimal)
+                            } ?: CryptoValue.zero(state.sendingAsset)
                         )
                     )
+                }
             }
             AssetAction.Withdraw ->
                 analytics.logEvent(
