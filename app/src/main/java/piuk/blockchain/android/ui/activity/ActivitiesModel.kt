@@ -22,6 +22,7 @@ enum class CryptoActivityType {
     NON_CUSTODIAL,
     CUSTODIAL_TRADING,
     CUSTODIAL_INTEREST,
+    CUSTODIAL_TRANSFER,
     SWAP,
     SELL,
     UNKNOWN

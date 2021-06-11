@@ -6,26 +6,28 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDirections
-import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import com.blockchain.koin.scopedInject
+import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.notifications.analytics.KYCAnalyticsEvents
+import com.blockchain.notifications.analytics.LaunchOrigin
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.KycNavXmlDirections
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
-import piuk.blockchain.android.ui.kyc.complete.ApplicationCompleteFragment
-import piuk.blockchain.androidcore.utils.helperfunctions.consume
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
+import piuk.blockchain.android.databinding.ActivityKycNavHostBinding
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.toast
+import piuk.blockchain.android.ui.kyc.complete.ApplicationCompleteFragment
 import piuk.blockchain.android.ui.kyc.email.entry.EmailEntryHost
 import piuk.blockchain.android.ui.kyc.email.entry.KycEmailEntryFragmentDirections
 import piuk.blockchain.android.util.invisibleIf
-import kotlinx.android.synthetic.main.activity_kyc_nav_host.frame_layout_fragment_wrapper as fragmentWrapper
-import kotlinx.android.synthetic.main.activity_kyc_nav_host.nav_host as navHostFragment
-import kotlinx.android.synthetic.main.activity_kyc_nav_host.progress_bar_loading_user as progressLoadingUser
-import kotlinx.android.synthetic.main.activity_kyc_nav_host.toolbar_kyc as toolBar
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
 
 interface StartKyc {
     fun startKycActivity(context: Any, campaignType: CampaignType)
@@ -40,11 +42,18 @@ internal class KycStarter : StartKyc {
 class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(),
     KycProgressListener, KycNavHostView {
 
+    private val binding: ActivityKycNavHostBinding by lazy {
+        ActivityKycNavHostBinding.inflate(layoutInflater)
+    }
+
     private val presenter: KycNavHostPresenter by scopedInject()
+    private val analytics: Analytics by inject()
     private var navInitialDestination: NavDestination? = null
-    private val navController by unsafeLazy { findNavController(navHostFragment) }
+    private val navController: NavController by lazy {
+        (supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment).navController
+    }
     private val currentFragment: Fragment?
-        get() = navHostFragment.childFragmentManager.findFragmentById(R.id.nav_host)
+        get() = supportFragmentManager.findFragmentById(R.id.nav_host)
 
     override val campaignType by unsafeLazy {
         intent.getSerializableExtra(EXTRA_CAMPAIGN_TYPE) as CampaignType
@@ -55,22 +64,22 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_kyc_nav_host)
+        setContentView(binding.root)
         val title = R.string.identity_verification
-        setupToolbar(toolBar, title)
-
+        setupToolbar(binding.toolbarKyc, title)
+        analytics.logEvent(KYCAnalyticsEvents.UpgradeKycVeriffClicked(campaignType.toLaunchOrigin()))
         navController.setGraph(R.navigation.kyc_nav, intent.extras)
 
         onViewReady()
     }
 
     override fun setHostTitle(title: Int) {
-        toolBar.title = getString(title)
+        binding.toolbarKyc.title = getString(title)
     }
 
     override fun displayLoading(loading: Boolean) {
-        fragmentWrapper.invisibleIf(loading)
-        progressLoadingUser.invisibleIf(!loading)
+        binding.frameLayoutFragmentWrapper.invisibleIf(loading)
+        binding.progressBarLoadingUser.invisibleIf(!loading)
     }
 
     override fun showErrorToastAndFinish(message: Int) {
@@ -98,7 +107,7 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
     }
 
     override fun onEmailEntryFragmentShown() {
-        toolBar.title = getString(R.string.kyc_email_title)
+        binding.toolbarKyc.title = getString(R.string.kyc_email_title)
     }
 
     override fun onEmailVerified() {
@@ -204,6 +213,18 @@ class KycNavHostActivity : BaseMvpActivity<KycNavHostView, KycNavHostPresenter>(
             resultCode == RESULT_KYC_FOR_SDD_COMPLETE || resultCode == RESULT_KYC_FOR_TIER_COMPLETE
     }
 }
+
+private fun CampaignType.toLaunchOrigin(): LaunchOrigin =
+    when (this) {
+        CampaignType.Swap -> LaunchOrigin.SWAP
+        CampaignType.Blockstack,
+        CampaignType.Sunriver -> LaunchOrigin.AIRDROP
+        CampaignType.Resubmission -> LaunchOrigin.RESUBMISSION
+        CampaignType.SimpleBuy -> LaunchOrigin.SIMPLETRADE
+        CampaignType.FiatFunds -> LaunchOrigin.FIAT_FUNDS
+        CampaignType.Interest -> LaunchOrigin.SAVINGS
+        CampaignType.None -> LaunchOrigin.SETTINGS
+    }
 
 interface KycProgressListener : EmailEntryHost {
 

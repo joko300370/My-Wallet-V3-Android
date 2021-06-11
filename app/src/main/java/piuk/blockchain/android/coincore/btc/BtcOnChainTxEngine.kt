@@ -19,6 +19,7 @@ import org.bitcoinj.core.Transaction
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import org.spongycastle.util.encoders.Hex
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FeeLevelRates
@@ -34,6 +35,7 @@ import piuk.blockchain.android.coincore.impl.txEngine.BitPayClientEngine
 import piuk.blockchain.android.coincore.impl.txEngine.EngineTransaction
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.updateTxValidity
+import piuk.blockchain.android.ui.transactionflow.flow.FeeInfo
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import piuk.blockchain.androidcore.data.payments.SendDataManager
@@ -185,7 +187,7 @@ class BtcOnChainTxEngine(
             amount = amount,
             totalBalance = balance,
             availableBalance = available.maxSpendable,
-            feeForFullAvailable = available.forForMax,
+            feeForFullAvailable = available.feeForMax,
             feeAmount = CryptoValue.fromMinor(sourceAsset, utxoBundle.absoluteFee),
             feeSelection = pendingTx.feeSelection.copy(
                 customLevelRates = feeOptions.toLevelRates()
@@ -215,23 +217,37 @@ class BtcOnChainTxEngine(
 
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(
-            pendingTx.copy(
-                confirmations = mutableListOf(
-                    TxConfirmationValue.From(from = sourceAccount.label),
-                    TxConfirmationValue.To(to = txTarget.label),
-                    makeFeeSelectionOption(pendingTx),
-                    TxConfirmationValue.FeedTotal(
-                        amount = pendingTx.amount,
-                        fee = pendingTx.feeAmount,
-                        exchangeFee = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
-                        exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
+            buildConfirmations(pendingTx)
+        )
+
+    private fun buildConfirmations(pendingTx: PendingTx): PendingTx =
+        pendingTx.copy(
+            confirmations = listOfNotNull(
+                TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
+                TxConfirmationValue.NewTo(txTarget, AssetAction.Send, sourceAccount),
+                TxConfirmationValue.CompoundNetworkFee(
+                    sendingFeeInfo = if (!pendingTx.feeAmount.isZero) {
+                        FeeInfo(
+                            pendingTx.feeAmount,
+                            pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+                            sourceAsset
+                        )
+                    } else null,
+                    feeLevel = pendingTx.feeSelection.selectedLevel
+                ),
+                TxConfirmationValue.NewTotal(
+                    totalWithFee = (pendingTx.amount as CryptoValue).plus(
+                        pendingTx.feeAmount as CryptoValue
                     ),
-                    TxConfirmationValue.Description()
-                ).apply {
-                    if (isLargeTransaction(pendingTx)) {
-                        add(TxConfirmationValue.TxBooleanConfirmation<Unit>(TxConfirmation.LARGE_TRANSACTION_WARNING))
-                    }
-                }.toList()
+                    exchange = pendingTx.amount.toFiat(exchangeRates, userFiat)
+                        .plus(pendingTx.feeAmount.toFiat(exchangeRates, userFiat))
+                ),
+                TxConfirmationValue.Description(),
+                if (isLargeTransaction(pendingTx)) {
+                    TxConfirmationValue.TxBooleanConfirmation<Unit>(
+                        TxConfirmation.LARGE_TRANSACTION_WARNING
+                    )
+                } else null
             )
         )
 
@@ -263,7 +279,8 @@ class BtcOnChainTxEngine(
             outputs = outputs // assumes change required
         )
 
-        val relativeFee = BigDecimal(100) * (pendingTx.feeAmount.toBigDecimal() / pendingTx.amount.toBigDecimal())
+        val relativeFee =
+            BigDecimal(100) * (pendingTx.feeAmount.toBigDecimal() / pendingTx.amount.toBigDecimal())
         return fiatValue.toBigDecimal() > BigDecimal(LARGE_TX_FEE) &&
             txSize > LARGE_TX_SIZE &&
             relativeFee > LARGE_TX_PERCENTAGE
@@ -316,7 +333,8 @@ class BtcOnChainTxEngine(
             // If the large_fee warning is present, make sure it's ack'd.
             // If it's not, then there's nothing to do
             if (pendingTx.getOption<TxConfirmationValue.TxBooleanConfirmation<Unit>>(
-                    TxConfirmation.LARGE_TRANSACTION_WARNING)?.value == false
+                    TxConfirmation.LARGE_TRANSACTION_WARNING
+                )?.value == false
             ) {
                 throw TxValidationFailure(ValidationState.OPTION_INVALID)
             }

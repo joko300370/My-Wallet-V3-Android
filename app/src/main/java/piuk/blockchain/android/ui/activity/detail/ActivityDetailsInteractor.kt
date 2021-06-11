@@ -4,6 +4,7 @@ import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.PaymentLimits
 import com.blockchain.nabu.datamanagers.PaymentMethod
+import com.blockchain.nabu.datamanagers.TransactionType
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
@@ -23,6 +24,7 @@ import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
+import piuk.blockchain.android.coincore.CustodialTransferActivitySummaryItem
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.NullCryptoAccount
@@ -135,19 +137,62 @@ class ActivityDetailsInteractor(
                 summaryItem.account.asset,
                 summaryItem.accountRef
             ).map {
-                list.add(
-                    if (it !is NullCryptoAccount) {
-                        getToField(it.label, it.label, summaryItem.cryptoCurrency.displayTicker)
-                    } else {
-                        To(summaryItem.accountRef)
-                    }
-                )
+                if (it !is NullCryptoAccount) {
+                    list.add(getToField(it.label, it.label, summaryItem.cryptoCurrency.displayTicker))
+                } else if (summaryItem.accountRef.isNotBlank()) {
+                    list.add(To(summaryItem.accountRef))
+                }
                 list.toList()
             }.toSingle()
         } else {
             Single.just(list.toList())
         }
     }
+
+    fun loadCustodialTransferItems(
+        summaryItem: CustodialTransferActivitySummaryItem
+    ): Single<List<ActivityDetailsType>> =
+        Single.just(
+            listOfNotNull(
+                TransactionId(summaryItem.txId),
+                Created(Date(summaryItem.timeStampMs)),
+                when (summaryItem.type) {
+                    TransactionType.DEPOSIT -> {
+                        when {
+                            summaryItem.recipientAddress.isBlank() -> {
+                                null
+                            }
+                            else -> {
+                                From(summaryItem.recipientAddress)
+                            }
+                        }
+                    }
+                    TransactionType.WITHDRAWAL -> {
+                        From(summaryItem.account.label)
+                    }
+                    else -> null
+                },
+                when (summaryItem.type) {
+                    TransactionType.DEPOSIT -> {
+                        To(summaryItem.account.label)
+                    }
+                    TransactionType.WITHDRAWAL -> {
+                        when {
+                            summaryItem.recipientAddress.isBlank() -> {
+                                null
+                            }
+                            else -> {
+                                To(summaryItem.recipientAddress)
+                            }
+                        }
+                    }
+                    else -> null
+                },
+                Amount(summaryItem.value),
+                Value(summaryItem.fiatValue),
+                NetworkFee(summaryItem.fee)
+            )
+        )
 
     fun loadSwapItems(
         item: TradeActivitySummaryItem
@@ -260,6 +305,15 @@ class ActivityDetailsInteractor(
             cryptoCurrency,
             txHash
         ) as? CustodialInterestActivitySummaryItem
+
+    fun getCustodialTransferActivityDetails(
+        cryptoCurrency: CryptoCurrency,
+        txHash: String
+    ): CustodialTransferActivitySummaryItem? =
+        assetActivityRepository.findCachedItem(
+            cryptoCurrency,
+            txHash
+        ) as? CustodialTransferActivitySummaryItem
 
     fun getTradeActivityDetails(
         cryptoCurrency: CryptoCurrency,

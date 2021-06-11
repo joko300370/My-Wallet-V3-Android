@@ -3,6 +3,9 @@ package piuk.blockchain.android.ui.linkbank
 import com.blockchain.extensions.exhaustive
 import com.blockchain.nabu.models.data.BankPartner
 import com.blockchain.notifications.analytics.AnalyticsEvent
+import com.blockchain.notifications.analytics.AnalyticsNames
+import com.blockchain.notifications.analytics.LaunchOrigin
+import java.io.Serializable
 
 enum class BankAuthAnalytics(
     override val event: String,
@@ -31,7 +34,34 @@ enum class BankAuthAnalytics(
     PIS_PERMISSIONS_APPROVED("ob_pis_approve"),
     PIS_PERMISSIONS_DENIED("ob_pis_deny"),
     PIS_EXTERNAL_FLOW_RETRY("ob_pis_retry"),
-    PIS_EXTERNAL_FLOW_CANCEL("ob_pis_cancel")
+    PIS_EXTERNAL_FLOW_CANCEL("ob_pis_cancel");
+
+    class LinkBankConditionsApproved(private val bankName: String, private val provider: String) : AnalyticsEvent {
+        override val event: String
+            get() = AnalyticsNames.LINK_BANK_CONDITIONS_APPROVED.eventName
+        override val params: Map<String, Serializable>
+            get() = mapOf(
+                "bank_name" to bankName,
+                "provider" to provider
+            )
+    }
+
+    class LinkBankSelected(override val origin: LaunchOrigin) : AnalyticsEvent {
+        override val event: String
+            get() = AnalyticsNames.LINK_BANK_CLICKED.eventName
+        override val params: Map<String, Serializable>
+            get() = mapOf()
+    }
+
+    class BankSelected(private val bankName: String, private val provider: String) : AnalyticsEvent {
+        override val event: String
+            get() = AnalyticsNames.BANK_SELECTED.eventName
+        override val params: Map<String, Serializable>
+            get() = mapOf(
+                "bank_name" to bankName,
+                "provider" to provider
+            )
+    }
 }
 
 private enum class BankPartnerTypes {

@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.UiThread
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.annotations.CommonCode
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.ActivityAnalytics
@@ -17,7 +16,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.fragment_activities.*
 import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
@@ -26,16 +24,17 @@ import piuk.blockchain.android.coincore.ActivitySummaryItem
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.databinding.FragmentActivitiesBinding
 import piuk.blockchain.android.ui.activity.adapter.ActivitiesDelegateAdapter
 import piuk.blockchain.android.ui.activity.detail.CryptoActivityDetailsBottomSheet
 import piuk.blockchain.android.ui.activity.detail.FiatActivityDetailsBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
+import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.ui.home.HomeScreenMviFragment
 import piuk.blockchain.android.util.getAccount
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.putAccount
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.visible
@@ -45,12 +44,13 @@ import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
 
-class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesIntent, ActivitiesState>(),
+class ActivitiesFragment :
+    HomeScreenMviFragment<ActivitiesModel, ActivitiesIntent, ActivitiesState, FragmentActivitiesBinding>(),
     AccountSelectSheet.SelectionHost {
 
     override val model: ActivitiesModel by scopedInject()
 
-    private val theAdapter: ActivitiesDelegateAdapter by lazy {
+    private val activityAdapter: ActivitiesDelegateAdapter by lazy {
         ActivitiesDelegateAdapter(
             prefs = get(),
             assetResources = assetResources,
@@ -60,8 +60,6 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
             onFiatItemClicked = { cc, tx -> onFiatActivityClicked(cc, tx) }
         )
     }
-
-    private lateinit var theLayoutManager: RecyclerView.LayoutManager
 
     private val displayList = mutableListOf<ActivitySummaryItem>()
 
@@ -77,20 +75,18 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
 
     private var state: ActivitiesState? = null
 
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentActivitiesBinding =
+        FragmentActivitiesBinding.inflate(inflater, container, false)
+
     @UiThread
     override fun render(newState: ActivitiesState) {
         if (newState.isError) {
-            ToastCustom.makeText(
-                requireContext(),
-                getString(R.string.activity_loading_error),
-                ToastCustom.LENGTH_SHORT,
-                ToastCustom.TYPE_ERROR
-            )
+            toast(R.string.activity_loading_error, ToastCustom.TYPE_ERROR)
         }
 
         switchView(newState)
 
-        swipe.isRefreshing = newState.isLoading
+        binding.swipe.isRefreshing = newState.isLoading
 
         renderAccountDetails(newState)
         renderTransactionList(newState)
@@ -120,26 +116,27 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
                 }
             }
         }
-
         this.state = newState
     }
 
     private fun switchView(newState: ActivitiesState) {
-        when {
-            newState.isLoading && newState.activityList.isEmpty() -> {
-                header_layout.gone()
-                content_list.gone()
-                empty_view.gone()
-            }
-            newState.activityList.isEmpty() -> {
-                header_layout.visible()
-                content_list.gone()
-                empty_view.visible()
-            }
-            else -> {
-                header_layout.visible()
-                content_list.visible()
-                empty_view.gone()
+        with(binding) {
+            when {
+                newState.isLoading && newState.activityList.isEmpty() -> {
+                    headerLayout.gone()
+                    contentList.gone()
+                    emptyView.gone()
+                }
+                newState.activityList.isEmpty() -> {
+                    headerLayout.visible()
+                    contentList.gone()
+                    emptyView.visible()
+                }
+                else -> {
+                    headerLayout.visible()
+                    contentList.visible()
+                    emptyView.gone()
+                }
             }
         }
     }
@@ -154,45 +151,47 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
             return
         }
 
-        disposables.clear()
+        with(binding) {
+            disposables.clear()
 
-        val account = newState.account
+            val account = newState.account
 
-        val accountIcon = AccountIcon(account, assetResources)
-        account_icon.setImageResource(accountIcon.icon)
+            val accIcon = AccountIcon(account, assetResources)
+            accountIcon.setImageResource(accIcon.icon)
 
-        accountIcon.indicator?.let {
-            check(account is CryptoAccount) {
-                "Indicators are supported only for CryptoAccounts"
-            }
-            val currency = account.asset
-            account_indicator.apply {
-                visible()
-                setImageResource(it)
-                setAssetIconColours(
-                    tintColor = R.color.white,
-                    filterColor = assetResources.assetFilter(currency)
-                )
-            }
-        } ?: account_indicator.gone()
-
-        account_name.text = account.label
-        fiat_balance.text = ""
-
-        disposables += account.fiatBalance(currencyPrefs.selectedFiatCurrency, exchangeRates)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = {
-                    fiat_balance.text =
-                        getString(
-                            R.string.common_spaced_strings, it.toStringWithSymbol(),
-                            it.currencyCode
-                        )
-                },
-                onError = {
-                    Timber.e("Unable to get balance for ${account.label}")
+            accIcon.indicator?.let {
+                check(account is CryptoAccount) {
+                    "Indicators are supported only for CryptoAccounts"
                 }
-            )
+                val currency = account.asset
+                accountIndicator.apply {
+                    visible()
+                    setImageResource(it)
+                    setAssetIconColours(
+                        tintColor = R.color.white,
+                        filterColor = assetResources.assetFilter(currency)
+                    )
+                }
+            } ?: accountIndicator.gone()
+
+            accountName.text = account.label
+            fiatBalance.text = ""
+
+            disposables += account.fiatBalance(currencyPrefs.selectedFiatCurrency, exchangeRates)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onSuccess = {
+                        fiatBalance.text =
+                            getString(
+                                R.string.common_spaced_strings, it.toStringWithSymbol(),
+                                it.currencyCode
+                            )
+                    },
+                    onError = {
+                        Timber.e("Unable to get balance for ${account.label}")
+                    }
+                )
+        }
     }
 
     private fun renderTransactionList(newState: ActivitiesState) {
@@ -207,7 +206,7 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
             } else {
                 displayList.addAll(this)
             }
-            theAdapter.notifyDataSetChanged()
+            activityAdapter.notifyDataSetChanged()
         }
     }
 
@@ -215,12 +214,6 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
 
     private val preselectedAccount: BlockchainAccount?
         get() = arguments?.getAccount(PARAM_ACCOUNT)
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_activities)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -234,14 +227,12 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
     }
 
     private fun setupRecycler() {
-        theLayoutManager = SafeLayoutManager(requireContext())
-
-        content_list.apply {
-            layoutManager = theLayoutManager
-            adapter = theAdapter
+        binding.contentList.apply {
+            layoutManager = SafeLayoutManager(requireContext())
+            adapter = activityAdapter
             addItemDecoration(BlockchainListDividerDecor(requireContext()))
         }
-        theAdapter.items = displayList
+        activityAdapter.items = displayList
     }
 
     private fun setupToolbar() {
@@ -251,20 +242,20 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
     }
 
     private fun setupAccountSelect() {
-        account_select_btn.setOnClickListener {
+        binding.accountSelectBtn.setOnClickListener {
             model.process(ShowAccountSelectionIntent)
         }
     }
 
     private fun setupSwipeRefresh() {
-        swipe.setOnRefreshListener {
+        binding.swipe.setOnRefreshListener {
             state?.account?.let {
                 model.process(AccountSelectedIntent(it, true))
             }
         }
 
         // Configure the refreshing colors
-        swipe.setColorSchemeResources(
+        binding.swipe.setColorSchemeResources(
             R.color.blue_800,
             R.color.blue_600,
             R.color.blue_400,
@@ -317,8 +308,7 @@ class ActivitiesFragment : HomeScreenMviFragment<ActivitiesModel, ActivitiesInte
         fun newInstance(account: BlockchainAccount?): ActivitiesFragment {
             return ActivitiesFragment().apply {
                 arguments = Bundle().apply {
-                    if (account != null)
-                        putAccount(PARAM_ACCOUNT, account)
+                    account?.let { putAccount(PARAM_ACCOUNT, it) }
                 }
             }
         }

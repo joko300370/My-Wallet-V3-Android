@@ -1,20 +1,19 @@
 package piuk.blockchain.android.coincore.xlm
 
 import com.blockchain.android.testutils.rxInit
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
 import com.blockchain.sunriver.XlmDataManager
 import com.blockchain.sunriver.XlmFeesFetcher
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.wallet.DefaultLabels
 import org.amshove.kluent.mock
 import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.coincore.impl.OfflineAccountUpdater
 import piuk.blockchain.android.thepit.PitLinking
-import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -40,10 +39,9 @@ class XlmAssetUriParseTest {
     private val labels: DefaultLabels = mock()
     private val pitLinking: PitLinking = mock()
     private val crashLogger: CrashLogger = mock()
-    private val environmentConfig: EnvironmentConfig = mock()
     private val walletPreferences: WalletStatus = mock()
-    private val eligibilityProvider: SimpleBuyEligibilityProvider = mock()
     private val offlineCache: OfflineAccountUpdater = mock()
+    private val features: InternalFeatureFlagApi = com.nhaarman.mockito_kotlin.mock()
 
     private val subject = XlmAsset(
         payloadManager = payloadManager,
@@ -59,7 +57,8 @@ class XlmAssetUriParseTest {
         crashLogger = crashLogger,
         walletPreferences = walletPreferences,
         offlineAccounts = offlineCache,
-        identity = mock()
+        identity = mock(),
+        features = features
     )
 
     @Test

@@ -37,7 +37,7 @@ private class SimpleConfirmationCheckoutItemViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(item: TxConfirmationValue) {
-        mapper.map(item)?.let {
+        mapper.map(item).let {
             with(binding) {
                 simpleItemLabel.text = it[ConfirmationPropertyKey.LABEL] as String
                 simpleItemTitle.text = it[ConfirmationPropertyKey.TITLE] as String

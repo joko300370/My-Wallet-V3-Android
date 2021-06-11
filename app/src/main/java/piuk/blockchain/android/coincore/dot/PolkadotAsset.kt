@@ -1,9 +1,9 @@
 package piuk.blockchain.android.coincore.dot
 
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
@@ -19,7 +19,6 @@ import piuk.blockchain.android.thepit.PitLinking
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateService
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
-import java.util.concurrent.atomic.AtomicBoolean
 
 internal class PolkadotAsset(
     payloadManager: PayloadDataManager,
@@ -30,9 +29,9 @@ internal class PolkadotAsset(
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
-    private val identity: UserIdentity,
+    identity: UserIdentity,
     offlineAccounts: OfflineAccountUpdater,
-    private val dotFeatureFlag: FeatureFlag
+    features: InternalFeatureFlagApi
 ) : CryptoAssetBase(
     payloadManager,
     exchangeRates,
@@ -43,24 +42,14 @@ internal class PolkadotAsset(
     pitLinking,
     crashLogger,
     offlineAccounts,
-    identity
+    identity,
+    features
 ) {
 
     override val asset: CryptoCurrency
         get() = CryptoCurrency.DOT
 
-    private val isDotFeatureFlagEnabled = AtomicBoolean(false)
-
-    override val isEnabled: Boolean
-        get() = isDotFeatureFlagEnabled.get()
-
-    override fun initToken(): Completable {
-        return dotFeatureFlag.enabled.doOnSuccess {
-            isDotFeatureFlagEnabled.set(it)
-        }.flatMapCompletable {
-            Completable.complete()
-        }
-    }
+    override fun initToken(): Completable = Completable.complete()
 
     override fun loadNonCustodialAccounts(labels: DefaultLabels): Single<SingleAccountList> =
         Single.just(emptyList())
@@ -73,12 +62,13 @@ internal class PolkadotAsset(
                     labels.getDefaultCustodialWalletLabel(asset),
                     exchangeRates,
                     custodialManager,
-                    identity
+                    identity,
+                    features
                 )
             )
         )
 
-    override fun parseAddress(address: String): Maybe<ReceiveAddress> = Maybe.empty()
+    override fun parseAddress(address: String, label: String?): Maybe<ReceiveAddress> = Maybe.empty()
 }
 
 internal class PolkadotAddress(

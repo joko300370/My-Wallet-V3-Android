@@ -10,13 +10,17 @@ import com.blockchain.nabu.datamanagers.repositories.interest.InterestLimits
 import com.blockchain.nabu.datamanagers.repositories.swap.TradeTransactionItem
 import com.blockchain.nabu.models.data.BankPartner
 import com.blockchain.nabu.models.data.BankTransferDetails
+import com.blockchain.nabu.models.data.CryptoWithdrawalFeeAndLimit
+import com.blockchain.nabu.models.data.FiatWithdrawalFeeAndLimit
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
-import com.blockchain.nabu.models.data.WithdrawalFeeAndLimit
+import com.blockchain.nabu.models.data.RecurringBuy
+import com.blockchain.nabu.models.data.RecurringBuyState
 import com.blockchain.nabu.models.responses.interest.InterestActivityItemResponse
 import com.blockchain.nabu.models.responses.interest.InterestAttributes
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
 import com.blockchain.nabu.models.responses.simplebuy.PaymentAttributes
+import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyConfirmationAttributes
 import com.braintreepayments.cardform.utils.CardType
 import info.blockchain.balance.CryptoCurrency
@@ -78,10 +82,16 @@ interface CustodialWalletManager {
         amount: String
     ): Single<CustodialQuote>
 
-    fun fetchWithdrawFeeAndMinLimit(
+    fun fetchFiatWithdrawFeeAndMinLimit(
         currency: String,
+        product: Product,
         paymentMethodType: PaymentMethodType
-    ): Single<WithdrawalFeeAndLimit>
+    ): Single<FiatWithdrawalFeeAndLimit>
+
+    fun fetchCryptoWithdrawFeeAndMinLimit(
+        currency: CryptoCurrency,
+        product: Product
+    ): Single<CryptoWithdrawalFeeAndLimit>
 
     fun fetchWithdrawLocksTime(
         paymentMethodType: PaymentMethodType,
@@ -94,6 +104,10 @@ interface CustodialWalletManager {
         stateAction: String? = null
     ): Single<BuySellOrder>
 
+    fun createRecurringBuyOrder(
+        recurringBuyRequestBody: RecurringBuyRequestBody
+    ): Single<RecurringBuyOrder>
+
     fun createWithdrawOrder(
         amount: Money,
         bankId: String
@@ -103,9 +117,17 @@ interface CustodialWalletManager {
         currency: String
     ): Single<List<FiatValue>>
 
-    fun getTransactions(
-        currency: String
+    fun getCustodialFiatTransactions(
+        currency: String,
+        product: Product,
+        type: String? = null
     ): Single<List<FiatTransaction>>
+
+    fun getCustodialCryptoTransactions(
+        currency: String,
+        product: Product,
+        type: String? = null
+    ): Single<List<CryptoTransaction>>
 
     fun getBankAccountDetails(
         currency: String
@@ -123,6 +145,8 @@ interface CustodialWalletManager {
     fun getAllOutstandingOrders(): Single<List<BuySellOrder>>
 
     fun getAllOrdersFor(crypto: CryptoCurrency): Single<BuyOrderList>
+
+    fun getRecurringBuyOrdersFor(crypto: CryptoCurrency): Single<RecurringBuyTransactions>
 
     fun getBuyOrder(orderId: String): Single<BuySellOrder>
 
@@ -180,9 +204,11 @@ interface CustodialWalletManager {
         isBankPartner: Boolean?
     ): Single<BuySellOrder>
 
-    fun getInterestAccountBalance(crypto: CryptoCurrency): Maybe<CryptoValue>
+    fun getInterestAccountBalance(crypto: CryptoCurrency): Single<CryptoValue>
 
-    fun getPendingInterestAccountBalance(crypto: CryptoCurrency): Maybe<CryptoValue>
+    fun getPendingInterestAccountBalance(crypto: CryptoCurrency): Single<CryptoValue>
+
+    fun getActionableInterestAccountBalance(crypto: CryptoCurrency): Single<CryptoValue>
 
     fun getInterestAccountDetails(crypto: CryptoCurrency): Single<InterestAccountDetails>
 
@@ -199,6 +225,10 @@ interface CustodialWalletManager {
     fun getInterestEnabledAssets(): Single<List<CryptoCurrency>>
 
     fun getInterestEligibilityForAsset(crypto: CryptoCurrency): Single<Eligibility>
+
+    fun startInterestWithdrawal(cryptoCurrency: CryptoCurrency, amount: Money, address: String): Completable
+
+    fun invalidateInterestBalanceForAsset(crypto: CryptoCurrency)
 
     fun getSupportedFundsFiats(fiatCurrency: String = defaultFiatCurrency): Single<List<String>>
 
@@ -261,6 +291,12 @@ interface CustodialWalletManager {
     fun updateOpenBankingConsent(url: String, token: String): Completable
 
     val defaultFiatCurrency: String
+
+    fun getRecurringBuyEligibility(): Single<List<PaymentMethodType>>
+
+    fun getRecurringBuysForAsset(assetTicker: String): Single<List<RecurringBuy>>
+
+    fun cancelRecurringBuy(id: String): Completable
 }
 
 data class InterestActivityItem(
@@ -312,7 +348,9 @@ enum class InterestState {
 data class InterestAccountDetails(
     val balance: CryptoValue,
     val pendingInterest: CryptoValue,
-    val totalInterest: CryptoValue
+    val pendingDeposit: CryptoValue,
+    val totalInterest: CryptoValue,
+    val lockedBalance: CryptoValue
 )
 
 data class BuySellOrder(
@@ -345,6 +383,7 @@ enum class ApprovalErrorStatus {
 }
 
 typealias BuyOrderList = List<BuySellOrder>
+typealias RecurringBuyTransactions = List<RecurringBuyTransaction>
 
 data class OrderInput(private val symbol: String, private val amount: String? = null)
 
@@ -382,15 +421,33 @@ data class FiatTransaction(
     val state: TransactionState
 )
 
+data class CryptoTransaction(
+    val amount: Money,
+    val id: String,
+    val date: Date,
+    val type: TransactionType,
+    val state: TransactionState,
+    val receivingAddress: String,
+    val fee: Money,
+    val txHash: String,
+    val currency: String
+)
+
 enum class TransactionType {
     DEPOSIT,
-    WITHDRAWAL,
-    UNKNOWN
+    WITHDRAWAL
 }
 
 enum class TransactionState {
     COMPLETED,
     PENDING,
+    FAILED
+}
+
+enum class RecurringBuyActivityState {
+    PENDING,
+    FAILED,
+    COMPLETED,
     UNKNOWN
 }
 
@@ -420,6 +477,12 @@ enum class CustodialOrderState {
 
     val isPending: Boolean
         get() = pendingState.contains(this)
+
+    private val failedState: Set<CustodialOrderState>
+        get() = setOf(FAILED)
+
+    val hasFailed: Boolean
+        get() = failedState.contains(this)
 
     val displayableState: Boolean
         get() = isPending || this == FINISHED
@@ -489,8 +552,13 @@ sealed class PaymentMethod(
     open val isEligible: Boolean
 ) : Serializable {
 
-    data class UndefinedCard(override val limits: PaymentLimits, override val isEligible: Boolean) :
-        PaymentMethod(UNDEFINED_CARD_PAYMENT_ID, limits, UNDEFINED_CARD_PAYMENT_METHOD_ORDER, isEligible),
+    data class UndefinedCard(
+        override val limits: PaymentLimits,
+        override val isEligible: Boolean
+    ) :
+        PaymentMethod(
+            UNDEFINED_CARD_PAYMENT_ID, limits, UNDEFINED_CARD_PAYMENT_METHOD_ORDER, isEligible
+        ),
         UndefinedPaymentMethod {
         override val paymentMethodType: PaymentMethodType
             get() = PaymentMethodType.PAYMENT_CARD
@@ -508,14 +576,21 @@ sealed class PaymentMethod(
         override val limits: PaymentLimits,
         override val isEligible: Boolean
     ) :
-        PaymentMethod(UNDEFINED_FUNDS_PAYMENT_ID, limits, UNDEFINED_FUNDS_PAYMENT_METHOD_ORDER, isEligible),
+        PaymentMethod(
+            UNDEFINED_FUNDS_PAYMENT_ID, limits, UNDEFINED_FUNDS_PAYMENT_METHOD_ORDER, isEligible
+        ),
         UndefinedPaymentMethod {
         override val paymentMethodType: PaymentMethodType
             get() = PaymentMethodType.FUNDS
     }
 
-    data class UndefinedBankTransfer(override val limits: PaymentLimits, override val isEligible: Boolean) :
-        PaymentMethod(UNDEFINED_BANK_TRANSFER_PAYMENT_ID, limits, UNDEFINED_BANK_TRANSFER_METHOD_ORDER, isEligible),
+    data class UndefinedBankTransfer(
+        override val limits: PaymentLimits,
+        override val isEligible: Boolean
+    ) :
+        PaymentMethod(
+            UNDEFINED_BANK_TRANSFER_PAYMENT_ID, limits, UNDEFINED_BANK_TRANSFER_METHOD_ORDER, isEligible
+        ),
         UndefinedPaymentMethod {
         override val paymentMethodType: PaymentMethodType
             get() = PaymentMethodType.BANK_TRANSFER
@@ -737,4 +812,17 @@ data class EligiblePaymentMethodType(
 data class SimplifiedDueDiligenceUserState(
     val isVerified: Boolean,
     val stateFinalised: Boolean
+)
+
+data class RecurringBuyOrder(
+    val state: RecurringBuyState = RecurringBuyState.UNINITIALISED
+)
+
+data class RecurringBuyTransaction(
+    val id: String,
+    val recurringBuyId: String,
+    val state: RecurringBuyActivityState,
+    val originMoney: Money,
+    val destinationValue: CryptoValue,
+    val insertedAt: Date
 )

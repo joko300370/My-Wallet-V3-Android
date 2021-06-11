@@ -7,7 +7,6 @@ import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.dust.DustService
 import info.blockchain.wallet.api.dust.data.DustInput
-import info.blockchain.wallet.exceptions.ApiException
 import info.blockchain.wallet.exceptions.TransactionHashApiException
 import info.blockchain.wallet.payload.data.XPub
 import info.blockchain.wallet.payload.data.XPubs
@@ -30,6 +29,7 @@ import com.nhaarman.mockito_kotlin.doAnswer
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
+import info.blockchain.api.ApiException
 import info.blockchain.wallet.keys.SigningKey
 import info.blockchain.wallet.payload.model.Utxo
 import info.blockchain.wallet.payment.OutputType

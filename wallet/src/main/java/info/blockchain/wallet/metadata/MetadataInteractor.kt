@@ -11,6 +11,7 @@ import io.reactivex.Single
 import io.reactivex.functions.Function
 import io.reactivex.rxkotlin.zipWith
 import org.json.JSONException
+import org.spongycastle.crypto.CryptoException
 import org.spongycastle.util.encoders.Base64
 import org.spongycastle.util.encoders.Hex
 import retrofit2.HttpException
@@ -35,12 +36,8 @@ class MetadataInteractor(
         if (!FormatsUtil.isValidJson(payloadJson))
             return Completable.error(JSONException("Payload is not a valid json object."))
 
-        val encryptedPayloadBytes: ByteArray = if (metadata.isEncrypted) {
-            // base64 to buffer
+        val encryptedPayloadBytes: ByteArray =
             Base64.decode(AESUtil.encryptWithKey(metadata.encryptionKey, payloadJson))
-        } else {
-            payloadJson.toByteArray(StandardCharsets.UTF_8)
-        }
 
         return fetchMagic(metadata.address)
             .onErrorReturn { ByteArray(0) }
@@ -73,18 +70,30 @@ class MetadataInteractor(
     }
 
     fun loadRemoteMetadata(metadata: Metadata): Maybe<String> {
-        return metadataService.getMetadata(metadata.address).toMaybe().map {
-            if (metadata.isEncrypted) {
-                AESUtil.decryptWithKey(metadata.encryptionKey, it.payload)
-            } else {
-                String(Base64.decode(it.payload))
-            }
-        }.onErrorResumeNext(Function {
-            if (it is HttpException && it.code() == 404) // haven't been created
-                Maybe.empty()
-            else Maybe.error(it)
-        })
+        return metadataService.getMetadata(metadata.address)
+            .toMaybe()
+            .map {
+                decryptMetadata(metadata, it.payload)
+            }.onErrorResumeNext(
+                Function {
+                    if (it is HttpException && it.code() == 404) // haven't been created
+                        Maybe.empty()
+                    else Maybe.error(it)
+                }
+            )
     }
+
+    private fun decryptMetadata(metadata: Metadata, payload: String): String =
+        try {
+            AESUtil.decryptWithKey(metadata.encryptionKey, payload).apply {
+                if (!FormatsUtil.isValidJson(this))
+                    throw CryptoException("Malformed plaintext")
+            }
+        } catch (e: CryptoException) {
+            metadata.unpaddedEncryptionKey?.let {
+                AESUtil.decryptWithKey(it, payload)
+            } ?: throw e
+        }
 
     companion object {
         const val METADATA_VERSION = 1

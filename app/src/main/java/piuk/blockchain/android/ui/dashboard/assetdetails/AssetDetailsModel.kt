@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
 import com.blockchain.logging.CrashLogger
+import com.blockchain.nabu.models.data.RecurringBuy
 import info.blockchain.balance.Money
 import info.blockchain.wallet.prices.data.PriceDatum
 import io.reactivex.Scheduler
@@ -15,6 +16,7 @@ import piuk.blockchain.android.ui.base.mvi.MviState
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
 import timber.log.Timber
+import java.util.Stack
 
 data class AssetDetailsState(
     val asset: CryptoAsset? = null,
@@ -22,6 +24,7 @@ data class AssetDetailsState(
     val actions: AvailableActions = emptySet(),
     val assetDetailsCurrentStep: AssetDetailsStep = AssetDetailsStep.ZERO,
     val assetDisplayMap: AssetDisplayMap? = null,
+    val recurringBuys: Map<String, RecurringBuy>? = null,
     val assetFiatPrice: String = "",
     val timeSpan: TimeSpan = TimeSpan.DAY,
     val chartLoading: Boolean = false,
@@ -30,7 +33,9 @@ data class AssetDetailsState(
     val hostAction: AssetAction? = null,
     val selectedAccountCryptoBalance: Money? = null,
     val selectedAccountFiatBalance: Money? = null,
-    val navigateToInterestDashboard: Boolean = false
+    val navigateToInterestDashboard: Boolean = false,
+    val selectedRecurringBuy: RecurringBuy? = null,
+    val stepsBackStack: Stack<AssetDetailsStep> = Stack()
 ) : MviState
 
 enum class AssetDetailsError {
@@ -38,7 +43,9 @@ enum class AssetDetailsError {
     NO_CHART_DATA,
     NO_ASSET_DETAILS,
     NO_EXCHANGE_RATE,
-    TX_IN_FLIGHT
+    TX_IN_FLIGHT,
+    NO_RECURRING_BUYS,
+    RECURRING_BUY_DELETE
 }
 
 class AssetDetailsModel(
@@ -69,26 +76,20 @@ class AssetDetailsModel(
                         process(ShowAssetDetailsIntent)
                     }
                 )
-            is LoadAssetDisplayDetails -> interactor.loadAssetDetails(previousState.asset!!)
-                .subscribeBy(
-                    onSuccess = {
-                        process(AssetDisplayDetailsLoaded(it))
-                    },
-                    onError = {
-                        process(AssetDisplayDetailsFailed)
-                    })
-            is LoadAssetFiatValue -> interactor.loadExchangeRate(previousState.asset!!)
-                .subscribeBy(
-                    onSuccess = {
-                        process(AssetExchangeRateLoaded(it))
-                    }, onError = {
-                        process(AssetExchangeRateFailed)
-                    })
             is ShowAssetActionsIntent -> accountActions(intent.account)
-            is LoadHistoricPrices -> updateChartData(previousState.asset!!, previousState.timeSpan)
-            is UpdateTimeSpan -> updateChartData(previousState.asset!!, intent.updatedTimeSpan)
+            is UpdateTimeSpan -> previousState.asset?.let { updateChartData(it, intent.updatedTimeSpan) }
+            is LoadAsset -> {
+                updateChartData(intent.asset, previousState.timeSpan)
+                loadFiatExchangeRate(intent.asset)
+                loadAssetDetails(intent.asset)
+                loadRecurringBuysForAsset(intent.asset)
+            }
+            is DeleteRecurringBuy -> {
+                previousState.selectedRecurringBuy?.let {
+                    deleteRecurringBuy(it.id)
+                }
+            }
             is HandleActionIntent,
-            is LoadAsset,
             is ChartLoading,
             is ChartDataLoaded,
             is ChartDataLoadFailed,
@@ -104,10 +105,57 @@ class AssetDetailsModel(
             is CustodialSheetFinished,
             is TransactionInFlight,
             is ShowInterestDashboard,
-            is ClearActionStates -> null
-            is AccountActionsLoaded -> null
+            is ClearActionStates,
+            is AccountActionsLoaded,
+            is RecurringBuyDataFailed,
+            is RecurringBuyDataLoaded,
+            is ShowRecurringBuySheet,
+            is ClearSelectedRecurringBuy,
+            is UpdateRecurringBuy,
+            is UpdateRecurringBuyError -> null
         }
     }
+
+    private fun deleteRecurringBuy(id: String) =
+        interactor.deleteRecurringBuy(id)
+            .subscribeBy(
+                onComplete = {
+                    process(UpdateRecurringBuy)
+                },
+                onError = {
+                    process(UpdateRecurringBuyError)
+                }
+            )
+
+    private fun loadAssetDetails(asset: CryptoAsset) =
+        interactor.loadAssetDetails(asset)
+            .subscribeBy(
+                onSuccess = {
+                    process(AssetDisplayDetailsLoaded(it))
+                },
+                onError = {
+                    process(AssetDisplayDetailsFailed)
+                })
+
+    private fun loadFiatExchangeRate(asset: CryptoAsset) =
+        interactor.loadExchangeRate(asset)
+            .subscribeBy(
+                onSuccess = {
+                    process(AssetExchangeRateLoaded(it))
+                }, onError = {
+                    process(AssetExchangeRateFailed)
+                })
+
+    private fun loadRecurringBuysForAsset(asset: CryptoAsset): Disposable =
+        interactor.loadRecurringBuysForAsset(asset.asset.networkTicker)
+            .subscribeBy(
+                onSuccess = { list ->
+                    process(RecurringBuyDataLoaded(list.map { it.id to it }.toMap()))
+                },
+                onError = {
+                    process(RecurringBuyDataFailed)
+                }
+            )
 
     private fun updateChartData(asset: CryptoAsset, timeSpan: TimeSpan) =
         interactor.loadHistoricPrices(asset, timeSpan).doOnSubscribe {

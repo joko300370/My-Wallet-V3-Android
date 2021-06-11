@@ -1,34 +1,26 @@
 package piuk.blockchain.android.ui.kyc.address
 
-import androidx.appcompat.app.AppCompatActivity.RESULT_CANCELED
-import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import android.content.Intent
 import android.location.Geocoder
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.SearchView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity.RESULT_CANCELED
+import androidx.appcompat.app.AppCompatActivity.RESULT_OK
+import androidx.appcompat.widget.SearchView
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.blockchain.extensions.nextAfterOrNull
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
-import piuk.blockchain.android.ui.kyc.address.models.AddressDialog
-import piuk.blockchain.android.ui.kyc.address.models.AddressIntent
-import piuk.blockchain.android.ui.kyc.address.models.AddressModel
-import piuk.blockchain.android.ui.kyc.extensions.skipFirstUnless
-import com.blockchain.notifications.analytics.logEvent
-import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
-import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
-import piuk.blockchain.android.ui.kyc.navigate
-import piuk.blockchain.android.ui.kyc.profile.models.ProfileModel
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.KYCAnalyticsEvents
+import com.blockchain.notifications.analytics.logEvent
 import com.blockchain.ui.extensions.throttledClicks
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException
@@ -46,36 +38,35 @@ import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.KycNavXmlDirections
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.FragmentKycHomeAddressBinding
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
+import piuk.blockchain.android.ui.customviews.toast
+import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
+import piuk.blockchain.android.ui.kyc.address.models.AddressDialog
+import piuk.blockchain.android.ui.kyc.address.models.AddressIntent
+import piuk.blockchain.android.ui.kyc.address.models.AddressModel
+import piuk.blockchain.android.ui.kyc.extensions.skipFirstUnless
+import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
+import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
+import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
+import piuk.blockchain.android.ui.kyc.navigate
+import piuk.blockchain.android.ui.kyc.profile.models.ProfileModel
+import piuk.blockchain.android.util.ViewUtils
+import piuk.blockchain.android.util.gone
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpFragment
-import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
-import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.ui.customviews.toast
-import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
-import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
-import piuk.blockchain.android.util.ViewUtils
-import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.inflate
 import timber.log.Timber
 import java.util.Locale
 import java.util.concurrent.TimeUnit
-import kotlinx.android.synthetic.main.fragment_kyc_home_address.button_kyc_address_next as buttonNext
-import kotlinx.android.synthetic.main.fragment_kyc_home_address.edit_text_kyc_address_apt_name as editTextAptName
-import kotlinx.android.synthetic.main.fragment_kyc_home_address.edit_text_kyc_address_city as editTextCity
-import kotlinx.android.synthetic.main.fragment_kyc_home_address.edit_text_kyc_address_country as editTextCountry
-import kotlinx.android.synthetic.main.fragment_kyc_home_address.edit_text_kyc_address_first_line as editTextFirstLine
-import kotlinx.android.synthetic.main.fragment_kyc_home_address.edit_text_kyc_address_state as editTextState
-import kotlinx.android.synthetic.main.fragment_kyc_home_address.edit_text_kyc_address_zip_code as editTextZipCode
-import kotlinx.android.synthetic.main.fragment_kyc_home_address.input_layout_kyc_address_first_line as textInputAddress1
-import kotlinx.android.synthetic.main.fragment_kyc_home_address.input_layout_kyc_address_apt_name as textInputAddress2
-import kotlinx.android.synthetic.main.fragment_kyc_home_address.input_layout_kyc_address_city as textInputCity
-import kotlinx.android.synthetic.main.fragment_kyc_home_address.input_layout_kyc_address_state as textInputLayoutState
-import kotlinx.android.synthetic.main.fragment_kyc_home_address.input_layout_kyc_address_zip_code as textInputLayoutZipCode
-import kotlinx.android.synthetic.main.fragment_kyc_home_address.search_view_kyc_address as searchViewAddress
 
 class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddressPresenter>(),
     KycHomeAddressView {
+
+    private var _binding: FragmentKycHomeAddressBinding? = null
+    private val binding: FragmentKycHomeAddressBinding
+        get() = _binding!!
 
     private val presenter: KycHomeAddressPresenter by scopedInject()
     private val analytics: Analytics by inject()
@@ -107,7 +98,10 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_kyc_home_address)
+    ): View {
+        _binding = FragmentKycHomeAddressBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -118,6 +112,11 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
         localiseUi()
 
         onViewReady()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     @Suppress("ConstantConditionIf")
@@ -150,12 +149,14 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
         postCode: String,
         countryName: String
     ) {
-        editTextFirstLine.setText(line1)
-        editTextAptName.setText(line2)
-        editTextCity.setText(city)
-        editTextState.setText(state)
-        editTextZipCode.setText(postCode)
-        editTextCountry.setText(countryName)
+        with(binding) {
+            editTextKycAddressFirstLine.setText(line1)
+            editTextKycAddressAptName.setText(line2)
+            editTextKycAddressCity.setText(city)
+            editTextKycAddressState.setText(state)
+            editTextKycAddressZipCode.setText(postCode)
+            editTextKycAddressCountry.setText(countryName)
+        }
     }
 
     private fun startPlacesActivityForResult() {
@@ -216,11 +217,13 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
                     ?.firstOrNull()
 
             if (address != null) {
-                editTextFirstLine.setText(address.thoroughfare ?: address.subThoroughfare)
-                editTextAptName.setText(address.featureName)
-                editTextCity.setText(address.locality ?: address.subAdminArea)
-                editTextState.setText(address.adminArea)
-                editTextZipCode.setText(address.postalCode)
+                with(binding) {
+                    editTextKycAddressFirstLine.setText(address.thoroughfare ?: address.subThoroughfare)
+                    editTextKycAddressAptName.setText(address.featureName)
+                    editTextKycAddressCity.setText(address.locality ?: address.subAdminArea)
+                    editTextKycAddressState.setText(address.adminArea)
+                    editTextKycAddressZipCode.setText(address.postalCode)
+                }
             }
         } catch (e: Exception) {
             Timber.e(e)
@@ -235,8 +238,8 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
 
     private fun subscribeToViewObservables() {
         if (compositeDisposable.size() == 0) {
-            compositeDisposable +=
-                buttonNext
+            with(binding) {
+                compositeDisposable += buttonKycAddressNext
                     .throttledClicks()
                     .subscribeBy(
                         onNext = {
@@ -246,34 +249,33 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
                         onError = { Timber.e(it) }
                     )
 
-            compositeDisposable += editTextFirstLine
-                .onDelayedChange(KycStep.AddressFirstLine)
-                .doOnNext { addressSubject.onNext(AddressIntent.FirstLine(it)) }
-                .subscribe()
-            compositeDisposable += editTextAptName
-                .onDelayedChange(KycStep.AptNameOrNumber)
-                .doOnNext { addressSubject.onNext(AddressIntent.SecondLine(it)) }
-                .subscribe()
-            compositeDisposable += editTextCity
-                .onDelayedChange(KycStep.City)
-                .doOnNext { addressSubject.onNext(AddressIntent.City(it)) }
-                .subscribe()
+                compositeDisposable += editTextKycAddressFirstLine
+                    .onDelayedChange(KycStep.AddressFirstLine)
+                    .doOnNext { addressSubject.onNext(AddressIntent.FirstLine(it)) }
+                    .subscribe()
+                compositeDisposable += editTextKycAddressAptName
+                    .onDelayedChange(KycStep.AptNameOrNumber)
+                    .doOnNext { addressSubject.onNext(AddressIntent.SecondLine(it)) }
+                    .subscribe()
+                compositeDisposable += editTextKycAddressCity
+                    .onDelayedChange(KycStep.City)
+                    .doOnNext { addressSubject.onNext(AddressIntent.City(it)) }
+                    .subscribe()
 
-            compositeDisposable += editTextZipCode
-                .onDelayedChange(KycStep.ZipCode)
-                .doOnNext { addressSubject.onNext(AddressIntent.PostCode(it)) }
-                .subscribe()
+                compositeDisposable += editTextKycAddressZipCode
+                    .onDelayedChange(KycStep.ZipCode)
+                    .doOnNext { addressSubject.onNext(AddressIntent.PostCode(it)) }
+                    .subscribe()
 
-            addressSubject.onNext(AddressIntent.State(profileModel.stateCode ?: ""))
+                addressSubject.onNext(AddressIntent.State(profileModel.stateCode ?: ""))
 
-            compositeDisposable += editTextState
-                .onDelayedChange(KycStep.State)
-                .filter { !profileModel.isInUs() }
-                .doOnNext { addressSubject.onNext(AddressIntent.State(it)) }
-                .subscribe()
+                compositeDisposable += editTextKycAddressState
+                    .onDelayedChange(KycStep.State)
+                    .filter { !profileModel.isInUs() }
+                    .doOnNext { addressSubject.onNext(AddressIntent.State(it)) }
+                    .subscribe()
 
-            compositeDisposable +=
-                searchViewAddress.getEditText()
+                compositeDisposable += searchViewKycAddress.getEditText()
                     .apply { isFocusable = false }
                     .throttledClicks()
                     .subscribeBy(
@@ -287,6 +289,7 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
                             }
                         }
                     )
+            }
         }
     }
 
@@ -300,7 +303,7 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
     }
 
     override fun setButtonEnabled(enabled: Boolean) {
-        buttonNext.isEnabled = enabled
+        binding.buttonKycAddressNext.isEnabled = enabled
     }
 
     override fun showErrorToast(message: Int) {
@@ -324,40 +327,42 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
         countryCode.equals("US", ignoreCase = true)
 
     private fun localiseUi() {
-        if (profileModel.isInUs()) {
-            searchViewAddress.queryHint = getString(
-                R.string.kyc_address_search_hint,
-                getString(R.string.kyc_address_search_hint_zipcode)
+        with(binding) {
+            if (profileModel.isInUs()) {
+                searchViewKycAddress.queryHint = getString(
+                    R.string.kyc_address_search_hint,
+                    getString(R.string.kyc_address_search_hint_zipcode)
+                )
+                inputLayoutKycAddressFirstLine.hint = getString(R.string.kyc_address_address_line_1)
+                inputLayoutKycAddressAptName.hint = getString(R.string.kyc_address_address_line_2)
+                inputLayoutKycAddressCity.hint = getString(R.string.kyc_address_address_city_hint)
+                inputLayoutKycAddressState.hint = getString(R.string.kyc_address_address_state_hint)
+                inputLayoutKycAddressZipCode.hint = getString(R.string.kyc_address_address_zip_code_hint_1)
+                inputLayoutKycAddressState.editText?.isEnabled = false
+            } else {
+                searchViewKycAddress.queryHint = getString(
+                    R.string.kyc_address_search_hint,
+                    getString(R.string.kyc_address_search_hint_postcode)
+                )
+                inputLayoutKycAddressFirstLine.hint = getString(R.string.kyc_address_address_line_1)
+                inputLayoutKycAddressAptName.hint = getString(R.string.kyc_address_address_line_2)
+                inputLayoutKycAddressCity.hint = getString(R.string.address_city)
+                inputLayoutKycAddressState.gone()
+                inputLayoutKycAddressZipCode.hint = getString(R.string.kyc_address_postal_code)
+                inputLayoutKycAddressState.editText?.isEnabled = true
+            }
+
+            editTextKycAddressCountry.setText(
+                Locale(
+                    Locale.getDefault().displayLanguage,
+                    profileModel.countryCode
+                ).displayCountry
             )
-            textInputAddress1.hint = getString(R.string.kyc_address_address_line_1)
-            textInputAddress2.hint = getString(R.string.kyc_address_address_line_2)
-            textInputCity.hint = getString(R.string.kyc_address_address_city_hint)
-            textInputLayoutState.hint = getString(R.string.kyc_address_address_state_hint)
-            textInputLayoutZipCode.hint = getString(R.string.kyc_address_address_zip_code_hint_1)
-            textInputLayoutState.editText?.isEnabled = false
-        } else {
-            searchViewAddress.queryHint = getString(
-                R.string.kyc_address_search_hint,
-                getString(R.string.kyc_address_search_hint_postcode)
+
+            editTextKycAddressState.setText(
+                profileModel.stateName ?: ""
             )
-            textInputAddress1.hint = getString(R.string.kyc_address_address_line_1)
-            textInputAddress2.hint = getString(R.string.kyc_address_address_line_2)
-            textInputCity.hint = getString(R.string.address_city)
-            textInputLayoutState.gone()
-            textInputLayoutZipCode.hint = getString(R.string.kyc_address_postal_code)
-            textInputLayoutState.editText?.isEnabled = true
         }
-
-        editTextCountry.setText(
-            Locale(
-                Locale.getDefault().displayLanguage,
-                profileModel.countryCode
-            ).displayCountry
-        )
-
-        editTextState.setText(
-            profileModel.stateName ?: ""
-        )
     }
 
     private fun TextView.onDelayedChange(kycStep: KycStep): Observable<String> =
@@ -369,22 +374,24 @@ class KycHomeAddressFragment : BaseMvpFragment<KycHomeAddressView, KycHomeAddres
             .distinctUntilChanged()
 
     private fun setupImeOptions() {
-        val editTexts = listOf(
-            editTextFirstLine,
-            editTextAptName,
-            editTextCity,
-            editTextState,
-            editTextZipCode
-        )
+        with(binding) {
+            val editTexts = listOf(
+                editTextKycAddressFirstLine,
+                editTextKycAddressAptName,
+                editTextKycAddressCity,
+                editTextKycAddressState,
+                editTextKycAddressZipCode
+            )
 
-        editTexts.forEach { editText ->
-            editText.setOnEditorActionListener { _, i, _ ->
-                consume {
-                    when (i) {
-                        EditorInfo.IME_ACTION_NEXT ->
-                            editTexts.nextAfterOrNull { it === editText }?.requestFocus()
-                        EditorInfo.IME_ACTION_DONE ->
-                            closeKeyboard()
+            editTexts.forEach { editText ->
+                editText.setOnEditorActionListener { _, i, _ ->
+                    consume {
+                        when (i) {
+                            EditorInfo.IME_ACTION_NEXT ->
+                                editTexts.nextAfterOrNull { it === editText }?.requestFocus()
+                            EditorInfo.IME_ACTION_DONE ->
+                                closeKeyboard()
+                        }
                     }
                 }
             }

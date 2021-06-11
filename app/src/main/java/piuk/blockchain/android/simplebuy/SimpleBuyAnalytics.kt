@@ -1,9 +1,14 @@
 package piuk.blockchain.android.simplebuy
 
+import com.blockchain.extensions.withoutNullValues
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.notifications.analytics.AnalyticsEvent
+import com.blockchain.notifications.analytics.AnalyticsNames
+import com.blockchain.notifications.analytics.LaunchOrigin
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.Money
+import java.io.Serializable
 
 enum class SimpleBuyAnalytics(override val event: String, override val params: Map<String, String> = emptyMap()) :
     AnalyticsEvent {
@@ -57,17 +62,7 @@ enum class SimpleBuyAnalytics(override val event: String, override val params: M
     WIRE_TRANSFER_LOADING_ERROR("sb_link_bank_loading_error"),
     WIRE_TRANSFER_SCREEN_SHOWN("sb_link_bank_screen_shown"),
 
-    ACH_SUCCESS("sb_ach_success"),
-    ACH_CLOSE("sb_ach_close"),
-    ACH_ERROR("sb_ach_error"),
-
-    WITHDRAWAL_FORM_SHOWN("cash_withdraw_form_shown"),
-    WITHDRAWAL_CONFIRM_AMOUNT("cash_withdraw_form_confirm_click"),
-    WITHDRAWAL_CHECKOUT_SHOWN("cash_withdraw_form_shown"),
-    WITHDRAWAL_CHECKOUT_CONFIRM("cash_withdraw_checkout_confirm"),
-    WITHDRAWAL_CHECKOUT_CANCEL("cash_withdraw_checkout_cancel"),
-    WITHDRAWAL_SUCCESS("cash_withdraw_success"),
-    WITHDRAWAL_ERROR("cash_withdraw_error"),
+    ACH_SUCCESS("sb_ach_success");
 }
 
 fun PaymentMethod.toAnalyticsString(): String =
@@ -78,6 +73,14 @@ fun PaymentMethod.toAnalyticsString(): String =
         is PaymentMethod.UndefinedFunds -> "FUNDS"
         is PaymentMethod.Bank,
         is PaymentMethod.UndefinedBankTransfer -> "LINK_BANK"
+        else -> ""
+    }
+
+fun PaymentMethod.toNabuAnalyticsString(): String =
+    when (this) {
+        is PaymentMethod.Card -> "PAYMENT_CARD"
+        is PaymentMethod.Bank -> "BANK_TRANSFER"
+        is PaymentMethod.Funds -> "FUNDS"
         else -> ""
     }
 
@@ -169,4 +172,44 @@ class CurrencyChangedFromBuyForm(fiatCurrency: String) : AnalyticsEvent {
     override val params: Map<String, String> = mapOf(
         "currency" to fiatCurrency
     )
+}
+
+class BuyAmountEntered(inputAmount: Money, maxAmount: Money, outputCurrency: String) : AnalyticsEvent {
+    override val event: String = AnalyticsNames.BUY_AMOUNT_ENTERED.eventName
+    override val params: Map<String, Serializable> = mapOf(
+        "input_amount" to inputAmount.toBigDecimal(),
+        "input_currency" to inputAmount.currencyCode,
+        "input_amount_max" to maxAmount.toBigDecimal(),
+        "output_currency" to outputCurrency
+    )
+}
+
+class BuySellViewedEvent(private val type: BuySellType? = null) : AnalyticsEvent {
+    override val event: String
+        get() = AnalyticsNames.BUY_SELL_VIEWED.eventName
+    override val params: Map<String, Serializable>
+        get() = mapOf(
+            "type" to type?.name
+        ).withoutNullValues()
+}
+
+class BuySellClicked(override val origin: LaunchOrigin, val type: BuySellType? = null) : AnalyticsEvent {
+
+    override val event: String
+        get() = AnalyticsNames.BUY_SELL_CLICKED.eventName
+    override val params: Map<String, Serializable>
+        get() = mapOf(
+            "type" to type?.name
+        ).withoutNullValues()
+}
+
+class BuyPaymentMethodSelected(type: String) : AnalyticsEvent {
+    override val event: String = AnalyticsNames.BUY_PAYMENT_METHOD_CHANGED.eventName
+    override val params: Map<String, Serializable> = mapOf(
+        "payment_type" to type
+    )
+}
+
+enum class BuySellType {
+    BUY, SELL
 }

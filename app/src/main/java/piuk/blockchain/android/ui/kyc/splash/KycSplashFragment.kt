@@ -19,23 +19,24 @@ import io.reactivex.rxkotlin.subscribeBy
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.databinding.FragmentKycSplashBinding
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
+import piuk.blockchain.android.ui.customviews.toast
+import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
 import piuk.blockchain.android.ui.kyc.hyperlinks.renderTermsLinks
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
 import piuk.blockchain.android.ui.kyc.navigate
+import piuk.blockchain.android.util.visible
 import piuk.blockchain.androidcore.data.settings.SettingsDataManager
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
-import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.ui.customviews.toast
-import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
-import piuk.blockchain.android.util.inflate
-import piuk.blockchain.android.util.visible
 import timber.log.Timber
-import kotlinx.android.synthetic.main.fragment_kyc_splash.button_kyc_splash_apply_now as buttonContinue
-import kotlinx.android.synthetic.main.fragment_kyc_splash.text_view_kyc_splash_message as textViewMessage
-import kotlinx.android.synthetic.main.fragment_kyc_splash.text_view_kyc_terms_and_conditions as textViewTerms
 
 class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), KycSplashView {
+
+    private var _binding: FragmentKycSplashBinding? = null
+    private val binding: FragmentKycSplashBinding
+        get() = _binding!!
 
     private val presenter: KycSplashPresenter by scopedInject()
 
@@ -55,7 +56,10 @@ class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), Kyc
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = container?.inflate(R.layout.fragment_kyc_splash)
+    ): View {
+        _binding = FragmentKycSplashBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -87,21 +91,23 @@ class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), Kyc
 
         progressListener.setHostTitle(title)
 
-        textViewTerms.renderTermsLinks(
-            R.string.buy_sell_splash_terms_and_conditions,
-            URL_COINIFY_POLICY,
-            URL_COINIFY_POLICY
-        )
-        textViewTerms.visible()
+        with(binding) {
+            textViewKycTermsAndConditions.renderTermsLinks(
+                R.string.buy_sell_splash_terms_and_conditions,
+                URL_COINIFY_POLICY,
+                URL_COINIFY_POLICY
+            )
+            textViewKycTermsAndConditions.visible()
 
-        textViewMessage.setText(R.string.buy_sell_splash_message)
+            textViewKycSplashMessage.setText(R.string.buy_sell_splash_message)
+        }
     }
 
     private val disposable = CompositeDisposable()
 
     override fun onResume() {
         super.onResume()
-        disposable += buttonContinue
+        disposable += binding.buttonKycSplashApplyNow
             .throttledClicks()
             .subscribeBy(
                 onNext = {
@@ -115,6 +121,11 @@ class KycSplashFragment : BaseFragment<KycSplashView, KycSplashPresenter>(), Kyc
     override fun onPause() {
         disposable.clear()
         super.onPause()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun goToNextKycStep(direction: NavDirections) =

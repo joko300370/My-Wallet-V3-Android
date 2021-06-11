@@ -115,6 +115,7 @@
         android:fadingEdge="vertical"
         android:fadingEdgeLength="@dimen/very_small_margin"
         android:requiresFadingEdge="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

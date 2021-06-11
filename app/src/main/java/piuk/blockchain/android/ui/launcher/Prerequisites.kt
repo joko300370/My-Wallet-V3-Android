@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.launcher
 
 import com.blockchain.logging.CrashLogger
+import com.blockchain.operations.AppStartUpFlushable
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.exceptions.HDWalletException
 import info.blockchain.wallet.exceptions.InvalidCredentialsException
@@ -23,6 +24,7 @@ class Prerequisites(
     private val coincore: Coincore,
     private val crashLogger: CrashLogger,
     private val simpleBuySync: SimpleBuySyncFactory,
+    private val flushables: List<AppStartUpFlushable>,
     private val walletCredentialsUpdater: WalletCredentialsMetadataUpdater,
     private val rxBus: RxBus
 ) {
@@ -36,6 +38,7 @@ class Prerequisites(
         }
             .then { simpleBuySync.performSync().logAndCompleteOnError(SIMPLE_BUY_SYNC) }
             .then { coincore.init() } // Coincore signals the crash logger internally
+            .then { Completable.concat(flushables.map { it.flush().logAndCompleteOnError(it.tag) }) }
             .then { walletCredentialsUpdater.checkAndUpdate().logAndCompleteOnError(WALLET_CREDENTIALS) }
             .doOnComplete {
                 rxBus.emitEvent(MetadataEvent::class.java, MetadataEvent.SETUP_COMPLETE)

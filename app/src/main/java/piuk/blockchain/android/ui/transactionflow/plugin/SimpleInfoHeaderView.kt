@@ -10,6 +10,7 @@ import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionConfirmationCustomisations
+import piuk.blockchain.android.util.goneIf
 import piuk.blockchain.android.util.visibleIf
 
 class SimpleInfoHeaderView @JvmOverloads constructor(
@@ -42,11 +43,21 @@ class SimpleInfoHeaderView @JvmOverloads constructor(
 
         with(binding) {
             state.pendingTx?.amount?.let { amnt ->
-                amount.text = amnt.toStringWithSymbol()
+                headerTitle.text = amnt.toStringWithSymbol()
                 state.fiatRate?.let {
-                    amountFiat.text = it.convert(amnt, false).toStringWithSymbol()
+                    headerSubtitle.text = it.convert(amnt, false).toStringWithSymbol()
                 }
             }
+        }
+    }
+
+    fun setDetails(title: String, subtitle: String) {
+        with(binding) {
+            headerTitle.goneIf { title.isBlank() }
+            headerSubtitle.goneIf { subtitle.isBlank() }
+
+            headerTitle.text = title
+            headerSubtitle.text = subtitle
         }
     }
 

@@ -5,6 +5,9 @@ import com.blockchain.nabu.datamanagers.NabuDataManager
 import com.blockchain.nabu.models.responses.nabu.NabuUser
 import piuk.blockchain.android.ui.kyc.navhost.toProfileModel
 import com.blockchain.nabu.NabuToken
+import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.notifications.analytics.KYCAnalyticsEvents
+import com.blockchain.notifications.analytics.LaunchOrigin
 import io.reactivex.Single
 import piuk.blockchain.android.KycNavXmlDirections
 
@@ -28,7 +31,8 @@ interface KycNavigator {
 class ReentryDecisionKycNavigator(
     private val token: NabuToken,
     private val dataManager: NabuDataManager,
-    private val reentryDecision: ReentryDecision
+    private val reentryDecision: ReentryDecision,
+    private val analytics: Analytics
 ) : KycNavigator {
 
     override fun findNextStep(): Single<NavDirections> =
@@ -41,7 +45,10 @@ class ReentryDecisionKycNavigator(
 
     override fun userAndReentryPointToDirections(user: NabuUser, reentryPoint: ReentryPoint) =
         when (reentryPoint) {
-            ReentryPoint.EmailEntry -> KycNavXmlDirections.actionStartEmailVerification(true)
+            ReentryPoint.EmailEntry -> {
+                analytics.logEvent(KYCAnalyticsEvents.EmailVeriffRequested(LaunchOrigin.VERIFICATION))
+                KycNavXmlDirections.actionStartEmailVerification(true)
+            }
             ReentryPoint.CountrySelection -> KycNavXmlDirections.actionStartCountrySelection()
             ReentryPoint.Profile -> KycNavXmlDirections.actionStartProfile(
                 user.requireCountryCode(), user.address?.state ?: "", user.address?.state ?: ""

@@ -5,23 +5,22 @@ import android.graphics.Typeface.BOLD
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.StyleSpan
-import android.view.View
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.ExchangeRates
 import info.blockchain.balance.Money
-import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_send_confirm_agreement_transfer.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.TxConfirmationValue
+import piuk.blockchain.android.databinding.ItemSendConfirmAgreementTransferBinding
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
+import piuk.blockchain.android.util.context
 import piuk.blockchain.android.util.setThrottledCheckedChange
-import piuk.blockchain.android.util.inflate
 
 class ConfirmAgreementToTransferItemDelegate<in T>(
     private val model: TransactionModel,
@@ -36,7 +35,7 @@ class ConfirmAgreementToTransferItemDelegate<in T>(
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
         AgreementTextItemViewHolder(
-            parent.inflate(R.layout.item_send_confirm_agreement_transfer),
+            ItemSendConfirmAgreementTransferBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             exchangeRates,
             selectedCurrency
         )
@@ -53,34 +52,31 @@ class ConfirmAgreementToTransferItemDelegate<in T>(
 }
 
 private class AgreementTextItemViewHolder(
-    val parent: View,
+    private val binding: ItemSendConfirmAgreementTransferBinding,
     private val exchangeRates: ExchangeRates,
     private val selectedCurrency: String
-) : RecyclerView.ViewHolder(parent), LayoutContainer {
-
-    override val containerView: View?
-        get() = itemView
+) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(
         item: TxConfirmationValue.TxBooleanConfirmation<Money>,
         model: TransactionModel,
         assetResources: AssetResources
     ) {
-        itemView.apply {
-            confirm_details_checkbox.setText(
+        binding.apply {
+            confirmDetailsCheckbox.setText(
                 agreementText(
                     item.data ?: return,
                     exchangeRates,
                     selectedCurrency,
-                    resources,
+                    context.resources,
                     assetResources
                 ),
                 TextView.BufferType.SPANNABLE
             )
 
-            confirm_details_checkbox.isChecked = item.value
+            confirmDetailsCheckbox.isChecked = item.value
 
-            confirm_details_checkbox.setThrottledCheckedChange { isChecked ->
+            confirmDetailsCheckbox.setThrottledCheckedChange { isChecked ->
                 model.process(TransactionIntent.ModifyTxOption(item.copy(value = isChecked)))
             }
         }
@@ -96,10 +92,10 @@ private class AgreementTextItemViewHolder(
         val introToHolding = resources.getString(R.string.send_confirmation_interest_holding_period_1)
         val amountInBold =
             amount.toFiat(exchangeRates, selectedCurrency).toStringWithSymbol()
-        val outroToHolding = resources.getString(
+        val outroToHolding = context.resources.getString(
             R.string.send_confirmation_interest_holding_period_2,
             amount.toStringWithSymbol(),
-            resources.getString(assetResources.assetNameRes((amount as CryptoValue).currency))
+            context.resources.getString(assetResources.assetNameRes((amount as CryptoValue).currency))
         )
         val sb = SpannableStringBuilder()
             .append(introToHolding)

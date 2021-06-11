@@ -3,21 +3,27 @@ package piuk.blockchain.android.ui.linkbank.yodlee
 import android.net.Uri
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.blockchain.nabu.models.data.BankPartner
 import com.blockchain.nabu.models.data.YodleeAttributes
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.ui.urllinks.YODLEE_LEARN_MORE
-import kotlinx.android.synthetic.main.fragment_simple_buy_yodlee_splash.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.FragmentSimpleBuyYodleeSplashBinding
 import piuk.blockchain.android.ui.linkbank.BankAuthAnalytics
 import piuk.blockchain.android.ui.linkbank.BankAuthFlowNavigator
 import piuk.blockchain.android.ui.linkbank.bankAuthEvent
 import piuk.blockchain.android.util.StringUtils
 
-class YodleeSplashFragment : Fragment(R.layout.fragment_simple_buy_yodlee_splash) {
+class YodleeSplashFragment : Fragment() {
+
+    private var _binding: FragmentSimpleBuyYodleeSplashBinding? = null
+    private val binding: FragmentSimpleBuyYodleeSplashBinding
+        get() = _binding!!
 
     private val stringUtils: StringUtils by inject()
     private val analytics: Analytics by inject()
@@ -30,21 +36,35 @@ class YodleeSplashFragment : Fragment(R.layout.fragment_simple_buy_yodlee_splash
         arguments?.getString(LINKING_BANK_ID) ?: ""
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentSimpleBuyYodleeSplashBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val learnMoreMap = mapOf<String, Uri>("yodlee_learn_more" to Uri.parse(YODLEE_LEARN_MORE))
 
-        yodlee_splash_blurb.movementMethod = LinkMovementMethod.getInstance()
-        yodlee_splash_blurb.text =
-            stringUtils.getStringWithMappedAnnotations(R.string.yodlee_splash_blurb, learnMoreMap, requireActivity())
+        with(binding) {
+            yodleeSplashBlurb.movementMethod = LinkMovementMethod.getInstance()
+            yodleeSplashBlurb.text =
+                stringUtils.getStringWithMappedAnnotations(
+                    R.string.yodlee_splash_blurb, learnMoreMap, requireActivity()
+                )
 
-        yodlee_splash_cta.setOnClickListener {
-            analytics.logEvent(bankAuthEvent(BankAuthAnalytics.SPLASH_CTA, BankPartner.YODLEE))
-            navigator().launchYodleeWebview(attributes, linkingBankId)
+            yodleeSplashCta.setOnClickListener {
+                analytics.logEvent(bankAuthEvent(BankAuthAnalytics.SPLASH_CTA, BankPartner.YODLEE))
+                navigator().launchYodleeWebview(attributes, linkingBankId)
+            }
         }
 
         analytics.logEvent(bankAuthEvent(BankAuthAnalytics.SPLASH_SEEN, BankPartner.YODLEE))
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {
@@ -62,5 +82,5 @@ class YodleeSplashFragment : Fragment(R.layout.fragment_simple_buy_yodlee_splash
 
     private fun navigator(): BankAuthFlowNavigator =
         (activity as? BankAuthFlowNavigator)
-        ?: throw IllegalStateException("Parent must implement BankAuthFlowNavigator")
+            ?: throw IllegalStateException("Parent must implement BankAuthFlowNavigator")
 }

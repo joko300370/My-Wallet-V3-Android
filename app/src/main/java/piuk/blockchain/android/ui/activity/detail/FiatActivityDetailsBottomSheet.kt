@@ -5,10 +5,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.TransactionState
 import com.blockchain.nabu.datamanagers.TransactionType
+import com.blockchain.utils.toFormattedString
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.databinding.DialogSheetActivityDetailsBinding
@@ -17,7 +17,6 @@ import piuk.blockchain.android.ui.activity.detail.adapter.FiatDetailsSheetAdapte
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.toFormattedString
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.util.Date
 
@@ -55,12 +54,6 @@ class FiatActivityDetailsBottomSheet : SlidingModalBottomDialog<DialogSheetActiv
 
                 with(detailsList) {
                     addItemDecoration(BlockchainListDividerDecor(requireContext()))
-
-                    layoutManager = LinearLayoutManager(
-                        requireContext(),
-                        LinearLayoutManager.VERTICAL,
-                        false
-                    )
                     adapter = fiatDetailsSheetAdapter
                 }
                 fiatDetailsSheetAdapter.items = getItemsForSummaryItem(it)
@@ -79,6 +72,11 @@ class FiatActivityDetailsBottomSheet : SlidingModalBottomDialog<DialogSheetActiv
                 text = getString(R.string.activity_details_label_pending)
                 setBackgroundResource(R.drawable.bkgd_status_unconfirmed)
                 setTextColor(ContextCompat.getColor(context, R.color.grey_800))
+            }
+            TransactionState.FAILED -> {
+                text = getString(R.string.activity_details_label_failed)
+                setBackgroundResource(R.drawable.bkgd_red_100_rounded)
+                setTextColor(ContextCompat.getColor(context, R.color.red_600))
             }
             else -> {
                 gone()

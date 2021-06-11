@@ -3,12 +3,15 @@ package piuk.blockchain.android.coincore.impl.txEngine
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.Product
+import com.blockchain.nabu.models.data.CryptoWithdrawalFeeAndLimit
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.testutils.usdPax
 import com.nhaarman.mockito_kotlin.atLeastOnce
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
+import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -30,6 +33,7 @@ import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.erc20.Erc20NonCustodialAccount
 import piuk.blockchain.android.coincore.impl.injectMocks
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
+import java.math.BigInteger
 import kotlin.test.assertEquals
 
 class TradingToOnChainTxEngineTest {
@@ -153,6 +157,10 @@ class TradingToOnChainTxEngineTest {
             on { asset } itReturns ASSET
         }
 
+        val feesAndLimits = CryptoWithdrawalFeeAndLimit(minLimit = 5000.toBigInteger(), fee = BigInteger.ONE)
+        whenever(walletManager.fetchCryptoWithdrawFeeAndMinLimit(ASSET, Product.TRADE))
+            .thenReturn(Single.just(feesAndLimits))
+
         subject.start(
             sourceAccount,
             txTarget,
@@ -167,10 +175,10 @@ class TradingToOnChainTxEngineTest {
                     it.totalBalance == CryptoValue.zero(ASSET) &&
                     it.availableBalance == CryptoValue.zero(ASSET) &&
                     it.feeForFullAvailable == CryptoValue.zero(ASSET) &&
-                    it.feeAmount == CryptoValue.zero(ASSET) &&
+                    it.feeAmount == CryptoValue.fromMinor(ASSET, feesAndLimits.fee) &&
                     it.selectedFiat == SELECTED_FIAT &&
                     it.confirmations.isEmpty() &&
-                    it.minLimit == CryptoValue.zero(ASSET) &&
+                    it.minLimit == CryptoValue.fromMinor(ASSET, feesAndLimits.minLimit) &&
                     it.maxLimit == null &&
                     it.validationState == ValidationState.UNINITIALISED &&
                     it.engineState.isEmpty()
@@ -181,6 +189,7 @@ class TradingToOnChainTxEngineTest {
 
         verify(sourceAccount, atLeastOnce()).asset
         verify(currencyPrefs).selectedFiatCurrency
+        verify(walletManager).fetchCryptoWithdrawFeeAndMinLimit(ASSET, Product.TRADE)
 
         noMoreInteractions(sourceAccount, txTarget)
     }

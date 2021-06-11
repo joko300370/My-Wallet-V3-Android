@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import info.blockchain.api.ApiException;
 import info.blockchain.api.BitcoinApi;
 import info.blockchain.api.bitcoin.data.BalanceDto;
 import info.blockchain.balance.CryptoValue;
@@ -32,7 +33,6 @@ import info.blockchain.wallet.BlockchainFramework;
 import info.blockchain.wallet.api.WalletApi;
 import info.blockchain.wallet.bip44.HDAccount;
 import info.blockchain.wallet.exceptions.AccountLockedException;
-import info.blockchain.wallet.exceptions.ApiException;
 import info.blockchain.wallet.exceptions.DecryptionException;
 import info.blockchain.wallet.exceptions.EncryptionException;
 import info.blockchain.wallet.exceptions.HDWalletException;
@@ -199,62 +199,64 @@ public class PayloadManager {
      * Upgrades a V2 wallet to a V3 HD wallet and saves it to the server
      * NB! When called from Android - First apply PRNGFixes
      */
-    public boolean upgradeV2PayloadToV3(
+    public void upgradeV2PayloadToV3(
         @Nullable String secondPassword,
         @Nonnull String defaultAccountName
     ) throws Exception {
-        getPayload().upgradeV2PayloadToV3(secondPassword, defaultAccountName);
-
-        boolean success = save();
-
-        if (!success) {
-            //Revert on save fail
+        try {
+            getPayload().upgradeV2PayloadToV3(secondPassword, defaultAccountName);
+            boolean success = save();
+            if (!success) {
+                throw new Exception("Save failed");
+            }
+        } catch (Throwable t) {
+            // Revert on fail
             getPayload().setWalletBodies(null);
+            throw t;
         }
-
         updateAllBalances();
-
-        return success;
     }
 
     /**
      * Upgrades a V3 wallet to V4 wallet format and saves it to the server
      */
-    public boolean upgradeV3PayloadToV4(@Nullable String secondPassword) throws Exception {
-        Wallet payload = getPayload();
+    public void upgradeV3PayloadToV4(@Nullable String secondPassword) throws Exception {
+        final Wallet payload = getPayload();
 
         if (payload.isDoubleEncryption()) {
             payload.decryptHDWallet(secondPassword);
         }
 
-        int wrapperVersionBackup = payload.getWrapperVersion();
-        List<List<Account>> hdWalletsAccountsBackup = new ArrayList<>();
+        // Prepare backup in case of failure
+        final int wrapperVersionBackup = payload.getWrapperVersion();
+        final List<List<Account>> hdWalletsAccountsBackup = new ArrayList<>();
 
         for (WalletBody walletBody : payload.getWalletBodies()) {
             hdWalletsAccountsBackup.add(walletBody.getAccounts());
-            List<Account> upgraded = walletBody.upgradeAccountsToV4();
-            encryptUpgradedAccounts(payload, upgraded, secondPassword);
-            walletBody.setAccounts(upgraded);
         }
 
-        payload.setWrapperVersion(WalletWrapper.V4);
+        try {
+            for (WalletBody walletBody : payload.getWalletBodies()) {
+                List<Account> upgraded = walletBody.upgradeAccountsToV4();
+                encryptUpgradedAccounts(payload, upgraded, secondPassword);
+                walletBody.setAccounts(upgraded);
+            }
+            payload.setWrapperVersion(WalletWrapper.V4);
 
-        boolean success = save();
-
-        if (!success) {
-            // Revert on save fail
+            if (!save()) {
+                throw new Exception("Save failed");
+            }
+        } catch (Throwable t) {
+            // Revert on fail
             for (int i = 0; i < hdWalletsAccountsBackup.size(); i++) {
                 WalletBody walletBody = getPayload().getWalletBodies().get(i);
                 walletBody.setWrapperVersion(wrapperVersionBackup);
                 walletBody.setAccounts(hdWalletsAccountsBackup.get(i));
             }
-
             getPayload().setWrapperVersion(wrapperVersionBackup);
+            throw t;
         }
-
         updateAllBalances();
-
-        return success;
     }
 
     private void encryptUpgradedAccounts(

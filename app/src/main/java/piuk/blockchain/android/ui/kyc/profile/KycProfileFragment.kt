@@ -10,14 +10,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
-import piuk.blockchain.android.ui.kyc.extensions.skipFirstUnless
-import com.blockchain.notifications.analytics.logEvent
-import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
-import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
-import piuk.blockchain.android.ui.kyc.navigate
-import piuk.blockchain.android.ui.kyc.profile.models.ProfileModel
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.KYCAnalyticsEvents
+import com.blockchain.notifications.analytics.logEvent
 import com.blockchain.ui.extensions.throttledClicks
 import com.jakewharton.rxbinding2.widget.afterTextChangeEvents
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
@@ -28,26 +23,30 @@ import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
-import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
-import piuk.blockchain.androidcore.utils.helperfunctions.consume
-import piuk.blockchain.androidcoreui.ui.base.BaseFragment
+import piuk.blockchain.android.databinding.FragmentKycProfileBinding
 import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
+import piuk.blockchain.android.ui.kyc.extensions.skipFirstUnless
+import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
+import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
+import piuk.blockchain.android.ui.kyc.navigate
+import piuk.blockchain.android.ui.kyc.profile.models.ProfileModel
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.getTextString
-import piuk.blockchain.android.util.inflate
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
+import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
-import kotlinx.android.synthetic.main.fragment_kyc_profile.button_kyc_profile_next as buttonNext
-import kotlinx.android.synthetic.main.fragment_kyc_profile.edit_text_date_of_birth as editTextDob
-import kotlinx.android.synthetic.main.fragment_kyc_profile.edit_text_kyc_first_name as editTextFirstName
-import kotlinx.android.synthetic.main.fragment_kyc_profile.edit_text_kyc_last_name as editTextLastName
-import kotlinx.android.synthetic.main.fragment_kyc_profile.input_layout_kyc_date_of_birth as inputLayoutDob
 
 class KycProfileFragment : BaseFragment<KycProfileView, KycProfilePresenter>(), KycProfileView {
+
+    private var _binding: FragmentKycProfileBinding? = null
+    private val binding: FragmentKycProfileBinding
+        get() = _binding!!
 
     private val presenter: KycProfilePresenter by scopedInject()
     private val analytics: Analytics by inject()
@@ -56,9 +55,9 @@ class KycProfileFragment : BaseFragment<KycProfileView, KycProfilePresenter>(), 
     )
     private val compositeDisposable = CompositeDisposable()
     override val firstName: String
-        get() = editTextFirstName.getTextString()
+        get() = binding.editTextKycFirstName.getTextString()
     override val lastName: String
-        get() = editTextLastName.getTextString()
+        get() = binding.editTextKycLastName.getTextString()
     override val countryCode: String by lazy {
         KycProfileFragmentArgs.fromBundle(
             arguments ?: Bundle()
@@ -82,7 +81,10 @@ class KycProfileFragment : BaseFragment<KycProfileView, KycProfilePresenter>(), 
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = container?.inflate(R.layout.fragment_kyc_profile)
+    ): View {
+        _binding = FragmentKycProfileBinding.inflate(layoutInflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -90,51 +92,56 @@ class KycProfileFragment : BaseFragment<KycProfileView, KycProfilePresenter>(), 
 
         progressListener.setHostTitle(R.string.kyc_profile_title)
 
-        editTextFirstName.setOnEditorActionListener { _, i, _ ->
-            consume { if (i == EditorInfo.IME_ACTION_NEXT) editTextLastName.requestFocus() }
-        }
+        with(binding) {
+            editTextKycFirstName.setOnEditorActionListener { _, i, _ ->
+                consume { if (i == EditorInfo.IME_ACTION_NEXT) binding.editTextKycLastName.requestFocus() }
+            }
 
-        editTextLastName.setOnEditorActionListener { _, i, _ ->
-            consume {
-                if (i == EditorInfo.IME_ACTION_NEXT) {
-                    editTextLastName.clearFocus()
-                    inputLayoutDob.performClick()
+            editTextKycLastName.setOnEditorActionListener { _, i, _ ->
+                consume {
+                    if (i == EditorInfo.IME_ACTION_NEXT) {
+                        binding.editTextKycLastName.clearFocus()
+                        binding.inputLayoutKycDateOfBirth.performClick()
+                    }
                 }
             }
+
+            inputLayoutKycDateOfBirth.setOnClickListener { onDateOfBirthClicked() }
+            editTextDateOfBirth.setOnClickListener { onDateOfBirthClicked() }
         }
-
-        inputLayoutDob.setOnClickListener { onDateOfBirthClicked() }
-        editTextDob.setOnClickListener { onDateOfBirthClicked() }
-
         onViewReady()
     }
 
     override fun onResume() {
         super.onResume()
-        compositeDisposable +=
-            buttonNext
-                .throttledClicks()
-                .subscribeBy(
-                    onNext = {
-                        presenter.onContinueClicked(progressListener.campaignType)
-                        analytics.logEvent(
-                            KYCAnalyticsEvents.PersonalDetailsSet(
-                                "${editTextFirstName.text}," +
-                                    "${editTextLastName.text}," +
-                                    "${editTextDob.text}"
-                            )
+        compositeDisposable += binding.buttonKycProfileNext
+            .throttledClicks()
+            .subscribeBy(
+                onNext = {
+                    presenter.onContinueClicked(progressListener.campaignType)
+                    analytics.logEvent(
+                        KYCAnalyticsEvents.PersonalDetailsSet(
+                            "${binding.editTextKycFirstName.text}," +
+                                "${binding.editTextKycLastName.text}," +
+                                "${binding.editTextDateOfBirth.text}"
                         )
-                    },
-                    onError = { Timber.e(it) }
-                )
+                    )
+                },
+                onError = { Timber.e(it) }
+            )
 
-        compositeDisposable += editTextFirstName
+        compositeDisposable += binding.editTextKycFirstName
             .onDelayedChange(KycStep.FirstName) { presenter.firstNameSet = it }
             .subscribe()
 
-        compositeDisposable += editTextLastName
+        compositeDisposable += binding.editTextKycLastName
             .onDelayedChange(KycStep.LastName) { presenter.lastNameSet = it }
             .subscribe()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun continueSignUp(profileModel: ProfileModel) {
@@ -168,9 +175,11 @@ class KycProfileFragment : BaseFragment<KycProfileView, KycProfilePresenter>(), 
         displayDob: String,
         dobCalendar: Calendar
     ) {
-        editTextFirstName.setText(firstName)
-        editTextLastName.setText(lastName)
-        editTextDob.setText(displayDob)
+        with(binding) {
+            editTextKycFirstName.setText(firstName)
+            editTextKycLastName.setText(lastName)
+            editTextDateOfBirth.setText(displayDob)
+        }
         dateOfBirth = dobCalendar
         presenter.dateSet = true
     }
@@ -216,14 +225,14 @@ class KycProfileFragment : BaseFragment<KycProfileView, KycProfilePresenter>(), 
             }.also {
                 val format = SimpleDateFormat("MMMM dd, yyyy")
                 val dateString = format.format(it.time)
-                editTextDob.setText(dateString)
+                binding.editTextDateOfBirth.setText(dateString)
             }
         }
 
     private fun mapToCompleted(text: String): Boolean = !text.isEmpty()
 
     override fun setButtonEnabled(enabled: Boolean) {
-        buttonNext.isEnabled = enabled
+        binding.buttonKycProfileNext.isEnabled = enabled
     }
 
     override fun onPause() {

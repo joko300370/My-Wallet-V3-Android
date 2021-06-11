@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.customviews.dialogs
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.jakewharton.rxbinding2.support.v7.widget.queryTextChanges
@@ -11,8 +12,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.dialog_select_country.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.DialogSelectCountryBinding
 import piuk.blockchain.android.util.gone
 import timber.log.Timber
 import java.util.SortedMap
@@ -25,10 +26,12 @@ class CountryDialog(
 ) : Dialog(context) {
 
     private val compositeDisposable = CompositeDisposable()
+    private val binding: DialogSelectCountryBinding =
+        DialogSelectCountryBinding.inflate(LayoutInflater.from(context))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.dialog_select_country)
+        setContentView(binding.root)
 
         compositeDisposable +=
             countryListSource
@@ -48,27 +51,29 @@ class CountryDialog(
             android.R.id.text1,
             countryMap.keys.toTypedArray()
         )
-        list_view_countries.adapter = arrayAdapter
-        progress_bar_select_country_dialog.gone()
+        with(binding) {
+            listViewCountries.adapter = arrayAdapter
+            progressBarSelectCountryDialog.gone()
 
-        list_view_countries.onItemClickListener =
-            AdapterView.OnItemClickListener { parent, _, position, _ ->
-                val item = parent!!.getItemAtPosition(position).toString()
-                val code = countryMap[item]!!
-                listener.onCountrySelected(code, item)
-                dismiss()
+            listViewCountries.onItemClickListener =
+                AdapterView.OnItemClickListener { parent, _, position, _ ->
+                    val item = parent!!.getItemAtPosition(position).toString()
+                    val code = countryMap[item]!!
+                    listener.onCountrySelected(code, item)
+                    dismiss()
+                }
+
+            searchViewCountry.apply {
+                queryHint = context.getString(R.string.search_country)
+
+                this.queryTextChanges()
+                    .skipInitialValue()
+                    .debounce(300, TimeUnit.MILLISECONDS)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(AndroidSchedulers.mainThread())
+                    .doOnNext { arrayAdapter.filter.filter(it) }
+                    .subscribe()
             }
-
-        search_view_country.apply {
-            queryHint = context.getString(R.string.search_country)
-
-            this.queryTextChanges()
-                .skipInitialValue()
-                .debounce(300, TimeUnit.MILLISECONDS)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .doOnNext { arrayAdapter.filter.filter(it) }
-                .subscribe()
         }
     }
 
@@ -78,7 +83,6 @@ class CountryDialog(
     }
 
     interface CountryCodeSelectionListener {
-
         fun onCountrySelected(code: String, name: String)
     }
 }

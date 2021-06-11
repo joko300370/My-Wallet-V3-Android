@@ -9,125 +9,127 @@ import android.view.ViewGroup
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.preferences.CurrencyPrefs
-import kotlinx.android.synthetic.main.fragment_simple_buy_kyc_pending.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.cards.CardDetailsActivity
+import piuk.blockchain.android.databinding.FragmentSimpleBuyKycPendingBinding
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.linkbank.BankAuthActivity
 import piuk.blockchain.android.ui.linkbank.BankAuthSource
-import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 
-class SimpleBuyPendingKycFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(), SimpleBuyScreen {
+class SimpleBuyPendingKycFragment :
+    MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState, FragmentSimpleBuyKycPendingBinding>(),
+    SimpleBuyScreen {
 
     override val model: SimpleBuyModel by scopedInject()
     private val currencyPrefs: CurrencyPrefs by inject()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_simple_buy_kyc_pending)
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentSimpleBuyKycPendingBinding =
+        FragmentSimpleBuyKycPendingBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         model.process(SimpleBuyIntent.FetchKycState)
         model.process(SimpleBuyIntent.FlowCurrentScreen(FlowScreen.KYC_VERIFICATION))
-        continue_to_wallet.setOnClickListener {
+        binding.continueToWallet.setOnClickListener {
             navigator().exitSimpleBuyFlow()
         }
     }
 
     override fun render(newState: SimpleBuyState) {
-        kyc_progress.visibleIf { newState.kycVerificationState == KycState.PENDING }
-        kyc_icon.visibleIf {
-            newState.kycVerificationState == KycState.FAILED ||
-                newState.kycVerificationState == KycState.IN_REVIEW ||
-                newState.kycVerificationState == KycState.UNDECIDED ||
-                newState.kycVerificationState == KycState.VERIFIED_BUT_NOT_ELIGIBLE
-        }
+        with(binding) {
+            kycProgress.visibleIf { newState.kycVerificationState == KycState.PENDING }
+            kycIcon.visibleIf {
+                newState.kycVerificationState == KycState.FAILED ||
+                    newState.kycVerificationState == KycState.IN_REVIEW ||
+                    newState.kycVerificationState == KycState.UNDECIDED ||
+                    newState.kycVerificationState == KycState.VERIFIED_BUT_NOT_ELIGIBLE
+            }
 
-        verif_text.text = when (newState.kycVerificationState) {
-            KycState.PENDING -> resources.getString(R.string.kyc_verifying_info)
-            KycState.IN_REVIEW, KycState.FAILED -> resources.getString(R.string.kyc_manual_review_required)
-            KycState.UNDECIDED -> resources.getString(R.string.kyc_pending_review)
-            KycState.VERIFIED_BUT_NOT_ELIGIBLE -> resources.getString(R.string.kyc_veriff_but_not_eligible_review)
-            else -> ""
-        }
+            verifText.text = when (newState.kycVerificationState) {
+                KycState.PENDING -> resources.getString(R.string.kyc_verifying_info)
+                KycState.IN_REVIEW, KycState.FAILED -> resources.getString(R.string.kyc_manual_review_required)
+                KycState.UNDECIDED -> resources.getString(R.string.kyc_pending_review)
+                KycState.VERIFIED_BUT_NOT_ELIGIBLE -> resources.getString(R.string.kyc_veriff_but_not_eligible_review)
+                else -> ""
+            }
 
-        verif_time.text = when (newState.kycVerificationState) {
-            KycState.PENDING -> resources.getString(R.string.kyc_verifying_time_info)
-            KycState.FAILED,
-            KycState.IN_REVIEW,
-            KycState.UNDECIDED -> resources.getString(R.string.kyc_verifying_manual_review_required_info)
-            KycState.VERIFIED_BUT_NOT_ELIGIBLE -> resources.getString(R.string.kyc_veriff_but_not_eligible_review_info)
-            else -> ""
-        }
-
-        continue_to_wallet.visibleIf {
-            newState.kycVerificationState == KycState.FAILED ||
-                newState.kycVerificationState == KycState.UNDECIDED ||
-                newState.kycVerificationState == KycState.VERIFIED_BUT_NOT_ELIGIBLE
-        }
-
-        kyc_icon.setImageResource(
-            when (newState.kycVerificationState) {
+            verifTime.text = when (newState.kycVerificationState) {
+                KycState.PENDING -> resources.getString(R.string.kyc_verifying_time_info)
+                KycState.FAILED,
                 KycState.IN_REVIEW,
-                KycState.FAILED -> R.drawable.ic_kyc_failed_warning
-                KycState.VERIFIED_BUT_NOT_ELIGIBLE -> R.drawable.ic_kyc_approved
-                else -> R.drawable.ic_kyc_pending
+                KycState.UNDECIDED -> resources.getString(R.string.kyc_verifying_manual_review_required_info)
+                KycState.VERIFIED_BUT_NOT_ELIGIBLE -> resources.getString(
+                    R.string.kyc_veriff_but_not_eligible_review_info
+                )
+                else -> ""
             }
-        )
 
-        newState.kycVerificationState?.takeIf { it != latestKycState }?.let {
-            sendStateAnalytics(it)
-        }
+            continueToWallet.visibleIf {
+                newState.kycVerificationState == KycState.FAILED ||
+                    newState.kycVerificationState == KycState.UNDECIDED ||
+                    newState.kycVerificationState == KycState.VERIFIED_BUT_NOT_ELIGIBLE
+            }
 
-        newState.linkBankTransfer?.let {
-            model.process(SimpleBuyIntent.ResetLinkBankTransfer)
-            startActivityForResult(
-                BankAuthActivity.newInstance(
-                    it, BankAuthSource.SIMPLE_BUY, requireContext()
-                ),
-                BankAuthActivity.LINK_BANK_REQUEST_CODE
+            kycIcon.setImageResource(
+                when (newState.kycVerificationState) {
+                    KycState.IN_REVIEW,
+                    KycState.FAILED -> R.drawable.ic_kyc_failed_warning
+                    KycState.VERIFIED_BUT_NOT_ELIGIBLE -> R.drawable.ic_kyc_approved
+                    else -> R.drawable.ic_kyc_pending
+                }
             )
-        }
-        if (
-            newState.kycVerificationState == KycState.VERIFIED_AND_ELIGIBLE &&
-            latestKycState != newState.kycVerificationState
-        ) {
-            when (newState.selectedPaymentMethod?.id) {
-                PaymentMethod.UNDEFINED_CARD_PAYMENT_ID -> {
-                    addCard()
-                }
-                PaymentMethod.UNDEFINED_BANK_TRANSFER_PAYMENT_ID -> {
-                    tryToLinkABank()
-                }
-                else -> {
-                    navigator().pop()
-                }
+
+            newState.kycVerificationState?.takeIf { it != latestKycState }?.let {
+                sendStateAnalytics(it)
             }
-            latestKycState = newState.kycVerificationState
-        }
 
-        // Case when user is not eligible for a payment method after kyc is done
-        // (Can happen only for bank at this state)
-        if (newState.errorState == ErrorState.LinkedBankNotSupported) {
-            kyc_icon.setImageResource(R.drawable.ic_bank_details_big)
-            kyc_icon.visible()
-            verif_text.text = getString(R.string.common_oops)
-            verif_time.text = getString(R.string.please_try_linking_your_bank_again)
-            continue_to_wallet.visible()
-            // Case when user is trying to link a payment method, after successful kyc
-        } else if (newState.isLoading) {
-            kyc_icon.setImageResource(R.drawable.ic_bank_details_big)
-            kyc_icon.visible()
-        }
+            newState.linkBankTransfer?.let {
+                model.process(SimpleBuyIntent.ResetLinkBankTransfer)
+                startActivityForResult(
+                    BankAuthActivity.newInstance(
+                        it, BankAuthSource.SIMPLE_BUY, requireContext()
+                    ),
+                    BankAuthActivity.LINK_BANK_REQUEST_CODE
+                )
+            }
+            if (
+                newState.kycVerificationState == KycState.VERIFIED_AND_ELIGIBLE &&
+                latestKycState != newState.kycVerificationState
+            ) {
+                when (newState.selectedPaymentMethod?.id) {
+                    PaymentMethod.UNDEFINED_CARD_PAYMENT_ID -> {
+                        addCard()
+                    }
+                    PaymentMethod.UNDEFINED_BANK_TRANSFER_PAYMENT_ID -> {
+                        tryToLinkABank()
+                    }
+                    else -> {
+                        navigator().pop()
+                    }
+                }
+                latestKycState = newState.kycVerificationState
+            }
 
-        bank_linked_failed.visibleIf { newState.errorState == ErrorState.LinkedBankNotSupported }
-        progress.visibleIf { newState.isLoading }
+            // Case when user is not eligible for a payment method after kyc is done
+            // (Can happen only for bank at this state)
+            if (newState.errorState == ErrorState.LinkedBankNotSupported) {
+                kycIcon.setImageResource(R.drawable.ic_bank_details_big)
+                kycIcon.visible()
+                verifText.text = getString(R.string.common_oops)
+                verifTime.text = getString(R.string.please_try_linking_your_bank_again)
+                continueToWallet.visible()
+                // Case when user is trying to link a payment method, after successful kyc
+            } else if (newState.isLoading) {
+                kycIcon.setImageResource(R.drawable.ic_bank_details_big)
+                kycIcon.visible()
+            }
+
+            bankLinkedFailed.visibleIf { newState.errorState == ErrorState.LinkedBankNotSupported }
+            progress.visibleIf { newState.isLoading }
+        }
     }
 
     private fun tryToLinkABank() {

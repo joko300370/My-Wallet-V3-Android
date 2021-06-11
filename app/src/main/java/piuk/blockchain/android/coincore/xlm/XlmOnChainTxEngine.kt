@@ -15,6 +15,7 @@ import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FeeSelection
@@ -28,6 +29,7 @@ import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.copyAndPut
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.updateTxValidity
+import piuk.blockchain.android.ui.transactionflow.flow.FeeInfo
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsDataManager
 import piuk.blockchain.androidcore.utils.extensions.then
 
@@ -63,11 +65,13 @@ class XlmOnChainTxEngine(
     override fun restart(txTarget: TransactionTarget, pendingTx: PendingTx): Single<PendingTx> {
         return super.restart(txTarget, pendingTx).map { px ->
             targetXlmAddress.memo?.let {
-                px.setMemo(TxConfirmationValue.Memo(
-                    text = it,
-                    isRequired = isMemoRequired(),
-                    id = null
-                ))
+                px.setMemo(
+                    TxConfirmationValue.Memo(
+                        text = it,
+                        isRequired = isMemoRequired(),
+                        id = null
+                    )
+                )
             }
         }
     }
@@ -144,15 +148,27 @@ class XlmOnChainTxEngine(
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(
             pendingTx.copy(
-                confirmations = listOf(
-                    TxConfirmationValue.From(from = sourceAccount.label),
-                    TxConfirmationValue.To(to = txTarget.label),
-                    makeFeeSelectionOption(pendingTx),
-                    TxConfirmationValue.FeedTotal(
-                        amount = pendingTx.amount,
-                        fee = pendingTx.feeAmount,
-                        exchangeFee = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
-                        exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
+                confirmations = listOfNotNull(
+                    TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
+                    TxConfirmationValue.NewTo(
+                        txTarget, AssetAction.Send, sourceAccount
+                    ),
+                    TxConfirmationValue.CompoundNetworkFee(
+                        sendingFeeInfo = if (!pendingTx.feeAmount.isZero) {
+                            FeeInfo(
+                                pendingTx.feeAmount,
+                                pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+                                sourceAsset
+                            )
+                        } else null,
+                        feeLevel = pendingTx.feeSelection.selectedLevel
+                    ),
+                    TxConfirmationValue.NewTotal(
+                        totalWithFee = (pendingTx.amount as CryptoValue).plus(
+                            pendingTx.feeAmount as CryptoValue
+                        ),
+                        exchange = pendingTx.amount.toFiat(exchangeRates, userFiat)
+                            .plus(pendingTx.feeAmount.toFiat(exchangeRates, userFiat))
                     ),
                     pendingTx.memo
                 )
@@ -185,7 +201,7 @@ class XlmOnChainTxEngine(
             true
         } else {
             !memoConfirmation.text.isNullOrEmpty() && memoConfirmation.text.length in 1..28 ||
-                    memoConfirmation.id != null
+                memoConfirmation.id != null
         }
     }
 
@@ -268,6 +284,7 @@ class XlmOnChainTxEngine(
 
     companion object {
         private val AVAILABLE_FEE_LEVELS = setOf(FeeLevel.Regular)
+
         // These map 1:1 to FailureReason enum class in HorizonProxy
         const val SUCCESS = 0
         const val UNKNOWN_ERROR = 1

@@ -85,8 +85,7 @@ class OnChainSwapEngineTest {
         engine = onChainEngine,
         walletManager = walletManager,
         quotesEngine = quotesEngine,
-        kycTierService = kycTierService,
-        internalFeatureFlagApi = internalFeatureFlagApi
+        kycTierService = kycTierService
     )
 
     @Before

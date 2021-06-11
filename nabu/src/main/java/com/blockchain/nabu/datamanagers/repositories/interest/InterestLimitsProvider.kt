@@ -27,21 +27,25 @@ class InterestLimitsProviderImpl(
             nabuService.getInterestLimits(it, currencyPrefs.selectedFiatCurrency)
                 .map { responseBody ->
                     InterestLimitsList(responseBody.limits.assetMap.entries.map { entry ->
-                        val crypto = CryptoCurrency.fromNetworkTicker(entry.key)!!
-                        val fiatValue = FiatValue.fromMinor(currencyPrefs.selectedFiatCurrency,
+                        val cryptoCurrency = CryptoCurrency.fromNetworkTicker(entry.key)!!
+                        val minDepositFiatValue = FiatValue.fromMinor(currencyPrefs.selectedFiatCurrency,
                             entry.value.minDepositAmount.toLong())
-                        val cryptoValue = fiatValue.toCrypto(exchangeRates, crypto)
+                        val minDepositCryptoValue = minDepositFiatValue.toCrypto(exchangeRates, cryptoCurrency)
+                        val maxWithdrawalFiatValue = FiatValue.fromMinor(currencyPrefs.selectedFiatCurrency,
+                            entry.value.maxWithdrawalAmount.toLong())
+                        val maxWithdrawalCryptoValue = maxWithdrawalFiatValue.toCrypto(exchangeRates, cryptoCurrency)
 
                         val calendar = Calendar.getInstance()
                         calendar.set(Calendar.DAY_OF_MONTH, 1)
                         calendar.add(Calendar.MONTH, 1)
 
                         InterestLimits(
-                            entry.value.lockUpDuration,
-                            cryptoValue,
-                            crypto,
-                            entry.value.currency,
-                            calendar.time
+                            interestLockUpDuration = entry.value.lockUpDuration,
+                            minDepositAmount = minDepositCryptoValue,
+                            cryptoCurrency = cryptoCurrency,
+                            currency = entry.value.currency,
+                            nextInterestPayment = calendar.time,
+                            maxWithdrawalAmount = maxWithdrawalCryptoValue
                         )
                     })
                 }
@@ -53,7 +57,8 @@ data class InterestLimits(
     val minDepositAmount: CryptoValue,
     val cryptoCurrency: CryptoCurrency,
     val currency: String,
-    val nextInterestPayment: Date
+    val nextInterestPayment: Date,
+    val maxWithdrawalAmount: CryptoValue
 )
 
 data class InterestLimitsList(

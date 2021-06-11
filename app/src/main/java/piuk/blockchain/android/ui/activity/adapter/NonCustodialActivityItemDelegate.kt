@@ -1,27 +1,28 @@
 package piuk.blockchain.android.ui.activity.adapter
 
 import android.graphics.Color
-import android.view.View
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.utils.toFormattedDate
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.dialog_activities_tx_item.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
+import piuk.blockchain.android.databinding.DialogActivitiesTxItemBinding
 import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.android.util.toFormattedDate
+import piuk.blockchain.android.util.context
 import piuk.blockchain.android.util.setAssetIconColours
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.setAssetIconColours
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import java.util.Date
 
 class NonCustodialActivityItemDelegate<in T>(
@@ -34,7 +35,9 @@ class NonCustodialActivityItemDelegate<in T>(
         items[position] is NonCustodialActivitySummaryItem
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        NonCustodialActivityItemViewHolder(parent.inflate(R.layout.dialog_activities_tx_item))
+        NonCustodialActivityItemViewHolder(
+            DialogActivitiesTxItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        )
 
     override fun onBindViewHolder(
         items: List<T>,
@@ -49,8 +52,8 @@ class NonCustodialActivityItemDelegate<in T>(
 }
 
 private class NonCustodialActivityItemViewHolder(
-    itemView: View
-) : RecyclerView.ViewHolder(itemView) {
+    private val binding: DialogActivitiesTxItemBinding
+) : RecyclerView.ViewHolder(binding.root) {
 
     private val disposables: CompositeDisposable = CompositeDisposable()
 
@@ -61,7 +64,7 @@ private class NonCustodialActivityItemViewHolder(
         onAccountClicked: (CryptoCurrency, String, CryptoActivityType) -> Unit
     ) {
         disposables.clear()
-        with(itemView) {
+        with(binding) {
             if (tx.isConfirmed) {
                 icon.setTransactionTypeIcon(tx.transactionType, tx.isFeeTransaction)
                 icon.setAssetIconColours(
@@ -72,32 +75,32 @@ private class NonCustodialActivityItemViewHolder(
                 icon.setIsConfirming()
             }
 
-            status_date.text = Date(tx.timeStampMs).toFormattedDate()
+            statusDate.text = Date(tx.timeStampMs).toFormattedDate()
 
-            tx_type.setTxLabel(tx.cryptoCurrency, tx.transactionType, tx.isFeeTransaction)
+            txType.setTxLabel(tx.cryptoCurrency, tx.transactionType, tx.isFeeTransaction)
 
             setTextColours(tx.isConfirmed)
 
-            asset_balance_fiat.gone()
-            asset_balance_crypto.text = tx.value.toStringWithSymbol()
-            asset_balance_fiat.bindAndConvertFiatBalance(tx, disposables, selectedFiatCurrency)
+            assetBalanceFiat.gone()
+            assetBalanceCrypto.text = tx.value.toStringWithSymbol()
+            assetBalanceFiat.bindAndConvertFiatBalance(tx, disposables, selectedFiatCurrency)
 
-            setOnClickListener { onAccountClicked(tx.cryptoCurrency, tx.txId, CryptoActivityType.NON_CUSTODIAL) }
+            txRoot.setOnClickListener { onAccountClicked(tx.cryptoCurrency, tx.txId, CryptoActivityType.NON_CUSTODIAL) }
         }
     }
 
     private fun setTextColours(isConfirmed: Boolean) {
-        with(itemView) {
+        with(binding) {
             if (isConfirmed) {
-                tx_type.setTextColor(ContextCompat.getColor(context, R.color.black))
-                status_date.setTextColor(ContextCompat.getColor(context, R.color.grey_600))
-                asset_balance_fiat.setTextColor(ContextCompat.getColor(context, R.color.grey_600))
-                asset_balance_crypto.setTextColor(ContextCompat.getColor(context, R.color.black))
+                txType.setTextColor(context.getResolvedColor(R.color.black))
+                statusDate.setTextColor(context.getResolvedColor(R.color.grey_600))
+                assetBalanceFiat.setTextColor(context.getResolvedColor(R.color.grey_600))
+                assetBalanceCrypto.setTextColor(context.getResolvedColor(R.color.black))
             } else {
-                tx_type.setTextColor(ContextCompat.getColor(context, R.color.grey_400))
-                status_date.setTextColor(ContextCompat.getColor(context, R.color.grey_400))
-                asset_balance_fiat.setTextColor(ContextCompat.getColor(context, R.color.grey_400))
-                asset_balance_crypto.setTextColor(ContextCompat.getColor(context, R.color.grey_400))
+                txType.setTextColor(context.getResolvedColor(R.color.grey_400))
+                statusDate.setTextColor(context.getResolvedColor(R.color.grey_400))
+                assetBalanceFiat.setTextColor(context.getResolvedColor(R.color.grey_400))
+                assetBalanceCrypto.setTextColor(context.getResolvedColor(R.color.grey_400))
             }
         }
     }
@@ -125,7 +128,7 @@ private fun ImageView.setTransactionTypeIcon(
 }
 
 private fun ImageView.setIsConfirming() =
-    icon.apply {
+    apply {
         setImageDrawable(
             AppCompatResources.getDrawable(
                 context,

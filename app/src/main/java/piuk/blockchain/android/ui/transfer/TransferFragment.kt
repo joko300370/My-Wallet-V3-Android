@@ -7,12 +7,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import kotlinx.android.synthetic.main.fragment_transfer.*
+import com.blockchain.notifications.analytics.Analytics
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.FragmentTransferBinding
+import piuk.blockchain.android.ui.transfer.analytics.TransferAnalyticsEvent
 import piuk.blockchain.android.ui.transfer.receive.TransferReceiveFragment
 import piuk.blockchain.android.ui.transfer.send.TransferSendFragment
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
-import piuk.blockchain.android.util.inflate
 
 class TransferFragment : Fragment() {
 
@@ -20,28 +22,45 @@ class TransferFragment : Fragment() {
         arguments?.getSerializable(PARAM_START_VIEW) as? TransferViewType ?: TransferViewType.TYPE_SEND
     }
 
+    private val analytics: Analytics by inject()
+
+    private var _binding: FragmentTransferBinding? = null
+
+    private val binding: FragmentTransferBinding
+        get() = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = container?.inflate(R.layout.fragment_transfer)
+    ): View {
+        _binding = FragmentTransferBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        transfer_tabs.setupWithViewPager(transfer_pager)
+        binding.apply {
+            transferTabs.setupWithViewPager(transferPager)
+            transferPager.adapter = TransferPagerAdapter(
+                listOf(getString(R.string.send), getString(R.string.common_receive)),
+                childFragmentManager
+            )
 
-        transfer_pager.adapter = TransferPagerAdapter(
-            listOf(getString(R.string.send), getString(R.string.common_receive)),
-            childFragmentManager
-        )
+            transferPager.setCurrentItem(
+                when (startingView) {
+                    TransferViewType.TYPE_SEND -> TransferViewType.TYPE_SEND.ordinal
+                    TransferViewType.TYPE_RECEIVE -> TransferViewType.TYPE_RECEIVE.ordinal
+                }, true
+            )
+        }
+        analytics.logEvent(TransferAnalyticsEvent.TransferViewed)
+    }
 
-        transfer_pager.setCurrentItem(
-            when (startingView) {
-                TransferViewType.TYPE_SEND -> TransferViewType.TYPE_SEND.ordinal
-                TransferViewType.TYPE_RECEIVE -> TransferViewType.TYPE_RECEIVE.ordinal
-            }, true
-        )
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {

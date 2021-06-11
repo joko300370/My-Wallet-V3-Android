@@ -2,39 +2,38 @@ package piuk.blockchain.android.ui.customviews
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
-import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_trending_pair_row.view.*
-import kotlinx.android.synthetic.main.view_trending_pairs.view.*
-import kotlinx.android.synthetic.main.view_trending_pairs.view.trending_title
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.databinding.ItemTrendingPairRowBinding
+import piuk.blockchain.android.databinding.ViewTrendingPairsBinding
 import piuk.blockchain.android.ui.dashboard.assetdetails.selectFirstAccount
+import piuk.blockchain.android.util.context
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.visible
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
 
 class TrendingPairsView(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs) {
 
+    private val binding: ViewTrendingPairsBinding =
+        ViewTrendingPairsBinding.inflate(LayoutInflater.from(context), this, true)
     private var viewType: TrendingType = TrendingType.OTHER
 
     init {
-        inflate(context, R.layout.view_trending_pairs, this)
 
         setupView(context, attrs)
-        trending_list.addItemDecoration(
+        binding.trendingList.addItemDecoration(
             BlockchainListDividerDecor(context)
         )
     }
@@ -61,22 +60,24 @@ class TrendingPairsView(context: Context, attrs: AttributeSet) : ConstraintLayou
         onSwapPairClicked: (TrendingPair) -> Unit,
         assetResources: AssetResources
     ) {
-        if (pairs.isEmpty()) {
-            trending_empty.visible()
-            trending_list.gone()
-        } else {
-            trending_empty.gone()
-            trending_list.apply {
-                layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-                adapter = TrendingPairsAdapter(
-                    type = viewType,
-                    itemClicked = {
-                        onSwapPairClicked(it)
-                    },
-                    items = pairs,
-                    assetResources = assetResources
-                )
-                visible()
+        with(binding) {
+            if (pairs.isEmpty()) {
+                trendingEmpty.visible()
+                trendingList.gone()
+            } else {
+                trendingEmpty.gone()
+                trendingList.apply {
+                    layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+                    adapter = TrendingPairsAdapter(
+                        type = viewType,
+                        itemClicked = {
+                            onSwapPairClicked(it)
+                        },
+                        items = pairs,
+                        assetResources = assetResources
+                    )
+                    visible()
+                }
             }
         }
     }
@@ -137,7 +138,9 @@ private class TrendingPairsAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
-        TrendingPairViewHolder(parent.inflate(R.layout.item_trending_pair_row, false), itemClicked)
+        TrendingPairViewHolder(
+            ItemTrendingPairRowBinding.inflate(LayoutInflater.from(parent.context), parent, false), itemClicked
+        )
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         (holder as TrendingPairViewHolder).bind(type, items[position], assetResources)
@@ -145,34 +148,36 @@ private class TrendingPairsAdapter(
 
     override fun getItemCount(): Int = items.size
 
-    private class TrendingPairViewHolder(parent: View, val itemClicked: (TrendingPair) -> Unit) :
-        RecyclerView.ViewHolder(parent), LayoutContainer {
-
-        override val containerView: View?
-            get() = itemView
+    private class TrendingPairViewHolder(
+        private val binding: ItemTrendingPairRowBinding,
+        val itemClicked: (TrendingPair) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(type: TrendingPairsView.TrendingType, item: TrendingPair, assetResources: AssetResources) {
-            itemView.apply {
-                trending_icon_in.setImageResource(assetResources.drawableResFilled(item.sourceAccount.asset))
-                trending_icon_out.setImageResource(assetResources.drawableResFilled(item.destinationAccount.asset))
+            binding.apply {
+                trendingIconIn.setImageResource(assetResources.drawableResFilled(item.sourceAccount.asset))
+                trendingIconOut.setImageResource(assetResources.drawableResFilled(item.destinationAccount.asset))
                 if (item.enabled) {
-                    trending_root.setOnClickListener {
+                    trendingRoot.setOnClickListener {
                         itemClicked(item)
                     }
-                    trending_root.alpha = 1f
+                    trendingRoot.alpha = 1f
                 } else {
-                    trending_root.setOnClickListener(null)
-                    trending_root.alpha = 0.6f
+                    trendingRoot.setOnClickListener(null)
+                    trendingRoot.alpha = 0.6f
                 }
 
                 when (type) {
                     TrendingPairsView.TrendingType.SWAP -> {
-                        trending_title.text = context.getString(R.string.trending_swap,
-                            context.getString(assetResources.assetNameRes(item.sourceAccount.asset)))
-                        trending_subtitle.text = context.getString(R.string.trending_receive,
-                            context.getString(assetResources.assetNameRes(item.destinationAccount.asset)))
-                        trending_icon_type.setImageDrawable(
-                            ContextCompat.getDrawable(context, R.drawable.ic_swap_light_blue))
+                        trendingTitle.text = context.getString(
+                            R.string.trending_swap,
+                            context.getString(assetResources.assetNameRes(item.sourceAccount.asset))
+                        )
+                        trendingSubtitle.text = context.getString(
+                            R.string.trending_receive,
+                            context.getString(assetResources.assetNameRes(item.destinationAccount.asset))
+                        )
+                        trendingIconType.setImageDrawable(context.getResolvedDrawable(R.drawable.ic_swap_light_blue))
                     }
                     else -> {
                         // do nothing

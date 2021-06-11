@@ -62,8 +62,8 @@
         style="@style/CtaButton.Blue"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/create_a_wallet"
-        android:text="@string/create_a_wallet"
+        android:contentDescription="@string/landing_create_wallet"
+        android:text="@string/landing_create_wallet"
         android:layout_marginBottom="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -72,11 +72,11 @@
 
     <Button
         android:id="@+id/btn_login"
-        style="@style/CtaButton.Black"
+        style="@style/CtaButton.White"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/log_in"
-        android:text="@string/log_in"
+        android:contentDescription="@string/landing_log_in"
+        android:text="@string/landing_log_in"
         android:layout_marginBottom="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -85,34 +85,37 @@
 
     <Button
         android:id="@+id/btn_recover"
-        style="@style/CtaButton.White"
-        android:layout_width="match_parent"
+        style="@style/CtaButton.White.Borderless"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/recover_funds"
         android:text="@string/recover_funds"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginBottom="@dimen/small_margin"
+        app:layout_constraintEnd_toStartOf="@+id/text_version"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/text_version"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"/>
 
     <TextView
         android:id="@+id/text_version"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="end"
         android:text="2.14 b1"
-        android:layout_marginBottom="16dp"
         android:layout_marginEnd="@dimen/standard_margin"
         android:layout_marginStart="@dimen/standard_margin"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btn_recover"
+        app:layout_constraintTop_toTopOf="@+id/btn_recover"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_recover"/>
+
+    <FrameLayout
+        android:id="@+id/content_frame"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-
-
-

@@ -10,6 +10,7 @@ import com.blockchain.nabu.models.responses.nabu.NabuUser
 import com.blockchain.nabu.models.responses.nabu.TierLevels
 import com.blockchain.nabu.models.responses.nabu.UserState
 import com.blockchain.nabu.service.TierUpdater
+import com.blockchain.notifications.analytics.Analytics
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.verify
@@ -36,6 +37,7 @@ class KycNavHostPresenterTest {
     private val sunriverCampaign: SunriverCampaignRegistration = mock()
     private val nabuDataManager: NabuDataManager = mock()
     private val nabuToken: NabuToken = mock()
+    private val analytics: Analytics = mock()
     private val reentryDecision: ReentryDecision = mock()
     private val tierUpdater: TierUpdater = mock()
 
@@ -53,7 +55,7 @@ class KycNavHostPresenterTest {
             nabuDataManager,
             sunriverCampaign,
             reentryDecision,
-            ReentryDecisionKycNavigator(nabuToken, nabuDataManager, reentryDecision),
+            ReentryDecisionKycNavigator(nabuToken, nabuDataManager, reentryDecision, analytics),
             tierUpdater
         )
         subject.initView(view)

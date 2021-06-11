@@ -141,6 +141,11 @@ class Coincore internal constructor(
                     it !is FiatAccount
                 }
             }
+            AssetAction.InterestWithdraw -> {
+                {
+                    it is CryptoAccount && it.asset == sourceAccount.asset
+                }
+            }
             else -> {
                 { true }
             }

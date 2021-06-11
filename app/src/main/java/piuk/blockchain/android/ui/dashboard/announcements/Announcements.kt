@@ -27,7 +27,6 @@ interface AnnouncementHost {
     fun startSetup2Fa()
     fun startVerifyEmail()
     fun startEnableFingerprintLogin()
-    fun startIntroTourGuide()
     fun startTransferCrypto()
 
     fun startStxReceivedDetail()
@@ -36,6 +35,7 @@ interface AnnouncementHost {
     fun startInterestDashboard()
     fun startBuy()
     fun startSell()
+    fun startSend()
 
     fun showFiatFundsKyc()
     fun showBankLinking()

@@ -15,26 +15,33 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.blockchain.koin.scopedInject
+import com.blockchain.nabu.models.responses.nabu.SupportedDocuments
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.KYCAnalyticsEvents
 import com.blockchain.notifications.analytics.logEvent
-import com.blockchain.nabu.models.responses.nabu.SupportedDocuments
 import com.blockchain.ui.extensions.throttledClicks
 import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_GOLD_UNAVAILABLE_SUPPORT
 import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_KYC_SUPPORTED_COUNTRIES_LIST
 import com.blockchain.veriff.VeriffApplicantAndToken
 import com.blockchain.veriff.VeriffLauncher
 import io.reactivex.Observable
-import kotlinx.android.synthetic.main.fragment_kyc_veriff_splash.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.databinding.FragmentKycVeriffSplashBinding
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
+import piuk.blockchain.android.ui.customviews.toast
+import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.goneIf
+import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.base.UiState
@@ -42,18 +49,14 @@ import piuk.blockchain.androidcoreui.ui.base.UiState.CONTENT
 import piuk.blockchain.androidcoreui.ui.base.UiState.EMPTY
 import piuk.blockchain.androidcoreui.ui.base.UiState.FAILURE
 import piuk.blockchain.androidcoreui.ui.base.UiState.LOADING
-import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.ui.customviews.toast
-import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
-import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.goneIf
-import piuk.blockchain.android.util.inflate
-import piuk.blockchain.android.util.visible
-import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 
 class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresenter>(),
     VeriffSplashView, DialogFlow.FlowHost {
+
+    private var _binding: FragmentKycVeriffSplashBinding? = null
+    private val binding: FragmentKycVeriffSplashBinding
+        get() = _binding!!
 
     private val presenter: VeriffSplashPresenter by scopedInject()
     private val stringUtils: StringUtils by inject()
@@ -66,16 +69,19 @@ class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresente
     private var progressDialog: MaterialProgressDialog? = null
 
     override val nextClick: Observable<Unit>
-        get() = btn_next.throttledClicks()
+        get() = binding.btnNext.throttledClicks()
 
     override val swapClick: Observable<Unit>
-        get() = btn_goto_swap.throttledClicks()
+        get() = binding.btnGotoSwap.throttledClicks()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_kyc_veriff_splash)
+    ): View {
+        _binding = FragmentKycVeriffSplashBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -84,6 +90,11 @@ class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresente
         checkCameraPermissions()
         setupTextLinks()
         onViewReady()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setupTextLinks() {
@@ -100,17 +111,19 @@ class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresente
             requireActivity()
         )
 
-        text_supported_countries.text = countriesText
-        text_supported_countries.movementMethod = LinkMovementMethod.getInstance()
+        with(binding) {
+            textSupportedCountries.text = countriesText
+            textSupportedCountries.movementMethod = LinkMovementMethod.getInstance()
 
-        // On the error view:
-        val supportText = stringUtils.getStringWithMappedAnnotations(
-            R.string.kyc_gold_unavailable_text_support,
-            linksMap,
-            requireActivity()
-        )
-        text_action.text = supportText
-        text_action.movementMethod = LinkMovementMethod.getInstance()
+            // On the error view:
+            val supportText = stringUtils.getStringWithMappedAnnotations(
+                R.string.kyc_gold_unavailable_text_support,
+                linksMap,
+                requireActivity()
+            )
+            textAction.text = supportText
+            textAction.movementMethod = LinkMovementMethod.getInstance()
+        }
     }
 
     private fun checkCameraPermissions() {
@@ -118,8 +131,10 @@ class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresente
             requireActivity(),
             Manifest.permission.CAMERA
         ) == PackageManager.PERMISSION_GRANTED
-        text_view_veriff_splash_enable_camera_title.goneIf(granted)
-        text_view_veriff_splash_enable_camera_body.goneIf(granted)
+        with(binding) {
+            textViewVeriffSplashEnableCameraTitle.goneIf(granted)
+            textViewVeriffSplashEnableCameraBody.goneIf(granted)
+        }
     }
 
     override fun showProgressDialog(cancelable: Boolean) {
@@ -205,27 +220,33 @@ class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresente
 
     private fun showLoadingState() {
         showProgressDialog(cancelable = false)
-        error_layout.gone()
-        content_view.gone()
-        loading_view.visible()
+        with(binding) {
+            errorLayout.gone()
+            contentView.gone()
+            loadingView.visible()
+        }
     }
 
     private fun showContentState() {
         dismissProgressDialog()
         progressListener.setHostTitle(R.string.kyc_veriff_splash_title)
-        error_layout.gone()
-        content_view.visible()
-        loading_view.gone()
+        with(binding) {
+            errorLayout.gone()
+            contentView.visible()
+            loadingView.gone()
+        }
     }
 
     private fun showErrorState() {
         dismissProgressDialog()
         progressListener.setHostTitle(R.string.kyc_veriff_splash_error_silver)
-        error_layout.visible()
-        content_view.gone()
-        loading_view.gone()
-        btn_goto_swap.visibleIf {
-            progressListener.campaignType != CampaignType.SimpleBuy
+        with(binding) {
+            errorLayout.visible()
+            contentView.gone()
+            loadingView.gone()
+            btnGotoSwap.visibleIf {
+                progressListener.campaignType != CampaignType.SimpleBuy
+            }
         }
     }
 

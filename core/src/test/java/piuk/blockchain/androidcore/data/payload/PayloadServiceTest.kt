@@ -5,7 +5,6 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.wallet.exceptions.ApiException
 import info.blockchain.wallet.payload.PayloadManager
 import info.blockchain.wallet.payload.data.Account
 import info.blockchain.wallet.payload.data.ImportedAddress
@@ -16,6 +15,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import com.blockchain.android.testutils.rxInit
+import info.blockchain.api.ApiException
 import info.blockchain.wallet.keys.SigningKey
 import info.blockchain.wallet.payload.data.XPub
 import info.blockchain.wallet.payload.data.XPubs
@@ -41,7 +41,11 @@ class PayloadServiceTest {
 
     @Before
     fun setUp() {
-        subject = PayloadService(mockPayloadManager, versionController)
+        subject = PayloadService(
+            payloadManager = mockPayloadManager,
+            versionController = versionController,
+            crashLogger = mock()
+        )
     }
 
     @Test

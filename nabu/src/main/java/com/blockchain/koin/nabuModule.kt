@@ -24,18 +24,27 @@ import com.blockchain.nabu.datamanagers.TransactionErrorMapper
 import com.blockchain.nabu.datamanagers.UniqueAnalyticsNabuUserReporter
 import com.blockchain.nabu.datamanagers.UniqueAnalyticsWalletReporter
 import com.blockchain.nabu.datamanagers.WalletReporter
+import com.blockchain.nabu.datamanagers.analytics.AnalyticsContextProvider
+import com.blockchain.nabu.datamanagers.analytics.AnalyticsContextProviderImpl
+import com.blockchain.nabu.datamanagers.analytics.AnalyticsFileLocalPersistence
+import com.blockchain.nabu.datamanagers.analytics.AnalyticsLocalPersistence
 import com.blockchain.nabu.datamanagers.analytics.NabuAnalytics
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.LiveCustodialWalletManager
 import com.blockchain.nabu.datamanagers.featureflags.BankLinkingEnabledProvider
 import com.blockchain.nabu.datamanagers.featureflags.BankLinkingEnabledProviderImpl
 import com.blockchain.nabu.datamanagers.featureflags.FeatureEligibility
 import com.blockchain.nabu.datamanagers.featureflags.KycFeatureEligibility
-import com.blockchain.nabu.datamanagers.repositories.AssetBalancesRepository
+import com.blockchain.nabu.datamanagers.repositories.CustodialAssetWalletsBalancesRepository
 import com.blockchain.nabu.datamanagers.repositories.NabuUserRepository
 import com.blockchain.nabu.datamanagers.repositories.QuotesProvider
+import com.blockchain.nabu.datamanagers.repositories.RecurringBuyEligibilityProvider
+import com.blockchain.nabu.datamanagers.repositories.RecurringBuyEligibilityProviderImpl
+import com.blockchain.nabu.datamanagers.repositories.RecurringBuyRepository
 import com.blockchain.nabu.datamanagers.repositories.WithdrawLocksRepository
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestAvailabilityProvider
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestAvailabilityProviderImpl
+import com.blockchain.nabu.datamanagers.repositories.interest.InterestBalancesProvider
+import com.blockchain.nabu.datamanagers.repositories.interest.InterestBalancesProviderImpl
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestEligibilityProvider
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestEligibilityProviderImpl
 import com.blockchain.nabu.datamanagers.repositories.interest.InterestLimitsProvider
@@ -64,8 +73,10 @@ import com.blockchain.nabu.service.TierUpdater
 import com.blockchain.nabu.status.KycTiersQueries
 import com.blockchain.nabu.stores.NabuSessionTokenStore
 import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.operations.AppStartUpFlushable
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import piuk.blockchain.androidcore.utils.PersistentPrefs
 import retrofit2.Retrofit
 
 val nabuModule = module {
@@ -106,12 +117,14 @@ val nabuModule = module {
                 achDepositWithdrawFeatureFlag = get(achDepositWithdrawFeatureFlag),
                 sddFeatureFlag = get(sddFeatureFlag),
                 kycFeatureEligibility = get(),
-                assetBalancesRepository = get(),
+                custodialAssetWalletsBalancesRepository = get(),
                 interestRepository = get(),
                 custodialRepository = get(),
                 bankLinkingEnabledProvider = get(),
                 transactionErrorMapper = get(),
-                currencyPrefs = get()
+                currencyPrefs = get(),
+                recurringBuysRepository = get(),
+                features = get()
             )
         }.bind(CustodialWalletManager::class)
 
@@ -157,6 +170,13 @@ val nabuModule = module {
         }.bind(InterestEligibilityProvider::class)
 
         factory {
+            InterestBalancesProviderImpl(
+                nabuService = get(),
+                authenticator = get()
+            )
+        }.bind(InterestBalancesProvider::class)
+
+        factory {
             BalanceProviderImpl(
                 nabuService = get(),
                 authenticator = get()
@@ -178,6 +198,14 @@ val nabuModule = module {
                 exchangeRates = get()
             )
         }.bind(SwapActivityProvider::class)
+
+        factory {
+            RecurringBuyEligibilityProviderImpl(
+                nabuService = get(),
+                authenticator = get(),
+                features = get()
+            )
+        }.bind(RecurringBuyEligibilityProvider::class)
 
         factory(uniqueUserAnalytics) {
             UniqueAnalyticsNabuUserReporter(
@@ -229,7 +257,7 @@ val nabuModule = module {
         }
 
         scoped {
-            AssetBalancesRepository(balancesProvider = get())
+            CustodialAssetWalletsBalancesRepository(balancesProvider = get())
         }
 
         scoped {
@@ -243,12 +271,17 @@ val nabuModule = module {
             InterestRepository(
                 interestAvailabilityProvider = get(),
                 interestEligibilityProvider = get(),
-                interestLimitsProvider = get()
+                interestLimitsProvider = get(),
+                interestAccountBalancesProvider = get()
             )
         }
 
         scoped {
             WithdrawLocksRepository(custodialWalletManager = get())
+        }
+
+        scoped {
+            RecurringBuyRepository(recurringBuyEligibilityProvider = get())
         }
 
         factory {
@@ -293,8 +326,27 @@ val nabuModule = module {
     }
 
     single(nabu) {
-        NabuAnalytics(analyticsService = get(), prefs = lazy { get() })
-    }.bind(Analytics::class)
+        NabuAnalytics(
+            analyticsService = get(),
+            prefs = lazy { get<PersistentPrefs>() },
+            analyticsContextProvider = get(),
+            localAnalyticsPersistence = get(),
+            crashLogger = get(),
+            tokenStore = get()
+        )
+    }
+        .bind(AppStartUpFlushable::class)
+        .bind(Analytics::class)
+
+    factory {
+        AnalyticsContextProviderImpl()
+    }.bind(AnalyticsContextProvider::class)
+
+    single {
+        AnalyticsFileLocalPersistence(
+            context = get()
+        )
+    }.bind(AnalyticsLocalPersistence::class)
 }
 
 val authenticationModule = module {

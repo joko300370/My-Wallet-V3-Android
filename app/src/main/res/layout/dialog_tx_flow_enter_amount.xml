@@ -2,7 +2,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true">
@@ -46,14 +45,16 @@
         android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintVertical_bias="0"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/amount_sheet_title">
+        app:layout_constraintTop_toBottomOf="@+id/amount_sheet_title"
+        app:layout_constraintVertical_bias="0">
+
         <LinearLayout
             android:id="@+id/scroll_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+
             <FrameLayout
                 android:id="@+id/frame_upper_slot"
                 android:layout_width="match_parent"
@@ -68,9 +69,9 @@
                 android:id="@+id/amount_sheet_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="32dp"
                 android:layout_marginTop="@dimen/standard_margin"
-                android:layout_marginBottom="@dimen/tiny_margin" />
+                android:layout_marginBottom="@dimen/tiny_margin"
+                android:minHeight="32dp" />
 
             <FrameLayout
                 android:id="@+id/frame_lower_slot"
@@ -82,8 +83,9 @@
                 style="@style/CtaButton.Blue"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="32dp"
+                android:layout_marginBottom="@dimen/medium_margin"
                 android:contentDescription="@string/next"
+                android:minHeight="32dp"
                 android:text="@string/next" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

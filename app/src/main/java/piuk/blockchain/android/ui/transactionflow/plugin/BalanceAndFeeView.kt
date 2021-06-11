@@ -14,10 +14,11 @@ import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
+import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.databinding.ViewTxFlowFeeAndBalanceBinding
+import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
-import piuk.blockchain.android.ui.transactionflow.engine.DisplayMode
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
@@ -31,8 +32,7 @@ class BalanceAndFeeView @JvmOverloads constructor(
     ctx: Context,
     attr: AttributeSet? = null,
     defStyle: Int = 0
-) : ConstraintLayout(ctx, attr, defStyle),
-    ExpandableTxFlowWidget {
+) : ConstraintLayout(ctx, attr, defStyle), ExpandableTxFlowWidget {
 
     private lateinit var model: TransactionModel
     private lateinit var customiser: EnterAmountCustomisations
@@ -74,6 +74,7 @@ class BalanceAndFeeView @JvmOverloads constructor(
 
         updateMaxGroup(state)
         updateBalance(state)
+
         state.pendingTx?.let {
             if (it.feeSelection.selectedLevel == FeeLevel.None) {
                 binding.feeEdit.gone()
@@ -89,40 +90,55 @@ class BalanceAndFeeView @JvmOverloads constructor(
     }
 
     private fun updateBalance(state: TransactionState) {
-        val availableBalance = state.availableBalance
-        binding.maxAvailableValue.text = makeAmountString(availableBalance, state)
-        binding.feeForFullAvailableLabel.text = customiser.enterAmountMaxNetworkFeeLabel(state)
+        with(binding) {
+            val availableBalance = state.availableBalance
+            maxAvailableValue.text = makeAmountString(availableBalance, state)
+            feeForFullAvailableLabel.text = customiser.enterAmountMaxNetworkFeeLabel(state)
 
-        state.pendingTx?.totalBalance?.let {
-            binding.totalAvailableValue.text = makeAmountString(it, state)
-        }
+            state.pendingTx?.totalBalance?.let {
+                totalAvailableValue.text = makeAmountString(it, state)
+            }
 
-        state.pendingTx?.feeAmount?.let {
-            binding.networkFeeValue.text = makeAmountString(it, state)
-        }
-        state.pendingTx?.feeForFullAvailable?.let {
-            binding.feeForFullAvailableValue.text = makeAmountString(it, state)
+            if (customiser.shouldNotDisplayNetworkFee(state)) {
+                networkFeeValue.text = context.getString(R.string.fee_calculated_at_checkout)
+                feeForFullAvailableValue.text = context.getString(R.string.fee_calculated_at_checkout)
+            } else {
+                state.pendingTx?.feeAmount?.let {
+                    networkFeeValue.text = makeAmountString(it, state)
+                }
+
+                state.pendingTx?.feeForFullAvailable?.let {
+                    feeForFullAvailableValue.text = makeAmountString(it, state)
+                }
+            }
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun makeAmountString(value: Money, state: TransactionState): String {
-        if (value.isPositive || value.isZero) {
-            state.fiatRate?.let { rate ->
-                return when (state.displayMode) {
-                    DisplayMode.Fiat -> {
-                        // This applies to case that fees are in different currency than the source account currency (ERC-20 token)
-                        // in this case we will show the fee in the default currency without make any conversions
-                        if (rate.canConvert(value))
-                            rate.convert(value).toStringWithSymbol()
-                        else value.toStringWithSymbol()
-                    }
-                    DisplayMode.Crypto -> value.toStringWithSymbol()
-                }
-            }
+    private fun makeAmountString(value: Money, state: TransactionState): String =
+        if ((value.isPositive || value.isZero) && state.fiatRate != null) {
+            showFiatOrCryptoValues(
+                currencyType = state.currencyType ?: (state.pendingTx?.selectedFiat?.let {
+                    val defaultMode = customiser.defInputType(state, it)
+                    model.process(TransactionIntent.DisplayModeChanged(defaultMode))
+                    defaultMode
+                } ?: CurrencyType.Crypto(state.sendingAsset)),
+                state.fiatRate,
+                value
+            )
+        } else {
+            "--"
         }
-        return "--"
-    }
+
+    private fun showFiatOrCryptoValues(currencyType: CurrencyType, rate: ExchangeRate, value: Money) =
+        when (currencyType) {
+            is CurrencyType.Fiat -> {
+                if (rate.canConvert(value))
+                    rate.convert(value).toStringWithSymbol()
+                else value.toStringWithSymbol()
+            }
+            is CurrencyType.Crypto -> value.toStringWithSymbol()
+        }
 
     private fun updateMaxGroup(state: TransactionState) =
         with(binding) {

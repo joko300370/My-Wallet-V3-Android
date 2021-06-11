@@ -8,9 +8,9 @@ import androidx.fragment.app.Fragment
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
-import kotlinx.android.synthetic.main.toolbar_general.*
 import org.koin.android.ext.android.get
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.ActivityBackupWalletBinding
 import piuk.blockchain.android.ui.backup.completed.BackupWalletCompletedFragment
 import piuk.blockchain.android.ui.backup.start.BackupWalletStartingFragment
 import piuk.blockchain.android.ui.base.BlockchainActivity
@@ -24,12 +24,16 @@ class BackupWalletActivity : BlockchainActivity() {
     override val alwaysDisableScreenshots: Boolean
         get() = true
 
+    private val binding: ActivityBackupWalletBinding by lazy {
+        ActivityBackupWalletBinding.inflate(layoutInflater)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_backup_wallet)
+        setContentView(binding.root)
         get<Analytics>().logEvent(AnalyticsEvents.Backup)
 
-        setupToolbar(toolbar_general, R.string.backup_wallet_title)
+        setupToolbar(binding.toolbarGeneral.toolbarGeneral, R.string.backup_wallet_title)
 
         if (isBackedUp()) {
             startFragment(

@@ -5,7 +5,9 @@ import android.content.Intent
 import android.net.Uri
 import android.net.http.SslError
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.SslErrorHandler
 import android.webkit.WebSettings
@@ -15,12 +17,12 @@ import androidx.fragment.app.Fragment
 import com.blockchain.nabu.models.data.YodleeAttributes
 import com.blockchain.notifications.analytics.Analytics
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.fragment_yodlee_webview.*
 import org.json.JSONException
 import org.json.JSONObject
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.FragmentYodleeWebviewBinding
 import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import piuk.blockchain.android.simplebuy.yodlee.FastLinkMessage
 import piuk.blockchain.android.simplebuy.yodlee.MessageData
@@ -33,8 +35,12 @@ import piuk.blockchain.android.util.visibleIf
 import timber.log.Timber
 import java.net.URLEncoder
 
-class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLinkInterfaceHandler.FastLinkListener,
+class YodleeWebViewFragment : Fragment(), FastLinkInterfaceHandler.FastLinkListener,
     YodleeWebClient.YodleeWebClientInterface {
+
+    private var _binding: FragmentYodleeWebviewBinding? = null
+    private val binding: FragmentYodleeWebviewBinding
+        get() = _binding!!
 
     private val analytics: Analytics by inject()
     private var isViewLoaded: Boolean = false
@@ -61,19 +67,29 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
             .build().query ?: ""
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentYodleeWebviewBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity?.setupToolbar(R.string.link_a_bank)
 
         setupWebView()
-        yodlee_retry.setOnClickListener {
+        binding.yodleeRetry.setOnClickListener {
             loadYodlee()
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
     private fun setupWebView() {
-        val settings: WebSettings = yodlee_webview.settings
+        val settings: WebSettings = binding.yodleeWebview.settings
         settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
@@ -84,8 +100,10 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
         }
 
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
-        yodlee_webview.webViewClient = YodleeWebClient(this)
-        yodlee_webview.addJavascriptInterface(FastLinkInterfaceHandler(this), "YWebViewHandler")
+        with(binding.yodleeWebview) {
+            webViewClient = YodleeWebClient(this@YodleeWebViewFragment)
+            addJavascriptInterface(FastLinkInterfaceHandler(this@YodleeWebViewFragment), "YWebViewHandler")
+        }
     }
 
     override fun onResume() {
@@ -100,12 +118,14 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
     private fun loadYodlee() {
         requireActivity().runOnUiThread {
             updateViewsVisibility(true)
-            yodlee_webview.clearCache(true)
-            yodlee_status_label.text = getString(R.string.yodlee_connection_title)
-            yodlee_subtitle.text = getString(R.string.yodlee_connection_subtitle)
-            yodlee_webview.gone()
-            yodlee_retry.gone()
-            yodlee_webview.postUrl(attributes.fastlinkUrl, yodleeQuery.toByteArray())
+            with(binding) {
+                yodleeWebview.clearCache(true)
+                yodleeStatusLabel.text = getString(R.string.yodlee_connection_title)
+                yodleeSubtitle.text = getString(R.string.yodlee_connection_subtitle)
+                yodleeWebview.gone()
+                yodleeRetry.gone()
+                yodleeWebview.postUrl(attributes.fastlinkUrl, yodleeQuery.toByteArray())
+            }
         }
         isViewLoaded = true
     }
@@ -124,19 +144,21 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
     }
 
     private fun showError(errorText: String, reason: String?) {
-        yodlee_webview.gone()
-        yodlee_icon.gone()
-        yodlee_progress.gone()
-        yodlee_status_label.text = errorText
-        yodlee_status_label.visible()
+        with(binding) {
+            yodleeWebview.gone()
+            yodleeIcon.gone()
+            yodleeProgress.gone()
+            yodleeStatusLabel.text = errorText
+            yodleeStatusLabel.visible()
 
-        yodlee_retry.visible()
-        yodlee_retry.setOnClickListener { loadYodlee() }
-        reason?.let {
-            yodlee_subtitle.visible()
-            yodlee_subtitle.text = it
-        } ?: kotlin.run {
-            yodlee_subtitle.gone()
+            yodleeRetry.visible()
+            yodleeRetry.setOnClickListener { loadYodlee() }
+            reason?.let {
+                yodleeSubtitle.visible()
+                yodleeSubtitle.text = it
+            } ?: kotlin.run {
+                yodleeSubtitle.gone()
+            }
         }
     }
 
@@ -146,15 +168,17 @@ class YodleeWebViewFragment : Fragment(R.layout.fragment_yodlee_webview), FastLi
     }
 
     override fun pageFinishedLoading() {
-        yodlee_webview.visible()
+        binding.yodleeWebview.visible()
         updateViewsVisibility(false)
     }
 
     private fun updateViewsVisibility(visible: Boolean) {
-        yodlee_progress.visibleIf { visible }
-        yodlee_status_label.visibleIf { visible }
-        yodlee_subtitle.visibleIf { visible }
-        yodlee_icon.visibleIf { visible }
+        with(binding) {
+            yodleeProgress.visibleIf { visible }
+            yodleeStatusLabel.visibleIf { visible }
+            yodleeSubtitle.visibleIf { visible }
+            yodleeIcon.visibleIf { visible }
+        }
     }
 
     private fun navigator(): BankAuthFlowNavigator =

@@ -3,15 +3,19 @@ package piuk.blockchain.android.ui.customviews
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.util.AttributeSet
+import android.view.LayoutInflater
 import android.view.animation.DecelerateInterpolator
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import info.blockchain.wallet.util.PasswordUtil
-import kotlinx.android.synthetic.main.view_password_strength.view.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.ViewPasswordStrengthBinding
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
 import kotlin.math.roundToInt
 
 class PasswordStrengthView(context: Context, attrs: AttributeSet) : ConstraintLayout(context, attrs) {
+    private val binding: ViewPasswordStrengthBinding =
+        ViewPasswordStrengthBinding.inflate(LayoutInflater.from(context), this, true)
 
     private val strengthVerdicts = intArrayOf(
         R.string.strength_weak,
@@ -35,8 +39,7 @@ class PasswordStrengthView(context: Context, attrs: AttributeSet) : ConstraintLa
     )
 
     init {
-        inflate(context, R.layout.view_password_strength, this)
-        pass_strength_bar.max = 100
+        binding.passStrengthBar.max = 100
     }
 
     // TODO make other methods private and only expose the update method - unify how we define password strengths
@@ -53,25 +56,26 @@ class PasswordStrengthView(context: Context, attrs: AttributeSet) : ConstraintLa
     }
 
     fun setStrengthProgress(score: Int) {
-        ObjectAnimator.ofInt(
-            pass_strength_bar,
-            "progress",
-            pass_strength_bar.progress,
-            score * 10
-        ).apply {
-            duration = 300
-            interpolator = DecelerateInterpolator()
-            start()
+        with(binding.passStrengthBar) {
+            ObjectAnimator.ofInt(
+                this,
+                "progress",
+                this.progress,
+                score * 10
+            ).apply {
+                duration = 300
+                interpolator = DecelerateInterpolator()
+                start()
+            }
         }
     }
 
     fun updateLevelUI(level: Int) {
-        pass_strength_verdict.setText(strengthVerdicts[level])
-        pass_strength_bar.progressDrawable =
-            ContextCompat.getDrawable(context, strengthProgressDrawables[level])
-        pass_strength_verdict.setText(strengthVerdicts[level])
-        pass_strength_verdict.setTextColor(
-            ContextCompat.getColor(context, strengthColors[level])
-        )
+        with(binding) {
+            passStrengthVerdict.setText(strengthVerdicts[level])
+            passStrengthBar.progressDrawable = context.getResolvedDrawable(strengthProgressDrawables[level])
+            passStrengthVerdict.setText(strengthVerdicts[level])
+            passStrengthVerdict.setTextColor(context.getResolvedColor(strengthColors[level]))
+        }
     }
 }

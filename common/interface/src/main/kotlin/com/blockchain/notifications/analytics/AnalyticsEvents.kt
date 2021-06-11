@@ -88,3 +88,61 @@ fun apiError(host: String, path: String, body: String?, requestId: String?, erro
                 "request_id" to requestId
             ).mapNotNull { it.value?.let { value -> it.key to value } }.toMap()
     }
+
+enum class AnalyticsNames(val eventName: String) {
+    BUY_AMOUNT_ENTERED("Buy Amount Entered"),
+    BUY_PAYMENT_METHOD_CHANGED("Buy Payment Method Selected"),
+    BUY_SELL_CLICKED("Buy Sell Clicked"),
+    BUY_SELL_VIEWED("Buy Sell Viewed"),
+    SIGNED_IN("Signed In"),
+    SIGNED_OUT("Signed Out"),
+    SWAP_VIEWED("Swap Viewed"),
+    SWAP_CLICKED("Swap Clicked"),
+    SWAP_RECEIVE_SELECTED("Swap Receive Selected"),
+    SWAP_MAX_CLICKED("Swap Amount Max Clicked"),
+    SWAP_FROM_SELECTED("Swap From Selected"),
+    SWAP_ACCOUNTS_SELECTED("Swap Accounts Selected"),
+    SWAP_AMOUNT_ENTERED("Swap Amount Entered"),
+    AMOUNT_SWITCHED("Amount Switched"),
+    SWAP_REQUESTED("Swap Requested"),
+    SEND_MAX_CLICKED("Send Amount Max Clicked"),
+    SEND_RECEIVE_CLICKED("Send Receive Clicked"),
+    SEND_FROM_SELECTED("Send From Selected"),
+    SEND_SUBMITTED("Send Submitted"),
+    SEND_RECEIVE_VIEWED("Send Receive Viewed"),
+    RECEIVE_ACCOUNT_SELECTED("Receive Currency Selected"),
+    RECEIVE_ADDRESS_COPIED("Receive Details Copied"),
+    WITHDRAWAL_AMOUNT_ENTERED("Withdrawal Amount Entered"),
+    WITHDRAWAL_MAX_CLICKED("Withdrawal Amount Max Clicked"),
+    WITHDRAWAL_CLICKED("Withdrawal Clicked"),
+    WITHDRAWAL_METHOD_SELECTED("Withdrawal Method Selected"),
+    LINK_BANK_CONDITIONS_APPROVED("Link Bank Conditions Approved"),
+    LINK_BANK_CLICKED("Link Bank Clicked"),
+    BANK_SELECTED("Link Bank Selected"),
+    SELL_AMOUNT_ENTERED("Sell Amount Entered"),
+    SELL_SOURCE_SELECTED("Sell From Selected"),
+    SELL_AMOUNT_MAX_CLICKED("Sell Amount Max Clicked"),
+    DEPOSIT_CLICKED("Deposit Clicked"),
+    DEPOSIT_AMOUNT_ENTERED("Deposit Amount Entered"),
+    DEPOSIT_METHOD_SELECTED("Deposit Method Selected"),
+    EMAIL_VERIFF_REQUESTED("Email Verification Requested");
+}
+
+enum class LaunchOrigin {
+    NAVIGATION,
+    SEND,
+    SWAP,
+    AIRDROP,
+    RESUBMISSION,
+    SIMPLETRADE,
+    DASHBOARD_PROMO,
+    TRANSACTION_DETAILS,
+    DEPOSIT,
+    WITHDRAWAL,
+    CURRENCY_PAGE,
+    SAVINGS,
+    FIAT_FUNDS,
+    SIGN_UP,
+    SETTINGS,
+    VERIFICATION;
+}

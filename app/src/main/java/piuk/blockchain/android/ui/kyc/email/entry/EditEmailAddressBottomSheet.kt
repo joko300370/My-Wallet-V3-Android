@@ -62,8 +62,8 @@ class EditEmailAddressBottomSheet :
                 }
             }
             editEmailInput.addTextChangedListener(object : AfterTextChangedWatcher() {
-                override fun afterTextChanged(s: Editable?) {
-                    model.process(EmailVeriffIntent.UpdateEmailInput(s?.toString() ?: ""))
+                override fun afterTextChanged(textEntered: Editable?) {
+                    model.process(EmailVeriffIntent.UpdateEmailInput(textEntered?.toString().orEmpty()))
                 }
             })
 

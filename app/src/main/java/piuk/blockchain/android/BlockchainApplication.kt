@@ -93,7 +93,6 @@ open class BlockchainApplication : Application(), FrameworkInterface {
         BlockchainFramework.init(this)
 
         UncaughtExceptionHandler.install(appUtils)
-
         RxJavaPlugins.setErrorHandler { throwable -> Timber.tag(RX_ERROR_TAG).e(throwable) }
 
         loginState.setLogoutActivity(LogoutActivity::class.java)

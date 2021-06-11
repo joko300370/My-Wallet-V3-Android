@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.ObjectMapper
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -41,10 +40,6 @@ data class AccountV3(
 
     constructor(xPub: String) : this(legacyXpub = xPub)
 
-    override fun toJson(mapper: ObjectMapper): String {
-        return mapper.writeValueAsString(this)
-    }
-
     override fun addAddressLabel(index: Int, reserveLabel: String) {
         val addressLabel = AddressLabel()
         addressLabel.label = reserveLabel
@@ -70,11 +65,5 @@ data class AccountV3(
 
     override fun containsXpub(xpub: String): Boolean {
         return legacyXpub == xpub
-    }
-
-    companion object {
-        fun fromJson(json: String): Account {
-            return ObjectMapper().readValue(json, AccountV3::class.java)
-        }
     }
 }

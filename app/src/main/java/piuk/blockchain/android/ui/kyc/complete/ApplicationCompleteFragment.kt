@@ -6,30 +6,33 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.notifications.analytics.KYCAnalyticsEvents
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.service.TierService
+import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.notifications.analytics.KYCAnalyticsEvents
 import com.blockchain.ui.extensions.throttledClicks
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.rxkotlin.zipWith
-import kotlinx.android.synthetic.main.fragment_kyc_complete.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.databinding.FragmentKycCompleteBinding
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.ui.home.MainActivity
-import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
-import piuk.blockchain.android.ui.kyc.navigate
 import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
-import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
+import piuk.blockchain.android.ui.kyc.navigate
 import timber.log.Timber
 
 class ApplicationCompleteFragment : Fragment() {
+
+    private var _binding: FragmentKycCompleteBinding? = null
+    private val binding: FragmentKycCompleteBinding
+        get() = _binding!!
 
     private val progressListener: KycProgressListener by ParentActivityDelegate(
         this
@@ -42,7 +45,10 @@ class ApplicationCompleteFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = container?.inflate(R.layout.fragment_kyc_complete)
+    ): View {
+        _binding = FragmentKycCompleteBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -54,7 +60,7 @@ class ApplicationCompleteFragment : Fragment() {
         super.onResume()
 
         compositeDisposable +=
-            button_done
+            binding.buttonDone
                 .throttledClicks().zipWith(
                     if (progressListener.campaignType == CampaignType.Swap ||
                         progressListener.campaignType == CampaignType.None) {
@@ -85,6 +91,11 @@ class ApplicationCompleteFragment : Fragment() {
                     },
                     onError = { Timber.e(it) }
                 )
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun launchSwap() {

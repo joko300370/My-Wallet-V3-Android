@@ -10,10 +10,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.fragment_activity.*
-import kotlinx.android.synthetic.main.toolbar_general.toolbar_general
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.databinding.FragmentActivityBinding
 import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.ui.home.MainActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
@@ -57,10 +56,14 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
         intent.getSerializableExtra(CRYPTOCURRENCY_KEY) as? CryptoCurrency
     }
 
+    private val binding: FragmentActivityBinding by lazy {
+        FragmentActivityBinding.inflate(layoutInflater)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment_activity)
-        setSupportActionBar(toolbar_general)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbarGeneral.toolbarGeneral)
         if (savedInstanceState == null) {
             if (startedFromApprovalDeepLink) {
                 val currentState = bankLinkingPrefs.getBankLinkingState().fromPreferencesValue()
@@ -68,7 +71,7 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
                     currentState.copy(bankAuthFlow = BankAuthFlowState.BANK_APPROVAL_COMPLETE).toPreferencesValue()
                 )
             }
-
+            analytics.logEvent(BuySellViewedEvent(BuySellType.BUY))
             subscribeForNavigation()
         }
     }
@@ -209,9 +212,9 @@ class SimpleBuyActivity : BlockchainActivity(), SimpleBuyNavigator {
 
     override fun onSupportNavigateUp(): Boolean = consume { onBackPressed() }
 
-    override fun showLoading() = progress.visible()
+    override fun showLoading() = binding.progress.visible()
 
-    override fun hideLoading() = progress.gone()
+    override fun hideLoading() = binding.progress.gone()
 
     override fun launchBankAuthWithError(errorState: ErrorState) {
         startActivity(BankAuthActivity.newInstance(errorState, BankAuthSource.SIMPLE_BUY, this))

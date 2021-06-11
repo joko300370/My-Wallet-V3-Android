@@ -8,6 +8,7 @@ import info.blockchain.wallet.exceptions.InvalidCredentialsException
 import info.blockchain.wallet.exceptions.ServerConnectionException
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.exceptions.Exceptions
 import okhttp3.ResponseBody
 import org.spongycastle.util.encoders.Hex
@@ -66,6 +67,16 @@ class AuthDataManager(
     fun getSessionId(guid: String): Observable<String> =
         authService.getSessionId(guid)
             .applySchedulers()
+
+    /**
+     * Requests authorization for the session specified by the ID
+     *
+     * @param authToken The token required for auth from the email
+     * @param sessionId The current session ID
+     * @return A [Single] wrapping
+     */
+    fun authorizeSession(authToken: String, sessionId: String): Single<Response<ResponseBody>> =
+        authService.authorizeSession(authToken, sessionId)
 
     /**
      * Submits a user's 2FA code to the server and returns a response. This response will contain

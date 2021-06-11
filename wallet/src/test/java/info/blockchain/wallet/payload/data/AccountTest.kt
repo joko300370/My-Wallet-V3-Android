@@ -5,7 +5,6 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.bitcoinj.crypto.HDKeyDerivation
-import org.json.JSONObject
 import org.junit.Before
 import org.junit.Test
 import java.nio.charset.StandardCharsets
@@ -83,21 +82,6 @@ class AccountTest {
         )
         assertNotNull(accounts[0].addressCache)
         assertNotNull(accounts[0].addressLabels)
-    }
-
-    @Test
-    fun testToJSON() {
-        // Ensure toJson doesn't write any unintended fields
-        val uri = javaClass.classLoader.getResource("wallet_body_1.txt")?.toURI()!!
-        val body = String(Files.readAllBytes(Paths.get(uri)), StandardCharsets.UTF_8)
-        val mapper = WalletWrapper.getMapperForVersion(WalletWrapper.V3)
-        val wallet = Wallet.fromJson(body, mapper)
-        val hdWallet = wallet.walletBody
-        val accounts = hdWallet!!.accounts
-        val accountBody = accounts[0]
-        val jsonString = accountBody.toJson(mapper)
-        val jsonObject = JSONObject(jsonString)
-        assertEquals(6, jsonObject.keySet().size.toLong())
     }
 }
 

@@ -7,13 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import com.blockchain.koin.scopedInject
-import kotlinx.android.synthetic.main.fragment_backup_complete.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.FragmentBackupCompleteBinding
 import piuk.blockchain.android.ui.backup.start.BackupWalletStartingFragment
-import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.setOnClickListenerDebounced
+import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -24,30 +23,42 @@ class BackupWalletCompletedFragment :
 
     private val presenter: BackupWalletCompletedPresenter by scopedInject()
 
+    private var _binding: FragmentBackupCompleteBinding? = null
+    private val binding: FragmentBackupCompleteBinding
+        get() = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = container?.inflate(R.layout.fragment_backup_complete)
+    ): View {
+        _binding = FragmentBackupCompleteBinding.inflate(layoutInflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        button_backup_done.setOnClickListenerDebounced { onBackupDone() }
-        button_backup_again.setOnClickListenerDebounced { onBackupAgainRequested() }
+        binding.buttonBackupDone.setOnClickListenerDebounced { onBackupDone() }
+        binding.buttonBackupAgain.setOnClickListenerDebounced { onBackupAgainRequested() }
 
         onViewReady()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun showLastBackupDate(lastBackup: Long) {
         val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
         val date = dateFormat.format(Date(lastBackup * 1000))
         val message = String.format(resources.getString(R.string.backup_last), date)
-        subheading_date.text = message
+        binding.subheadingDate.text = message
     }
 
     override fun hideLastBackupDate() {
-        subheading_date.gone()
+        binding.subheadingDate.gone()
     }
 
     override fun createPresenter() = presenter

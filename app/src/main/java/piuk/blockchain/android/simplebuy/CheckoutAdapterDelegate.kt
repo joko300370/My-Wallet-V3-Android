@@ -25,13 +25,13 @@ class CheckoutAdapterDelegate : DelegationAdapter<SimpleBuyCheckoutItem>(Adapter
 }
 
 sealed class SimpleBuyCheckoutItem {
-    data class SimpleCheckoutItem(val title: String, val value: String, val isImportant: Boolean = false) :
+    data class SimpleCheckoutItem(val label: String, val title: String, val isImportant: Boolean = false) :
         SimpleBuyCheckoutItem()
 
-    data class ComplexCheckoutItem(val title: String, val detail: String, val subtitle: String) :
+    data class ComplexCheckoutItem(val label: String, val title: String, val subtitle: String) :
         SimpleBuyCheckoutItem()
 
-    data class ExpandableCheckoutItem(val title: String, val value: String, val expandableContent: CharSequence) :
+    data class ExpandableCheckoutItem(val label: String, val title: String, val expandableContent: CharSequence) :
         SimpleBuyCheckoutItem()
 }
 
@@ -61,14 +61,14 @@ private class SimpleCheckoutItemViewHolder(
     fun bind(item: SimpleBuyCheckoutItem.SimpleCheckoutItem) {
         with(binding) {
             simpleItemTitle.text = item.title
-            simpleItemLabel.text = item.value
+            simpleItemLabel.text = item.label
 
             if (item.isImportant) {
-                simpleItemTitle.setTextAppearance(R.style.Text_Semibold_16)
                 simpleItemLabel.setTextAppearance(R.style.Text_Semibold_16)
+                simpleItemTitle.setTextAppearance(R.style.Text_Semibold_16)
             } else {
-                simpleItemTitle.setTextAppearance(R.style.Text_Standard_14)
                 simpleItemLabel.setTextAppearance(R.style.Text_Standard_14)
+                simpleItemTitle.setTextAppearance(R.style.Text_Standard_14)
             }
         }
     }
@@ -99,8 +99,8 @@ private class ComplexCheckoutItemItemViewHolder(
 
     fun bind(item: SimpleBuyCheckoutItem.ComplexCheckoutItem) {
         with(binding) {
+            complexItemLabel.text = item.label
             complexItemTitle.text = item.title
-            complexItemLabel.text = item.detail
             complexItemSubtitle.text = item.subtitle
         }
     }
@@ -132,15 +132,15 @@ private class ExpandableCheckoutItemViewHolder(
     init {
         with(binding) {
             expandableItemExpansion.movementMethod = LinkMovementMethod.getInstance()
-            expandableItemTitle.setOnClickListener {
+            expandableItemLabel.setOnClickListener {
                 isExpanded = !isExpanded
                 expandableItemExpansion.visibleIf { isExpanded }
                 if (isExpanded) {
-                    expandableItemTitle.compoundDrawables[DRAWABLE_END_POSITION].setTint(
+                    expandableItemLabel.compoundDrawables[DRAWABLE_END_POSITION].setTint(
                         expandableItemTitle.context.getResolvedColor(R.color.blue_600)
                     )
                 } else {
-                    expandableItemTitle.compoundDrawables[DRAWABLE_END_POSITION].setTint(
+                    expandableItemLabel.compoundDrawables[DRAWABLE_END_POSITION].setTint(
                         expandableItemTitle.context.getResolvedColor(R.color.grey_300)
                     )
                 }
@@ -150,8 +150,8 @@ private class ExpandableCheckoutItemViewHolder(
 
     fun bind(item: SimpleBuyCheckoutItem.ExpandableCheckoutItem) {
         with(binding) {
+            expandableItemLabel.text = item.label
             expandableItemTitle.text = item.title
-            expandableItemLabel.text = item.value
             expandableItemExpansion.text = item.expandableContent
         }
     }

@@ -5,14 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import io.reactivex.Maybe
 import io.reactivex.Single
-import kotlinx.android.synthetic.main.status_line_info.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.TxSourceState
+import piuk.blockchain.android.databinding.StatusLineInfoBinding
 import piuk.blockchain.android.ui.customviews.account.CellDecorator
 
-class AssetActionsDecorator(private val account: CryptoAccount) :
-    CellDecorator {
+class AssetActionsDecorator(private val account: CryptoAccount) : CellDecorator {
     override fun view(context: Context): Maybe<View> =
         account.sourceState.flatMapMaybe {
             when (it) {
@@ -25,13 +24,9 @@ class AssetActionsDecorator(private val account: CryptoAccount) :
         }
 
     private fun viewWithText(text: String, context: Context): Maybe<View> {
-        val view = LayoutInflater.from(context).inflate(
-            R.layout.status_line_info,
-            null,
-            false
-        )
-        view.message.text = text
-        return Maybe.just(view)
+        val binding = StatusLineInfoBinding.inflate(LayoutInflater.from(context), null, false)
+        binding.message.text = text
+        return Maybe.just(binding.root)
     }
 
     override fun isEnabled(): Single<Boolean> = account.sourceState.map {

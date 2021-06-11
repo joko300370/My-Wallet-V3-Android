@@ -1,7 +1,5 @@
 package piuk.blockchain.android.coincore.impl.txEngine.sell
 
-import com.blockchain.featureflags.GatedFeature
-import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.CustodialOrder
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.Product
@@ -16,12 +14,11 @@ import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NullAddress
-import piuk.blockchain.android.coincore.NullCryptoAccount
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmationValue
-import piuk.blockchain.android.coincore.TxFee
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.txEngine.PricedQuote
@@ -33,8 +30,7 @@ import java.math.RoundingMode
 abstract class SellTxEngineBase(
     private val walletManager: CustodialWalletManager,
     kycTierService: TierService,
-    quotesEngine: TransferQuotesEngine,
-    private val internalFeatureFlagApi: InternalFeatureFlagApi
+    quotesEngine: TransferQuotesEngine
 ) : QuotedEngine(quotesEngine, kycTierService, walletManager, Product.SELL) {
 
     val target: FiatAccount
@@ -102,7 +98,7 @@ abstract class SellTxEngineBase(
         CryptoCurrency.ETHER
     } else this
 
-    private fun buildNewConfirmations(
+    private fun buildConfirmation(
         pendingTx: PendingTx,
         latestQuoteExchangeRate: ExchangeRate,
         pricedQuote: PricedQuote
@@ -110,43 +106,22 @@ abstract class SellTxEngineBase(
         pendingTx.copy(
             confirmations = listOfNotNull(
                 TxConfirmationValue.NewExchangePriceConfirmation(pricedQuote.price, sourceAsset),
-                TxConfirmationValue.NewTo(txTarget, NullCryptoAccount()),
+                TxConfirmationValue.NewTo(
+                    txTarget,
+                    AssetAction.Sell
+                ),
                 TxConfirmationValue.NewSale(
                     amount = pendingTx.amount,
                     exchange = latestQuoteExchangeRate.convert(pendingTx.amount)
                 ),
                 buildNewFee(pendingTx.feeAmount, latestQuoteExchangeRate.convert(pendingTx.feeAmount)),
                 TxConfirmationValue.NewTotal(
-                    totalWithoutFee = (pendingTx.amount as CryptoValue).minus(
+                    totalWithFee = (pendingTx.amount as CryptoValue).plus(
                         pendingTx.feeAmount as CryptoValue
                     ),
                     exchange = latestQuoteExchangeRate.convert(
-                        pendingTx.amount.minus(pendingTx.feeAmount)
+                        pendingTx.amount.plus(pendingTx.feeAmount)
                     )
-                )
-            )
-        )
-
-    private fun buildOldConfirmations(
-        pendingTx: PendingTx,
-        latestQuoteExchangeRate: ExchangeRate,
-        pricedQuote: PricedQuote
-    ): PendingTx =
-        pendingTx.copy(
-            confirmations = listOf(
-                TxConfirmationValue.ExchangePriceConfirmation(pricedQuote.price, sourceAsset),
-                TxConfirmationValue.From(sourceAccount.label),
-                TxConfirmationValue.To(txTarget.label),
-                TxConfirmationValue.NetworkFee(
-                    txFee = TxFee(
-                        fee = pendingTx.feeAmount,
-                        type = TxFee.FeeType.DEPOSIT_FEE,
-                        asset = sourceAsset.disambiguateERC20()
-                    )
-                ),
-                TxConfirmationValue.Total(
-                    total = pendingTx.amount,
-                    exchange = latestQuoteExchangeRate.convert(pendingTx.amount)
                 )
             )
         )
@@ -160,12 +135,29 @@ abstract class SellTxEngineBase(
                     to = userFiat,
                     _rate = pricedQuote.price.toBigDecimal()
                 )
-                if (internalFeatureFlagApi.isFeatureEnabled(GatedFeature.CHECKOUT)) {
-                    buildNewConfirmations(pendingTx, latestQuoteExchangeRate, pricedQuote)
-                } else {
-                    buildOldConfirmations(pendingTx, latestQuoteExchangeRate, pricedQuote)
-                }
+                buildConfirmation(pendingTx, latestQuoteExchangeRate, pricedQuote)
             }
+
+    private fun addOrRefreshConfirmations(
+        pendingTx: PendingTx,
+        pricedQuote: PricedQuote,
+        latestQuoteExchangeRate: ExchangeRate
+    ): PendingTx =
+        pendingTx.apply {
+            addOrReplaceOption(
+                TxConfirmationValue.NewExchangePriceConfirmation(pricedQuote.price, sourceAsset)
+            )
+            addOrReplaceOption(
+                TxConfirmationValue.NewTotal(
+                    totalWithFee = (pendingTx.amount as CryptoValue).plus(
+                        pendingTx.feeAmount as CryptoValue
+                    ),
+                    exchange = latestQuoteExchangeRate.convert(
+                        pendingTx.amount.plus(pendingTx.feeAmount)
+                    )
+                )
+            )
+        }
 
     override fun doRefreshConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         quotesEngine.pricedQuote
@@ -176,20 +168,7 @@ abstract class SellTxEngineBase(
                     to = userFiat,
                     _rate = pricedQuote.price.toBigDecimal()
                 )
-                pendingTx.apply {
-                    addOrReplaceOption(
-                        TxConfirmationValue.ExchangePriceConfirmation(
-                            pricedQuote.price,
-                            sourceAsset
-                        )
-                    )
-                    addOrReplaceOption(
-                        TxConfirmationValue.Total(
-                            total = pendingTx.amount,
-                            exchange = latestQuoteExchangeRate.convert(pendingTx.amount)
-                        )
-                    )
-                }
+                    addOrRefreshConfirmations(pendingTx, pricedQuote, latestQuoteExchangeRate)
             }
 
     protected fun createSellOrder(pendingTx: PendingTx): Single<CustodialOrder> =

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.ObjectMapper
 import info.blockchain.wallet.bip44.HDAccount
 import java.lang.IllegalStateException
 
@@ -67,8 +66,6 @@ data class AccountV4(
             derivation?.addressLabels?.add(addressLabel)
         }
     }
-
-    override fun toJson(mapper: ObjectMapper): String = mapper.writeValueAsString(this)
 
     override fun upgradeToV4() = this
 

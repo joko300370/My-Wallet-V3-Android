@@ -11,6 +11,8 @@ import com.blockchain.nabu.datamanagers.UndefinedPaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
+import com.blockchain.nabu.models.data.RecurringBuyFrequency
+import com.blockchain.nabu.models.data.RecurringBuyState
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
@@ -118,8 +120,15 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
             when {
                 preselectedId != null -> availablePaymentMethods.firstOrNull { it.id == preselectedId }?.id
                 oldStateId != null -> availablePaymentMethods.firstOrNull { it.id == oldStateId }?.id
-                else -> availablePaymentMethods.firstOrNull { it.isEligible }?.id
-                    ?: availablePaymentMethods.firstIfSizeOne()
+                else -> {
+                    // we skip undefined funds cause this payment method should trigger a bottom sheet
+                    // and it should always be actioned before
+                    val paymentMethodsThatCanBePreselected =
+                        availablePaymentMethods.filter { it !is PaymentMethod.UndefinedFunds }
+                    paymentMethodsThatCanBePreselected.firstOrNull { it.isEligible && it.canUsedForPaying() }?.id
+                        ?: paymentMethodsThatCanBePreselected.firstOrNull { it.isEligible }?.id
+                        ?: paymentMethodsThatCanBePreselected.firstIfSizeOne()
+                }
             }
 
         private fun List<PaymentMethod>.firstIfSizeOne(): String? =
@@ -330,7 +339,8 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
 
     class OrderCreated(
         private val buyOrder: BuySellOrder,
-        private val showInAppRating: Boolean = false
+        private val showInAppRating: Boolean = false,
+        private val recurringBuyState: RecurringBuyState = RecurringBuyState.UNINITIALISED
     ) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(
@@ -342,7 +352,8 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
                 orderExchangePrice = buyOrder.price,
                 paymentSucceeded = buyOrder.state == OrderState.FINISHED,
                 isLoading = false,
-                showRating = showInAppRating
+                showRating = showInAppRating,
+                recurringBuyState = recurringBuyState
             )
     }
 
@@ -434,5 +445,15 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     object AddNewPaymentMethodHandled : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             oldState.copy(newPaymentMethodToBeAdded = null)
+    }
+
+    class RecurringBuyIntervalUpdated(private val recurringBuyFrequency: RecurringBuyFrequency) : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
+            oldState.copy(recurringBuyFrequency = recurringBuyFrequency)
+    }
+
+    class RecurringBuyEligibilityUpdated(private val eligibleMethods: List<PaymentMethodType>) : SimpleBuyIntent() {
+        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
+            oldState.copy(recurringBuyEligiblePaymentMethods = eligibleMethods)
     }
 }

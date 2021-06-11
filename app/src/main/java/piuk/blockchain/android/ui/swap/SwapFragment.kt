@@ -44,6 +44,7 @@ import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.ui.transactionflow.analytics.SwapAnalyticsEvents
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalyticsAccountType
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
@@ -101,7 +102,7 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
                 DividerItemDecoration.VERTICAL
             )
         )
-
+        analytics.logEvent(SwapAnalyticsEvents.SwapViewedEvent)
         loadSwapOrKyc(showLoading = true)
     }
 
@@ -238,6 +239,15 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
                 host = this@SwapFragment
             )
         }
+        analytics.logEvent(
+            SwapAnalyticsEvents.SwapAccountsSelected(
+                inputCurrency = pair.sourceAccount.asset.networkTicker,
+                outputCurrency = pair.destinationAccount.asset.networkTicker,
+                sourceAccountType = TxFlowAnalyticsAccountType.fromAccount(pair.sourceAccount),
+                targetAccountType = TxFlowAnalyticsAccountType.fromAccount(pair.destinationAccount),
+                werePreselected = true
+            )
+        )
     }
 
     private fun initKycView() {

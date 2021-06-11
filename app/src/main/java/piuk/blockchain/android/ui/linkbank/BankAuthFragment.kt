@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import com.blockchain.extensions.exhaustive
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.models.data.BankPartner
@@ -32,14 +33,10 @@ import piuk.blockchain.android.util.visible
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
 
-class BankAuthFragment : MviFragment<BankAuthModel, BankAuthIntent, BankAuthState>() {
+class BankAuthFragment : MviFragment<BankAuthModel, BankAuthIntent, BankAuthState, FragmentLinkABankBinding>() {
 
     override val model: BankAuthModel by scopedInject()
     private val stringUtils: StringUtils by inject()
-
-    private var _binding: FragmentLinkABankBinding? = null
-    private val binding: FragmentLinkABankBinding
-        get() = _binding!!
 
     private val isFromDeepLink: Boolean by lazy {
         arguments?.getBoolean(FROM_DEEP_LINK, false) ?: false
@@ -80,15 +77,6 @@ class BankAuthFragment : MviFragment<BankAuthModel, BankAuthIntent, BankAuthStat
     private var hasChosenExternalApp: Boolean = false
     private var hasExternalLinkingLaunched: Boolean = false
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentLinkABankBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity.setupToolbar(
@@ -97,6 +85,15 @@ class BankAuthFragment : MviFragment<BankAuthModel, BankAuthIntent, BankAuthStat
             } else {
                 R.string.link_a_bank
             }, false
+        )
+
+        activity.onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    navigator().bankAuthCancelled()
+                }
+            }
         )
 
         if (savedInstanceState == null) {
@@ -132,10 +129,8 @@ class BankAuthFragment : MviFragment<BankAuthModel, BankAuthIntent, BankAuthStat
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentLinkABankBinding =
+        FragmentLinkABankBinding.inflate(inflater, container, false)
 
     override fun render(newState: BankAuthState) {
         when (newState.bankLinkingProcessState) {

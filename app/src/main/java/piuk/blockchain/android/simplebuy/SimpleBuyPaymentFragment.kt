@@ -11,11 +11,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.BankPartner
 import com.blockchain.nabu.models.data.LinkedBank
+import com.blockchain.nabu.models.data.RecurringBuyState
 import com.blockchain.preferences.RatingPrefs
 import com.blockchain.ui.urllinks.URL_SUPPORT_BALANCE_LOCKED
 import com.google.android.play.core.review.ReviewInfo
@@ -31,16 +34,21 @@ import piuk.blockchain.android.databinding.FragmentSimpleBuyPaymentBinding
 import piuk.blockchain.android.sdd.SDDAnalytics
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.linkbank.BankAuthActivity
 import piuk.blockchain.android.ui.linkbank.BankAuthSource
 import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionFlowCustomiserImpl.Companion.getEstimatedTransactionCompletionTime
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.secondsToDays
+import com.blockchain.utils.secondsToDays
+import java.util.Locale
 
-class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(),
-    SimpleBuyScreen, UnlockHigherLimitsBottomSheet.Host {
+class SimpleBuyPaymentFragment :
+    MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState, FragmentSimpleBuyPaymentBinding>(),
+    SimpleBuyScreen,
+    UnlockHigherLimitsBottomSheet.Host {
 
     override val model: SimpleBuyModel by scopedInject()
     private val stringUtils: StringUtils by inject()
@@ -48,6 +56,7 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
     private val assetResources: AssetResources by scopedInject()
     private var reviewInfo: ReviewInfo? = null
     private var isFirstLoad = false
+    private val internalFlags: InternalFeatureFlagApi by inject()
 
     private val isPaymentAuthorised: Boolean by lazy {
         arguments?.getBoolean(IS_PAYMENT_AUTHORISED, false) ?: false
@@ -62,17 +71,8 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
         isFirstLoad = savedInstanceState == null
     }
 
-    private var _binding: FragmentSimpleBuyPaymentBinding? = null
-    private val binding get() = _binding!!
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentSimpleBuyPaymentBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentSimpleBuyPaymentBinding =
+        FragmentSimpleBuyPaymentBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -89,11 +89,6 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
     override fun render(newState: SimpleBuyState) {
         binding.transactionProgressView.setAssetIcon(
             newState.selectedCryptoCurrency?.let {
@@ -108,6 +103,11 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
         if (newState.orderState == OrderState.CANCELED) {
             navigator().exitSimpleBuyFlow()
             return
+        }
+
+        if (internalFlags.isFeatureEnabled(GatedFeature.RECURRING_BUYS) &&
+            newState.recurringBuyState == RecurringBuyState.NOT_ACTIVE) {
+            toast(resources.getString(R.string.recurring_buy_creation_error), ToastCustom.TYPE_ERROR)
         }
 
         if (newState.orderState == OrderState.AWAITING_FUNDS && isFirstLoad) {
@@ -211,18 +211,32 @@ class SimpleBuyPaymentFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, Si
         when {
             newState.paymentSucceeded && newState.orderValue != null -> {
                 val lockedFundDays = newState.withdrawalLockPeriod.secondsToDays()
+                val messageOnPayment = if (newState.recurringBuyState == RecurringBuyState.ACTIVE) {
+                    getString(
+                        R.string.recurring_buy_payment_message,
+                        newState.order.amount?.toStringWithSymbol(),
+                        newState.recurringBuyFrequency.toHumanReadableRecurringBuy(requireContext())
+                            .toLowerCase(Locale.getDefault()),
+                        getString(assetResources.assetNameRes(newState.orderValue.currency)),
+                        newState.selectedCryptoCurrency?.networkTicker
+                    )
+                } else {
+                    getString(
+                        R.string.card_purchased_available_now,
+                        getString(assetResources.assetNameRes(newState.orderValue.currency))
+                    )
+                }
+
                 if (lockedFundDays <= 0L) {
                     binding.transactionProgressView.showTxSuccess(
-                        getString(R.string.card_purchased, newState.orderValue.formatOrSymbolForZero()),
-                        getString(
-                            R.string.card_purchased_available_now,
-                            getString(assetResources.assetNameRes(newState.orderValue.currency))
-                        )
+                        title = getString(R.string.card_purchased, newState.orderValue.formatOrSymbolForZero()),
+                        subtitle = messageOnPayment
                     )
                 } else {
                     binding.transactionProgressView.showPendingTx(
-                        getString(R.string.card_purchased, newState.orderValue.formatOrSymbolForZero()),
-                        subtitleForLockedFunds(
+                        title = getString(R.string.card_purchased, newState.orderValue.formatOrSymbolForZero()),
+                        subtitle = messageOnPayment,
+                        locksNote = subtitleForLockedFunds(
                             lockedFundDays, newState.selectedPaymentMethod.paymentMethodType
                         )
                     )

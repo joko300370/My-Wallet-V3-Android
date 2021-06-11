@@ -13,27 +13,28 @@ fun String.tryFromStellarUri(): StellarPayment? = try {
     null
 }
 
-fun String.fromStellarUri(): StellarPayment = if (this.contains("web+stellar")) {
-    val uri = URI.create(this)
-    val pat = Pattern.compile("([^&=]+)=([^&]*)")
-    val matcher = pat.matcher(uri.schemeSpecificPart)
-    val map = mutableMapOf<String, String>()
-    while (matcher.find()) {
-        map[matcher.group(1)] = matcher.group(2)
+fun String.fromStellarUri(): StellarPayment =
+    if (this.contains("web+stellar")) {
+        val uri = URI.create(this)
+        val pat = Pattern.compile("([^&=]+)=([^&]*)")
+        val matcher = pat.matcher(uri.schemeSpecificPart)
+        val map = mutableMapOf<String, String>()
+        while (matcher.find()) {
+            map[matcher.group(1)] = matcher.group(2)
+        }
+
+        val amount = map["amount"]?.let {
+            CryptoValue.fromMajor(CryptoCurrency.XLM, it.toBigDecimal())
+        } ?: CryptoValue.zero(CryptoCurrency.XLM)
+
+        StellarPayment(HorizonKeyPair.createValidatedPublic(map["pay?destination"]!!), amount, getMemo(map))
+    } else {
+        StellarPayment(
+            HorizonKeyPair.createValidatedPublic(this),
+            CryptoValue.zero(CryptoCurrency.XLM),
+            Memo.None
+        )
     }
-
-    val amount = map["amount"]?.let {
-        CryptoValue.fromMajor(CryptoCurrency.XLM, it.toBigDecimal())
-    } ?: CryptoValue.zero(CryptoCurrency.XLM)
-
-    StellarPayment(HorizonKeyPair.createValidatedPublic(map["pay?destination"]!!), amount, getMemo(map))
-} else {
-    StellarPayment(
-        HorizonKeyPair.createValidatedPublic(this),
-        CryptoValue.zero(CryptoCurrency.XLM),
-        Memo.None
-    )
-}
 
 private fun getMemo(map: MutableMap<String, String>): Memo {
     val memoValue = map["memo"] ?: ""

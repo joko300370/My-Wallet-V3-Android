@@ -1,8 +1,6 @@
 package com.blockchain.notifications.analytics
 
 import android.content.SharedPreferences
-import com.blockchain.featureflags.GatedFeature
-import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
@@ -10,7 +8,6 @@ import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
-import org.amshove.kluent.itReturns
 import org.junit.Test
 
 class AnalyticsImplTest {
@@ -24,21 +21,12 @@ class AnalyticsImplTest {
         override val params: Map<String, String> = emptyMap()
     }
 
-    private val mockInternalFeatureFlagApi: InternalFeatureFlagApi = mock {
-        on { isFeatureEnabled(GatedFeature.SEGMENT_ANALYTICS) } itReturns false
-    }
-
-    private val internalFeatureFlagApi: Lazy<InternalFeatureFlagApi> = mock {
-        on { value } itReturns mockInternalFeatureFlagApi
-    }
-
     @Test
     fun `should log custom event`() {
         val mockStore = mock<SharedPreferences>()
 
         AnalyticsImpl(
             firebaseAnalytics = mockFirebase, store = mockStore,
-            internalFeatureFlagApi = internalFeatureFlagApi,
             nabuAnalytics = mock()
         ).logEvent(event)
 
@@ -57,7 +45,6 @@ class AnalyticsImplTest {
         AnalyticsImpl(
             firebaseAnalytics = mockFirebase,
             store = mockStore,
-            internalFeatureFlagApi = internalFeatureFlagApi,
             nabuAnalytics = mock()
         ).logEventOnce(event)
         verify(mockFirebase).logEvent(event.event, null)
@@ -73,7 +60,6 @@ class AnalyticsImplTest {
         AnalyticsImpl(
             firebaseAnalytics = mockFirebase,
             store = mockStore,
-            internalFeatureFlagApi = internalFeatureFlagApi,
             nabuAnalytics = mock()
         ).logEventOnce(event)
         verify(mockFirebase, never()).logEvent(event.event, null)

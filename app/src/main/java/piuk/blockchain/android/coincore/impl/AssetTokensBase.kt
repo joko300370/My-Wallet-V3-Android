@@ -1,6 +1,7 @@
 package piuk.blockchain.android.coincore.impl
 
 import androidx.annotation.VisibleForTesting
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.preferences.CurrencyPrefs
@@ -17,6 +18,7 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.CryptoAsset
+import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.NonCustodialAccount
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.coincore.SingleAccountList
@@ -47,7 +49,8 @@ internal abstract class CryptoAssetBase(
     private val pitLinking: PitLinking,
     protected val crashLogger: CrashLogger,
     protected val offlineAccounts: OfflineAccountUpdater,
-    private val identity: UserIdentity
+    protected val identity: UserIdentity,
+    protected val features: InternalFeatureFlagApi
 ) : CryptoAsset, AccountRefreshTrigger {
 
     private val activeAccounts: ActiveAccountList by unsafeLazy {
@@ -132,7 +135,8 @@ internal abstract class CryptoAssetBase(
                             asset,
                             labels.getDefaultInterestWalletLabel(asset),
                             custodialManager,
-                            exchangeRates
+                            exchangeRates,
+                            features
                         )
                     )
                 } else {
@@ -150,7 +154,8 @@ internal abstract class CryptoAssetBase(
                     label = labels.getDefaultCustodialWalletLabel(asset),
                     exchangeRates = exchangeRates,
                     custodialWalletManager = custodialManager,
-                    identity = identity
+                    identity = identity,
+                    features = features
                 )
             )
         )
@@ -264,6 +269,14 @@ internal abstract class CryptoAssetBase(
                 ).toList()
                     .map { ll -> ll.flatten() }
                     .onErrorReturnItem(emptyList())
+            is InterestAccount -> {
+                Maybe.concat(
+                    getCustodialTargets(),
+                    getNonCustodialTargets()
+                ).toList()
+                    .map { ll -> ll.flatten() }
+                    .onErrorReturnItem(emptyList())
+            }
             else -> Single.just(emptyList())
         }
     }

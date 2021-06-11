@@ -5,7 +5,9 @@ import android.content.Intent
 import com.blockchain.logging.CrashLogger
 import com.blockchain.notifications.NotificationTokenManager
 import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.blockchain.notifications.analytics.AnalyticsEvents
+import com.blockchain.notifications.analytics.AnalyticsNames
 import com.blockchain.preferences.CurrencyPrefs
 import info.blockchain.wallet.api.Environment
 import info.blockchain.wallet.api.data.Settings
@@ -31,6 +33,7 @@ import piuk.blockchain.androidcore.utils.PersistentPrefs
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcore.data.metadata.MetadataInitException
 import timber.log.Timber
+import java.io.Serializable
 
 class LauncherPresenter(
     private val appUtil: AppUtil,
@@ -147,7 +150,10 @@ class LauncherPresenter(
                     Single.just(emailVerifShouldLaunched)
                 }
             }
-                .doOnSuccess { accessState.isLoggedIn = true }
+                .doOnSuccess {
+                    accessState.isLoggedIn = true
+                    analytics.logEvent(LoginAnalyticsEvent)
+                }
                 .doOnSuccess { notificationTokenManager.registerAuthEvent() }
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe { view.updateProgressVisibility(true) }
@@ -250,4 +256,11 @@ class LauncherPresenter(
         const val INTENT_EXTRA_VERIFIED = "verified"
         const val INTENT_AUTOMATION_TEST = "IS_AUTOMATION_TESTING"
     }
+}
+
+object LoginAnalyticsEvent : AnalyticsEvent {
+    override val event: String
+        get() = AnalyticsNames.SIGNED_IN.eventName
+    override val params: Map<String, Serializable>
+        get() = mapOf()
 }

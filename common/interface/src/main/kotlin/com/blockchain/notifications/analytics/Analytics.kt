@@ -1,5 +1,7 @@
 package com.blockchain.notifications.analytics
 
+import java.io.Serializable
+
 interface Analytics {
     fun logEvent(analyticsEvent: AnalyticsEvent)
     fun logEventOnce(analyticsEvent: AnalyticsEvent)
@@ -24,7 +26,13 @@ interface UserAnalytics {
 
 interface AnalyticsEvent {
     val event: String
-    val params: Map<String, String>
+    val params: Map<String, Serializable>
+    val origin: LaunchOrigin?
+        get() = null
+}
+
+interface TxFlowAnalyticsEvent {
+    val flowType: String
 }
 
 sealed class NotificationAnalytics(

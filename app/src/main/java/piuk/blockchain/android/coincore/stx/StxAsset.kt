@@ -1,5 +1,6 @@
 package piuk.blockchain.android.coincore.stx
 
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
@@ -31,7 +32,8 @@ internal class StxAsset(
     labels: DefaultLabels,
     pitLinking: PitLinking,
     crashLogger: CrashLogger,
-    private val identity: UserIdentity,
+    identity: UserIdentity,
+    features: InternalFeatureFlagApi,
     offlineAccounts: OfflineAccountUpdater
 ) : CryptoAssetBase(
     payloadManager,
@@ -43,7 +45,8 @@ internal class StxAsset(
     pitLinking,
     crashLogger,
     offlineAccounts,
-    identity
+    identity,
+    features
 ) {
 
     override val asset: CryptoCurrency
@@ -72,10 +75,10 @@ internal class StxAsset(
         )
     }
 
-    override fun parseAddress(address: String): Maybe<ReceiveAddress> =
+    override fun parseAddress(address: String, label: String?): Maybe<ReceiveAddress> =
         Maybe.fromCallable {
             if (isValidAddress(address)) {
-                StxAddress(address)
+                StxAddress(address, label ?: address)
             } else {
                 null
             }

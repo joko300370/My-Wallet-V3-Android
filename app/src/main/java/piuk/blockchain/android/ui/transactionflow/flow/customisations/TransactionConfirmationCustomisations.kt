@@ -10,7 +10,7 @@ interface TransactionConfirmationCustomisations {
     fun confirmTitle(state: TransactionState): String
     fun confirmCtaText(state: TransactionState): String
     fun confirmListItemTitle(assetAction: AssetAction): String
-    fun confirmDisclaimerBlurb(assetAction: AssetAction, context: Context): CharSequence
+    fun confirmDisclaimerBlurb(state: TransactionState, context: Context): CharSequence
     fun confirmDisclaimerVisibility(assetAction: AssetAction): Boolean
     fun amountHeaderConfirmationVisible(state: TransactionState): Boolean
     fun confirmInstallHeaderView(

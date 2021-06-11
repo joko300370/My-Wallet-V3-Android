@@ -1,7 +1,6 @@
 package info.blockchain.wallet.payload.data
 
 import com.blockchain.serialization.JsonSerializableAccount
-import com.fasterxml.jackson.databind.ObjectMapper
 
 interface Account : JsonSerializableAccount {
     override var label: String
@@ -23,6 +22,4 @@ interface Account : JsonSerializableAccount {
     fun addAddressLabel(index: Int, reserveLabel: String)
 
     fun upgradeToV4(): AccountV4
-
-    fun toJson(mapper: ObjectMapper): String
 }

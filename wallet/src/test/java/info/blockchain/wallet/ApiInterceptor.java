@@ -8,6 +8,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okio.Buffer;
+
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +17,7 @@ public class ApiInterceptor implements Interceptor {
 
     private static Logger log = LoggerFactory.getLogger(ApiInterceptor.class);
 
+    @NotNull
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request request = chain.request();
@@ -27,7 +30,7 @@ public class ApiInterceptor implements Interceptor {
             request.headers());
 
         if (request.method().compareToIgnoreCase("post") == 0) {
-            requestLog = "\n" + requestLog + "\n" + requestBodyToString(request.body());
+            requestLog = "\n" + requestLog + "\nBody:" + requestBodyToString(request.body());
         }
 
         log.info("-------------------------------------------------------------------------------");

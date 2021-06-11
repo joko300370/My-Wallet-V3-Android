@@ -16,8 +16,7 @@ val secureChannelModule = module {
                 crashLogger = get(),
                 secureChannelManager = get(),
                 secureChannelPrefs = get(),
-                walletApi = get(),
-                internalFlags = get()
+                walletApi = get()
             )
         }
     }

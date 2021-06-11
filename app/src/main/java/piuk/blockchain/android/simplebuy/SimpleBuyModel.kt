@@ -5,9 +5,11 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.ApprovalErrorStatus
 import com.blockchain.nabu.datamanagers.BuySellOrder
 import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.datamanagers.RecurringBuyOrder
 import com.blockchain.nabu.datamanagers.UndefinedPaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.BankPartner.Companion.YAPILY_DEEPLINK_PAYMENT_APPROVAL_URL
+import com.blockchain.nabu.models.data.RecurringBuyState
 import com.blockchain.nabu.models.responses.nabu.NabuApiException
 import com.blockchain.nabu.models.responses.nabu.NabuErrorCodes
 import com.blockchain.nabu.models.responses.simplebuy.EverypayPaymentAttrs
@@ -286,10 +288,14 @@ class SimpleBuyModel(
         interactor.eligiblePaymentMethods(
             fiatCurrency,
             selectedPaymentMethodId
-        )
-            .subscribeBy(
-                onSuccess = {
-                    process(it)
+        ).flatMap { intent ->
+            interactor.getRecurringBuyEligibility()
+                .map { intent to it }
+                .onErrorReturn { intent to emptyList() }
+        }.subscribeBy(
+                onSuccess = { (intent, eligibility) ->
+                    process(SimpleBuyIntent.RecurringBuyEligibilityUpdated(eligibility))
+                    process(intent)
                 },
                 onError = {
                     process(SimpleBuyIntent.ErrorIntent())
@@ -326,13 +332,21 @@ class SimpleBuyModel(
                 }?.paymentAttributes()
             },
             isBankPayment
-        ).subscribeBy(
-            onSuccess = {
-                val orderCreatedSuccessfully = it.state == OrderState.FINISHED
+        ).flatMap { buySellOrder ->
+            interactor.createRecurringBuyOrder(previousState)
+                .map { buySellOrder to it }
+                .onErrorReturn { buySellOrder to RecurringBuyOrder(RecurringBuyState.NOT_ACTIVE) }
+        }.subscribeBy(
+            onSuccess = { (buySellOrder, recurringBuy) ->
+                val orderCreatedSuccessfully = buySellOrder.state == OrderState.FINISHED
                 if (orderCreatedSuccessfully) {
                     updatePersistingCountersForCompletedOrders()
                 }
-                process(SimpleBuyIntent.OrderCreated(it, shouldShowAppRating(orderCreatedSuccessfully)))
+                process(
+                    SimpleBuyIntent.OrderCreated(
+                        buySellOrder, shouldShowAppRating(orderCreatedSuccessfully), recurringBuy.state
+                    )
+                )
             },
             onError = {
                 processOrderErrors(it)

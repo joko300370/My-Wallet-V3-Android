@@ -19,7 +19,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.fragment_interest_dashboard.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
@@ -27,10 +26,10 @@ import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.databinding.FragmentInterestDashboardBinding
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.visible
 import timber.log.Timber
 
@@ -48,6 +47,10 @@ class InterestDashboardFragment : Fragment() {
             "Host fragment is not a InterestDashboardFragment.InterestDashboardHost"
         )
     }
+
+    private var _binding: FragmentInterestDashboardBinding? = null
+    private val binding: FragmentInterestDashboardBinding
+        get() = _binding!!
 
     private val disposables = CompositeDisposable()
     private val custodialWalletManager: CustodialWalletManager by scopedInject()
@@ -69,12 +72,15 @@ class InterestDashboardFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_interest_dashboard)
+    ): View {
+        _binding = FragmentInterestDashboardBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        interest_dashboard_list.apply {
+        binding.interestDashboardList.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             adapter = listAdapter
         }
@@ -83,15 +89,14 @@ class InterestDashboardFragment : Fragment() {
     }
 
     private fun loadInterestDetails() {
-
         disposables +=
             Singles.zip(
                 kycTierService.tiers(),
                 custodialWalletManager.getInterestEnabledAssets()
             ).observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe {
-                    interest_error.gone()
-                    interest_dashboard_progress.visible()
+                    binding.interestError.gone()
+                    binding.interestDashboardProgress.visible()
                 }
                 .subscribeBy(
                     onSuccess = { (tiers, enabledAssets) ->
@@ -107,6 +112,7 @@ class InterestDashboardFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         disposables.clear()
+        _binding = null
     }
 
     private fun renderInterestDetails(
@@ -127,22 +133,26 @@ class InterestDashboardFragment : Fragment() {
         listAdapter.items = items
         listAdapter.notifyDataSetChanged()
 
-        interest_dashboard_progress.gone()
-        interest_dashboard_list.visible()
+        with(binding) {
+            interestDashboardProgress.gone()
+            interestDashboardList.visible()
+        }
     }
 
     private fun renderErrorState() {
-        interest_dashboard_list.gone()
-        interest_dashboard_progress.gone()
+        with(binding) {
+            interestDashboardList.gone()
+            interestDashboardProgress.gone()
 
-        interest_error.setDetails(
-            title = R.string.interest_error_title,
-            description = R.string.interest_error_desc,
-            contactSupportEnabled = true
-        ) {
-            loadInterestDetails()
+            interestError.setDetails(
+                title = R.string.interest_error_title,
+                description = R.string.interest_error_desc,
+                contactSupportEnabled = true
+            ) {
+                loadInterestDetails()
+            }
+            interestError.visible()
         }
-        interest_error.visible()
     }
 
     fun refreshBalances() {

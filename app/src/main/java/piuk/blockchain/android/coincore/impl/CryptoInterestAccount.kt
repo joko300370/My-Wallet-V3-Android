@@ -1,11 +1,12 @@
 package piuk.blockchain.android.coincore.impl
 
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.InterestActivityItem
 import com.blockchain.nabu.datamanagers.InterestState
 import com.blockchain.nabu.datamanagers.Product
-import com.blockchain.nabu.models.responses.interest.DisabledReason
 import com.blockchain.nabu.datamanagers.TransferDirection
+import com.blockchain.nabu.models.responses.interest.DisabledReason
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -29,8 +30,9 @@ import java.util.concurrent.atomic.AtomicBoolean
 internal class CryptoInterestAccount(
     override val asset: CryptoCurrency,
     override val label: String,
-    val custodialWalletManager: CustodialWalletManager,
-    override val exchangeRates: ExchangeRateDataManager
+    private val custodialWalletManager: CustodialWalletManager,
+    override val exchangeRates: ExchangeRateDataManager,
+    private val features: InternalFeatureFlagApi
 ) : CryptoAccountBase(), InterestAccount {
 
     private val hasFunds = AtomicBoolean(false)
@@ -71,19 +73,16 @@ internal class CryptoInterestAccount(
 
     override val accountBalance: Single<Money>
         get() = custodialWalletManager.getInterestAccountBalance(asset)
-            .switchIfEmpty(
-                Single.just(CryptoValue.zero(asset))
-            ).doOnSuccess { hasFunds.set(it.isPositive) }
+            .doOnSuccess { hasFunds.set(it.isPositive) }
             .map { it }
 
     override val pendingBalance: Single<Money>
         get() = custodialWalletManager.getPendingInterestAccountBalance(asset)
-            .switchIfEmpty(
-                Single.just(CryptoValue.zero(asset))
-            ).map { it }
+            .map { it }
 
     override val actionableBalance: Single<Money>
-        get() = accountBalance // TODO This will need updating when we support transfer out of an interest account
+        get() = custodialWalletManager.getActionableInterestAccountBalance(asset)
+            .map { it }
 
     override val activity: Single<ActivitySummaryList>
         get() = custodialWalletManager.getInterestActivity(asset)
@@ -144,14 +143,23 @@ internal class CryptoInterestAccount(
             }
 
     override val actions: Single<AvailableActions> =
-        Single.just(setOf(AssetAction.Summary, AssetAction.ViewActivity))
+        actionableBalance.map {
+            setOfNotNull(
+                if (it.isPositive) {
+                    AssetAction.InterestWithdraw
+                } else {
+                    null
+                }, AssetAction.Summary, AssetAction.ViewActivity
+            )
+        }
 
     companion object {
         private val displayedStates = setOf(
             InterestState.COMPLETE,
             InterestState.PROCESSING,
             InterestState.PENDING,
-            InterestState.MANUAL_REVIEW
+            InterestState.MANUAL_REVIEW,
+            InterestState.FAILED
         )
     }
 }

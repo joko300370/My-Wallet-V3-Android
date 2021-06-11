@@ -3,21 +3,16 @@ package piuk.blockchain.android.ui.kyc.mobile.validation
 import android.net.Uri
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
-import androidx.appcompat.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.KYCAnalyticsEvents
-import piuk.blockchain.android.ui.kyc.extensions.skipFirstUnless
-import piuk.blockchain.android.ui.kyc.mobile.entry.models.PhoneVerificationModel
-import piuk.blockchain.android.ui.kyc.mobile.validation.models.VerificationCode
-import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
-import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
 import com.blockchain.ui.extensions.throttledClicks
 import com.jakewharton.rxbinding2.widget.afterTextChangeEvents
 import io.reactivex.Observable
@@ -29,23 +24,28 @@ import io.reactivex.subjects.PublishSubject
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.KycNavXmlDirections
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.FragmentKycMobileValidationBinding
+import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
+import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
+import piuk.blockchain.android.ui.kyc.extensions.skipFirstUnless
+import piuk.blockchain.android.ui.kyc.mobile.entry.models.PhoneVerificationModel
+import piuk.blockchain.android.ui.kyc.mobile.validation.models.VerificationCode
+import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
+import piuk.blockchain.android.ui.kyc.navhost.models.KycStep
+import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.androidcore.data.settings.PhoneNumber
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpFragment
-import kotlinx.android.synthetic.main.fragment_kyc_mobile_validation.*
-import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
-import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
-import piuk.blockchain.android.util.ViewUtils
-import piuk.blockchain.android.util.inflate
 import java.util.concurrent.TimeUnit
-import kotlinx.android.synthetic.main.fragment_kyc_mobile_validation.button_kyc_mobile_validation_next as buttonNext
-import kotlinx.android.synthetic.main.fragment_kyc_mobile_validation.edit_text_kyc_mobile_validation_code as editTextVerificationCode
-import kotlinx.android.synthetic.main.fragment_kyc_mobile_validation.text_view_mobile_validation_message as textViewPhoneNumber
 
 class KycMobileValidationFragment :
     BaseMvpFragment<KycMobileValidationView, KycMobileValidationPresenter>(),
     KycMobileValidationView {
+
+    private var _binding: FragmentKycMobileValidationBinding? = null
+    private val binding: FragmentKycMobileValidationBinding
+        get() = _binding!!
 
     private val presenter: KycMobileValidationPresenter by scopedInject()
     private val analytics: Analytics by inject()
@@ -57,12 +57,13 @@ class KycMobileValidationFragment :
     private var progressDialog: MaterialProgressDialog? = null
     private val args by unsafeLazy {
         KycMobileValidationFragmentArgs.fromBundle(
-            arguments ?: Bundle())
+            arguments ?: Bundle()
+        )
     }
     private val displayModel by unsafeLazy { args.mobileNumber }
     private val countryCode by unsafeLazy { args.countryCode }
     private val verificationCodeObservable by unsafeLazy {
-        editTextVerificationCode.afterTextChangeEvents()
+        binding.editTextKycMobileValidationCode.afterTextChangeEvents()
             .skipInitialValue()
             .debounce(300, TimeUnit.MILLISECONDS)
             .observeOn(AndroidSchedulers.mainThread())
@@ -86,7 +87,7 @@ class KycMobileValidationFragment :
     override val uiStateObservable: Observable<Pair<PhoneVerificationModel, Unit>> by unsafeLazy {
         Observables.combineLatest(
             verificationCodeObservable.cache(),
-            buttonNext.throttledClicks()
+            binding.buttonKycMobileValidationNext.throttledClicks()
         ).doOnNext {
             analytics.logEvent(KYCAnalyticsEvents.PhoneNumberUpdateButtonClicked)
         }
@@ -96,26 +97,29 @@ class KycMobileValidationFragment :
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_kyc_mobile_validation)
+    ): View {
+        _binding = FragmentKycMobileValidationBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         progressListener.setHostTitle(R.string.kyc_phone_number_title)
-        textViewPhoneNumber.text = displayModel.formattedString
+        binding.textViewMobileValidationMessage.text = displayModel.formattedString
 
         val linksMap = mapOf<String, Uri?>(
             "resend_code" to null
         )
 
-        text_view_resend_prompt.text =
-            stringUtils.getStringWithMappedAnnotations(
+        with(binding.textViewResendPrompt) {
+            text = stringUtils.getStringWithMappedAnnotations(
                 R.string.kyc_phone_send_again,
                 linksMap,
                 requireActivity()
             ) { resend.onNext(Unit) }
 
-        text_view_resend_prompt.movementMethod = LinkMovementMethod.getInstance()
-
+            movementMethod = LinkMovementMethod.getInstance()
+        }
         onViewReady()
     }
 
@@ -123,9 +127,14 @@ class KycMobileValidationFragment :
         super.onResume()
 
         compositeDisposable +=
-            editTextVerificationCode
+            binding.editTextKycMobileValidationCode
                 .onDelayedChange(KycStep.VerificationCodeEntered)
                 .subscribe()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onPause() {
@@ -174,7 +183,7 @@ class KycMobileValidationFragment :
             .map { mapToCompleted(it) }
             .distinctUntilChanged()
             .doOnNext {
-                buttonNext.isEnabled = it
+                binding.buttonKycMobileValidationNext.isEnabled = it
             }
 
     private fun mapToCompleted(text: String): Boolean = VerificationCode(text).isValid

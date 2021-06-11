@@ -6,8 +6,9 @@ object Versions {
     const val minSdk = 23
     const val targetSdk = 30
     const val compileSdk = 30
-    const val versionCode = 634
-    const val versionName = "8.6.0"
+
+    const val versionCode = 647
+    const val versionName = "8.8.2"
     const val buildTools = "29.0.2"
 
     // Build tools and languages
@@ -29,8 +30,9 @@ object Versions {
     const val preference = "1.1.0"
     const val dynamicanimation = "1.0.0"
     const val annotations = "1.1.0"
-    const val constraintLayout = "1.1.0"
+    const val constraintLayout = "2.0.4"
     const val multidex = "2.0.1"
+    const val desugaring = "1.1.5"
     const val navigation = "2.1.0"
     const val lifecycle = "2.1.0"
     const val camera = "1.0.0-rc04"
@@ -38,6 +40,7 @@ object Versions {
 
     // Support Libraries
     const val googleServices = "17.1.0"
+    const val googleServicesAuth = "19.0.0"
     const val googleServicesPlaces = "17.0.0"
     const val googlePlayCore = "1.8.2"
     const val firebaseMessaging = "20.2.0"
@@ -86,7 +89,7 @@ object Versions {
 
     // Custom Views
     const val charts = "3.1.0"
-    const val circleIndicator = "1.2.2"
+    const val circleIndicator = "2.1.6"
     const val bottomNav = "2.2.0"
     const val countryPicker = "2.0.4"
 
@@ -99,7 +102,6 @@ object Versions {
 
     // Third Party SDKs
     const val veriff = "3.14.1"
-    const val probity = "1.0.0"
     const val sift = "0.11.1"
     const val cardForm = "4.2.0"
     const val xlmSunriver = "0.21.1"
@@ -151,6 +153,7 @@ object Libraries {
     const val annotations = "androidx.annotations:annotations:${Versions.annotations}"
     const val constraintLayout = "androidx.constraintlayout:constraintlayout:${Versions.constraintLayout}"
     const val multidex = "androidx.multidex:multidex:${Versions.multidex}"
+    const val desugaring = "com.android.tools:desugar_jdk_libs:${Versions.desugaring}"
 
     const val navigationControllerCore = "androidx.navigation:navigation-ui:${Versions.navigation}"
     const val navigationControllerFragments = "androidx.navigation:navigation-fragment:${Versions.navigation}"
@@ -171,6 +174,8 @@ object Libraries {
         "com.google.firebase:firebase-dynamic-links:${Versions.firebaseDynamicLink}"
     const val googlePlayServicesBase =
         "com.google.android.gms:play-services-base:${Versions.googleServices}"
+    const val googlePlayServicesAuth =
+        "com.google.android.gms:play-services-auth:${Versions.googleServicesAuth}"
     const val googlePlaces =
         "com.google.android.gms:play-services-places:${Versions.googleServicesPlaces}"
     const val googlePlayCore = "com.google.android.play:core:${Versions.googlePlayCore}"
@@ -240,7 +245,6 @@ object Libraries {
 
     // Third Party SDKs
     const val veriff = "com.veriff:veriff-library:${Versions.veriff}"
-    const val probity = "io.probity.sdk:collector:${Versions.probity}"
     const val sift = "com.siftscience:sift-android:${Versions.sift}"
     const val cardForm = "com.braintreepayments:card-form:${Versions.cardForm}"
     const val sunriver = "com.github.stellar:java-stellar-sdk:${Versions.xlmSunriver}"

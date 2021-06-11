@@ -1,5 +1,7 @@
 package piuk.blockchain.android.simplebuy
 
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.nabu.datamanagers.BillingAddress
 import com.blockchain.nabu.datamanagers.BuySellOrder
 import com.blockchain.nabu.datamanagers.BuySellPairs
@@ -11,6 +13,7 @@ import com.blockchain.nabu.datamanagers.OrderOutput
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.PaymentMethod
 import com.blockchain.nabu.datamanagers.Product
+import com.blockchain.nabu.datamanagers.RecurringBuyOrder
 import com.blockchain.nabu.datamanagers.SimpleBuyEligibilityProvider
 import com.blockchain.nabu.datamanagers.TransferLimits
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.CardStatus
@@ -21,6 +24,7 @@ import com.blockchain.nabu.models.data.LinkedBank
 import com.blockchain.nabu.models.responses.nabu.KycTierLevel
 import com.blockchain.nabu.models.responses.nabu.KycTiers
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
+import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyConfirmationAttributes
 import com.blockchain.nabu.service.TierService
 import com.blockchain.notifications.analytics.Analytics
@@ -54,8 +58,13 @@ class SimpleBuyInteractor(
     private val analytics: Analytics,
     private val eligibilityProvider: SimpleBuyEligibilityProvider,
     private val coincore: Coincore,
-    private val bankLinkingPrefs: BankLinkingPrefs
+    private val bankLinkingPrefs: BankLinkingPrefs,
+    private val featureFlagApi: InternalFeatureFlagApi
 ) {
+
+    private val isRecurringBuyEnabled: Boolean by lazy {
+        featureFlagApi.isFeatureEnabled(GatedFeature.RECURRING_BUYS)
+    }
 
     // ignore limits when user is in tier 0
     fun fetchBuyLimitsAndSupportedCryptoCurrencies(
@@ -106,6 +115,27 @@ class SimpleBuyInteractor(
         ).map {
             SimpleBuyIntent.OrderCreated(it)
         }
+
+    fun createRecurringBuyOrder(state: SimpleBuyState): Single<RecurringBuyOrder> {
+        return if (isRecurringBuyEnabled) {
+            require(state.order.amount != null) { "createRecurringBuyOrder amount is null" }
+            require(state.selectedCryptoCurrency != null) { "createRecurringBuyOrder selected crypto is null" }
+            require(state.selectedPaymentMethod != null) { "createRecurringBuyOrder selected payment method is null" }
+
+            custodialWalletManager.createRecurringBuyOrder(
+                RecurringBuyRequestBody(
+                    inputValue = state.order.amount?.toBigDecimal().toString(),
+                    inputCurrency = state.order.amount?.currencyCode.toString(),
+                    destinationCurrency = state.selectedCryptoCurrency.networkTicker,
+                    paymentMethod = state.selectedPaymentMethod.paymentMethodType.name,
+                    period = state.recurringBuyFrequency.name,
+                    beneficiaryId = state.selectedPaymentMethod.id
+                )
+            )
+        } else {
+            Single.just(RecurringBuyOrder())
+        }
+    }
 
     fun fetchWithdrawLockTime(
         paymentMethod: PaymentMethodType,
@@ -263,6 +293,8 @@ class SimpleBuyInteractor(
                     )
                 }
             }
+
+    fun getRecurringBuyEligibility() = custodialWalletManager.getRecurringBuyEligibility()
 
     // attributes are null in case of bank
     fun confirmOrder(

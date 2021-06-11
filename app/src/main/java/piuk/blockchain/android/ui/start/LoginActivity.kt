@@ -3,32 +3,36 @@ package piuk.blockchain.android.ui.start
 import android.content.Intent
 import android.os.Bundle
 import com.blockchain.koin.scopedInject
-import kotlinx.android.synthetic.main.activity_login.*
-import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.ActivityLoginBinding
 import piuk.blockchain.android.ui.auth.PinEntryActivity
-import piuk.blockchain.android.ui.scan.QrScanActivity
-import piuk.blockchain.androidcore.utils.helperfunctions.consume
 import piuk.blockchain.android.ui.base.MvpActivity
-import piuk.blockchain.android.ui.scan.QrExpected
-import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
 import piuk.blockchain.android.ui.customviews.toast
+import piuk.blockchain.android.ui.scan.QrExpected
+import piuk.blockchain.android.ui.scan.QrScanActivity
+import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
+import piuk.blockchain.androidcore.utils.helperfunctions.consume
 
 class LoginActivity : MvpActivity<LoginView, LoginPresenter>(), LoginView {
 
     override val presenter: LoginPresenter by scopedInject()
     override val view: LoginView = this
+    private val binding: ActivityLoginBinding by lazy {
+        ActivityLoginBinding.inflate(layoutInflater)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        setContentView(binding.root)
 
-        setupToolbar(toolbar_general, R.string.login_auto_pair_title)
+        setupToolbar(binding.toolbarGeneral.toolbarGeneral, R.string.login_auto_pair_title)
 
-        step_one.text = getString(R.string.pair_wallet_step_1, WEB_WALLET_URL_PROD)
+        with(binding) {
+            stepOne.text = getString(R.string.pair_wallet_step_1, WEB_WALLET_URL_PROD)
 
-        btn_manual_pair.setOnClickListener { onClickManualPair() }
-        btn_scan_qr.setOnClickListener { startScanActivity() }
+            btnManualPair.setOnClickListener { onClickManualPair() }
+            btnScanQr.setOnClickListener { startScanActivity() }
+        }
     }
 
     override fun showToast(message: Int, toastType: String) = toast(message, toastType)

@@ -11,8 +11,8 @@ import com.blockchain.nabu.models.data.YapilyAttributes
 import com.blockchain.nabu.models.data.YapilyInstitution
 import com.blockchain.nabu.models.data.YodleeAttributes
 import com.blockchain.preferences.BankLinkingPrefs
-import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.FragmentActivityBinding
 import piuk.blockchain.android.simplebuy.ErrorState
 import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
@@ -47,10 +47,14 @@ class BankAuthActivity : BlockchainActivity(), BankAuthFlowNavigator,
 
     private val bankLinkingPrefs: BankLinkingPrefs by scopedInject()
 
+    private val binding: FragmentActivityBinding by lazy {
+        FragmentActivityBinding.inflate(layoutInflater)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment_activity)
-        setSupportActionBar(toolbar_general)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbarGeneral.toolbarGeneral)
 
         if (savedInstanceState == null) {
             when {

@@ -12,16 +12,15 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.blockchain.featureflags.GatedFeature
-import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.OrderState
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.models.data.RecurringBuyFrequency
 import com.blockchain.ui.urllinks.ORDER_PRICE_EXPLANATION
 import com.blockchain.ui.urllinks.PRIVATE_KEY_EXPLANATION
+import com.blockchain.utils.secondsToDays
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
-import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.FragmentSimplebuyCheckoutBinding
 import piuk.blockchain.android.ui.base.ErrorDialogData
@@ -31,26 +30,19 @@ import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.secondsToDays
 import piuk.blockchain.android.util.setOnClickListenerDebounced
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 
-class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState>(), SimpleBuyScreen,
+class SimpleBuyCheckoutFragment :
+    MviFragment<SimpleBuyModel, SimpleBuyIntent, SimpleBuyState, FragmentSimplebuyCheckoutBinding>(),
+    SimpleBuyScreen,
     SimpleBuyCancelOrderBottomSheet.Host {
-
-    private var _binding: FragmentSimplebuyCheckoutBinding? = null
-    private val binding: FragmentSimplebuyCheckoutBinding
-        get() = _binding!!
 
     override val model: SimpleBuyModel by scopedInject()
 
-    private val internalFlags: InternalFeatureFlagApi by inject()
-    private val stringUtils: StringUtils by inject()
-
     private var lastState: SimpleBuyState? = null
-    private val checkoutAdapter = CheckoutAdapter()
     private val checkoutAdapterDelegate = CheckoutAdapterDelegate()
 
     private val isForPendingPayment: Boolean by unsafeLazy {
@@ -61,25 +53,15 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
         arguments?.getBoolean(SHOW_ONLY_ORDER_DATA, false) ?: false
     }
 
-    private val shouldShowNewCheckout: Boolean by lazy {
-        internalFlags.isFeatureEnabled(GatedFeature.CHECKOUT)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentSimplebuyCheckoutBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentSimplebuyCheckoutBinding =
+        FragmentSimplebuyCheckoutBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.recycler.apply {
             layoutManager = LinearLayoutManager(activity)
-            adapter = if (shouldShowNewCheckout) checkoutAdapterDelegate else checkoutAdapter
+            adapter = checkoutAdapterDelegate
             addItemDecoration(BlockchainListDividerDecor(requireContext()))
         }
 
@@ -151,18 +133,14 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
 
         updateStatusPill(newState)
 
-        if (shouldShowNewCheckout) {
-            if (newState.paymentOptions.availablePaymentMethods.isEmpty()) {
-                model.process(
-                    SimpleBuyIntent.FetchPaymentDetails(
-                        newState.fiatCurrency, newState.selectedPaymentMethod?.id.orEmpty()
-                    )
+        if (newState.paymentOptions.availablePaymentMethods.isEmpty()) {
+            model.process(
+                SimpleBuyIntent.FetchPaymentDetails(
+                    newState.fiatCurrency, newState.selectedPaymentMethod?.id.orEmpty()
                 )
-            } else {
-                checkoutAdapterDelegate.items = getCheckoutFields(newState)
-            }
+            )
         } else {
-            checkoutAdapter.items = getListFields(newState)
+            checkoutAdapterDelegate.items = getCheckoutFields(newState)
         }
 
         configureButtons(newState)
@@ -190,10 +168,10 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
     private fun renderPrivateKeyLabel(selectedCryptoCurrency: CryptoCurrency) {
         if (selectedCryptoCurrency.hasFeature(CryptoCurrency.CUSTODIAL_ONLY)) {
             val map = mapOf("learn_more_link" to Uri.parse(PRIVATE_KEY_EXPLANATION))
-            val learnMoreLink = stringUtils.getStringWithMappedAnnotations(
+            val learnMoreLink = StringUtils.getStringWithMappedAnnotations(
+                requireContext(),
                 R.string.common_linked_learn_more,
-                map,
-                requireContext()
+                map
             )
 
             val sb = SpannableStringBuilder()
@@ -251,46 +229,15 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
         }
     }
 
-    private fun getListFields(state: SimpleBuyState) =
-        listOfNotNull(
-            CheckoutItem(
-                getString(R.string.quote_price, state.selectedCryptoCurrency?.displayTicker),
-                state.orderExchangePrice?.toStringWithSymbol() ?: ""
-            ),
-
-            CheckoutItem(
-                getString(R.string.fee),
-                state.fee?.toStringWithSymbol() ?: FiatValue.zero(state.fiatCurrency)
-                    .toStringWithSymbol()
-            ),
-
-            CheckoutItem(
-                getString(R.string.common_total),
-                state.order.amount?.toStringWithSymbol() ?: ""
-            ),
-
-            CheckoutItem(getString(R.string.payment_method),
-                state.selectedPaymentMethod?.let {
-                    paymentMethodLabel(it, state.fiatCurrency)
-                } ?: ""
-            ),
-            state.selectedPaymentMethod?.isBank()?.let {
-                CheckoutItem(
-                    getString(R.string.available_to_trade),
-                    getString(R.string.instantly)
-                )
-            }
-        )
-
     private fun getCheckoutFields(state: SimpleBuyState): List<SimpleBuyCheckoutItem> {
         val linksMap = mapOf<String, Uri>(
             "learn_more" to Uri.parse(ORDER_PRICE_EXPLANATION)
         )
 
-        val priceExplanation = stringUtils.getStringWithMappedAnnotations(
+        val priceExplanation = StringUtils.getStringWithMappedAnnotations(
+            requireContext(),
             R.string.checkout_item_price_blurb,
-            linksMap,
-            requireContext()
+            linksMap
         )
 
         return listOfNotNull(
@@ -300,19 +247,26 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
                 priceExplanation
             ),
             buildPaymentMethodItem(state),
-            SimpleBuyCheckoutItem.SimpleCheckoutItem(
-                getString(R.string.purchase),
-                state.order.amount.addStringWithSymbolOrDefault(state.fiatCurrency)
-            ),
-
+            if (state.recurringBuyFrequency != RecurringBuyFrequency.ONE_TIME) {
+                SimpleBuyCheckoutItem.ComplexCheckoutItem(
+                    getString(R.string.recurring_buy_frequency_label),
+                    state.recurringBuyFrequency.toHumanReadableRecurringBuy(requireContext()),
+                    state.recurringBuyFrequency.toHumanReadableRecurringDate(requireContext())
+                )
+            } else null,
+            if (state.fee != null && state.fee.isPositive) {
+                SimpleBuyCheckoutItem.SimpleCheckoutItem(
+                    getString(R.string.purchase),
+                    state.order.amount.addStringWithSymbolOrDefault(state.fiatCurrency)
+                )
+            } else null,
             buildPaymentFee(
-                state, stringUtils.getStringWithMappedAnnotations(
+                state, StringUtils.getStringWithMappedAnnotations(
+                    requireContext(),
                     R.string.checkout_item_price_fee,
-                    linksMap,
-                    requireContext()
+                    linksMap
                 )
             ),
-
             SimpleBuyCheckoutItem.SimpleCheckoutItem(
                 getString(R.string.common_total),
                 (state.order.amount?.plus(state.fee ?: FiatValue.zero(state.fiatCurrency)) as? FiatValue)
@@ -349,7 +303,7 @@ class SimpleBuyCheckoutFragment : MviFragment<SimpleBuyModel, SimpleBuyIntent, S
 
     private fun buildPaymentFee(state: SimpleBuyState, feeExplanation: CharSequence): SimpleBuyCheckoutItem? =
         state.fee?.let { fee ->
-            if (!fee.isZero) {
+            if (fee.isPositive) {
                 SimpleBuyCheckoutItem.ExpandableCheckoutItem(
                     if (state.selectedPaymentMethod?.paymentMethodType == PaymentMethodType.PAYMENT_CARD) {
                         getString(R.string.card_fee)

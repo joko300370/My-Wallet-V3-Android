@@ -9,8 +9,8 @@ import android.os.Bundle
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import com.blockchain.koin.scopedInject
-import kotlinx.android.synthetic.main.activity_receive_qr.*
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.ActivityReceiveQrBinding
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.shortcuts.LauncherShortcutHelper
 import piuk.blockchain.androidcoreui.ui.base.BaseMvpActivity
@@ -19,19 +19,23 @@ internal class ReceiveQrActivity :
     BaseMvpActivity<ReceiveQrView, ReceiveQrPresenter>(), ReceiveQrView {
 
     private val receiveQrPresenter: ReceiveQrPresenter by scopedInject()
+    private val binding: ActivityReceiveQrBinding by lazy {
+        ActivityReceiveQrBinding.inflate(layoutInflater)
+    }
 
     override val pageIntent: Intent
         get() = intent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_receive_qr)
+        setContentView(binding.root)
 
         onViewReady()
         logShortcutUse()
-
-        action_done.setOnClickListener { finish() }
-        action_copy.setOnClickListener { presenter.onCopyClicked() }
+        with(binding) {
+            actionDone.setOnClickListener { finish() }
+            actionCopy.setOnClickListener { presenter.onCopyClicked() }
+        }
     }
 
     override fun lockScreenOrientation() {
@@ -39,11 +43,11 @@ internal class ReceiveQrActivity :
     }
 
     override fun setAddressInfo(addressInfo: String) {
-        address_info.text = addressInfo
+        binding.addressInfo.text = addressInfo
     }
 
     override fun setAddressLabel(label: String) {
-        account_name.text = label
+        binding.accountName.text = label
     }
 
     override fun showToast(@StringRes message: Int, @ToastCustom.ToastType toastType: String) {
@@ -51,7 +55,7 @@ internal class ReceiveQrActivity :
     }
 
     override fun setImageBitmap(bitmap: Bitmap) {
-        imageview_qr.setImageBitmap(bitmap)
+        binding.imageviewQr.setImageBitmap(bitmap)
     }
 
     override fun finishActivity() {
@@ -68,10 +72,12 @@ internal class ReceiveQrActivity :
                     getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                 val clip =
                     ClipData.newPlainText("Send address", receiveAddressString)
-                ToastCustom.makeText(this,
+                ToastCustom.makeText(
+                    this,
                     getString(R.string.copied_to_clipboard),
                     ToastCustom.LENGTH_LONG,
-                    ToastCustom.TYPE_GENERAL)
+                    ToastCustom.TYPE_GENERAL
+                )
                 clipboard.setPrimaryClip(clip)
             }
             .setNegativeButton(R.string.common_no, null)

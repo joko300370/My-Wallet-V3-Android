@@ -8,7 +8,6 @@ import org.amshove.kluent.`should equal`
 import org.amshove.kluent.mock
 import org.junit.Test
 
-private const val useNewCoinSelection = true
 private const val useReplayProtection = false
 
 class CoinsTest {
@@ -81,8 +80,7 @@ private fun maximumSpendable(
     unspentOutputs,
     OutputType.P2PKH,
     fee.toBigInteger(),
-    useReplayProtection,
-    useNewCoinSelection
+    useReplayProtection
 ).let { (balance, fee) ->
     CryptoValue(CryptoCurrency.BTC, balance) to CryptoValue(CryptoCurrency.BTC, fee)
 }
@@ -114,8 +112,7 @@ private fun spendableUnspentOutputs(
     OutputType.P2PKH,
     value.toBigInteger(),
     fee.toBigInteger(),
-    useReplayProtection,
-    useNewCoinSelection
+    useReplayProtection
 )
 
 private fun unspentOutputs(vararg values: CryptoValue): List<Utxo> {

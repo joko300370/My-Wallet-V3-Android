@@ -18,9 +18,9 @@ import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 
 class InterestDepositOnChainTxEngine(
-    walletManager: CustodialWalletManager,
+    private val walletManager: CustodialWalletManager,
     private val onChainEngine: OnChainTxEngineBase
-) : InterestEngine(walletManager) {
+) : InterestBaseEngine(walletManager) {
 
     override fun assertInputsValid() {
         check(sourceAccount is CryptoNonCustodialAccount)
@@ -122,7 +122,9 @@ class InterestDepositOnChainTxEngine(
             }
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
-        onChainEngine.doExecute(pendingTx, secondPassword)
+        onChainEngine.doExecute(pendingTx, secondPassword).doOnSuccess {
+            walletManager.invalidateInterestBalanceForAsset(sourceAsset)
+        }
 
     override fun doPostExecute(pendingTx: PendingTx, txResult: TxResult): Completable = txTarget.onTxCompleted(txResult)
 

@@ -1,6 +1,7 @@
 package piuk.blockchain.androidcore.data.bitcoincash
 
 import androidx.annotation.VisibleForTesting
+import com.blockchain.logging.CrashLogger
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.api.BitcoinApi
 import info.blockchain.balance.CryptoCurrency
@@ -39,6 +40,7 @@ class BchDataManager(
     private val bitcoinApi: BitcoinApi,
     private val defaultLabels: DefaultLabels,
     private val metadataManager: MetadataManager,
+    private val crashLogger: CrashLogger,
     rxBus: RxBus
 ) {
 
@@ -191,7 +193,9 @@ class BchDataManager(
             // BCH Metadata does not store xpub - get from btc wallet since PATH is the same
             payloadDataManager.accounts.forEachIndexed { i, account ->
                 bchDataStore.bchWallet?.addAccount()
-                walletMetadata.accounts[i].setXpub(account.xpubForDerivation(Derivation.LEGACY_TYPE))
+                val xpub = account.xpubForDerivation(Derivation.LEGACY_TYPE)
+                checkXpubAndLog(xpub, "restorebchwallet_update", i)
+                walletMetadata.accounts[i].setXpub(xpub)
             }
         } else {
             val params = BchMainNetParams.get()
@@ -204,7 +208,9 @@ class BchDataManager(
             // Only use this [DeterministicAccount] to derive receive/change addresses. Don't use xpub as multiaddr etc parameter.
             payloadDataManager.accounts.forEachIndexed { i, account ->
                 bchDataStore.bchWallet?.addWatchOnlyAccount(account.xpubForDerivation(Derivation.LEGACY_TYPE))
-                walletMetadata.accounts[i].setXpub(account.xpubForDerivation(Derivation.LEGACY_TYPE))
+                val xpub = account.xpubForDerivation(Derivation.LEGACY_TYPE)
+                checkXpubAndLog(xpub, "restorebchwallet_wo", i)
+                walletMetadata.accounts[i].setXpub(xpub)
             }
         }
     }
@@ -227,13 +233,15 @@ class BchDataManager(
                 .forEach {
                     val accountNumber = it + 1
 
+                    val walletBody = payloadDataManager.wallet!!.walletBody
                     val label = defaultLabels.getDefaultNonCustodialWalletLabel(CryptoCurrency.BTC)
                     val newAccountLabel = "$label $accountNumber"
-                    val acc =
-                        payloadDataManager.wallet!!.walletBody?.addAccount(newAccountLabel)
+                    val acc = walletBody?.addAccount(newAccountLabel)
 
                     bchDataStore.bchMetadata!!.accounts[it].apply {
-                        this.setXpub(acc?.xpubForDerivation(Derivation.LEGACY_TYPE))
+                        val xpub = acc?.xpubForDerivation(Derivation.LEGACY_TYPE)
+                        checkXpubAndLog(xpub, "correctoffset", it)
+                        this.setXpub(xpub)
                     }
                 }
         }
@@ -255,7 +263,9 @@ class BchDataManager(
 
         payloadDataManager.accounts.forEachIndexed { i, account ->
             bchDataStore.bchWallet?.addAccount()
-            bchDataStore.bchMetadata!!.accounts[i].setXpub(account.xpubForDerivation(Derivation.LEGACY_TYPE))
+            val xpub = account.xpubForDerivation(Derivation.LEGACY_TYPE)
+            checkXpubAndLog(xpub, "decryptwatchonly", i)
+            bchDataStore.bchMetadata!!.accounts[i].setXpub(xpub)
         }
     }
 
@@ -496,4 +506,14 @@ class BchDataManager(
         bchDataStore.bchWallet!!.subtractAmountFromAddressBalance(account, amount)
 
     private data class MetadataPair(val metadata: GenericMetadataWallet, val needsSave: Boolean)
+
+    private fun checkXpubAndLog(xpub: String?, callSite: String, accountIndex: Int) {
+        if (xpub == null) {
+            // We should not have a null xpub. Something is very wrong; let's write some
+            // info to the crash logger and see if that gives a clue
+            crashLogger.logState("xpub_$callSite", "hit")
+            crashLogger.logState("nBtc", payloadDataManager.accountCount.toString())
+            crashLogger.logState("null xpub idx==$accountIndex", "hit")
+        }
+    }
 }

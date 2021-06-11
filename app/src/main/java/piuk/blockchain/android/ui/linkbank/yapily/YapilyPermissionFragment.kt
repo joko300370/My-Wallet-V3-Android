@@ -116,6 +116,9 @@ class YapilyPermissionFragment : Fragment() {
                     navigator().yapilyApprovalAccepted(approvalDetails)
                 } else {
                     navigator().yapilyAgreementAccepted(institution)
+                    analytics.logEvent(
+                        BankAuthAnalytics.LinkBankConditionsApproved(institution.name, entity)
+                    )
                 }
             }
             agreementDenyCta.setOnClickListener {

@@ -23,7 +23,7 @@ class SendDataManager(
 ) {
     data class MaxAvailable(
         val maxSpendable: CryptoValue,
-        val forForMax: CryptoValue
+        val feeForMax: CryptoValue
     )
 
     private val rxPinning: RxPinning = RxPinning(rxBus)
@@ -199,7 +199,7 @@ class SendDataManager(
 
         return MaxAvailable(
             maxSpendable = CryptoValue.fromMinor(cryptoCurrency, available.first),
-            forForMax = CryptoValue.fromMinor(cryptoCurrency, available.second)
+            feeForMax = CryptoValue.fromMinor(cryptoCurrency, available.second)
         )
     }
 

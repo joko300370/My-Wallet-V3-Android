@@ -29,6 +29,8 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.campaign.SunriverCampaignRegistration
 import piuk.blockchain.android.campaign.SunriverCardType
+import piuk.blockchain.android.coincore.AssetAction
+import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoTarget
 import piuk.blockchain.android.deeplink.DeepLinkProcessor
 import piuk.blockchain.android.deeplink.EmailVerifiedLinkState
@@ -52,6 +54,7 @@ import piuk.blockchain.android.ui.linkbank.BankAuthFlowState
 import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
 import piuk.blockchain.android.ui.linkbank.fromPreferencesValue
 import piuk.blockchain.android.ui.linkbank.toPreferencesValue
+import piuk.blockchain.android.ui.upsell.KycUpgradePromptManager
 import piuk.blockchain.android.ui.auth.newlogin.SecureChannelManager
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
@@ -88,6 +91,9 @@ interface MainView : MvpView, HomeNavigator {
     fun handleApprovalDepositError(currency: String)
     fun handleApprovalDepositTimeout(currencyCode: String)
     fun handleBuyApprovalError()
+
+    fun launchUpsellAssetAction(upsell: KycUpgradePromptManager.Type, action: AssetAction, account: BlockchainAccount)
+    fun launchAssetAction(action: AssetAction, account: BlockchainAccount)
 }
 
 class MainPresenter internal constructor(
@@ -107,6 +113,7 @@ class MainPresenter internal constructor(
     private val credentialsWiper: CredentialsWiper,
     private val bankLinkingPrefs: BankLinkingPrefs,
     private val custodialWalletManager: CustodialWalletManager,
+    private val upsellManager: KycUpgradePromptManager,
     val payloadManager: PayloadManager,
     private val secureChannelManager: SecureChannelManager
 ) : MvpPresenter<MainView>() {
@@ -537,6 +544,23 @@ class MainPresenter internal constructor(
                             Timber.d("Scan failed")
                         }
                     }
+                }
+            )
+    }
+
+    fun validateAccountAction(action: AssetAction, account: BlockchainAccount) {
+        compositeDisposable += upsellManager.queryUpsell(action, account)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { upsell ->
+                    if (upsell != KycUpgradePromptManager.Type.NONE) {
+                        view?.launchUpsellAssetAction(upsell, action, account)
+                    } else {
+                        view?.launchAssetAction(action, account)
+                    }
+                },
+                onError = {
+                    Timber.e("Upsell manager failure")
                 }
             )
     }

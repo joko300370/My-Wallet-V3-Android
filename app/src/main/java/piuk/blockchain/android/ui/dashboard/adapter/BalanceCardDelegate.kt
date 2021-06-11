@@ -2,25 +2,26 @@ package piuk.blockchain.android.ui.dashboard.adapter
 
 import android.annotation.SuppressLint
 import android.graphics.Color
-import android.view.View
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
-import kotlinx.android.synthetic.main.item_dashboard_balance_card.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.CryptoAsset
+import piuk.blockchain.android.databinding.ItemDashboardBalanceCardBinding
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.dashboard.BalanceState
 import piuk.blockchain.android.ui.dashboard.asDeltaPercent
 import piuk.blockchain.android.ui.dashboard.setDeltaColour
-import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.context
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 
-class BalanceCardDelegate<in T> (
+class BalanceCardDelegate<in T>(
     private val selectedFiat: String,
     private val coincore: Coincore,
     private val assetResources: AssetResources
@@ -31,7 +32,7 @@ class BalanceCardDelegate<in T> (
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
         BalanceCardViewHolder(
-            parent.inflate(R.layout.item_dashboard_balance_card),
+            ItemDashboardBalanceCardBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             selectedFiat,
             coincore,
             assetResources
@@ -45,11 +46,11 @@ class BalanceCardDelegate<in T> (
 }
 
 private class BalanceCardViewHolder(
-    itemView: View,
+    private val binding: ItemDashboardBalanceCardBinding,
     private val selectedFiat: String,
     private val coincore: Coincore,
     private val assetResources: AssetResources
-) : RecyclerView.ViewHolder(itemView) {
+) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(state: BalanceState) {
         configurePieChart()
@@ -62,28 +63,29 @@ private class BalanceCardViewHolder(
     }
 
     private fun renderLoading() {
-        itemView.total_balance.resetLoader()
-        itemView.balance_delta_value.resetLoader()
-        itemView.balance_delta_percent.resetLoader()
-
+        with(binding) {
+            totalBalance.resetLoader()
+            balanceDeltaValue.resetLoader()
+            balanceDeltaPercent.resetLoader()
+        }
         populateEmptyPieChart()
     }
 
     @SuppressLint("SetTextI18n")
     private fun renderLoaded(state: BalanceState) {
 
-        with(itemView) {
-            total_balance.text = state.fiatBalance?.toStringWithSymbol() ?: ""
+        with(binding) {
+            totalBalance.text = state.fiatBalance?.toStringWithSymbol() ?: ""
 
             if (state.delta == null) {
-                balance_delta_value.text = ""
-                balance_delta_percent.text = ""
+                balanceDeltaValue.text = ""
+                balanceDeltaPercent.text = ""
             } else {
                 val (deltaVal, deltaPercent) = state.delta!!
 
-                balance_delta_value.text = deltaVal.toStringWithSymbol()
-                balance_delta_value.setDeltaColour(deltaPercent)
-                balance_delta_percent.asDeltaPercent(deltaPercent, "(", ")")
+                balanceDeltaValue.text = deltaVal.toStringWithSymbol()
+                balanceDeltaValue.setDeltaColour(deltaPercent)
+                balanceDeltaPercent.asDeltaPercent(deltaPercent, "(", ")")
             }
 
             populatePieChart(state)
@@ -91,24 +93,24 @@ private class BalanceCardViewHolder(
     }
 
     private fun populateEmptyPieChart() {
-        with(itemView) {
+        with(binding) {
             val entries = listOf(PieEntry(100f))
 
-            val sliceColours = listOf(ContextCompat.getColor(itemView.context, R.color.grey_100))
+            val sliceColours = listOf(context.getResolvedColor(R.color.grey_100))
 
-            pie_chart.data = PieData(
+            pieChart.data = PieData(
                 PieDataSet(entries, null).apply {
                     sliceSpace = 5f
                     setDrawIcons(false)
                     setDrawValues(false)
                     colors = sliceColours
                 })
-            pie_chart.invalidate()
+            pieChart.invalidate()
         }
     }
 
     private fun populatePieChart(state: BalanceState) {
-        with(itemView) {
+        with(binding) {
             val entries = ArrayList<PieEntry>().apply {
                 coincore.cryptoAssets.forEach {
                     val asset = state[(it as CryptoAsset).asset]
@@ -130,20 +132,20 @@ private class BalanceCardViewHolder(
                 // Add colour for Funds
                 sliceColours.add(ContextCompat.getColor(itemView.context, R.color.green_500))
 
-                pie_chart.data = PieData(
+                pieChart.data = PieData(
                     PieDataSet(entries, null).apply {
                         sliceSpace = SLICE_SPACE_DP
                         setDrawIcons(false)
                         setDrawValues(false)
                         colors = sliceColours
                     })
-                pie_chart.invalidate()
+                pieChart.invalidate()
             }
         }
     }
 
     private fun configurePieChart() {
-        with(itemView.pie_chart) {
+        with(binding.pieChart) {
             setDrawCenterText(false)
 
             isDrawHoleEnabled = true

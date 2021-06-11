@@ -5,6 +5,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.NabuDataManager
+import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.notifications.analytics.AnalyticsEvent
+import com.blockchain.notifications.analytics.AnalyticsNames
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
@@ -15,6 +18,7 @@ import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.ethereum.EthDataManager
 import piuk.blockchain.androidcore.data.walletoptions.WalletOptionsState
 import piuk.blockchain.androidcore.utils.PersistentPrefs
+import java.io.Serializable
 
 class LogoutActivity : AppCompatActivity() {
 
@@ -23,6 +27,7 @@ class LogoutActivity : AppCompatActivity() {
     private val walletOptionsState: WalletOptionsState by scopedInject()
     private val nabuDataManager: NabuDataManager by scopedInject()
     private val osUtil: OSUtil by inject()
+    private val analytics: Analytics by inject()
     private val loginState: AccessState by inject()
     private val prefs: PersistentPrefs by inject()
 
@@ -42,6 +47,7 @@ class LogoutActivity : AppCompatActivity() {
             // TODO: 30/06/20 We shouldn't need this any more now we have koin scopes
             // TODO: see Jira AND-3312
             clearData()
+            analytics.logEvent(LogOutAnalyticsEvent)
         }
     }
 
@@ -64,4 +70,11 @@ class LogoutActivity : AppCompatActivity() {
             scope.close()
         }
     }
+}
+
+object LogOutAnalyticsEvent : AnalyticsEvent {
+    override val event: String
+        get() = AnalyticsNames.SIGNED_OUT.eventName
+    override val params: Map<String, Serializable>
+        get() = mapOf()
 }

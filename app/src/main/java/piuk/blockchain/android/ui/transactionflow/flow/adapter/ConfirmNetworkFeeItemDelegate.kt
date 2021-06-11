@@ -7,21 +7,20 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
 import android.text.style.StyleSpan
-import android.view.View
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.ui.urllinks.URL_TX_FEES
-import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_send_confirm_network_fee.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.coincore.TxConfirmationValue
+import piuk.blockchain.android.databinding.ItemSendConfirmNetworkFeeBinding
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.StringUtils
+import piuk.blockchain.android.util.context
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.visible
 
 class ConfirmNetworkFeeItemDelegate<in T>(
@@ -33,7 +32,9 @@ class ConfirmNetworkFeeItemDelegate<in T>(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        NetworkFeeItemViewHolder(parent.inflate(R.layout.item_send_confirm_network_fee), stringUtils)
+        NetworkFeeItemViewHolder(
+            ItemSendConfirmNetworkFeeBinding.inflate(LayoutInflater.from(parent.context), parent, false), stringUtils
+        )
 
     override fun onBindViewHolder(
         items: List<T>,
@@ -46,12 +47,9 @@ class ConfirmNetworkFeeItemDelegate<in T>(
 }
 
 private class NetworkFeeItemViewHolder(
-    val parent: View,
-    val stringUtils: StringUtils
-) : RecyclerView.ViewHolder(parent), LayoutContainer {
-
-    override val containerView: View?
-        get() = itemView
+    private val binding: ItemSendConfirmNetworkFeeBinding,
+    private val stringUtils: StringUtils
+) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(
         item: TxConfirmationValue.NetworkFee,
@@ -59,30 +57,31 @@ private class NetworkFeeItemViewHolder(
     ) {
         val linksMap = mapOf<String, Uri>("send_tx_fees" to Uri.parse(URL_TX_FEES))
 
-        with(itemView) {
-            confirmation_fee_label.text =
+        with(binding) {
+            confirmationFreeLabel.text =
                 context.getString(R.string.tx_confirmation_network_fee, item.txFee.asset.displayTicker)
 
             if (item.txFee.fee.isZero) {
-                confirmation_fee_value.gone()
-                confirmation_free_label.visible()
+                confirmationFeeValue.gone()
+                confirmationFeeLabel.visible()
 
-                confirmation_learn_more.setText(getFreeFeesText(context, linksMap), TextView.BufferType.SPANNABLE)
+                confirmationLearnMore.setText(getFreeFeesText(context, linksMap), TextView.BufferType.SPANNABLE)
             } else {
-                confirmation_fee_value.text = item.txFee.fee.toStringWithSymbol()
-                confirmation_fee_value.visible()
-                confirmation_free_label.gone()
+                confirmationFeeValue.text = item.txFee.fee.toStringWithSymbol()
+                confirmationFeeValue.visible()
+                confirmationFeeLabel.gone()
 
-                confirmation_learn_more.setText(
+                confirmationLearnMore.setText(
                     getFeesText(
                         context,
                         linksMap,
                         assetResources.assetNameRes(item.txFee.asset)
                     ),
-                    TextView.BufferType.SPANNABLE)
+                    TextView.BufferType.SPANNABLE
+                )
             }
 
-            confirmation_learn_more.movementMethod = LinkMovementMethod.getInstance()
+            confirmationLearnMore.movementMethod = LinkMovementMethod.getInstance()
         }
     }
 
@@ -99,8 +98,10 @@ private class NetworkFeeItemViewHolder(
             .append(boldText)
             .append(linkedText)
 
-        sb.setSpan(StyleSpan(Typeface.BOLD), introText.length,
-            introText.length + boldText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        sb.setSpan(
+            StyleSpan(Typeface.BOLD), introText.length,
+            introText.length + boldText.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
 
         return sb
     }

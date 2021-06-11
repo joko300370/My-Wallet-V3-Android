@@ -8,7 +8,9 @@ data class InterestAccountDetailsResponse(
     val balance: String,
     val pendingInterest: String,
     val pendingDeposit: String,
-    val totalInterest: String
+    val totalInterest: String,
+    val pendingWithdrawal: String,
+    val locked: String
 )
 
 data class InterestAddressResponse(
@@ -98,3 +100,9 @@ enum class DisabledReason {
     OTHER,
     NONE
 }
+
+data class InterestWithdrawalBody(
+    val withdrawalAddress: String,
+    val amount: String,
+    val currency: String
+)

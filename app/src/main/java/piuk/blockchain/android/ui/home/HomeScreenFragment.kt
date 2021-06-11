@@ -1,8 +1,10 @@
 package piuk.blockchain.android.ui.home
 
 import androidx.fragment.app.Fragment
+import androidx.viewbinding.ViewBinding
 import info.blockchain.balance.CryptoCurrency
 import piuk.blockchain.android.campaign.CampaignType
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.simplebuy.SimpleBuyState
@@ -26,11 +28,6 @@ interface HomeNavigator {
         targetAccount: CryptoAccount? = null
     )
 
-    fun launchSwap(
-        sourceAccount: CryptoAccount? = null,
-        targetAccount: CryptoAccount? = null
-    )
-
     fun launchKyc(campaignType: CampaignType)
     fun launchThePitLinking(linkId: String = "")
     fun launchThePit()
@@ -38,15 +35,16 @@ interface HomeNavigator {
     fun launchSetup2Fa()
     fun launchVerifyEmail()
     fun launchSetupFingerprintLogin()
-    fun launchTransfer()
-    fun launchIntroTour()
+    fun launchReceive()
+    fun launchSend()
+    fun performAssetActionFor(action: AssetAction, account: BlockchainAccount)
+
     fun launchSimpleBuySell(viewType: BuySellFragment.BuySellViewType = BuySellFragment.BuySellViewType.TYPE_BUY)
     fun launchOpenBankingLinking(bankLinkingInfo: BankLinkingInfo)
     fun launchSimpleBuyFromDeepLinkApproval()
     fun handlePaymentForCancelledOrder(state: SimpleBuyState)
     fun showOpenBankingDeepLinkError()
 
-    fun gotoActivityFor(account: BlockchainAccount?)
     fun goToTransfer()
 
     fun resumeSimpleBuyKyc()
@@ -54,7 +52,8 @@ interface HomeNavigator {
     fun startInterestDashboard()
 }
 
-abstract class HomeScreenMviFragment<M : MviModel<S, I>, I : MviIntent<S>, S : MviState> : MviFragment<M, I, S>(),
+abstract class HomeScreenMviFragment<M : MviModel<S, I>, I : MviIntent<S>, S : MviState, E : ViewBinding> :
+    MviFragment<M, I, S, E>(),
     HomeScreenFragment {
 
     override fun navigator(): HomeNavigator =

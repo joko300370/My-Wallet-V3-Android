@@ -8,7 +8,7 @@ import com.blockchain.nabu.models.responses.banktransfer.BankTransferPaymentBody
 import com.blockchain.nabu.models.responses.banktransfer.CreateLinkBankRequestBody
 import com.blockchain.nabu.models.responses.banktransfer.OpenBankingTokenBody
 import com.blockchain.nabu.models.responses.banktransfer.UpdateProviderAccountBody
-import com.blockchain.nabu.models.responses.interest.InterestAccountDetailsResponse
+import com.blockchain.nabu.models.responses.interest.InterestWithdrawalBody
 import com.blockchain.nabu.models.responses.nabu.AddAddressRequest
 import com.blockchain.nabu.models.responses.nabu.AirdropStatusList
 import com.blockchain.nabu.models.responses.nabu.ApplicantIdRequest
@@ -33,6 +33,7 @@ import com.blockchain.nabu.models.responses.simplebuy.ConfirmOrderRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.CustodialWalletOrder
 import com.blockchain.nabu.models.responses.simplebuy.DepositRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.ProductTransferRequestBody
+import com.blockchain.nabu.models.responses.simplebuy.RecurringBuyRequestBody
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyConfirmationAttributes
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyCurrency
 import com.blockchain.nabu.models.responses.simplebuy.SimpleBuyEligibility
@@ -330,10 +331,14 @@ class NabuService(retrofit: Retrofit) {
 
     internal fun getTransactions(
         sessionToken: NabuSessionTokenResponse,
-        currency: String
+        currency: String,
+        product: String,
+        type: String?
     ): Single<TransactionsResponse> = service.getTransactions(
         sessionToken.authHeader,
-        currency
+        currency,
+        product,
+        type
     ).wrapErrorMessage()
 
     internal fun isEligibleForSimpleBuy(
@@ -358,8 +363,20 @@ class NabuService(retrofit: Retrofit) {
         }
     }.wrapErrorMessage()
 
-    internal fun fetchWithdrawFee(sessionToken: NabuSessionTokenResponse, paymentMethod: String) = service.withdrawFee(
-        sessionToken.authHeader, type = paymentMethod
+    fun createRecurringBuyOrder(
+        sessionToken: NabuSessionTokenResponse,
+        recurringOrderBody: RecurringBuyRequestBody
+    ) = service.createRecurringBuy(
+        authorization = sessionToken.authHeader,
+        recurringBuyBody = recurringOrderBody
+    ).wrapErrorMessage()
+
+    internal fun fetchWithdrawFeesAndLimits(
+        sessionToken: NabuSessionTokenResponse,
+        product: String,
+        paymentMethod: String
+    ) = service.getWithdrawFeeAndLimits(
+        sessionToken.authHeader, product, paymentMethod
     ).wrapErrorMessage()
 
     internal fun fetchWithdrawLocksRules(
@@ -505,9 +522,9 @@ class NabuService(retrofit: Retrofit) {
         }
     }.wrapErrorMessage()
 
-    fun getBalanceForAllAssets(
+    fun getCustodialWalletBalanceForAllAssets(
         sessionToken: NabuSessionTokenResponse
-    ) = service.getBalanceForAllAssets(
+    ) = service.getCustodialWalletBalanceForAllAssets(
         sessionToken.authHeader
     ).wrapErrorMessage()
 
@@ -600,22 +617,6 @@ class NabuService(retrofit: Retrofit) {
         }
     }.wrapErrorMessage()
 
-    fun getInterestAccountDetails(
-        sessionToken: NabuSessionTokenResponse,
-        currency: String
-    ) = service.getInterestAccountDetails(
-        authorization = sessionToken.authHeader,
-        cryptoSymbol = currency
-    ).flatMap {
-        when (it.code()) {
-            200 -> Single.just(it.body())
-            204 -> Single.just(
-                InterestAccountDetailsResponse("0", "0", "0", "0")
-            )
-            else -> Single.error(HttpException(it))
-        }
-    }.wrapErrorMessage()
-
     fun getInterestAddress(
         sessionToken: NabuSessionTokenResponse,
         currency: String
@@ -632,6 +633,12 @@ class NabuService(retrofit: Retrofit) {
         sessionToken: NabuSessionTokenResponse,
         currency: String
     ) = service.getInterestLimits(authorization = sessionToken.authHeader, currency = currency)
+        .wrapErrorMessage()
+
+    fun createInterestWithdrawal(
+        sessionToken: NabuSessionTokenResponse,
+        body: InterestWithdrawalBody
+    ) = service.createInterestWithdrawal(authorization = sessionToken.authHeader, body = body)
         .wrapErrorMessage()
 
     fun getInterestEnabled(
@@ -689,6 +696,36 @@ class NabuService(retrofit: Retrofit) {
     ) = service.executeTransfer(
         authorization = sessionToken.authHeader,
         body = body
+    ).wrapErrorMessage()
+
+    fun getRecurringBuyEligibility(
+        sessionToken: NabuSessionTokenResponse
+    ) = service.getRecurringBuyEligibility(
+        authorization = sessionToken.authHeader
+    ).wrapErrorMessage()
+
+    fun getRecurringBuysForAsset(
+        sessionToken: NabuSessionTokenResponse,
+        assetTicker: String
+    ) = service.getRecurringBuysForAsset(
+        authorization = sessionToken.authHeader,
+        assetTicker = assetTicker
+    ).wrapErrorMessage()
+
+    fun cancelRecurringBuy(
+        sessionToken: NabuSessionTokenResponse,
+        id: String
+    ) = service.cancelRecurringBuy(
+        authorization = sessionToken.authHeader,
+        id = id
+    ).wrapErrorMessage()
+
+    fun getRecurringBuysTransactions(
+        sessionToken: NabuSessionTokenResponse,
+        currency: String? = null
+    ) = service.fetchRecurringBuysTransactions(
+        authorization = sessionToken.authHeader,
+        assetTicker = currency
     ).wrapErrorMessage()
 
     companion object {

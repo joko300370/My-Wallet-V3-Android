@@ -431,6 +431,14 @@ class PrefsUtil(
         removeValue(KEY_ENCRYPTED_PIN_CODE)
     }
 
+    override var sessionId: String
+        get() = getValue(SESSION_ID, "")
+        set(value) = setValue(SESSION_ID, value)
+
+    override fun clearSessionId() {
+        removeValue(SESSION_ID)
+    }
+
     private fun encodeToBase64(data: String) =
         Base64.encodeToString(data.toByteArray(charset("UTF-8")), Base64.DEFAULT)
 
@@ -534,6 +542,7 @@ class PrefsUtil(
         val mapping = browserIdentityMapping.mapping
         return mapping.get(pubkeyHash)
     }
+
     override fun addBrowserIdentity(browserIdentity: BrowserIdentity) {
         getBrowserIdentityMapping().mapping
             .also { it.put(browserIdentity.pubKeyHash(), browserIdentity) }
@@ -551,15 +560,19 @@ class PrefsUtil(
             .also { it.get(pubkeyHash)?.lastUsed = System.currentTimeMillis() }
             .also { setBrowserIdentityMapping(BrowserIdentityMapping(it)) }
     }
+
     override fun addBrowserIdentityAuthorization(pubkeyHash: String, authorization: Authorization) {
         getBrowserIdentityMapping().mapping
             .also { it.get(pubkeyHash)?.authorized?.add(authorization) }
             .also { setBrowserIdentityMapping(BrowserIdentityMapping(it)) }
     }
+
     override fun pruneBrowserIdentities() {
         getBrowserIdentityMapping().mapping
-            .filterNot { it.value.lastUsed == 0L &&
-                (System.currentTimeMillis() - it.value.scanned) > TimeUnit.MINUTES.toMillis(2) }
+            .filterNot {
+                it.value.lastUsed == 0L &&
+                    (System.currentTimeMillis() - it.value.scanned) > TimeUnit.MINUTES.toMillis(2)
+            }
             .toMutableMap()
             .also { setBrowserIdentityMapping(BrowserIdentityMapping(it)) }
     }
@@ -663,8 +676,10 @@ class PrefsUtil(
         private const val KEY_SWIPE_RECEIVE_XLM_ADDRESS = "key_swipe_receive_xlm_address"
         private const val KEY_SWIPE_RECEIVE_BTC_ACCOUNT_NAME = "swipe_receive_account_name"
         private const val KEY_SWIPE_RECEIVE_BCH_ACCOUNT_NAME = "swipe_receive_bch_account_name"
+
         // New key
         private const val OFFLINE_CACHE_KEY = "key_offline_address_cache"
+
         // Auth prefs
         private const val KEY_ENCRYPTED_PIN_CODE = "encrypted_pin_code"
         private const val KEY_FINGERPRINT_ENABLED = "fingerprint_enabled"
@@ -673,6 +688,7 @@ class PrefsUtil(
         private const val KEY_SHARED_KEY = "sharedKey"
         private const val KEY_ENCRYPTED_PASSWORD = "encrypted_password"
         const val KEY_PIN_FAILS = "pin_fails"
+        const val SESSION_ID = "session_id"
     }
 }
 

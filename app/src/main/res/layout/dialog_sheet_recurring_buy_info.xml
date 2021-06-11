@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/rb_sheet_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/tiny_margin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/vector_sheet_indicator" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/rb_sheet_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/small_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rb_sheet_indicator"
+        app:srcCompat="@drawable/ic_arrow_back_blue" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/rb_sheet_title"
+        style="@style/Text.Semibold.20"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        app:layout_constraintBottom_toBottomOf="@id/rb_sheet_back"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/rb_sheet_back"
+        app:layout_constraintTop_toTopOf="@id/rb_sheet_back"
+        tools:text="Recurring BTC Buy" />
+
+    <piuk.blockchain.android.ui.transactionflow.plugin.SimpleInfoHeaderView
+        android:id="@+id/rb_sheet_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/rb_sheet_back" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rb_sheet_items"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toTopOf="@id/rb_sheet_cancel"
+        app:layout_constraintTop_toBottomOf="@id/rb_sheet_header" />
+
+    <Button
+        android:id="@+id/rb_sheet_cancel"
+        style="@style/CtaButton.NoBackgroundRedText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/standard_margin"
+        android:text="@string/recurring_buy_info_cta"
+        app:layout_constraintBottom_toBottomOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

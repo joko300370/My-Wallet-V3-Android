@@ -25,6 +25,7 @@ enum class AssetAction {
     Sell,
     Summary,
     InterestDeposit,
+    InterestWithdraw,
     FiatDeposit
 }
 
@@ -38,7 +39,7 @@ interface Asset {
 
     fun transactionTargets(account: SingleAccount): Single<SingleAccountList>
 
-    fun parseAddress(address: String): Maybe<ReceiveAddress>
+    fun parseAddress(address: String, label: String? = null): Maybe<ReceiveAddress>
     fun isValidAddress(address: String): Boolean = false
 }
 

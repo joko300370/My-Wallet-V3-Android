@@ -10,14 +10,16 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.blockchain.koin.payloadScope
 import com.blockchain.koin.scopedInject
+import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.ui.trackProgress
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.fragment_buy_sell.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.FragmentBuySellBinding
+import piuk.blockchain.android.simplebuy.BuySellViewedEvent
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.simplebuy.SimpleBuyCheckoutFragment
 import piuk.blockchain.android.simplebuy.SimpleBuySelectCurrencyFragment
@@ -36,8 +38,13 @@ import kotlin.properties.Delegates
 class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIntroHost,
     SlidingModalBottomDialog.Host {
 
+    private var _binding: FragmentBuySellBinding? = null
+    private val binding: FragmentBuySellBinding
+        get() = _binding!!
+
     private val compositeDisposable = CompositeDisposable()
     private val appUtil: AppUtil by inject()
+    private val analytics: Analytics by inject()
     private val simpleBuySync: SimpleBuySyncFactory by scopedInject()
     private val buySellFlowNavigator: BuySellFlowNavigator
         get() = payloadScope.get()
@@ -51,11 +58,15 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_buy_sell)
+    ): View {
+        _binding = FragmentBuySellBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         activity?.setupToolbar(R.string.buy_and_sell)
+        analytics.logEvent(BuySellViewedEvent())
     }
 
     private fun subscribeForNavigation() {
@@ -65,7 +76,7 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
             }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
-                buy_sell_empty.gone()
+                binding.buySellEmpty.gone()
             }
             .trackProgress(appUtil.activityIndicator)
             .subscribeBy(
@@ -79,38 +90,46 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
     }
 
     private fun renderBuySellFragments(it: BuySellIntroAction?) {
-        buy_sell_empty.gone()
-        pager.visible()
-        when (it) {
-            is BuySellIntroAction.NavigateToCurrencySelection ->
-                goToCurrencySelection(it.supportedCurrencies)
-            is BuySellIntroAction.DisplayBuySellIntro -> {
-                if (!it.isGoldButNotEligible) {
-                    renderBuySellUi(it.hasPendingBuy)
-                } else {
-                    renderNotEligibleUi()
+        with(binding) {
+            buySellEmpty.gone()
+            pager.visible()
+            when (it) {
+                is BuySellIntroAction.NavigateToCurrencySelection ->
+                    goToCurrencySelection(it.supportedCurrencies)
+                is BuySellIntroAction.DisplayBuySellIntro -> {
+                    if (!it.isGoldButNotEligible) {
+                        renderBuySellUi(it.hasPendingBuy)
+                    } else {
+                        renderNotEligibleUi()
+                    }
                 }
+                else -> startActivity(
+                    SimpleBuyActivity.newInstance(
+                        context = activity as Context,
+                        launchFromNavigationBar = true, launchKycResume = false
+                    )
+                )
             }
-            else -> startActivity(SimpleBuyActivity.newInstance(
-                context = activity as Context,
-                launchFromNavigationBar = true, launchKycResume = false
-            ))
         }
     }
 
     private fun renderErrorState() {
-        pager.gone()
-        buy_sell_empty.setDetails {
-            subscribeForNavigation()
+        with(binding) {
+            pager.gone()
+            buySellEmpty.setDetails {
+                subscribeForNavigation()
+            }
+            buySellEmpty.visible()
         }
-        buy_sell_empty.visible()
     }
 
     private fun renderNotEligibleUi() {
-        pager.gone()
-        not_eligible_icon.visible()
-        not_eligible_title.visible()
-        not_eligible_description.visible()
+        with(binding) {
+            pager.gone()
+            notEligibleIcon.visible()
+            notEligibleTitle.visible()
+            notEligibleDescription.visible()
+        }
     }
 
     private val pagerAdapter: ViewPagerAdapter by lazy {
@@ -121,24 +140,28 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
     }
 
     private fun renderBuySellUi(hasPendingBuy: Boolean) {
-        tab_layout.setupWithViewPager(pager)
-        activity?.setupToolbar(R.string.buy_and_sell)
+        with(binding) {
+            tabLayout.setupWithViewPager(pager)
+            activity?.setupToolbar(R.string.buy_and_sell)
 
-        if (pager.adapter == null) {
-            pager.adapter = pagerAdapter
-            when (showView) {
-                BuySellViewType.TYPE_BUY -> pager.setCurrentItem(
-                    BuySellViewType.TYPE_BUY.ordinal, true)
-                BuySellViewType.TYPE_SELL -> pager.setCurrentItem(
-                    BuySellViewType.TYPE_SELL.ordinal, true)
+            if (pager.adapter == null) {
+                pager.adapter = pagerAdapter
+                when (showView) {
+                    BuySellViewType.TYPE_BUY -> pager.setCurrentItem(
+                        BuySellViewType.TYPE_BUY.ordinal, true
+                    )
+                    BuySellViewType.TYPE_SELL -> pager.setCurrentItem(
+                        BuySellViewType.TYPE_SELL.ordinal, true
+                    )
+                }
             }
-        }
 
-        pagerAdapter.showPendingBuy = hasPendingBuy
-        pager.visible()
-        not_eligible_icon.gone()
-        not_eligible_title.gone()
-        not_eligible_description.gone()
+            pagerAdapter.showPendingBuy = hasPendingBuy
+            pager.visible()
+            notEligibleIcon.gone()
+            notEligibleTitle.gone()
+            notEligibleDescription.gone()
+        }
     }
 
     private fun goToCurrencySelection(supportedCurrencies: List<String>) {
@@ -148,16 +171,18 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
     override fun onDestroyView() {
         super.onDestroyView()
         compositeDisposable.clear()
+        _binding = null
     }
 
     companion object {
         private const val VIEW_TYPE = "VIEW_TYPE"
 
-        fun newInstance(viewType: BuySellViewType = BuySellViewType.TYPE_BUY) = BuySellFragment().apply {
-            arguments = Bundle().apply {
-                putSerializable(VIEW_TYPE, viewType)
+        fun newInstance(viewType: BuySellViewType = BuySellViewType.TYPE_BUY) =
+            BuySellFragment().apply {
+                arguments = Bundle().apply {
+                    putSerializable(VIEW_TYPE, viewType)
+                }
             }
-        }
     }
 
     enum class BuySellViewType {
@@ -172,7 +197,7 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
     override fun onSellInfoClicked() = navigator().goToTransfer()
 
     override fun onSellListEmptyCta() {
-        pager.setCurrentItem(BuySellViewType.TYPE_BUY.ordinal, true)
+        binding.pager.setCurrentItem(BuySellViewType.TYPE_BUY.ordinal, true)
     }
 
     override fun onResume() {

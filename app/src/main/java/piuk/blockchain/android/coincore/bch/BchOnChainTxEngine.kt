@@ -5,17 +5,18 @@ import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
+import info.blockchain.wallet.bch.BchMainNetParams
 import info.blockchain.wallet.exceptions.HDWalletException
+import info.blockchain.wallet.keys.SigningKey
+import info.blockchain.wallet.payload.data.XPub
 import info.blockchain.wallet.payload.model.Utxo
 import info.blockchain.wallet.payment.Payment
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import info.blockchain.wallet.util.FormatsUtil
-import info.blockchain.wallet.bch.BchMainNetParams
-import info.blockchain.wallet.keys.SigningKey
-import info.blockchain.wallet.payload.data.XPub
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FeeSelection
@@ -27,6 +28,7 @@ import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.copyAndPut
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.updateTxValidity
+import piuk.blockchain.android.ui.transactionflow.flow.FeeInfo
 import piuk.blockchain.androidcore.data.bitcoincash.BchDataManager
 import piuk.blockchain.androidcore.data.fees.FeeDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -145,7 +147,7 @@ class BchOnChainTxEngine(
             amount = amount,
             totalBalance = balance,
             availableBalance = available.maxSpendable,
-            feeForFullAvailable = available.forForMax,
+            feeForFullAvailable = available.feeForMax,
             feeAmount = CryptoValue.fromMinor(sourceAsset, unspentOutputs.absoluteFee),
             engineState = pendingTx.engineState.copyAndPut(STATE_UTXO, unspentOutputs)
         )
@@ -188,17 +190,32 @@ class BchOnChainTxEngine(
 
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(
-            pendingTx.copy(
-                confirmations = listOf(
-                    TxConfirmationValue.From(from = sourceAccount.label),
-                    TxConfirmationValue.To(to = txTarget.label),
-                    makeFeeSelectionOption(pendingTx),
-                    TxConfirmationValue.FeedTotal(
-                        amount = pendingTx.amount,
-                        fee = pendingTx.feeAmount,
-                        exchangeFee = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
-                        exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
-                    )
+            buildConfirmations(pendingTx)
+        )
+
+    private fun buildConfirmations(pendingTx: PendingTx): PendingTx =
+        pendingTx.copy(
+            confirmations = listOfNotNull(
+                TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
+                TxConfirmationValue.NewTo(
+                    txTarget, AssetAction.Send, sourceAccount
+                ),
+                TxConfirmationValue.CompoundNetworkFee(
+                    sendingFeeInfo = if (!pendingTx.feeAmount.isZero) {
+                        FeeInfo(
+                            pendingTx.feeAmount,
+                            pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+                            sourceAsset
+                        )
+                    } else null,
+                    feeLevel = pendingTx.feeSelection.selectedLevel
+                ),
+                TxConfirmationValue.NewTotal(
+                    totalWithFee = (pendingTx.amount as CryptoValue).plus(
+                        pendingTx.feeAmount as CryptoValue
+                    ),
+                    exchange = pendingTx.amount.toFiat(exchangeRates, userFiat)
+                        .plus(pendingTx.feeAmount.toFiat(exchangeRates, userFiat))
                 )
             )
         )

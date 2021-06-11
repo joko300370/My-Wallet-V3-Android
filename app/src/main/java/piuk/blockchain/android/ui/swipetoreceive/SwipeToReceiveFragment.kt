@@ -5,38 +5,41 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
-import androidx.core.content.ContextCompat
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.AppCompatImageView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.content.ContextCompat
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.blockchain.koin.scopedInject
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
-import kotlinx.android.synthetic.main.fragment_swipe_to_receive.*
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetResources
+import piuk.blockchain.android.databinding.FragmentSwipeToReceiveBinding
+import piuk.blockchain.android.databinding.ItemImagePagerBinding
+import piuk.blockchain.android.ui.customviews.toast
+import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.invisible
+import piuk.blockchain.android.util.setOnPageChangeListener
+import piuk.blockchain.android.util.visible
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import piuk.blockchain.androidcoreui.ui.base.UiState
-import piuk.blockchain.android.ui.customviews.toast
-import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.inflate
-import piuk.blockchain.android.util.invisible
-import piuk.blockchain.android.util.visible
-import piuk.blockchain.android.util.setOnPageChangeListener
 
 @Suppress("MemberVisibilityCanPrivate")
 class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePresenter>(),
     SwipeToReceiveView {
+
+    private var _binding: FragmentSwipeToReceiveBinding? = null
+    private val binding: FragmentSwipeToReceiveBinding
+        get() = _binding!!
 
     private val presenter: SwipeToReceivePresenter by inject()
     private val rxBus: RxBus by inject()
@@ -46,20 +49,25 @@ class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePr
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = container?.inflate(R.layout.fragment_swipe_to_receive)
+    ): View {
+        _binding = FragmentSwipeToReceiveBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        listOf(imageview_qr, textview_address, textview_request_currency).forEach {
-            it.setOnClickListener { showClipboardWarning() }
-        }
+        with(binding) {
+            listOf(imageviewQr, textviewAddress, textviewRequestCurrency).forEach {
+                it.setOnClickListener { showClipboardWarning() }
+            }
 
-        imageview_left_arrow.setOnClickListener {
-            viewpager_icons.currentItem = viewpager_icons.currentItem - 1
-        }
-        imageview_right_arrow.setOnClickListener {
-            viewpager_icons.currentItem = viewpager_icons.currentItem + 1
+            imageviewLeftArrow.setOnClickListener {
+                viewpagerIcons.currentItem = viewpagerIcons.currentItem - 1
+            }
+            imageviewRightArrow.setOnClickListener {
+                viewpagerIcons.currentItem = viewpagerIcons.currentItem + 1
+            }
         }
 
         onViewReady()
@@ -72,18 +80,19 @@ class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePr
             assetImageList
         )
 
-        viewpager_icons.run {
+        binding.viewpagerIcons.run {
             offscreenPageLimit = 3
             setAdapter(adapter)
-            indicator.setViewPager(this)
+            binding.indicator.setViewPager(this)
             setOnPageChangeListener {
                 onPageSelected { index ->
                     presenter.onCurrencySelected(assetList[index])
-
-                    when (index) {
-                        0 -> imageview_left_arrow.invisible()
-                        adapter.count - 1 -> imageview_right_arrow.invisible()
-                        else -> listOf(imageview_left_arrow, imageview_right_arrow).forEach { it.visible() }
+                    with(binding) {
+                        when (index) {
+                            0 -> imageviewLeftArrow.invisible()
+                            adapter.count - 1 -> imageviewRightArrow.invisible()
+                            else -> listOf(imageviewLeftArrow, imageviewRightArrow).forEach { it.visible() }
+                        }
                     }
                 }
             }
@@ -94,18 +103,20 @@ class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePr
     }
 
     override fun displayReceiveAddress(address: String) {
-        textview_address.text = address
+        binding.textviewAddress.text = address
     }
 
     override fun displayReceiveAccount(accountName: String) {
-        textview_account.text = accountName
+        binding.textviewAccount.text = accountName
     }
 
     override fun displayAsset(cryptoCurrency: CryptoCurrency) {
         val assetName = assetResources.assetName(cryptoCurrency)
         val requestString = getString(R.string.swipe_to_receive_request, assetName)
-        textview_request_currency.text = requestString
-        textview_request_currency.contentDescription = requestString
+        with(binding.textviewRequestCurrency) {
+            text = requestString
+            contentDescription = requestString
+        }
     }
 
     override fun setUiState(uiState: Int) {
@@ -118,7 +129,7 @@ class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePr
     }
 
     override fun displayQrCode(bitmap: Bitmap) {
-        imageview_qr.setImageBitmap(bitmap)
+        binding.imageviewQr.setImageBitmap(bitmap)
     }
 
     override fun onStop() {
@@ -141,32 +152,43 @@ class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePr
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     override fun createPresenter() = presenter
 
     override fun getMvpView() = this
 
     private fun showContent() {
-        layout_qr.visible()
-        progress_bar.gone()
-        imageview_qr.visible()
-        textview_error.gone()
+        with(binding) {
+            layoutQr.visible()
+            progressBar.gone()
+            imageviewQr.visible()
+            textviewError.gone()
+        }
     }
 
     private fun displayLoading() {
-        layout_qr.visible()
-        progress_bar.visible()
-        imageview_qr.invisible()
-        textview_error.gone()
+        with(binding) {
+            layoutQr.visible()
+            progressBar.visible()
+            imageviewQr.invisible()
+            textviewError.gone()
+        }
     }
 
     private fun showNoAddressesAvailable() {
-        layout_qr.invisible()
-        textview_error.visible()
-        textview_address.text = ""
+        with(binding) {
+            layoutQr.invisible()
+            textviewError.visible()
+            textviewAddress.text = ""
+        }
     }
 
     private fun showClipboardWarning() {
-        val address = textview_address.text
+        val address = binding.textviewAddress.text
         activity?.run {
             AlertDialog.Builder(this, R.style.AlertDialogStyle)
                 .setTitle(R.string.app_name)
@@ -196,7 +218,8 @@ class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePr
         }
 
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
-            val imageView = container.inflate(R.layout.item_image_pager) as ImageView
+            val imageViewBinding = ItemImagePagerBinding.inflate(LayoutInflater.from(context), container, false)
+            val imageView = imageViewBinding.imageviewCurrencyIcon
             imageView.setImageDrawable(ContextCompat.getDrawable(context, drawables[position]))
             (container as ViewPager).addView(imageView, 0)
             return imageView

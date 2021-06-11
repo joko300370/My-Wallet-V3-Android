@@ -1,10 +1,10 @@
 package info.blockchain.wallet.multiaddress
 
+import info.blockchain.api.ApiException
 import info.blockchain.api.BitcoinApi
 import info.blockchain.api.bitcoin.data.MultiAddress
 import info.blockchain.api.bitcoin.data.Transaction
 import info.blockchain.wallet.bip44.HDChain
-import info.blockchain.wallet.exceptions.ApiException
 import info.blockchain.wallet.payload.data.AddressLabel
 import info.blockchain.wallet.payload.data.XPub
 import info.blockchain.wallet.payload.data.XPubs

@@ -5,8 +5,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
-import kotlinx.android.synthetic.main.view_status_line_info.view.*
-import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.ViewStatusLineInfoBinding
 import piuk.blockchain.android.util.visibleIf
 
 class StatusInfoLine @JvmOverloads constructor(
@@ -15,10 +14,7 @@ class StatusInfoLine @JvmOverloads constructor(
     defStyle: Int = 0
 ) : LinearLayout(ctx, attr, defStyle) {
 
-    init {
-        LayoutInflater.from(context)
-            .inflate(R.layout.view_status_line_info, this, true)
-    }
+    private val binding = ViewStatusLineInfoBinding.inflate(LayoutInflater.from(ctx), this, true)
 
     var status: String = ""
         set(value) {
@@ -39,11 +35,11 @@ class StatusInfoLine @JvmOverloads constructor(
         }
 
     private fun refreshTextColour() {
-        message.setTextColor(ContextCompat.getColor(context, textColour))
+        binding.message.setTextColor(ContextCompat.getColor(context, textColour))
     }
 
     private fun refreshBkgdColour() {
-        item_account_parent.background =
+        binding.itemAccountParent.background =
             ContextCompat.getDrawable(context, background)
     }
 
@@ -54,10 +50,10 @@ class StatusInfoLine @JvmOverloads constructor(
         }
 
     private fun refreshIconVisibility() {
-        icon.visibleIf { isIconVisible }
+        binding.icon.visibleIf { isIconVisible }
     }
 
     private fun refreshText() {
-        message.text = status
+        binding.message.text = status
     }
 }

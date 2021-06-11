@@ -6,7 +6,6 @@ import android.os.Bundle
 import com.blockchain.notifications.analytics.InterestAnalytics
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
-import kotlinx.android.synthetic.main.toolbar_general.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
@@ -14,6 +13,7 @@ import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
 import piuk.blockchain.android.coincore.InterestAccount
 import piuk.blockchain.android.coincore.SingleAccount
+import piuk.blockchain.android.databinding.ActivityInterestDashboardBinding
 import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
@@ -27,6 +27,10 @@ class InterestDashboardActivity : BlockchainActivity(),
     InterestDashboardFragment.InterestDashboardHost,
     DialogFlow.FlowHost {
 
+    private val binding: ActivityInterestDashboardBinding by lazy {
+        ActivityInterestDashboardBinding.inflate(layoutInflater)
+    }
+
     override val alwaysDisableScreenshots: Boolean
         get() = false
 
@@ -34,8 +38,8 @@ class InterestDashboardActivity : BlockchainActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_interest_dashboard)
-        setSupportActionBar(toolbar_general)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbarGeneral.toolbarGeneral)
         setTitle(R.string.interest_dashboard_title)
 
         supportFragmentManager.beginTransaction()
@@ -62,6 +66,15 @@ class InterestDashboardActivity : BlockchainActivity(),
         TransactionFlow(
             target = toAccount,
             action = AssetAction.InterestDeposit
+        ).startFlow(supportFragmentManager, this)
+    }
+
+    override fun goToInterestWithdraw(fromAccount: InterestAccount) {
+        clearBottomSheet()
+        require(fromAccount is CryptoAccount)
+        TransactionFlow(
+            sourceAccount = fromAccount,
+            action = AssetAction.InterestWithdraw
         ).startFlow(supportFragmentManager, this)
     }
 

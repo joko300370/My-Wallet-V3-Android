@@ -1,17 +1,14 @@
 package piuk.blockchain.android.ui.transactionflow.flow.adapter
 
-import android.view.View
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_send_large_tx_confirm_item.view.*
-import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
+import piuk.blockchain.android.databinding.ItemSendLargeTxConfirmItemBinding
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
-import piuk.blockchain.android.util.inflate
 
 class LargeTransactionWarningItemDelegate<in T>(
     private val model: TransactionModel
@@ -21,7 +18,7 @@ class LargeTransactionWarningItemDelegate<in T>(
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
         LargeTransactionViewHolder(
-            parent.inflate(R.layout.item_send_large_tx_confirm_item)
+            ItemSendLargeTxConfirmItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
 
     @Suppress("UNCHECKED_CAST")
@@ -35,18 +32,14 @@ class LargeTransactionWarningItemDelegate<in T>(
     )
 }
 
-private class LargeTransactionViewHolder(val parent: View) :
-    RecyclerView.ViewHolder(parent),
-    LayoutContainer {
-
-    override val containerView: View?
-        get() = itemView
+private class LargeTransactionViewHolder(private val binding: ItemSendLargeTxConfirmItemBinding) :
+    RecyclerView.ViewHolder(binding.root) {
 
     fun bind(
         item: TxConfirmationValue.TxBooleanConfirmation<Unit>,
         model: TransactionModel
     ) {
-        with(itemView.confirm_checkbox) {
+        with(binding.confirmCheckbox) {
             isChecked = item.value
             setOnCheckedChangeListener { view, isChecked ->
                 model.process(TransactionIntent.ModifyTxOption(item.copy(value = isChecked)))

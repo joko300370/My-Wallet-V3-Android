@@ -12,7 +12,7 @@ class EmailVerifyInteractor(private val emailUpdater: EmailSyncUpdater) {
     private val pollEmail = PollService(
         emailUpdater.email()
     ) {
-        it.verified
+        it.isVerified
     }
 
     fun fetchEmail(): Single<Email> =

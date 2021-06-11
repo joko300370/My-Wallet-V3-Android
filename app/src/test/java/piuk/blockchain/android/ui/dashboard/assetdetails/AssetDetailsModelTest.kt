@@ -1,17 +1,26 @@
 package piuk.blockchain.android.ui.dashboard.assetdetails
 
 import com.blockchain.android.testutils.rxInit
-import com.nhaarman.mockito_kotlin.any
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.models.data.RecurringBuy
+import com.blockchain.nabu.models.data.RecurringBuyFrequency
+import com.blockchain.nabu.models.data.RecurringBuyState
 import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
+import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.FiatValue
 import info.blockchain.wallet.prices.data.PriceDatum
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import org.amshove.kluent.`it returns`
+import org.amshove.kluent.itReturns
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import piuk.blockchain.android.coincore.AssetFilter
+import piuk.blockchain.android.coincore.CryptoAsset
 import piuk.blockchain.android.coincore.btc.BtcAsset
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import piuk.blockchain.androidcore.data.exchangerate.TimeSpan
@@ -33,7 +42,8 @@ class AssetDetailsModelTest {
             walletPreferences = mock(),
             offlineAccounts = mock(),
             identity = mock(),
-            coinsWebsocket = mock()
+            coinsWebsocket = mock(),
+            features = mock()
         )
     )
 
@@ -51,74 +61,91 @@ class AssetDetailsModelTest {
 
     @Before
     fun setUp() {
-        model =
-            AssetDetailsModel(defaultState, Schedulers.io(), interactor, environmentConfig, mock())
+        model = AssetDetailsModel(defaultState, Schedulers.io(), interactor, environmentConfig, mock())
     }
 
     @Test
-    fun `load details success`() {
+    fun `load asset success`() {
         val assetDisplayMap = mapOf(
             AssetFilter.Custodial to AssetDisplayInfo(mock(), mock(), mock(), mock(), emptySet())
         )
-
-        whenever(interactor.loadAssetDetails(any())).thenReturn(Single.just(assetDisplayMap))
-
-        val testObserver = model.state.test()
-        model.process(LoadAssetDisplayDetails)
-        testObserver.assertValueAt(0, defaultState)
-        testObserver.assertValueAt(1, defaultState.copy(assetDisplayMap = assetDisplayMap))
-    }
-
-    @Test
-    fun `load price success`() {
+        val recurringBuy = RecurringBuy(
+            "123", RecurringBuyState.ACTIVE, RecurringBuyFrequency.BI_WEEKLY, mock(),
+            PaymentMethodType.BANK_TRANSFER, FiatValue.zero("EUR"), mock()
+        )
+        val recurringBuys: List<RecurringBuy> = listOf(
+            recurringBuy
+        )
+        val expectedRecurringBuyMap = mapOf(
+            "123" to recurringBuy
+        )
         val price = "1000 BTC"
-        whenever(interactor.loadExchangeRate(any())).thenReturn(Single.just(price))
-
-        val testObserver = model.state.test()
-        model.process(LoadAssetFiatValue)
-        testObserver.assertValueAt(0, defaultState)
-        testObserver.assertValueAt(1, defaultState.copy(assetFiatPrice = price))
-    }
-
-    @Test
-    fun `historic price success`() {
         val priceSeries = listOf(PriceDatum())
-        whenever(interactor.loadHistoricPrices(any(), any())).thenReturn(Single.just(priceSeries))
+        val asset: CryptoAsset = mock {
+            on { asset } itReturns CryptoCurrency.BTC
+        }
+
+        val timeSpan = TimeSpan.DAY
+
+        whenever(interactor.loadAssetDetails(asset)).thenReturn(Single.just(assetDisplayMap))
+        whenever(interactor.loadExchangeRate(asset)).thenReturn(Single.just(price))
+        whenever(interactor.loadHistoricPrices(asset, timeSpan)).thenReturn(Single.just(priceSeries))
+        whenever(interactor.loadRecurringBuysForAsset(asset.asset.networkTicker)).thenReturn(Single.just(recurringBuys))
 
         val testObserver = model.state.test()
-        model.process(LoadHistoricPrices)
+        model.process(LoadAsset(asset))
+
         testObserver.assertValueAt(0, defaultState)
-        testObserver.assertValueAt(1, defaultState.copy(chartLoading = true))
+        testObserver.assertValueAt(1, defaultState.copy(asset = asset, assetDisplayMap = mapOf()))
         testObserver.assertValueAt(
             2, defaultState.copy(
-                chartData = priceSeries,
-                chartLoading = false
+                asset = asset,
+                assetDisplayMap = mapOf(),
+                chartLoading = true
             )
-        )
-    }
-
-    @Test
-    fun `changing timestamp updates historic price`() {
-        val priceSeries = listOf(PriceDatum())
-        val monthTimeSpan = TimeSpan.MONTH
-
-        whenever(interactor.loadHistoricPrices(any(), any())).thenReturn(Single.just(priceSeries))
-
-        val testObserver = model.state.test()
-        model.process(UpdateTimeSpan(monthTimeSpan))
-
-        testObserver.assertValueAt(0, defaultState)
-        testObserver.assertValueAt(1, defaultState.copy(timeSpan = monthTimeSpan))
-        testObserver.assertValueAt(
-            2,
-            defaultState.copy(chartLoading = true, timeSpan = monthTimeSpan)
         )
         testObserver.assertValueAt(
             3, defaultState.copy(
+                asset = asset,
+                assetDisplayMap = mapOf(),
                 chartData = priceSeries,
-                timeSpan = monthTimeSpan,
                 chartLoading = false
             )
         )
+        testObserver.assertValueAt(
+            4, defaultState.copy(
+                asset = asset,
+                assetDisplayMap = mapOf(),
+                chartData = priceSeries,
+                chartLoading = false,
+                assetFiatPrice = price
+            )
+        )
+        testObserver.assertValueAt(
+            5, defaultState.copy(
+                asset = asset,
+                chartData = priceSeries,
+                chartLoading = false,
+                assetFiatPrice = price,
+                assetDisplayMap = assetDisplayMap
+            )
+        )
+        testObserver.assertValueAt(
+            6, defaultState.copy(
+                asset = asset,
+                chartData = priceSeries,
+                chartLoading = false,
+                assetFiatPrice = price,
+                assetDisplayMap = assetDisplayMap,
+                recurringBuys = expectedRecurringBuyMap
+            )
+        )
+
+        verify(interactor).loadAssetDetails(asset)
+        verify(interactor).loadExchangeRate(asset)
+        verify(interactor).loadRecurringBuysForAsset(asset.asset.networkTicker)
+        verify(interactor).loadHistoricPrices(asset, timeSpan)
+
+        verifyNoMoreInteractions(interactor)
     }
 }

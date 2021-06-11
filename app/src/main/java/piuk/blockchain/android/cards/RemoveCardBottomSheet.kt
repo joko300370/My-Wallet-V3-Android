@@ -6,17 +6,16 @@ import android.view.ViewGroup
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.PaymentMethod
-import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.remove_card_bottom_sheet.view.*
 import piuk.blockchain.android.databinding.RemoveCardBottomSheetBinding
 import piuk.blockchain.android.simplebuy.RemovePaymentMethodBottomSheetHost
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.android.util.visibleIf
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 
 class RemoveCardBottomSheet : SlidingModalBottomDialog<RemoveCardBottomSheetBinding>() {
 
@@ -58,9 +57,11 @@ class RemoveCardBottomSheet : SlidingModalBottomDialog<RemoveCardBottomSheetBind
     }
 
     private fun updateUi(isLoading: Boolean) {
-        view?.progress.visibleIf { isLoading }
-        view?.icon.visibleIf { !isLoading }
-        view?.rmv_card_btn?.isEnabled = !isLoading
+        with(binding) {
+            progress.visibleIf { isLoading }
+            icon.visibleIf { !isLoading }
+            rmvCardBtn.isEnabled = !isLoading
+        }
     }
 
     companion object {

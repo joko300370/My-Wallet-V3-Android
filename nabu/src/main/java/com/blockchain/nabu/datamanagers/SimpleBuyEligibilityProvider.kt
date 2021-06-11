@@ -1,9 +1,9 @@
 package com.blockchain.nabu.datamanagers
 
-import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.rx.ParameteredTimedCacheRequest
 import com.blockchain.nabu.Authenticator
 import com.blockchain.nabu.service.NabuService
+import com.blockchain.preferences.CurrencyPrefs
+import com.blockchain.rx.ParameteredSingleTimedCacheRequest
 import io.reactivex.Single
 
 interface SimpleBuyEligibilityProvider {
@@ -29,7 +29,7 @@ class NabuCachedEligibilityProvider(
         }
     }
 
-    private val cache = ParameteredTimedCacheRequest(
+    private val cache = ParameteredSingleTimedCacheRequest(
         cacheLifetimeSeconds = 20L,
         refreshFn = refresh
     )

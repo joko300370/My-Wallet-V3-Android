@@ -2,6 +2,8 @@
 <resources>
 
     <!-- common -->
+    <string name="debug_app_shortcut">BC Debug Opts</string>
+    <string name="debug_app_shortcut_short">BC Opts</string>
     <string name="common_replaceable_value">%1$s</string>
     <string name="common_hyphenated_strings">%1$s - %2$s</string>
     <string name="common_newlined_strings">%1$s\n%2$s</string>
@@ -40,6 +42,8 @@
     <string name="common_approve">Approve</string>
     <string name="common_deny">Deny</string>
     <string name="common_payment">Payment</string>
+    <string name="common_unknown">Unknown</string>
+    <string name="common_wallets">Wallets</string>
 
     <plurals name="transfer_label_plural">
         <item quantity="one">1 imported address</item>
@@ -136,6 +140,9 @@
     <string name="pair_wallet_step_2">Go to Settings / General.</string>
     <string name="landing_title">Welcome to Blockchain</string>
     <string name="landing_body">The easy way to <b>send</b>, <b>receive</b>, <b>store</b> and <b>trade</b> digital currencies.</string>
+    <string name="landing_create_wallet">Create a Wallet</string>
+    <string name="landing_log_in">Log in</string>
+    <string name="landing_version">v%1$s (%2$d) %3$s</string>
 
     <!-- Recover Funds -->
     <string name="pair_wallet_step_3">Click Show Pairing Code to reveal a QR Code, a square black
@@ -226,7 +233,6 @@
     <string name="change_pin_code">Change PIN</string>
     <string name="drawer_addresses">Addresses</string>
 
-    <string name="wallets">Wallets</string>
     <string name="save_name">Save name</string>
     <string name="receive_address_to_clipboard">Copy this receive address to the clipboard? If so,
         be advised that other applications may be able to look at this information.
@@ -259,7 +265,9 @@
     <string name="received_bitcoin_cash">Received Bitcoin Cash</string>
 
     <string name="send">Send</string>
-    <string name="share">Share Receive Address</string>
+    <string name="receive_share">Share Address</string>
+    <string name="receive_copy">Copy Address</string>
+    <string name="receive_share_title">Share %1$s Address Via:</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="check_email_to_auth_login">Please check your email to approve this login attempt.</string>
 
@@ -574,7 +582,7 @@
     <string name="tx_title_receive">Receive %1s</string>
     <string name="tx_title_sell">Sell %1s</string>
     <string name="tx_title_buy">Buy %1s</string>
-    <string name="tx_title_deposit">Transfer %1s</string>
+    <string name="tx_title_deposit">Deposit %1s</string>
     <string name="tx_title_withdraw">Withdraw %1s</string>
     <string name="tx_title_swap">Swap %1$s → %2$s</string>
     <string name="tx_title_transfer">Transfer %1s</string>
@@ -756,7 +764,8 @@
     <string name="dashboard_asset_actions_send_dsc">Transfer %1$s to any Wallet</string>
     <string name="dashboard_asset_actions_receive_dsc">Accept or Share Your %1$s Address</string>
     <string name="dashboard_asset_actions_swap_dsc">Exchange %1$s for Another Crypto</string>
-    <string name="dashboard_asset_actions_deposit_dsc">Add %1$s to your Interest Wallet</string>
+    <string name="dashboard_asset_actions_deposit_dsc">Add %1$s to your Interest Account</string>
+    <string name="dashboard_asset_actions_withdraw_dsc">Withdraw %1$s from your Interest Account</string>
     <string name="dashboard_asset_actions_summary_title">Interest Summary</string>
     <string name="dashboard_asset_actions_summary_dsc">View your accrued %1$s Interest</string>
     <string name="dashboard_asset_actions_interest_dsc_failed">Could not load Interest details</string>
@@ -920,6 +929,11 @@
     <string name="aave_yfi_dot_available_card_body">Aave, YFI and Polkadot tokens are now available to Buy, Sell, Swap and Send in your Wallet.</string>
     <string name="aave_yfi_dot_available_card_cta">Buy Now</string>
 
+    <!-- Domain address announcement -->
+    <string name="domain_announcement_title">Introducing Send to Domains</string>
+    <string name="domain_announcement_description">You can send money directly to registered Unstoppable and ENS domains. Send crypto to .crypto, .eth, .xyz extensions and many more!</string>
+    <string name="domain_announcement_action">Get Started</string>
+
     <!-- Airdrop Status bottom sheet -->
     <string name="airdrop_received_sheet_heading">Airdrop</string>
     <string name="airdrop_received_sheet_status_label">Status</string>
@@ -1037,7 +1051,7 @@
 
     <!-- Email -->
     <string name="kyc_email_hint_focused">Your Email</string>
-    <string name="kyc_email_hint_unfocused">@string/kyc_email_hint_focused</string>
+    <string name="kyc_email_hint_unfocused">Your Email</string>
     <string name="kyc_email_error_saving_email">Error saving email, please try again</string>
     <string name="kyc_email_send_verification">Send Email</string>
     <string name="kyc_email_validation_header">Check your inbox.</string>
@@ -1067,7 +1081,7 @@
     <string name="kyc_veriff_splash_country_supported_subheader">Not all countries are supported at this time. Check our up to date <annotation link="country_list">list of countries</annotation> before proceeding.</string>
 
     <!-- Veriff Splash -->
-    <string name="kyc_veriff_splash_title">@string/kyc_documents_needed</string>
+    <string name="kyc_veriff_splash_title">Documents needed</string>
     <string name="kyc_veriff_splash_error_silver">SILVER VERIFIED</string>
     <string name="kyc_veriff_splash_header">Let’s Confirm It’s You</string>
     <string name="kyc_veriff_splash_subtitle">You’ll need 1 of the ID types below to continue.</string>
@@ -1090,13 +1104,13 @@
     <string name="kyc_complete_home_address">Home Address Added</string>
     <string name="kyc_complete_id_uploaded">ID Uploaded</string>
     <string name="kyc_complete_video_uploaded">Video uploaded</string>
-    <string name="kyc_help_dialog_need_some_help">@string/need_some_help</string>
+    <string name="kyc_help_dialog_need_some_help">Need some help?</string>
     <string name="kyc_help_dialog_need_some_help_body">Our Blockchain Support Team has written Help Guides explaining why we need to verify your identity.</string>
 
     <!-- Help -->
     <string name="kyc_help_dialog_read_now">Read Now</string>
     <string name="kyc_help_dialog_read_now_url">https://blockchain.zendesk.com/hc/en-us/categories/360001135512-Identity-Verification</string>
-    <string name="kyc_help_dialog_contact_support">@string/contact_support</string>
+    <string name="kyc_help_dialog_contact_support">Contact Support</string>
     <string name="kyc_help_dialog_contact_support_url">https://blockchain.zendesk.com/hc/en-us/requests/new?ticket_form_id=360000186571</string>
 
     <!-- Settings -->
@@ -1110,7 +1124,7 @@
     <string name="kyc_settings_gold_level_in_review">Gold Level - In review</string>
     <string name="kyc_settings_gold_level_approved">Gold Level - Approved</string>
     <string name="kyc_settings_silver_level_approved">Silver Level - Approved</string>
-    <string name="kyc_settings_tier_status_failed">@string/kyc_settings_status_rejected</string>
+    <string name="kyc_settings_tier_status_failed">Failed</string>
     <string name="kyc_status_error">Error fetching KYC status</string>
     <string name="kyc_status_title_in_progress">Verification In Progress</string>
 
@@ -1138,12 +1152,12 @@
     <!-- Drop-off Card -->
     <string name="kyc_drop_off_card_button">Continue verification</string>
     <string name="kyc_documents_needed">Documents needed</string>
-    <string name="kyc_resubmission_card_title">@string/kyc_documents_needed</string>
+    <string name="kyc_resubmission_card_title">Documents needed</string>
 
     <!-- Resubmission Card -->
     <string name="kyc_resubmission_card_description">We had some issues with the documents you’ve supplied. Please try uploading the documents again to continue with your verification.</string>
     <string name="kyc_resubmission_card_button">Upload Documents</string>
-    <string name="kyc_resubmission_splash_title">@string/kyc_resubmission_card_title</string>
+    <string name="kyc_resubmission_splash_title">Documents needed</string>
     <string name="kyc_resubmission_splash_description_1">We are unable to verify your identity and need you to re upload the required documents.</string>
 
     <!-- Resubmission Splash -->
@@ -1172,8 +1186,6 @@
     <!-- Blockstack mini-announcement -->
     <string name="stacks_airdrop_registered_mini_card_title">A Reward for Being Gold Level</string>
     <string name="stacks_airdrop_registered_mini_card_body">We’re airdropping you free crypto in 2020</string>
-
-    <!-- Blockstack airdrop share message -->
 
     <!-- KYC Tiers -->
     <string name="gold_level">Gold Level</string>
@@ -1260,8 +1272,8 @@
     <string name="airdrop_activity_title">Airdrops</string>
 
     <string-array name="xlm_memo_types_manual">
-        <item>@string/xlm_memo_text</item>
-        <item>@string/xlm_memo_id</item>
+        <item>Memo Text</item>
+        <item>Memo ID</item>
     </string-array>
 
     <!--Simple buy-->
@@ -1372,6 +1384,7 @@
     <string name="select_account_sheet_empty">You have no eligible Wallets to perform this action.</string>
     <string name="select_send_sheet_title">Send from</string>
     <string name="select_deposit_source_title">Transfer from</string>
+    <string name="select_withdraw_target_title">Withdraw to</string>
     <string name="select_send_source_title">Send from</string>
     <string name="activity_state_initialised">Initialised</string>
     <string name="activity_state_uninitialised">Uninitialised</string>
@@ -1452,6 +1465,7 @@
     <string name="activity_details_label_manual_review">Manual Review</string>
     <string name="activity_details_label_processing">Processing</string>
     <string name="activity_details_label_complete">Complete</string>
+    <string name="activity_details_label_failed">Failed</string>
     <string name="activity_details_title_transferred">Transfer</string>
     <string name="activity_details_title_received">Receive</string>
     <string name="activity_details_title_sent">Send</string>
@@ -1524,6 +1538,7 @@
     <string name="withdraw_confirmation_progress_title">Withdrawing %1$s</string>
     <string name="withdraw_confirmation_success_title">%1$s Withdrawn!</string>
     <string name="withdraw_confirmation_success_message">We are sending the cash now. Expect the cash to hit your bank on %1$s. Check the status of your Withdrawal at anytime from your Activity Screen</string>
+    <string name="withdraw_interest_confirmation_success_message">Your %1$s will be available in your %2$s within 2 days.</string>
     <string name="withdraw_target_select_title">Withdraw to…</string>
     <string name="withdraw_confirmation_eta">Funds Will Arrive by</string>
     <string name="add_a_bank">Add a Bank</string>
@@ -1570,6 +1585,7 @@
     <string name="send_enter_amount_available">Available</string>
     <string name="send_enter_amount_max">Send Max</string>
     <string name="sell_enter_amount_max">Sell Max</string>
+    <string name="withdraw_enter_amount_max">Withdraw Max</string>
     <string name="sell_enter_amount_min_error">%1$s Min</string>
     <string name="sell_enter_amount_max_error">%1$s Max</string>
     <string name="sell_enter_amount_error_insufficient_funds_for_fees">Not enough %1$s in your wallet to sell with current network fees.</string>
@@ -1585,7 +1601,7 @@
     <string name="send_error_tx_in_flight">A transaction is already in progress</string>
     <string name="send_error_tx_option_invalid">An error has occurred</string>
     <string name="too_many_pending_orders_error_message">Your %1$s Wallet has too many swaps in-progress. Please select a different wallet.</string>
-    <string name="send_confirmation_title">Send %1$s</string>
+    <string name="send_confirmation_title">Send</string>
     <string name="send_confirmation_fee">Fee - Regular</string>
     <string name="send_confirmation_tx_fee">Transaction Fee</string>
     <string name="send_confirmation_eta">Funds Will Arrive</string>
@@ -1645,7 +1661,7 @@
     <string name="send_error_address_is_eth_contract">Address is not a user address</string>
     <string name="send_enter_amount_error_insufficient_funds">Not enough %1$s in your wallet.</string>
     <string name="send_enter_amount_error_insufficient_funds_for_fees">Not enough %1$s in your wallet to send with current network fees.</string>
-    <string name="send_enter_amount_error_invalid_amount">Send 0.00000001 %1$s or more.</string>
+    <string name="send_enter_amount_error_invalid_amount_1">Send %1$s or more.</string>
     <string name="send_enter_invalid_password">Password is incorrect.</string>
     <string name="send_enter_unexpected_error">An unexpected error has occurred. Please try again.</string>
     <string name="send_enter_insufficient_gas">You do not have enough ETH to process this transaction.</string>
@@ -1791,10 +1807,10 @@
 
     <!-- Transaction Flow confirmation screen -->
     <string name="confirm_status_msg_insufficient_funds">You have insufficient funds in this account to process this transaction</string>
-    <string name="confirm_status_msg_insufficient_gas">@string/send_enter_insufficient_gas</string>
+    <string name="confirm_status_msg_insufficient_gas">You do not have enough ETH to process this transaction.</string>
     <string name="confirm_status_msg_option_invalid">Please ensure you`ve agreed to our Terms.</string>
-    <string name="confirm_status_msg_invoice_expired">@string/bitpay_invoice_expired</string>
-    <string name="confirm_status_msg_unexpected_error">@string/send_enter_unexpected_error</string>
+    <string name="confirm_status_msg_invoice_expired">BitPay Invoice Expired</string>
+    <string name="confirm_status_msg_unexpected_error">An unexpected error has occurred. Please try again.</string>
     <string name="pending_swap_info_message">You have 1 swap pending. Once that clears, you can make a new swap.</string>
     <string name="deposit_fee">Network Fee</string>
     <string name="current_unit_price">%1$s = %2$s</string>
@@ -1877,7 +1893,7 @@
     <string name="trading_withdrawal_balance_locked">Oops! For security reasons, your balance is currently locked, please try again later.</string>
     <string name="trading_withdrawal_insufficient_funds">Oops! You don’t have enough funds to Withdraw</string>
     <string name="trading_internal_server_error">Oops! This service is currently unavailable, please try again later.</string>
-    <string name="trading_albert_error">@string/send_progress_error_title</string>
+    <string name="trading_albert_error">Oops! Something Went Wrong. Please try again.</string>
     <string name="trading_service_temp_disabled">This service will be back soon. We’re updating &amp; fixing some bugs right now.</string>
     <string name="trading_insufficient_balance">Oops! You don’t have enough balance to %1$s.</string>
     <string name="trading_amount_below_min">Oops! The amount you selected is below the minimum %1$s limit.</string>
@@ -1905,6 +1921,8 @@
     <string name="kyc_country_selection_title_1">Select Your Country</string>
     <string name="security_check">Security Check</string>
     <string name="success_email_veriff">Success! Your email has been confirmed.</string>
+    <string name="error_email_veriff_title">Oops! Something went wrong.</string>
+    <string name="error_email_veriff">We were unable to your verify your email. Please try again or we can send you a new email.</string>
     <string name="email_verified">Email Verified</string>
     <string name="email_verification_part_1">We sent a verification email to&#160;</string>
     <string name="email_verification_part_2">. Please tap the link in the email to continue.</string>
@@ -2005,22 +2023,47 @@
     <string name="increase_your_limits">Increase your limits</string>
     <string name="increase_your_limits_body">Continue your verification to become Gold level and increase your limits and payment methods.</string>
     <string name="continue_to_gold">Continue to Gold</string>
+    <string name="receive_memo_warning">If you send funds without the %1$s Memo Text, your funds will be lost and not credited to your account. Please send only %1$s to this address.</string>
+    <string name="receive_memo_title">%1$s Memo:</string>
+
+    <string name="kyc_upsell_custodial_dlg_title">Verify to use the Trading Account</string>
+    <string name="kyc_upsell_custodial_dlg_body">Get access to the Trading Account in seconds by completing your profile and getting Silver access.</string>
+    <string name="kyc_upsell_custodial_dlg_item_title_1">Verify Your Email</string>
+    <string name="kyc_upsell_custodial_dlg_item_body_1">Confirm your email address to protect your Blockchain.com Wallet.</string>
+    <string name="kyc_upsell_custodial_dlg_item_title_2">Add Your Name &amp; Address</string>
+    <string name="kyc_upsell_custodial_dlg_item_body_2">We need to know your name and address to comply with local laws.</string>
+    <string name="kyc_upsell_custodial_dlg_item_title_3">Use the Trading Account</string>
+    <string name="kyc_upsell_custodial_dlg_item_body_3">Receive, Buy and Swap cryptocurrencies with your Trading Account.</string>
+    <string name="kyc_upsell_custodial_dlg_cta">Verify Now</string>
 
     <!-- New checkout items -->
     <string name="checkout_item_price_blurb">Blockchain.com provides the best market price we receive and applies a spread. <annotation link="learn_more">Learn more</annotation></string>
     <string name="checkout_item_price_fee">Blockchain.com requires a fee when paying with a card. <annotation link="learn_more">Learn more</annotation></string>
     <string name="checkout_item_private_key_wallet_explanation">%s Private Key wallets, send, and receive are not supported at this time.</string>
     <string name="checkout_item_deposit_to">Deposit to</string>
-    <string name="checkout_item_sale">Sale</string>
+    <string name="checkout_item_send_to">Send to</string>
+    <string name="checkout_item_sale">Sale amount</string>
     <string name="checkout_item_network_fee">%s Network fee</string>
+    <string name="checkout_item_erc20_network_fee">%1$s Network fee - %2$s</string>
+    <string name="checkout_item_network_fee_label">Network fees</string>
+    <string name="checkout_item_network_fee_level_label">Network fees - %s</string>
+    <string name="checkout_item_network_fee_estimate">~ %1$s</string>
     <string name="checkout_item_price_note">Blockchain.com provides the best market price we receive and applies a spread.&#160;</string>
     <string name="checkout_item_network_fee_note">Pays for %1$s miners to confirm your transaction on the blockchain network.&#160;</string>
     <string name="swap_confirmation_disclaimer_1">Final amount may change due to market activity. By approving this Swap you agree to Blockchain.com’s\n<annotation link="refund_policy">Refund Policy</annotation></string>
     <string name="checkout_swap_exchange_note">The exchange rate is the best price available for %1$s in terms of 1 %2$s&#160;</string>
     <string name="upsell_message">Get lower fees and double the transaction speed when you Swap crypto to any Trading Account. Just look for these badges to reduce fees by up to 50%.</string>
     <string name="upsell_title">Reduce fees. Swap to Trading Account.</string>
-    <string name="swap_erc_20_tooltip">This token is an ERC-20. The network fees are set by the Ethereum Network.&#160;</string>
+    <string name="swap_erc_20_tooltip">This token is an ERC-20. The network fees are set by the Ethereum Network.</string>
+    <string name="checkout_dual_fee_note">Network fees are set by the %1$s and %2$s networks.</string>
+    <string name="checkout_one_fee_note">Network fees are set by the %1$s network.</string>
+    <string name="checkout_one_erc_20_fee_note">%1$s is an ERC-20 token. Network fees are set by the Ethereum network.</string>
+    <string name="checkout_one_erc_20_one_not_fee_note">%1$s is an ERC-20 token. Network fees are set by the %2$s and %3$s networks.</string>
+    <string name="checkout_both_erc_20_fee_note">%1$s and %2$s are ERC-20 tokens. Network fees are set by the Ethereum network.</string>
+    <string name="checkout_fee_link"><annotation link="learn_more_link">Learn more about fees.</annotation></string>
+    <string name="checkout_fee_free">When using Trading Accounts, there are no network fees</string>
     <string name="private_key_wallet_explanation">%s Private Key wallets, send, and receive are not supported at this time.</string>
+    <string name="checkout_interest_confirmation_disclaimer">After confirming this withdrawal, you will not continue to earn interest on the amount withdrawn.\n\nYour %1$s will be available in your \"%2$s\" Account within 2 days.</string>
 
     <!-- New pairing -->
     <string name="pairing_wallet_title">Pair your wallet</string>
@@ -2032,4 +2075,78 @@
     <string name="pairing_wallet_instruction_3">Using your computer’s camera, scan the QR code below.</string>
     <string name="pairing_wallet_show_qr">Show QR code</string>
     <string name="pairing_wallet_hide_qr">Hide QR code</string>
+
+    <!-- Login & Verify Email -->
+    <string name="login_title">Log In</string>
+    <string name="login_email_hint">Email</string>
+    <string name="common_or">OR</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="login_failed_session_id_error">Could not connect, please try again.</string>
+    <string name="login_send_email_error">Could not send email</string>
+    <string name="login_google_email_not_found">Email not found</string>
+    <string name="login_google_sign_in_failed">Google Sign in failed</string>
+    <string name="verify_device_title">Verify Device</string>
+    <string name="verify_device_desc">If you have an account registered with this email address, you will receive an email with a link to verify your device.</string>
+    <string name="open_email_cta">Open Email App</string>
+    <string name="login_wallet_id_text">Wallet: %s</string>
+    <string name="login_password_hint">Password</string>
+    <string name="forgot_password_label">Forgot password?</string>
+    <string name="two_factor_auth_title">Authorize login</string>
+    <string name="two_factor_code_hint">2FA code</string>
+    <string name="invalid_two_fa_code">Invalid 2FA code</string>
+    <string name="auth_required">Authorization required, please check your email.</string>
+    <string name="hardware_key_hint">Verify with your |HARDWARE KEY|</string>
+    <string name="tap_hardware_key_label">Tap |HARDWARE KEY| to verify</string>
+    <string name="second_password_hint">Second password</string>
+    <string name="second_password_notice">We’re moving away from 2nd passwords. Enable 2FA under security settings. </string>
+
+    <!-- Recurring buy screens -->
+    <string name="recurring_buy_toolbar">Recurring Buys</string>
+    <string name="recurring_buy_cta">Set up recurring buy</string>
+    <string name="recurring_buy_title_1">Instead of timing the market, many smart investors use</string>
+    <string name="recurring_buy_title_2">The strategy is pretty simple</string>
+    <string name="recurring_buy_title_3">When the price goes down,</string>
+    <string name="recurring_buy_title_4">When the price goes up,</string>
+    <string name="recurring_buy_title_5">But does it work?</string>
+    <string name="recurring_buy_subtitle_1">Dollar cost averaging</string>
+    <string name="recurring_buy_subtitle_2">Invest the same amount every week</string>
+    <string name="recurring_buy_subtitle_3">You’ll buy more crypto.</string>
+    <string name="recurring_buy_subtitle_4">You’ll buy less.</string>
+    <string name="recurring_buy_subtitle_5_1">Over the past 5 years, buying Bitcoin every week performed better than timing the market&#160;</string>
+    <string name="recurring_buy_subtitle_5_2">82% of the time.</string>
+    <string name="recurring_buy_label">Frequency</string>
+    <string name="recurring_buy_one_time_short">One time</string>
+    <string name="recurring_buy_one_time">One time purchase</string>
+    <string name="recurring_buy_daily">Every day</string>
+    <string name="recurring_buy_weekly">Every week</string>
+    <string name="recurring_buy_bi_weekly">Every 2 weeks</string>
+    <string name="recurring_buy_monthly">Every month</string>
+    <string name="recurring_buy_frequency_label">Recurring</string>
+    <string name="recurring_buy_frequency_subtitle">on %1$s</string>
+    <string name="recurring_buy_frequency_subtitle_each_day">around %s</string>
+    <string name="recurring_buy_frequency_subtitle_monthly">on day %s</string>
+    <string name="recurring_buy_frequency_subtitle_monthly_last_day">on the last day</string>
+    <string name="recurring_buy_frequency_subtitle_today">Today</string>
+    <string name="recurring_buy_unavailable_title">Recurring buy unavailable</string>
+    <string name="recurring_buy_unavailable_message">Please use a different payment method to set up a recurring buy</string>
+    <string name="recurring_buy_selection_title">Select frequency</string>
+    <string name="recurring_buy_cta_alert">OK</string>
+    <string name="recurring_buy_payment_message">You’ll be charged %1$s %2$s for the market equivalent of %3$s. You can manage your Recurring Buy from the %4$s Wallets &amp; Accounts Page.</string>
+    <string name="recurring_buy_creation_error">Error creating your Recurring Buy. Please try again.</string>
+    <string name="dashboard_title_recurring_buy">Unsure when to buy?</string>
+    <string name="dashboard_recurring_buy_description">Timing the market is hard, which is why many investors use dollar cost averaging.</string>
+    <string name="dashboard_recurring_buy_learn_more">Learn more →</string>
+    <string name="dashboard_recurring_buy_item_title">Buy %1$s in %2$s %3$s</string>
+    <string name="dashboard_recurring_buy_item_label">Next buy: %1$s</string>
+    <string name="dashboard_recurring_buy_item_label_error">Low balance. Add Funds</string>
+    <string name="dashboard_recurring_buy_title">Recurring buys</string>
+    <string name="recurring_buy_info_cta">Cancel Recurring Buy</string>
+    <string name="recurring_buy_sheet_title">Recurring %1$s Buy</string>
+    <string name="recurring_buy_info_purchase_label">Next Purchase</string>
+    <string name="recurring_buy_cancelled_toast">Recurring buy cancelled</string>
+    <string name="recurring_buy_cancelled_error_toast">Oops! There was an issue cancelling your recurring buy. Please try again later.</string>
+    <string name="recurring_buy_cancel_dialog_desc">Are you sure you want to cancel this Recurring Buy?</string>
+    <string name="recurring_buy_activity_failed">Failed. Low balance.</string>
+    <string name="recurring_buy_activity_pending">Pending</string>
+    <string name="fee_calculated_at_checkout">Calculated at checkout</string>
 </resources>

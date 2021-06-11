@@ -45,6 +45,6 @@ class MetadataNodeFactory(
         val bi = BigInteger(1, entropy)
         val key = ECKey.fromPrivate(bi)
         val address = metadataDerivation.deriveAddress(key)
-        return Metadata(address, key, key.privKeyBytes, true, -1)
+        return Metadata(address, key, key.privKeyBytes, null, -1)
     }
 }

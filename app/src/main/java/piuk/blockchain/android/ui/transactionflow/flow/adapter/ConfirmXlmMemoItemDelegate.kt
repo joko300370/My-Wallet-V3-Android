@@ -3,14 +3,13 @@ package piuk.blockchain.android.ui.transactionflow.flow.adapter
 import android.app.Activity
 import android.graphics.Typeface
 import android.net.Uri
-import android.text.Editable
 import android.text.InputFilter
 import android.text.InputType
 import android.text.SpannableStringBuilder
 import android.text.Spanned
-import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
 import android.text.style.StyleSpan
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
@@ -22,19 +21,18 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.ui.urllinks.URL_XLM_MIN_BALANCE
-import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.item_send_confirm_xlm_memo.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.TxConfirmationValue
+import piuk.blockchain.android.databinding.ItemSendConfirmXlmMemoBinding
 import piuk.blockchain.android.ui.activity.detail.adapter.INPUT_FIELD_FLAGS
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
+import piuk.blockchain.android.ui.customviews.installUpdateThrottle
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.util.StringUtils
-import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.context
 import piuk.blockchain.android.util.visible
-import java.util.Timer
-import java.util.TimerTask
 
 class ConfirmXlmMemoItemDelegate<in T>(
     private val model: TransactionModel,
@@ -47,7 +45,7 @@ class ConfirmXlmMemoItemDelegate<in T>(
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
         XlmMemoItemViewHolder(
-            parent.inflate(R.layout.item_send_confirm_xlm_memo),
+            ItemSendConfirmXlmMemoBinding.inflate(LayoutInflater.from(parent.context), parent, false),
             stringUtils,
             activity
         )
@@ -63,23 +61,17 @@ class ConfirmXlmMemoItemDelegate<in T>(
 }
 
 private class XlmMemoItemViewHolder(
-    val parent: View,
-    val stringUtils: StringUtils,
-    val activity: Activity
-) : RecyclerView.ViewHolder(parent), LayoutContainer {
+    private val binding: ItemSendConfirmXlmMemoBinding,
+    private val stringUtils: StringUtils,
+    private val activity: Activity
+) : RecyclerView.ViewHolder(binding.root) {
     private val maxCharacters = 28
 
-    override val containerView: View
-        get() = itemView
-
-    private lateinit var timer: Timer
-    private val savingDelay = 300L
-
     init {
-        itemView.apply {
-            confirm_details_memo_spinner.setupSpinner()
-            confirm_details_memo_spinner.setSelection(TEXT_INDEX)
-            confirm_details_memo_input.configureForSelection(TEXT_INDEX)
+        binding.apply {
+            confirmDetailsMemoSpinner.setupSpinner()
+            confirmDetailsMemoSpinner.setSelection(TEXT_INDEX)
+            confirmDetailsMemoInput.configureForSelection(TEXT_INDEX)
         }
     }
 
@@ -87,29 +79,29 @@ private class XlmMemoItemViewHolder(
         item: TxConfirmationValue.Memo,
         model: TransactionModel
     ) {
-        itemView.apply {
+        binding.apply {
             if (item.isRequired) {
                 showExchangeInfo()
             }
 
-            confirm_details_memo_spinner.onItemSelectedListener = null
+            confirmDetailsMemoSpinner.onItemSelectedListener = null
 
             if (!item.text.isNullOrBlank()) {
-                confirm_details_memo_spinner.setSelection(TEXT_INDEX)
-                confirm_details_memo_input.setText(item.text, TextView.BufferType.EDITABLE)
+                confirmDetailsMemoSpinner.setSelection(TEXT_INDEX)
+                confirmDetailsMemoInput.setText(item.text, TextView.BufferType.EDITABLE)
                 model.process(TransactionIntent.ModifyTxOption(item.copy(text = item.text.toString())))
             } else if (item.id != null) {
-                confirm_details_memo_spinner.setSelection(ID_INDEX)
-                confirm_details_memo_input.setText(item.id.toString(), TextView.BufferType.EDITABLE)
+                confirmDetailsMemoSpinner.setSelection(ID_INDEX)
+                confirmDetailsMemoInput.setText(item.id.toString(), TextView.BufferType.EDITABLE)
                 model.process(TransactionIntent.ModifyTxOption(item.copy(id = item.id)))
             } else {
                 model.process(TransactionIntent.ModifyTxOption(item.copy(id = null, text = null)))
             }
 
-            confirm_details_memo_spinner.addSpinnerListener(model, item, confirm_details_memo_input)
+            confirmDetailsMemoSpinner.addSpinnerListener(model, item, confirmDetailsMemoInput)
 
             if (item.editable) {
-                with(confirm_details_memo_input) {
+                with(confirmDetailsMemoInput) {
                     if (text?.isNotEmpty() == true) {
                         requestFocus()
                         setSelection(confirm_details_memo_input.text?.length ?: 0)
@@ -118,9 +110,9 @@ private class XlmMemoItemViewHolder(
                     setupMemoSaving(model, item)
                 }
             } else {
-                confirm_details_memo_spinner.isEnabled = false
-                confirm_details_memo_input.isEnabled = false
-                confirm_details_memo_parent.alpha = 0.6f
+                confirmDetailsMemoSpinner.isEnabled = false
+                confirmDetailsMemoInput.isEnabled = false
+                confirmDetailsMemoParent.alpha = 0.6f
             }
         }
     }
@@ -156,47 +148,25 @@ private class XlmMemoItemViewHolder(
         model: TransactionModel,
         item: TxConfirmationValue.Memo
     ) {
-
-        addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                // do nothing
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (::timer.isInitialized) {
-                    timer.cancel()
-                }
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-                if (::timer.isInitialized) {
-                    timer.cancel()
-                }
-
-                timer = Timer()
-                timer.schedule(object : TimerTask() {
-                    override fun run() {
-                        if (text?.isNotEmpty() == true) {
-                            if (itemView.confirm_details_memo_spinner.selectedItemPosition == TEXT_INDEX) {
-                                if (haveContentsChanged(s?.toString(), item.text)) {
-                                    model.process(
-                                        TransactionIntent.ModifyTxOption(item.copy(text = text.toString()))
-                                    )
-                                }
-                            } else {
-                                if (haveContentsChanged(s?.toString(), item.id?.toString())) {
-                                    model.process(
-                                        TransactionIntent.ModifyTxOption(
-                                            item.copy(id = text.toString().toLong())
-                                        )
-                                    )
-                                }
-                            }
+        installUpdateThrottle { newText ->
+            if (text?.isNotEmpty() == true) {
+                if (itemView.confirm_details_memo_spinner.selectedItemPosition == TEXT_INDEX) {
+                    if (haveContentsChanged(newText?.toString(), item.text)) {
+                            model.process(
+                                TransactionIntent.ModifyTxOption(item.copy(text = text.toString()))
+                            )
+                        }
+                    } else {
+                        if (haveContentsChanged(newText?.toString(), item.id?.toString())) {
+                            model.process(
+                                TransactionIntent.ModifyTxOption(
+                                    item.copy(id = text.toString().toLong())
+                                )
+                            )
                         }
                     }
-                }, savingDelay)
+                }
             }
-        })
     }
 
     private fun AppCompatSpinner.setupSpinner() {
@@ -254,7 +224,7 @@ private class XlmMemoItemViewHolder(
         }
     }
 
-    private fun View.showExchangeInfo() {
+    private fun ItemSendConfirmXlmMemoBinding.showExchangeInfo() {
         val boldIntro = context.getString(R.string.send_to_exchange_xlm_title)
         val blurb = context.getString(R.string.send_to_exchange_xlm_blurb)
 
@@ -275,7 +245,7 @@ private class XlmMemoItemViewHolder(
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
 
-        confirm_details_memo_exchange.run {
+        confirmDetailsMemoExchange.run {
             setText(sb, TextView.BufferType.SPANNABLE)
             movementMethod = LinkMovementMethod.getInstance()
             visible()

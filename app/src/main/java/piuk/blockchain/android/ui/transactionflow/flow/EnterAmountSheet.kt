@@ -29,7 +29,6 @@ import piuk.blockchain.android.ui.customviews.FiatCryptoInputView
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
 import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
-import piuk.blockchain.android.ui.transactionflow.engine.DisplayMode
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionIntent
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
@@ -152,17 +151,16 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
             (lowerSlot as? ExpandableTxFlowWidget)?.let {
                 it.expanded.observeOn(AndroidSchedulers.mainThread()).subscribe { expanded ->
                     upperSlot?.setVisible(!expanded)
-                    configureCtaButton(expanded)
+                    configureCtaButton()
                 }
             }
         }
     }
 
-    private fun configureCtaButton(expanded: Boolean) {
+    private fun configureCtaButton() {
         val layoutParams: ViewGroup.MarginLayoutParams =
             binding.amountSheetCtaButton.layoutParams as ViewGroup.MarginLayoutParams
-        layoutParams.bottomMargin =
-            if (expanded) resources.getDimension(R.dimen.xhuge_margin).toInt() else 0
+        layoutParams.bottomMargin = resources.getDimension(R.dimen.medium_margin).toInt()
         binding.amountSheetCtaButton.layoutParams = layoutParams
     }
 
@@ -235,16 +233,9 @@ class EnterAmountSheet : TransactionFlowSheet<DialogTxFlowEnterAmountBinding>() 
         compositeDisposable += binding.amountSheetInput.onInputToggle
             .subscribe {
                 analyticsHooks.onCryptoToggle(it, state)
-                model.process(TransactionIntent.DisplayModeChanged(it.toDisplayMode()))
+                model.process(TransactionIntent.DisplayModeChanged(it))
             }
     }
-
-    private fun CurrencyType.toDisplayMode() =
-        when {
-            isCrypto() -> DisplayMode.Crypto
-            isFiat() -> DisplayMode.Fiat
-            else -> throw IllegalStateException("Unknown CurrencyType")
-        }
 
     // in this method we try to convert the fiat value coming out from
     // the view to a crypto which is withing the min and max limits allowed.

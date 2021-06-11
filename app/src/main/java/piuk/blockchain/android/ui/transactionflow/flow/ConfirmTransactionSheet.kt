@@ -69,7 +69,7 @@ class ConfirmTransactionSheet : TransactionFlowSheet<DialogTxFlowConfirmBinding>
 
             if (customiser.confirmDisclaimerVisibility(newState.action)) {
                 confirmDisclaimer.apply {
-                    text = customiser.confirmDisclaimerBlurb(newState.action, requireContext())
+                    text = customiser.confirmDisclaimerBlurb(newState, requireContext())
                     visible()
                     movementMethod = LinkMovementMethod.getInstance()
                 }

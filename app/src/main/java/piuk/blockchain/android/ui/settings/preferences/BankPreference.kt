@@ -5,11 +5,12 @@ import android.graphics.Typeface
 import android.text.TextUtils
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import com.blockchain.nabu.datamanagers.Bank
 import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.preference_bank_layout.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.loadInterMedium
@@ -51,9 +52,9 @@ class BankPreference(
             layoutParams?.width = size
             requestLayout()
         }
-        val addBank = holder.itemView.add_bank
-        val accountInfo = holder.itemView.account_info
-        val endDigits = holder.itemView.end_digits
+        val addBank = holder.itemView.findViewById(R.id.add_bank) as AppCompatImageView
+        val accountInfo = holder.itemView.findViewById(R.id.account_info) as AppCompatTextView
+        val endDigits = holder.itemView.findViewById(R.id.end_digits) as AppCompatTextView
 
         bank?.let { bank ->
             addBank.gone()

@@ -19,6 +19,7 @@ import info.blockchain.wallet.keys.SigningKey;
 import info.blockchain.wallet.util.DoubleEncryptionFactory;
 import info.blockchain.wallet.util.FormatsUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.ECKey;
 import org.bitcoinj.core.LegacyAddress;
@@ -87,11 +88,11 @@ public class Wallet {
     private int wrapperVersion;
 
     public Wallet() {
-        guid = UUID.randomUUID().toString();
-        sharedKey = UUID.randomUUID().toString();
-        txNotes  = new HashMap<>();
-        imported = new ArrayList<>();
-        options  = Options.getDefaultOptions();
+        guid           = UUID.randomUUID().toString();
+        sharedKey      = UUID.randomUUID().toString();
+        txNotes        = new HashMap<>();
+        imported       = new ArrayList<>();
+        options        = Options.getDefaultOptions();
         wrapperVersion = WalletWrapper.V4;
         walletBodies   = new ArrayList<>();
     }
@@ -101,15 +102,15 @@ public class Wallet {
     }
 
     public Wallet(String defaultAccountName, boolean createV4) throws Exception {
-        guid = UUID.randomUUID().toString();
+        guid      = UUID.randomUUID().toString();
         sharedKey = UUID.randomUUID().toString();
-        txNotes  = new HashMap<>();
-        imported = new ArrayList<>();
-        options  = Options.getDefaultOptions();
+        txNotes   = new HashMap<>();
+        imported  = new ArrayList<>();
+        options   = Options.getDefaultOptions();
 
         WalletBody walletBodyBody = new WalletBody(defaultAccountName, createV4);
         wrapperVersion = createV4 ? WalletWrapper.V4 : WalletWrapper.V3;
-        walletBodies = new ArrayList<>();
+        walletBodies   = new ArrayList<>();
         walletBodies.add(walletBodyBody);
     }
 
@@ -164,7 +165,8 @@ public class Wallet {
     public WalletBody getWalletBody() {
         if (walletBodies == null || walletBodies.isEmpty()) {
             return null;
-        } else{
+        }
+        else {
             return walletBodies.get(HD_WALLET_INDEX);
         }
     }
@@ -211,14 +213,14 @@ public class Wallet {
     }
 
     public static Wallet fromJson(String json)
-            throws IOException, HDWalletException {
+        throws IOException, HDWalletException {
         ObjectMapper mapper = new ObjectMapper();
 
         mapper.setVisibility(mapper.getSerializationConfig().getDefaultVisibilityChecker()
-                .withFieldVisibility(JsonAutoDetect.Visibility.ANY)
-                .withGetterVisibility(JsonAutoDetect.Visibility.NONE)
-                .withSetterVisibility(JsonAutoDetect.Visibility.NONE)
-                .withCreatorVisibility(JsonAutoDetect.Visibility.NONE));
+                                 .withFieldVisibility(JsonAutoDetect.Visibility.ANY)
+                                 .withGetterVisibility(JsonAutoDetect.Visibility.NONE)
+                                 .withSetterVisibility(JsonAutoDetect.Visibility.NONE)
+                                 .withCreatorVisibility(JsonAutoDetect.Visibility.NONE));
 
         KotlinModule module = new KotlinModule();
         module.addAbstractTypeMapping(Account.class, AccountV3.class);
@@ -273,12 +275,15 @@ public class Wallet {
         if (getImportedAddressList() != null) {
             List<ImportedAddress> importedAddresses = getImportedAddressList();
             for (ImportedAddress importedAddress : importedAddresses) {
-                keyList.add(importedAddress.getPrivateKey());
+                String privateKey = importedAddress.getPrivateKey();
+                // Filter watch-only addresses, which still exist in some wallets
+                if (privateKey != null) {
+                    keyList.add(privateKey);
+                }
             }
         }
 
         if (getWalletBodies() != null && getWalletBodies().size() > 0) {
-
             for (WalletBody walletBody : getWalletBodies()) {
                 List<Account> accounts = walletBody.getAccounts();
                 for (Account account : accounts) {
@@ -310,11 +315,13 @@ public class Wallet {
 
         if (isDoubleEncryption()) {
             DoubleEncryptionFactory.validateSecondPassword(
-                    getDpasswordhash(),
-                    getSharedKey(),
-                    secondPassword,
-                    getOptions().getPbkdf2Iterations());
-        } else if (!isDoubleEncryption() && secondPassword != null) {
+                getDpasswordhash(),
+                getSharedKey(),
+                secondPassword,
+                getOptions().getPbkdf2Iterations()
+            );
+        }
+        else if (!isDoubleEncryption() && secondPassword != null) {
             throw new DecryptionException("Double encryption password specified on non double encrypted wallet.");
         }
     }
@@ -339,17 +346,19 @@ public class Wallet {
                     walletBodyBody.getSeedHex(),
                     getSharedKey(),
                     secondPassword,
-                    getOptions().getPbkdf2Iterations());
+                    getOptions().getPbkdf2Iterations()
+                );
                 walletBodyBody.setSeedHex(doubleEncryptedSeedHex);
 
                 //Double encrypt private keys
                 for (Account account : walletBodyBody.getAccounts()) {
 
                     String encryptedXPriv = DoubleEncryptionFactory.encrypt(
-                            account.getXpriv(),
-                            getSharedKey(),
-                            secondPassword,
-                            getOptions().getPbkdf2Iterations());
+                        account.getXpriv(),
+                        getSharedKey(),
+                        secondPassword,
+                        getOptions().getPbkdf2Iterations()
+                    );
 
                     account.setXpriv(encryptedXPriv);
 
@@ -362,7 +371,7 @@ public class Wallet {
 
     @VisibleForTesting
     public ImportedAddress addImportedAddress(ImportedAddress address, @Nullable String secondPassword)
-            throws Exception {
+        throws Exception {
 
         validateSecondPassword(secondPassword);
 
@@ -370,10 +379,12 @@ public class Wallet {
             //Double encryption
             String unencryptedKey = address.getPrivateKey();
 
-            String encryptedKey = DoubleEncryptionFactory.encrypt(unencryptedKey,
-                    getSharedKey(),
-                    secondPassword,
-                    getOptions().getPbkdf2Iterations());
+            String encryptedKey = DoubleEncryptionFactory.encrypt(
+                unencryptedKey,
+                getSharedKey(),
+                secondPassword,
+                getOptions().getPbkdf2Iterations()
+            );
 
             address.setPrivateKey(encryptedKey);
 
@@ -383,7 +394,7 @@ public class Wallet {
     }
 
     public ImportedAddress addImportedAddressFromKey(SigningKey key, @Nullable String secondPassword)
-            throws Exception {
+        throws Exception {
         return addImportedAddress(ImportedAddress.fromECKey(key.toECKey()), secondPassword);
     }
 
@@ -400,14 +411,15 @@ public class Wallet {
     }
 
     public void encryptAccount(Account account, String secondPassword)
-            throws UnsupportedEncodingException, EncryptionException {
+        throws UnsupportedEncodingException, EncryptionException {
         //Double encryption
         if (secondPassword != null) {
             String encryptedPrivateKey = DoubleEncryptionFactory.encrypt(
-                    account.getXpriv(),
-                    sharedKey,
-                    secondPassword,
-                    getOptions().getPbkdf2Iterations());
+                account.getXpriv(),
+                sharedKey,
+                secondPassword,
+                getOptions().getPbkdf2Iterations()
+            );
             account.setXpriv(encryptedPrivateKey);
         }
     }
@@ -455,8 +467,8 @@ public class Wallet {
 
         ImportedAddress matchingAddressBody = null;
 
-        for(ImportedAddress addressBody : addressList) {
-            if(addressBody.getAddress().equals(address)) {
+        for (ImportedAddress addressBody : addressList) {
+            if (addressBody.getAddress().equals(address)) {
                 matchingAddressBody = addressBody;
             }
         }
@@ -468,14 +480,17 @@ public class Wallet {
         if (secondPassword != null) {
             //Double encryption
             String encryptedKey = Base58.encode(ecKey.getPrivKeyBytes());
-            String encrypted2 = DoubleEncryptionFactory.encrypt(encryptedKey,
-                    getSharedKey(),
-                    secondPassword,
-                    getOptions().getPbkdf2Iterations());
+            String encrypted2 = DoubleEncryptionFactory.encrypt(
+                encryptedKey,
+                getSharedKey(),
+                secondPassword,
+                getOptions().getPbkdf2Iterations()
+            );
 
             matchingAddressBody.setPrivateKey(encrypted2);
 
-        } else {
+        }
+        else {
             matchingAddressBody.setPrivateKeyFromBytes(ecKey.getPrivKeyBytes());
         }
         return matchingAddressBody;
@@ -560,12 +575,13 @@ public class Wallet {
 
         List<ImportedAddress> addresses = getImportedAddressList();
 
-        for(ImportedAddress importedAddress : addresses) {
-            if(importedAddress.getAddress().equals(address)) {
+        for (ImportedAddress importedAddress : addresses) {
+            if (importedAddress.getAddress().equals(address)) {
                 String label = importedAddress.getLabel();
-                if(label == null || label.isEmpty()){
+                if (label == null || label.isEmpty()) {
                     return address;
-                } else {
+                }
+                else {
                     return label;
                 }
             }
@@ -576,4 +592,15 @@ public class Wallet {
 
     //Assume we only support 1 hdWallet
     private static final int HD_WALLET_INDEX = 0;
+
+    private boolean isKeyUnencrypted(String data) {
+        if (data == null)
+            return false;
+        try {
+            Base58.decode(data);
+            return true;
+        } catch (AddressFormatException e) {
+            return false;
+        }
+    }
 }

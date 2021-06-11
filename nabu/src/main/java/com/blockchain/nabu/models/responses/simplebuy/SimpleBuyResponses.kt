@@ -6,7 +6,6 @@ import com.blockchain.nabu.datamanagers.Partner
 import com.blockchain.nabu.models.responses.nabu.Address
 import com.squareup.moshi.Json
 import info.blockchain.balance.CryptoCurrency
-import java.math.BigDecimal
 import java.util.Date
 
 data class SimpleBuyPairsResp(val pairs: List<SimpleBuyPairResp>)
@@ -57,7 +56,7 @@ data class SimpleBuyBalanceResponse(
     val actionable: String
 )
 
-data class SimpleBuyAllBalancesResponse(
+data class AllAssetBalancesResponse(
     @field:Json(name = "BTC")
     val BTC: SimpleBuyBalanceResponse? = null,
     @field:Json(name = "BCH")
@@ -269,9 +268,13 @@ data class TransactionsResponse(
 data class TransactionResponse(
     val id: String,
     val amount: AmountResponse,
+    val amountMinor: String,
+    val feeMinor: String?,
     val insertedAt: String,
     val type: String,
-    val state: String
+    val state: String,
+    val extraAttributes: TransactionAttributesResponse,
+    val txHash: String?
 ) {
     companion object {
         const val COMPLETE = "COMPLETE"
@@ -291,9 +294,16 @@ data class TransactionResponse(
     }
 }
 
+data class TransactionAttributesResponse(
+    val beneficiary: TransactionBeneficiaryResponse?
+)
+
+data class TransactionBeneficiaryResponse(
+    val accountRef: String?
+)
+
 data class AmountResponse(
-    val symbol: String,
-    val value: BigDecimal
+    val symbol: String
 )
 
 data class SimpleBuyConfirmationAttributes(

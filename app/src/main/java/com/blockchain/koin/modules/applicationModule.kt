@@ -6,6 +6,7 @@ import com.blockchain.koin.explorerRetrofit
 import com.blockchain.koin.gbp
 import com.blockchain.koin.interestAccountFeatureFlag
 import com.blockchain.koin.moshiExplorerRetrofit
+import com.blockchain.koin.mwaFeatureFlag
 import com.blockchain.koin.payloadScope
 import com.blockchain.koin.payloadScopeQualifier
 import com.blockchain.koin.usd
@@ -100,6 +101,7 @@ import piuk.blockchain.android.ui.pairingcode.PairingModel
 import piuk.blockchain.android.ui.pairingcode.PairingState
 import piuk.blockchain.android.ui.sell.BuySellFlowNavigator
 import piuk.blockchain.android.ui.settings.SettingsPresenter
+import piuk.blockchain.android.ui.transfer.receive.ReceiveIntentHelper
 import piuk.blockchain.android.ui.shortcuts.receive.ReceiveQrPresenter
 import piuk.blockchain.android.ui.ssl.SSLVerifyPresenter
 import piuk.blockchain.android.ui.swipetoreceive.LocalOfflineAccountCache
@@ -108,7 +110,9 @@ import piuk.blockchain.android.ui.thepit.PitPermissionsPresenter
 import piuk.blockchain.android.ui.thepit.PitVerifyEmailPresenter
 import piuk.blockchain.android.ui.transfer.AccountsSorting
 import piuk.blockchain.android.ui.transfer.DefaultAccountsSorting
-import piuk.blockchain.android.ui.transfer.receive.activity.ReceivePresenter
+import piuk.blockchain.android.ui.transfer.receive.ReceiveModel
+import piuk.blockchain.android.ui.transfer.receive.ReceiveState
+import piuk.blockchain.android.ui.upsell.KycUpgradePromptManager
 import piuk.blockchain.android.util.AppUtil
 import piuk.blockchain.android.util.BackupWalletUtil
 import piuk.blockchain.android.util.CurrentContextAccess
@@ -183,7 +187,8 @@ val applicationModule = module {
                 bitcoinApi = get(),
                 defaultLabels = get(),
                 metadataManager = get(),
-                rxBus = get()
+                rxBus = get(),
+                crashLogger = get()
             )
         }
 
@@ -224,6 +229,7 @@ val applicationModule = module {
                 analytics = get(),
                 bankLinkingPrefs = get(),
                 custodialWalletManager = get(),
+                upsellManager = get(),
                 secureChannelManager = get(),
                 payloadManager = get()
             )
@@ -383,7 +389,7 @@ val applicationModule = module {
         scoped {
             QrScanResultProcessor(
                 bitPayDataManager = get(),
-                internalFlags = get()
+                mwaFeatureFlag = get(mwaFeatureFlag)
             )
         }
 
@@ -443,7 +449,8 @@ val applicationModule = module {
             AssetDetailsInteractor(
                 interestFeatureFlag = get(interestAccountFeatureFlag),
                 dashboardPrefs = get(),
-                coincore = get()
+                coincore = get(),
+                custodialWalletManager = get()
             )
         }
 
@@ -456,7 +463,8 @@ val applicationModule = module {
                 coincore = get(),
                 eligibilityProvider = get(),
                 bankLinkingPrefs = get(),
-                analytics = get()
+                analytics = get(),
+                featureFlagApi = get()
             )
         }
 
@@ -539,10 +547,19 @@ val applicationModule = module {
         }
 
         factory {
-            ReceivePresenter(
-                prefs = get(),
+            ReceiveModel(
+                initialState = ReceiveState(),
+                observeScheduler = AndroidSchedulers.mainThread(),
+                environmentConfig = get(),
+                crashLogger = get(),
                 qrCodeDataManager = get(),
-                exchangeRates = get()
+                receiveIntentHelper = get()
+            )
+        }
+
+        factory {
+            KycUpgradePromptManager(
+                identity = get()
             )
         }
 
@@ -670,6 +687,7 @@ val applicationModule = module {
                 crashLogger = get(),
                 simpleBuySync = get(),
                 rxBus = get(),
+                flushables = getAll(),
                 walletCredentialsUpdater = get()
             )
         }
@@ -794,6 +812,13 @@ val applicationModule = module {
             resources = get()
         )
     }.bind(AssetResources::class)
+
+    factory {
+        ReceiveIntentHelper(
+            context = get(),
+            assetResources = get()
+        )
+    }
 
     factory { FormatChecker() }
 }

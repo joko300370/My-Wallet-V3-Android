@@ -3,16 +3,21 @@ package piuk.blockchain.android.ui.transfer.send
 import android.os.Bundle
 import android.view.View
 import com.blockchain.notifications.analytics.Analytics
+import com.blockchain.notifications.analytics.LaunchOrigin
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.CryptoAccount
+import piuk.blockchain.android.simplebuy.BuySellClicked
+import piuk.blockchain.android.simplebuy.BuySellType
 import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.customviews.account.DefaultCellDecorator
 import piuk.blockchain.android.ui.home.HomeNavigator
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
 import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.ui.transactionflow.analytics.SendAnalyticsEvent
+import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalyticsAccountType
 import piuk.blockchain.android.ui.transfer.AccountSelectorFragment
 import piuk.blockchain.android.ui.transfer.analytics.TransferAnalyticsEvent
 
@@ -36,6 +41,7 @@ class TransferSendFragment : AccountSelectorFragment(), DialogFlow.FlowHost {
             R.string.transfer_wallet_buy_crypto
         ) {
             analytics.logEvent(TransferAnalyticsEvent.NoBalanceCtaClicked)
+            analytics.logEvent(BuySellClicked(origin = LaunchOrigin.SEND, type = BuySellType.BUY))
             (activity as? HomeNavigator)?.launchSimpleBuySell()
         }
 
@@ -59,6 +65,14 @@ class TransferSendFragment : AccountSelectorFragment(), DialogFlow.FlowHost {
         require(account is CryptoAccount)
 
         analytics.logEvent(TransferAnalyticsEvent.SourceWalletSelected(account))
+        analytics.logEvent(
+            SendAnalyticsEvent.SendSourceAccountSelected(
+                currency = account.asset.networkTicker,
+                fromAccountType = TxFlowAnalyticsAccountType.fromAccount(
+                    account
+                )
+            )
+        )
         startTransactionFlow(account)
     }
 

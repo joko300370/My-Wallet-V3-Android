@@ -8,16 +8,16 @@ class EmailTest {
 
     @Test
     fun `assert equals`() {
-        Email("abc@def.com", verified = false) `should equal` Email("abc@def.com", verified = false)
+        Email("abc@def.com", isVerified = false) `should equal` Email("abc@def.com", isVerified = false)
     }
 
     @Test
     fun `assert not equals by verified`() {
-        Email("abc@def.com", verified = false) `should not equal` Email("abc@def.com", verified = true)
+        Email("abc@def.com", isVerified = false) `should not equal` Email("abc@def.com", isVerified = true)
     }
 
     @Test
     fun `assert not equals by address`() {
-        Email("abc@def.com", verified = false) `should not equal` Email("def@abc.com", verified = false)
+        Email("abc@def.com", isVerified = false) `should not equal` Email("def@abc.com", isVerified = false)
     }
 }

@@ -1,13 +1,11 @@
 package piuk.blockchain.android.cards
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.picker_item.view.*
-import piuk.blockchain.android.R
-import piuk.blockchain.android.util.visible
+import piuk.blockchain.android.databinding.PickerItemBinding
 import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.visible
 
 class PickerItemsAdapter(private val block: (PickerItem) -> Unit) :
     RecyclerView.Adapter<PickerItemsAdapter.ViewHolder>() {
@@ -21,10 +19,7 @@ class PickerItemsAdapter(private val block: (PickerItem) -> Unit) :
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): ViewHolder {
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.picker_item, parent, false)
-        return ViewHolder(v)
-    }
+    ): ViewHolder = ViewHolder(PickerItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 
     override fun onBindViewHolder(
         holder: ViewHolder,
@@ -37,16 +32,18 @@ class PickerItemsAdapter(private val block: (PickerItem) -> Unit) :
         return items.size
     }
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class ViewHolder(private val binding: PickerItemBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(pickerItem: PickerItem) {
-            itemView.item_title.text = pickerItem.label
-            pickerItem.icon?.let {
-                itemView.item_icon.text = it
-                itemView.item_icon.visible()
-            } ?: itemView.item_icon.gone()
+            with(binding) {
+                itemTitle.text = pickerItem.label
+                pickerItem.icon?.let {
+                    itemIcon.text = it
+                    itemIcon.visible()
+                } ?: itemIcon.gone()
 
-            itemView.root_view.setOnClickListener {
-                block(pickerItem)
+                rootView.setOnClickListener {
+                    block(pickerItem)
+                }
             }
         }
     }

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/very_small_margin"
+    app:cardCornerRadius="@dimen/tiny_margin"
+    app:cardElevation="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_view_grey_100_border">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/asset_label_title"
+            style="@style/Text.Semibold.16"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/small_margin"
+            android:layout_marginTop="@dimen/small_margin"
+            android:text="@string/dashboard_title_recurring_buy"
+            app:layout_constraintBottom_toTopOf="@+id/asset_label_description"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/asset_label_description"
+            style="@style/Text.Light.14"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/tiny_margin"
+            android:layout_marginEnd="@dimen/tiny_margin"
+            android:text="@string/dashboard_recurring_buy_description"
+            app:layout_constraintBottom_toTopOf="@+id/button_layout"
+            app:layout_constraintEnd_toStartOf="@+id/bg_image"
+            app:layout_constraintStart_toStartOf="@+id/asset_label_title"
+            app:layout_constraintTop_toBottomOf="@+id/asset_label_title"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/bg_image"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:src="@drawable/recurring_buy_image_dashboard"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/button_layout"
+            style="@style/CtaButton.White.Slim"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/tiny_margin"
+            android:layout_marginBottom="@dimen/small_margin"
+            android:orientation="horizontal"
+            android:text="@string/dashboard_recurring_buy_learn_more"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/asset_label_description"
+            app:layout_constraintTop_toBottomOf="@+id/asset_label_description" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

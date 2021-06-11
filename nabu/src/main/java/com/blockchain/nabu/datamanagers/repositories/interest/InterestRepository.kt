@@ -2,13 +2,15 @@ package com.blockchain.nabu.datamanagers.repositories.interest
 
 import com.blockchain.rx.TimedCacheRequest
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
 import io.reactivex.Maybe
 import io.reactivex.Single
 
 class InterestRepository(
-    interestLimitsProvider: InterestLimitsProvider,
-    interestAvailabilityProvider: InterestAvailabilityProvider,
-    interestEligibilityProvider: InterestEligibilityProvider
+    private val interestLimitsProvider: InterestLimitsProvider,
+    private val interestAvailabilityProvider: InterestAvailabilityProvider,
+    private val interestEligibilityProvider: InterestEligibilityProvider,
+    private val interestAccountBalancesProvider: InterestBalancesProvider
 ) {
     private val limitsCache = TimedCacheRequest(
         cacheLifetimeSeconds = SHORT_LIFETIME,
@@ -24,6 +26,28 @@ class InterestRepository(
         cacheLifetimeSeconds = LONG_LIFETIME,
         refreshFn = { interestEligibilityProvider.getEligibilityForAllAssets() }
     )
+
+    fun getInterestAccountBalance(asset: CryptoCurrency) =
+        interestAccountBalancesProvider.getBalanceForAsset(asset).map {
+            it.balance
+        }
+
+    fun getInterestPendingBalance(asset: CryptoCurrency) =
+        interestAccountBalancesProvider.getBalanceForAsset(asset).map {
+            it.pendingDeposit
+        }
+
+    fun getInterestActionableBalance(asset: CryptoCurrency) =
+        interestAccountBalancesProvider.getBalanceForAsset(asset).map {
+            (it.balance - it.lockedBalance) as CryptoValue
+        }
+
+    fun getInterestAccountDetails(asset: CryptoCurrency) =
+        interestAccountBalancesProvider.getBalanceForAsset(asset)
+
+    fun clearBalanceForAsset(asset: CryptoCurrency) = interestAccountBalancesProvider.clearBalanceForAsset(asset)
+
+    fun clearBalanceForAsset(ticker: String) = interestAccountBalancesProvider.clearBalanceForAsset(ticker)
 
     fun getLimitForAsset(ccy: CryptoCurrency): Maybe<InterestLimits> =
         limitsCache.getCachedSingle().flatMapMaybe { limitsList ->

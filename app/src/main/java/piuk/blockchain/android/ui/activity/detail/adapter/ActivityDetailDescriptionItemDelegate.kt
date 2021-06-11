@@ -2,18 +2,15 @@ package piuk.blockchain.android.ui.activity.detail.adapter
 
 import android.text.InputFilter
 import android.text.InputType
-import android.view.View
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_activity_detail_description.view.*
-import piuk.blockchain.android.R
+import piuk.blockchain.android.databinding.ItemActivityDetailDescriptionBinding
 import piuk.blockchain.android.ui.activity.detail.ActivityDetailsType
 import piuk.blockchain.android.ui.activity.detail.Description
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
-import piuk.blockchain.android.util.inflate
 
 const val MAX_NOTE_LENGTH = 255
 
@@ -34,7 +31,7 @@ class ActivityDetailDescriptionItemDelegate<in T>(
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
         DescriptionItemViewHolder(
-            parent.inflate(R.layout.item_activity_detail_description)
+            ItemActivityDetailDescriptionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
 
     override fun onBindViewHolder(
@@ -47,13 +44,11 @@ class ActivityDetailDescriptionItemDelegate<in T>(
     )
 }
 
-private class DescriptionItemViewHolder(var parent: View) : RecyclerView.ViewHolder(parent),
-    LayoutContainer {
-    override val containerView: View?
-        get() = itemView
+private class DescriptionItemViewHolder(private val binding: ItemActivityDetailDescriptionBinding) :
+    RecyclerView.ViewHolder(binding.root) {
 
     fun bind(item: Description, onDescriptionUpdated: (String) -> Unit) {
-        itemView.item_activity_detail_description.apply {
+        binding.itemActivityDetailDescription.apply {
             item.description?.let {
                 setText(it, TextView.BufferType.EDITABLE)
                 setSelection(item.description.length)

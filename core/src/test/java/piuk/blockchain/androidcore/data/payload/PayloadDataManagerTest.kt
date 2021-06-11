@@ -24,6 +24,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import com.blockchain.android.testutils.rxInit
+import com.blockchain.logging.CrashLogger
 import info.blockchain.api.BitcoinApi
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -46,6 +47,7 @@ class PayloadDataManagerTest {
     private val privateKeyFactory: PrivateKeyFactory = mock()
     private val bitcoinApi: BitcoinApi = mock()
 
+    private val crashLogger: CrashLogger = mock()
     private val rxBus = RxBus()
     private val testScheduler = TestScheduler()
 
@@ -64,6 +66,7 @@ class PayloadDataManagerTest {
             bitcoinApi,
             privateKeyFactory,
             payloadManager,
+            crashLogger,
             rxBus
         )
     }
@@ -164,8 +167,7 @@ class PayloadDataManagerTest {
         // Arrange
         val secondPassword = "SECOND_PASSWORD"
         val defaultAccountName = "DEFAULT_ACCOUNT_NAME"
-        whenever(payloadManager.upgradeV2PayloadToV3(secondPassword, defaultAccountName))
-            .thenReturn(true)
+
         whenever(payloadManager.isV3UpgradeRequired).thenReturn(true)
         whenever(payloadManager.isV4UpgradeRequired).thenReturn(false)
 
@@ -178,6 +180,7 @@ class PayloadDataManagerTest {
         verify(payloadManager).upgradeV2PayloadToV3(secondPassword, defaultAccountName)
         verify(payloadManager).isV3UpgradeRequired
         verify(payloadManager).isV4UpgradeRequired
+        verify(payloadManager).payload
 
         verifyNoMoreInteractions(payloadService)
         verifyNoMoreInteractions(payloadManager)
@@ -188,8 +191,7 @@ class PayloadDataManagerTest {
         // Arrange
         val secondPassword = "SECOND_PASSWORD"
         val defaultAccountName = "DEFAULT_ACCOUNT_NAME"
-        whenever(payloadManager.upgradeV2PayloadToV3(secondPassword, defaultAccountName)).thenReturn(true)
-        whenever(payloadManager.upgradeV3PayloadToV4(secondPassword)).thenReturn(true)
+
         whenever(payloadManager.isV3UpgradeRequired).thenReturn(true)
         whenever(payloadManager.isV4UpgradeRequired).thenReturn(true)
 
@@ -203,6 +205,7 @@ class PayloadDataManagerTest {
         verify(payloadManager).upgradeV3PayloadToV4(secondPassword)
         verify(payloadManager).isV3UpgradeRequired
         verify(payloadManager).isV4UpgradeRequired
+        verify(payloadManager).payload
 
         verifyNoMoreInteractions(payloadService)
         verifyNoMoreInteractions(payloadManager)
@@ -213,8 +216,7 @@ class PayloadDataManagerTest {
         // Arrange
         val secondPassword = "SECOND_PASSWORD"
         val defaultAccountName = "DEFAULT_ACCOUNT_NAME"
-        whenever(payloadManager.upgradeV3PayloadToV4(secondPassword))
-            .thenReturn(true)
+
         whenever(payloadManager.isV3UpgradeRequired).thenReturn(false)
         whenever(payloadManager.isV4UpgradeRequired).thenReturn(true)
 
@@ -227,6 +229,7 @@ class PayloadDataManagerTest {
         verify(payloadManager).upgradeV3PayloadToV4(secondPassword)
         verify(payloadManager).isV3UpgradeRequired
         verify(payloadManager).isV4UpgradeRequired
+        verify(payloadManager).payload
 
         verifyNoMoreInteractions(payloadService)
         verifyNoMoreInteractions(payloadManager)
@@ -237,7 +240,8 @@ class PayloadDataManagerTest {
         // Arrange
         val secondPassword = "SECOND_PASSWORD"
         val defaultAccountName = "DEFAULT_ACCOUNT_NAME"
-        whenever(payloadManager.upgradeV2PayloadToV3(secondPassword, defaultAccountName)).thenReturn(false)
+        whenever(payloadManager.upgradeV2PayloadToV3(secondPassword, defaultAccountName))
+            .thenThrow(Exception("Failed"))
         whenever(payloadManager.isV3UpgradeRequired).thenReturn(true)
         whenever(payloadManager.isV4UpgradeRequired).thenReturn(true)
 
@@ -249,6 +253,7 @@ class PayloadDataManagerTest {
         // Assert
         verify(payloadManager).upgradeV2PayloadToV3(secondPassword, defaultAccountName)
         verify(payloadManager).isV3UpgradeRequired
+        verify(payloadManager).payload
 
         verifyNoMoreInteractions(payloadService)
         verifyNoMoreInteractions(payloadManager)
@@ -259,8 +264,7 @@ class PayloadDataManagerTest {
         // Arrange
         val secondPassword = "SECOND_PASSWORD"
         val defaultAccountName = "DEFAULT_ACCOUNT_NAME"
-        whenever(payloadManager.upgradeV2PayloadToV3(secondPassword, defaultAccountName)).thenReturn(true)
-        whenever(payloadManager.upgradeV3PayloadToV4(secondPassword)).thenReturn(false)
+        whenever(payloadManager.upgradeV3PayloadToV4(secondPassword)).thenThrow(Exception("Failed"))
         whenever(payloadManager.isV3UpgradeRequired).thenReturn(true)
         whenever(payloadManager.isV4UpgradeRequired).thenReturn(true)
 
@@ -274,6 +278,7 @@ class PayloadDataManagerTest {
         verify(payloadManager).upgradeV3PayloadToV4(secondPassword)
         verify(payloadManager).isV3UpgradeRequired
         verify(payloadManager).isV4UpgradeRequired
+        verify(payloadManager).payload
 
         verifyNoMoreInteractions(payloadService)
         verifyNoMoreInteractions(payloadManager)

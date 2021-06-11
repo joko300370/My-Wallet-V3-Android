@@ -1,19 +1,17 @@
 package piuk.blockchain.android.ui.transactionflow.flow.adapter
 
-import android.view.View
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.ColorRes
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_send_confirm_countdown.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
+import piuk.blockchain.android.databinding.ItemSendConfirmCountdownBinding
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.util.context
-import piuk.blockchain.android.util.inflate
-import java.util.concurrent.TimeUnit
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
+import java.util.concurrent.TimeUnit
 
 class InvoiceCountdownTimerDelegate<in T> : AdapterDelegate<T> {
     override fun isForViewType(items: List<T>, position: Int): Boolean {
@@ -21,7 +19,9 @@ class InvoiceCountdownTimerDelegate<in T> : AdapterDelegate<T> {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
-        ViewHolder(parent.inflate(R.layout.item_send_confirm_countdown))
+        ViewHolder(
+            ItemSendConfirmCountdownBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        )
 
     override fun onBindViewHolder(
         items: List<T>,
@@ -30,14 +30,11 @@ class InvoiceCountdownTimerDelegate<in T> : AdapterDelegate<T> {
     ) = (holder as ViewHolder).bind(items[position] as TxConfirmationValue.BitPayCountdown)
 
     class ViewHolder(
-        val view: View
-    ) : RecyclerView.ViewHolder(view), LayoutContainer {
-
-        override val containerView: View?
-            get() = itemView
+        private val binding: ItemSendConfirmCountdownBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: TxConfirmationValue.BitPayCountdown) {
-            itemView.confirmation_item_label.setText(R.string.bitpay_remaining_time)
+            binding.confirmationItemLabel.setText(R.string.bitpay_remaining_time)
             updateCountdownElements(item.timeRemainingSecs)
         }
 
@@ -52,7 +49,7 @@ class InvoiceCountdownTimerDelegate<in T> : AdapterDelegate<T> {
             } else {
                 "--:--"
             }
-            itemView.confirmation_item_value.text = readableTime
+            binding.confirmationItemValue.text = readableTime
 
             when {
                 remaining > FIVE_MINUTES -> setColors(R.color.primary_grey_light)
@@ -63,8 +60,8 @@ class InvoiceCountdownTimerDelegate<in T> : AdapterDelegate<T> {
 
         private fun setColors(@ColorRes colourResId: Int) {
             val resolved = context.getResolvedColor(colourResId)
-            itemView.confirmation_item_value.setTextColor(resolved)
-            itemView.confirmation_item_label.setTextColor(resolved)
+            binding.confirmationItemValue.setTextColor(resolved)
+            binding.confirmationItemLabel.setTextColor(resolved)
         }
 
         companion object {

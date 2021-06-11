@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:drawableEnd="@drawable/ic_question"
-        android:drawablePadding="@dimen/miniscule_margin"
+        android:drawablePadding="@dimen/minuscule_margin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="BTC Price" />

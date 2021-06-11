@@ -10,8 +10,9 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
-import com.blockchain.notifications.analytics.ActivityAnalytics
 import com.blockchain.nabu.datamanagers.InterestState
+import com.blockchain.notifications.analytics.ActivityAnalytics
+import com.blockchain.notifications.analytics.LaunchOrigin
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -20,6 +21,8 @@ import io.reactivex.rxkotlin.plusAssign
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetResources
 import piuk.blockchain.android.databinding.DialogSheetActivityDetailsBinding
+import piuk.blockchain.android.simplebuy.BuySellClicked
+import piuk.blockchain.android.simplebuy.BuySellType
 import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.ui.activity.CryptoActivityType
@@ -33,11 +36,6 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
     ActivityDetailsIntents,
     ActivityDetailState,
     DialogSheetActivityDetailsBinding>() {
-
-    override val host: Host by lazy {
-        super.host as? Host
-            ?: throw IllegalStateException("Host fragment is not a ActivityDetailsBottomSheet.Host")
-    }
 
     override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogSheetActivityDetailsBinding =
         DialogSheetActivityDetailsBinding.inflate(inflater, container, false)
@@ -95,9 +93,7 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
             amount.text = newState.amount?.toStringWithSymbol()
 
             newState.transactionType?.let {
-                showTransactionTypeUi(newState)
-
-                renderCompletedOrPending(
+                renderCompletedPendingOrFailed(
                     newState.isPending,
                     newState.isPendingExecution,
                     newState.confirmations,
@@ -105,6 +101,8 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
                     newState.transactionType,
                     newState.isFeeTransaction
                 )
+
+                showTransactionTypeUi(newState)
             }
         }
 
@@ -130,12 +128,13 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
                     else -> R.string.empty
                 }
             )
-
             showPendingPill()
 
             if (newState.transactionType == TransactionSummary.TransactionType.DEPOSIT) {
                 showConfirmationUi(newState.confirmations, newState.totalConfirmations)
             }
+        } else if (newState.interestState == InterestState.FAILED) {
+            showFailedPill()
         } else {
             showCompletePill()
         }
@@ -148,7 +147,6 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
             state.transactionType == TransactionSummary.TransactionType.DEPOSIT ||
             state.transactionType == TransactionSummary.TransactionType.WITHDRAW
         ) {
-
             showInterestUi(state)
         }
     }
@@ -168,6 +166,9 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
                 AndroidSchedulers.mainThread()
             )
                 .subscribe {
+                    analytics.logEvent(
+                        BuySellClicked(origin = LaunchOrigin.TRANSACTION_DETAILS, type = BuySellType.BUY)
+                    )
                     startActivity(SimpleBuyActivity.newInstance(requireContext(), arguments.cryptoCurrency, true))
                     dismiss()
                 }
@@ -192,7 +193,7 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
         }
     }
 
-    private fun renderCompletedOrPending(
+    private fun renderCompletedPendingOrFailed(
         pending: Boolean,
         pendingExecution: Boolean,
         confirmations: Int,
@@ -201,42 +202,56 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
         isFeeTransaction: Boolean
     ) {
         binding.apply {
-            if (pending || pendingExecution) {
-                showConfirmationUi(confirmations, totalConfirmations)
-
-                status.text = getString(
-                    when {
-                        transactionType == TransactionSummary.TransactionType.SENT ||
-                            transactionType == TransactionSummary.TransactionType.TRANSFERRED -> {
-                            analytics.logEvent(ActivityAnalytics.DETAILS_SEND_CONFIRMING)
-                            R.string.activity_details_label_confirming
-                        }
-                        isFeeTransaction || transactionType == TransactionSummary.TransactionType.SWAP ||
-                            transactionType == TransactionSummary.TransactionType.SELL -> {
-                            if (isFeeTransaction) {
-                                analytics.logEvent(ActivityAnalytics.DETAILS_FEE_PENDING)
-                            } else {
-                                analytics.logEvent(ActivityAnalytics.DETAILS_SWAP_PENDING)
-                            }
-                            R.string.activity_details_label_pending
-                        }
-                        transactionType == TransactionSummary.TransactionType.BUY ->
-                            if (pending && !pendingExecution) {
-                                analytics.logEvent(ActivityAnalytics.DETAILS_BUY_AWAITING_FUNDS)
-                                R.string.activity_details_label_waiting_on_funds
-                            } else {
-                                analytics.logEvent(ActivityAnalytics.DETAILS_BUY_PENDING)
-                                R.string.activity_details_label_pending_execution
-                            }
-                        else -> R.string.activity_details_label_confirming
-                    }
-                )
-                showPendingPill()
-            } else {
-                showCompletePill()
-                logAnalyticsForComplete(transactionType, isFeeTransaction)
+            when {
+                pending || pendingExecution -> {
+                    showConfirmationUi(confirmations, totalConfirmations)
+                    setStatusText(transactionType, pending, pendingExecution, isFeeTransaction)
+                    showPendingPill()
+                }
+                confirmations >= totalConfirmations -> {
+                    showCompletePill()
+                    logAnalyticsForComplete(transactionType, isFeeTransaction)
+                }
+                else -> {
+                    showFailedPill()
+                }
             }
         }
+    }
+
+    private fun setStatusText(
+        transactionType: TransactionSummary.TransactionType?,
+        pending: Boolean,
+        pendingExecution: Boolean,
+        isFeeTransaction: Boolean
+    ) {
+        binding.status.text = getString(
+            when {
+                transactionType == TransactionSummary.TransactionType.SENT ||
+                    transactionType == TransactionSummary.TransactionType.TRANSFERRED -> {
+                    analytics.logEvent(ActivityAnalytics.DETAILS_SEND_CONFIRMING)
+                    R.string.activity_details_label_confirming
+                }
+                isFeeTransaction || transactionType == TransactionSummary.TransactionType.SWAP ||
+                    transactionType == TransactionSummary.TransactionType.SELL -> {
+                    if (isFeeTransaction) {
+                        analytics.logEvent(ActivityAnalytics.DETAILS_FEE_PENDING)
+                    } else {
+                        analytics.logEvent(ActivityAnalytics.DETAILS_SWAP_PENDING)
+                    }
+                    R.string.activity_details_label_pending
+                }
+                transactionType == TransactionSummary.TransactionType.BUY ->
+                    if (pending && !pendingExecution) {
+                        analytics.logEvent(ActivityAnalytics.DETAILS_BUY_AWAITING_FUNDS)
+                        R.string.activity_details_label_waiting_on_funds
+                    } else {
+                        analytics.logEvent(ActivityAnalytics.DETAILS_BUY_PENDING)
+                        R.string.activity_details_label_pending_execution
+                    }
+                else -> R.string.activity_details_label_confirming
+            }
+        )
     }
 
     private fun showConfirmationUi(
@@ -260,23 +275,25 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
     }
 
     private fun showPendingPill() {
-        binding.apply {
-            status.background =
-                ContextCompat.getDrawable(requireContext(), R.drawable.bkgd_status_unconfirmed)
-            status.setTextColor(
-                ContextCompat.getColor(requireContext(), R.color.grey_800)
-            )
+        binding.status.apply {
+            setBackgroundResource(R.drawable.bkgd_status_unconfirmed)
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.grey_800))
         }
     }
 
     private fun showCompletePill() {
-        binding.apply {
-            status.text = getString(R.string.activity_details_label_complete)
-            status.background =
-                ContextCompat.getDrawable(requireContext(), R.drawable.bkgd_green_100_rounded)
-            status.setTextColor(
-                ContextCompat.getColor(requireContext(), R.color.green_600)
-            )
+        binding.status.apply {
+            text = getString(R.string.activity_details_label_complete)
+            setBackgroundResource(R.drawable.bkgd_green_100_rounded)
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.green_600))
+        }
+    }
+
+    private fun showFailedPill() {
+        binding.status.apply {
+            text = getString(R.string.activity_details_label_failed)
+            setBackgroundResource(R.drawable.bkgd_red_100_rounded)
+            setTextColor(ContextCompat.getColor(requireContext(), R.color.red_600))
         }
     }
 

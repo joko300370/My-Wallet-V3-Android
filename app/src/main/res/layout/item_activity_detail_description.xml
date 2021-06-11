@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:background="@android:color/transparent"
-        android:padding="@dimen/miniscule_margin"
+        android:padding="@dimen/minuscule_margin"
         android:hint="@string/activity_detail_description_action"
         android:imeOptions="actionDone"
         app:layout_constraintEnd_toEndOf="parent"

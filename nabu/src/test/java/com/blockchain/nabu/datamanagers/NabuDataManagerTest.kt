@@ -17,8 +17,8 @@ import com.blockchain.utils.Optional
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
+import info.blockchain.api.ApiException
 import info.blockchain.wallet.api.data.Settings
-import info.blockchain.wallet.exceptions.ApiException
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
