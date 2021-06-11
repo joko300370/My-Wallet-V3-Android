@@ -73,13 +73,15 @@ class ExchangeRateDataStore(
             0.0
         }
 
-        val lastPrice: Double? = tickerData?.get(fiatCurrency)?.price
+        val price = tickerData?.get(fiatCurrency)?.price?.also {
+            prefs.setValue(prefsKey, it.toString())
+        } ?: lastKnown
 
-        if (lastPrice != null) {
-            prefs.setValue("$prefsKey$fiatCurrency", lastPrice.toString())
-        }
+        // adding this requirement ensures the app won't crash due to divide by 0
+        // link to issue: https://tinyurl.com/rmf6um4h
+        require(price != 0.0)
 
-        return lastPrice ?: lastKnown
+        return price
     }
 
     fun getFiatLastPrice(targetFiat: String, sourceFiat: String): Double {

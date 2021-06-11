@@ -115,7 +115,7 @@ private class InterestAssetItemViewHolder(private val binding: ItemInterestDashb
         itemClicked: (CryptoCurrency, Boolean) -> Unit
     ) {
         with(binding) {
-            itemInterestAccBalanceLabel.text = details.totalInterest.toStringWithSymbol()
+            itemInterestAccEarnedLabel.text = details.totalInterest.toStringWithSymbol()
 
             itemInterestAccBalanceLabel.text = details.balance.toStringWithSymbol()
 
