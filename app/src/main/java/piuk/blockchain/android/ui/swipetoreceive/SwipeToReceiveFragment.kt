@@ -218,7 +218,7 @@ class SwipeToReceiveFragment : BaseFragment<SwipeToReceiveView, SwipeToReceivePr
         }
 
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
-            val imageViewBinding = ItemImagePagerBinding.inflate(LayoutInflater.from(context), container, true)
+            val imageViewBinding = ItemImagePagerBinding.inflate(LayoutInflater.from(context), container, false)
             val imageView = imageViewBinding.imageviewCurrencyIcon
             imageView.setImageDrawable(ContextCompat.getDrawable(context, drawables[position]))
             (container as ViewPager).addView(imageView, 0)
