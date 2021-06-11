@@ -15,7 +15,6 @@ import piuk.blockchain.android.ui.transactionflow.flow.ActiveTransactionFlow
 import piuk.blockchain.android.ui.transactionflow.flow.CompoundNetworkFeeFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.EstimatedCompletionPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.ExchangePriceFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.FeedTotalFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.FiatFeePropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.FromPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.NewExchangePriceFormatter
@@ -26,8 +25,6 @@ import piuk.blockchain.android.ui.transactionflow.flow.NewSwapExchangeRateFormat
 import piuk.blockchain.android.ui.transactionflow.flow.NewToPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.NewTotalFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.SwapDestinationPropertyFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.SwapExchangeRateFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.SwapReceiveFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.SwapSourcePropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.ToPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.TotalFormatter
@@ -51,8 +48,7 @@ val transactionModule = module {
         TransactionFlowCustomiserImpl(
             resources = get<Context>().resources,
             assetResources = get(),
-            stringUtils = get(),
-            features = get()
+            stringUtils = get()
         )
     }.bind(TransactionFlowCustomiser::class)
         .bind(EnterAmountCustomisations::class)
@@ -126,25 +122,7 @@ val transactionModule = module {
     }.bind(TxOptionsFormatter::class)
 
     factory {
-        SwapExchangeRateFormatter(
-            resources = get<Context>().resources
-        )
-    }.bind(TxOptionsFormatter::class)
-
-    factory {
-        SwapReceiveFormatter(
-            resources = get<Context>().resources
-        )
-    }.bind(TxOptionsFormatter::class)
-
-    factory {
         FromPropertyFormatter(
-            resources = get<Context>().resources
-        )
-    }.bind(TxOptionsFormatter::class)
-
-    factory {
-        FeedTotalFormatter(
             resources = get<Context>().resources
         )
     }.bind(TxOptionsFormatter::class)

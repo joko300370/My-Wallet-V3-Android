@@ -1,6 +1,5 @@
 package piuk.blockchain.android.coincore.eth
 
-import com.blockchain.featureflags.GatedFeature
 import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
@@ -65,57 +64,34 @@ open class EthOnChainTxEngine(
             )
         )
 
-    private fun buildNewConfirmation(pendingTx: PendingTx): PendingTx =
-        pendingTx.copy(
-            confirmations = listOfNotNull(
-                TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
-                TxConfirmationValue.NewTo(
-                    txTarget, AssetAction.Send, sourceAccount
-                ),
-                TxConfirmationValue.CompoundNetworkFee(
-                    sendingFeeInfo = if (!pendingTx.feeAmount.isZero) {
-                        FeeInfo(
-                            pendingTx.feeAmount,
-                            pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
-                            sourceAsset
-                        )
-                    } else null,
-                    feeLevel = pendingTx.feeSelection.selectedLevel
-                ),
-                TxConfirmationValue.NewTotal(
-                    totalWithFee = (pendingTx.amount as CryptoValue).plus(
-                        pendingTx.feeAmount as CryptoValue
-                    ),
-                    exchange = pendingTx.amount.toFiat(exchangeRates, userFiat)
-                        .plus(pendingTx.feeAmount.toFiat(exchangeRates, userFiat))
-                ),
-                TxConfirmationValue.Description()
-            )
-        )
-
-    private fun buildOldConfirmation(pendingTx: PendingTx): PendingTx =
-        pendingTx.copy(
-            confirmations = listOf(
-                TxConfirmationValue.From(from = sourceAccount.label),
-                TxConfirmationValue.To(to = txTarget.label),
-                makeFeeSelectionOption(pendingTx),
-                TxConfirmationValue.FeedTotal(
-                    amount = pendingTx.amount,
-                    fee = pendingTx.feeAmount,
-                    exchangeFee = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
-                    exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
-                ),
-                TxConfirmationValue.Description()
-            )
-        )
-
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         Single.just(
-            if (internalFeatureFlagApi.isFeatureEnabled(GatedFeature.CHECKOUT)) {
-                buildNewConfirmation(pendingTx)
-            } else {
-                buildOldConfirmation(pendingTx)
-            }
+            pendingTx.copy(
+                confirmations = listOfNotNull(
+                    TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
+                    TxConfirmationValue.NewTo(
+                        txTarget, AssetAction.Send, sourceAccount
+                    ),
+                    TxConfirmationValue.CompoundNetworkFee(
+                        sendingFeeInfo = if (!pendingTx.feeAmount.isZero) {
+                            FeeInfo(
+                                pendingTx.feeAmount,
+                                pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
+                                sourceAsset
+                            )
+                        } else null,
+                        feeLevel = pendingTx.feeSelection.selectedLevel
+                    ),
+                    TxConfirmationValue.NewTotal(
+                        totalWithFee = (pendingTx.amount as CryptoValue).plus(
+                            pendingTx.feeAmount as CryptoValue
+                        ),
+                        exchange = pendingTx.amount.toFiat(exchangeRates, userFiat)
+                            .plus(pendingTx.feeAmount.toFiat(exchangeRates, userFiat))
+                    ),
+                    TxConfirmationValue.Description()
+                )
+            )
         )
 
     private fun absoluteFee(feeLevel: FeeLevel): Single<CryptoValue> =

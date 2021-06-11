@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.blockchain.featureflags.GatedFeature
 import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
@@ -82,9 +81,6 @@ class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetails
 
             interestDetailsAssetWithIcon.updateIcon(account as CryptoAccount)
 
-            interestDetailsActivityCta.setOnClickListener {
-                host.gotoActivityFor(account as BlockchainAccount)
-            }
             disposables += coincore.allWalletsWithActions(setOf(AssetAction.InterestDeposit)).map { accounts ->
                 accounts.filter { account -> account is CryptoAccount && account.asset == cryptoCurrency }
             }
@@ -131,9 +127,6 @@ class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetails
 
     private fun compositeToView(composite: CompositeInterestDetails) {
         with(binding) {
-            if (features.isFeatureEnabled(GatedFeature.INTEREST_WITHDRAWAL)) {
-                interestDetailsDisclaimer.gone()
-                interestDetailsActivityCta.gone()
                 if (composite.balance.isPositive) {
                     interestDetailsWithdrawCta.text =
                         getString(R.string.tx_title_withdraw, cryptoCurrency.displayTicker)
@@ -143,10 +136,6 @@ class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetails
                         host.goToInterestWithdraw(account as InterestAccount)
                     }
                 }
-            } else {
-                interestDetailsDisclaimer.visible()
-                interestDetailsActivityCta.visible()
-            }
         }
         val itemList = mutableListOf<InterestSummaryInfoItem>()
         itemList.apply {

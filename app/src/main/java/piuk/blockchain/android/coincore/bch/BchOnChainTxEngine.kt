@@ -1,6 +1,5 @@
 package piuk.blockchain.android.coincore.bch
 
-import com.blockchain.featureflags.GatedFeature
 import com.blockchain.nabu.datamanagers.TransactionError
 import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
@@ -191,7 +190,12 @@ class BchOnChainTxEngine(
     private fun PendingTx.hasSufficientFunds() =
         availableBalance >= amount && unspentOutputBundle.spendableOutputs.isNotEmpty()
 
-    private fun buildNewConfirmation(pendingTx: PendingTx): PendingTx =
+    override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
+        Single.just(
+            buildConfirmations(pendingTx)
+        )
+
+    private fun buildConfirmations(pendingTx: PendingTx): PendingTx =
         pendingTx.copy(
             confirmations = listOfNotNull(
                 TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
@@ -216,30 +220,6 @@ class BchOnChainTxEngine(
                         .plus(pendingTx.feeAmount.toFiat(exchangeRates, userFiat))
                 )
             )
-        )
-
-    private fun buildOldConfirmation(pendingTx: PendingTx): PendingTx =
-        pendingTx.copy(
-            confirmations = listOf(
-                TxConfirmationValue.From(from = sourceAccount.label),
-                TxConfirmationValue.To(to = txTarget.label),
-                makeFeeSelectionOption(pendingTx),
-                TxConfirmationValue.FeedTotal(
-                    amount = pendingTx.amount,
-                    fee = pendingTx.feeAmount,
-                    exchangeFee = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
-                    exchangeAmount = pendingTx.amount.toFiat(exchangeRates, userFiat)
-                )
-            )
-        )
-
-    override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
-        Single.just(
-            if (internalFeatureFlagApi.isFeatureEnabled(GatedFeature.CHECKOUT)) {
-                buildNewConfirmation(pendingTx)
-            } else {
-                buildOldConfirmation(pendingTx)
-            }
         )
 
     override fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =

@@ -14,22 +14,6 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
     data class NewExchangePriceConfirmation(val money: Money, val asset: CryptoCurrency) :
         TxConfirmationValue(TxConfirmation.EXPANDABLE_SIMPLE_READ_ONLY)
 
-    data class FeedTotal(
-        val amount: Money,
-        val fee: Money,
-        val exchangeAmount: Money? = null,
-        val exchangeFee: Money? = null
-    ) : TxConfirmationValue(TxConfirmation.READ_ONLY)
-
-    data class SwapExchangeRate(
-        val unitCryptoCurrency: Money,
-        val price: Money
-    ) : TxConfirmationValue(TxConfirmation.READ_ONLY)
-
-    data class SwapReceiveValue(
-        val receiveAmount: Money
-    ) : TxConfirmationValue(TxConfirmation.READ_ONLY)
-
     data class From(val from: String) : TxConfirmationValue(TxConfirmation.READ_ONLY)
 
     data class NewFrom(val sourceAccount: BlockchainAccount, val sourceAsset: CryptoCurrency) :

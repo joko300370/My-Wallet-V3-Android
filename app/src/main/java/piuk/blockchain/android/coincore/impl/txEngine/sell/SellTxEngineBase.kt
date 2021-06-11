@@ -1,6 +1,5 @@
 package piuk.blockchain.android.coincore.impl.txEngine.sell
 
-import com.blockchain.featureflags.GatedFeature
 import com.blockchain.nabu.datamanagers.CustodialOrder
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
 import com.blockchain.nabu.datamanagers.Product
@@ -20,7 +19,6 @@ import piuk.blockchain.android.coincore.FiatAccount
 import piuk.blockchain.android.coincore.NullAddress
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TxConfirmationValue
-import piuk.blockchain.android.coincore.TxFee
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.impl.txEngine.PricedQuote
@@ -100,7 +98,7 @@ abstract class SellTxEngineBase(
         CryptoCurrency.ETHER
     } else this
 
-    private fun buildNewConfirmation(
+    private fun buildConfirmation(
         pendingTx: PendingTx,
         latestQuoteExchangeRate: ExchangeRate,
         pricedQuote: PricedQuote
@@ -128,30 +126,6 @@ abstract class SellTxEngineBase(
             )
         )
 
-    private fun buildOldConfirmations(
-        pendingTx: PendingTx,
-        latestQuoteExchangeRate: ExchangeRate,
-        pricedQuote: PricedQuote
-    ): PendingTx =
-        pendingTx.copy(
-            confirmations = listOf(
-                TxConfirmationValue.ExchangePriceConfirmation(pricedQuote.price, sourceAsset),
-                TxConfirmationValue.From(sourceAccount.label),
-                TxConfirmationValue.To(txTarget.label),
-                TxConfirmationValue.NetworkFee(
-                    txFee = TxFee(
-                        fee = pendingTx.feeAmount,
-                        type = TxFee.FeeType.DEPOSIT_FEE,
-                        asset = sourceAsset.disambiguateERC20()
-                    )
-                ),
-                TxConfirmationValue.Total(
-                    total = pendingTx.amount,
-                    exchange = latestQuoteExchangeRate.convert(pendingTx.amount)
-                )
-            )
-        )
-
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         quotesEngine.pricedQuote
             .firstOrError()
@@ -161,14 +135,10 @@ abstract class SellTxEngineBase(
                     to = userFiat,
                     _rate = pricedQuote.price.toBigDecimal()
                 )
-                if (internalFeatureFlagApi.isFeatureEnabled(GatedFeature.CHECKOUT)) {
-                    buildNewConfirmation(pendingTx, latestQuoteExchangeRate, pricedQuote)
-                } else {
-                    buildOldConfirmations(pendingTx, latestQuoteExchangeRate, pricedQuote)
-                }
+                buildConfirmation(pendingTx, latestQuoteExchangeRate, pricedQuote)
             }
 
-    private fun addOrRefreshNewConfirmations(
+    private fun addOrRefreshConfirmations(
         pendingTx: PendingTx,
         pricedQuote: PricedQuote,
         latestQuoteExchangeRate: ExchangeRate
@@ -189,26 +159,6 @@ abstract class SellTxEngineBase(
             )
         }
 
-    private fun addOrRefreshConfirmations(
-        pendingTx: PendingTx,
-        pricedQuote: PricedQuote,
-        latestQuoteExchangeRate: ExchangeRate
-    ): PendingTx =
-        pendingTx.apply {
-            addOrReplaceOption(
-                TxConfirmationValue.ExchangePriceConfirmation(
-                    pricedQuote.price,
-                    sourceAsset
-                )
-            )
-            addOrReplaceOption(
-                TxConfirmationValue.Total(
-                    total = pendingTx.amount,
-                    exchange = latestQuoteExchangeRate.convert(pendingTx.amount)
-                )
-            )
-        }
-
     override fun doRefreshConfirmations(pendingTx: PendingTx): Single<PendingTx> =
         quotesEngine.pricedQuote
             .firstOrError()
@@ -218,12 +168,7 @@ abstract class SellTxEngineBase(
                     to = userFiat,
                     _rate = pricedQuote.price.toBigDecimal()
                 )
-
-                if (internalFeatureFlagApi.isFeatureEnabled(GatedFeature.CHECKOUT)) {
-                    addOrRefreshNewConfirmations(pendingTx, pricedQuote, latestQuoteExchangeRate)
-                } else {
                     addOrRefreshConfirmations(pendingTx, pricedQuote, latestQuoteExchangeRate)
-                }
             }
 
     protected fun createSellOrder(pendingTx: PendingTx): Single<CustodialOrder> =

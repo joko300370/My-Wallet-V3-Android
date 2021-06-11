@@ -30,9 +30,11 @@ sealed class ExchangeRate(val rate: BigDecimal) {
             CryptoValue.fromMajor(to, rate)
 
         override fun inverse(roundingMode: RoundingMode, scale: Int) =
-            CryptoToCrypto(to,
+            CryptoToCrypto(
+                to,
                 from,
-                BigDecimal.ONE.divide(rate, if (scale == -1) from.dp else scale, roundingMode).stripTrailingZeros())
+                BigDecimal.ONE.divide(rate, if (scale == -1) from.dp else scale, roundingMode).stripTrailingZeros()
+            )
     }
 
     data class CryptoToFiat(
