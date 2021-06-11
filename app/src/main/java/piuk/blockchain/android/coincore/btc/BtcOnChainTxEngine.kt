@@ -8,6 +8,7 @@ import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
 import info.blockchain.wallet.api.data.FeeOptions
+import info.blockchain.wallet.api.dust.data.DustInput
 import info.blockchain.wallet.payload.data.XPubs
 import info.blockchain.wallet.payload.model.Utxo
 import info.blockchain.wallet.payment.Payment
@@ -379,8 +380,10 @@ class BtcOnChainTxEngine(
         }
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
-        doPrepareTransaction(pendingTx, secondPassword)
-            .flatMap { engineTx ->
+        doPrepareTransaction(pendingTx)
+            .flatMap { (tx, _) ->
+                doSignTransaction(tx, pendingTx, secondPassword)
+            }.flatMap { engineTx ->
                 val btcTx = engineTx as BtcPreparedTx
                 sendDataManager.submitBtcPayment(btcTx.btcTx)
             }.doOnSuccess {
@@ -392,27 +395,6 @@ class BtcOnChainTxEngine(
             }.map {
                 TxResult.HashedTxResult(it, pendingTx.amount)
             }
-
-    override fun doPrepareTransaction(
-        pendingTx: PendingTx,
-        secondPassword: String
-    ): Single<EngineTransaction> =
-        Singles.zip(
-            btcSource.getChangeAddress(),
-            btcSource.receiveAddress,
-            btcSource.getSigningKeys(pendingTx.utxoBundle, secondPassword)
-        ).map { (changeAddress, receiveAddress, keys) ->
-            BtcPreparedTx(
-                sendDataManager.createAndSignBtcTransaction(
-                    pendingTx.utxoBundle,
-                    keys,
-                    btcTarget.address,
-                    selectAddressForChange(pendingTx.utxoBundle, changeAddress, receiveAddress.address),
-                    pendingTx.feeAmount.toBigInteger(),
-                    pendingTx.amount.toBigInteger()
-                )
-            )
-        }
 
     // Logic to decide on sending change to bech32 xpub change or receive chain.
     // When moving from legacy to segwit, we should send change to at least one receive address before we start
@@ -427,6 +409,40 @@ class BtcOnChainTxEngine(
         receiveAddress: String
     ): String =
         changeAddress.takeIf { inputs.spendableOutputs.firstOrNull { it.isSegwit } != null } ?: receiveAddress
+
+    override fun doSignTransaction(
+        tx: Transaction,
+        pendingTx: PendingTx,
+        secondPassword: String
+    ): Single<EngineTransaction> =
+        btcSource.getSigningKeys(
+            pendingTx.utxoBundle,
+            secondPassword
+        )
+            .map { keys ->
+                BtcPreparedTx(
+                    sendDataManager.getSignedBtcTransaction(
+                        tx,
+                        keys
+                    )
+                )
+            }
+
+    override fun doPrepareTransaction(
+        pendingTx: PendingTx
+    ): Single<Pair<Transaction, DustInput?>> =
+        Singles.zip(
+            btcSource.getChangeAddress(),
+            btcSource.receiveAddress
+        ).map { (changeAddress, receiveAddress) ->
+            sendDataManager.getBtcTransaction(
+                pendingTx.utxoBundle,
+                btcTarget.address,
+                selectAddressForChange(pendingTx.utxoBundle, changeAddress, receiveAddress.address),
+                pendingTx.feeAmount.toBigInteger(),
+                pendingTx.amount.toBigInteger()
+            ) to null
+        }
 
     override fun doOnTransactionSuccess(pendingTx: PendingTx) {
         btcSource.incrementReceiveAddress()

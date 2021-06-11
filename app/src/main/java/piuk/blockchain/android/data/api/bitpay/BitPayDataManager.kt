@@ -1,10 +1,11 @@
 package piuk.blockchain.android.data.api.bitpay
 
+import io.reactivex.Completable
 import piuk.blockchain.android.data.api.bitpay.models.RawPaymentRequest
 import io.reactivex.Single
-import piuk.blockchain.android.data.api.bitpay.models.BitPayPaymentResponse
 import piuk.blockchain.android.data.api.bitpay.models.BitPaymentRequest
 import piuk.blockchain.androidcore.utils.extensions.applySchedulers
+import java.util.Locale
 
 class BitPayDataManager constructor(
     private val bitPayService: BitPayService
@@ -18,18 +19,21 @@ class BitPayDataManager constructor(
      *
      * @return A [RawPaymentRequest] object wrapped in a [Single].
      */
-    fun getRawPaymentRequest(invoiceId: String): Single<RawPaymentRequest> =
-        bitPayService.getRawPaymentRequest(invoiceId = invoiceId).applySchedulers()
+    fun getRawPaymentRequest(invoiceId: String, currencyCode: String): Single<RawPaymentRequest> =
+        bitPayService.getRawPaymentRequest(
+            invoiceId = invoiceId,
+            chain = currencyCode.toUpperCase(Locale.getDefault())
+        ).applySchedulers()
 
     fun paymentVerificationRequest(invoiceId: String, paymentRequest: BitPaymentRequest):
-            Single<BitPayPaymentResponse> =
+        Completable =
         bitPayService.getPaymentVerificationRequest(
             invoiceId = invoiceId,
             body = paymentRequest
         ).applySchedulers()
 
     fun paymentSubmitRequest(invoiceId: String, paymentRequest: BitPaymentRequest):
-            Single<BitPayPaymentResponse> =
+        Completable =
         bitPayService.getPaymentSubmitRequest(
             invoiceId = invoiceId,
             body = paymentRequest

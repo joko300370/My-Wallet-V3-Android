@@ -102,6 +102,7 @@ import piuk.blockchain.android.util.visible
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
 import timber.log.Timber
+import java.net.URLDecoder
 
 class MainActivity : MvpActivity<MainView, MainPresenter>(),
     HomeNavigator,
@@ -317,9 +318,9 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         activityResultAction = {
             when (requestCode) {
                 QrScanActivity.SCAN_URI_RESULT -> {
-                    val scanData = data.getRawScanData()
-                    if (resultCode == RESULT_OK && scanData != null) {
-                        presenter.processScanResult(scanData)
+                    data.getRawScanData()?.let {
+                        val decodeData = URLDecoder.decode(it, "UTF-8")
+                        if (resultCode == RESULT_OK) presenter.processScanResult(decodeData)
                     }
                 }
                 SETTINGS_EDIT,

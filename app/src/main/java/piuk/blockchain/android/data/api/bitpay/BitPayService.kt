@@ -1,8 +1,8 @@
 package piuk.blockchain.android.data.api.bitpay
 
+import io.reactivex.Completable
 import io.reactivex.Single
 import piuk.blockchain.android.data.api.bitpay.models.BitPayChain
-import piuk.blockchain.android.data.api.bitpay.models.BitPayPaymentResponse
 import piuk.blockchain.android.data.api.bitpay.models.BitPaymentRequest
 import piuk.blockchain.android.data.api.bitpay.models.RawPaymentRequest
 import piuk.blockchain.android.data.api.bitpay.models.exceptions.wrapErrorMessage
@@ -23,9 +23,10 @@ class BitPayService constructor(
 
     internal fun getRawPaymentRequest(
         path: String = "$baseUrl$PATH_BITPAY_INVOICE",
-        invoiceId: String
+        invoiceId: String,
+        chain: String
     ): Single<RawPaymentRequest> = rxPinning.callSingle {
-        service.getRawPaymentRequest("$path/$invoiceId", BitPayChain("BTC"))
+        service.getRawPaymentRequest("$path/$invoiceId", BitPayChain(chain))
             .wrapErrorMessage()
     }
 
@@ -33,21 +34,16 @@ class BitPayService constructor(
         path: String = "$baseUrl$PATH_BITPAY_INVOICE",
         body: BitPaymentRequest,
         invoiceId: String
-    ): Single<BitPayPaymentResponse> = rxPinning.callSingle {
+    ): Completable =
         service.paymentRequest(path = "$path/$invoiceId",
             body = body,
             contentType = "application/payment-verification")
-            .wrapErrorMessage()
-    }
 
     internal fun getPaymentSubmitRequest(
         path: String = "$baseUrl$PATH_BITPAY_INVOICE",
         body: BitPaymentRequest,
         invoiceId: String
-    ): Single<BitPayPaymentResponse> = rxPinning.callSingle {
-        service.paymentRequest(path = "$path/$invoiceId",
+    ): Completable = service.paymentRequest(path = "$path/$invoiceId",
             body = body,
             contentType = "application/payment")
-            .wrapErrorMessage()
-    }
 }

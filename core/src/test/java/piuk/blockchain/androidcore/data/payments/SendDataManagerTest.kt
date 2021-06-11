@@ -10,17 +10,19 @@ import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.CryptoValue
+import info.blockchain.wallet.api.dust.data.DustInput
+import info.blockchain.wallet.keys.SigningKey
 import info.blockchain.wallet.payload.data.XPub
 import info.blockchain.wallet.payload.data.XPubs
 import info.blockchain.wallet.payload.model.Utxo
-import info.blockchain.balance.CryptoValue
-import info.blockchain.wallet.keys.SigningKey
 import info.blockchain.wallet.payment.OutputType
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.amshove.kluent.shouldEqual
+import org.bitcoinj.core.Transaction
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -57,37 +59,43 @@ class SendDataManagerTest {
         val mockFee: BigInteger = mock()
         val mockAmount: BigInteger = mock()
         val txHash = "TX_HASH"
+        val mockTx: Transaction = mock()
+
         whenever(
-            mockPaymentService.submitBtcPayment(
+            mockPaymentService.getBtcTx(
                 mockOutputBundle,
-                mockKeys,
                 toAddress,
                 changeAddress,
                 mockFee,
                 mockAmount
             )
-        ).thenReturn(Observable.just(txHash))
-        whenever(mockLastTxUpdater.updateLastTxTime()).thenReturn(Completable.complete())
+        ).thenReturn(mockTx)
+
+        whenever(
+            mockPaymentService.signBtcTx(
+                mockTx,
+                mockKeys
+            )
+        ).thenReturn(mockTx)
+
+        whenever(
+            mockPaymentService.submitBtcPayment(mockTx)
+        ).thenReturn(Single.just(txHash))
+
+        whenever(
+            mockLastTxUpdater.updateLastTxTime()
+        ).thenReturn(Completable.complete())
+
         // Act
         val testObserver = subject.submitBtcPayment(
-            mockOutputBundle,
-            mockKeys,
-            toAddress,
-            changeAddress,
-            mockFee,
-            mockAmount
+            mockTx
         ).test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         testObserver.values()[0] shouldEqual txHash
         verify(mockPaymentService).submitBtcPayment(
-            mockOutputBundle,
-            mockKeys,
-            toAddress,
-            changeAddress,
-            mockFee,
-            mockAmount
+            mockTx
         )
         verifyNoMoreInteractions(mockPaymentService)
     }
@@ -102,37 +110,97 @@ class SendDataManagerTest {
         val mockFee: BigInteger = mock()
         val mockAmount: BigInteger = mock()
         val txHash = "TX_HASH"
+        val mockTx: Transaction = mock()
+
         whenever(
-            mockPaymentService.submitBtcPayment(
+            mockPaymentService.getBtcTx(
                 mockOutputBundle,
-                mockKeys,
                 toAddress,
                 changeAddress,
                 mockFee,
                 mockAmount
             )
-        ).thenReturn(Observable.just(txHash))
-        whenever(mockLastTxUpdater.updateLastTxTime()).thenReturn(Completable.error(Exception()))
+        ).thenReturn(mockTx)
+
+        whenever(
+            mockPaymentService.signBtcTx(
+                mockTx,
+                mockKeys
+            )
+        ).thenReturn(mockTx)
+
+        whenever(
+            mockPaymentService.submitBtcPayment(mockTx)
+        ).thenReturn(Single.just(txHash))
+
+        whenever(
+            mockLastTxUpdater.updateLastTxTime()
+        ).thenReturn(Completable.error(Exception()))
         // Act
         val testObserver = subject.submitBtcPayment(
-            mockOutputBundle,
-            mockKeys,
-            toAddress,
-            changeAddress,
-            mockFee,
-            mockAmount
+            mockTx
         ).test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         testObserver.values()[0] shouldEqual txHash
         verify(mockPaymentService).submitBtcPayment(
-            mockOutputBundle,
-            mockKeys,
-            toAddress,
-            changeAddress,
-            mockFee,
-            mockAmount
+            mockTx
+        )
+        verifyNoMoreInteractions(mockPaymentService)
+    }
+
+    @Test
+    fun `submitPayment BCH  successful even if logging last tx fails`() {
+        // Arrange
+        val mockOutputBundle: SpendableUnspentOutputs = mock()
+        val mockKeys = listOf(mock<SigningKey>())
+        val toAddress = "TO_ADDRESS"
+        val changeAddress = "CHANGE_ADDRESS"
+        val mockFee: BigInteger = mock()
+        val mockAmount: BigInteger = mock()
+        val txHash = "TX_HASH"
+        val mockTx: Transaction = mock()
+        val dustInput = mock<DustInput>()
+
+        whenever(
+            mockPaymentService.getBchTx(
+                mockOutputBundle,
+                toAddress,
+                changeAddress,
+                mockFee,
+                mockAmount
+            )
+        ).thenReturn(
+            Observable.just(mockTx to dustInput)
+        )
+
+        whenever(
+            mockPaymentService.signBchTx(
+                mockTx,
+                mockKeys
+            )
+        ).thenReturn(mockTx)
+
+        whenever(
+            mockPaymentService.submitBchPayment(mockTx, dustInput)
+        ).thenReturn(Single.just(txHash))
+
+        whenever(
+            mockLastTxUpdater.updateLastTxTime()
+        ).thenReturn(Completable.error(Exception()))
+
+        // Act
+        val testObserver = subject.submitBchPayment(
+            mockTx,
+            dustInput
+        ).test()
+        // Assert
+        testObserver.assertComplete()
+        testObserver.assertNoErrors()
+        testObserver.values()[0] shouldEqual txHash
+        verify(mockPaymentService).submitBchPayment(
+            mockTx, dustInput
         )
         verifyNoMoreInteractions(mockPaymentService)
     }
@@ -147,37 +215,46 @@ class SendDataManagerTest {
         val mockFee: BigInteger = mock()
         val mockAmount: BigInteger = mock()
         val txHash = "TX_HASH"
+        val mockTx: Transaction = mock()
+        val dustInput = mock<DustInput>()
+
         whenever(
-            mockPaymentService.submitBchPayment(
+            mockPaymentService.getBchTx(
                 mockOutputBundle,
-                mockKeys,
                 toAddress,
                 changeAddress,
                 mockFee,
                 mockAmount
             )
-        ).thenReturn(Observable.just(txHash))
-        whenever(mockLastTxUpdater.updateLastTxTime()).thenReturn(Completable.complete())
+        ).thenReturn(Observable.just(mockTx to dustInput))
+
+        whenever(
+            mockPaymentService.signBchTx(
+                mockTx,
+                mockKeys
+            )
+        ).thenReturn(mockTx)
+
+        whenever(
+            mockPaymentService.submitBchPayment(mockTx, dustInput)
+        ).thenReturn(Single.just(txHash))
+
+        whenever(
+            mockLastTxUpdater.updateLastTxTime()
+        ).thenReturn(Completable.complete())
+
         // Act
         val testObserver = subject.submitBchPayment(
-            mockOutputBundle,
-            mockKeys,
-            toAddress,
-            changeAddress,
-            mockFee,
-            mockAmount
+            mockTx,
+            dustInput
         ).test()
         // Assert
         testObserver.assertComplete()
         testObserver.assertNoErrors()
         testObserver.values()[0] shouldEqual txHash
         verify(mockPaymentService).submitBchPayment(
-            mockOutputBundle,
-            mockKeys,
-            toAddress,
-            changeAddress,
-            mockFee,
-            mockAmount
+            mockTx,
+            dustInput
         )
         verifyNoMoreInteractions(mockPaymentService)
     }
@@ -247,13 +324,15 @@ class SendDataManagerTest {
         val payment = 1.bitcoin()
         val fee = 1.toBigInteger()
         val outputs = SpendableUnspentOutputs()
-        whenever(mockPaymentService.getSpendableCoins(
-            unspent,
-            targetOutputType,
-            changeOutputType,
-            payment.toBigInteger(),
-            fee,
-            false)
+        whenever(
+            mockPaymentService.getSpendableCoins(
+                unspent,
+                targetOutputType,
+                changeOutputType,
+                payment.toBigInteger(),
+                fee,
+                false
+            )
         ).thenReturn(outputs)
         // Act
         val result = subject
@@ -272,8 +351,10 @@ class SendDataManagerTest {
         val payment = 1.bitcoinCash()
         val fee = 1.toBigInteger()
         val outputs = SpendableUnspentOutputs()
-        whenever(mockPaymentService.getSpendableCoins(
-            unspent, targetOutputType, changeOutputType, payment.toBigInteger(), fee, true)
+        whenever(
+            mockPaymentService.getSpendableCoins(
+                unspent, targetOutputType, changeOutputType, payment.toBigInteger(), fee, true
+            )
         ).thenReturn(outputs)
         // Act
         val result = subject

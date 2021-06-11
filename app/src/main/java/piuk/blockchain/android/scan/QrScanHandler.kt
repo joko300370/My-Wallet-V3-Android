@@ -7,6 +7,8 @@ import com.blockchain.koin.payloadScope
 import com.blockchain.remoteconfig.FeatureFlag
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.util.FormatsUtil
+import info.blockchain.wallet.util.FormatsUtil.BCH_PREFIX
+import info.blockchain.wallet.util.FormatsUtil.BTC_PREFIX
 import io.reactivex.Maybe
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
@@ -29,6 +31,7 @@ import piuk.blockchain.android.data.api.bitpay.BitPayDataManager
 import piuk.blockchain.android.data.api.bitpay.PATH_BITPAY_INVOICE
 import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
+import java.lang.IllegalArgumentException
 import java.security.KeyPair
 
 sealed class ScanResult(
@@ -99,11 +102,13 @@ class QrScanResultProcessor(
             }
         }
 
-    private fun parseBitpayInvoice(bitpayUri: String): Single<CryptoTarget> =
-        BitPayInvoiceTarget.fromLink(CryptoCurrency.BTC, bitpayUri, bitPayDataManager)
+    private fun parseBitpayInvoice(bitpayUri: String): Single<CryptoTarget> {
+        val cryptoCurrency = bitpayUri.getCryptoCurrencyFromLink()
+        return BitPayInvoiceTarget.fromLink(cryptoCurrency, bitpayUri, bitPayDataManager)
             .onErrorResumeNext {
                 Single.error(QrScanError(QrScanError.ErrorCode.BitPayScanFailed, it.message ?: "Unknown reason"))
             }
+    }
 
     fun disambiguateScan(
         activity: Activity,
@@ -142,8 +147,8 @@ class QrScanResultProcessor(
             .filter { r -> r is ScanResult.TxTarget }
             .map { r ->
                 (r as ScanResult.TxTarget).targets
-                .filterIsInstance<CryptoAddress>()
-                .first { a -> a.asset == asset }
+                    .filterIsInstance<CryptoAddress>()
+                    .first { a -> a.asset == asset }
             }.onErrorComplete()
 
     // TODO: Move this into the flow.
@@ -216,10 +221,15 @@ class QrScanResultProcessor(
 private fun String.isHttpUri(): Boolean = startsWith("http")
 
 private const val bitpayInvoiceUrl = "$BITPAY_LIVE_BASE$PATH_BITPAY_INVOICE/"
-private fun String.isBitpayUri(): Boolean {
-    val amount = FormatsUtil.getBitcoinAmount(this)
-    val paymentRequestUrl = FormatsUtil.getPaymentRequestUrl(this)
-    return amount == "0.0000" && paymentRequestUrl.contains(bitpayInvoiceUrl)
-}
+
+private fun String.isBitpayUri(): Boolean =
+    FormatsUtil.getPaymentRequestUrl(this).contains(bitpayInvoiceUrl)
+
+private fun String.getCryptoCurrencyFromLink(): CryptoCurrency =
+    when {
+        this.startsWith(BTC_PREFIX) -> CryptoCurrency.BTC
+        this.startsWith(BCH_PREFIX) -> CryptoCurrency.BCH
+        else -> throw IllegalArgumentException("$this cannot be mapped to a supported CryptoCurrency")
+    }
 
 private fun String.isJson(): Boolean = FormatsUtil.isValidJson(this)

@@ -72,16 +72,18 @@ class BchDustServiceTest : AutoCloseKoinTest() {
             .values()
             .single()
             .apply {
-                txHash `should equal` "fd208b67abd52eb417cce9a1886f29342e3577a4d1f9c87fbb11ca21e6fc3a81"
-                txHashBigEndian `should equal` "813afce621ca11bb7fc8f9d1a477352e34296f88a1e9cc17b42ed5ab678b20fd"
-                txIndex `should equal` 0L
-                txOutputN `should equal` 26L
-                script `should equal` "00"
-                value `should equal` 546.toBigInteger()
-                valueHex `should equal` "00000222"
-                confirmations `should equal` 1
-                outputScript `should equal` "76a914757666a692b3676fef9df7d0f61d415012555f6288ac"
-                lockSecret `should equal` "b812995e2ca64c69bdd9187f2c26ab3b"
+                this?.let {
+                    txHash `should equal` "fd208b67abd52eb417cce9a1886f29342e3577a4d1f9c87fbb11ca21e6fc3a81"
+                    txHashBigEndian `should equal` "813afce621ca11bb7fc8f9d1a477352e34296f88a1e9cc17b42ed5ab678b20fd"
+                    txIndex `should equal` 0L
+                    txOutputN `should equal` 26L
+                    script `should equal` "00"
+                    value `should equal` 546.toBigInteger()
+                    valueHex `should equal` "00000222"
+                    confirmations `should equal` 1
+                    outputScript `should equal` "76a914757666a692b3676fef9df7d0f61d415012555f6288ac"
+                    lockSecret `should equal` "b812995e2ca64c69bdd9187f2c26ab3b"
+                }
             }
     }
 }
