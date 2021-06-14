@@ -69,7 +69,7 @@ data class AccountV4(
 
     override fun upgradeToV4() = this
 
-    @Deprecated("We should pass the info into the Accountv3.upgrade method and keep this immutable if possible")
+    @Deprecated("We should pass the info into the Account v3.upgrade method and keep this immutable if possible")
     fun addSegwitDerivation(hdAccount: HDAccount, index: Int) {
         if (defaultType == Derivation.SEGWIT_BECH32_TYPE) {
             return
@@ -77,7 +77,7 @@ data class AccountV4(
         derivations += Derivation.createSegwit(
             hdAccount.xPriv,
             hdAccount.xpub,
-            AddressCache.forAccountWithIndex(hdAccount, index, Derivation.SEGWIT_BECH32_PURPOSE))
+            AddressCache.setCachedXPubs(hdAccount))
         defaultType = Derivation.SEGWIT_BECH32_TYPE
     }
 }

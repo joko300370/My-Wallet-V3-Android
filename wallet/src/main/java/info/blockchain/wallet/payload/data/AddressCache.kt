@@ -38,7 +38,7 @@ data class AddressCache(
             return ObjectMapper().readValue(json, AddressCache::class.java)
         }
 
-        fun forAccountWithIndex(account: HDAccount, index: Int, derivationPurpose: Int): AddressCache {
+        fun setCachedXPubs(account: HDAccount): AddressCache {
             return AddressCache(
                 receiveAccount = account.receive.xpub,
                 changeAccount = account.change.xpub
