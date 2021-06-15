@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.transactionflow.analytics
 
 import com.blockchain.extensions.withoutNullValues
+import com.blockchain.logging.CrashLogger
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.blockchain.notifications.analytics.AnalyticsNames
@@ -41,7 +42,8 @@ const val WALLET_TYPE_EXTERNAL = "external"
 const val WALLET_TYPE_UNKNOWN = "unknown"
 
 class TxFlowAnalytics(
-    private val analytics: Analytics
+    private val analytics: Analytics,
+    private val crashLogger: CrashLogger
 ) {
     // General
     fun onFlowCanceled(state: TransactionState) {
@@ -296,7 +298,10 @@ class TxFlowAnalytics(
                     MaxAmountClicked(
                         sourceAccountType = TxFlowAnalyticsAccountType.fromAccount(state.sendingAccount),
                         inputCurrency = state.sendingAsset.networkTicker,
-                        outputCurrency = (state.selectedTarget as FiatAccount).fiatCurrency
+                        outputCurrency = (state.selectedTarget as? FiatAccount)?.fiatCurrency ?: run {
+                            crashLogger.logEvent("Target account not set")
+                            return
+                        }
                     )
                 )
             }

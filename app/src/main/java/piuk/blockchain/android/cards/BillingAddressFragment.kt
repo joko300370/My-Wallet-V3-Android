@@ -10,23 +10,25 @@ import com.blockchain.nabu.NabuToken
 import com.blockchain.nabu.datamanagers.BillingAddress
 import com.blockchain.nabu.datamanagers.NabuDataManager
 import com.blockchain.nabu.models.responses.nabu.NabuUser
-import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.FragmentBillingAddressBinding
+import piuk.blockchain.android.simplebuy.SimpleBuyAnalytics
+import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.base.mvi.MviFragment
 import piuk.blockchain.android.ui.base.setupToolbar
+import piuk.blockchain.android.util.AfterTextChangedWatcher
 import piuk.blockchain.android.util.US
 import piuk.blockchain.android.util.visibleIf
-import piuk.blockchain.android.util.AfterTextChangedWatcher
 import java.util.Locale
 
 class BillingAddressFragment : MviFragment<CardModel, CardIntent, CardState, FragmentBillingAddressBinding>(),
     PickerItemListener,
-    AddCardFlowFragment {
+    AddCardFlowFragment,
+    SlidingModalBottomDialog.Host {
 
     private var usSelected = false
     private val nabuToken: NabuToken by scopedInject()
@@ -176,5 +178,11 @@ class BillingAddressFragment : MviFragment<CardModel, CardIntent, CardState, Fra
 
     override fun onBackPressed(): Boolean = true
 
-    override fun render(newState: CardState) {}
+    override fun render(newState: CardState) {
+        // do nothing
+    }
+
+    override fun onSheetClosed() {
+        // do nothing
+    }
 }

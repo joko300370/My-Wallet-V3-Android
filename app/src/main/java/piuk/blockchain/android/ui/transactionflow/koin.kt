@@ -171,7 +171,8 @@ val transactionModule = module {
 
     factory {
         TxFlowAnalytics(
-            analytics = get()
+            analytics = get(),
+            crashLogger = get()
         )
     }
 

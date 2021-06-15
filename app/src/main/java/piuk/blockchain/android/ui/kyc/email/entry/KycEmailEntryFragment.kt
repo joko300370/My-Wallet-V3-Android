@@ -21,7 +21,6 @@ import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.data.settings.Email
-import java.lang.IllegalStateException
 
 class KycEmailEntryFragment :
     MviFragment<EmailVeriffModel, EmailVeriffIntent, EmailVeriffState, FragmentKycAddEmailBinding>(),
@@ -46,6 +45,8 @@ class KycEmailEntryFragment :
             model.process(EmailVeriffIntent.ResendEmail)
         }
         model.process(EmailVeriffIntent.StartEmailVerification)
+
+        binding.skip.gone()
         binding.skip.setOnClickListener {
             emailEntryHost.onEmailVerificationSkipped()
         }

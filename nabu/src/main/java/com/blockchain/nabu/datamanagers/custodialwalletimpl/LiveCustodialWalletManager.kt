@@ -1115,7 +1115,7 @@ class LiveCustodialWalletManager(
     private fun BankInfoResponse.toBank(): Bank =
         Bank(
             id = id,
-            name = accountName ?: bankName ?: "",
+            name = name.takeIf { it?.isNotEmpty() == true } ?: accountName.orEmpty(),
             state = state.toBankState(),
             currency = currency,
             account = accountNumber ?: "****",
