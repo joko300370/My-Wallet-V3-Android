@@ -33,9 +33,9 @@ class LoginInteractor(
         return authService.createSessionId(email)
     }
 
-    fun sendEmailForVerification(sessionId: String, email: String): Completable {
+    fun sendEmailForVerification(sessionId: String, email: String, captcha: String): Completable {
         prefs.sessionId = sessionId
-        return authService.sendEmailForDeviceVerification(sessionId, email)
+        return authService.sendEmailForDeviceVerification(sessionId, email, captcha)
             .ignoreElement()
     }
 }

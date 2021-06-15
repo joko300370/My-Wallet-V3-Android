@@ -37,8 +37,14 @@ class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState, Fragment
         GoogleSignIn.getClient(requireContext(), gso)
     }
 
+    private val recaptchaClient: GoogleReCaptchaClient by lazy {
+        GoogleReCaptchaClient(requireActivity())
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        recaptchaClient.initReCaptcha()
 
         with(binding) {
             backButton.setOnClickListener {
@@ -58,9 +64,9 @@ class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState, Fragment
                 })
             }
             continueButton.setOnClickListener {
-                loginEmailText.text?.let { emailInputText ->
+                binding.loginEmailText.text?.let { emailInputText ->
                     if (emailInputText.isNotBlank()) {
-                        model.process(LoginIntents.ObtainSessionIdForEmail(emailInputText.toString()))
+                        verifyReCaptcha(emailInputText.toString())
                     }
                 }
             }
@@ -71,6 +77,11 @@ class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState, Fragment
                 startActivityForResult(googleSignInClient.signInIntent, RC_SIGN_IN)
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        recaptchaClient.close()
     }
 
     override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentLoginBinding =
@@ -114,7 +125,7 @@ class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState, Fragment
             try {
                 val task = GoogleSignIn.getSignedInAccountFromIntent(data)
                 task.result.email?.let { email ->
-                    model.process(LoginIntents.ObtainSessionIdForEmail(email))
+                    verifyReCaptcha(email)
                 } ?: toast(R.string.login_google_email_not_found, ToastCustom.TYPE_GENERAL)
             } catch (apiException: ApiException) {
                 Timber.e(apiException)
@@ -147,6 +158,20 @@ class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState, Fragment
                 .addToBackStack(VerifyDeviceFragment::class.simpleName)
                 .commitAllowingStateLoss()
         }
+    }
+
+    private fun verifyReCaptcha(selectedEmail: String) {
+        recaptchaClient.verifyForLogin(
+            onSuccess = { response ->
+                model.process(
+                    LoginIntents.ObtainSessionIdForEmail(
+                        selectedEmail = selectedEmail,
+                        captcha = response.tokenResult
+                    )
+                )
+            },
+            onError = { toast(R.string.common_error, ToastCustom.TYPE_ERROR) }
+        )
     }
 
     private val emailRegex = Regex(

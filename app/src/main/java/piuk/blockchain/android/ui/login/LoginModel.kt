@@ -22,7 +22,8 @@ class LoginModel(
         return when (intent) {
             is LoginIntents.LoginWithQr -> loginWithQrCode(intent.qrString)
             is LoginIntents.ObtainSessionIdForEmail -> obtainSessionId(intent.selectedEmail)
-            is LoginIntents.SendEmail -> sendVerificationEmail(intent.sessionId, intent.selectedEmail)
+            is LoginIntents.SendEmail ->
+                sendVerificationEmail(intent.sessionId, intent.selectedEmail, previousState.captcha)
             else -> null
         }
     }
@@ -64,8 +65,8 @@ class LoginModel(
             )
     }
 
-    private fun sendVerificationEmail(sessionId: String, email: String): Disposable {
-        return interactor.sendEmailForVerification(sessionId, email)
+    private fun sendVerificationEmail(sessionId: String, email: String, captcha: String): Disposable {
+        return interactor.sendEmailForVerification(sessionId, email, captcha)
             .subscribeBy(
                 onComplete = { process(LoginIntents.ShowEmailSent) },
                 onError = { throwable ->

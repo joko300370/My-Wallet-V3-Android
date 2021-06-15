@@ -29,13 +29,16 @@ public final class WalletApiIntegTest extends BaseIntegTest {
     // Unverified details
     private String guid = "cfd055ed-1a7f-4a92-8584-2f4d01365034";
     private String sharedKey = "b4ff6bf5-17a9-4905-b54b-a526816aa100";
+    // TODO: replace with real key once required for tests
+    private final String siteKey = "site-key";
 
     private WalletApi walletApi = new WalletApi(
         getRetrofit(
             "https://explorer.staging.blockchain.info/",
             getOkHttpClient()
         ).create(WalletExplorerEndpoints.class),
-        BlockchainFramework::getApiCode
+        BlockchainFramework::getApiCode,
+        siteKey
     );
 
     @Test

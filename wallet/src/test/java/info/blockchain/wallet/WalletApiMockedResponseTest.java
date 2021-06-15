@@ -26,6 +26,9 @@ public abstract class WalletApiMockedResponseTest extends MockedResponseTest {
 
     protected WalletApi walletApi;
 
+    // TODO: replace with real key once required for tests
+    private final String siteKey = "site-key";
+
     @Before
     public void setWalletApiAccess() {
         walletApi = new WalletApi(
@@ -33,7 +36,8 @@ public abstract class WalletApiMockedResponseTest extends MockedResponseTest {
                 "https://explorer.staging.blockchain.info/",
                 newOkHttpClient()
             ).create(WalletExplorerEndpoints.class),
-            BlockchainFramework::getApiCode
+            BlockchainFramework::getApiCode,
+            siteKey
         );
     }
 

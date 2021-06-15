@@ -20,6 +20,9 @@ public final class PayloadManagerIntegTest extends BaseIntegTest {
 
     private PayloadManager payloadManager;
 
+    // TODO: replace with real key once required for tests
+    private final String siteKey = "site-key";
+
     @Before
     public void setup() {
         final BitcoinApi bitcoinApi = new BitcoinApi(
@@ -32,7 +35,8 @@ public final class PayloadManagerIntegTest extends BaseIntegTest {
                         "https://explorer.staging.blockchain.info/",
                         getOkHttpClient()
                     ).create(WalletExplorerEndpoints.class),
-                    BlockchainFramework::getApiCode
+                    BlockchainFramework::getApiCode,
+                    siteKey
                 ),
                 bitcoinApi,
                 new MultiAddressFactory(bitcoinApi),

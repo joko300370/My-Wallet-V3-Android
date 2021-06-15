@@ -176,6 +176,8 @@ public interface WalletExplorerEndpoints {
         @Header("Authorization") String sessionId,
         @Field("method") String method,
         @Field("api_code") String apiCode,
-        @Field("email") String email
+        @Field("email") String email,
+        @Field("captcha") String captcha,
+        @Field("siteKey") String siteKey
     );
 }

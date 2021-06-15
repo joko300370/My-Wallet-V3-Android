@@ -130,6 +130,7 @@ android {
             buildConfigField "String", "COMMIT_HASH", "\"\""
             buildConfigString "SIFT_ACCOUNT_ID", buildProperties.secrets['prodSiftAccount']
             buildConfigString "SIFT_BEACON_KEY", buildProperties.secrets['prodSiftBeaconId']
+            buildConfigString "RECAPTCHA_SITE_KEY", buildProperties.secrets['captchaProdSiteKey']
         }
         envDev {
             dimension "environment"
@@ -156,6 +157,7 @@ android {
             buildConfigField "String", "VERSION_NAME_SUFFIX", "\"" + versionNameSuffix + "\""
             buildConfigString "SIFT_ACCOUNT_ID", buildProperties.secrets['devSiftAccount']
             buildConfigString "SIFT_BEACON_KEY", buildProperties.secrets['devSiftBeaconId']
+            buildConfigString "RECAPTCHA_SITE_KEY", buildProperties.secrets['captchaDevSiteKey']
 
             versionNameSuffix '-dev'
             applicationId "piuk.blockchain.android.dev"
@@ -186,6 +188,7 @@ android {
             buildConfigField "String", "VERSION_NAME_SUFFIX", "\"" + versionNameSuffix + "\""
             buildConfigString "SIFT_ACCOUNT_ID", buildProperties.secrets['stagingSiftAccount']
             buildConfigString "SIFT_BEACON_KEY", buildProperties.secrets['stagingSiftBeaconId']
+            buildConfigString "RECAPTCHA_SITE_KEY", buildProperties.secrets['captchaStagingSiteKey']
 
             versionNameSuffix '-staging'
             applicationId "piuk.blockchain.android.staging"
@@ -305,6 +308,7 @@ dependencies {
     }
     implementation Libraries.googlePlayServicesAuth
     implementation Libraries.googlePlaces
+    implementation Libraries.googleServicesReCaptcha
     implementation Libraries.biometricsApi
 
     implementation Libraries.gson
