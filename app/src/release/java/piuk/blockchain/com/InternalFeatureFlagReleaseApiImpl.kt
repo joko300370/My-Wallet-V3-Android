@@ -2,9 +2,13 @@ package piuk.blockchain.com
 
 import com.blockchain.featureflags.GatedFeature
 import com.blockchain.featureflags.InternalFeatureFlagApi
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 
-class InternalFeatureFlagReleaseApiImpl : InternalFeatureFlagApi {
-    override fun isFeatureEnabled(gatedFeature: GatedFeature): Boolean = false
+class InternalFeatureFlagReleaseApiImpl(
+    private val environmentConfig: EnvironmentConfig
+) : InternalFeatureFlagApi {
+    override fun isFeatureEnabled(gatedFeature: GatedFeature): Boolean = environmentConfig.isCompanyInternalBuild() &&
+        gatedFeature.enabledForCompanyInternalBuild
 
     override fun enable(gatedFeature: GatedFeature) {
         // do nothing
