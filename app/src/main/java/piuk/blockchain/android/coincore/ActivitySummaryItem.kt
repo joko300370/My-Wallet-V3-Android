@@ -4,12 +4,14 @@ import com.blockchain.nabu.datamanagers.CurrencyPair
 import com.blockchain.nabu.datamanagers.CustodialOrderState
 import com.blockchain.nabu.datamanagers.InterestState
 import com.blockchain.nabu.datamanagers.OrderState
-import com.blockchain.nabu.datamanagers.RecurringBuyActivityState
+import com.blockchain.nabu.datamanagers.RecurringBuyTransactionState
+import com.blockchain.nabu.datamanagers.RecurringBuyErrorState
 import com.blockchain.nabu.datamanagers.TransactionState
 import com.blockchain.nabu.datamanagers.TransactionType
 import com.blockchain.nabu.datamanagers.TransferDirection
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.models.data.RecurringBuyFrequency
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
@@ -21,6 +23,7 @@ import io.reactivex.Single
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.helperfunctions.JavaHashCode
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
+import java.util.Date
 import kotlin.math.sign
 
 abstract class CryptoActivitySummaryItem : ActivitySummaryItem() {
@@ -108,8 +111,16 @@ data class RecurringBuyActivitySummaryItem(
     override val timeStampMs: Long,
     override val value: Money,
     override val account: SingleAccount,
-    val destinationValue: Money,
-    val state: RecurringBuyActivityState
+    val originMoney: FiatValue,
+    val destinationMoney: Money,
+    val state: RecurringBuyTransactionState,
+    val failureReason: RecurringBuyErrorState?,
+    val nextPayment: Date,
+    val insertedAt: Date,
+    val period: RecurringBuyFrequency,
+    val fee: FiatValue,
+    val paymentMethodId: String,
+    val paymentMethodType: PaymentMethodType
 ) : CryptoActivitySummaryItem() {
     override fun totalFiatWhenExecuted(selectedFiat: String): Single<Money> = Single.just(value)
 }

@@ -3,16 +3,22 @@ package piuk.blockchain.android.ui.activity.detail
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.InterestState
+import com.blockchain.nabu.datamanagers.RecurringBuyErrorState
+import com.blockchain.nabu.datamanagers.RecurringBuyTransactionState
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.notifications.analytics.ActivityAnalytics
 import com.blockchain.notifications.analytics.LaunchOrigin
+import com.blockchain.ui.urllinks.URL_BLOCKCHAIN_SUPPORT_PORTAL
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -27,8 +33,11 @@ import piuk.blockchain.android.simplebuy.SimpleBuyActivity
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.activity.detail.adapter.ActivityDetailsDelegateAdapter
+import piuk.blockchain.android.ui.base.HostedBottomSheet
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 
@@ -37,10 +46,21 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
     ActivityDetailState,
     DialogSheetActivityDetailsBinding>() {
 
+    interface Host : HostedBottomSheet.Host {
+        fun onAddCash(currency: String)
+    }
+
+    override val host: Host by lazy {
+        super.host as? Host ?: throw IllegalStateException(
+            "Host fragment is not a CryptoActivityDetailsBottomSheet.Host"
+        )
+    }
+
     override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogSheetActivityDetailsBinding =
         DialogSheetActivityDetailsBinding.inflate(inflater, container, false)
 
     override val model: ActivityDetailsModel by scopedInject()
+    private val compositeDisposable = CompositeDisposable()
 
     private val listAdapter: ActivityDetailsDelegateAdapter by lazy {
         ActivityDetailsDelegateAdapter(
@@ -65,7 +85,6 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
     private lateinit var currentState: ActivityDetailState
 
     private val simpleBuySync: SimpleBuySyncFactory by scopedInject()
-    private val compositeDisposable = CompositeDisposable()
 
     private val assetResources: AssetResources by scopedInject()
 
@@ -106,9 +125,9 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
             }
         }
 
-        /* TODO we should improve error handling here
-         * if(newState.isError) {}
-         */
+        if (newState.isError) {
+            showFailedPill()
+        }
 
         if (listAdapter.items != newState.listOfItems) {
             listAdapter.items = newState.listOfItems.toList()
@@ -141,13 +160,86 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
     }
 
     private fun showTransactionTypeUi(state: ActivityDetailState) {
-        if (state.transactionType == TransactionSummary.TransactionType.BUY) {
-            showBuyUi(state)
-        } else if (state.transactionType == TransactionSummary.TransactionType.INTEREST_EARNED ||
-            state.transactionType == TransactionSummary.TransactionType.DEPOSIT ||
-            state.transactionType == TransactionSummary.TransactionType.WITHDRAW
-        ) {
-            showInterestUi(state)
+        when (state.transactionType) {
+            TransactionSummary.TransactionType.BUY -> showBuyUi(state)
+            TransactionSummary.TransactionType.RECURRING_BUY -> showRecurringBuyUi(state)
+            TransactionSummary.TransactionType.INTEREST_EARNED,
+            TransactionSummary.TransactionType.DEPOSIT,
+            TransactionSummary.TransactionType.WITHDRAW -> showInterestUi(state)
+            else -> { }
+        }
+    }
+
+    private fun showRecurringBuyUi(state: ActivityDetailState) {
+        binding.rbSheetCancel.apply {
+            binding.rbSheetCancel.setOnClickListener {
+                AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.settings_bank_remove_check_title)
+                    .setMessage(R.string.recurring_buy_cancel_dialog_desc)
+                    .setPositiveButton(R.string.common_ok) { di, _ ->
+                        di.dismiss()
+                        model.process(DeleteRecurringBuy)
+                    }
+                    .setNegativeButton(R.string.common_cancel) { di, _ ->
+                        di.dismiss()
+                    }.show()
+            }
+        }
+        if (state.recurringBuyId == null) {
+            ToastCustom.makeText(
+                requireContext(), getString(R.string.recurring_buy_cancelled_toast), Toast.LENGTH_LONG,
+                ToastCustom.TYPE_OK
+            )
+            dismiss()
+        }
+
+        if (state.hasDeleteError) {
+            ToastCustom.makeText(
+                requireContext(), getString(R.string.recurring_buy_cancelled_error_toast), Toast.LENGTH_LONG,
+                ToastCustom.TYPE_ERROR
+            )
+        }
+
+        if (state.recurringBuyHasFailedAndCanBeFixedByAddingFunds()) {
+            binding.custodialTxButton.apply {
+                visible()
+                text = getString(R.string.activity_details_label_btn_cash)
+                setOnClickListener {
+                    state.recurringBuyOriginCurrency?.let { launchDepositFlow(it) }
+                }
+            }
+        }
+        setErrorMessageAndLinks(state.recurringBuyError, state.recurringBuyState)
+    }
+
+    // TODO recurringBuyState needs to be added by BE
+    private fun ActivityDetailState.recurringBuyHasFailedAndCanBeFixedByAddingFunds(): Boolean {
+        return this.recurringBuyPaymentMethodType == PaymentMethodType.FUNDS &&
+            this.recurringBuyError == RecurringBuyErrorState.INSUFFICIENT_FUNDS
+        // && this.recurringBuyState == RecurringBuyState.ACTIVE
+    }
+
+    private fun launchDepositFlow(originCurrency: String) {
+        host.onAddCash(originCurrency)
+    }
+
+    private fun setErrorMessageAndLinks(
+        errorState: RecurringBuyErrorState,
+        transactionState: RecurringBuyTransactionState
+    ) {
+        val linksMap = mapOf<String, Uri>(
+            "contact_support_link" to Uri.parse(URL_BLOCKCHAIN_SUPPORT_PORTAL)
+        )
+
+        val errorExplanation = StringUtils.getStringWithMappedAnnotations(
+            requireContext(),
+            toErrorMessage(errorState, transactionState),
+            linksMap
+        )
+        binding.errorReason.apply {
+            visible()
+            movementMethod = LinkMovementMethod.getInstance()
+            text = errorExplanation
         }
     }
 
@@ -169,7 +261,9 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
                     analytics.logEvent(
                         BuySellClicked(origin = LaunchOrigin.TRANSACTION_DETAILS, type = BuySellType.BUY)
                     )
-                    startActivity(SimpleBuyActivity.newInstance(requireContext(), arguments.cryptoCurrency, true))
+                    startActivity(
+                        SimpleBuyActivity.newInstance(requireContext(), arguments.cryptoCurrency, true)
+                    )
                     dismiss()
                 }
         }
@@ -193,6 +287,23 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
         }
     }
 
+    private fun toErrorMessage(
+        errorState: RecurringBuyErrorState,
+        transactionState: RecurringBuyTransactionState
+    ) = when (errorState) {
+        RecurringBuyErrorState.INTERNAL_SERVER_ERROR ->
+            if (transactionState == RecurringBuyTransactionState.PENDING) {
+                // Pending: transaction has failed but will retry after 1 hour
+                R.string.recurring_buy_internal_server_error
+            } else {
+                R.string.recurring_buy_final_attempt_error
+            }
+        RecurringBuyErrorState.TRADING_LIMITS_EXCEED -> R.string.recurring_buy_limits_exceed_error
+        RecurringBuyErrorState.INSUFFICIENT_FUNDS -> R.string.recurring_buy_insufficient_funds_error
+        RecurringBuyErrorState.BLOCKED_BENEFICIARY_ID -> R.string.recurring_buy_beneficiary_error
+        RecurringBuyErrorState.UNKNOWN -> R.string.recurring_buy_generic_error
+    }
+
     private fun renderCompletedPendingOrFailed(
         pending: Boolean,
         pendingExecution: Boolean,
@@ -205,7 +316,33 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
             when {
                 pending || pendingExecution -> {
                     showConfirmationUi(confirmations, totalConfirmations)
-                    setStatusText(transactionType, pending, pendingExecution, isFeeTransaction)
+                    status.text = getString(
+                        when {
+                            transactionType == TransactionSummary.TransactionType.SENT ||
+                                transactionType == TransactionSummary.TransactionType.TRANSFERRED -> {
+                                analytics.logEvent(ActivityAnalytics.DETAILS_SEND_CONFIRMING)
+                                R.string.activity_details_label_confirming
+                            }
+                            isFeeTransaction || transactionType == TransactionSummary.TransactionType.SWAP ||
+                                transactionType == TransactionSummary.TransactionType.SELL -> {
+                                if (isFeeTransaction) {
+                                    analytics.logEvent(ActivityAnalytics.DETAILS_FEE_PENDING)
+                                } else {
+                                    analytics.logEvent(ActivityAnalytics.DETAILS_SWAP_PENDING)
+                                }
+                                R.string.activity_details_label_pending
+                            }
+                            transactionType == TransactionSummary.TransactionType.BUY ->
+                                if (pending && !pendingExecution) {
+                                    analytics.logEvent(ActivityAnalytics.DETAILS_BUY_AWAITING_FUNDS)
+                                    R.string.activity_details_label_waiting_on_funds
+                                } else {
+                                    analytics.logEvent(ActivityAnalytics.DETAILS_BUY_PENDING)
+                                    R.string.activity_details_label_pending_execution
+                                }
+                            else -> R.string.activity_details_label_confirming
+                        }
+                    )
                     showPendingPill()
                 }
                 confirmations >= totalConfirmations -> {
@@ -217,41 +354,6 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
                 }
             }
         }
-    }
-
-    private fun setStatusText(
-        transactionType: TransactionSummary.TransactionType?,
-        pending: Boolean,
-        pendingExecution: Boolean,
-        isFeeTransaction: Boolean
-    ) {
-        binding.status.text = getString(
-            when {
-                transactionType == TransactionSummary.TransactionType.SENT ||
-                    transactionType == TransactionSummary.TransactionType.TRANSFERRED -> {
-                    analytics.logEvent(ActivityAnalytics.DETAILS_SEND_CONFIRMING)
-                    R.string.activity_details_label_confirming
-                }
-                isFeeTransaction || transactionType == TransactionSummary.TransactionType.SWAP ||
-                    transactionType == TransactionSummary.TransactionType.SELL -> {
-                    if (isFeeTransaction) {
-                        analytics.logEvent(ActivityAnalytics.DETAILS_FEE_PENDING)
-                    } else {
-                        analytics.logEvent(ActivityAnalytics.DETAILS_SWAP_PENDING)
-                    }
-                    R.string.activity_details_label_pending
-                }
-                transactionType == TransactionSummary.TransactionType.BUY ->
-                    if (pending && !pendingExecution) {
-                        analytics.logEvent(ActivityAnalytics.DETAILS_BUY_AWAITING_FUNDS)
-                        R.string.activity_details_label_waiting_on_funds
-                    } else {
-                        analytics.logEvent(ActivityAnalytics.DETAILS_BUY_PENDING)
-                        R.string.activity_details_label_pending_execution
-                    }
-                else -> R.string.activity_details_label_confirming
-            }
-        )
     }
 
     private fun showConfirmationUi(
@@ -335,6 +437,9 @@ class CryptoActivityDetailsBottomSheet : MviBottomSheet<ActivityDetailsModel,
             )
             TransactionSummary.TransactionType.INTEREST_EARNED -> getString(
                 R.string.activity_details_title_interest_earned
+            )
+            TransactionSummary.TransactionType.RECURRING_BUY -> getString(
+                R.string.activity_details_title_recurring_buy
             )
             else -> ""
         }

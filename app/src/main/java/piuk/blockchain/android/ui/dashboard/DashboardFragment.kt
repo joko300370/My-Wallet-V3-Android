@@ -638,7 +638,7 @@ class DashboardFragment :
         }
     }
 
-    override fun gotoActivityFor(account: BlockchainAccount) =
+    override fun goToActivityFor(account: BlockchainAccount) =
         navigator().performAssetActionFor(AssetAction.ViewActivity, account)
 
     override fun goToInterestDeposit(toAccount: InterestAccount) {

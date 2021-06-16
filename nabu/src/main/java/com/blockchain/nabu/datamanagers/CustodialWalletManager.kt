@@ -15,6 +15,7 @@ import com.blockchain.nabu.models.data.FiatWithdrawalFeeAndLimit
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
 import com.blockchain.nabu.models.data.RecurringBuy
+import com.blockchain.nabu.models.data.RecurringBuyFrequency
 import com.blockchain.nabu.models.data.RecurringBuyState
 import com.blockchain.nabu.models.responses.interest.InterestActivityItemResponse
 import com.blockchain.nabu.models.responses.interest.InterestAttributes
@@ -146,7 +147,7 @@ interface CustodialWalletManager {
 
     fun getAllOrdersFor(crypto: CryptoCurrency): Single<BuyOrderList>
 
-    fun getRecurringBuyOrdersFor(crypto: CryptoCurrency): Single<RecurringBuyTransactions>
+    fun getRecurringBuyOrders(): Single<RecurringBuyTransactions>
 
     fun getBuyOrder(orderId: String): Single<BuySellOrder>
 
@@ -444,10 +445,18 @@ enum class TransactionState {
     FAILED
 }
 
-enum class RecurringBuyActivityState {
+enum class RecurringBuyTransactionState {
     PENDING,
     FAILED,
     COMPLETED,
+    UNKNOWN
+}
+
+enum class RecurringBuyErrorState {
+    INSUFFICIENT_FUNDS,
+    BLOCKED_BENEFICIARY_ID,
+    INTERNAL_SERVER_ERROR,
+    TRADING_LIMITS_EXCEED,
     UNKNOWN
 }
 
@@ -821,8 +830,14 @@ data class RecurringBuyOrder(
 data class RecurringBuyTransaction(
     val id: String,
     val recurringBuyId: String,
-    val state: RecurringBuyActivityState,
-    val originMoney: Money,
-    val destinationValue: CryptoValue,
+    val state: RecurringBuyTransactionState,
+    val failureReason: RecurringBuyErrorState?,
+    val originMoney: FiatValue,
+    val destinationMoney: CryptoValue,
+    val paymentMethod: PaymentMethodType,
+    val paymentMethodId: String?,
+    val fee: FiatValue,
+    val period: RecurringBuyFrequency,
+    val nextPayment: Date,
     val insertedAt: Date
 )

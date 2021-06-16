@@ -51,7 +51,7 @@ class InterestDashboardActivity : BlockchainActivity(),
         onBackPressed()
     }
 
-    override fun gotoActivityFor(account: BlockchainAccount) {
+    override fun goToActivityFor(account: BlockchainAccount) {
         val b = Bundle()
         b.putAccount(ACTIVITY_ACCOUNT, account)
         setResult(RESULT_FIRST_USER, Intent().apply {

@@ -71,7 +71,7 @@ class AssetDetailsModelTest {
         )
         val recurringBuy = RecurringBuy(
             "123", RecurringBuyState.ACTIVE, RecurringBuyFrequency.BI_WEEKLY, mock(),
-            PaymentMethodType.BANK_TRANSFER, FiatValue.zero("EUR"), mock()
+            PaymentMethodType.BANK_TRANSFER, "321", FiatValue.zero("EUR"), mock(), mock()
         )
         val recurringBuys: List<RecurringBuy> = listOf(
             recurringBuy

@@ -688,8 +688,10 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     }
 
     private fun startDashboardFragment() {
-        val fragment = DashboardFragment.newInstance()
-        replaceContentFragment(fragment)
+        runOnUiThread {
+            val fragment = DashboardFragment.newInstance()
+            replaceContentFragment(fragment)
+        }
     }
 
     override fun resumeSimpleBuyKyc() {
@@ -934,6 +936,13 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         ToastCustom.makeText(
             this, getString(R.string.open_banking_deeplink_error), Toast.LENGTH_LONG, ToastCustom.TYPE_ERROR
         )
+    }
+
+    override fun launchFiatDeposit(currency: String) {
+        runOnUiThread {
+            gotoDashboard()
+            launchDashboardFlow(AssetAction.FiatDeposit, currency)
+        }
     }
 
     override fun onFlowFinished() {

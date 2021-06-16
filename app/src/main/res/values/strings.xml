@@ -1474,6 +1474,7 @@
     <string name="activity_details_title_swap">Swap</string>
     <string name="activity_details_title_deposit">Transfer</string>
     <string name="activity_details_title_interest_earned">Interest Earned</string>
+    <string name="activity_details_title_recurring_buy">Recurring Buy</string>
     <string name="activity_details_title_withdraw">Withdrawal</string>
     <string name="activity_details_label_confirming">Confirming</string>
     <string name="activity_details_label_waiting_on_funds">Waiting on Funds</string>
@@ -2147,7 +2148,21 @@
     <string name="recurring_buy_cancelled_toast">Recurring buy cancelled</string>
     <string name="recurring_buy_cancelled_error_toast">Oops! There was an issue cancelling your recurring buy. Please try again later.</string>
     <string name="recurring_buy_cancel_dialog_desc">Are you sure you want to cancel this Recurring Buy?</string>
-    <string name="recurring_buy_activity_failed">Failed. Low balance.</string>
     <string name="recurring_buy_activity_pending">Pending</string>
+    <string name="recurring_buy_details_next_payment">Next Payment</string>
+    <string name="recurring_buy_details_recurring">Recurring</string>
+    <string name="recurring_buy_details_total_cost">Total Cost</string>
+    <string name="recurring_buy_details_fees">Fees</string>
+    <string name="activity_details_label_btn_cash">Add Cash</string>
+
+    <string name="recurring_buy_short_error">Failed</string>
+    <string name="recurring_buy_insufficient_funds_short_error">Failed. Low Balance</string>
+
+    <string name="recurring_buy_insufficient_funds_error">Your payment method has insufficient funds. Add more to complete the recurring buy.</string>
+    <string name="recurring_buy_internal_server_error">There has been an error with your purchase. We will retry shortly.</string>
+    <string name="recurring_buy_final_attempt_error">There has been an error with your purchase. <annotation link="contact_support_link">Contact support</annotation> for more information.</string>
+    <string name="recurring_buy_beneficiary_error">Your selected payment method is not active. Please use another.</string>
+    <string name="recurring_buy_limits_exceed_error">Your account has exceeded its trading limits. <annotation link="contact_support_link">Contact support</annotation> for more information.</string>
+    <string name="recurring_buy_generic_error">There has been an error with your purchase. <annotation link="contact_support_link">Contact support</annotation> for more information.</string>
     <string name="fee_calculated_at_checkout">Calculated at checkout</string>
 </resources>

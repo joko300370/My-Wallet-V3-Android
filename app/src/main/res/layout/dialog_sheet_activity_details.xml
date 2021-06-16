@@ -83,6 +83,23 @@
         tools:text="1 of 3\nConfirmations"
         tools:visibility="visible" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/error_reason"
+        style="@style/Text.Light.12"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/standard_margin"
+        android:layout_marginTop="@dimen/medium_margin"
+        android:layout_marginEnd="@dimen/standard_margin"
+        android:background="@drawable/bkgd_grey_000_rounded"
+        android:padding="@dimen/medium_margin"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/status"
+        tools:text="Insufficient funds"
+        tools:visibility="visible" />
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/custodial_tx_button"
         style="@style/CtaButton.Blue"
@@ -94,7 +111,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/status"
+        app:layout_constraintTop_toBottomOf="@id/error_reason"
         tools:text="Call to Arms"
         tools:visibility="visible" />
 
@@ -117,9 +134,21 @@
         android:requiresFadingEdge="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constrainedHeight="true"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/rb_sheet_cancel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/header_separator" />
+
+    <Button
+        android:id="@+id/rb_sheet_cancel"
+        style="@style/CtaButton.NoBackgroundRedText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/standard_margin"
+        android:text="@string/recurring_buy_info_cta"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/details_list"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

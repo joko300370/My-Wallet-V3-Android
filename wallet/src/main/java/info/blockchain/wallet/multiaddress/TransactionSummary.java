@@ -6,7 +6,7 @@ import java.util.HashMap;
 public class TransactionSummary {
 
     public enum TransactionType {
-        TRANSFERRED, RECEIVED, SENT, BUY, SELL, SWAP, DEPOSIT, WITHDRAW, INTEREST_EARNED, UNKNOWN
+        TRANSFERRED, RECEIVED, SENT, BUY, SELL, SWAP, DEPOSIT, WITHDRAW, INTEREST_EARNED, RECURRING_BUY, UNKNOWN
     }
 
     private String hash;

@@ -713,11 +713,11 @@ class LiveCustodialWalletManager(
             Single.just(emptyList())
         }
 
-    override fun getRecurringBuyOrdersFor(crypto: CryptoCurrency): Single<List<RecurringBuyTransaction>> =
+    override fun getRecurringBuyOrders(): Single<List<RecurringBuyTransaction>> =
         if (features.isFeatureEnabled(GatedFeature.RECURRING_BUYS)) {
             authenticator.authenticate { sessionToken ->
                 nabuService.getRecurringBuysTransactions(
-                    sessionToken, crypto.networkTicker
+                    sessionToken
                 ).map { list ->
                     list.map {
                         it.toRecurringBuyTransaction()

@@ -13,6 +13,7 @@ import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import io.reactivex.Completable
@@ -28,6 +29,7 @@ import piuk.blockchain.android.coincore.CustodialTransferActivitySummaryItem
 import piuk.blockchain.android.coincore.FiatActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
 import piuk.blockchain.android.coincore.NullCryptoAccount
+import piuk.blockchain.android.coincore.RecurringBuyActivitySummaryItem
 import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.coincore.bch.BchActivitySummaryItem
 import piuk.blockchain.android.coincore.btc.BtcActivitySummaryItem
@@ -102,6 +104,48 @@ class ActivityDetailsInteractor(
         }
     }
 
+    fun deleteRecurringBuy(id: String) = custodialWalletManager.cancelRecurringBuy(id)
+
+    fun loadRecurringBuyItems(
+        summaryItem: RecurringBuyActivitySummaryItem
+    ): Single<List<ActivityDetailsType>> {
+        val list = mutableListOf(
+            TransactionId(summaryItem.txId),
+            Created(summaryItem.insertedAt),
+            TotalCostAmount(summaryItem.originMoney),
+            FeeAmount(FiatValue.fromMinor(summaryItem.fee.currencyCode, 0)),
+            RecurringBuyFrequency(summaryItem.period),
+            NextPayment(summaryItem.nextPayment)
+        )
+        return when (summaryItem.paymentMethodType) {
+            PaymentMethodType.PAYMENT_CARD -> custodialWalletManager.getCardDetails(summaryItem.paymentMethodId)
+                .map { paymentMethod ->
+                    addPaymentDetailsToList(list, paymentMethod, summaryItem)
+                    list.toList()
+                }.onErrorReturn {
+                    addPaymentDetailsToList(list, null, summaryItem)
+                    list.toList()
+                }
+            PaymentMethodType.BANK_TRANSFER -> custodialWalletManager.getLinkedBank(summaryItem.paymentMethodId).map {
+                it.toPaymentMethod()
+            }.map { paymentMethod ->
+                addPaymentDetailsToList(list, paymentMethod, summaryItem)
+                list.toList()
+            }.onErrorReturn {
+                addPaymentDetailsToList(list, null, summaryItem)
+                list.toList()
+            }
+            else -> {
+                list.add(
+                    BuyPaymentMethod(
+                        PaymentDetails(summaryItem.paymentMethodId)
+                    )
+                )
+                Single.just(list.toList())
+            }
+        }
+    }
+
     fun loadCustodialInterestItems(
         summaryItem: CustodialInterestActivitySummaryItem
     ): Single<List<ActivityDetailsType>> {
@@ -113,7 +157,8 @@ class ActivityDetailsInteractor(
             TransactionSummary.TransactionType.DEPOSIT -> {
                 list.add(
                     getToField(
-                        summaryItem.account.label, summaryItem.account.label, summaryItem.cryptoCurrency.displayTicker
+                        summaryItem.account.label, summaryItem.account.label,
+                        summaryItem.cryptoCurrency.displayTicker
                     )
                 )
             }
@@ -124,7 +169,8 @@ class ActivityDetailsInteractor(
                 list.add(From(stringUtils.getString(R.string.common_company_name)))
                 list.add(
                     getToField(
-                        summaryItem.account.label, summaryItem.account.label, summaryItem.cryptoCurrency.displayTicker
+                        summaryItem.account.label, summaryItem.account.label,
+                        summaryItem.cryptoCurrency.displayTicker
                     )
                 )
             }
@@ -256,7 +302,9 @@ class ActivityDetailsInteractor(
         require(item.currencyPair is CurrencyPair.CryptoCurrencyPair)
         val cryptoPair = item.currencyPair
         return when (item.direction) {
-            TransferDirection.ON_CHAIN -> coincore.findAccountByAddress(cryptoPair.destination, item.receivingAddress!!)
+            TransferDirection.ON_CHAIN -> coincore.findAccountByAddress(
+                cryptoPair.destination, item.receivingAddress!!
+            )
                 .toSingle().map {
                     val defaultLabel = defaultLabels.getDefaultNonCustodialWalletLabel(cryptoPair.destination)
                     getToField(it.label, defaultLabel, cryptoPair.destination.displayTicker)
@@ -276,6 +324,22 @@ class ActivityDetailsInteractor(
         list: MutableList<ActivityDetailsType>,
         paymentMethod: PaymentMethod?,
         summaryItem: CustodialTradingActivitySummaryItem
+    ) {
+        paymentMethod?.let {
+            list.add(
+                BuyPaymentMethod(
+                    PaymentDetails(
+                        it.id, it.label(), it.endDigits(), it.accountType()
+                    )
+                )
+            )
+        } ?: list.add(BuyPaymentMethod(PaymentDetails(summaryItem.paymentMethodId)))
+    }
+
+    private fun addPaymentDetailsToList(
+        list: MutableList<ActivityDetailsType>,
+        paymentMethod: PaymentMethod?,
+        summaryItem: RecurringBuyActivitySummaryItem
     ) {
         paymentMethod?.let {
             list.add(
@@ -320,6 +384,11 @@ class ActivityDetailsInteractor(
         txHash: String
     ): TradeActivitySummaryItem? =
         assetActivityRepository.findCachedTradeItem(cryptoCurrency, txHash)
+
+    fun getRecurringBuyTransactionCacheDetails(
+        txHash: String
+    ): RecurringBuyActivitySummaryItem? =
+        assetActivityRepository.findCachedItemById(txHash) as? RecurringBuyActivitySummaryItem
 
     fun getFiatActivityDetails(
         currency: String,

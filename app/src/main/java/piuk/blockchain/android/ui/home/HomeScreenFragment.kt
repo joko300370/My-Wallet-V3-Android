@@ -50,6 +50,7 @@ interface HomeNavigator {
     fun resumeSimpleBuyKyc()
     fun startSimpleBuy(cryptoCurrency: CryptoCurrency)
     fun startInterestDashboard()
+    fun launchFiatDeposit(currency: String)
 }
 
 abstract class HomeScreenMviFragment<M : MviModel<S, I>, I : MviIntent<S>, S : MviState, E : ViewBinding> :

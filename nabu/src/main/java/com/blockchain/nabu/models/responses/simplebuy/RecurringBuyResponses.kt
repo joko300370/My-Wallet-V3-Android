@@ -1,8 +1,9 @@
 package com.blockchain.nabu.models.responses.simplebuy
 
-import com.blockchain.nabu.datamanagers.RecurringBuyActivityState
+import com.blockchain.nabu.datamanagers.RecurringBuyErrorState
 import com.blockchain.nabu.datamanagers.RecurringBuyOrder
 import com.blockchain.nabu.datamanagers.RecurringBuyTransaction
+import com.blockchain.nabu.datamanagers.RecurringBuyTransactionState
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.toPaymentMethodType
 import com.blockchain.nabu.models.data.RecurringBuy
 import com.blockchain.nabu.models.data.RecurringBuyFrequency
@@ -26,6 +27,7 @@ data class RecurringBuyResponse(
     val inputValue: String,
     val destinationCurrency: String,
     val paymentMethod: String,
+    val paymentMethodId: String?,
     val period: String,
     val nextPayment: String,
     val state: String,
@@ -52,7 +54,9 @@ fun RecurringBuyResponse.toRecurringBuy(): RecurringBuy? {
             nextPaymentDate = nextPayment.fromIso8601ToUtc()?.toLocalTime() ?: Date(),
             paymentMethodType = paymentMethod.toPaymentMethodType(),
             amount = FiatValue.fromMinor(inputCurrency, inputValue.toLong()),
-            asset = it
+            asset = it,
+            createDate = insertedAt.fromIso8601ToUtc()?.toLocalTime() ?: Date(),
+            paymentMethodId = paymentMethodId
         )
     }
 }
@@ -80,10 +84,16 @@ data class RecurringBuyTransactionResponse(
     val id: String,
     val recurringBuyId: String,
     val state: String,
+    val failureReason: String?,
     val originValue: String,
     val originCurrency: String,
-    val destinationValue: String,
+    val destinationValue: String?,
     val destinationCurrency: String,
+    val paymentMethod: String,
+    val paymentMethodId: String?,
+    val nextPayment: String,
+    val period: String,
+    val fee: String?,
     val insertedAt: String
 ) {
     companion object {
@@ -91,6 +101,10 @@ data class RecurringBuyTransactionResponse(
         const val CREATED = "CREATED"
         const val PENDING = "PENDING"
         const val FAILED = "FAILED"
+        const val FAILED_INSUFFICIENT_FUNDS = "Insufficient funds"
+        const val FAILED_INTERNAL_ERROR = "Internal server error"
+        const val FAILED_BENEFICIARY_BLOCKED = "Beneficiary missed/blocked"
+        const val FAILED_LIMITS_EXCEED = "User trading limits exceeded"
     }
 }
 
@@ -103,17 +117,40 @@ fun RecurringBuyTransactionResponse.toRecurringBuyTransaction(): RecurringBuyTra
         id = id,
         recurringBuyId = recurringBuyId,
         state = state.toRecurringBuyActivityState(),
-        destinationValue = CryptoValue.fromMinor(cryptoCurrency, destinationValue.toBigInteger()),
+        failureReason = failureReason?.toRecurringBuyError(),
+        destinationMoney = destinationValue?.let {
+            CryptoValue.fromMinor(
+                cryptoCurrency, destinationValue.toBigInteger()
+            )
+        } ?: CryptoValue.zero(cryptoCurrency),
         originMoney = FiatValue.fromMinor(originCurrency, originValue.toLong()),
+        paymentMethodId = paymentMethodId,
+        paymentMethod = paymentMethod.toPaymentMethodType(),
+        fee = fee?.let { FiatValue.fromMinor(originCurrency, fee.toLong()) } ?: FiatValue.zero(originCurrency),
+        period = period.toRecurringBuyFrequency(),
+        nextPayment = nextPayment.fromIso8601ToUtc()?.toLocalTime() ?: Date(),
         insertedAt = insertedAt.fromIso8601ToUtc()?.toLocalTime() ?: Date()
     )
 }
 
 fun String.toRecurringBuyActivityState() =
     when (this) {
-        RecurringBuyTransactionResponse.COMPLETED -> RecurringBuyActivityState.COMPLETED
+        RecurringBuyTransactionResponse.COMPLETED -> RecurringBuyTransactionState.COMPLETED
         RecurringBuyTransactionResponse.PENDING,
-        RecurringBuyTransactionResponse.CREATED -> RecurringBuyActivityState.PENDING
-        RecurringBuyTransactionResponse.FAILED -> RecurringBuyActivityState.FAILED
-        else -> RecurringBuyActivityState.UNKNOWN
+        RecurringBuyTransactionResponse.CREATED -> RecurringBuyTransactionState.PENDING
+        RecurringBuyTransactionResponse.FAILED -> RecurringBuyTransactionState.FAILED
+        else -> RecurringBuyTransactionState.UNKNOWN
+    }
+
+fun String.toRecurringBuyError() =
+    when (this) {
+        RecurringBuyTransactionResponse.FAILED_INSUFFICIENT_FUNDS ->
+            RecurringBuyErrorState.INSUFFICIENT_FUNDS
+        RecurringBuyTransactionResponse.FAILED_INTERNAL_ERROR ->
+            RecurringBuyErrorState.INTERNAL_SERVER_ERROR
+        RecurringBuyTransactionResponse.FAILED_BENEFICIARY_BLOCKED ->
+            RecurringBuyErrorState.BLOCKED_BENEFICIARY_ID
+        RecurringBuyTransactionResponse.FAILED_LIMITS_EXCEED ->
+            RecurringBuyErrorState.TRADING_LIMITS_EXCEED
+        else -> RecurringBuyErrorState.UNKNOWN
     }

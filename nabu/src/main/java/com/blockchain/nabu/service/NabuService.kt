@@ -722,10 +722,14 @@ class NabuService(retrofit: Retrofit) {
 
     fun getRecurringBuysTransactions(
         sessionToken: NabuSessionTokenResponse,
-        currency: String? = null
+        recurringBuyId: String? = null,
+        currency: String? = null,
+        limit: Int? = null
     ) = service.fetchRecurringBuysTransactions(
         authorization = sessionToken.authHeader,
-        assetTicker = currency
+        recurringBuyId = recurringBuyId,
+        assetTicker = currency,
+        limit = limit
     ).wrapErrorMessage()
 
     companion object {

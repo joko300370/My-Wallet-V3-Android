@@ -2,6 +2,10 @@ package piuk.blockchain.android.ui.activity.detail
 
 import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.datamanagers.InterestState
+import com.blockchain.nabu.datamanagers.RecurringBuyErrorState
+import com.blockchain.nabu.datamanagers.RecurringBuyTransactionState
+import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
+import com.blockchain.nabu.models.data.RecurringBuyFrequency
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
@@ -18,6 +22,7 @@ import java.util.Date
 
 sealed class ActivityDetailsType
 data class Created(val date: Date) : ActivityDetailsType()
+data class NextPayment(val date: Date) : ActivityDetailsType()
 data class Amount(val value: Money) : ActivityDetailsType()
 data class Fee(val feeValue: Money?) : ActivityDetailsType()
 data class NetworkFee(val feeValue: Money) : ActivityDetailsType()
@@ -38,9 +43,12 @@ data class Description(val description: String? = null) : ActivityDetailsType()
 data class Action(val action: String = "") : ActivityDetailsType()
 data class BuyFee(val feeValue: FiatValue) : ActivityDetailsType()
 data class BuyPurchaseAmount(val fundedFiat: FiatValue) : ActivityDetailsType()
+data class TotalCostAmount(val fundedFiat: FiatValue) : ActivityDetailsType()
+data class FeeAmount(val fundedFiat: FiatValue) : ActivityDetailsType()
 data class SellPurchaseAmount(val value: Money) : ActivityDetailsType()
 data class TransactionId(val txId: String) : ActivityDetailsType()
 data class BuyCryptoWallet(val crypto: CryptoCurrency) : ActivityDetailsType()
+data class RecurringBuyFrequency(val frequency: RecurringBuyFrequency) : ActivityDetailsType()
 data class SellCryptoWallet(val currency: String) : ActivityDetailsType()
 data class BuyPaymentMethod(val paymentDetails: PaymentDetails) : ActivityDetailsType()
 data class SwapReceiveAmount(val receivedAmount: Money) : ActivityDetailsType()
@@ -70,7 +78,13 @@ data class ActivityDetailState(
     val totalConfirmations: Int = 0,
     val listOfItems: Set<ActivityDetailsType> = emptySet(),
     val isError: Boolean = false,
-    val descriptionState: DescriptionState = DescriptionState.NOT_SET
+    val hasDeleteError: Boolean = false,
+    val recurringBuyState: RecurringBuyTransactionState = RecurringBuyTransactionState.UNKNOWN,
+    val recurringBuyError: RecurringBuyErrorState = RecurringBuyErrorState.UNKNOWN,
+    val descriptionState: DescriptionState = DescriptionState.NOT_SET,
+    val recurringBuyId: String? = "",
+    val recurringBuyPaymentMethodType: PaymentMethodType? = null,
+    val recurringBuyOriginCurrency: String? = null
 ) : MviState
 
 class ActivityDetailsModel(
@@ -94,6 +108,7 @@ class ActivityDetailsModel(
                     CryptoActivityType.CUSTODIAL_TRANSFER -> loadCustodialTransferActivityDetails(intent)
                     CryptoActivityType.SWAP -> loadSwapActivityDetails(intent)
                     CryptoActivityType.SELL -> loadSellActivityDetails(intent)
+                    CryptoActivityType.RECURRING_BUY -> loadRecurringBuyTransactionDetails(intent)
                     CryptoActivityType.UNKNOWN -> {
                         throw IllegalStateException(
                             "Cannot load activity details for an unknown account type"
@@ -102,6 +117,7 @@ class ActivityDetailsModel(
                 }
                 null
             }
+
             is UpdateDescriptionIntent ->
                 interactor.updateItemDescription(
                     intent.txId, intent.cryptoCurrency,
@@ -136,8 +152,12 @@ class ActivityDetailsModel(
             is LoadCustodialInterestHeaderDataIntent,
             is LoadSwapHeaderDataIntent,
             is LoadSellHeaderDataIntent,
+            is LoadRecurringBuyDetailsHeaderDataIntent,
+            is RecurringBuyDeleteError,
+            is RecurringBuyDeletedSuccessfully,
             is LoadNonCustodialHeaderDataIntent,
             is LoadCustodialSendHeaderDataIntent -> null
+            is DeleteRecurringBuy -> deleteRecurringBuy(previousState.recurringBuyId.orEmpty())
         }
     }
 
@@ -193,6 +213,31 @@ class ActivityDetailsModel(
         )?.let {
             process(LoadCustodialTradingHeaderDataIntent(it))
             interactor.loadCustodialTradingItems(it).subscribeBy(
+                onSuccess = { activityList ->
+                    process(ListItemsLoadedIntent(activityList))
+                },
+                onError = {
+                    process(ListItemsFailedToLoadIntent)
+                })
+        } ?: process(ActivityDetailsLoadFailedIntent)
+
+    private fun deleteRecurringBuy(id: String) =
+        interactor.deleteRecurringBuy(id)
+            .subscribeBy(
+                onComplete = {
+                    process(RecurringBuyDeletedSuccessfully)
+                },
+                onError = {
+                    process(RecurringBuyDeleteError)
+                }
+            )
+
+    private fun loadRecurringBuyTransactionDetails(intent: LoadActivityDetailsIntent) =
+        interactor.getRecurringBuyTransactionCacheDetails(
+            txHash = intent.txHash
+        )?.let {
+            process(LoadRecurringBuyDetailsHeaderDataIntent(it))
+            interactor.loadRecurringBuyItems(it).subscribeBy(
                 onSuccess = { activityList ->
                     process(ListItemsLoadedIntent(activityList))
                 },

@@ -40,7 +40,7 @@ import java.util.Locale
 
 class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetailsBinding>() {
     interface Host : SlidingModalBottomDialog.Host {
-        fun gotoActivityFor(account: BlockchainAccount)
+        fun goToActivityFor(account: BlockchainAccount)
         fun goToInterestDeposit(toAccount: InterestAccount)
         fun goToInterestWithdraw(fromAccount: InterestAccount)
     }
