@@ -654,9 +654,6 @@
     <string name="airdrop_sheet_stx_body">Possui sua identidade e dados digitais com centenas de aplicativos descentralizados criados com o Blockstack.</string>
     <string name="airdrop_sheet_stx_where_are_my_stacks_title">Onde estão minhas pilhas?</string>
     <string name="airdrop_sheet_stx_where_are_my_stacks">As pilhas (STX) são armazenadas na sua Carteira Blockchain. Observe que o saldo não é transferível no momento.</string>
-    <string name="custody_intro_title">Sua Carteira de Custódia.</string>
-    <string name="custody_intro_body_1">Quando você compra criptografia, armazenamos seus fundos com segurança em uma Carteira de negociação criptográfica. Esses fundos são armazenados por nós em seu nome. Você pode mantê-los em segurança conosco ou transferi-los para sua Carteira virtual sem custódia para possuir e armazenar você mesmo.</string>
-    <string name="custody_intro_body_2">Se você deseja trocar ou enviar esses fundos, é necessário transferi-los para sua Carteira Bitcoin.</string>
     <string name="backup_before_send_title">Faça backup da sua carteira</string>
     <string name="backup_before_send_body">Sua frase de backup permitirá recuperar sua criptografia se você perder o acesso à sua carteira.
 

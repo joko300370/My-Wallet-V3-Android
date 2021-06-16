@@ -654,9 +654,6 @@
     <string name="airdrop_sheet_stx_body">Blockstack ile oluşturulmuş yüzlerce merkezi olmayan uygulama ile dijital kimliğinize ve verilerinize sahip olun.</string>
     <string name="airdrop_sheet_stx_where_are_my_stacks_title">Yığınlarım nerede?</string>
     <string name="airdrop_sheet_stx_where_are_my_stacks">Yığınlar (STX) Blockchain Cüzdanınızda saklanır. Bakiyenin şu anda aktarılamadığını lütfen unutmayın.</string>
-    <string name="custody_intro_title">Velayet Cüzdanınız.</string>
-    <string name="custody_intro_body_1">Kripto satın aldığınızda, paranızı sizin için bir Kripto Ticaret Cüzdanında güvenli bir şekilde saklarız. Bu fonlar bizim tarafımızdan sizin adınıza saklanır. Onları bizimle güvende tutabilir veya kendinize ait ve saklamak için gözaltı olmayan Cüzdanınıza aktarabilirsiniz.</string>
-    <string name="custody_intro_body_2">Bu fonları değiştirmek veya göndermek istiyorsanız, bunları bitcoin Cüzdanınıza aktarmanız gerekir.</string>
     <string name="backup_before_send_title">Cüzdanınızı Yedekleyin</string>
     <string name="backup_before_send_body">Yedek ifadeniz, cüzdanınıza erişiminizi kaybederseniz kripto parayı kurtarmanıza izin verecektir.
 

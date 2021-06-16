@@ -953,9 +953,8 @@
     <string name="airdrop_sheet_xlm_title" translatable="false">Stellar (XLM)</string>
 
     <!-- custody wallet intro sheet -->
-    <string name="custody_intro_title">Your Custody Wallet.</string>
-    <string name="custody_intro_body_1">When you buy crypto, we store your funds securely for you in a Crypto Trading Wallet. These funds are stored by us on your behalf. You can keep them safe with us or transfer them to your non-custodial Wallet to own and store yourself.</string>
-    <string name="custody_intro_body_2">If you want to swap or send these funds you need to transfer them to your bitcoin Wallet.</string>
+    <string name="custody_intro_title_1">Your Trading Account</string>
+    <string name="custody_intro_body">When you buy crypto, we store your funds securely on your behalf in a crypto Trading Account. You can keep them safe with us or transfer them to your Private Key (or non-custodial) Wallet to own and store yourself.</string>
 
     <!-- force backup before send sheet -->
     <string name="backup_before_send_title">Backup Your Wallet</string>

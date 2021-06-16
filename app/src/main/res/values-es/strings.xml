@@ -653,9 +653,6 @@ Euros/Dolares</string>
     <string name="airdrop_sheet_stx_body">Adquiera su identidad y datos digitales con cientos de aplicaciones descentralizadas creadas con Blockstack.</string>
     <string name="airdrop_sheet_stx_where_are_my_stacks_title">¿Dónde están mis pilas?</string>
     <string name="airdrop_sheet_stx_where_are_my_stacks">Las pilas (STX) se almacenan en su billetera Blockchain. Tenga en cuenta que el saldo actualmente no es transferible.</string>
-    <string name="custody_intro_title">Su billetera de custodia.</string>
-    <string name="custody_intro_body_1">Cuando compra crypto, almacenamos sus fondos de forma segura para usted en una billetera Crypto Trading. Nosotros almacenamos estos fondos en su nombre. Puede mantenerlos a salvo con nosotros o transferirlos a su billetera sin custodia para que los posea y almacene.</string>
-    <string name="custody_intro_body_2">Si desea intercambiar o enviar estos fondos, debe transferirlos a su billetera bitcoin.</string>
     <string name="backup_before_send_title">Copia de seguridad de su billetera</string>
     <string name="backup_before_send_body">Su frase de respaldo le permitirá recuperar su criptografía si pierde el acceso a su billetera.
 

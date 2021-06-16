@@ -654,9 +654,6 @@
     <string name="airdrop_sheet_stx_body">Possédez votre identité numérique et vos données avec des centaines d\'applications décentralisées construites avec Blockstack.</string>
     <string name="airdrop_sheet_stx_where_are_my_stacks_title">Où sont mes piles?</string>
     <string name="airdrop_sheet_stx_where_are_my_stacks">Les piles (STX) sont stockées dans votre portefeuille Blockchain. Veuillez noter que le solde est actuellement non transférable.</string>
-    <string name="custody_intro_title">Votre portefeuille de garde.</string>
-    <string name="custody_intro_body_1">Lorsque vous achetez de la crypto, nous stockons vos fonds en toute sécurité pour vous dans un portefeuille de trading de crypto. Ces fonds sont stockés par nous en votre nom. Vous pouvez les garder en sécurité avec nous ou les transférer sur votre portefeuille non-gardien pour posséder et stocker vous-même.</string>
-    <string name="custody_intro_body_2">Si vous souhaitez échanger ou envoyer ces fonds, vous devez les transférer sur votre portefeuille Bitcoin.</string>
     <string name="backup_before_send_title">Sauvegardez votre portefeuille</string>
     <string name="backup_before_send_body">Votre phrase de sauvegarde vous permettra de récupérer votre crypto si vous perdez l\'accès à votre portefeuille.
 

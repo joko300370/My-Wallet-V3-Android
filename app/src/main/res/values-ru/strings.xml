@@ -654,9 +654,6 @@
     <string name="airdrop_sheet_stx_body">Имейте свою цифровую идентификацию и данные с сотнями децентрализованных приложений, созданных с Blockstack.</string>
     <string name="airdrop_sheet_stx_where_are_my_stacks_title">Где мои стеки?</string>
     <string name="airdrop_sheet_stx_where_are_my_stacks">Стеки (STX) хранятся в вашем кошельке Blockchain. Обратите внимание, что баланс в настоящее время не подлежит передаче.</string>
-    <string name="custody_intro_title">Ваш Хранитель Кошелек.</string>
-    <string name="custody_intro_body_1">Когда вы покупаете crypto, мы надежно храним ваши средства в кошельке Crypto Trading. Эти средства хранятся нами от вашего имени. Вы можете хранить их в безопасности у нас или перевести на свой кошелек, не связанный с тюремным заключением, для хранения и хранения.</string>
-    <string name="custody_intro_body_2">Если вы хотите обменять или отправить эти средства, вам необходимо перевести их на свой биткойн-кошелек.</string>
     <string name="backup_before_send_title">Сделайте резервную копию вашего кошелька</string>
     <string name="backup_before_send_body">Ваша резервная фраза позволит вам восстановить криптографию, если вы потеряете доступ к своему кошельку.
 
