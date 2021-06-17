@@ -127,14 +127,9 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
                         availablePaymentMethods.filter { it !is PaymentMethod.UndefinedFunds }
                     paymentMethodsThatCanBePreselected.firstOrNull { it.isEligible && it.canUsedForPaying() }?.id
                         ?: paymentMethodsThatCanBePreselected.firstOrNull { it.isEligible }?.id
-                        ?: paymentMethodsThatCanBePreselected.firstIfSizeOne()
+                        ?: paymentMethodsThatCanBePreselected.firstOrNull()?.id
                 }
             }
-
-        private fun List<PaymentMethod>.firstIfSizeOne(): String? =
-            if (size == 1)
-                this[0].id
-            else null
     }
 
     class SelectedPaymentMethodUpdate(

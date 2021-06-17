@@ -947,7 +947,6 @@
     <string name="bank_wire_transfer">Transferencia bancária</string>
     <string name="credit_or_debit_card">Cartão de crédito ou débito</string>
     <string name="add_credit_or_debit_card">Adicione um cartão de crédito ou débito</string>
-    <string name="select_payment_method">Selecione um método de pagamento</string>
     <string name="payment_method_limit">Limite de %1$s</string>
     <string name="order_details">detalhes do pedido</string>
     <string name="purchase_bank_note">Assim que recebermos seus fundos, iniciaremos seu pedido de compra de %1$s . Observe que seu valor final pode mudar para a atividade de mercado devida. Podem ser aplicadas taxas.</string>

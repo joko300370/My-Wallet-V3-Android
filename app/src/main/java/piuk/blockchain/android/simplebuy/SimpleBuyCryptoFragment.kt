@@ -266,7 +266,7 @@ class SimpleBuyCryptoFragment :
         } else {
             newState.selectedPaymentMethodDetails?.let {
                 renderDefinedPaymentMethod(it)
-            } ?: renderUndefinedPaymentMethod()
+            }
         }
 
         binding.btnContinue.isEnabled = canContinue(newState)
@@ -373,7 +373,6 @@ class SimpleBuyCryptoFragment :
             paymentMethod.visible()
             paymentMethodSeparator.visible()
             paymentMethodDetailsRoot.visible()
-            undefinedPaymentText.gone()
             paymentMethodTitle.visible()
             paymentMethodLimit.visible()
         }
@@ -395,19 +394,6 @@ class SimpleBuyCryptoFragment :
                     setTextColor(requireContext().getResolvedColor(R.color.grey_800))
                 }
             }
-        }
-    }
-
-    private fun renderUndefinedPaymentMethod() {
-        with(binding) {
-            paymentMethodIcon.setImageResource(R.drawable.ic_add_payment_method)
-            undefinedPaymentText.text = getString(R.string.select_payment_method)
-            paymentMethod.visible()
-            paymentMethodSeparator.visible()
-            paymentMethodDetailsRoot.visible()
-            undefinedPaymentText.visible()
-            paymentMethodTitle.gone()
-            paymentMethodLimit.gone()
         }
     }
 

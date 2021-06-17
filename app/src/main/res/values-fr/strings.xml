@@ -947,7 +947,6 @@
     <string name="bank_wire_transfer">Virement bancaire</string>
     <string name="credit_or_debit_card">Carte de crédit ou de débit</string>
     <string name="add_credit_or_debit_card">Ajouter une Carte de Crédit ou Débit</string>
-    <string name="select_payment_method">Choisissez une méthode de paiement</string>
     <string name="payment_method_limit">Limite de %1$s</string>
     <string name="order_details">détails de la commande</string>
     <string name="purchase_bank_note">Une fois que nous aurons reçu vos fonds, nous commencerons votre commande d\'achat %1$s . Notez que votre montant final peut changer en fonction de l\'activité du marché. Des frais peuvent s\'appliquer.</string>

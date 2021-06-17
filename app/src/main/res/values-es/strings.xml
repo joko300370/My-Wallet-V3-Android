@@ -946,7 +946,6 @@ Euros/Dolares</string>
     <string name="bank_wire_transfer">Transferencia bancaria</string>
     <string name="credit_or_debit_card">Tarjeta de crédito o débito</string>
     <string name="add_credit_or_debit_card">Agregar una tarjeta de crédito o débito</string>
-    <string name="select_payment_method">Seleccione un método de pago</string>
     <string name="payment_method_limit">Límite %1$s</string>
     <string name="order_details">Detalles del pedido</string>
     <string name="purchase_bank_note">Una vez que recibamos sus fondos, comenzaremos su orden de compra de %1$s . Tenga en cuenta que su cantidad final puede cambiar a la actividad de mercado debida. Se pueden aplicar tarifas.</string>
