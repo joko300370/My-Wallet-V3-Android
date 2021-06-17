@@ -13,10 +13,8 @@ import org.bitcoinj.core.Transaction
 import org.spongycastle.util.encoders.Hex
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.FeeLevel
-import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
-import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxResult
@@ -114,13 +112,7 @@ class BitpayTxEngine(
                 pTx.addOrReplaceOption(
                     TxConfirmationValue.BitPayCountdown(timeRemainingSecs()),
                     true
-                ).run {
-                    if (hasOption(TxConfirmation.FEE_SELECTION)) {
-                        addOrReplaceOption(makeFeeSelectionOption(pTx))
-                    } else {
-                        this
-                    }
-                }
+                )
             }
 
     override fun doRefreshConfirmations(pendingTx: PendingTx): Single<PendingTx> =
@@ -159,17 +151,6 @@ class BitpayTxEngine(
         Timber.d("BitPay Invoice Countdown expired")
         refreshConfirmations(true)
     }
-
-    // BitPay invoices _always_ require priority fees, so replace the option as defined by the
-    // underlying asset engine.
-    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
-        TxConfirmationValue.FeeSelection(
-            feeDetails = FeeState.FeeDetails(pendingTx.feeAmount),
-            exchange = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
-            selectedLevel = pendingTx.feeSelection.selectedLevel,
-            availableLevels = setOf(FeeLevel.Priority),
-            asset = sourceAsset
-        )
 
     // Don't set the amount here, it is fixed so we can do it in the confirmation building step
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> =

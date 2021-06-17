@@ -198,8 +198,8 @@ class BchOnChainTxEngine(
     private fun buildConfirmations(pendingTx: PendingTx): PendingTx =
         pendingTx.copy(
             confirmations = listOfNotNull(
-                TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
-                TxConfirmationValue.NewTo(
+                TxConfirmationValue.From(sourceAccount, sourceAsset),
+                TxConfirmationValue.To(
                     txTarget, AssetAction.Send, sourceAccount
                 ),
                 TxConfirmationValue.CompoundNetworkFee(
@@ -212,7 +212,7 @@ class BchOnChainTxEngine(
                     } else null,
                     feeLevel = pendingTx.feeSelection.selectedLevel
                 ),
-                TxConfirmationValue.NewTotal(
+                TxConfirmationValue.Total(
                     totalWithFee = (pendingTx.amount as CryptoValue).plus(
                         pendingTx.feeAmount as CryptoValue
                     ),
@@ -220,15 +220,6 @@ class BchOnChainTxEngine(
                         .plus(pendingTx.feeAmount.toFiat(exchangeRates, userFiat))
                 )
             )
-        )
-
-    override fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
-        TxConfirmationValue.FeeSelection(
-            feeDetails = getFeeState(pendingTx),
-            exchange = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
-            selectedLevel = pendingTx.feeSelection.selectedLevel,
-            availableLevels = AVAILABLE_FEE_LEVELS,
-            asset = sourceAsset
         )
 
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =

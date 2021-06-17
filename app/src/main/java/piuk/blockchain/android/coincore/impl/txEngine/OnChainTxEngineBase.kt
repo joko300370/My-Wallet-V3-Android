@@ -1,6 +1,5 @@
 package piuk.blockchain.android.coincore.impl.txEngine
 
-import androidx.annotation.CallSuper
 import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.data.FeeOptions
@@ -10,7 +9,6 @@ import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.PendingTx
-import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxResult
 
@@ -87,27 +85,6 @@ abstract class OnChainTxEngineBase(
             Single.just(pendingTx)
         }
     }
-
-    @CallSuper
-    override fun doOptionUpdateRequest(pendingTx: PendingTx, newConfirmation: TxConfirmationValue): Single<PendingTx> =
-        if (newConfirmation is TxConfirmationValue.FeeSelection) {
-            if (pendingTx.hasFeeLevelChanged(newConfirmation.selectedLevel, newConfirmation.customFeeAmount)) {
-                updateFeeSelection(
-                    sourceAsset,
-                    pendingTx,
-                    newConfirmation.selectedLevel,
-                    newConfirmation.customFeeAmount
-                )
-                .flatMap { pTx -> doValidateAmount(pTx) }
-                .flatMap { pTx -> doBuildConfirmations(pTx) }
-            } else {
-                super.doOptionUpdateRequest(pendingTx, makeFeeSelectionOption(pendingTx))
-            }
-        } else {
-            super.doOptionUpdateRequest(pendingTx, newConfirmation)
-        }
-
-    protected abstract fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection
 
     private fun updateFeeSelection(
         cryptoCurrency: CryptoCurrency,

@@ -68,8 +68,8 @@ open class EthOnChainTxEngine(
         Single.just(
             pendingTx.copy(
                 confirmations = listOfNotNull(
-                    TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
-                    TxConfirmationValue.NewTo(
+                    TxConfirmationValue.From(sourceAccount, sourceAsset),
+                    TxConfirmationValue.To(
                         txTarget, AssetAction.Send, sourceAccount
                     ),
                     TxConfirmationValue.CompoundNetworkFee(
@@ -82,7 +82,7 @@ open class EthOnChainTxEngine(
                         } else null,
                         feeLevel = pendingTx.feeSelection.selectedLevel
                     ),
-                    TxConfirmationValue.NewTotal(
+                    TxConfirmationValue.Total(
                         totalWithFee = (pendingTx.amount as CryptoValue).plus(
                             pendingTx.feeAmount as CryptoValue
                         ),
@@ -112,15 +112,6 @@ open class EthOnChainTxEngine(
             FeeLevel.Priority -> priorityFee
             FeeLevel.Custom -> priorityFee
         }
-
-    override fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
-        TxConfirmationValue.FeeSelection(
-            feeDetails = getFeeState(pendingTx),
-            exchange = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
-            selectedLevel = pendingTx.feeSelection.selectedLevel,
-            availableLevels = AVAILABLE_FEE_LEVELS,
-            asset = sourceAsset
-        )
 
     private fun feeOptions(): Single<FeeOptions> =
         feeManager.ethFeeOptions.singleOrError()

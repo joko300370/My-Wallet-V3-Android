@@ -76,8 +76,8 @@ class TradingToOnChainTxEngine(
         Single.just(
             pendingTx.copy(
                 confirmations = listOfNotNull(
-                    TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
-                    TxConfirmationValue.NewTo(
+                    TxConfirmationValue.From(sourceAccount, sourceAsset),
+                    TxConfirmationValue.To(
                         txTarget, AssetAction.Send, sourceAccount
                     ),
                     TxConfirmationValue.CompoundNetworkFee(
@@ -91,7 +91,7 @@ class TradingToOnChainTxEngine(
                         feeLevel = pendingTx.feeSelection.selectedLevel,
                         ignoreErc20LinkedNote = true
                     ),
-                    TxConfirmationValue.NewTotal(
+                    TxConfirmationValue.Total(
                         totalWithFee = (pendingTx.amount as CryptoValue).plus(
                             pendingTx.feeAmount as CryptoValue
                         ),

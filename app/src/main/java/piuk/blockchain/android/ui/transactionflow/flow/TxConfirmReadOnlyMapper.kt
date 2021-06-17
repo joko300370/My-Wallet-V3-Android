@@ -1,7 +1,6 @@
 package piuk.blockchain.android.ui.transactionflow.flow
 
 import android.content.Context
-import android.content.res.Resources
 import android.text.SpannableStringBuilder
 import com.blockchain.ui.urllinks.CHECKOUT_PRICE_EXPLANATION
 import com.blockchain.ui.urllinks.EXCHANGE_SWAP_RATE_EXPLANATION
@@ -19,43 +18,27 @@ import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionFlowCustomiserImpl
 import piuk.blockchain.android.util.StringUtils
 
-class TxConfirmReadOnlyMapper(private val formatters: List<TxOptionsFormatter>) {
-    fun map(property: TxConfirmationValue): Pair<String, String> {
-        for (formatter in formatters) {
-            formatter.format(property)?.let {
-                return it
-            }
-        }
-        throw IllegalStateException("No formatter found")
-    }
-}
-
-interface TxOptionsFormatter {
-    fun format(property: TxConfirmationValue): Pair<String, String>?
-}
-
-// New checkout screens
-class TxConfirmReadOnlyMapperNewCheckout(
-    private val formatters: List<TxOptionsFormatterNewCheckout>
+class TxConfirmReadOnlyMapperCheckout(
+    private val formatters: List<TxOptionsFormatterCheckout>
 ) {
     fun map(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
         return when (property) {
-            is TxConfirmationValue.NewTo -> formatters.first { it is NewToPropertyFormatter }.format(property)
-            is TxConfirmationValue.NewFrom -> formatters.first { it is NewFromPropertyFormatter }.format(property)
-            is TxConfirmationValue.NewExchangePriceConfirmation ->
-                formatters.first { it is NewExchangePriceFormatter }.format(property)
-            is TxConfirmationValue.NewNetworkFee -> formatters.first { it is NewNetworkFormatter }.format(property)
+            is TxConfirmationValue.To -> formatters.first { it is ToPropertyFormatter }.format(property)
+            is TxConfirmationValue.From -> formatters.first { it is FromPropertyFormatter }.format(property)
+            is TxConfirmationValue.ExchangePriceConfirmation ->
+                formatters.first { it is ExchangePriceFormatter }.format(property)
+            is TxConfirmationValue.NetworkFee -> formatters.first { it is NetworkFormatter }.format(property)
             is TxConfirmationValue.TransactionFee -> formatters.first { it is TransactionFeeFormatter }.format(property)
-            is TxConfirmationValue.NewSale -> formatters.first { it is NewSalePropertyFormatter }.format(property)
-            is TxConfirmationValue.NewTotal -> formatters.first { it is NewTotalFormatter }.format(property)
-            is TxConfirmationValue.Amount -> formatters.first { it is AmountTotalFormatter }.format(property)
+            is TxConfirmationValue.Sale -> formatters.first { it is SalePropertyFormatter }.format(property)
+            is TxConfirmationValue.Total -> formatters.first { it is TotalFormatter }.format(property)
+            is TxConfirmationValue.Amount -> formatters.first { it is AmountFormatter }.format(property)
             is TxConfirmationValue.EstimatedCompletion ->
                 formatters.first { it is EstimatedCompletionPropertyFormatter }
                     .format(property)
             is TxConfirmationValue.PaymentMethod ->
                 formatters.first { it is PaymentMethodPropertyFormatter }.format(property)
-            is TxConfirmationValue.NewSwapExchange ->
-                formatters.first { it is NewSwapExchangeRateFormatter }.format(property)
+            is TxConfirmationValue.SwapExchange ->
+                formatters.first { it is SwapExchangeRateFormatter }.format(property)
             is TxConfirmationValue.CompoundNetworkFee -> formatters.first { it is CompoundNetworkFeeFormatter }
                 .format(property)
             else -> throw IllegalStateException("No formatter found for property: $property")
@@ -63,7 +46,7 @@ class TxConfirmReadOnlyMapperNewCheckout(
     }
 }
 
-interface TxOptionsFormatterNewCheckout {
+interface TxOptionsFormatterCheckout {
     fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any>
 }
 
@@ -83,11 +66,11 @@ class FeeInfo(
     val asset: CryptoCurrency
 )
 
-class NewExchangePriceFormatter(
+class ExchangePriceFormatter(
     private val context: Context
-) : TxOptionsFormatterNewCheckout {
+) : TxOptionsFormatterCheckout {
     override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
-        require(property is TxConfirmationValue.NewExchangePriceConfirmation)
+        require(property is TxConfirmationValue.ExchangePriceConfirmation)
         return mapOf(
             ConfirmationPropertyKey.LABEL to context.resources.getString(
                 R.string.quote_price, property.asset.displayTicker
@@ -101,12 +84,12 @@ class NewExchangePriceFormatter(
     }
 }
 
-class NewToPropertyFormatter(
+class ToPropertyFormatter(
     private val context: Context,
     private val defaultLabel: DefaultLabels
-) : TxOptionsFormatterNewCheckout {
+) : TxOptionsFormatterCheckout {
     override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
-        require(property is TxConfirmationValue.NewTo)
+        require(property is TxConfirmationValue.To)
         return if (property.assetAction == AssetAction.Sell || property.assetAction == AssetAction.FiatDeposit) {
             mapOf(
                 ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.checkout_item_deposit_to),
@@ -127,7 +110,7 @@ class NewToPropertyFormatter(
     }
 }
 
-class EstimatedCompletionPropertyFormatter(private val context: Context) : TxOptionsFormatterNewCheckout {
+class EstimatedCompletionPropertyFormatter(private val context: Context) : TxOptionsFormatterCheckout {
     override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
         return mapOf(
             ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.send_confirmation_eta),
@@ -136,9 +119,9 @@ class EstimatedCompletionPropertyFormatter(private val context: Context) : TxOpt
     }
 }
 
-class NewSalePropertyFormatter(private val context: Context) : TxOptionsFormatterNewCheckout {
+class SalePropertyFormatter(private val context: Context) : TxOptionsFormatterCheckout {
     override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
-        require(property is TxConfirmationValue.NewSale)
+        require(property is TxConfirmationValue.Sale)
         return mapOf(
             ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.checkout_item_sale),
             ConfirmationPropertyKey.TITLE to property.exchange.toStringWithSymbol(),
@@ -147,7 +130,7 @@ class NewSalePropertyFormatter(private val context: Context) : TxOptionsFormatte
     }
 }
 
-class PaymentMethodPropertyFormatter(private val context: Context) : TxOptionsFormatterNewCheckout {
+class PaymentMethodPropertyFormatter(private val context: Context) : TxOptionsFormatterCheckout {
     override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
         require(property is TxConfirmationValue.PaymentMethod)
         return mapOf(
@@ -168,12 +151,12 @@ class PaymentMethodPropertyFormatter(private val context: Context) : TxOptionsFo
     }
 }
 
-class NewFromPropertyFormatter(
+class FromPropertyFormatter(
     private val context: Context,
     private val defaultLabel: DefaultLabels
-) : TxOptionsFormatterNewCheckout {
+) : TxOptionsFormatterCheckout {
     override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
-        require(property is TxConfirmationValue.NewFrom)
+        require(property is TxConfirmationValue.From)
         return mapOf(
             ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.common_from),
             property.sourceAsset?.let {
@@ -189,7 +172,7 @@ class NewFromPropertyFormatter(
 
 class TransactionFeeFormatter(
     private val context: Context
-) : TxOptionsFormatterNewCheckout {
+) : TxOptionsFormatterCheckout {
     override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
         require(property is TxConfirmationValue.TransactionFee)
         return mapOf(
@@ -199,12 +182,12 @@ class TransactionFeeFormatter(
     }
 }
 
-class NewNetworkFormatter(
+class NetworkFormatter(
     private val context: Context,
     private val assetResources: AssetResources
-) : TxOptionsFormatterNewCheckout {
+) : TxOptionsFormatterCheckout {
     override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
-        require(property is TxConfirmationValue.NewNetworkFee)
+        require(property is TxConfirmationValue.NetworkFee)
         return mapOf(
             ConfirmationPropertyKey.LABEL to context.resources.getString(
                 R.string.checkout_item_network_fee, property.asset.displayTicker
@@ -231,7 +214,7 @@ class NewNetworkFormatter(
 class CompoundNetworkFeeFormatter(
     private val context: Context,
     private val assetResources: AssetResources
-) : TxOptionsFormatterNewCheckout {
+) : TxOptionsFormatterCheckout {
     override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
         require(property is TxConfirmationValue.CompoundNetworkFee)
         return mapOf(
@@ -376,12 +359,10 @@ class CompoundNetworkFeeFormatter(
         }
 }
 
-class NewSwapExchangeRateFormatter(
-    private val context: Context
-) :
-    TxOptionsFormatterNewCheckout {
+class SwapExchangeRateFormatter(private val context: Context) :
+    TxOptionsFormatterCheckout {
     override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
-        require(property is TxConfirmationValue.NewSwapExchange)
+        require(property is TxConfirmationValue.SwapExchange)
         return mapOf(
             ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.exchange_rate),
             ConfirmationPropertyKey.TITLE to property.unitCryptoCurrency.toStringWithSymbol(),
@@ -396,9 +377,9 @@ class NewSwapExchangeRateFormatter(
     }
 }
 
-class NewTotalFormatter(private val context: Context) : TxOptionsFormatterNewCheckout {
+class TotalFormatter(private val context: Context) : TxOptionsFormatterCheckout {
     override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
-        require(property is TxConfirmationValue.NewTotal)
+        require(property is TxConfirmationValue.Total)
         return mapOf(
             ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.common_total),
             ConfirmationPropertyKey.TITLE to property.exchange.toStringWithSymbol(),
@@ -408,7 +389,7 @@ class NewTotalFormatter(private val context: Context) : TxOptionsFormatterNewChe
     }
 }
 
-class AmountTotalFormatter(private val context: Context) : TxOptionsFormatterNewCheckout {
+class AmountFormatter(private val context: Context) : TxOptionsFormatterCheckout {
     override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
         require(property is TxConfirmationValue.Amount)
         return mapOf(
@@ -422,65 +403,6 @@ class AmountTotalFormatter(private val context: Context) : TxOptionsFormatterNew
         )
     }
 }
-
-class FromPropertyFormatter(private val resources: Resources) : TxOptionsFormatter {
-    override fun format(property: TxConfirmationValue): Pair<String, String>? =
-        if (property is TxConfirmationValue.From)
-            resources.getString(R.string.common_from) to property.from
-        else null
-}
-
-class ExchangePriceFormatter(private val resources: Resources) : TxOptionsFormatter {
-    override fun format(property: TxConfirmationValue): Pair<String, String>? =
-        if (property is TxConfirmationValue.ExchangePriceConfirmation) {
-            resources.getString(
-                R.string.quote_price,
-                property.asset.displayTicker
-            ) to property.money.toStringWithSymbol()
-        } else {
-            null
-        }
-}
-
-class TotalFormatter(private val resources: Resources) : TxOptionsFormatter {
-    override fun format(property: TxConfirmationValue): Pair<String, String>? =
-        if (property is TxConfirmationValue.Total)
-            resources.getString(R.string.common_total) to property.total.formatWithExchange(property.exchange)
-        else null
-}
-
-class ToPropertyFormatter(private val resources: Resources) : TxOptionsFormatter {
-    override fun format(property: TxConfirmationValue): Pair<String, String>? =
-        if (property is TxConfirmationValue.To)
-            resources.getString(R.string.common_to) to property.to
-        else null
-}
-
-class SwapSourcePropertyFormatter(private val resources: Resources) : TxOptionsFormatter {
-    override fun format(property: TxConfirmationValue): Pair<String, String>? =
-        if (property is TxConfirmationValue.SwapSourceValue)
-            resources.getString(R.string.common_swap) to property.swappingAssetValue.toStringWithSymbol()
-        else null
-}
-
-class SwapDestinationPropertyFormatter(private val resources: Resources) : TxOptionsFormatter {
-    override fun format(property: TxConfirmationValue): Pair<String, String>? =
-        if (property is TxConfirmationValue.SwapDestinationValue)
-            resources.getString(R.string.common_receive) to property.receivingAssetValue.toStringWithSymbol()
-        else null
-}
-
-class FiatFeePropertyFormatter(private val resources: Resources) : TxOptionsFormatter {
-    override fun format(property: TxConfirmationValue): Pair<String, String>? =
-        if (property is TxConfirmationValue.FiatTxFee)
-            resources.getString(R.string.send_confirmation_tx_fee) to property.fee.toStringWithSymbol()
-        else null
-}
-
-fun Money.formatWithExchange(exchange: Money?) =
-    exchange?.let {
-        "${this.toStringWithSymbol()} (${it.toStringWithSymbol()})"
-    } ?: this.toStringWithSymbol()
 
 fun getLabel(label: String, defaultLabel: String, displayTicker: String): String =
     if (label.isEmpty() || label == defaultLabel) {

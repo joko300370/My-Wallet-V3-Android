@@ -19,7 +19,6 @@ import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FeeSelection
-import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
 import piuk.blockchain.android.coincore.TxConfirmationValue
@@ -149,8 +148,8 @@ class XlmOnChainTxEngine(
         Single.just(
             pendingTx.copy(
                 confirmations = listOfNotNull(
-                    TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
-                    TxConfirmationValue.NewTo(
+                    TxConfirmationValue.From(sourceAccount, sourceAsset),
+                    TxConfirmationValue.To(
                         txTarget, AssetAction.Send, sourceAccount
                     ),
                     TxConfirmationValue.CompoundNetworkFee(
@@ -163,7 +162,7 @@ class XlmOnChainTxEngine(
                         } else null,
                         feeLevel = pendingTx.feeSelection.selectedLevel
                     ),
-                    TxConfirmationValue.NewTotal(
+                    TxConfirmationValue.Total(
                         totalWithFee = (pendingTx.amount as CryptoValue).plus(
                             pendingTx.feeAmount as CryptoValue
                         ),
@@ -183,15 +182,6 @@ class XlmOnChainTxEngine(
                 } ?: Single.just(tx)
             }
     }
-
-    override fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
-        TxConfirmationValue.FeeSelection(
-            feeDetails = FeeState.FeeDetails(pendingTx.feeAmount),
-            exchange = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
-            selectedLevel = pendingTx.feeSelection.selectedLevel,
-            availableLevels = AVAILABLE_FEE_LEVELS,
-            asset = sourceAsset
-        )
 
     private fun isMemoRequired(): Boolean =
         walletOptionsDataManager.isXlmAddressExchange(targetXlmAddress.address)

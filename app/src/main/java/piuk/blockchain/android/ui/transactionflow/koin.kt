@@ -15,26 +15,17 @@ import piuk.blockchain.android.ui.transactionflow.flow.ActiveTransactionFlow
 import piuk.blockchain.android.ui.transactionflow.flow.CompoundNetworkFeeFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.EstimatedCompletionPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.ExchangePriceFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.FiatFeePropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.FromPropertyFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.NewExchangePriceFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.NewFromPropertyFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.NewNetworkFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.NewSalePropertyFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.NewSwapExchangeRateFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.NewToPropertyFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.NewTotalFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.PaymentMethodPropertyFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.AmountTotalFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.SwapDestinationPropertyFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.SwapSourcePropertyFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.NetworkFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.SalePropertyFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.SwapExchangeRateFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.ToPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.TotalFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.PaymentMethodPropertyFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.AmountFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.TransactionFeeFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapper
-import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapperNewCheckout
-import piuk.blockchain.android.ui.transactionflow.flow.TxOptionsFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.TxOptionsFormatterNewCheckout
+import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapperCheckout
+import piuk.blockchain.android.ui.transactionflow.flow.TxOptionsFormatterCheckout
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.EnterAmountCustomisations
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.SourceSelectionCustomisations
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.TargetSelectionCustomisations
@@ -61,131 +52,83 @@ val transactionModule = module {
         .bind(TransactionProgressCustomisations::class)
 
     factory {
-        NewExchangePriceFormatter(
+        ExchangePriceFormatter(
             context = get()
         )
-    }.bind(TxOptionsFormatterNewCheckout::class)
+    }.bind(TxOptionsFormatterCheckout::class)
 
     factory {
-        NewToPropertyFormatter(
+        ToPropertyFormatter(
             context = get(),
             defaultLabel = get()
         )
-    }.bind(TxOptionsFormatterNewCheckout::class)
+    }.bind(TxOptionsFormatterCheckout::class)
 
     factory {
-        NewFromPropertyFormatter(
+        FromPropertyFormatter(
             context = get(),
             defaultLabel = get()
         )
-    }.bind(TxOptionsFormatterNewCheckout::class)
+    }.bind(TxOptionsFormatterCheckout::class)
 
     factory {
-        NewSalePropertyFormatter(
+        SalePropertyFormatter(
             context = get()
         )
-    }.bind(TxOptionsFormatterNewCheckout::class)
+    }.bind(TxOptionsFormatterCheckout::class)
 
     factory {
         EstimatedCompletionPropertyFormatter(
             context = get()
         )
-    }.bind(TxOptionsFormatterNewCheckout::class)
+    }.bind(TxOptionsFormatterCheckout::class)
 
     factory {
         PaymentMethodPropertyFormatter(
             context = get()
         )
-    }.bind(TxOptionsFormatterNewCheckout::class)
+    }.bind(TxOptionsFormatterCheckout::class)
 
     factory {
-        NewSwapExchangeRateFormatter(
+        SwapExchangeRateFormatter(
             context = get()
         )
-    }.bind(TxOptionsFormatterNewCheckout::class)
+    }.bind(TxOptionsFormatterCheckout::class)
 
     factory {
-        NewNetworkFormatter(
+        NetworkFormatter(
             context = get(),
             assetResources = get()
         )
-    }.bind(TxOptionsFormatterNewCheckout::class)
+    }.bind(TxOptionsFormatterCheckout::class)
 
     factory {
         TransactionFeeFormatter(
             context = get()
         )
-    }.bind(TxOptionsFormatterNewCheckout::class)
+    }.bind(TxOptionsFormatterCheckout::class)
 
     factory {
         CompoundNetworkFeeFormatter(
             context = get(),
             assetResources = get()
         )
-    }.bind(TxOptionsFormatterNewCheckout::class)
-
-    factory {
-        NewTotalFormatter(
-            context = get()
-        )
-    }.bind(TxOptionsFormatterNewCheckout::class)
-
-    factory {
-        AmountTotalFormatter(
-            context = get()
-        )
-    }.bind(TxOptionsFormatterNewCheckout::class)
-
-    factory {
-        ExchangePriceFormatter(
-            resources = get<Context>().resources
-        )
-    }.bind(TxOptionsFormatter::class)
+    }.bind(TxOptionsFormatterCheckout::class)
 
     factory {
         TotalFormatter(
-            resources = get<Context>().resources
+            context = get()
         )
-    }.bind(TxOptionsFormatter::class)
+    }.bind(TxOptionsFormatterCheckout::class)
 
     factory {
-        FromPropertyFormatter(
-            resources = get<Context>().resources
+        AmountFormatter(
+            context = get()
         )
-    }.bind(TxOptionsFormatter::class)
+    }.bind(TxOptionsFormatterCheckout::class)
 
     factory {
-        ToPropertyFormatter(
-            resources = get<Context>().resources
-        )
-    }.bind(TxOptionsFormatter::class)
-
-    factory {
-        SwapSourcePropertyFormatter(
-            resources = get<Context>().resources
-        )
-    }.bind(TxOptionsFormatter::class)
-
-    factory {
-        SwapDestinationPropertyFormatter(
-            resources = get<Context>().resources
-        )
-    }.bind(TxOptionsFormatter::class)
-
-    factory {
-        FiatFeePropertyFormatter(
-            resources = get<Context>().resources
-        )
-    }.bind(TxOptionsFormatter::class)
-
-    factory {
-        TxConfirmReadOnlyMapper(
-            formatters = getAll()
-        )
-    }
-
-    factory {
-        TxConfirmReadOnlyMapperNewCheckout(
+        TxConfirmReadOnlyMapperCheckout(
             formatters = getAll()
         )
     }

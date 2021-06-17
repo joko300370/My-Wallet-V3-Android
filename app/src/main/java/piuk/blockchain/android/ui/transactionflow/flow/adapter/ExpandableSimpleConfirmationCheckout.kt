@@ -12,11 +12,11 @@ import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.databinding.ItemCheckoutSimpleExpandableInfoBinding
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.transactionflow.flow.ConfirmationPropertyKey
-import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapperNewCheckout
+import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapperCheckout
 import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 
-class ExpandableSimpleConfirmationCheckout(private val mapper: TxConfirmReadOnlyMapperNewCheckout) :
+class ExpandableSimpleConfirmationCheckout(private val mapper: TxConfirmReadOnlyMapperCheckout) :
     AdapterDelegate<TxConfirmationValue> {
     override fun isForViewType(items: List<TxConfirmationValue>, position: Int): Boolean {
         return items[position].confirmation == TxConfirmation.EXPANDABLE_SIMPLE_READ_ONLY
@@ -39,7 +39,7 @@ class ExpandableSimpleConfirmationCheckout(private val mapper: TxConfirmReadOnly
 
 private class ExpandableSimpleConfirmationCheckoutItemViewHolder(
     val binding: ItemCheckoutSimpleExpandableInfoBinding,
-    private val mapper: TxConfirmReadOnlyMapperNewCheckout
+    private val mapper: TxConfirmReadOnlyMapperCheckout
 ) : RecyclerView.ViewHolder(binding.root) {
     private var isExpanded = false
 

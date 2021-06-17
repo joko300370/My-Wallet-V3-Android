@@ -55,17 +55,6 @@ enum class FeeLevel {
     Custom
 }
 
-data class TxFee(
-    val fee: Money,
-    val type: FeeType,
-    val asset: CryptoCurrency
-) {
-    enum class FeeType {
-        DEPOSIT_FEE,
-        WITHDRAWAL_FEE
-    }
-}
-
 data class FeeLevelRates(
     val regularFee: Long,
     val priorityFee: Long
@@ -130,7 +119,6 @@ enum class TxConfirmation {
     DESCRIPTION,
     AGREEMENT_INTEREST_T_AND_C,
     AGREEMENT_INTEREST_TRANSFER,
-    READ_ONLY,
     SIMPLE_READ_ONLY,
     COMPLEX_READ_ONLY,
     EXPANDABLE_SIMPLE_READ_ONLY,
@@ -138,10 +126,8 @@ enum class TxConfirmation {
     COMPOUND_EXPANDABLE_READ_ONLY,
     MEMO,
     LARGE_TRANSACTION_WARNING,
-    FEE_SELECTION,
     ERROR_NOTICE,
-    INVOICE_COUNTDOWN,
-    NETWORK_FEE
+    INVOICE_COUNTDOWN
 }
 
 sealed class FeeState {
@@ -183,7 +169,7 @@ abstract class TxEngine : KoinComponent {
 
     fun buildNewFee(feeAmount: Money, exchangeAmount: Money, asset: CryptoCurrency): TxConfirmationValue? {
         return if (!feeAmount.isZero) {
-            TxConfirmationValue.NewNetworkFee(
+            TxConfirmationValue.NetworkFee(
                 feeAmount = feeAmount as CryptoValue,
                 exchange = exchangeAmount,
                 asset = asset
@@ -405,7 +391,7 @@ class TransactionProcessor(
             .ignoreElement()
     }
 
-    // Check that the fee level is supported, then call into the engine to set the fee and validate ballances etc
+    // Check that the fee level is supported, then call into the engine to set the fee and validate balances etc
     // the selected fee level is supported
     fun updateFeeLevel(level: FeeLevel, customFeeAmount: Long?): Completable {
         Timber.d("!TRANSACTION!> in UpdateFeeLevel")

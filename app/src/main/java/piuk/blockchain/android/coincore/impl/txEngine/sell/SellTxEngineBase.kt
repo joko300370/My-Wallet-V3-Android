@@ -86,7 +86,7 @@ abstract class SellTxEngineBase(
 
     private fun buildNewFee(feeAmount: Money, exchangeAmount: Money): TxConfirmationValue? {
         return if (!feeAmount.isZero) {
-            TxConfirmationValue.NewNetworkFee(
+            TxConfirmationValue.NetworkFee(
                 feeAmount = feeAmount as CryptoValue,
                 exchange = exchangeAmount,
                 asset = sourceAsset.disambiguateERC20()
@@ -105,17 +105,17 @@ abstract class SellTxEngineBase(
     ): PendingTx =
         pendingTx.copy(
             confirmations = listOfNotNull(
-                TxConfirmationValue.NewExchangePriceConfirmation(pricedQuote.price, sourceAsset),
-                TxConfirmationValue.NewTo(
+                TxConfirmationValue.ExchangePriceConfirmation(pricedQuote.price, sourceAsset),
+                TxConfirmationValue.To(
                     txTarget,
                     AssetAction.Sell
                 ),
-                TxConfirmationValue.NewSale(
+                TxConfirmationValue.Sale(
                     amount = pendingTx.amount,
                     exchange = latestQuoteExchangeRate.convert(pendingTx.amount)
                 ),
                 buildNewFee(pendingTx.feeAmount, latestQuoteExchangeRate.convert(pendingTx.feeAmount)),
-                TxConfirmationValue.NewTotal(
+                TxConfirmationValue.Total(
                     totalWithFee = (pendingTx.amount as CryptoValue).plus(
                         pendingTx.feeAmount as CryptoValue
                     ),
@@ -145,10 +145,10 @@ abstract class SellTxEngineBase(
     ): PendingTx =
         pendingTx.apply {
             addOrReplaceOption(
-                TxConfirmationValue.NewExchangePriceConfirmation(pricedQuote.price, sourceAsset)
+                TxConfirmationValue.ExchangePriceConfirmation(pricedQuote.price, sourceAsset)
             )
             addOrReplaceOption(
-                TxConfirmationValue.NewTotal(
+                TxConfirmationValue.Total(
                     totalWithFee = (pendingTx.amount as CryptoValue).plus(
                         pendingTx.feeAmount as CryptoValue
                     ),

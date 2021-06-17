@@ -224,8 +224,8 @@ class BtcOnChainTxEngine(
     private fun buildConfirmations(pendingTx: PendingTx): PendingTx =
         pendingTx.copy(
             confirmations = listOfNotNull(
-                TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
-                TxConfirmationValue.NewTo(txTarget, AssetAction.Send, sourceAccount),
+                TxConfirmationValue.From(sourceAccount, sourceAsset),
+                TxConfirmationValue.To(txTarget, AssetAction.Send, sourceAccount),
                 TxConfirmationValue.CompoundNetworkFee(
                     sendingFeeInfo = if (!pendingTx.feeAmount.isZero) {
                         FeeInfo(
@@ -236,7 +236,7 @@ class BtcOnChainTxEngine(
                     } else null,
                     feeLevel = pendingTx.feeSelection.selectedLevel
                 ),
-                TxConfirmationValue.NewTotal(
+                TxConfirmationValue.Total(
                     totalWithFee = (pendingTx.amount as CryptoValue).plus(
                         pendingTx.feeAmount as CryptoValue
                     ),
@@ -250,17 +250,6 @@ class BtcOnChainTxEngine(
                     )
                 } else null
             )
-        )
-
-    override fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
-        TxConfirmationValue.FeeSelection(
-            feeDetails = getFeeState(pendingTx, pendingTx.feeOptions),
-            exchange = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
-            selectedLevel = pendingTx.feeSelection.selectedLevel,
-            availableLevels = pendingTx.feeSelection.availableLevels,
-            customFeeAmount = pendingTx.feeSelection.customAmount,
-            feeInfo = pendingTx.feeSelection.customLevelRates,
-            asset = sourceAsset
         )
 
     // Returns true if bitcoin transaction is large by checking against 3 criteria:

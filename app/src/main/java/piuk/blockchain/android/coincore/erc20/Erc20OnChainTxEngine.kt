@@ -58,10 +58,10 @@ open class Erc20OnChainTxEngine(
             )
         )
 
-    private fun buildConfirmationTotal(pendingTx: PendingTx): TxConfirmationValue.NewTotal {
+    private fun buildConfirmationTotal(pendingTx: PendingTx): TxConfirmationValue.Total {
         val fiatAmount = pendingTx.amount.toFiat(exchangeRates, userFiat) as FiatValue
 
-        return TxConfirmationValue.NewTotal(
+        return TxConfirmationValue.Total(
             totalWithFee = pendingTx.amount,
             exchange = fiatAmount
         )
@@ -71,8 +71,8 @@ open class Erc20OnChainTxEngine(
         Single.just(
             pendingTx.copy(
                 confirmations = listOfNotNull(
-                    TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
-                    TxConfirmationValue.NewTo(
+                    TxConfirmationValue.From(sourceAccount, sourceAsset),
+                    TxConfirmationValue.To(
                         txTarget, AssetAction.Send, sourceAccount
                     ),
                     TxConfirmationValue.CompoundNetworkFee(
@@ -109,15 +109,6 @@ open class Erc20OnChainTxEngine(
             FeeLevel.Priority,
             FeeLevel.Custom -> priorityFee
         }
-
-    override fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
-        TxConfirmationValue.FeeSelection(
-            feeDetails = getFeeState(pendingTx),
-            exchange = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
-            availableLevels = AVAILABLE_FEE_LEVELS,
-            selectedLevel = pendingTx.feeSelection.selectedLevel,
-            asset = sourceAsset
-        )
 
     private fun feeOptions(): Single<FeeOptions> =
         feeManager.getErc20FeeOptions(ethDataManager.erc20ContractAddress(sourceAsset))

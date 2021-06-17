@@ -76,7 +76,7 @@ class FiatDepositTxEngine(
                         (sourceAccount as LinkedBankAccount).accountType,
                         AssetAction.FiatDeposit
                     ),
-                    TxConfirmationValue.NewTo(txTarget, AssetAction.FiatDeposit),
+                    TxConfirmationValue.To(txTarget, AssetAction.FiatDeposit),
                     if (!pendingTx.isOpenBankingCurrency()) {
                         TxConfirmationValue.EstimatedCompletion
                     } else null,

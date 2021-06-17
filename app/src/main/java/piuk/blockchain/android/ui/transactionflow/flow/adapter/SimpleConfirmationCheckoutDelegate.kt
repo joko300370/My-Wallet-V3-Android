@@ -9,9 +9,9 @@ import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.databinding.ItemCheckoutSimpleInfoBinding
 import piuk.blockchain.android.ui.adapters.AdapterDelegate
 import piuk.blockchain.android.ui.transactionflow.flow.ConfirmationPropertyKey
-import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapperNewCheckout
+import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapperCheckout
 
-class SimpleConfirmationCheckoutDelegate(private val mapper: TxConfirmReadOnlyMapperNewCheckout) :
+class SimpleConfirmationCheckoutDelegate(private val mapper: TxConfirmReadOnlyMapperCheckout) :
     AdapterDelegate<TxConfirmationValue> {
     override fun isForViewType(items: List<TxConfirmationValue>, position: Int): Boolean {
         return items[position].confirmation == TxConfirmation.SIMPLE_READ_ONLY
@@ -34,7 +34,7 @@ class SimpleConfirmationCheckoutDelegate(private val mapper: TxConfirmReadOnlyMa
 
 private class SimpleConfirmationCheckoutItemViewHolder(
     val binding: ItemCheckoutSimpleInfoBinding,
-    val mapper: TxConfirmReadOnlyMapperNewCheckout
+    val mapper: TxConfirmReadOnlyMapperCheckout
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(item: TxConfirmationValue) {

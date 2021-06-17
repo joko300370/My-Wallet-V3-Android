@@ -73,7 +73,7 @@ class FiatWithdrawalTxEngine(
         return Single.just(
             pendingTx.copy(
                 confirmations = listOfNotNull(
-                    TxConfirmationValue.NewFrom(sourceAccount),
+                    TxConfirmationValue.From(sourceAccount),
                     TxConfirmationValue.PaymentMethod(
                         txTarget.label,
                         (txTarget as LinkedBankAccount).accountNumber,
