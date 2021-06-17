@@ -296,7 +296,7 @@ class TransactionFlowCustomiserImpl(
         }
 
     override fun confirmCtaText(state: TransactionState): String {
-        val amount = state.pendingTx?.amount?.toStringWithSymbol() ?: ""
+        val amount = state.pendingTx?.amount?.toStringWithSymbol().orEmpty()
 
         return when (state.action) {
             AssetAction.Send -> resources.getString(
@@ -820,6 +820,8 @@ class TransactionFlowCustomiserImpl(
     ): ConfirmSheetWidget =
         when (state.action) {
             AssetAction.Swap -> SwapInfoHeaderView(ctx).also { frame.addView(it) }
+            AssetAction.FiatDeposit, AssetAction.Withdraw ->
+                SimpleInfoHeaderView(ctx, false).also { frame.addView(it) }
             else -> SimpleInfoHeaderView(ctx).also { frame.addView(it) }
         }
 

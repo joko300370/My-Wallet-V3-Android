@@ -1540,7 +1540,6 @@
     <string name="withdraw_confirmation_success_message">We are sending the cash now. Expect the cash to hit your bank on %1$s. Check the status of your Withdrawal at anytime from your Activity Screen</string>
     <string name="withdraw_interest_confirmation_success_message">Your %1$s will be available in your %2$s within 2 days.</string>
     <string name="withdraw_target_select_title">Withdraw to…</string>
-    <string name="withdraw_confirmation_eta">Funds Will Arrive by</string>
     <string name="add_a_bank">Add a Bank</string>
     <string name="fiat_funds_detail_activity_title">Activity</string>
     <string name="fiat_funds_detail_activity_details">View All Transactions</string>
@@ -2040,7 +2039,10 @@
     <string name="checkout_item_price_blurb">Blockchain.com provides the best market price we receive and applies a spread. <annotation link="learn_more">Learn more</annotation></string>
     <string name="checkout_item_price_fee">Blockchain.com requires a fee when paying with a card. <annotation link="learn_more">Learn more</annotation></string>
     <string name="checkout_item_private_key_wallet_explanation">%s Private Key wallets, send, and receive are not supported at this time.</string>
-    <string name="checkout_item_deposit_to">Deposit to</string>
+    <string name="checkout_item_deposit_to">Deposit To</string>
+    <string name="checkout_item_withdraw_to">Withdraw To</string>
+    <string name="checkout_item_fee_to">Withdraw Fee</string>
+    <string name="checkout_item_account_number">Ending in %s</string>
     <string name="checkout_item_send_to">Send to</string>
     <string name="checkout_item_sale">Sale amount</string>
     <string name="checkout_item_network_fee">%s Network fee</string>

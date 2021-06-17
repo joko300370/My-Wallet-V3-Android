@@ -10,11 +10,13 @@ import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.flow.customisations.TransactionConfirmationCustomisations
+import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.goneIf
 import piuk.blockchain.android.util.visibleIf
 
 class SimpleInfoHeaderView @JvmOverloads constructor(
     ctx: Context,
+    private val showExchange: Boolean = true,
     attr: AttributeSet? = null,
     defStyle: Int = 0
 ) : ConstraintLayout(ctx, attr, defStyle), ConfirmSheetWidget, KoinComponent {
@@ -44,8 +46,12 @@ class SimpleInfoHeaderView @JvmOverloads constructor(
         with(binding) {
             state.pendingTx?.amount?.let { amnt ->
                 headerTitle.text = amnt.toStringWithSymbol()
-                state.fiatRate?.let {
-                    headerSubtitle.text = it.convert(amnt, false).toStringWithSymbol()
+                if (showExchange) {
+                    state.fiatRate?.let {
+                        headerSubtitle.text = it.convert(amnt, false).toStringWithSymbol()
+                    }
+                } else {
+                    headerSubtitle.gone()
                 }
             }
         }

@@ -3,6 +3,7 @@ package piuk.blockchain.android.ui.transactionflow.flow.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.databinding.ItemCheckoutSimpleInfoBinding
@@ -41,6 +42,16 @@ private class SimpleConfirmationCheckoutItemViewHolder(
             with(binding) {
                 simpleItemLabel.text = it[ConfirmationPropertyKey.LABEL] as String
                 simpleItemTitle.text = it[ConfirmationPropertyKey.TITLE] as String
+
+                it[ConfirmationPropertyKey.IS_IMPORTANT]?.let { isImportant ->
+                    if (isImportant as Boolean) {
+                        simpleItemLabel.setTextAppearance(R.style.Text_Semibold_16)
+                        simpleItemTitle.setTextAppearance(R.style.Text_Semibold_16)
+                    } else {
+                        simpleItemLabel.setTextAppearance(R.style.Text_Standard_14)
+                        simpleItemTitle.setTextAppearance(R.style.Text_Standard_14)
+                    }
+                }
             }
         }
     }

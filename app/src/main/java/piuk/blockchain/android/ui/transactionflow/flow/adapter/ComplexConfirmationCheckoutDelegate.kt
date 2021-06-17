@@ -39,12 +39,11 @@ private class ComplexConfirmationCheckoutItemItemViewHolder(
 
     fun bind(item: TxConfirmationValue) {
         with(binding) {
-            mapper.map(item)?.let {
-                complexItemLabel.text = it[ConfirmationPropertyKey.LABEL] as String
-                complexItemTitle.text = it[ConfirmationPropertyKey.TITLE] as String
-                complexItemSubtitle.text = it[ConfirmationPropertyKey.SUBTITLE] as String
-
-                it[ConfirmationPropertyKey.IS_IMPORTANT]?.let { isImportant ->
+            mapper.map(item).run {
+                complexItemLabel.text = this[ConfirmationPropertyKey.LABEL] as String
+                complexItemTitle.text = this[ConfirmationPropertyKey.TITLE] as String
+                complexItemSubtitle.text = this[ConfirmationPropertyKey.SUBTITLE] as String
+                this[ConfirmationPropertyKey.IS_IMPORTANT]?.let { isImportant ->
                     if (isImportant as Boolean) {
                         complexItemLabel.setTextAppearance(R.style.Text_Semibold_16)
                         complexItemTitle.setTextAppearance(R.style.Text_Semibold_16)

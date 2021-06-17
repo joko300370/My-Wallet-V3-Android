@@ -6,6 +6,7 @@ import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FeeSelection
 import piuk.blockchain.android.coincore.FiatAccount
@@ -71,16 +72,20 @@ class FiatWithdrawalTxEngine(
     override fun doBuildConfirmations(pendingTx: PendingTx): Single<PendingTx> {
         return Single.just(
             pendingTx.copy(
-                confirmations = listOf(
-                    TxConfirmationValue.From(sourceAccount.label),
-                    TxConfirmationValue.To(txTarget.label),
-                    TxConfirmationValue.FiatTxFee(
-                        fee = pendingTx.feeAmount
+                confirmations = listOfNotNull(
+                    TxConfirmationValue.NewFrom(sourceAccount),
+                    TxConfirmationValue.PaymentMethod(
+                        txTarget.label,
+                        (txTarget as LinkedBankAccount).accountNumber,
+                        (txTarget as LinkedBankAccount).accountType,
+                        AssetAction.Withdraw
                     ),
-                    TxConfirmationValue.EstimatedWithdrawalCompletion,
-                    TxConfirmationValue.Total(
-                        total = pendingTx.amount
-                    )
+                    TxConfirmationValue.EstimatedCompletion,
+                    TxConfirmationValue.Amount(pendingTx.amount, false),
+                    if (pendingTx.feeAmount.isPositive) {
+                        TxConfirmationValue.TransactionFee(pendingTx.feeAmount)
+                    } else null,
+                    TxConfirmationValue.Amount(pendingTx.amount.minus(pendingTx.feeAmount), true)
                 )
             )
         )

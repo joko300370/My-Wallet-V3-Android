@@ -16,8 +16,15 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
 
     data class From(val from: String) : TxConfirmationValue(TxConfirmation.READ_ONLY)
 
-    data class NewFrom(val sourceAccount: BlockchainAccount, val sourceAsset: CryptoCurrency) :
+    data class NewFrom(val sourceAccount: BlockchainAccount, val sourceAsset: CryptoCurrency? = null) :
         TxConfirmationValue(TxConfirmation.SIMPLE_READ_ONLY)
+
+    data class PaymentMethod(
+        val paymentTitle: String,
+        val paymentSubtitle: String,
+        val accountType: String?,
+        val assetAction: AssetAction
+    ) : TxConfirmationValue(TxConfirmation.COMPLEX_READ_ONLY)
 
     data class NewSale(val amount: Money, val exchange: Money) :
         TxConfirmationValue(TxConfirmation.COMPLEX_READ_ONLY)
@@ -35,11 +42,15 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
     data class NewTotal(val totalWithFee: Money, val exchange: Money) :
         TxConfirmationValue(TxConfirmation.COMPLEX_READ_ONLY)
 
-    data class FiatTxFee(val fee: Money) : TxConfirmationValue(TxConfirmation.READ_ONLY)
+    data class Amount(val amount: Money, val isImportant: Boolean) :
+        TxConfirmationValue(TxConfirmation.SIMPLE_READ_ONLY)
 
-    object EstimatedDepositCompletion : TxConfirmationValue(TxConfirmation.READ_ONLY)
+    data class PurchaseAmount(val amount: Money) :
+        TxConfirmationValue(TxConfirmation.SIMPLE_READ_ONLY)
 
-    object EstimatedWithdrawalCompletion : TxConfirmationValue(TxConfirmation.READ_ONLY)
+    data class FiatTxFee(val fee: Money) : TxConfirmationValue(TxConfirmation.SIMPLE_READ_ONLY)
+
+    object EstimatedCompletion : TxConfirmationValue(TxConfirmation.SIMPLE_READ_ONLY)
 
     @CommonCode("This structure is repeated in non-confirmation FEeSelection. They should be merged")
     data class FeeSelection(
@@ -73,6 +84,10 @@ sealed class TxConfirmationValue(open val confirmation: TxConfirmation) {
         val exchange: Money,
         val asset: CryptoCurrency
     ) : TxConfirmationValue(TxConfirmation.EXPANDABLE_COMPLEX_READ_ONLY)
+
+    data class TransactionFee(
+        val feeAmount: Money
+    ) : TxConfirmationValue(TxConfirmation.SIMPLE_READ_ONLY)
 
     data class CompoundNetworkFee(
         val sendingFeeInfo: FeeInfo? = null,

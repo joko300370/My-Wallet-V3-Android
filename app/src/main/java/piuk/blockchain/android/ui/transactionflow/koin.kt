@@ -24,10 +24,13 @@ import piuk.blockchain.android.ui.transactionflow.flow.NewSalePropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.NewSwapExchangeRateFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.NewToPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.NewTotalFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.PaymentMethodPropertyFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.AmountTotalFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.SwapDestinationPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.SwapSourcePropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.ToPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.TotalFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.TransactionFeeFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapper
 import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapperNewCheckout
 import piuk.blockchain.android.ui.transactionflow.flow.TxOptionsFormatter
@@ -84,6 +87,18 @@ val transactionModule = module {
     }.bind(TxOptionsFormatterNewCheckout::class)
 
     factory {
+        EstimatedCompletionPropertyFormatter(
+            context = get()
+        )
+    }.bind(TxOptionsFormatterNewCheckout::class)
+
+    factory {
+        PaymentMethodPropertyFormatter(
+            context = get()
+        )
+    }.bind(TxOptionsFormatterNewCheckout::class)
+
+    factory {
         NewSwapExchangeRateFormatter(
             context = get()
         )
@@ -97,6 +112,12 @@ val transactionModule = module {
     }.bind(TxOptionsFormatterNewCheckout::class)
 
     factory {
+        TransactionFeeFormatter(
+            context = get()
+        )
+    }.bind(TxOptionsFormatterNewCheckout::class)
+
+    factory {
         CompoundNetworkFeeFormatter(
             context = get(),
             assetResources = get()
@@ -105,6 +126,12 @@ val transactionModule = module {
 
     factory {
         NewTotalFormatter(
+            context = get()
+        )
+    }.bind(TxOptionsFormatterNewCheckout::class)
+
+    factory {
+        AmountTotalFormatter(
             context = get()
         )
     }.bind(TxOptionsFormatterNewCheckout::class)
@@ -147,12 +174,6 @@ val transactionModule = module {
 
     factory {
         FiatFeePropertyFormatter(
-            resources = get<Context>().resources
-        )
-    }.bind(TxOptionsFormatter::class)
-
-    factory {
-        EstimatedCompletionPropertyFormatter(
             resources = get<Context>().resources
         )
     }.bind(TxOptionsFormatter::class)

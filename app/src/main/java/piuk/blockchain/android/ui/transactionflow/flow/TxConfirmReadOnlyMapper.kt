@@ -45,8 +45,15 @@ class TxConfirmReadOnlyMapperNewCheckout(
             is TxConfirmationValue.NewExchangePriceConfirmation ->
                 formatters.first { it is NewExchangePriceFormatter }.format(property)
             is TxConfirmationValue.NewNetworkFee -> formatters.first { it is NewNetworkFormatter }.format(property)
+            is TxConfirmationValue.TransactionFee -> formatters.first { it is TransactionFeeFormatter }.format(property)
             is TxConfirmationValue.NewSale -> formatters.first { it is NewSalePropertyFormatter }.format(property)
             is TxConfirmationValue.NewTotal -> formatters.first { it is NewTotalFormatter }.format(property)
+            is TxConfirmationValue.Amount -> formatters.first { it is AmountTotalFormatter }.format(property)
+            is TxConfirmationValue.EstimatedCompletion ->
+                formatters.first { it is EstimatedCompletionPropertyFormatter }
+                    .format(property)
+            is TxConfirmationValue.PaymentMethod ->
+                formatters.first { it is PaymentMethodPropertyFormatter }.format(property)
             is TxConfirmationValue.NewSwapExchange ->
                 formatters.first { it is NewSwapExchangeRateFormatter }.format(property)
             is TxConfirmationValue.CompoundNetworkFee -> formatters.first { it is CompoundNetworkFeeFormatter }
@@ -100,7 +107,7 @@ class NewToPropertyFormatter(
 ) : TxOptionsFormatterNewCheckout {
     override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
         require(property is TxConfirmationValue.NewTo)
-        return if (property.assetAction == AssetAction.Sell) {
+        return if (property.assetAction == AssetAction.Sell || property.assetAction == AssetAction.FiatDeposit) {
             mapOf(
                 ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.checkout_item_deposit_to),
                 ConfirmationPropertyKey.TITLE to property.txTarget.label
@@ -120,6 +127,15 @@ class NewToPropertyFormatter(
     }
 }
 
+class EstimatedCompletionPropertyFormatter(private val context: Context) : TxOptionsFormatterNewCheckout {
+    override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
+        return mapOf(
+            ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.send_confirmation_eta),
+            ConfirmationPropertyKey.TITLE to TransactionFlowCustomiserImpl.getEstimatedTransactionCompletionTime()
+        )
+    }
+}
+
 class NewSalePropertyFormatter(private val context: Context) : TxOptionsFormatterNewCheckout {
     override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
         require(property is TxConfirmationValue.NewSale)
@@ -127,6 +143,27 @@ class NewSalePropertyFormatter(private val context: Context) : TxOptionsFormatte
             ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.checkout_item_sale),
             ConfirmationPropertyKey.TITLE to property.exchange.toStringWithSymbol(),
             ConfirmationPropertyKey.SUBTITLE to property.amount.toStringWithSymbol()
+        )
+    }
+}
+
+class PaymentMethodPropertyFormatter(private val context: Context) : TxOptionsFormatterNewCheckout {
+    override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
+        require(property is TxConfirmationValue.PaymentMethod)
+        return mapOf(
+            if (property.assetAction == AssetAction.FiatDeposit) {
+                ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.payment_method)
+            } else {
+                ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.checkout_item_withdraw_to)
+            },
+            ConfirmationPropertyKey.TITLE to property.paymentTitle,
+            if (property.accountType.isNullOrBlank()) {
+                ConfirmationPropertyKey.SUBTITLE to context.getString(
+                    R.string.checkout_item_account_number, property.paymentSubtitle
+                )
+            } else {
+                ConfirmationPropertyKey.SUBTITLE to property.paymentSubtitle
+            }
         )
     }
 }
@@ -139,11 +176,25 @@ class NewFromPropertyFormatter(
         require(property is TxConfirmationValue.NewFrom)
         return mapOf(
             ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.common_from),
-            ConfirmationPropertyKey.TITLE to getLabel(
-                property.sourceAccount.label,
-                defaultLabel.getDefaultNonCustodialWalletLabel(property.sourceAsset),
-                property.sourceAsset.displayTicker
-            )
+            property.sourceAsset?.let {
+                ConfirmationPropertyKey.TITLE to getLabel(
+                    property.sourceAccount.label,
+                    defaultLabel.getDefaultNonCustodialWalletLabel(it),
+                    it.displayTicker
+                )
+            } ?: ConfirmationPropertyKey.TITLE to property.sourceAccount.label
+        )
+    }
+}
+
+class TransactionFeeFormatter(
+    private val context: Context
+) : TxOptionsFormatterNewCheckout {
+    override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
+        require(property is TxConfirmationValue.TransactionFee)
+        return mapOf(
+            ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.checkout_item_fee_to),
+            ConfirmationPropertyKey.TITLE to property.feeAmount.toStringWithSymbol()
         )
     }
 }
@@ -173,7 +224,6 @@ class NewNetworkFormatter(
                     R.string.common_linked_learn_more, NETWORK_FEE_EXPLANATION, context, R.color.blue_600
                 )
             }
-
         )
     }
 }
@@ -358,6 +408,21 @@ class NewTotalFormatter(private val context: Context) : TxOptionsFormatterNewChe
     }
 }
 
+class AmountTotalFormatter(private val context: Context) : TxOptionsFormatterNewCheckout {
+    override fun format(property: TxConfirmationValue): Map<ConfirmationPropertyKey, Any> {
+        require(property is TxConfirmationValue.Amount)
+        return mapOf(
+            if (property.isImportant) {
+                ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.common_total)
+            } else {
+                ConfirmationPropertyKey.LABEL to context.resources.getString(R.string.amount)
+            },
+            ConfirmationPropertyKey.TITLE to property.amount.toStringWithSymbol(),
+            ConfirmationPropertyKey.IS_IMPORTANT to property.isImportant
+        )
+    }
+}
+
 class FromPropertyFormatter(private val resources: Resources) : TxOptionsFormatter {
     override fun format(property: TxConfirmationValue): Pair<String, String>? =
         if (property is TxConfirmationValue.From)
@@ -410,19 +475,6 @@ class FiatFeePropertyFormatter(private val resources: Resources) : TxOptionsForm
         if (property is TxConfirmationValue.FiatTxFee)
             resources.getString(R.string.send_confirmation_tx_fee) to property.fee.toStringWithSymbol()
         else null
-}
-
-class EstimatedCompletionPropertyFormatter(private val resources: Resources) : TxOptionsFormatter {
-    override fun format(property: TxConfirmationValue): Pair<String, String>? =
-        when (property) {
-            is TxConfirmationValue.EstimatedDepositCompletion -> resources.getString(
-                R.string.send_confirmation_eta
-            ) to TransactionFlowCustomiserImpl.getEstimatedTransactionCompletionTime()
-            is TxConfirmationValue.EstimatedWithdrawalCompletion -> resources.getString(
-                R.string.withdraw_confirmation_eta
-            ) to TransactionFlowCustomiserImpl.getEstimatedTransactionCompletionTime()
-            else -> null
-        }
 }
 
 fun Money.formatWithExchange(exchange: Money?) =
