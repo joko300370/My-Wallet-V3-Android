@@ -161,7 +161,7 @@ open class CustodialTradingAccount(
                 }
                 val receive = AssetAction.Receive
                 setOfNotNull(
-                    activity, send, swap, sell, interest, receive
+                    AssetAction.Buy, sell, swap, send, receive, interest, activity
                 )
             }
 

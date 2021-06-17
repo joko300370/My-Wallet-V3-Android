@@ -1256,8 +1256,7 @@ Veuillez réessayer plus tard.</string>
     <string name="interest_dashboard_verify_point_three_title">Gagnez de l\'intérêt</string>
     <string name="interest_dashboard_verify_point_three_label">Transférez à votre compte d\'intérêt et recevez des paiements d\'intérêts mensuels.</string>
     <string name="interest_summary_disclaimer_label">Utilisez le portefeuille Web pour retirer vos fonds</string>
-    <string name="buy">Acheter</string>
-    <string name="sell">Vendre</string>
+    <string name="common_buy">Acheter</string>
     <string name="buy_and_sell">Acheter vendre</string>
     <string name="buy_with_cash">Achetez avec de l\'argent ou une carte.</string>
     <string name="select_crypto_you_want">Sélectionnez la crypto que vous souhaitez acheter.</string>

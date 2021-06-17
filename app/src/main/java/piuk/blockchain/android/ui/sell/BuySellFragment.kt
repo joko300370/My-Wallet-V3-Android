@@ -1,6 +1,9 @@
 package piuk.blockchain.android.ui.sell
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +15,7 @@ import com.blockchain.koin.payloadScope
 import com.blockchain.koin.scopedInject
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.ui.trackProgress
+import info.blockchain.balance.CryptoCurrency
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
@@ -29,10 +33,9 @@ import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.ui.home.HomeNavigator
 import piuk.blockchain.android.ui.home.HomeScreenFragment
 import piuk.blockchain.android.util.AppUtil
-import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.inflate
 import piuk.blockchain.android.util.visible
+import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import kotlin.properties.Delegates
 
 class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIntroHost,
@@ -54,6 +57,12 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
             ?: BuySellViewType.TYPE_BUY
     }
 
+    private val selectedAsset: CryptoCurrency? by unsafeLazy {
+        arguments?.getSerializable(SELECTED_ASSET) as? CryptoCurrency
+    }
+
+    private var hasReturnedFromBuyActivity = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -72,7 +81,7 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
     private fun subscribeForNavigation() {
         compositeDisposable += simpleBuySync.performSync().onErrorComplete().toSingleDefault(false)
             .flatMap {
-                buySellFlowNavigator.navigateTo()
+                buySellFlowNavigator.navigateTo(selectedAsset)
             }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
@@ -89,27 +98,48 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
             )
     }
 
-    private fun renderBuySellFragments(it: BuySellIntroAction?) {
+    private fun renderBuySellFragments(action: BuySellIntroAction?) {
         with(binding) {
             buySellEmpty.gone()
             pager.visible()
-            when (it) {
+            when (action) {
                 is BuySellIntroAction.NavigateToCurrencySelection ->
-                    goToCurrencySelection(it.supportedCurrencies)
+                    goToCurrencySelection(action.supportedCurrencies)
                 is BuySellIntroAction.DisplayBuySellIntro -> {
-                    if (!it.isGoldButNotEligible) {
-                        renderBuySellUi(it.hasPendingBuy)
+                    if (!action.isGoldButNotEligible) {
+                        renderBuySellUi(action.hasPendingBuy)
                     } else {
                         renderNotEligibleUi()
+                    }
+                }
+                is BuySellIntroAction.StarBuyWithSelectedAsset -> {
+                    renderBuySellUi(action.hasPendingBuy)
+                    if (!action.hasPendingBuy && !hasReturnedFromBuyActivity) {
+                        hasReturnedFromBuyActivity = false
+                        startActivityForResult(
+                            SimpleBuyActivity.newInstance(
+                                context = activity as Context,
+                                cryptoCurrency = action.selectedAsset,
+                                launchFromNavigationBar = true
+                            ), SB_ACTIVITY
+                        )
                     }
                 }
                 else -> startActivity(
                     SimpleBuyActivity.newInstance(
                         context = activity as Context,
-                        launchFromNavigationBar = true, launchKycResume = false
+                        launchFromNavigationBar = true,
+                        launchKycResume = false
                     )
                 )
             }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == SB_ACTIVITY && resultCode == Activity.RESULT_CANCELED) {
+            hasReturnedFromBuyActivity = true
         }
     }
 
@@ -134,7 +164,7 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
 
     private val pagerAdapter: ViewPagerAdapter by lazy {
         ViewPagerAdapter(
-            listOf(getString(R.string.buy), getString(R.string.sell)),
+            listOf(getString(R.string.common_buy), getString(R.string.common_sell)),
             childFragmentManager
         )
     }
@@ -176,11 +206,16 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
 
     companion object {
         private const val VIEW_TYPE = "VIEW_TYPE"
+        private const val SELECTED_ASSET = "SELECTED_ASSET"
+        private const val SB_ACTIVITY = 321
 
-        fun newInstance(viewType: BuySellViewType = BuySellViewType.TYPE_BUY) =
+        fun newInstance(viewType: BuySellViewType = BuySellViewType.TYPE_BUY, asset: CryptoCurrency?) =
             BuySellFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(VIEW_TYPE, viewType)
+                    asset?.let {
+                        putSerializable(SELECTED_ASSET, it)
+                    }
                 }
             }
     }
@@ -211,6 +246,7 @@ class BuySellFragment : HomeScreenFragment, Fragment(), SellIntroFragment.SellIn
     override fun onBackPressed(): Boolean = false
 }
 
+@SuppressLint("WrongConstant")
 internal class ViewPagerAdapter(
     private val titlesList: List<String>,
     fragmentManager: FragmentManager

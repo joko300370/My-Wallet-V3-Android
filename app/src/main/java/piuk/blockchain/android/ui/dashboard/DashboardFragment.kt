@@ -670,6 +670,10 @@ class DashboardFragment :
         navigator().startInterestDashboard()
     }
 
+    override fun goToBuy(asset: CryptoCurrency) {
+        navigator().launchSimpleBuySell(BuySellFragment.BuySellViewType.TYPE_BUY, asset)
+    }
+
     override fun startBackupForTransfer() {
         navigator().launchBackupFunds(this, BACKUP_FUNDS_REQUEST_CODE)
     }

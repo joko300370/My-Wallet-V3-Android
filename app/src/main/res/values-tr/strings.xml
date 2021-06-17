@@ -1252,8 +1252,7 @@ desteklenmez. Lütfen  bir adres ve özel anahtar
     <string name="interest_dashboard_verify_point_three_title">Faiz Kazanın</string>
     <string name="interest_dashboard_verify_point_three_label">Faiz Hesabınıza aktarın ve aylık Faiz Ödemeleri alın.</string>
     <string name="interest_summary_disclaimer_label">Paranızı çekmek için Web cüzdanını kullanın</string>
-    <string name="buy">Satın Al</string>
-    <string name="sell">Satmak</string>
+    <string name="common_buy">Satın Al</string>
     <string name="buy_and_sell">Alış-satış</string>
     <string name="buy_with_cash">Nakit veya Kart ile satın alın.</string>
     <string name="select_crypto_you_want">Satın almak istediğiniz kriptoyu seçin.</string>

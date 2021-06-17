@@ -208,7 +208,7 @@ class AssetActionsSheet :
                 getString(R.string.dashboard_asset_actions_deposit_dsc, asset.displayTicker),
                 asset, action
             ) {
-                goToInterestDeposit()
+                processAction(AssetAction.InterestDeposit)
             }
             AssetAction.InterestWithdraw -> AssetActionItem(
                 getString(R.string.common_withdraw),
@@ -216,7 +216,7 @@ class AssetActionsSheet :
                 getString(R.string.dashboard_asset_actions_withdraw_dsc, asset.displayTicker),
                 asset, action
             ) {
-                goToInterestWithdraw()
+                processAction(AssetAction.InterestWithdraw)
             }
             AssetAction.Sell -> AssetActionItem(
                 getString(R.string.common_sell),
@@ -227,20 +227,20 @@ class AssetActionsSheet :
                 logActionEvent(AssetDetailsAnalytics.SELL_CLICKED, asset)
                 processAction(AssetAction.Sell)
             }
+            AssetAction.Buy -> AssetActionItem(
+                getString(R.string.common_buy),
+                R.drawable.ic_tx_buy,
+                getString(R.string.dashboard_asset_actions_buy_dsc, asset.displayTicker),
+                asset, action
+            ) {
+                processAction(AssetAction.Buy)
+            }
             AssetAction.Withdraw -> throw IllegalStateException("Cannot Withdraw a non-fiat currency")
             AssetAction.FiatDeposit -> throw IllegalStateException("Cannot Deposit a non-fiat currency to Fiat")
         }
 
     private fun logActionEvent(event: AssetDetailsAnalytics, asset: CryptoCurrency) {
         analytics.logEvent(assetActionEvent(event, asset.networkTicker))
-    }
-
-    private fun goToInterestDeposit() {
-        model.process(HandleActionIntent(AssetAction.InterestDeposit))
-    }
-
-    private fun goToInterestWithdraw() {
-        model.process(HandleActionIntent(AssetAction.InterestWithdraw))
     }
 
     private fun goToSummary() {

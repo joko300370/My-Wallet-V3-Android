@@ -1255,8 +1255,7 @@ se disponível. Isso permite que restaure a sua carteira e perder este dispositi
     <string name="interest_dashboard_verify_point_three_title">Ganhe juros</string>
     <string name="interest_dashboard_verify_point_three_label">Transfira para sua conta de juros e receba pagamentos de juros mensais.</string>
     <string name="interest_summary_disclaimer_label">Use a carteira da Web para retirar seus fundos</string>
-    <string name="buy">Comprar</string>
-    <string name="sell">Vender</string>
+    <string name="common_buy">Comprar</string>
     <string name="buy_and_sell">Compra venda</string>
     <string name="buy_with_cash">Compre com dinheiro ou cartão.</string>
     <string name="select_crypto_you_want">Selecione a criptografia que deseja comprar.</string>

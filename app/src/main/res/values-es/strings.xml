@@ -1252,8 +1252,7 @@ Esto le permitirá restaurar su Wallet si perdiera este dispositivo.</string>
     <string name="interest_dashboard_verify_point_three_title">Ganar intereses</string>
     <string name="interest_dashboard_verify_point_three_label">Transfiera a su Cuenta de Intereses y obtenga Pagos de Intereses mensuales.</string>
     <string name="interest_summary_disclaimer_label">Utilice la billetera web para retirar sus fondos</string>
-    <string name="buy">Comprar</string>
-    <string name="sell">Vender</string>
+    <string name="common_buy">Comprar</string>
     <string name="buy_and_sell">Compra y Venda</string>
     <string name="buy_with_cash">Compre en efectivo o con tarjeta.</string>
     <string name="select_crypto_you_want">Seleccione la criptomoneda que desea comprar.</string>

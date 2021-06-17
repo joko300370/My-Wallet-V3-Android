@@ -815,10 +815,10 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         }
     }
 
-    override fun launchSimpleBuySell(viewType: BuySellFragment.BuySellViewType) {
+    override fun launchSimpleBuySell(viewType: BuySellFragment.BuySellViewType, asset: CryptoCurrency?) {
         setCurrentTabItem(ITEM_BUY_SELL)
 
-        val buySellFragment = BuySellFragment.newInstance(viewType)
+        val buySellFragment = BuySellFragment.newInstance(viewType, asset)
         replaceContentFragment(buySellFragment)
     }
 

@@ -1256,8 +1256,7 @@
     <string name="interest_dashboard_verify_point_three_title">Зарабатывайте проценты</string>
     <string name="interest_dashboard_verify_point_three_label">Переводите на свой процентный счет и получайте ежемесячные процентные выплаты.</string>
     <string name="interest_summary_disclaimer_label">Используйте веб-кошелек для вывода средств</string>
-    <string name="buy">купить</string>
-    <string name="sell">Продать</string>
+    <string name="common_buy">купить</string>
     <string name="buy_and_sell">Купи продай</string>
     <string name="buy_with_cash">Купить наличными или картой.</string>
     <string name="select_crypto_you_want">Выберите криптовалюту, которую хотите купить.</string>

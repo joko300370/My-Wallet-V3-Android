@@ -38,6 +38,7 @@
     <string name="common_try_again">Try Again</string>
     <string name="common_oops">Oops! Something went wrong.</string>
     <string name="common_sell">Sell</string>
+    <string name="common_buy">Buy</string>
     <string name="common_search">Search</string>
     <string name="common_approve">Approve</string>
     <string name="common_deny">Deny</string>
@@ -766,6 +767,7 @@
     <string name="dashboard_asset_actions_swap_dsc">Exchange %1$s for Another Crypto</string>
     <string name="dashboard_asset_actions_deposit_dsc">Add %1$s to your Interest Account</string>
     <string name="dashboard_asset_actions_withdraw_dsc">Withdraw %1$s from your Interest Account</string>
+    <string name="dashboard_asset_actions_buy_dsc">Add %1$s to your Trading Account</string>
     <string name="dashboard_asset_actions_summary_title">Interest Summary</string>
     <string name="dashboard_asset_actions_summary_dsc">View your accrued %1$s Interest</string>
     <string name="dashboard_asset_actions_interest_dsc_failed">Could not load Interest details</string>
@@ -1717,8 +1719,6 @@
     <string name="interest_error_desc">An error occurred while loading Interest Account details.\nPlease check your internet connection and try again or Contact Support if the issue persists.</string>
 
     <!-- Buy & Sell -->
-    <string name="buy">Buy</string>
-    <string name="sell">Sell</string>
     <string name="buy_and_sell">Buy &amp; Sell</string>
     <string name="buy_with_cash">Buy with Cash or Card.</string>
     <string name="select_crypto_you_want">Select the crypto you want to buy.</string>
