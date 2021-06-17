@@ -1,7 +1,7 @@
 package info.blockchain.wallet.util;
 
-import info.blockchain.api.BitcoinApi;
-import info.blockchain.api.bitcoin.data.BalanceDto;
+import com.blockchain.api.NonCustodialBitcoinService;
+import com.blockchain.api.bitcoin.data.BalanceDto;
 import info.blockchain.wallet.WalletApiMockedResponseTest;
 import info.blockchain.wallet.keys.SigningKey;
 import retrofit2.Call;
@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 public class PrivateKeyFactoryTest extends WalletApiMockedResponseTest {
 
     private PrivateKeyFactory privateKeyFactory;
-    private final BitcoinApi bitcoinApi = mock(BitcoinApi.class);
+    private final NonCustodialBitcoinService bitcoinApi = mock(NonCustodialBitcoinService.class);
 
     //Mini key
     private final String miniKey = "SxuRMDrSNbwozww4twnedUPouUmGST";

@@ -1,7 +1,7 @@
 package info.blockchain.wallet.payload
 
-import info.blockchain.api.BitcoinApi
-import info.blockchain.api.bitcoin.data.BalanceResponseDto
+import com.blockchain.api.NonCustodialBitcoinService
+import com.blockchain.api.bitcoin.data.BalanceResponseDto
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.payload.data.XPub
@@ -11,7 +11,7 @@ import retrofit2.Call
 import java.math.BigInteger
 
 abstract class BalanceManager constructor(
-    val bitcoinApi: BitcoinApi,
+    val bitcoinApi: NonCustodialBitcoinService,
     private val cryptoCurrency: CryptoCurrency
 ) {
     private var balanceMap: CryptoBalanceMap

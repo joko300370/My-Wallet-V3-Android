@@ -1,9 +1,9 @@
 package info.blockchain.wallet.util
 
-import info.blockchain.api.bitcoin.data.BalanceResponseDto
-import info.blockchain.api.bitcoin.data.MultiAddress
-import info.blockchain.api.bitcoin.data.UnspentOutputDto
-import info.blockchain.api.bitcoin.data.UnspentOutputsDto
+import com.blockchain.api.bitcoin.data.BalanceResponseDto
+import com.blockchain.api.bitcoin.data.MultiAddress
+import com.blockchain.api.bitcoin.data.UnspentOutputDto
+import com.blockchain.api.bitcoin.data.UnspentOutputsDto
 import info.blockchain.wallet.payload.model.Utxo
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json

@@ -1,7 +1,7 @@
 package info.blockchain.wallet.payload.model
 
-import info.blockchain.api.bitcoin.data.BalanceDto
-import info.blockchain.api.bitcoin.data.BalanceResponseDto
+import com.blockchain.api.bitcoin.data.BalanceDto
+import com.blockchain.api.bitcoin.data.BalanceResponseDto
 import java.math.BigInteger
 
 data class Balance(

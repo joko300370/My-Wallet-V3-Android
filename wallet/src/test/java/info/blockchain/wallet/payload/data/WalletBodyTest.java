@@ -4,8 +4,8 @@ import com.google.common.collect.BiMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import info.blockchain.api.BitcoinApi;
-import info.blockchain.api.bitcoin.data.BalanceDto;
+import com.blockchain.api.NonCustodialBitcoinService;
+import com.blockchain.api.bitcoin.data.BalanceDto;
 import info.blockchain.wallet.WalletApiMockedResponseTest;
 import info.blockchain.wallet.exceptions.HDWalletException;
 import info.blockchain.wallet.keys.SigningKey;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 public class WalletBodyTest extends WalletApiMockedResponseTest {
 
     private final ObjectMapper mapperV3 = WalletWrapper.getMapperForVersion(WalletWrapper.V3);
-    private final BitcoinApi bitcoinApi = mock(BitcoinApi.class);
+    private final NonCustodialBitcoinService bitcoinApi = mock(NonCustodialBitcoinService.class);
 
     @Test
     public void fromJson_1() throws Exception {
@@ -155,7 +155,7 @@ public class WalletBodyTest extends WalletApiMockedResponseTest {
         body = loadResourceContent("wallet_body_1_account1_unspent.txt");
         final List<Utxo> unspentOutputs = LoaderUtilKt.parseUnspentOutputsAsUtxoList(body);
 
-        final BitcoinApi mockApi = mock(BitcoinApi.class);
+        final NonCustodialBitcoinService mockApi = mock(NonCustodialBitcoinService.class);
         Payment payment = new Payment(mockApi);
 
         long spendAmount = 40108;

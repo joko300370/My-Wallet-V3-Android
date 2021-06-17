@@ -12,8 +12,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
-import info.blockchain.api.BitcoinApi;
-import info.blockchain.api.bitcoin.data.BalanceDto;
+import com.blockchain.api.NonCustodialBitcoinService;
+import com.blockchain.api.bitcoin.data.BalanceDto;
 import info.blockchain.wallet.bip44.HDAccount;
 import info.blockchain.wallet.bip44.HDAddress;
 import info.blockchain.wallet.bip44.HDWallet;
@@ -347,7 +347,7 @@ public class WalletBody {
     public static WalletBody recoverFromMnemonic(
         String mnemonic,
         String defaultAccountName,
-        BitcoinApi bitcoinApi,
+        NonCustodialBitcoinService bitcoinApi,
         boolean recoverV4
     ) throws Exception {
         return recoverFromMnemonic(
@@ -364,7 +364,7 @@ public class WalletBody {
         String mnemonic,
         String passphrase,
         String defaultAccountName,
-        BitcoinApi bitcoinApi,
+        NonCustodialBitcoinService bitcoinApi,
         boolean recoverV4
     ) throws Exception {
         return recoverFromMnemonic(
@@ -382,7 +382,7 @@ public class WalletBody {
         String passphrase,
         String defaultAccountName,
         int walletSize,
-        BitcoinApi bitcoinApi,
+        NonCustodialBitcoinService bitcoinApi,
         boolean recoverV4
     ) throws Exception {
         int wrapperVersion = recoverV4 ? WalletWrapper.V4 : WalletWrapper.V3;
@@ -474,7 +474,7 @@ public class WalletBody {
         int walletSize,
         int trySize,
         int currentGap,
-        BitcoinApi bitcoinApi,
+        NonCustodialBitcoinService bitcoinApi,
         HDWallet bip44Wallet,
         int purpose
     ) throws Exception {
@@ -487,10 +487,10 @@ public class WalletBody {
         }
 
         Response<Map<String, BalanceDto>> exe = bitcoinApi.getBalance(
-            BitcoinApi.BITCOIN,
+            NonCustodialBitcoinService.BITCOIN,
             purpose == Derivation.LEGACY_PURPOSE ? xpubs : Collections.emptyList(),
             purpose == Derivation.SEGWIT_BECH32_PURPOSE ? xpubs : Collections.emptyList(),
-            BitcoinApi.BalanceFilter.RemoveUnspendable
+            NonCustodialBitcoinService.BalanceFilter.RemoveUnspendable
         ).execute();
 
         if (!exe.isSuccessful()) {

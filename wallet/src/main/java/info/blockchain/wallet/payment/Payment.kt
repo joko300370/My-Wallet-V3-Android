@@ -1,6 +1,6 @@
 package info.blockchain.wallet.payment
 
-import info.blockchain.api.BitcoinApi
+import com.blockchain.api.NonCustodialBitcoinService
 import info.blockchain.wallet.api.dust.data.DustInput
 import info.blockchain.wallet.bch.BchMainNetParams
 import info.blockchain.wallet.keys.SigningKey
@@ -20,7 +20,7 @@ import retrofit2.Call
 import java.math.BigInteger
 
 class Payment(
-    private val bitcoinApi: BitcoinApi
+    private val bitcoinApi: NonCustodialBitcoinService
 ) {
     // Fee Handling
     fun estimatedFee(inputs: List<Utxo>, outputs: List<OutputType>, @NonNull feePerKb: BigInteger): BigInteger {
@@ -38,7 +38,7 @@ class Payment(
     // Coin selection
     fun getUnspentBtcCoins(@NonNull xpubs: XPubs): Single<List<Utxo>> {
         return bitcoinApi.getUnspentOutputs(
-            BitcoinApi.BITCOIN,
+            NonCustodialBitcoinService.BITCOIN,
             xpubs.legacyXpubAddresses(),
             xpubs.segwitXpubAddresses(),
             null,
@@ -50,7 +50,7 @@ class Payment(
 
     fun getUnspentBchCoins(@NonNull addresses: List<String>): Single<List<Utxo>> {
         return bitcoinApi.getUnspentOutputs(
-            BitcoinApi.BITCOIN_CASH,
+            NonCustodialBitcoinService.BITCOIN_CASH,
             addresses,
             emptyList(),
             null,
@@ -134,7 +134,7 @@ class Payment(
 
     fun publishBtcSimpleTransaction(@NonNull transaction: Transaction): Call<ResponseBody> {
         return bitcoinApi.pushTx(
-            BitcoinApi.BITCOIN,
+            NonCustodialBitcoinService.BITCOIN,
             String(Hex.encode(transaction.bitcoinSerialize()))
         )
     }
@@ -163,7 +163,7 @@ class Payment(
         @NonNull lockSecret: String
     ): Call<ResponseBody> {
         return bitcoinApi.pushTxWithSecret(
-            BitcoinApi.BITCOIN_CASH,
+            NonCustodialBitcoinService.BITCOIN_CASH,
             String(Hex.encode(transaction.bitcoinSerialize())),
             lockSecret
         )

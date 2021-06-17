@@ -1,8 +1,8 @@
 package info.blockchain.wallet.util;
 
-import info.blockchain.api.ApiException;
-import info.blockchain.api.BitcoinApi;
-import info.blockchain.api.bitcoin.data.BalanceDto;
+import com.blockchain.api.ApiException;
+import com.blockchain.api.NonCustodialBitcoinService;
+import com.blockchain.api.bitcoin.data.BalanceDto;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -83,7 +83,7 @@ public class PrivateKeyFactory {
         return null;
     }
 
-    public SigningKey getKeyFromImportedData(String format, String data, BitcoinApi bitcoinApi) throws Exception {
+    public SigningKey getKeyFromImportedData(String format, String data, NonCustodialBitcoinService bitcoinApi) throws Exception {
         // If we're importing a key, we need bitcoinApi, if we're signing then we don't, so use the other
         // 'getSigningKey()' method
         MainNetParams netParams = MainNetParams.get();
@@ -128,7 +128,7 @@ public class PrivateKeyFactory {
 
     private ECKey decodeMiniKey(
         String mini,
-        BitcoinApi bitcoinApi,
+        NonCustodialBitcoinService bitcoinApi,
         NetworkParameters btcParameters
     ) throws Exception {
         Hash hash = new Hash(
@@ -138,7 +138,7 @@ public class PrivateKeyFactory {
         return determineImportedKey(hash.toString(), bitcoinApi, btcParameters);
     }
 
-    private ECKey determineImportedKey(String hash, BitcoinApi bitcoinApi, NetworkParameters btcParameters) {
+    private ECKey determineImportedKey(String hash, NonCustodialBitcoinService bitcoinApi, NetworkParameters btcParameters) {
 
         ECKey uncompressedKey = decodeHexPK(hash, false);
         ECKey compressedKey = decodeHexPK(hash, true);
@@ -154,10 +154,10 @@ public class PrivateKeyFactory {
             // No need to use segwit xpubs/addresses here, this is only called for imported
             // addresses, which don't support segwit at this time.
             Response<Map<String, BalanceDto>> exe = bitcoinApi.getBalance(
-                BitcoinApi.BITCOIN,
+                NonCustodialBitcoinService.BITCOIN,
                 list,
                 Collections.emptyList(),
-                BitcoinApi.BalanceFilter.RemoveUnspendable
+                NonCustodialBitcoinService.BalanceFilter.RemoveUnspendable
             ).execute();
 
             if (!exe.isSuccessful()) {

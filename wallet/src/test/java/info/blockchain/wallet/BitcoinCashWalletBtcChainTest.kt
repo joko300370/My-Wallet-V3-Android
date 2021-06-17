@@ -1,6 +1,6 @@
 package info.blockchain.wallet
 
-import info.blockchain.api.BitcoinApi
+import com.blockchain.api.NonCustodialBitcoinService
 import info.blockchain.wallet.BitcoinCashWallet.Companion.create
 import info.blockchain.wallet.BitcoinCashWallet.Companion.restore
 import info.blockchain.wallet.bch.BchMainNetParams
@@ -17,7 +17,7 @@ import java.nio.file.Paths
 
 class BitcoinCashWalletBtcChainTest {
     private val params: NetworkParameters = BchMainNetParams.get()
-    private val bitcoinApi: BitcoinApi = mock()
+    private val bitcoinApi: NonCustodialBitcoinService = mock()
 
     private fun getTestVectors(): TestVectorBip39List {
         val uri = javaClass.classLoader.getResource("hd/test_EN_BIP39.json").toURI()

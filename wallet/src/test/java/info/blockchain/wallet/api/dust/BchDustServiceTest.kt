@@ -5,7 +5,7 @@ import com.blockchain.koin.walletModule
 import com.blockchain.network.initRule
 import com.blockchain.network.modules.apiModule
 import com.blockchain.testutils.rxInit
-import info.blockchain.api.blockchainApiModule
+import com.blockchain.api.blockchainApiModule
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.ApiCode
 import io.fabric8.mockwebserver.DefaultMockServer

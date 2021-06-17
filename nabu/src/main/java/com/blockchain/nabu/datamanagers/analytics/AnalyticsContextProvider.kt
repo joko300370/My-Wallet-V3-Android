@@ -1,9 +1,9 @@
 package com.blockchain.nabu.datamanagers.analytics
 
 import android.content.res.Resources
-import info.blockchain.api.analytics.AnalyticsContext
-import info.blockchain.api.analytics.DeviceInfo
-import info.blockchain.api.analytics.ScreenInfo
+import com.blockchain.api.analytics.AnalyticsContext
+import com.blockchain.api.analytics.DeviceInfo
+import com.blockchain.api.analytics.ScreenInfo
 import java.util.Locale
 import java.util.TimeZone
 

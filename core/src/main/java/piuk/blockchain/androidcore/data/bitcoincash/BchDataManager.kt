@@ -3,7 +3,7 @@ package piuk.blockchain.androidcore.data.bitcoincash
 import androidx.annotation.VisibleForTesting
 import com.blockchain.logging.CrashLogger
 import com.blockchain.wallet.DefaultLabels
-import info.blockchain.api.BitcoinApi
+import com.blockchain.api.NonCustodialBitcoinService
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.BitcoinCashWallet
@@ -37,7 +37,7 @@ import java.math.BigInteger
 class BchDataManager(
     private val payloadDataManager: PayloadDataManager,
     private val bchDataStore: BchDataStore,
-    private val bitcoinApi: BitcoinApi,
+    private val bitcoinApi: NonCustodialBitcoinService,
     private val defaultLabels: DefaultLabels,
     private val metadataManager: MetadataManager,
     private val crashLogger: CrashLogger,

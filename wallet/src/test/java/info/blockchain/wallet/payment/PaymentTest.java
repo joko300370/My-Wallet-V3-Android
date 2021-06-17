@@ -1,7 +1,7 @@
 package info.blockchain.wallet.payment;
 
-import info.blockchain.api.BitcoinApi;
-import info.blockchain.api.bitcoin.data.UnspentOutputsDto;
+import com.blockchain.api.NonCustodialBitcoinService;
+import com.blockchain.api.bitcoin.data.UnspentOutputsDto;
 import info.blockchain.wallet.MockedResponseTest;
 import info.blockchain.wallet.keys.SigningKey;
 import info.blockchain.wallet.payload.data.XPub;
@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 
 public class PaymentTest extends MockedResponseTest {
 
-    final BitcoinApi mockApi = mock(BitcoinApi.class);
+    final NonCustodialBitcoinService mockApi = mock(NonCustodialBitcoinService.class);
     final private Payment subject = new Payment(mockApi);
     final private OutputType targetOutputType = OutputType.P2PKH;
     final private OutputType changeOutputType = OutputType.P2PKH;
@@ -111,7 +111,7 @@ public class PaymentTest extends MockedResponseTest {
         );
 
         when(mockApi.getUnspentOutputs(
-            BitcoinApi.BITCOIN,
+            NonCustodialBitcoinService.BITCOIN,
             expectedLegacyAddresses,
             expectedSegwitAddresses,
             null,
@@ -123,7 +123,7 @@ public class PaymentTest extends MockedResponseTest {
            .assertComplete();
 
         verify(mockApi).getUnspentOutputs(
-            BitcoinApi.BITCOIN,
+            NonCustodialBitcoinService.BITCOIN,
             expectedLegacyAddresses,
             expectedSegwitAddresses,
             null,
@@ -152,7 +152,7 @@ public class PaymentTest extends MockedResponseTest {
         );
 
         when(mockApi.getUnspentOutputs(
-            BitcoinApi.BITCOIN,
+            NonCustodialBitcoinService.BITCOIN,
             expectedLegacyAddresses,
             expectedSegwitAddresses,
             null,
@@ -164,7 +164,7 @@ public class PaymentTest extends MockedResponseTest {
             .assertComplete();
 
         verify(mockApi).getUnspentOutputs(
-            BitcoinApi.BITCOIN,
+            NonCustodialBitcoinService.BITCOIN,
             expectedLegacyAddresses,
             expectedSegwitAddresses,
             null,

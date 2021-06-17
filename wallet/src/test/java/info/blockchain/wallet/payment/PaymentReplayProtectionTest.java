@@ -1,6 +1,6 @@
 package info.blockchain.wallet.payment;
 
-import info.blockchain.api.BitcoinApi;
+import com.blockchain.api.NonCustodialBitcoinService;
 import info.blockchain.wallet.MockedResponseTest;
 import info.blockchain.wallet.payload.model.Utxo;
 import info.blockchain.wallet.util.LoaderUtilKt;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.mock;
 
 public final class PaymentReplayProtectionTest extends MockedResponseTest {
 
-    final BitcoinApi mockApi = mock(BitcoinApi.class);
+    final NonCustodialBitcoinService mockApi = mock(NonCustodialBitcoinService.class);
     private final Payment subject = new Payment(mockApi);
 
     private final OutputType targetOutputType = OutputType.P2PKH;

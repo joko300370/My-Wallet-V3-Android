@@ -1,6 +1,6 @@
 package info.blockchain.wallet.api;
 
-import info.blockchain.api.ApiException;
+import com.blockchain.api.ApiException;
 import info.blockchain.wallet.ApiCode;
 import info.blockchain.wallet.BaseIntegTest;
 import info.blockchain.wallet.BlockchainFramework;

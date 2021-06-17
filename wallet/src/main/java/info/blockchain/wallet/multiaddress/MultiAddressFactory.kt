@@ -1,9 +1,9 @@
 package info.blockchain.wallet.multiaddress
 
-import info.blockchain.api.ApiException
-import info.blockchain.api.BitcoinApi
-import info.blockchain.api.bitcoin.data.MultiAddress
-import info.blockchain.api.bitcoin.data.Transaction
+import com.blockchain.api.ApiException
+import com.blockchain.api.NonCustodialBitcoinService
+import com.blockchain.api.bitcoin.data.MultiAddress
+import com.blockchain.api.bitcoin.data.Transaction
 import info.blockchain.wallet.bip44.HDChain
 import info.blockchain.wallet.payload.data.AddressLabel
 import info.blockchain.wallet.payload.data.XPub
@@ -17,7 +17,7 @@ import java.util.Collections
 import kotlin.collections.Map.Entry
 
 open class MultiAddressFactory(
-    internal val bitcoinApi: BitcoinApi
+    internal val bitcoinApi: NonCustodialBitcoinService
 ) {
     private val nextReceiveAddressMap: HashMap<String, Int> = HashMap()
     private val nextChangeAddressMap: HashMap<String, Int> = HashMap()
@@ -54,11 +54,11 @@ open class MultiAddressFactory(
     ): Call<MultiAddress> {
         return bitcoinApi
             .getMultiAddress(
-                BitcoinApi.BITCOIN,
+                NonCustodialBitcoinService.BITCOIN,
                 xpubs.legacyXpubAddresses(),
                 xpubs.segwitXpubAddresses(),
                 context?.joinToString("|"),
-                BitcoinApi.BalanceFilter.RemoveUnspendable,
+                NonCustodialBitcoinService.BalanceFilter.RemoveUnspendable,
                 limit,
                 offset
             )

@@ -1,8 +1,8 @@
 package piuk.blockchain.android.coincore
 
 import com.blockchain.featureflags.InternalFeatureFlagApi
-import info.blockchain.api.AddressMappingService
-import info.blockchain.api.DomainAddressNotFound
+import com.blockchain.api.AddressMappingService
+import com.blockchain.api.DomainAddressNotFound
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import io.reactivex.Completable

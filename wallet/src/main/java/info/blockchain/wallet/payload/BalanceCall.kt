@@ -1,7 +1,7 @@
 package info.blockchain.wallet.payload
 
-import info.blockchain.api.BitcoinApi
-import info.blockchain.api.bitcoin.data.BalanceResponseDto
+import com.blockchain.api.NonCustodialBitcoinService
+import com.blockchain.api.bitcoin.data.BalanceResponseDto
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.exceptions.ServerConnectionException
 import info.blockchain.wallet.payload.data.XPubs
@@ -13,7 +13,7 @@ import retrofit2.Response
 import java.math.BigInteger
 
 class BalanceCall(
-    private val bitcoinApi: BitcoinApi,
+    private val bitcoinApi: NonCustodialBitcoinService,
     private val cryptoCurrency: CryptoCurrency
 ) : BalanceQuery {
 
@@ -37,7 +37,7 @@ class BalanceCall(
             cryptoCurrency.networkTicker.toLowerCase(),
             addresses,
             emptyList(),
-            BitcoinApi.BalanceFilter.RemoveUnspendable
+            NonCustodialBitcoinService.BalanceFilter.RemoveUnspendable
         )
 
     private fun getBalanceOfXpubs(legacyAddresses: List<String>, segwitAddresses: List<String>) =
@@ -45,7 +45,7 @@ class BalanceCall(
             cryptoCurrency.networkTicker.toLowerCase(),
             legacyAddresses,
             segwitAddresses,
-            BitcoinApi.BalanceFilter.RemoveUnspendable
+            NonCustodialBitcoinService.BalanceFilter.RemoveUnspendable
         )
 
     private fun buildBalanceMap(response: Response<BalanceResponseDto>): Map<String, BigInteger> {

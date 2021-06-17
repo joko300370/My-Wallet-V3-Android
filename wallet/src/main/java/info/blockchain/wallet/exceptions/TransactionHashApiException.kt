@@ -1,6 +1,6 @@
 package info.blockchain.wallet.exceptions
 
-import info.blockchain.api.ApiException
+import com.blockchain.api.ApiException
 import okhttp3.ResponseBody
 
 class TransactionHashApiException(

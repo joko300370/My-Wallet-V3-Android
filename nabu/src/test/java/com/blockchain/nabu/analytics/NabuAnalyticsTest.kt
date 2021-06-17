@@ -10,9 +10,9 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.never
 import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.api.AnalyticsService
-import info.blockchain.api.NabuAnalyticsEvent
-import info.blockchain.api.analytics.AnalyticsContext
+import com.blockchain.api.AnalyticsService
+import com.blockchain.api.NabuAnalyticsEvent
+import com.blockchain.api.analytics.AnalyticsContext
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
