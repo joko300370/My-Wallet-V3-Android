@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
+    android:background="@color/white" >
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/back_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginTop="@dimen/standard_margin"
+        android:background="@android:color/transparent"
+        android:padding="@dimen/tiny_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/verify_title"
+        app:layout_constraintBottom_toBottomOf="@+id/verify_title"
+        app:layout_constraintVertical_bias="0"
+        app:srcCompat="@drawable/ic_arrow_back_blue" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/verify_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@+id/back_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/recover_scroll_view"
+        android:layout_margin="@dimen/standard_margin"
+        style="@style/Text.Semibold.20"
+        android:text="@string/account_recover_title"
+        app:layout_constraintVertical_chainStyle="spread_inside"
+        />
+
+    <ScrollView
+        android:id="@+id/recover_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/verify_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/verify_title">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/recover_form"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/standard_margin"
+            android:layout_marginEnd="@dimen/standard_margin"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@+id/continue_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/login_title">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/account_recover_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/small_margin"
+                android:layout_marginTop="@dimen/standard_margin"
+                android:layout_marginEnd="@dimen/small_margin"
+                android:layout_marginBottom="@dimen/standard_margin"
+                android:text="@string/enter_recovery_phrase_desc"
+                style="@style/Text.Standard.12"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/recovery_phase_text_layout"
+                style="@style/LightDataInputAppearance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/enter_recovery_phrase_hint">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/recovery_phase_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textNoSuggestions|textVisiblePassword"
+                    android:contentDescription="@string/enter_recovery_phrase_hint"
+                    android:maxLines="5"
+                    android:maxLength="250"
+                    android:minHeight="@dimen/size_epic"/>
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/reset_account_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/small_margin"
+                android:layout_marginEnd="@dimen/small_margin"
+                android:layout_marginTop="@dimen/tiny_margin"
+                android:text="@string/reset_account_notice"
+                style="@style/Text.Light.12" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/reset_kyc_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/small_margin"
+                android:text="@string/reset_kyc_notice"
+                android:background="@drawable/bkgd_grey_000_rounded"
+                style="@style/Text.Light.12" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </ScrollView>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/verify_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/CtaButton.Blue"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recover_scroll_view"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="@dimen/tiny_margin"
+        android:layout_marginBottom="@dimen/standard_margin"
+        android:text="@string/verify" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

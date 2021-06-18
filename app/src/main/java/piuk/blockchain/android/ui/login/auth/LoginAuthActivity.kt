@@ -11,17 +11,24 @@ import android.text.method.LinkMovementMethod
 import android.util.Base64
 import androidx.annotation.StringRes
 import com.blockchain.extensions.exhaustive
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.scopedInject
+import com.blockchain.koin.ssoAccountRecoveryFeatureFlag
+import com.blockchain.remoteconfig.FeatureFlag
 import com.blockchain.ui.urllinks.RESET_2FA
 import com.blockchain.ui.urllinks.SECOND_PASSWORD_EXPLANATION
 import com.google.android.material.textfield.TextInputLayout
+import io.reactivex.rxkotlin.subscribeBy
 import org.json.JSONObject
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.ActivityLoginAuthBinding
 import piuk.blockchain.android.ui.auth.PinEntryActivity
 import piuk.blockchain.android.ui.base.mvi.MviActivity
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.toast
+import piuk.blockchain.android.ui.recover.AccountRecoveryActivity
 import piuk.blockchain.android.ui.recover.RecoverFundsActivity
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.gone
@@ -37,9 +44,22 @@ class LoginAuthActivity :
 
     private lateinit var currentState: LoginAuthState
 
+    private val internalFlags: InternalFeatureFlagApi by inject()
+
+    private val ssoARFF: FeatureFlag by inject(ssoAccountRecoveryFeatureFlag)
+
+    private var isAccountRecoveryEnabled: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        val compositeDisposable = ssoARFF.enabled.subscribeBy(
+            onSuccess = { enabled ->
+                isAccountRecoveryEnabled = enabled
+            },
+            onError = { isAccountRecoveryEnabled = false }
+        )
 
         intent.data?.let { uri ->
             uri.fragment?.let { fragment ->
@@ -186,7 +206,13 @@ class LoginAuthActivity :
         toast(message, ToastCustom.TYPE_GENERAL)
     }
 
-    private fun launchPasswordRecoveryFlow() = RecoverFundsActivity.start(this)
+    private fun launchPasswordRecoveryFlow() {
+        if (internalFlags.isFeatureEnabled(GatedFeature.ACCOUNT_RECOVERY) && isAccountRecoveryEnabled) {
+            start<AccountRecoveryActivity>(this)
+        } else {
+            RecoverFundsActivity.start(this)
+        }
+    }
 
     private fun decodeJson(fragment: String): JSONObject {
         val encodedData = fragment.split("/").last()

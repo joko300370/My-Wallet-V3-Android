@@ -10,5 +10,6 @@ interface InternalFeatureFlagApi {
 
 enum class GatedFeature(val readableName: String, val enabledForCompanyInternalBuild: Boolean = false) {
     ADD_SUB_WALLET_ADDRESSES("Create BTC sub-wallets"),
-    RECURRING_BUYS("Enable recurring buys", true)
+    RECURRING_BUYS("Enable recurring buys", true),
+    ACCOUNT_RECOVERY("Enable New Account Recovery Flow")
 }

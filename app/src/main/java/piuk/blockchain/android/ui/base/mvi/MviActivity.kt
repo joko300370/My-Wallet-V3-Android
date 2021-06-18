@@ -1,6 +1,9 @@
 package piuk.blockchain.android.ui.base.mvi
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
@@ -52,4 +55,10 @@ abstract class MviActivity<M : MviModel<S, I>, I : MviIntent<S>, S : MviState, E
     abstract fun initBinding(): E
 
     protected abstract fun render(newState: S)
+
+    companion object {
+        inline fun <reified T : AppCompatActivity> start(ctx: Context) {
+            ctx.startActivity(Intent(ctx, T::class.java))
+        }
+    }
 }

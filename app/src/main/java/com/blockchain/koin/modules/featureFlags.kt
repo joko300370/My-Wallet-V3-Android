@@ -5,6 +5,7 @@ import com.blockchain.koin.interestAccountFeatureFlag
 import com.blockchain.koin.mwaFeatureFlag
 import com.blockchain.koin.obFeatureFlag
 import com.blockchain.koin.sddFeatureFlag
+import com.blockchain.koin.ssoAccountRecoveryFeatureFlag
 import com.blockchain.koin.ssoLoginFeatureFlag
 import com.blockchain.remoteconfig.RemoteConfig
 import com.blockchain.remoteconfig.featureFlag
@@ -32,5 +33,8 @@ val featureFlagsModule = module {
     }
     factory(ssoLoginFeatureFlag) {
         get<RemoteConfig>().featureFlag("sso_login_enabled")
+    }
+    factory(ssoAccountRecoveryFeatureFlag) {
+        get<RemoteConfig>().featureFlag("sso_account_recovery_enabled")
     }
 }
