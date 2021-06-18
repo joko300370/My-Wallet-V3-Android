@@ -79,7 +79,7 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
                 .doOnNext {
                     showEntropyContainer()
                     presenter.logEventPasswordOneClicked()
-                    presenter.calculateEntropy(it.editable().toString())
+                    binding.entropyContainer.updatePasswordStrength(it.editable().toString())
                     hideShowCreateButton(
                         it.editable().toString().length,
                         walletPassConfirm.getTextString().length,
@@ -202,14 +202,6 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
     override fun onFocusChange(v: View?, hasFocus: Boolean) = when {
         hasFocus -> showEntropyContainer()
         else -> hideEntropyContainer()
-    }
-
-    override fun setEntropyStrength(score: Int) {
-        binding.entropyContainer.setStrengthProgress(score)
-    }
-
-    override fun setEntropyLevel(level: Int) {
-        binding.entropyContainer.updateLevelUI(level)
     }
 
     override fun showError(message: Int) =

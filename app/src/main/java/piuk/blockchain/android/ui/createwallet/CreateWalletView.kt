@@ -5,10 +5,6 @@ import piuk.blockchain.androidcoreui.ui.base.View
 
 interface CreateWalletView : View {
 
-    fun setEntropyStrength(score: Int)
-
-    fun setEntropyLevel(level: Int)
-
     fun showError(@StringRes message: Int)
 
     fun warnWeakPassword(email: String, password: String)

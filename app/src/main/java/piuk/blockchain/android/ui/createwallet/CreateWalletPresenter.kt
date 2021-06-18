@@ -4,7 +4,6 @@ import android.app.LauncherActivity
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.preferences.WalletStatus
-import info.blockchain.wallet.util.PasswordUtil
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
@@ -18,7 +17,6 @@ import piuk.blockchain.androidcore.utils.PrngFixer
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
-import kotlin.math.roundToInt
 
 class CreateWalletPresenter(
     private val payloadDataManager: PayloadDataManager,
@@ -36,18 +34,6 @@ class CreateWalletPresenter(
 
     override fun onViewReady() {
         // No-op
-    }
-
-    fun calculateEntropy(password: String) {
-        passwordStrength = PasswordUtil.getStrength(password).roundToInt()
-        view.setEntropyStrength(passwordStrength)
-
-        when (passwordStrength) {
-            in 0..25 -> view.setEntropyLevel(0)
-            in 26..50 -> view.setEntropyLevel(1)
-            in 51..75 -> view.setEntropyLevel(2)
-            in 76..100 -> view.setEntropyLevel(3)
-        }
     }
 
     fun validateCredentials(email: String, password1: String, password2: String): Boolean =

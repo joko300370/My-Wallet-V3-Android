@@ -42,7 +42,6 @@ class PasswordStrengthView(context: Context, attrs: AttributeSet) : ConstraintLa
         binding.passStrengthBar.max = 100
     }
 
-    // TODO make other methods private and only expose the update method - unify how we define password strengths
     fun updatePasswordStrength(password: String) {
         val passwordStrength = PasswordUtil.getStrength(password).roundToInt()
         setStrengthProgress(passwordStrength)
@@ -55,7 +54,7 @@ class PasswordStrengthView(context: Context, attrs: AttributeSet) : ConstraintLa
         }
     }
 
-    fun setStrengthProgress(score: Int) {
+    private fun setStrengthProgress(score: Int) {
         with(binding.passStrengthBar) {
             ObjectAnimator.ofInt(
                 this,
@@ -70,7 +69,7 @@ class PasswordStrengthView(context: Context, attrs: AttributeSet) : ConstraintLa
         }
     }
 
-    fun updateLevelUI(level: Int) {
+    private fun updateLevelUI(level: Int) {
         with(binding) {
             passStrengthVerdict.setText(strengthVerdicts[level])
             passStrengthBar.progressDrawable = context.getResolvedDrawable(strengthProgressDrawables[level])

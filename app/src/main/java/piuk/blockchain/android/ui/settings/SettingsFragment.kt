@@ -17,9 +17,9 @@ import android.text.Html
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
@@ -53,10 +53,8 @@ import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.mukesh.countrypicker.CountryPicker
 import info.blockchain.wallet.api.data.Settings
-import info.blockchain.wallet.util.PasswordUtil
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
-import io.reactivex.schedulers.Schedulers
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.BuildConfig
 import piuk.blockchain.android.R
@@ -72,6 +70,7 @@ import piuk.blockchain.android.data.biometrics.BiometricKeysInvalidated
 import piuk.blockchain.android.data.biometrics.BiometricsCallback
 import piuk.blockchain.android.data.biometrics.BiometricsController
 import piuk.blockchain.android.data.biometrics.BiometricsNoSuitableMethods
+import piuk.blockchain.android.databinding.ModalChangePasswordBinding
 import piuk.blockchain.android.scan.QrScanError
 import piuk.blockchain.android.simplebuy.RemoveLinkedBankBottomSheet
 import piuk.blockchain.android.simplebuy.RemovePaymentMethodBottomSheetHost
@@ -87,8 +86,8 @@ import piuk.blockchain.android.ui.customviews.PasswordStrengthView
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.dashboard.LinkablePaymentMethodsForAction
-import piuk.blockchain.android.ui.dashboard.sheets.WireTransferAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.dashboard.sheets.LinkBankMethodChooserBottomSheet
+import piuk.blockchain.android.ui.dashboard.sheets.WireTransferAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.linkbank.BankAuthActivity
 import piuk.blockchain.android.ui.linkbank.BankAuthSource
@@ -106,6 +105,7 @@ import piuk.blockchain.android.util.AndroidUtils
 import piuk.blockchain.android.util.FormatChecker
 import piuk.blockchain.android.util.RootUtil
 import piuk.blockchain.android.util.ViewUtils
+import piuk.blockchain.android.util.visible
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.PersistentPrefs
@@ -114,7 +114,6 @@ import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.util.Calendar
 import java.util.Locale
-import kotlin.math.roundToInt
 
 class SettingsFragment : PreferenceFragmentCompat(),
     SettingsView,
@@ -207,15 +206,6 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
         analytics.logEvent(AnalyticsEvents.Settings)
         Logging.logContentView(javaClass.simpleName)
-
-        val compositeDisposable = mwaFF.enabled.observeOn(Schedulers.io()).subscribe(
-            { result ->
-                isMWAEnabled = result
-            },
-            {
-                isMWAEnabled = false
-            }
-        )
 
         initReviews()
     }
@@ -1057,94 +1047,91 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
 
     private fun showDialogChangePassword() {
-        val inflater = settingsActivity.layoutInflater
-        val pwLayout = inflater.inflate(R.layout.modal_change_password2, null) as LinearLayout
+        val changePasswordBinding = ModalChangePasswordBinding.inflate(
+            LayoutInflater.from(settingsActivity.layoutInflater.context), null, false
+        )
+        with(changePasswordBinding) {
+            currentPassword.requestFocus()
+            newPassword.addTextChangedListener(object : AfterTextChangedWatcher() {
+                override fun afterTextChanged(editable: Editable) {
+                    newPassword.postDelayed({
+                        if (activity != null && !settingsActivity.isFinishing) {
+                            passwordStrength.visible()
+                            setPasswordStrength(editable.toString(), passwordStrength)
+                        }
+                    }, 200)
+                }
+            })
 
-        val currentPassword = pwLayout.findViewById<AppCompatEditText>(R.id.current_password)
-        val newPassword = pwLayout.findViewById<AppCompatEditText>(R.id.new_password)
-        val newPasswordConfirmation = pwLayout.findViewById<AppCompatEditText>(R.id.confirm_password)
-        val passwordStrength = pwLayout.findViewById<PasswordStrengthView>(R.id.password_strength)
+            val alertDialog = AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
+                .setTitle(R.string.change_password)
+                .setCancelable(false)
+                .setView(root)
+                .setPositiveButton(R.string.update, null)
+                .setNegativeButton(android.R.string.cancel, null)
+                .create()
 
-        newPassword.addTextChangedListener(object : AfterTextChangedWatcher() {
-            override fun afterTextChanged(editable: Editable) {
-                newPassword.postDelayed({
-                    if (activity != null && !settingsActivity.isFinishing) {
-                        passwordStrength.visibility = View.VISIBLE
-                        setPasswordStrength(editable.toString(), passwordStrength)
-                    }
-                }, 200)
-            }
-        })
+            alertDialog.setOnShowListener {
+                val buttonPositive = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                buttonPositive.setOnClickListener {
+                    val currentPw = currentPassword.text.toString()
+                    val newPw = newPassword.text.toString()
+                    val newConfirmedPw = confirmPassword.text.toString()
+                    val walletPassword = settingsPresenter.tempPassword
 
-        val alertDialog = AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
-            .setTitle(R.string.change_password)
-            .setCancelable(false)
-            .setView(pwLayout)
-            .setPositiveButton(R.string.update, null)
-            .setNegativeButton(android.R.string.cancel, null)
-            .create()
-
-        alertDialog.setOnShowListener {
-            val buttonPositive = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            buttonPositive.setOnClickListener {
-
-                val currentPw = currentPassword.text.toString()
-                val newPw = newPassword.text.toString()
-                val newConfirmedPw = newPasswordConfirmation.text.toString()
-                val walletPassword = settingsPresenter.tempPassword
-
-                if (currentPw != newPw) {
-                    if (currentPw == walletPassword) {
-                        if (newPw == newConfirmedPw) {
-                            if (newConfirmedPw.length < 4 || newConfirmedPw.length > 255) {
-                                ToastCustom.makeText(
-                                    activity,
-                                    getString(R.string.invalid_password),
-                                    ToastCustom.LENGTH_SHORT,
-                                    ToastCustom.TYPE_ERROR
-                                )
-                            } else if (pwStrength < 50) {
-                                AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
-                                    .setTitle(R.string.app_name)
-                                    .setMessage(R.string.weak_password)
-                                    .setCancelable(false)
-                                    .setPositiveButton(R.string.common_yes) { _, _ ->
-                                        newPasswordConfirmation.setText("")
-                                        newPasswordConfirmation.requestFocus()
-                                        newPassword.setText("")
-                                        newPassword.requestFocus()
-                                    }
-                                    .setNegativeButton(R.string.polite_no) { _, _ ->
-                                        alertDialog.dismiss()
-                                        settingsPresenter.updatePassword(
-                                            newConfirmedPw,
-                                            walletPassword
-                                        )
-                                    }
-                                    .show()
+                    if (currentPw != newPw) {
+                        if (currentPw == walletPassword) {
+                            if (newPw == newConfirmedPw) {
+                                if (newConfirmedPw.length < 4 || newConfirmedPw.length > 255) {
+                                    ToastCustom.makeText(
+                                        activity,
+                                        getString(R.string.invalid_password),
+                                        ToastCustom.LENGTH_SHORT,
+                                        ToastCustom.TYPE_ERROR
+                                    )
+                                } else if (pwStrength < 50) {
+                                    AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
+                                        .setTitle(R.string.app_name)
+                                        .setMessage(R.string.weak_password)
+                                        .setCancelable(false)
+                                        .setPositiveButton(R.string.common_yes) { _, _ ->
+                                            confirmPassword.setText("")
+                                            confirmPassword.requestFocus()
+                                            newPassword.setText("")
+                                            newPassword.requestFocus()
+                                        }
+                                        .setNegativeButton(R.string.polite_no) { _, _ ->
+                                            alertDialog.dismiss()
+                                            settingsPresenter.updatePassword(
+                                                newConfirmedPw,
+                                                walletPassword
+                                            )
+                                        }
+                                        .show()
+                                } else {
+                                    alertDialog.dismiss()
+                                    settingsPresenter.updatePassword(newConfirmedPw, walletPassword)
+                                }
                             } else {
-                                alertDialog.dismiss()
-                                settingsPresenter.updatePassword(newConfirmedPw, walletPassword)
+                                confirmPassword.setText("")
+                                confirmPassword.requestFocus()
+                                showCustomToast(R.string.password_mismatch_error)
                             }
                         } else {
-                            newPasswordConfirmation.setText("")
-                            newPasswordConfirmation.requestFocus()
-                            showCustomToast(R.string.password_mismatch_error)
+                            currentPassword.setText("")
+                            currentPassword.requestFocus()
+                            showCustomToast(R.string.invalid_password)
                         }
                     } else {
-                        currentPassword.setText("")
-                        currentPassword.requestFocus()
-                        showCustomToast(R.string.invalid_password)
+                        newPassword.setText("")
+                        confirmPassword.setText("")
+                        newPassword.requestFocus()
+                        showCustomToast(R.string.change_password_new_matches_current)
                     }
-                } else {
-                    newPassword.setText("")
-                    newPasswordConfirmation.setText("")
-                    newPassword.requestFocus()
-                    showCustomToast(R.string.change_password_new_matches_current)
                 }
             }
+            alertDialog.show()
         }
-        alertDialog.show()
     }
 
     private fun showCustomToast(@StringRes stringId: Int) {
@@ -1206,26 +1193,11 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
 
     private fun setPasswordStrength(
-        pw: String,
+        passwordEntered: String,
         passwordStrengthView: PasswordStrengthView
     ) {
         if (activity != null && !settingsActivity.isFinishing) {
-            pwStrength = PasswordUtil.getStrength(pw).roundToInt()
-
-            // red
-            var pwStrengthLevel = 0
-
-            when {
-                pwStrength >= 75 -> // green
-                    pwStrengthLevel = 3
-                pwStrength >= 50 -> // green
-                    pwStrengthLevel = 2
-                pwStrength >= 25 -> // orange
-                    pwStrengthLevel = 1
-            }
-
-            passwordStrengthView.setStrengthProgress(pwStrength)
-            passwordStrengthView.updateLevelUI(pwStrengthLevel)
+            passwordStrengthView.updatePasswordStrength(passwordEntered)
         }
     }
 
@@ -1295,10 +1267,6 @@ fun Preference?.onClick(onClick: () -> Unit) {
         onClick()
         true
     }
-}
-
-interface ReviewHost {
-    fun showReviewDialog()
 }
 
 enum class ReviewAnalytics : AnalyticsEvent {

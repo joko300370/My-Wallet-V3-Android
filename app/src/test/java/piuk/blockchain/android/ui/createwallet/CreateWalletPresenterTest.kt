@@ -60,54 +60,6 @@ class CreateWalletPresenterTest {
     }
 
     @Test
-    fun `calculateEntropy on weak password`() {
-        // Arrange
-
-        // Act
-        subject.calculateEntropy("password")
-        // Assert
-        verify(view).setEntropyStrength(8)
-        verify(view).setEntropyLevel(0)
-        verifyNoMoreInteractions(view)
-    }
-
-    @Test
-    fun `calculateEntropy on regular password`() {
-        // Arrange
-
-        // Act
-        subject.calculateEntropy("MyWallet")
-        // Assert
-        verify(view).setEntropyStrength(46)
-        verify(view).setEntropyLevel(1)
-        verifyNoMoreInteractions(view)
-    }
-
-    @Test
-    fun `calculateEntropy on normal password`() {
-        // Arrange
-
-        // Act
-        subject.calculateEntropy("MyTestWallet")
-        // Assert
-        verify(view).setEntropyStrength(69)
-        verify(view).setEntropyLevel(2)
-        verifyNoMoreInteractions(view)
-    }
-
-    @Test
-    fun `calculateEntropy on strong password`() {
-        // Arrange
-
-        // Act
-        subject.calculateEntropy("MyTestWallet!@!ASD@!")
-        // Assert
-        verify(view).setEntropyStrength(100)
-        verify(view).setEntropyLevel(3)
-        verifyNoMoreInteractions(view)
-    }
-
-    @Test
     fun `create wallet`() {
         // Arrange
         val email = "john@snow.com"

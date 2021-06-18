@@ -90,7 +90,8 @@
                 style="@style/LightDataInputAppearance"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/login_password_hint">
+                android:hint="@string/login_password_hint"
+                app:passwordToggleEnabled="true">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/password_text"
