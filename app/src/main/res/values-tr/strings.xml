@@ -863,7 +863,6 @@
     <string name="xlm_memo_id">Not Kimliği</string>
     <string name="airdrop_activity_title">Airdrops</string>
     <string name="simple_buy_intro_title">Blockchain\'e Hoşgeldiniz</string>
-    <string name="simple_buy_buy_crypto">Kripto satın al</string>
     <string name="simple_buy_instructions_to_buy">Birkaç basit adımda satın almanıza yardımcı olabiliriz.</string>
     <string name="simple_buy_intro_main_button_action">Şimdi Kripto Al</string>
     <string name="simple_buy_deposit_my_crypto">Cüzdanı Gezin</string>

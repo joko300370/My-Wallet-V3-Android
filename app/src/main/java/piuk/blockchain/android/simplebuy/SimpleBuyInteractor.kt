@@ -262,10 +262,11 @@ class SimpleBuyInteractor(
         isUnderReviewFor(KycTierLevel.SILVER) ||
             isUnderReviewFor(KycTierLevel.GOLD)
 
-    fun exchangeRate(cryptoCurrency: CryptoCurrency): Single<SimpleBuyIntent.ExchangeRateUpdated> =
-        coincore[cryptoCurrency].exchangeRate().map {
-            SimpleBuyIntent.ExchangeRateUpdated(it.price() as FiatValue)
-        }
+    fun exchangeRate(cryptoCurrency: CryptoCurrency): Single<SimpleBuyIntent.ExchangePriceWithDeltaUpdated> =
+        coincore.getExchangePriceWithDelta(cryptoCurrency)
+            .map { exchangePriceWithDelta ->
+                SimpleBuyIntent.ExchangePriceWithDeltaUpdated(exchangePriceWithDelta = exchangePriceWithDelta)
+            }
 
     fun eligiblePaymentMethods(fiatCurrency: String, preselectedId: String?):
         Single<SimpleBuyIntent.PaymentMethodsUpdated> =

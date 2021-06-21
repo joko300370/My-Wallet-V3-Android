@@ -1279,7 +1279,6 @@
 
     <!--Simple buy-->
     <string name="simple_buy_intro_title">Welcome to Blockchain</string>
-    <string name="simple_buy_buy_crypto">Buy Crypto</string>
     <string name="simple_buy_own_crypto">Own Crypto in a Few Minutes</string>
     <string name="simple_buy_instructions_to_buy">We can help you buy in just a few simple steps.</string>
     <string name="simple_buy_verify_your_identity">Verify your identity and buy crypto</string>
@@ -1293,7 +1292,6 @@
     <string name="payment_methods">Payment Methods</string>
     <string name="payment_method">Payment Method</string>
     <string name="simple_buy_enter_amount">Enter amount</string>
-    <string name="simple_buy_buy_crypto_title">Buy Crypto</string>
     <string name="simple_buy_select_currency">Select Your Currency</string>
     <string name="change_currency">Change Currency</string>
     <string name="simple_buy_verify_email_instruction">We sent an email to %1$s with a verification link. Didn’t get it? Check your spam folder.</string>

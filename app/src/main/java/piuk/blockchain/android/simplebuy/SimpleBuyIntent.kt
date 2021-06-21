@@ -18,6 +18,7 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.FiatValue
 import piuk.blockchain.android.cards.EverypayAuthOptions
 import piuk.blockchain.android.ui.base.mvi.MviIntent
+import piuk.blockchain.android.ui.sell.ExchangePriceWithDelta
 import java.math.BigInteger
 
 sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
@@ -32,7 +33,11 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
     class NewCryptoCurrencySelected(val currency: CryptoCurrency) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
             if (oldState.selectedCryptoCurrency == currency) oldState else
-                oldState.copy(selectedCryptoCurrency = currency, amount = null, exchangePrice = null)
+                oldState.copy(
+                    selectedCryptoCurrency = currency,
+                    amount = null,
+                    exchangePriceWithDelta = null
+                )
     }
 
     class AmountUpdated(private val amount: FiatValue) : SimpleBuyIntent() {
@@ -60,9 +65,10 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
             oldState.copy(authorisePaymentUrl = url, linkedBank = linkedBank)
     }
 
-    class ExchangeRateUpdated(private val price: FiatValue) : SimpleBuyIntent() {
+    class ExchangePriceWithDeltaUpdated(private val exchangePriceWithDelta: ExchangePriceWithDelta) :
+        SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(exchangePrice = price)
+            oldState.copy(exchangePriceWithDelta = exchangePriceWithDelta)
     }
 
     class PaymentMethodChangeRequested(val paymentMethod: PaymentMethod) : SimpleBuyIntent() {
@@ -155,9 +161,9 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
             )
     }
 
-    class UpdateExchangeRate(val currency: CryptoCurrency) : SimpleBuyIntent() {
+    class UpdateExchangePriceWithDelta(val currency: CryptoCurrency) : SimpleBuyIntent() {
         override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(exchangePrice = null)
+            oldState.copy(exchangePriceWithDelta = null)
     }
 
     object BuyButtonClicked : SimpleBuyIntent() {

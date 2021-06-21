@@ -865,7 +865,6 @@
     <string name="xlm_memo_id">ID mémo</string>
     <string name="airdrop_activity_title">Airdrops</string>
     <string name="simple_buy_intro_title">Bienvenue sur Blockchain</string>
-    <string name="simple_buy_buy_crypto">Acheter de la Crypto</string>
     <string name="simple_buy_instructions_to_buy">Nous pouvons vous aider à acheter en quelques étapes simples.</string>
     <string name="simple_buy_intro_main_button_action">Achetez de la Crypto maintenant</string>
     <string name="simple_buy_deposit_my_crypto">Visite du Wallet</string>

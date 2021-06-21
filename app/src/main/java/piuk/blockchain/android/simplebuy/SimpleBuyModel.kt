@@ -134,7 +134,7 @@ class SimpleBuyModel(
                     }
                 )
             }
-            is SimpleBuyIntent.UpdateExchangeRate -> interactor.exchangeRate(intent.currency)
+            is SimpleBuyIntent.UpdateExchangePriceWithDelta -> interactor.exchangeRate(intent.currency)
                 .subscribeBy(
                     onSuccess = { process(it) },
                     onError = { }

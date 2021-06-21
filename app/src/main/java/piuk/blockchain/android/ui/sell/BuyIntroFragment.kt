@@ -194,3 +194,8 @@ data class BuyCryptoItem(
     val percentageDelta: Double,
     val click: () -> Unit
 )
+
+data class ExchangePriceWithDelta(
+    val price: Money,
+    val delta: Double
+)

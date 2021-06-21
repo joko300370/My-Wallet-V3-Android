@@ -865,7 +865,6 @@
     <string name="xlm_memo_id">Memo ID</string>
     <string name="airdrop_activity_title">Airdrops</string>
     <string name="simple_buy_intro_title">Добро пожаловать в блокчейн</string>
-    <string name="simple_buy_buy_crypto">Купить Крипто</string>
     <string name="simple_buy_instructions_to_buy">Мы можем помочь вам купить всего за несколько простых шагов.</string>
     <string name="simple_buy_intro_main_button_action">Купить Crypto сейчас</string>
     <string name="simple_buy_deposit_my_crypto">Тур кошелек</string>
