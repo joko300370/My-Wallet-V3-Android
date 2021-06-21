@@ -43,7 +43,7 @@ import piuk.blockchain.android.ui.customviews.VerifyIdentityNumericBenefitItem
 import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.home.HomeNavigator
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
-import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionLauncher
 import piuk.blockchain.android.ui.transfer.AccountsSorting
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
@@ -72,6 +72,8 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     private val currencyPrefs: CurrencyPrefs by inject()
     private val analytics: Analytics by inject()
     private val accountsSorting: AccountsSorting by inject()
+    private val txLauncher: TransactionLauncher by inject()
+
     private val compositeDisposable = CompositeDisposable()
 
     override fun onCreateView(
@@ -267,15 +269,12 @@ class SellIntroFragment : Fragment(), DialogFlow.FlowHost {
     private fun statusDecorator(account: BlockchainAccount): CellDecorator = SellCellDecorator(account)
 
     private fun startSellFlow(it: CryptoAccount) {
-        TransactionFlow(
+        txLauncher.startFlow(
             sourceAccount = it,
-            action = AssetAction.Sell
-        ).apply {
-            startFlow(
-                fragmentManager = fragmentManager ?: return,
-                host = this@SellIntroFragment
-            )
-        }
+            action = AssetAction.Sell,
+            fragmentManager = fragmentManager ?: return,
+            flowHost = this@SellIntroFragment
+        )
         analytics.logEvent(BuySellViewedEvent(BuySellType.SELL))
     }
 

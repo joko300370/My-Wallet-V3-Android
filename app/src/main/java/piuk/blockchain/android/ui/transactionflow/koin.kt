@@ -12,17 +12,17 @@ import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionState
 import piuk.blockchain.android.ui.transactionflow.engine.TxFlowErrorReporting
 import piuk.blockchain.android.ui.transactionflow.flow.ActiveTransactionFlow
+import piuk.blockchain.android.ui.transactionflow.flow.AmountFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.CompoundNetworkFeeFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.EstimatedCompletionPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.ExchangePriceFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.FromPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.NetworkFormatter
+import piuk.blockchain.android.ui.transactionflow.flow.PaymentMethodPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.SalePropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.SwapExchangeRateFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.ToPropertyFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.TotalFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.PaymentMethodPropertyFormatter
-import piuk.blockchain.android.ui.transactionflow.flow.AmountFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.TransactionFeeFormatter
 import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapperCheckout
 import piuk.blockchain.android.ui.transactionflow.flow.TxOptionsFormatterCheckout
@@ -50,6 +50,13 @@ val transactionModule = module {
         .bind(TargetSelectionCustomisations::class)
         .bind(TransactionConfirmationCustomisations::class)
         .bind(TransactionProgressCustomisations::class)
+
+    factory {
+        TransactionLauncher(
+            flags = get(),
+            context = get()
+        )
+    }
 
     factory {
         ExchangePriceFormatter(

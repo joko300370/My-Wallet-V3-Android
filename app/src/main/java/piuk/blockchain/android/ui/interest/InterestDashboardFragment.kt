@@ -19,6 +19,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.Singles
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.AssetFilter
@@ -28,7 +29,7 @@ import piuk.blockchain.android.coincore.Coincore
 import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.databinding.FragmentInterestDashboardBinding
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
-import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionLauncher
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import timber.log.Timber
@@ -57,6 +58,7 @@ class InterestDashboardFragment : Fragment() {
     private val kycTierService: TierService by scopedInject()
     private val coincore: Coincore by scopedInject()
     private val assetResources: AssetResources by scopedInject()
+    private val txLauncher: TransactionLauncher by inject()
 
     private val listAdapter: InterestDashboardAdapter by lazy {
         InterestDashboardAdapter(
@@ -166,10 +168,12 @@ class InterestDashboardFragment : Fragment() {
             if (hasBalance) {
                 host.showInterestSummarySheet(interestAccount, cryptoCurrency)
             } else {
-                TransactionFlow(
+                txLauncher.startFlow(
                     target = it.accounts.first(),
-                    action = AssetAction.InterestDeposit
-                ).startFlow(parentFragmentManager, activity as DialogFlow.FlowHost)
+                    action = AssetAction.InterestDeposit,
+                    fragmentManager = parentFragmentManager,
+                    flowHost = activity as DialogFlow.FlowHost
+                )
             }
         }
     }

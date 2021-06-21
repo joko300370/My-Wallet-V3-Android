@@ -25,11 +25,11 @@ import piuk.blockchain.android.ui.base.MvpActivity
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.toast
-import piuk.blockchain.android.ui.transactionflow.DialogFlow
-import piuk.blockchain.android.ui.transactionflow.TransactionFlow
-import piuk.blockchain.android.ui.scan.QrScanActivity
 import piuk.blockchain.android.ui.scan.QrExpected
+import piuk.blockchain.android.ui.scan.QrScanActivity
 import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
+import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionLauncher
 import piuk.blockchain.androidcore.data.events.ActionEvent
 import piuk.blockchain.androidcore.data.rxjava.RxBus
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
@@ -37,14 +37,15 @@ import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import timber.log.Timber
 
 class AccountActivity : MvpActivity<AccountView, AccountPresenter>(),
-                        AccountView,
-                        AccountAdapter.Listener,
-                        AccountEditSheet.Host,
-                        DialogFlow.FlowHost {
+    AccountView,
+    AccountAdapter.Listener,
+    AccountEditSheet.Host,
+    DialogFlow.FlowHost {
 
     private val rxBus: RxBus by inject()
     private val secondPasswordHandler: SecondPasswordHandler by scopedInject()
     private val features: InternalFeatureFlagApi by inject()
+    private val txLauncher: TransactionLauncher by inject()
     private val compositeDisposable = CompositeDisposable()
 
     private val binding: ActivityAccountsBinding by lazy {
@@ -235,15 +236,12 @@ class AccountActivity : MvpActivity<AccountView, AccountPresenter>(),
     }
 
     private fun launchFlow(sourceAccount: CryptoAccount) {
-        TransactionFlow(
+        txLauncher.startFlow(
             sourceAccount = sourceAccount,
-            action = AssetAction.Send
-        ).apply {
-            startFlow(
-                fragmentManager = supportFragmentManager,
-                host = this@AccountActivity
-            )
-        }
+            action = AssetAction.Send,
+            fragmentManager = supportFragmentManager,
+            flowHost = this@AccountActivity
+        )
     }
 
     override fun onFlowFinished() {

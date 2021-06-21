@@ -6,6 +6,7 @@ import android.os.Bundle
 import com.blockchain.notifications.analytics.InterestAnalytics
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
@@ -18,7 +19,7 @@ import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
-import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionLauncher
 import piuk.blockchain.android.util.putAccount
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
 
@@ -30,6 +31,8 @@ class InterestDashboardActivity : BlockchainActivity(),
     private val binding: ActivityInterestDashboardBinding by lazy {
         ActivityInterestDashboardBinding.inflate(layoutInflater)
     }
+
+    private val txLauncher: TransactionLauncher by inject()
 
     override val alwaysDisableScreenshots: Boolean
         get() = false
@@ -63,19 +66,23 @@ class InterestDashboardActivity : BlockchainActivity(),
     override fun goToInterestDeposit(toAccount: InterestAccount) {
         clearBottomSheet()
         require(toAccount is CryptoAccount)
-        TransactionFlow(
+        txLauncher.startFlow(
             target = toAccount,
-            action = AssetAction.InterestDeposit
-        ).startFlow(supportFragmentManager, this)
+            action = AssetAction.InterestDeposit,
+            fragmentManager = supportFragmentManager,
+            flowHost = this
+        )
     }
 
     override fun goToInterestWithdraw(fromAccount: InterestAccount) {
         clearBottomSheet()
         require(fromAccount is CryptoAccount)
-        TransactionFlow(
+        txLauncher.startFlow(
             sourceAccount = fromAccount,
-            action = AssetAction.InterestWithdraw
-        ).startFlow(supportFragmentManager, this)
+            action = AssetAction.InterestWithdraw,
+            fragmentManager = supportFragmentManager,
+            flowHost = this
+        )
     }
 
     override fun onSheetClosed() {
@@ -117,11 +124,13 @@ class InterestDashboardActivity : BlockchainActivity(),
         fromAccount: SingleAccount,
         toAccount: SingleAccount
     ) {
-        TransactionFlow(
+        txLauncher.startFlow(
             sourceAccount = fromAccount as CryptoAccount,
             target = toAccount,
-            action = AssetAction.InterestDeposit
-        ).startFlow(supportFragmentManager, this)
+            action = AssetAction.InterestDeposit,
+            fragmentManager = supportFragmentManager,
+            flowHost = this
+        )
     }
 
     companion object {

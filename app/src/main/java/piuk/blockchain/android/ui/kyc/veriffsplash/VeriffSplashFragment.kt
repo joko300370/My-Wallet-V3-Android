@@ -36,7 +36,7 @@ import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
-import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionLauncher
 import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.goneIf
@@ -60,6 +60,8 @@ class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresente
 
     private val presenter: VeriffSplashPresenter by scopedInject()
     private val stringUtils: StringUtils by inject()
+    private val txLauncher: TransactionLauncher by inject()
+
     private val progressListener: KycProgressListener by ParentActivityDelegate(
         this
     )
@@ -183,14 +185,11 @@ class VeriffSplashFragment : BaseFragment<VeriffSplashView, VeriffSplashPresente
     }
 
     override fun continueToSwap() {
-        TransactionFlow(
-            action = AssetAction.Swap
-        ).apply {
-            startFlow(
-                fragmentManager = childFragmentManager,
-                host = this@VeriffSplashFragment
-            )
-        }
+        txLauncher.startFlow(
+            action = AssetAction.Swap,
+            fragmentManager = childFragmentManager,
+            flowHost = this@VeriffSplashFragment
+        )
     }
 
     override fun createPresenter(): VeriffSplashPresenter = presenter

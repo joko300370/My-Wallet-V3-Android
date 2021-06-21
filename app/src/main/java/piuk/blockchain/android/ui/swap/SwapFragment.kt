@@ -9,16 +9,16 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.blockchain.koin.scopedInject
+import com.blockchain.nabu.datamanagers.CustodialOrder
+import com.blockchain.nabu.datamanagers.CustodialWalletManager
+import com.blockchain.nabu.datamanagers.Product
+import com.blockchain.nabu.datamanagers.TransferLimits
+import com.blockchain.nabu.models.responses.nabu.KycTierLevel
+import com.blockchain.nabu.models.responses.nabu.KycTiers
+import com.blockchain.nabu.service.TierService
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.preferences.WalletStatus
-import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.nabu.models.responses.nabu.KycTierLevel
-import com.blockchain.nabu.models.responses.nabu.KycTiers
-import com.blockchain.nabu.datamanagers.TransferLimits
-import com.blockchain.nabu.datamanagers.CustodialOrder
-import com.blockchain.nabu.datamanagers.Product
-import com.blockchain.nabu.service.TierService
 import info.blockchain.balance.Money
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -35,19 +35,19 @@ import piuk.blockchain.android.databinding.FragmentSwapBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.ButtonOptions
 import piuk.blockchain.android.ui.customviews.KycBenefitsBottomSheet
+import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.TrendingPair
 import piuk.blockchain.android.ui.customviews.TrendingPairsProvider
 import piuk.blockchain.android.ui.customviews.VerifyIdentityNumericBenefitItem
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
-import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionLauncher
 import piuk.blockchain.android.ui.transactionflow.analytics.SwapAnalyticsEvents
-import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
-import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalyticsAccountType
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
+import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import timber.log.Timber
 
 class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Host, TradingWalletPromoBottomSheet.Host {
@@ -70,10 +70,12 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
     private val exchangeRateDataManager: ExchangeRateDataManager by scopedInject()
     private val trendingPairsProvider: TrendingPairsProvider by scopedInject()
     private val walletManager: CustodialWalletManager by scopedInject()
+    private val assetResources: AssetResources by scopedInject()
+
     private val currencyPrefs: CurrencyPrefs by inject()
     private val walletPrefs: WalletStatus by inject()
     private val analytics: Analytics by inject()
-    private val assetResources: AssetResources by scopedInject()
+    private val txLauncher: TransactionLauncher by inject()
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -107,14 +109,11 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
     }
 
     private fun startSwap() {
-        TransactionFlow(
-            action = AssetAction.Swap
-        ).apply {
-            startFlow(
-                fragmentManager = childFragmentManager,
-                host = this@SwapFragment
-            )
-        }
+        txLauncher.startFlow(
+            action = AssetAction.Swap,
+            fragmentManager = childFragmentManager,
+            flowHost = this@SwapFragment
+        )
     }
 
     override fun verificationCtaClicked() {
@@ -229,16 +228,13 @@ class SwapFragment : Fragment(), DialogFlow.FlowHost, KycBenefitsBottomSheet.Hos
 
     private fun onTrendingPairClicked(): (TrendingPair) -> Unit = { pair ->
         analytics.logEvent(SwapAnalyticsEvents.TrendingPairClicked)
-        TransactionFlow(
+        txLauncher.startFlow(
             sourceAccount = pair.sourceAccount,
             target = pair.destinationAccount,
-            action = AssetAction.Swap
-        ).apply {
-            startFlow(
-                fragmentManager = childFragmentManager,
-                host = this@SwapFragment
-            )
-        }
+            action = AssetAction.Swap,
+            fragmentManager = childFragmentManager,
+            flowHost = this@SwapFragment
+        )
         analytics.logEvent(
             SwapAnalyticsEvents.SwapAccountsSelected(
                 inputCurrency = pair.sourceAccount.asset.networkTicker,
