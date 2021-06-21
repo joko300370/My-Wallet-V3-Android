@@ -40,15 +40,19 @@ class AccountRecoveryActivity :
             AccountRecoveryStatus.RECOVERY_SUCCESSFUL -> start<PinEntryActivity>(this)
             AccountRecoveryStatus.RECOVERY_FAILED ->
                 toast(R.string.restore_failed, ToastCustom.TYPE_ERROR)
+            AccountRecoveryStatus.RESET_KYC_FAILED ->
+                toast(R.string.reset_kyc_failed, ToastCustom.TYPE_ERROR)
             else -> {
                 // Do nothing.
             }
         }
-        binding.progressBar.visibleIf {
-            newState.status == AccountRecoveryStatus.VERIFYING_SEED_PHRASE ||
-                newState.status == AccountRecoveryStatus.RECOVERING_CREDENTIALS
-        }
+        binding.progressBar.visibleIf { isRecoveryInProgress(newState) }
     }
+
+    private fun isRecoveryInProgress(newState: AccountRecoveryState) =
+        newState.status == AccountRecoveryStatus.VERIFYING_SEED_PHRASE ||
+            newState.status == AccountRecoveryStatus.RECOVERING_CREDENTIALS ||
+            newState.status == AccountRecoveryStatus.RESETTING_KYC
 
     private fun initControls() {
         with(binding) {

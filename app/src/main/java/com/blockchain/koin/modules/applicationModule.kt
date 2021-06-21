@@ -371,7 +371,8 @@ val applicationModule = module {
                 payloadDataManager = get(),
                 prefs = get(),
                 metadataInteractor = get(),
-                metadataDerivation = MetadataDerivation()
+                metadataDerivation = MetadataDerivation(),
+                nabuDataManager = get()
             )
         }
 

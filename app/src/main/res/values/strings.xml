@@ -2109,6 +2109,7 @@
     <string name="recovery_phrase_word_count_error">The Recovery Phrase must be exactly 12 words</string>
     <string name="reset_account_notice">Can’t find your recovery phrase? <annotation link="reset_account">Reset your account</annotation></string>
     <string name="reset_kyc_notice">For your security, you may have to re-verify your identity before accessing your trading or interest account.\n<annotation link="learn_more">Learn more</annotation></string>
+    <string name="reset_kyc_failed">Restoring account failed. Please try again.</string>
 
     <!-- Recurring buy screens -->
     <string name="recurring_buy_toolbar">Recurring Buys</string>

@@ -36,9 +36,9 @@ class AccountRecoveryModel(
 
     override fun performAction(previousState: AccountRecoveryState, intent: AccountRecoveryIntents): Disposable? {
         return when (intent) {
-            is AccountRecoveryIntents.VerifySeedPhrase -> verifyMnemonic(intent.seedPhrase)
-            is AccountRecoveryIntents.RecoverWalletCredentials -> recoverCredentials(intent.seedPhrase)
-            AccountRecoveryIntents.RestoreWallet -> restoreWallet()
+            is AccountRecoveryIntents.VerifySeedPhrase -> verifyMnemonic(seedPhrase = intent.seedPhrase)
+            is AccountRecoveryIntents.RecoverWalletCredentials -> recoverCredentials(seedPhrase = intent.seedPhrase)
+            is AccountRecoveryIntents.RestoreWallet -> restoreWallet()
             is AccountRecoveryIntents.UpdateStatus -> null
         }
     }
@@ -51,7 +51,11 @@ class AccountRecoveryModel(
             }
             else -> try {
                 mnemonicChecker.check(seedWords)
-                process(AccountRecoveryIntents.RecoverWalletCredentials(seedPhrase))
+                process(
+                    AccountRecoveryIntents.RecoverWalletCredentials(
+                        seedPhrase = seedPhrase
+                    )
+                )
             } catch (e: MnemonicException) {
                 process(AccountRecoveryIntents.UpdateStatus(AccountRecoveryStatus.INVALID_PHRASE))
             }
@@ -62,12 +66,23 @@ class AccountRecoveryModel(
     private fun recoverCredentials(seedPhrase: String): Disposable {
         return interactor.recoverCredentials(seedPhrase)
             .subscribeBy(
-                onComplete = { process(AccountRecoveryIntents.RestoreWallet) },
-                onError = { process(AccountRecoveryIntents.UpdateStatus(AccountRecoveryStatus.RECOVERY_FAILED)) }
+                onComplete = {
+                    process(AccountRecoveryIntents.RestoreWallet)
+                },
+                onError = {
+                    process(AccountRecoveryIntents.UpdateStatus(AccountRecoveryStatus.RECOVERY_FAILED))
+                }
             )
     }
 
-    private fun restoreWallet(): Disposable {
-        return interactor.restoreWallet().subscribe()
-    }
+    private fun restoreWallet(): Disposable =
+        interactor.recoverWallet()
+            .subscribeBy(
+                onComplete = {
+                    process(AccountRecoveryIntents.UpdateStatus(AccountRecoveryStatus.RECOVERY_SUCCESSFUL))
+                },
+                onError = {
+                    process(AccountRecoveryIntents.UpdateStatus(AccountRecoveryStatus.RESET_KYC_FAILED))
+                }
+            )
 }

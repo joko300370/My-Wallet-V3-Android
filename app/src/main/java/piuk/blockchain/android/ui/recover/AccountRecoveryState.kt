@@ -8,8 +8,10 @@ enum class AccountRecoveryStatus {
     INVALID_PHRASE,
     WORD_COUNT_ERROR,
     RECOVERING_CREDENTIALS,
+    RESETTING_KYC,
     RECOVERY_SUCCESSFUL,
-    RECOVERY_FAILED
+    RECOVERY_FAILED,
+    RESET_KYC_FAILED
 }
 
 data class AccountRecoveryState(

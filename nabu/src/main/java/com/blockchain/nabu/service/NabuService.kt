@@ -202,6 +202,15 @@ class NabuService(retrofit: Retrofit) {
         authorization = "Bearer ${offlineToken.token}"
     ).wrapErrorMessage()
 
+    internal fun resetUserKyc(
+        offlineToken: NabuOfflineTokenResponse,
+        jwt: String
+    ): Completable = service.resetUserKyc(
+        offlineToken.userId,
+        NabuJwt(jwt),
+        authorization = "Bearer ${offlineToken.token}"
+    ).wrapErrorMessage()
+
     internal fun registerCampaign(
         sessionToken: NabuSessionTokenResponse,
         campaignRequest: RegisterCampaignRequest,

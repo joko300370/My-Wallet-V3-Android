@@ -29,8 +29,6 @@ sealed class AccountRecoveryIntents : MviIntent<AccountRecoveryState> {
 
     object RestoreWallet : AccountRecoveryIntents() {
         override fun reduce(oldState: AccountRecoveryState): AccountRecoveryState =
-            oldState.copy(
-                status = AccountRecoveryStatus.RECOVERY_SUCCESSFUL
-            )
+            oldState.copy(status = AccountRecoveryStatus.RESETTING_KYC)
     }
 }

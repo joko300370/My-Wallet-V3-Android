@@ -49,8 +49,14 @@ class AccountRecoveryModelTest {
         // Assert
         testState.assertValues(
             AccountRecoveryState(),
-            AccountRecoveryState(seedPhrase = seedPhrase, status = AccountRecoveryStatus.VERIFYING_SEED_PHRASE),
-            AccountRecoveryState(seedPhrase = seedPhrase, status = AccountRecoveryStatus.WORD_COUNT_ERROR)
+            AccountRecoveryState(
+                seedPhrase = seedPhrase,
+                status = AccountRecoveryStatus.VERIFYING_SEED_PHRASE
+            ),
+            AccountRecoveryState(
+                seedPhrase = seedPhrase,
+                status = AccountRecoveryStatus.WORD_COUNT_ERROR
+            )
         )
     }
 
@@ -61,7 +67,7 @@ class AccountRecoveryModelTest {
         whenever(interactor.recoverCredentials(seedPhrase)).thenReturn(
             Completable.complete()
         )
-        whenever(interactor.restoreWallet()).thenReturn(
+        whenever(interactor.recoverWallet()).thenReturn(
             Completable.complete()
         )
 
@@ -71,9 +77,18 @@ class AccountRecoveryModelTest {
         // Assert
         testState.assertValues(
             AccountRecoveryState(),
-            AccountRecoveryState(seedPhrase = seedPhrase, status = AccountRecoveryStatus.VERIFYING_SEED_PHRASE),
-            AccountRecoveryState(seedPhrase = seedPhrase, status = AccountRecoveryStatus.RECOVERING_CREDENTIALS),
-            AccountRecoveryState(seedPhrase = seedPhrase, status = AccountRecoveryStatus.RECOVERY_SUCCESSFUL)
+            AccountRecoveryState(
+                seedPhrase = seedPhrase,
+                status = AccountRecoveryStatus.VERIFYING_SEED_PHRASE),
+            AccountRecoveryState(
+                seedPhrase = seedPhrase,
+                status = AccountRecoveryStatus.RECOVERING_CREDENTIALS),
+            AccountRecoveryState(
+                seedPhrase = seedPhrase,
+                status = AccountRecoveryStatus.RESETTING_KYC),
+            AccountRecoveryState(
+                seedPhrase = seedPhrase,
+                status = AccountRecoveryStatus.RECOVERY_SUCCESSFUL)
         )
     }
 
@@ -91,9 +106,15 @@ class AccountRecoveryModelTest {
         // Assert
         testState.assertValues(
             AccountRecoveryState(),
-            AccountRecoveryState(seedPhrase = seedPhrase, status = AccountRecoveryStatus.VERIFYING_SEED_PHRASE),
-            AccountRecoveryState(seedPhrase = seedPhrase, status = AccountRecoveryStatus.RECOVERING_CREDENTIALS),
-            AccountRecoveryState(seedPhrase = seedPhrase, status = AccountRecoveryStatus.RECOVERY_FAILED)
+            AccountRecoveryState(
+                seedPhrase = seedPhrase,
+                status = AccountRecoveryStatus.VERIFYING_SEED_PHRASE),
+            AccountRecoveryState(
+                seedPhrase = seedPhrase,
+                status = AccountRecoveryStatus.RECOVERING_CREDENTIALS),
+            AccountRecoveryState(
+                seedPhrase = seedPhrase,
+                status = AccountRecoveryStatus.RECOVERY_FAILED)
         )
     }
 }

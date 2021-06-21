@@ -117,6 +117,8 @@ interface NabuDataManager {
 
     fun currentToken(offlineToken: NabuOfflineTokenResponse): Single<NabuSessionTokenResponse>
 
+    fun resetUserKyc(): Completable
+
     fun linkWalletWithMercury(offlineTokenResponse: NabuOfflineTokenResponse): Single<String>
 
     fun linkMercuryWithWallet(
@@ -359,6 +361,14 @@ internal class NabuDataManagerImpl(
                 .map { (it as Optional.Some).element }
                 .singleOrError()
         }
+
+    override fun resetUserKyc(): Completable {
+        return requestJwt().flatMapCompletable { jwt ->
+            nabuService.getAuthToken(jwt).flatMapCompletable { response ->
+                nabuService.resetUserKyc(response, jwt)
+            }
+        }
+    }
 
     override fun linkWalletWithMercury(offlineTokenResponse: NabuOfflineTokenResponse): Single<String> =
         authenticate(offlineTokenResponse) {
