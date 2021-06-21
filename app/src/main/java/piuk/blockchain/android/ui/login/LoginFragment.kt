@@ -14,6 +14,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.FragmentLoginBinding
 import piuk.blockchain.android.ui.auth.PinEntryActivity
@@ -24,12 +25,17 @@ import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.ui.scan.QrExpected
 import piuk.blockchain.android.ui.scan.QrScanActivity
 import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
+import piuk.blockchain.android.ui.start.ManualPairingActivity
+import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import timber.log.Timber
 
 class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState, FragmentLoginBinding>() {
 
     override val model: LoginModel by scopedInject()
+
+    private val environmentConfig: EnvironmentConfig by inject()
 
     private val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build()
 
@@ -75,6 +81,15 @@ class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState, Fragment
             }
             continueWithGoogleButton.setOnClickListener {
                 startActivityForResult(googleSignInClient.signInIntent, RC_SIGN_IN)
+            }
+            if (environmentConfig.isRunningInDebugMode()) {
+                manualPairingButton.apply {
+                    setOnClickListener {
+                        startActivity(Intent(context, ManualPairingActivity::class.java))
+                    }
+                    isEnabled = true
+                    visible()
+                }
             }
         }
     }
