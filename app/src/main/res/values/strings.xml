@@ -243,6 +243,9 @@
         advised that other applications may be able to look at this information.
     </string>
 
+    <string name="receive_rotating_address_title">Did you know?</string>
+    <string name="receive_rotating_address_desc">For added security, we create a new %1$s address for every request you make. Each unique address is linked to your %2$s.</string>
+
     <string name="guid_to_clipboard">Copy your Wallet ID to the clipboard? If so, be advised that
         other applications may be able to look at this information.
     </string>

@@ -22,7 +22,11 @@ internal data class ReceiveState(
     val qrBitmap: Bitmap? = null,
     val qrDimension: Int = 0,
     val shareList: List<SendPaymentCodeData> = emptyList()
-) : MviState
+) : MviState {
+    fun shouldShowXlmMemo() = address.memo != null
+
+    fun shouldShowRotatingAddressInfo() = !account.hasStaticAddress
+}
 
 internal sealed class ReceiveIntent : MviIntent<ReceiveState>
 internal class InitWithAccount(
@@ -75,6 +79,10 @@ internal object AddressError : ReceiveIntent() {
     override fun reduce(oldState: ReceiveState): ReceiveState = oldState
 }
 
+internal object ClearShareList : ReceiveIntent() {
+    override fun reduce(oldState: ReceiveState): ReceiveState = oldState.copy(shareList = emptyList())
+}
+
 internal class ReceiveModel(
     private val qrCodeDataManager: QrCodeDataManager,
     private val receiveIntentHelper: ReceiveIntentHelper,
@@ -97,7 +105,8 @@ internal class ReceiveModel(
             is UpdateShareList,
             is UpdateAddress,
             is UpdateQrCode,
-            is AddressError -> null
+            is AddressError,
+            is ClearShareList -> null
         }
 
     private fun handleInit(account: CryptoAccount): Disposable =

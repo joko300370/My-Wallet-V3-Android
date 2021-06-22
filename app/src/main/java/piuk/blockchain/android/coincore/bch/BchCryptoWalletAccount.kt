@@ -164,6 +164,8 @@ internal class BchCryptoWalletAccount private constructor(
     override fun doesAddressBelongToWallet(address: String): Boolean =
         payloadDataManager.isOwnHDAddress(address)
 
+    override val hasStaticAddress: Boolean = false
+
     companion object {
         fun createBchAccount(
             payloadManager: PayloadDataManager,

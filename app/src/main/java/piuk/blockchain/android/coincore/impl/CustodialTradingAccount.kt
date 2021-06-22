@@ -129,8 +129,7 @@ open class CustodialTradingAccount(
     override val isDefault: Boolean =
         false // Default is, presently, only ever a non-custodial account.
 
-    override
-    val sourceState: Single<TxSourceState>
+    override val sourceState: Single<TxSourceState>
         get() = Singles.zip(
             accountBalance,
             actionableBalance
@@ -164,6 +163,8 @@ open class CustodialTradingAccount(
                     AssetAction.Buy, sell, swap, send, receive, interest, activity
                 )
             }
+
+    override val hasStaticAddress: Boolean = false
 
     private fun appendTransferActivity(
         custodialWalletManager: CustodialWalletManager,

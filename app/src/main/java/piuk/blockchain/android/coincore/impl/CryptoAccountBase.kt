@@ -38,7 +38,6 @@ internal const val transactionFetchCount = 50
 internal const val transactionFetchOffset = 0
 
 abstract class CryptoAccountBase : CryptoAccount {
-
     protected abstract val exchangeRates: ExchangeRateDataManager
 
     final override var hasTransactions: Boolean = false

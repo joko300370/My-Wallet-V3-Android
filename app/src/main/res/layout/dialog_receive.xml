@@ -4,28 +4,36 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/switcher"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/receive_main_content"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="@dimen/standard_margin"
-        android:paddingBottom="16dp">
+        android:layout_height="match_parent"
+        android:padding="@dimen/standard_margin">
 
-        <TextView
-            android:id="@+id/receive_title"
-            android:layout_width="0dp"
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/sheet_indicator"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/tx_title_receive"
-            tools:text="Receive BTC"
-            style="@style/Text.Semibold.20"
-            android:layout_marginStart="@dimen/standard_margin"
-            android:layout_marginEnd="@dimen/standard_margin"
+            android:layout_gravity="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/vector_sheet_indicator_small" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/receive_title"
+            style="@style/Text.Semibold.20"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/tiny_margin"
+            android:text="@string/tx_title_receive"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/sheet_indicator"
+            tools:text="Receive BTC" />
 
         <piuk.blockchain.android.ui.customviews.account.AccountInfoCrypto
             android:id="@+id/receive_account_details"
@@ -44,7 +52,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/qrImage" />
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/qrImage"
             android:layout_width="180dp"
             android:layout_height="180dp"
@@ -55,80 +63,104 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/receive_account_details" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/receiving_address"
+            style="@style/Text.Standard.14"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal|center_vertical"
             android:layout_marginTop="@dimen/small_margin"
-            android:layout_marginStart="@dimen/large_margin"
-            android:layout_marginEnd="@dimen/large_margin"
+            android:layout_marginBottom="@dimen/small_margin"
+            android:ellipsize="middle"
             android:gravity="center_horizontal|center_vertical"
             android:padding="8dp"
-            android:ellipsize="middle"
-            style="@style/Text.Standard.14"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/qrImage"
             tools:text="Some bitcoin address" />
 
-        <FrameLayout
-            android:id="@+id/customised"
+        <Button
+            android:id="@+id/copy_button"
+            style="@style/CtaButton.NoMargin.White"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/large_margin"
-            android:layout_marginEnd="@dimen/large_margin"
-            android:layout_marginTop="@dimen/standard_margin"
-            android:layout_marginBottom="@dimen/large_margin"
+            android:layout_marginTop="@dimen/tiny_margin"
+            android:text="@string/receive_copy"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/receiving_address"
-            app:layout_constraintBottom_toTopOf="@id/share_button"/>
+            app:layout_goneMarginBottom="@dimen/small_margin" />
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/customisation_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/small_margin"
+            android:layout_marginBottom="@dimen/tiny_margin"
+            android:fadeScrollbars="false"
+            android:fadingEdgeLength="@dimen/very_small_margin"
+            android:requiresFadingEdge="vertical"
+            android:scrollbars="vertical"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintBottom_toTopOf="@id/share_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/copy_button">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/customisation_slots"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </androidx.core.widget.NestedScrollView>
 
         <Button
             android:id="@+id/share_button"
-            style="@style/CtaButton.Blue"
+            style="@style/CtaButton.NoMargin.Blue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/small_margin"
             android:text="@string/receive_share"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/copy_button"/>
-
-        <Button
-            android:id="@+id/copy_button"
-            style="@style/CtaButton.White"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/receive_copy"
-            android:layout_marginBottom="@dimen/small_margin"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/share_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="@dimen/standard_margin"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:padding="@dimen/standard_margin">
 
-        <TextView
-            android:id="@+id/share_title"
-            android:layout_width="match_parent"
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/share_back"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/tx_title_receive"
+            app:layout_constraintBottom_toBottomOf="@id/share_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/share_title"
+            app:srcCompat="@drawable/ic_arrow_back_blue" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/share_title"
             style="@style/Text.Semibold.20"
-            tools:text="Share Address With"/>
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/medium_margin"
+            android:text="@string/tx_title_receive"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/share_back"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Share Address With" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/share_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/small_margin"
             android:elevation="5dp"
-            android:orientation="vertical"/>
-    </LinearLayout>
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/share_title" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ViewSwitcher>

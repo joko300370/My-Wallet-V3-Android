@@ -74,6 +74,9 @@ interface CryptoAccount : SingleAccount {
         get() = Single.just(CryptoValue.zero(asset))
 
     fun matches(other: CryptoAccount): Boolean
+
+    val hasStaticAddress: Boolean
+        get() = true
 }
 
 interface FiatAccount : SingleAccount {
@@ -133,6 +136,7 @@ class NullCryptoAccount(
     override val actions: Single<AvailableActions> = Single.just(emptySet())
 
     override val isFunded: Boolean = false
+
     override val hasTransactions: Boolean = false
 
     override fun requireSecondPassword(): Single<Boolean> = Single.just(false)

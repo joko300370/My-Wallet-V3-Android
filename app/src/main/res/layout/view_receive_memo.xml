@@ -3,33 +3,34 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/receive_memo_parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/memo_label"
+        style="@style/Text.Standard.14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/small_margin"
+        android:layout_marginTop="@dimen/tiny_margin"
         android:gravity="start"
         android:padding="8dp"
         android:text="@string/receive_memo_title"
-        style="@style/Text.Standard.14"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="XLM Memo" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/memo_text"
+        style="@style/Text.Standard.14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|center_vertical"
-        android:layout_marginTop="@dimen/small_margin"
+        android:layout_marginTop="@dimen/tiny_margin"
+        android:ellipsize="middle"
         android:gravity="start"
         android:padding="8dp"
-        android:ellipsize="middle"
-        style="@style/Text.Standard.14"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="xxxxxxxxxxxxx" />
@@ -37,25 +38,27 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bkgd_grey_100_rounded"
+        android:layout_marginStart="@dimen/tiny_margin"
+        android:layout_marginEnd="@dimen/tiny_margin"
+        android:background="@drawable/bkgd_grey_000_rounded"
         android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/memo_text"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/memo_text">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/memo_warn"
             style="@style/Text.Standard.12"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="@dimen/minuscule_margin"
-            android:paddingEnd="@dimen/minuscule_margin"
-            android:paddingTop="@dimen/minuscule_margin"
-            android:paddingBottom="@dimen/smallest_margin"
             android:gravity="start"
-            android:text="@string/receive_memo_warning"
+            android:paddingStart="@dimen/minuscule_margin"
+            android:paddingTop="@dimen/minuscule_margin"
+            android:paddingEnd="@dimen/minuscule_margin"
+            android:paddingBottom="@dimen/smallest_margin"
             android:singleLine="false"
+            android:text="@string/receive_memo_warning"
             tools:text="If you send funds without the XLM Memo Text, your funds will be lost and not credited to your account. Please send only XLM to this address." />
 
         <androidx.appcompat.widget.AppCompatTextView
@@ -63,12 +66,12 @@
             style="@style/Text.Standard.12"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="start"
             android:paddingStart="@dimen/minuscule_margin"
             android:paddingEnd="@dimen/minuscule_margin"
             android:paddingBottom="@dimen/minuscule_margin"
-            android:gravity="start"
-            android:text="@string/common_linked_learn_more"
             android:singleLine="true"
+            android:text="@string/common_linked_learn_more"
             tools:text="Learn more" />
     </LinearLayout>
 

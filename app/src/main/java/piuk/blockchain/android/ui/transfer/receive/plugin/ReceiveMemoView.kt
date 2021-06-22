@@ -18,7 +18,7 @@ class ReceiveMemoView @JvmOverloads constructor(
     defStyle: Int = 0
 ) : ConstraintLayout(ctx, attr, defStyle) {
 
-    val binding: ViewReceiveMemoBinding =
+    private val binding: ViewReceiveMemoBinding =
         ViewReceiveMemoBinding.inflate(LayoutInflater.from(context), this, true)
 
     fun updateAddress(address: CryptoAddress) {
