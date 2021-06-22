@@ -427,9 +427,6 @@ class DashboardInteractor(
         }
     }
 
-    private fun FiatAccount.isOpenBankingCurrency() =
-        this.fiatCurrency == "EUR" || this.fiatCurrency == "GBP"
-
     private fun handleNoLinkedBanks(
         targetAccount: FiatAccount,
         paymentMethodForAction: LinkablePaymentMethodsForAction

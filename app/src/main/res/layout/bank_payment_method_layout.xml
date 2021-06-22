@@ -63,15 +63,4 @@
         app:layout_constraintTop_toBottomOf="@+id/payment_method_details"
         tools:text="$5,000 USD Limit" />
 
-    <View
-        style="@style/Separator"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="@dimen/small_margin"
-        android:layout_marginBottom="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

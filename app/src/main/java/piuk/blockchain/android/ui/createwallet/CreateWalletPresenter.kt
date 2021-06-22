@@ -4,6 +4,7 @@ import android.app.LauncherActivity
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.preferences.WalletStatus
+import info.blockchain.wallet.util.PasswordUtil
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
 import piuk.blockchain.android.R
@@ -17,6 +18,7 @@ import piuk.blockchain.androidcore.utils.PrngFixer
 import piuk.blockchain.androidcoreui.ui.base.BasePresenter
 import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
+import kotlin.math.roundToInt
 
 class CreateWalletPresenter(
     private val payloadDataManager: PayloadDataManager,
@@ -29,8 +31,6 @@ class CreateWalletPresenter(
     private val environmentConfig: EnvironmentConfig,
     private val formatChecker: FormatChecker
 ) : BasePresenter<CreateWalletView>() {
-
-    var passwordStrength = 0
 
     override fun onViewReady() {
         // No-op
@@ -50,7 +50,7 @@ class CreateWalletPresenter(
             password1 != password2 -> {
                 view.showError(R.string.password_mismatch_error); false
             }
-            !passwordStrength.isStrongEnough() -> {
+            !PasswordUtil.getStrength(password1).roundToInt().isStrongEnough() -> {
                 view.warnWeakPassword(email, password1); false
             }
             else -> true

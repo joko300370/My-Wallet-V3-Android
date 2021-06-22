@@ -940,7 +940,6 @@
     <string name="buy_max">Max Satın Alın</string>
     <string name="bank_wire_transfer">Banka havalesi</string>
     <string name="credit_or_debit_card">Kredi veya Banka Kartı</string>
-    <string name="add_credit_or_debit_card">kredi kartı veya bankamatik kartı ekle</string>
     <string name="payment_method_limit">%1$s Sınırı</string>
     <string name="order_details">sipariş detayları</string>
     <string name="purchase_bank_note">Paranızı aldıktan sonra, %1$s satın alma siparişinize başlayacağız. Nihai tutarınızın vadesi gelmiş piyasa etkinliğine göre değişebileceğini unutmayın. Ücret uygulanabilir.</string>

@@ -53,6 +53,7 @@ import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.mukesh.countrypicker.CountryPicker
 import info.blockchain.wallet.api.data.Settings
+import info.blockchain.wallet.util.PasswordUtil
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import org.koin.android.ext.android.inject
@@ -114,6 +115,7 @@ import piuk.blockchain.androidcoreui.utils.logging.Logging
 import timber.log.Timber
 import java.util.Calendar
 import java.util.Locale
+import kotlin.math.roundToInt
 
 class SettingsFragment : PreferenceFragmentCompat(),
     SettingsView,
@@ -190,7 +192,6 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
     private var isMWAEnabled: Boolean = false
 
-    private var pwStrength = 0
     private var progressDialog: MaterialProgressDialog? = null
 
     private val reviewManager: ReviewManager by lazy {
@@ -1051,6 +1052,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
             LayoutInflater.from(settingsActivity.layoutInflater.context), null, false
         )
         with(changePasswordBinding) {
+
             currentPassword.requestFocus()
             newPassword.addTextChangedListener(object : AfterTextChangedWatcher() {
                 override fun afterTextChanged(editable: Editable) {
@@ -1089,7 +1091,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
                                         ToastCustom.LENGTH_SHORT,
                                         ToastCustom.TYPE_ERROR
                                     )
-                                } else if (pwStrength < 50) {
+                                } else if (PasswordUtil.getStrength(newPw).roundToInt() < 50) {
                                     AlertDialog.Builder(settingsActivity, R.style.AlertDialogStyle)
                                         .setTitle(R.string.app_name)
                                         .setMessage(R.string.weak_password)
@@ -1197,7 +1199,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
         passwordStrengthView: PasswordStrengthView
     ) {
         if (activity != null && !settingsActivity.isFinishing) {
-            passwordStrengthView.updatePasswordStrength(passwordEntered)
+            passwordStrengthView.updatePassword(passwordEntered)
         }
     }
 

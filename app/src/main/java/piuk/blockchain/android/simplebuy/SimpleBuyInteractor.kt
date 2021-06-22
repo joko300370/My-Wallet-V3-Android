@@ -288,7 +288,7 @@ class SimpleBuyInteractor(
                             .firstOrNull()?.isEligible ?: false,
                         canAddCard = paymentMethods.filterIsInstance<PaymentMethod.UndefinedCard>()
                             .firstOrNull()?.isEligible ?: false,
-                        canLinkFunds = paymentMethods.filterIsInstance<PaymentMethod.UndefinedFunds>()
+                        canLinkFunds = paymentMethods.filterIsInstance<PaymentMethod.UndefinedBankAccount>()
                             .firstOrNull()?.isEligible ?: false,
                         preselectedId = preselectedId
                     )

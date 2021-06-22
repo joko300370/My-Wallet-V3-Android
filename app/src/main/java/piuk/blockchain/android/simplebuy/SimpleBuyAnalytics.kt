@@ -69,8 +69,8 @@ fun PaymentMethod.toAnalyticsString(): String =
     when (this) {
         is PaymentMethod.Card,
         is PaymentMethod.UndefinedCard -> "CARD"
-        is PaymentMethod.Funds,
-        is PaymentMethod.UndefinedFunds -> "FUNDS"
+        is PaymentMethod.Funds -> "FUNDS"
+        is PaymentMethod.UndefinedBankAccount -> "BANK_ACCOUNT"
         is PaymentMethod.Bank,
         is PaymentMethod.UndefinedBankTransfer -> "LINK_BANK"
         else -> ""

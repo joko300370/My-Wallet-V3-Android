@@ -945,7 +945,6 @@
     <string name="buy_max">Купить Макс</string>
     <string name="bank_wire_transfer">Банковский перевод</string>
     <string name="credit_or_debit_card">Кредитная или дебетовая карта</string>
-    <string name="add_credit_or_debit_card">Добавить кредитную или дебетовую карту</string>
     <string name="payment_method_limit">%1$s лимит</string>
     <string name="order_details">Информация для заказа</string>
     <string name="purchase_bank_note">Как только мы получим ваши средства, мы начнем ваш заказ на покупку %1$s . Обратите внимание, что ваша окончательная сумма может измениться в зависимости от рыночной активности. Может взиматься плата.</string>

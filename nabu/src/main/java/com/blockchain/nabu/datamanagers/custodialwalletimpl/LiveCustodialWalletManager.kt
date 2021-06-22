@@ -654,7 +654,7 @@ class LiveCustodialWalletManager(
                         paymentMethod.currency == fiatCurrency
                     ) {
                         availablePaymentMethods.add(
-                            PaymentMethod.UndefinedFunds(
+                            PaymentMethod.UndefinedBankAccount(
                                 paymentMethod.currency,
                                 PaymentLimits(
                                     paymentMethod.limits.min, paymentMethod.limits.max, paymentMethod.currency

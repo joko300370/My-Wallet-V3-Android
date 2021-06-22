@@ -42,7 +42,7 @@ class PasswordStrengthView(context: Context, attrs: AttributeSet) : ConstraintLa
         binding.passStrengthBar.max = 100
     }
 
-    fun updatePasswordStrength(password: String) {
+    fun updatePassword(password: String) {
         val passwordStrength = PasswordUtil.getStrength(password).roundToInt()
         setStrengthProgress(passwordStrength)
 

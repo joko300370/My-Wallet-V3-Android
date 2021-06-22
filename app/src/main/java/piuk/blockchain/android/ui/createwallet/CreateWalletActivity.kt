@@ -79,7 +79,7 @@ class CreateWalletActivity : BaseMvpActivity<CreateWalletView, CreateWalletPrese
                 .doOnNext {
                     showEntropyContainer()
                     presenter.logEventPasswordOneClicked()
-                    binding.entropyContainer.updatePasswordStrength(it.editable().toString())
+                    binding.entropyContainer.updatePassword(it.editable().toString())
                     hideShowCreateButton(
                         it.editable().toString().length,
                         walletPassConfirm.getTextString().length,

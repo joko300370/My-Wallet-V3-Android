@@ -130,7 +130,7 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
                     // we skip undefined funds cause this payment method should trigger a bottom sheet
                     // and it should always be actioned before
                     val paymentMethodsThatCanBePreselected =
-                        availablePaymentMethods.filter { it !is PaymentMethod.UndefinedFunds }
+                        availablePaymentMethods.filter { it !is PaymentMethod.UndefinedBankAccount }
                     paymentMethodsThatCanBePreselected.firstOrNull { it.isEligible && it.canUsedForPaying() }?.id
                         ?: paymentMethodsThatCanBePreselected.firstOrNull { it.isEligible }?.id
                         ?: paymentMethodsThatCanBePreselected.firstOrNull()?.id
@@ -153,17 +153,12 @@ sealed class SimpleBuyIntent : MviIntent<SimpleBuyState> {
                         is PaymentMethod.UndefinedCard -> PaymentMethodType.PAYMENT_CARD
                         is PaymentMethod.Bank -> PaymentMethodType.BANK_TRANSFER
                         is PaymentMethod.Funds -> PaymentMethodType.FUNDS
-                        is PaymentMethod.UndefinedFunds -> PaymentMethodType.FUNDS
+                        is PaymentMethod.UndefinedBankAccount -> PaymentMethodType.FUNDS
                         else -> PaymentMethodType.PAYMENT_CARD
                     },
                     paymentMethod.isEligible
                 )
             )
-    }
-
-    class UpdateExchangePriceWithDelta(val currency: CryptoCurrency) : SimpleBuyIntent() {
-        override fun reduce(oldState: SimpleBuyState): SimpleBuyState =
-            oldState.copy(exchangePriceWithDelta = null)
     }
 
     object BuyButtonClicked : SimpleBuyIntent() {

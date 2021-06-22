@@ -75,11 +75,11 @@ class CreateWalletPresenterTest {
                 Wallet()
             )
         )
+
         whenever(payloadDataManager.wallet!!.guid).thenReturn(guid)
         whenever(payloadDataManager.wallet!!.sharedKey).thenReturn(sharedKey)
 
         // Act
-        subject.passwordStrength = 80
         subject.createOrRestoreWallet(email, pw1, recoveryPhrase)
         // Assert
         verify(prngFixer).applyPRNGFixes()
@@ -139,9 +139,7 @@ class CreateWalletPresenterTest {
         val pw1 = "MyTestWallet"
         val pw2 = "MyTestWallet"
         whenever(formatChecker.isValidEmailAddress(anyString())).thenReturn(true)
-
         // Act
-        subject.passwordStrength = 80
         val result = subject.validateCredentials(email, pw1, pw2)
         // Assert
         assert(result)
@@ -150,12 +148,11 @@ class CreateWalletPresenterTest {
 
     @Test
     fun `validateCredentials invalid email`() {
+        val pw1 = "MyTestWallet"
         // Arrange
         whenever(formatChecker.isValidEmailAddress(anyString())).thenReturn(false)
-
         // Act
-        subject.passwordStrength = 80
-        val result = subject.validateCredentials("john", "MyTestWallet", "MyTestWallet")
+        val result = subject.validateCredentials("john", pw1, pw1)
         // Assert
         assert(!result)
         verify(view).showError(R.string.invalid_email)
@@ -164,12 +161,11 @@ class CreateWalletPresenterTest {
 
     @Test
     fun `validateCredentials short password`() {
+        val pw1 = "aaa"
         // Arrange
         whenever(formatChecker.isValidEmailAddress(anyString())).thenReturn(true)
-
         // Act
-        subject.passwordStrength = 80
-        val result = subject.validateCredentials("john@snow.com", "aaa", "aaa")
+        val result = subject.validateCredentials("john@snow.com", pw1, pw1)
         // Assert
         assert(!result)
         verify(view).showError(R.string.invalid_password_too_short)
@@ -178,12 +174,11 @@ class CreateWalletPresenterTest {
 
     @Test
     fun `validateCredentials password mismatch`() {
+        val pw1 = "MyTestWallet"
         // Arrange
         whenever(formatChecker.isValidEmailAddress(anyString())).thenReturn(true)
-
         // Act
-        subject.passwordStrength = 80
-        val result = subject.validateCredentials("john@snow.com", "MyTestWallet", "MyTestWallet2")
+        val result = subject.validateCredentials("john@snow.com", pw1, "MyTestWallet2")
         // Assert
         assert(!result)
         verify(view).showError(R.string.password_mismatch_error)
@@ -192,12 +187,12 @@ class CreateWalletPresenterTest {
 
     @Test
     fun `validateCredentials weak password running on non debug mode`() {
+        val pw1 = "aaaaaa"
         // Arrange
         whenever(formatChecker.isValidEmailAddress(anyString())).thenReturn(true)
         whenever(environmentConfig.isRunningInDebugMode()).thenReturn(false)
         // Act
-        subject.passwordStrength = 20
-        val result = subject.validateCredentials("john@snow.com", "aaaaaa", "aaaaaa")
+        val result = subject.validateCredentials("john@snow.com", pw1, pw1)
         // Assert
         assert(!result)
         verify(view).warnWeakPassword(any(), any())
@@ -206,12 +201,12 @@ class CreateWalletPresenterTest {
 
     @Test
     fun `validateCredentials weak password running on  debug mode`() {
+        val pw1 = "aaaaaa"
         // Arrange
         whenever(formatChecker.isValidEmailAddress(anyString())).thenReturn(true)
         whenever(environmentConfig.isRunningInDebugMode()).thenReturn(true)
         // Act
-        subject.passwordStrength = 5
-        val result = subject.validateCredentials("john@snow.com", "aaaaaa", "aaaaaa")
+        val result = subject.validateCredentials("john@snow.com", pw1, pw1)
         // Assert
         assert(result)
         verifyZeroInteractions(view)
