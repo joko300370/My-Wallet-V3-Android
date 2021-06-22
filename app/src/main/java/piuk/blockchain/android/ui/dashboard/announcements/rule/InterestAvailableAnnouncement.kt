@@ -2,7 +2,6 @@ package piuk.blockchain.android.ui.dashboard.announcements.rule
 
 import androidx.annotation.VisibleForTesting
 import com.blockchain.notifications.analytics.Analytics
-import com.blockchain.notifications.analytics.InterestAnalytics
 import io.reactivex.Single
 import org.koin.core.KoinComponent
 import org.koin.core.inject
@@ -12,6 +11,7 @@ import piuk.blockchain.android.ui.dashboard.announcements.AnnouncementRule
 import piuk.blockchain.android.ui.dashboard.announcements.DismissRecorder
 import piuk.blockchain.android.ui.dashboard.announcements.DismissRule
 import piuk.blockchain.android.ui.dashboard.announcements.StandardAnnouncementCard
+import piuk.blockchain.android.ui.transactionflow.analytics.InterestAnalytics
 
 class InterestAvailableAnnouncement(
     dismissRecorder: DismissRecorder
@@ -39,7 +39,7 @@ class InterestAvailableAnnouncement(
                 iconImage = R.drawable.ic_interest_blue_circle,
                 ctaText = R.string.interest_announcement_action,
                 ctaFunction = {
-                    analytics.logEvent(InterestAnalytics.INTEREST_ANNOUNCEMENT_CTA)
+                    analytics.logEvent(InterestAnalytics.InterestAnnouncementCta)
                     host.dismissAnnouncementCard()
                     host.startInterestDashboard()
                 },

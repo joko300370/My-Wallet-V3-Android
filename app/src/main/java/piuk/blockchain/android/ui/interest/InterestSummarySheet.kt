@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.datamanagers.CustodialWalletManager
-import com.blockchain.notifications.analytics.InterestAnalytics
+import com.blockchain.notifications.analytics.LaunchOrigin
 import com.blockchain.preferences.CurrencyPrefs
 import com.blockchain.utils.secondsToDays
 import info.blockchain.balance.CryptoCurrency
@@ -31,6 +31,7 @@ import piuk.blockchain.android.coincore.SingleAccount
 import piuk.blockchain.android.databinding.DialogSheetInterestDetailsBinding
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
 import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
+import piuk.blockchain.android.ui.transactionflow.analytics.InterestAnalytics
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import timber.log.Timber
@@ -92,7 +93,7 @@ class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetails
                         interestDetailsDepositCta.text =
                             getString(R.string.tx_title_deposit, cryptoCurrency.displayTicker)
                         interestDetailsDepositCta.setOnClickListener {
-                            analytics.logEvent(InterestAnalytics.INTEREST_SUMMARY_DEPOSIT_CTA)
+                            analytics.logEvent(InterestAnalytics.InterestSummaryDepositCta)
                             host.goToInterestDeposit(account as InterestAccount)
                         }
                     } else {
@@ -132,7 +133,11 @@ class InterestSummarySheet : SlidingModalBottomDialog<DialogSheetInterestDetails
                         getString(R.string.tx_title_withdraw, cryptoCurrency.displayTicker)
                     interestDetailsWithdrawCta.visible()
                     interestDetailsWithdrawCta.setOnClickListener {
-                        analytics.logEvent(InterestAnalytics.INTEREST_SUMMARY_WITHDRAW_CTA)
+                        analytics.logEvent(InterestAnalytics.InterestWithdrawalClicked(
+                            currency = composite.balance.currencyCode,
+                            origin = LaunchOrigin.SAVINGS_PAGE
+                        ))
+                        analytics.logEvent(InterestAnalytics.InterestSummaryWithdrawCta)
                         host.goToInterestWithdraw(account as InterestAccount)
                     }
                 }

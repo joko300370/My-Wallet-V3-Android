@@ -125,6 +125,14 @@ enum class AnalyticsNames(val eventName: String) {
     DEPOSIT_CLICKED("Deposit Clicked"),
     DEPOSIT_AMOUNT_ENTERED("Deposit Amount Entered"),
     DEPOSIT_METHOD_SELECTED("Deposit Method Selected"),
+    INTEREST_CLICKED("Interest Clicked"),
+    INTEREST_DEPOSIT_AMOUNT_ENTERED("Interest Deposit Amount Entered"),
+    INTEREST_DEPOSIT_CLICKED("Interest Deposit Clicked"),
+    INTEREST_MAX_CLICKED("Interest Deposit Max Amount Clicked"),
+    INTEREST_DEPOSIT_VIEWED("Interest Deposit Viewed"),
+    INTEREST_VIEWED("Interest Viewed"),
+    INTEREST_WITHDRAWAL_CLICKED("Interest Withdrawal Clicked"),
+    INTEREST_WITHDRAWAL_VIEWED("Interest Withdrawal Viewed"),
     EMAIL_VERIFF_REQUESTED("Email Verification Requested");
 }
 
@@ -144,5 +152,6 @@ enum class LaunchOrigin {
     FIAT_FUNDS,
     SIGN_UP,
     SETTINGS,
+    SAVINGS_PAGE,
     VERIFICATION;
 }

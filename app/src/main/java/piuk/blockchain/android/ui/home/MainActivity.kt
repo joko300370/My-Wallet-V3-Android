@@ -86,6 +86,7 @@ import piuk.blockchain.android.ui.swap.SwapFragment
 import piuk.blockchain.android.ui.thepit.PitLaunchBottomDialog
 import piuk.blockchain.android.ui.thepit.PitPermissionsActivity
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.analytics.InterestAnalytics
 import piuk.blockchain.android.ui.transactionflow.TransactionLauncher
 import piuk.blockchain.android.ui.transactionflow.analytics.SwapAnalyticsEvents
 import piuk.blockchain.android.ui.transfer.TransferFragment
@@ -710,10 +711,12 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         launchInterestDashboard()
     }
 
-    private fun launchInterestDashboard() =
+    private fun launchInterestDashboard() {
         startActivityForResult(
             InterestDashboardActivity.newInstance(this), INTEREST_DASHBOARD
         )
+        analytics.logEvent(InterestAnalytics.InterestClicked)
+    }
 
     private fun startActivitiesFragment(account: BlockchainAccount? = null) {
         setCurrentTabItem(ITEM_ACTIVITY)

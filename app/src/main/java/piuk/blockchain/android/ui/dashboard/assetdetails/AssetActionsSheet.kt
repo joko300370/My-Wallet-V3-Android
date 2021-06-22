@@ -34,6 +34,7 @@ import piuk.blockchain.android.ui.customviews.account.PendingBalanceAccountDecor
 import piuk.blockchain.android.ui.customviews.account.StatusDecorator
 import piuk.blockchain.android.ui.customviews.account.addViewToBottomWithConstraints
 import piuk.blockchain.android.ui.customviews.account.removePossibleBottomView
+import piuk.blockchain.android.ui.transactionflow.analytics.InterestAnalytics
 import piuk.blockchain.android.ui.transfer.analytics.TransferAnalyticsEvent
 import piuk.blockchain.android.util.context
 import piuk.blockchain.android.util.setAssetIconColours
@@ -209,6 +210,12 @@ class AssetActionsSheet :
                 asset, action
             ) {
                 processAction(AssetAction.InterestDeposit)
+                analytics.logEvent(
+                    InterestAnalytics.InterestDepositClicked(
+                        currency = asset.networkTicker,
+                        origin = LaunchOrigin.CURRENCY_PAGE
+                    )
+                )
             }
             AssetAction.InterestWithdraw -> AssetActionItem(
                 getString(R.string.common_withdraw),
@@ -217,6 +224,12 @@ class AssetActionsSheet :
                 asset, action
             ) {
                 processAction(AssetAction.InterestWithdraw)
+                analytics.logEvent(
+                    InterestAnalytics.InterestWithdrawalClicked(
+                        currency = asset.networkTicker,
+                        origin = LaunchOrigin.CURRENCY_PAGE
+                    )
+                )
             }
             AssetAction.Sell -> AssetActionItem(
                 getString(R.string.common_sell),

@@ -5,6 +5,7 @@ import com.blockchain.logging.CrashLogger
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvent
 import com.blockchain.notifications.analytics.AnalyticsNames
+import com.blockchain.notifications.analytics.LaunchOrigin
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
@@ -86,6 +87,7 @@ class TxFlowAnalytics(
             AssetAction.Sell -> triggerSellScreenEvent(state)
             AssetAction.Swap -> triggerSwapScreenEvent(state.currentStep)
             AssetAction.InterestDeposit -> triggerDepositScreenEvent(state.currentStep)
+            AssetAction.InterestWithdraw -> triggerInterestWithdrawScreenEvent(state.currentStep)
             AssetAction.Withdraw -> triggerWithdrawScreenEvent(
                 state.currentStep, (state.sendingAccount as FiatAccount).fiatCurrency
             )
@@ -108,6 +110,14 @@ class TxFlowAnalytics(
                     (account as LinkedBankAccount).type
                 )
             )
+            AssetAction.Send -> if (account is InterestAccount) {
+                analytics.logEvent(
+                    InterestAnalytics.InterestDepositClicked(
+                        currency = state.sendingAsset.networkTicker,
+                        origin = LaunchOrigin.SEND
+                    )
+                )
+            }
             else -> {
             }
         }
@@ -151,8 +161,20 @@ class TxFlowAnalytics(
 
     private fun triggerDepositScreenEvent(step: TransactionStep) {
         when (step) {
-            TransactionStep.ENTER_AMOUNT -> analytics.logEvent(InterestDepositAnalyticsEvent.EnterAmountSeen)
+
+            TransactionStep.ENTER_AMOUNT -> {
+                analytics.logEvent(InterestAnalytics.InterestDepositViewed)
+                analytics.logEvent(InterestDepositAnalyticsEvent.EnterAmountSeen)
+            }
             TransactionStep.CONFIRM_DETAIL -> analytics.logEvent(InterestDepositAnalyticsEvent.ConfirmationsSeen)
+            else -> {
+            }
+        }
+    }
+
+    private fun triggerInterestWithdrawScreenEvent(step: TransactionStep) {
+        when (step) {
+            TransactionStep.ENTER_AMOUNT -> analytics.logEvent(InterestAnalytics.InterestWithdrawalViewed)
             else -> {
             }
         }
@@ -305,6 +327,14 @@ class TxFlowAnalytics(
                     )
                 )
             }
+            AssetAction.InterestDeposit -> {
+                analytics.logEvent(
+                    InterestAnalytics.InterestDepositMaxAmount(
+                        currency = state.amount.currencyCode,
+                        sourceAccountType = TxFlowAnalyticsAccountType.fromAccount(state.sendingAccount)
+                    )
+                )
+            }
             else -> {
             }
         }
@@ -339,8 +369,16 @@ class TxFlowAnalytics(
                     )
                 )
             }
-            AssetAction.InterestDeposit ->
+            AssetAction.InterestDeposit -> {
                 analytics.logEvent(InterestDepositAnalyticsEvent.EnterAmountCtaClick(state.sendingAsset))
+                analytics.logEvent(
+                    InterestAnalytics.InterestDepositAmountEntered(
+                        currency = state.sendingAsset.networkTicker,
+                        sourceAccountType = TxFlowAnalyticsAccountType.fromAccount(state.sendingAccount),
+                        inputAmount = state.amount
+                    )
+                )
+            }
             AssetAction.Swap -> {
                 analytics.logEvent(
                     SwapAnalyticsEvents.EnterAmountCtaClick(

@@ -39,7 +39,6 @@ class InterestDashboardFragment : Fragment() {
     interface InterestDashboardHost {
         fun startKyc()
         fun showInterestSummarySheet(account: SingleAccount, cryptoCurrency: CryptoCurrency)
-        fun startDepositFlow(fromAccount: SingleAccount, toAccount: SingleAccount)
         fun startAccountSelection(filter: Single<List<BlockchainAccount>>, toAccount: SingleAccount)
     }
 

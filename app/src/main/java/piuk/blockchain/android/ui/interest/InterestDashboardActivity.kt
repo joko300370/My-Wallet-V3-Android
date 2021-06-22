@@ -3,7 +3,7 @@ package piuk.blockchain.android.ui.interest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import com.blockchain.notifications.analytics.InterestAnalytics
+import com.blockchain.notifications.analytics.LaunchOrigin
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Single
 import org.koin.android.ext.android.inject
@@ -19,6 +19,7 @@ import piuk.blockchain.android.ui.base.BlockchainActivity
 import piuk.blockchain.android.ui.customviews.account.AccountSelectSheet
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
+import piuk.blockchain.android.ui.transactionflow.analytics.InterestAnalytics
 import piuk.blockchain.android.ui.transactionflow.TransactionLauncher
 import piuk.blockchain.android.util.putAccount
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
@@ -44,6 +45,7 @@ class InterestDashboardActivity : BlockchainActivity(),
         setContentView(binding.root)
         setSupportActionBar(binding.toolbarGeneral.toolbarGeneral)
         setTitle(R.string.interest_dashboard_title)
+        analytics.logEvent(InterestAnalytics.InterestViewed)
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.content_frame, fragment, InterestDashboardFragment::class.simpleName)
@@ -90,17 +92,12 @@ class InterestDashboardActivity : BlockchainActivity(),
     }
 
     override fun startKyc() {
-        analytics.logEvent(InterestAnalytics.INTEREST_DASHBOARD_KYC)
+        analytics.logEvent(InterestAnalytics.InterestDashboardKyc)
         KycNavHostActivity.start(this, CampaignType.Interest)
     }
 
     override fun showInterestSummarySheet(account: SingleAccount, cryptoCurrency: CryptoCurrency) {
         showBottomSheet(InterestSummarySheet.newInstance(account, cryptoCurrency))
-    }
-
-    override fun startDepositFlow(fromAccount: SingleAccount, toAccount: SingleAccount) {
-        analytics.logEvent(InterestAnalytics.INTEREST_DASHBOARD_ACTION)
-        startDeposit(fromAccount, toAccount)
     }
 
     override fun startAccountSelection(
@@ -111,6 +108,12 @@ class InterestDashboardActivity : BlockchainActivity(),
             AccountSelectSheet.newInstance(object : AccountSelectSheet.SelectionHost {
                 override fun onAccountSelected(account: BlockchainAccount) {
                     startDeposit(account as SingleAccount, toAccount)
+                    analytics.logEvent(
+                        InterestAnalytics.InterestDepositClicked(
+                            currency = (toAccount as CryptoAccount).asset.networkTicker,
+                            origin = LaunchOrigin.SAVINGS_PAGE
+                        )
+                    )
                 }
 
                 override fun onSheetClosed() {
