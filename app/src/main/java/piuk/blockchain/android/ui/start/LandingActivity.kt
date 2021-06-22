@@ -6,6 +6,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import androidx.appcompat.app.AlertDialog
+import com.blockchain.featureflags.GatedFeature
+import com.blockchain.featureflags.InternalFeatureFlagApi
 import com.blockchain.koin.scopedInject
 import com.blockchain.koin.ssoLoginFeatureFlag
 import com.blockchain.remoteconfig.FeatureFlag
@@ -30,6 +32,7 @@ class LandingActivity : MvpActivity<LandingView, LandingPresenter>(), LandingVie
     override val presenter: LandingPresenter by scopedInject()
     private val stringUtils: StringUtils by inject()
     private val ssoLoginFF: FeatureFlag by inject(ssoLoginFeatureFlag)
+    private val internalFlags: InternalFeatureFlagApi by inject()
     private var isSSOLoginEnabled = false
     override val view: LandingView = this
 
@@ -51,7 +54,7 @@ class LandingActivity : MvpActivity<LandingView, LandingPresenter>(), LandingVie
         with(binding) {
             btnCreate.setOnClickListener { launchCreateWalletActivity() }
             btnLogin.setOnClickListener {
-                if (isSSOLoginEnabled) {
+                if (internalFlags.isFeatureEnabled(GatedFeature.SINGLE_SIGN_ON) && isSSOLoginEnabled) {
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.content_frame, LoginFragment(), LoginFragment::class.simpleName)
                         .addToBackStack(LoginFragment::class.simpleName)
