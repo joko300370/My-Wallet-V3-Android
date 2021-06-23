@@ -17,6 +17,7 @@ import com.blockchain.preferences.SimpleBuyPrefs
 import com.google.gson.Gson
 import com.nhaarman.mockito_kotlin.anyOrNull
 import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
@@ -283,12 +284,16 @@ class SimpleBuyModelTest {
         model.process(SimpleBuyIntent.CheckOrderStatus)
 
         testObserver.assertValueAt(0, defaultState)
-        testObserver.assertValueAt(1, defaultState.copy(
-            isLoading = true
-        ))
-        testObserver.assertValueAt(2, defaultState.copy(
-            errorState = ErrorState.ApprovedBankRejected
-        ))
+        testObserver.assertValueAt(
+            1, defaultState.copy(
+                isLoading = true
+            )
+        )
+        testObserver.assertValueAt(
+            2, defaultState.copy(
+                errorState = ErrorState.ApprovedBankRejected
+            )
+        )
     }
 
     @Test
@@ -335,5 +340,87 @@ class SimpleBuyModelTest {
                 transferLimits = TransferLimits("USD")
             )
         )
+    }
+
+    @Test
+    fun `WHEN eligiblePaymentMethods and getRecurringBuyEligibility success THEN observe state`() {
+        val paymentMethodsUpdated = mock<SimpleBuyIntent.PaymentMethodsUpdated>()
+        whenever(interactor.eligiblePaymentMethods("USD", "123-321"))
+            .thenReturn(Single.just(paymentMethodsUpdated))
+
+        val paymentMethodType = mock<PaymentMethodType>()
+        whenever(interactor.getRecurringBuyEligibility())
+            .thenReturn(Single.just(listOf(paymentMethodType)))
+
+        verifyNoMoreInteractions(interactor)
+
+        val testObserver = model.state.test()
+        model.process(SimpleBuyIntent.FetchSuggestedPaymentMethod("USD", "123-321"))
+
+        testObserver.assertValueAt(0, defaultState)
+
+        val state1 = defaultState.copy(
+            paymentOptions = PaymentOptions(),
+            selectedPaymentMethod = null
+        )
+        testObserver.assertValueAt(1, state1)
+
+        val state2 = state1.copy(
+            recurringBuyEligiblePaymentMethods = listOf(paymentMethodType),
+            isLoading = false,
+            selectedPaymentMethod = null,
+            paymentOptions = PaymentOptions()
+        )
+        testObserver.assertValueAt(2, state2)
+    }
+
+    @Test
+    fun `WHEN eligiblePaymentMethods fails THEN observe state`() {
+        whenever(interactor.eligiblePaymentMethods("USD", "123-321"))
+            .thenReturn(Single.error(Throwable()))
+
+        verifyNoMoreInteractions(interactor)
+
+        val testObserver = model.state.test()
+        model.process(SimpleBuyIntent.FetchSuggestedPaymentMethod("USD", "123-321"))
+
+        testObserver.assertValueAt(0, defaultState)
+
+        val state1 = defaultState.copy(
+            paymentOptions = PaymentOptions(),
+            selectedPaymentMethod = null
+        )
+        testObserver.assertValueAt(1, state1)
+
+        testObserver.assertValueAt(
+            2,
+            state1.copy(
+                errorState = ErrorState.GenericError,
+                isLoading = false,
+                confirmationActionRequested = false
+            )
+        )
+    }
+
+    @Test
+    fun `WHEN eligiblePaymentMethods success and getRecurringBuyEligibility fails THEN observe state`() {
+        whenever(interactor.eligiblePaymentMethods("USD", "123-321"))
+            .thenReturn(Single.just(mock()))
+
+        whenever(interactor.getRecurringBuyEligibility())
+            .thenReturn(Single.error(Throwable()))
+
+        verifyNoMoreInteractions(interactor)
+
+        val testObserver = model.state.test()
+        model.process(SimpleBuyIntent.FetchSuggestedPaymentMethod("USD", "123-321"))
+
+        testObserver.assertValueAt(0, defaultState)
+
+        val state1 = defaultState.copy(
+            paymentOptions = PaymentOptions(),
+            selectedPaymentMethod = null
+        )
+        testObserver.assertValueAt(1, state1)
     }
 }

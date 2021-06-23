@@ -156,10 +156,10 @@ class SimpleBuyModel(
                     onError = { process(SimpleBuyIntent.ErrorIntent()) }
                 )
 
-            is SimpleBuyIntent.FetchSuggestedPaymentMethod ->
+            is SimpleBuyIntent.FetchPaymentDetails ->
                 processGetPaymentMethod(intent.fiatCurrency, intent.selectedPaymentMethodId)
 
-            is SimpleBuyIntent.FetchPaymentDetails ->
+            is SimpleBuyIntent.FetchSuggestedPaymentMethod ->
                 processGetPaymentMethod(intent.fiatCurrency, intent.selectedPaymentMethodId)
 
             is SimpleBuyIntent.PaymentMethodChangeRequested -> {
