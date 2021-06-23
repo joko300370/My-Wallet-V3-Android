@@ -34,16 +34,29 @@ class FiatAsset(
             AssetFilter.Interest -> Maybe.empty() // Only support single accounts
         }
 
+    private fun setSelectedFiatFirst(fiatList: List<String>): List<String> {
+        val fiatMutableList = fiatList.toMutableList()
+        if (fiatMutableList.first() != currencyPrefs.selectedFiatCurrency) {
+            fiatMutableList.firstOrNull { it == currencyPrefs.selectedFiatCurrency }?.let {
+                fiatMutableList.remove(it)
+                fiatMutableList.add(0, it)
+            }
+        }
+        return fiatMutableList.toList()
+    }
+
     private fun fetchFiatWallets(): Maybe<AccountGroup> =
         custodialWalletManager.getSupportedFundsFiats(
             currencyPrefs.selectedFiatCurrency
         )
             .flatMapMaybe { fiatList ->
-                if (fiatList.isNotEmpty()) {
+                val mutable = fiatList.toMutableList()
+                if (mutable.isNotEmpty()) {
+                    val orderedList = setSelectedFiatFirst(fiatList)
                     Maybe.just(
                         FiatAccountGroup(
                             label = "Fiat Accounts",
-                            accounts = fiatList.map { getAccount(it) }
+                            accounts = orderedList.map { getAccount(it) }
                         )
                     )
                 } else {
