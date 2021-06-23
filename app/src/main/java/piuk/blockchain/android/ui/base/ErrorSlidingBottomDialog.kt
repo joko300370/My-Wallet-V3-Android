@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.ErrorSlidingBottomDialogBinding
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy

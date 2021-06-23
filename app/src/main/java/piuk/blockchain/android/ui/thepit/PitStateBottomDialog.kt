@@ -10,7 +10,7 @@ import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.ui.extensions.throttledClicks
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import piuk.blockchain.android.databinding.DialogSheetWalletMercuryLinkingBinding
 import piuk.blockchain.android.ui.customviews.ErrorBottomDialog
 import piuk.blockchain.android.util.gone

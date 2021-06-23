@@ -46,7 +46,7 @@ import com.google.zxing.DecodeHintType
 import com.google.zxing.Result
 import com.karumi.dexter.Dexter
 import info.blockchain.balance.CryptoCurrency
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.ActivityScanBinding
 import piuk.blockchain.android.ui.base.BlockchainActivity

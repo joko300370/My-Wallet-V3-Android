@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import piuk.blockchain.android.databinding.VerifyIdentityBenefitsLayoutBinding
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visibleIf
