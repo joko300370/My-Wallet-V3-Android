@@ -1,63 +1,60 @@
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="piuk.blockchain.android.ui.onboarding.BiometricsPromptFragment">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:background="@color/primary_navy_medium">
+
+            <ImageView
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/fingerprint_login_title"
+                app:srcCompat="@drawable/vector_fingerprint"
+                app:tint="@color/white" />
+
+        </FrameLayout>
+
+        <TextView
+            style="@style/OnboardingHeader"
+            android:layout_marginTop="16dp"
+            android:text="@string/onboarding_fingerprint_title_1" />
+
+        <TextView
+            style="@style/OnBoardingDetail"
+            android:gravity="center"
+            android:text="@string/onboarding_fingerprint_summary_1" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom"
+            android:gravity="bottom"
             android:orientation="vertical">
 
-            <FrameLayout
+            <Button
+                android:id="@+id/button_enable"
+                style="@style/CtaButton.Blue"
                 android:layout_width="match_parent"
-                android:layout_height="160dp"
-                android:background="@color/primary_navy_medium">
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="64dp"
+                android:layout_marginRight="64dp"
+                android:layout_marginBottom="64dp"
+                android:contentDescription="@string/onboarding_fingerprint_enable_1"
+                android:text="@string/onboarding_fingerprint_enable_1" />
 
-                <ImageView
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/fingerprint_login_title"
-                    app:tint="@color/white"
-                    app:srcCompat="@drawable/vector_fingerprint" />
-
-            </FrameLayout>
-
-            <TextView
-                style="@style/OnboardingHeader"
-                android:layout_marginTop="16dp"
-                android:text="@string/onboarding_fingerprint_title_1" />
-
-            <TextView
-                style="@style/OnBoardingDetail"
-                android:gravity="center"
-                android:text="@string/onboarding_fingerprint_summary_1" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="bottom"
-                android:gravity="bottom"
-                android:orientation="vertical">
-
-                <Button
-                    android:id="@+id/button_enable"
-                    style="@style/CtaButton.Blue"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="64dp"
-                    android:layout_marginRight="64dp"
-                    android:layout_marginBottom="64dp"
-                    android:contentDescription="@string/onboarding_fingerprint_enable_1"
-                    android:text="@string/onboarding_fingerprint_enable_1" />
-
-            </LinearLayout>
         </LinearLayout>
-    </ScrollView>
-</layout>
+    </LinearLayout>
+</ScrollView>
+

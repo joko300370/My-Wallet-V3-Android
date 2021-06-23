@@ -5,19 +5,16 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.Window
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.viewpager.widget.ViewPager
 import org.koin.android.ext.android.inject
-import piuk.blockchain.android.R
 import piuk.blockchain.android.data.coinswebsocket.service.CoinsWebSocketService
 import piuk.blockchain.android.databinding.ActivityPinEntryBinding
 import piuk.blockchain.android.ui.customviews.dialogs.OverlayDetection
 import piuk.blockchain.android.ui.swipetoreceive.SwipeToReceiveFragment
 import piuk.blockchain.androidcore.data.access.AccessState
-import piuk.blockchain.androidcore.utils.annotations.Thunk
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import piuk.blockchain.androidcoreui.ui.base.BaseAuthActivity
 
@@ -27,9 +24,6 @@ class PinEntryActivity : BaseAuthActivity(), PinEntryFragment.OnPinEntryFragment
     private val coinsWebSocketService: CoinsWebSocketService by inject()
     private val overlayDetection: OverlayDetection by inject()
     private val loginState: AccessState by inject()
-
-    @Thunk
-    private lateinit var binding: ActivityPinEntryBinding
 
     private val pinEntryFragment: PinEntryFragment by lazy {
         PinEntryFragment.newInstance(!shouldHideSwipeToReceive(), isAfterCreateWallet)
@@ -42,11 +36,14 @@ class PinEntryActivity : BaseAuthActivity(), PinEntryFragment.OnPinEntryFragment
     private val isCreatingNewPin: Boolean
         get() = prefs.pinId.isEmpty()
 
+    private val binding: ActivityPinEntryBinding by lazy {
+        ActivityPinEntryBinding.inflate(layoutInflater)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
-
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_pin_entry)
+        setContentView(binding.root)
 
         val fragmentPagerAdapter: FragmentPagerAdapter
         if (shouldHideSwipeToReceive()) {

@@ -1,67 +1,66 @@
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
     tools:context="piuk.blockchain.android.ui.onboarding.BiometricsPromptFragment">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:background="@color/primary_navy_medium">
+
+            <ImageView
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/fingerprint_login_title"
+                app:tint="@color/white"
+                app:srcCompat="@drawable/vector_email" />
+
+        </FrameLayout>
+
+        <TextView
+            style="@style/OnboardingHeader"
+            android:layout_marginTop="16dp"
+            android:text="@string/onboarding_check_inbox_title" />
+
+        <TextView
+            android:id="@+id/email_address"
+            style="@style/OnBoardingEmail"
+            android:gravity="center"
+            tools:text="example@blockchain.com" />
+
+        <TextView
+            style="@style/OnBoardingDetail"
+            android:gravity="center"
+            android:text="@string/onboarding_check_inbox_summary" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom"
+            android:gravity="bottom"
             android:orientation="vertical">
 
-            <FrameLayout
+            <Button
+                android:id="@+id/button_enable"
+                style="@style/CtaButton.Blue"
                 android:layout_width="match_parent"
-                android:layout_height="160dp"
-                android:background="@color/primary_navy_medium">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:contentDescription="@string/onboarding_verify_email"
+                android:text="@string/onboarding_verify_email" />
 
-                <ImageView
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/fingerprint_login_title"
-                    android:tint="@color/white"
-                    app:srcCompat="@drawable/vector_email" />
-
-            </FrameLayout>
-
-            <TextView
-                style="@style/OnboardingHeader"
-                android:layout_marginTop="16dp"
-                android:text="@string/onboarding_check_inbox_title" />
-
-            <TextView
-                android:id="@+id/email_address"
-                style="@style/OnBoardingEmail"
-                android:gravity="center"
-                tools:text="example@blockchain.com" />
-
-            <TextView
-                style="@style/OnBoardingDetail"
-                android:gravity="center"
-                android:text="@string/onboarding_check_inbox_summary" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="bottom"
-                android:gravity="bottom"
-                android:orientation="vertical">
-
-                <Button
-                    android:id="@+id/button_enable"
-                    style="@style/CtaButton.Blue"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:contentDescription="@string/onboarding_verify_email"
-                    android:text="@string/onboarding_verify_email"/>
-
-            </LinearLayout>
         </LinearLayout>
-    </ScrollView>
-</layout>
+    </LinearLayout>
+</ScrollView>
+
