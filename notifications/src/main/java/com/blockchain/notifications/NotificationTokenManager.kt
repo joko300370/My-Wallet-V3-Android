@@ -1,6 +1,7 @@
 package com.blockchain.notifications
 
 import android.annotation.SuppressLint
+import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.NotificationPrefs
 import com.google.common.base.Optional
 import com.google.firebase.iid.FirebaseInstanceId
@@ -18,7 +19,8 @@ class NotificationTokenManager(
     private val payloadManager: PayloadManager,
     private val prefs: NotificationPrefs,
     private val firebaseInstanceId: FirebaseInstanceId,
-    private val rxBus: RxBus
+    private val rxBus: RxBus,
+    private val crashLogger: CrashLogger
 ) {
 
     /**
@@ -37,6 +39,7 @@ class NotificationTokenManager(
                 Observable.create { subscriber ->
                     FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener { instanceIdResult ->
                         val newToken = instanceIdResult.token
+                        prefs.firebaseToken = newToken
                         subscriber.onNext(Optional.of(newToken))
                         subscriber.onComplete()
                     }
@@ -67,6 +70,13 @@ class NotificationTokenManager(
     fun registerAuthEvent() {
         val loginObservable = rxBus.register(AuthEvent::class.java)
 
+        /* TODO: need to fix this method. The subscribe call here is never executed due to
+            threading/timing issues. Everything here except the subscribe has to happen before
+            accessState.isLoggedIn is set in the LaunchPresenter, however the token isn't sent
+            here in its current form because the MainActivity is launched on the main thread
+            before this is finished. Making the launch dependent on this chain causes a dead-lock
+            because the execution of this block is depending on setting the accessState.isLoggedIn,
+            which is done in the onSuccess block of the main chain in initSettings. */
         loginObservable
             .subscribeOn(Schedulers.io())
             .flatMapCompletable { authEvent ->
@@ -124,14 +134,20 @@ class NotificationTokenManager(
      * If no stored notification token exists, it will be refreshed
      * and will be handled appropriately by FcmCallbackService
      */
-    private fun resendNotificationToken(): Completable {
+    fun resendNotificationToken(): Completable {
         return storedFirebaseToken
             .flatMapCompletable { optional ->
                 if (optional.isPresent) {
-                    return@flatMapCompletable sendFirebaseToken(optional.get())
+                    sendFirebaseToken(optional.get())
                 } else {
-                    return@flatMapCompletable Completable.complete()
+                    Completable.complete()
                 }
+            }
+            .doOnError { throwable ->
+                crashLogger.logException(
+                    throwable = throwable,
+                    logMsg = "Failed to resend the Firebase token for notifications"
+                )
             }
     }
 

@@ -10,7 +10,6 @@ data class AuthNewLoginState(
     val location: String = "",
     val ip: String = "",
     val info: String = "",
-    val lastUsed: Long = 0,
     val forcePin: Boolean = false,
     val enableApproval: Boolean = false
 ) : MviState
