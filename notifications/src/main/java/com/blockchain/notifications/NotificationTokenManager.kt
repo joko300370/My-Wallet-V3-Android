@@ -70,27 +70,13 @@ class NotificationTokenManager(
     fun registerAuthEvent() {
         val loginObservable = rxBus.register(AuthEvent::class.java)
 
-        /* TODO: need to fix this method. The subscribe call here is never executed due to
-            threading/timing issues. Everything here except the subscribe has to happen before
-            accessState.isLoggedIn is set in the LaunchPresenter, however the token isn't sent
-            here in its current form because the MainActivity is launched on the main thread
-            before this is finished. Making the launch dependent on this chain causes a dead-lock
-            because the execution of this block is depending on setting the accessState.isLoggedIn,
-            which is done in the onSuccess block of the main chain in initSettings. */
         loginObservable
             .subscribeOn(Schedulers.io())
             .flatMapCompletable { authEvent ->
-                if (authEvent == AuthEvent.LOGIN) {
-                    val storedToken = prefs.firebaseToken
-                    if (storedToken.isNotEmpty()) {
-                        return@flatMapCompletable sendFirebaseToken(storedToken)
-                    } else {
-                        return@flatMapCompletable resendNotificationToken()
-                    }
-                } else if (authEvent == AuthEvent.FORGET) {
-                    return@flatMapCompletable revokeAccessToken()
+                if (authEvent == AuthEvent.FORGET) {
+                    revokeAccessToken()
                 } else {
-                    return@flatMapCompletable Completable.complete()
+                    Completable.complete()
                 }
             }
             .subscribe({

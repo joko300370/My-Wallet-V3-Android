@@ -70,7 +70,7 @@ class BackupWalletWordListPresenterTest {
         whenever(backupWalletUtil.getMnemonic(password)).thenReturn(mnemonic)
         // Act
         subject.onViewReady()
-        val result = subject.getWordForIndex(2)
+        val result = subject.getWordForIndex(2)!!
         // Assert
         verify(view).getPageBundle()
         verifyNoMoreInteractions(view)

@@ -245,6 +245,9 @@
 
 -keep public class com.mukesh.countrypicker.** { *; }
 
+-keep public class com.blockchain.preferences.** { *; }
+-keep public class piuk.blockchain.android.ui.auth.newlogin.** { *; }
+
 # Change here com.yourcompany.yourpackage
 #-keep,includedescriptorclasses class com.yourcompany.yourpackage.**$$serializer { *; } # <-- change package name to your app's
 #-keepclassmembers class com.yourcompany.yourpackage.** { # <-- change package name to your app's

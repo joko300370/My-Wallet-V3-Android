@@ -1,5 +1,6 @@
 package piuk.blockchain.android.ui.dashboard.announcements.rule
 
+import android.content.res.Resources
 import androidx.annotation.VisibleForTesting
 import io.reactivex.Single
 import piuk.blockchain.android.R
@@ -18,25 +19,29 @@ class AaveYfiDotAvailableAnnouncement(
     override fun shouldShow(): Single<Boolean> = Single.just(!dismissEntry.isDismissed)
 
     override fun show(host: AnnouncementHost) {
-        host.showAnnouncementCard(
-            card = StandardAnnouncementCard(
-                name = name,
-                dismissRule = DismissRule.CardOneTime,
-                dismissEntry = dismissEntry,
-                titleText = R.string.aave_yfi_dot_available_card_title,
-                bodyText = R.string.aave_yfi_dot_available_card_body,
-                ctaText = R.string.aave_yfi_dot_available_card_cta,
-                iconImage = R.drawable.vector_aave_yfi_dot_announcement,
-                shouldWrapIconWidth = true,
-                dismissFunction = {
-                    host.dismissAnnouncementCard()
-                },
-                ctaFunction = {
-                    host.dismissAnnouncementCard()
-                    host.startBuy()
-                }
+        try {
+            host.showAnnouncementCard(
+                card = StandardAnnouncementCard(
+                    name = name,
+                    dismissRule = DismissRule.CardOneTime,
+                    dismissEntry = dismissEntry,
+                    titleText = R.string.aave_yfi_dot_available_card_title,
+                    bodyText = R.string.aave_yfi_dot_available_card_body,
+                    ctaText = R.string.aave_yfi_dot_available_card_cta,
+                    iconImage = R.drawable.vector_aave_yfi_dot_announcement,
+                    shouldWrapIconWidth = true,
+                    dismissFunction = {
+                        host.dismissAnnouncementCard()
+                    },
+                    ctaFunction = {
+                        host.dismissAnnouncementCard()
+                        host.startBuy()
+                    }
+                )
             )
-        )
+        } catch (e: Resources.NotFoundException) {
+            host.dismissAnnouncementCard()
+        }
     }
 
     override val name = "aave_yfi_dot_available"

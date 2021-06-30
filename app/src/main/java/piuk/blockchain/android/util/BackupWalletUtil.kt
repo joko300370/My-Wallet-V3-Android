@@ -35,8 +35,10 @@ class BackupWalletUtil(
      * if the mnemonic isn't found.
      */
     fun getMnemonic(secondPassword: String?): List<String>? = try {
-        payloadDataManager.wallet!!.decryptHDWallet(secondPassword)
-        payloadDataManager.wallet!!.walletBody?.mnemonic?.toList()
+        payloadDataManager.wallet?.let {
+            it.decryptHDWallet(secondPassword)
+            it.walletBody?.mnemonic?.toList()
+        }
     } catch (e: Exception) {
         Timber.e(e)
         null

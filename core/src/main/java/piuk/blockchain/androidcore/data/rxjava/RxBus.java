@@ -19,6 +19,8 @@ import timber.log.Timber;
  */
 public class RxBus {
 
+    private final Object lock1 = new Object();
+
     /**
      * A map of lists of {@link PublishSubject} objects, where their type is used as the
      * key for lookups. This holds weak references, in order to prevent potential memory leaks.
@@ -37,16 +39,18 @@ public class RxBus {
      */
     @SuppressWarnings("Java8MapApi")
     public <T> Observable<T> register(@NonNull Class<T> type) {
-        List<Subject> subjects = subjectsMap.get(type);
-        if (subjects == null) {
-            subjects = new ArrayList<>();
-            subjectsMap.put(type, subjects);
+        synchronized (lock1) {
+            List<Subject> subjects = subjectsMap.get(type);
+            if (subjects == null) {
+                subjects = new ArrayList<>();
+                subjectsMap.put(type, subjects);
+            }
+
+            Subject<T> subject = PublishSubject.create();
+            subjects.add(subject);
+
+            return subject;
         }
-
-        Subject<T> subject = PublishSubject.create();
-        subjects.add(subject);
-
-        return subject;
     }
 
     /**
@@ -59,15 +63,18 @@ public class RxBus {
      */
     @SuppressWarnings("SuspiciousMethodCalls")
     public void unregister(@NonNull Class type, @NonNull Observable observable) {
-        List<Subject> subjects = subjectsMap.get(type);
-        if (subjects != null) {
-            subjects.remove(observable);
+        synchronized (lock1) {
+            List<Subject> subjects = subjectsMap.get(type);
+            if (subjects != null) {
+                subjects.remove(observable);
 
-            if (subjects.isEmpty()) {
-                subjectsMap.remove(type);
+                if (subjects.isEmpty()) {
+                    subjectsMap.remove(type);
+                }
             }
-        } else {
-            Timber.w("unregister of type " + type.getSimpleName() + " failed, as no PublishSubject with a matching type was found");
+            else {
+                Timber.w("unregister of type " + type.getSimpleName() + " failed, as no PublishSubject with a matching type was found");
+            }
         }
     }
 
@@ -80,13 +87,15 @@ public class RxBus {
      * @param content The actual object to be emitted
      */
     @SuppressWarnings("unchecked")
+
     public void emitEvent(@NonNull Class type, @NonNull Object content) {
         List<Subject> subjects = subjectsMap.get(type);
         if (subjects != null && !subjects.isEmpty()) {
             for (Subject subject : subjects) {
                 subject.onNext(content);
             }
-        } else {
+        }
+        else {
             Timber.i("emitEvent of type " + type.getSimpleName() + " failed, as no PublishSubject was registered");
         }
     }

@@ -156,7 +156,8 @@ class LauncherPresenter(
                     analytics.logEvent(LoginAnalyticsEvent)
                 }
                 .flatMap { emailVerifShouldLaunched ->
-                    notificationTokenManager.resendNotificationToken().toSingle { emailVerifShouldLaunched }
+                    notificationTokenManager.resendNotificationToken().onErrorComplete()
+                        .toSingle { emailVerifShouldLaunched }
                 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe { view.updateProgressVisibility(true) }

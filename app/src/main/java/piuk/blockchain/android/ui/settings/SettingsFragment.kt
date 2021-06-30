@@ -700,7 +700,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
             .setPositiveButton(R.string.common_yes) { _, _ ->
                 startActivityForResult(
                     Intent(
-                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                             android.provider.Settings.ACTION_SECURITY_SETTINGS
                         } else {
                             android.provider.Settings.ACTION_BIOMETRIC_ENROLL

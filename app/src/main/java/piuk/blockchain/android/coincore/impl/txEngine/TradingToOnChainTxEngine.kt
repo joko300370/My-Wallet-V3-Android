@@ -32,7 +32,7 @@ class TradingToOnChainTxEngine(
     }
 
     override fun doInitialiseTx(): Single<PendingTx> =
-        walletManager.fetchCryptoWithdrawFeeAndMinLimit(sourceAsset, Product.TRADE)
+        walletManager.fetchCryptoWithdrawFeeAndMinLimit(sourceAsset, Product.BUY)
             .map {
                 PendingTx(
                     amount = CryptoValue.zero(sourceAsset),

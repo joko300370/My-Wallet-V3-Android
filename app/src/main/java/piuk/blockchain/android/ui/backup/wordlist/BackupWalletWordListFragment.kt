@@ -10,9 +10,13 @@ import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.FragmentTransaction
 import com.blockchain.koin.scopedInject
+import com.blockchain.logging.CrashLogger
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.FragmentBackupWordListBinding
 import piuk.blockchain.android.ui.backup.verify.BackupWalletVerifyFragment
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.util.invisible
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
@@ -23,6 +27,7 @@ class BackupWalletWordListFragment :
     BackupWalletWordListView {
 
     private val backupWalletWordListPresenter: BackupWalletWordListPresenter by scopedInject()
+    private val crashLogger: CrashLogger by inject()
 
     private val animEnterFromRight: Animation by unsafeLazy {
         AnimationUtils.loadAnimation(
@@ -80,8 +85,12 @@ class BackupWalletWordListFragment :
 
         with(binding) {
             textviewWordCounter.text = getFormattedPositionString()
-            textviewCurrentWord.text = presenter.getWordForIndex(currentWordIndex)
-
+            presenter.getWordForIndex(currentWordIndex)?.let {
+                textviewCurrentWord.text = it
+            } ?: kotlin.run {
+                crashLogger.logEvent("Mnemonic word for position $currentWordIndex was null")
+                toast(getString(R.string.common_error), ToastCustom.TYPE_ERROR)
+            }
             buttonNext.setOnClickListener { onNextClicked() }
             buttonPrevious.setOnClickListener { onPreviousClicked() }
         }

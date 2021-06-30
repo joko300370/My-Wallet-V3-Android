@@ -12,6 +12,5 @@ enum class GatedFeature(val readableName: String, val enabledForCompanyInternalB
     ADD_SUB_WALLET_ADDRESSES("Create BTC sub-wallets"),
     RECURRING_BUYS("Enable recurring buys", true),
     ACCOUNT_RECOVERY("Enable New Account Recovery Flow"),
-    FULL_SCREEN_TXS("Enable full screen tx flow"),
-    SINGLE_SIGN_ON("Enable New SSO Flow")
+    FULL_SCREEN_TXS("Enable full screen tx flow")
 }

@@ -403,7 +403,6 @@ class AmountFormatter(private val context: Context) : TxOptionsFormatterCheckout
         )
     }
 }
-
 fun getLabel(label: String, defaultLabel: String, displayTicker: String): String =
     if (label.isEmpty() || label == defaultLabel) {
         "$displayTicker $defaultLabel"

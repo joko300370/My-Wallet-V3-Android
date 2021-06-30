@@ -822,7 +822,8 @@ class TransactionFlowCustomiserImpl(
     ): ConfirmSheetWidget =
         when (state.action) {
             AssetAction.Swap -> SwapInfoHeaderView(ctx).also { frame.addView(it) }
-            AssetAction.FiatDeposit, AssetAction.Withdraw ->
+            AssetAction.FiatDeposit,
+            AssetAction.Withdraw ->
                 SimpleInfoHeaderView(ctx, false).also { frame.addView(it) }
             else -> SimpleInfoHeaderView(ctx).also { frame.addView(it) }
         }

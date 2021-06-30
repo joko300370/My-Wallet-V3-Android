@@ -77,14 +77,18 @@ import kotlin.math.min
 sealed class QrExpected : Parcelable {
     @Parcelize
     object AnyAssetAddressQr : QrExpected()
+
     @Parcelize
     data class AssetAddressQr(val asset: CryptoCurrency) : QrExpected()
     @Parcelize
     object BitPayQr : QrExpected()
+
     @Parcelize
     object ImportWalletKeysQr : QrExpected() // Import a wallet.
+
     @Parcelize
     object LegacyPairingQr : QrExpected()
+
     @Parcelize
     object WebLoginQr : QrExpected() // New auth
 
@@ -106,6 +110,7 @@ class QrScanActivity : BlockchainActivity() {
     private var camera: Camera? = null
     var targetRect: Rect? = null
     var framingViewSize = Point()
+
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
 
@@ -177,7 +182,7 @@ class QrScanActivity : BlockchainActivity() {
         binding.previewView.post {
             try {
                 setUpCamera()
-            } catch (e: IllegalStateException) {
+            } catch (e: java.lang.IllegalStateException) {
                 toast(resources.getString(R.string.camera_setup_failed), ToastCustom.TYPE_ERROR)
                 setResult(RESULT_CAMERA_ERROR)
                 finish()
@@ -289,7 +294,7 @@ class QrScanActivity : BlockchainActivity() {
             lensFacing = when {
                 hasCamera(CameraSelector.DEFAULT_BACK_CAMERA) -> CameraSelector.LENS_FACING_BACK
                 hasCamera(CameraSelector.DEFAULT_FRONT_CAMERA) -> CameraSelector.LENS_FACING_FRONT
-                else -> throw IllegalStateException("Back and front camera are unavailable")
+                else -> throw java.lang.IllegalStateException("Back and front camera are unavailable")
             }
 
             // Build and bind the camera use cases

@@ -48,6 +48,13 @@ class EnterTargetAddressSheet : TransactionFlowSheet<DialogTxFlowEnterAddressBin
     override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): DialogTxFlowEnterAddressBinding =
         DialogTxFlowEnterAddressBinding.inflate(inflater, container, false)
 
+    private val addressTextWatcher: EditTextUpdateThrottle by lazy {
+        EditTextUpdateThrottle(
+            updateFn = ::onAddressEditUpdated,
+            updateDelayMillis = ADDRESS_UPDATE_INTERVAL
+        )
+    }
+
     private fun onAddressEditUpdated(s: Editable?) {
         val address = s.toString()
 
@@ -300,11 +307,6 @@ class EnterTargetAddressSheet : TransactionFlowSheet<DialogTxFlowEnterAddressBin
         analyticsHooks.onEnterAddressCtaClick(state)
         model.process(TransactionIntent.TargetSelected)
     }
-
-    private val addressTextWatcher = EditTextUpdateThrottle(
-        updateFn = ::onAddressEditUpdated,
-        updateDelayMillis = ADDRESS_UPDATE_INTERVAL
-    )
 
     companion object {
         private const val NONCUSTODIAL_INPUT = 0
