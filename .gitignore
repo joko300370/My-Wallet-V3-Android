@@ -5,7 +5,7 @@
 .gradle/
 build/
 envProd/
-envProdInternal/
+envProdInternal/*
 
 # Android Studio
 .idea/*

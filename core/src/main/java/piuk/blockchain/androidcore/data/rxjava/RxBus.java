@@ -87,7 +87,6 @@ public class RxBus {
      * @param content The actual object to be emitted
      */
     @SuppressWarnings("unchecked")
-
     public void emitEvent(@NonNull Class type, @NonNull Object content) {
         List<Subject> subjects = subjectsMap.get(type);
         if (subjects != null && !subjects.isEmpty()) {
