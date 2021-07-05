@@ -8,4 +8,6 @@ interface EnvironmentConfig : EnvironmentUrls {
     val bitpayUrl: String
 
     fun isRunningInDebugMode(): Boolean
+
+    fun isCompanyInternalBuild(): Boolean
 }

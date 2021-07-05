@@ -134,11 +134,6 @@ class SimpleBuyModel(
                     }
                 )
             }
-            is SimpleBuyIntent.UpdateExchangeRate -> interactor.exchangeRate(intent.currency)
-                .subscribeBy(
-                    onSuccess = { process(it) },
-                    onError = { }
-                )
             is SimpleBuyIntent.NewCryptoCurrencySelected -> interactor.exchangeRate(intent.currency)
                 .subscribeBy(
                     onSuccess = { process(it) },
@@ -161,10 +156,10 @@ class SimpleBuyModel(
                     onError = { process(SimpleBuyIntent.ErrorIntent()) }
                 )
 
-            is SimpleBuyIntent.FetchSuggestedPaymentMethod ->
+            is SimpleBuyIntent.FetchPaymentDetails ->
                 processGetPaymentMethod(intent.fiatCurrency, intent.selectedPaymentMethodId)
 
-            is SimpleBuyIntent.FetchPaymentDetails ->
+            is SimpleBuyIntent.FetchSuggestedPaymentMethod ->
                 processGetPaymentMethod(intent.fiatCurrency, intent.selectedPaymentMethodId)
 
             is SimpleBuyIntent.PaymentMethodChangeRequested -> {

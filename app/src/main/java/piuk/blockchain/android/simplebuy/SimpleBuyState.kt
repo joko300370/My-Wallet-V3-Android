@@ -18,6 +18,7 @@ import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import piuk.blockchain.android.cards.EverypayAuthOptions
 import piuk.blockchain.android.ui.base.mvi.MviState
+import piuk.blockchain.android.ui.sell.ExchangePriceWithDelta
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.io.Serializable
@@ -48,7 +49,7 @@ data class SimpleBuyState(
     @Transient val paymentOptions: PaymentOptions = PaymentOptions(),
     val supportedFiatCurrencies: List<String> = emptyList(),
     @Transient val errorState: ErrorState? = null,
-    @Transient val exchangePrice: FiatValue? = null,
+    @Transient val exchangePriceWithDelta: ExchangePriceWithDelta? = null,
     @Transient val isLoading: Boolean = false,
     @Transient val everypayAuthOptions: EverypayAuthOptions? = null,
     @Transient val authorisePaymentUrl: String? = null,

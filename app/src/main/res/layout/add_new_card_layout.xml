@@ -5,17 +5,18 @@
     android:id="@+id/payment_method_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="@dimen/standard_margin"
-    android:layout_marginEnd="@dimen/standard_margin"
+    android:paddingTop="@dimen/standard_margin"
+    android:paddingBottom="@dimen/standard_margin"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/input_amount">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/payment_method_icon"
+        style="@style/Text.Semibold.16"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/standard_margin"
+        android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginEnd="@dimen/small_margin"
         android:layout_marginBottom="@dimen/small_margin"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,6 +26,7 @@
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/payment_method_title"
         style="@style/Text.Semibold.16"
+        android:textColor="@color/grey_900"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/small_margin"
@@ -36,21 +38,36 @@
         app:layout_constraintTop_toTopOf="@+id/payment_method_icon" />
 
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/payment_method_availability"
+        style="@style/Text.Light.14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginTop="2dp"
+        android:text="@string/instantly_available"
+        android:textColor="@color/grey_900"
+        app:layout_constraintStart_toEndOf="@+id/payment_method_icon"
+        app:layout_constraintTop_toBottomOf="@+id/payment_method_title" />
+
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/payment_method_limit"
         style="@style/Text.Light.14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginTop="2dp"
         app:layout_constraintStart_toEndOf="@+id/payment_method_icon"
-        app:layout_constraintTop_toBottomOf="@+id/payment_method_title"
-        tools:text="$5,000 USD Limit" />
+        app:layout_constraintTop_toBottomOf="@+id/payment_method_availability"
+        tools:text="£5000.00 Limit" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/instructions"
-        style="@style/Text.Light.14"
+        style="@style/Text.Light.12"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/small_margin"
+        android:textColor="@color/grey_600"
+        android:layout_marginTop="2dp"
         android:layout_marginEnd="@dimen/standard_margin"
         android:text="@string/instantly_buy_crypto_with_card"
         app:layout_constraintEnd_toEndOf="parent"
@@ -61,7 +78,7 @@
         android:id="@+id/add_payment_method_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/small_margin"
+        android:layout_margin="@dimen/standard_margin"
         android:rotation="-90"
         app:layout_constraintBottom_toBottomOf="@+id/payment_method_title"
         app:layout_constraintEnd_toEndOf="parent"
@@ -79,17 +96,5 @@
         android:textColor="@color/green_500"
         app:layout_constraintStart_toStartOf="@+id/instructions"
         app:layout_constraintTop_toBottomOf="@+id/instructions" />
-
-    <View
-        style="@style/Separator"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="@dimen/small_margin"
-        android:layout_marginBottom="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/badge" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

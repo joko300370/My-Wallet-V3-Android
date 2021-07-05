@@ -15,7 +15,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import com.blockchain.android.testutils.rxInit
-import info.blockchain.api.ApiException
+import com.blockchain.api.ApiException
 import info.blockchain.wallet.keys.SigningKey
 import info.blockchain.wallet.payload.data.XPub
 import info.blockchain.wallet.payload.data.XPubs

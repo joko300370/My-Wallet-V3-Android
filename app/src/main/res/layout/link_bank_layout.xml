@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/payment_method_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="@dimen/standard_margin"
-    android:layout_marginEnd="@dimen/standard_margin"
+    android:paddingTop="@dimen/standard_margin"
+    android:paddingBottom="@dimen/standard_margin"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/input_amount">
@@ -15,7 +16,7 @@
         android:id="@+id/payment_method_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/standard_margin"
+        android:layout_marginStart="@dimen/standard_margin"
         android:layout_marginEnd="@dimen/small_margin"
         android:layout_marginBottom="@dimen/small_margin"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,8 +42,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginTop="2dp"
         android:text="@string/instantly_available"
-        android:textColor="@color/grey_800"
+        android:textColor="@color/grey_900"
         app:layout_constraintStart_toEndOf="@+id/payment_method_icon"
         app:layout_constraintTop_toBottomOf="@+id/payment_method_title" />
 
@@ -52,16 +54,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginTop="2dp"
         app:layout_constraintStart_toEndOf="@+id/payment_method_icon"
         app:layout_constraintTop_toBottomOf="@+id/payment_method_availability"
         tools:text="$5,000 USD Limit" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/instructions"
-        style="@style/Text.Light.14"
+        style="@style/Text.Light.12"
         android:layout_width="0dp"
+        android:textColor="@color/grey_600"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/small_margin"
+        android:layout_marginTop="2dp"
         android:layout_marginEnd="@dimen/standard_margin"
         android:text="@string/instantly_buy_crypto_with_link_a_bank"
         app:layout_constraintEnd_toEndOf="parent"
@@ -72,23 +77,11 @@
         android:id="@+id/add_payment_method_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/small_margin"
+        android:layout_margin="@dimen/standard_margin"
         android:rotation="-90"
         app:layout_constraintBottom_toBottomOf="@+id/payment_method_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/payment_method_title"
         app:srcCompat="@drawable/ic_arrow_down" />
-
-    <View
-        style="@style/Separator"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="@dimen/small_margin"
-        android:layout_marginBottom="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/instructions" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

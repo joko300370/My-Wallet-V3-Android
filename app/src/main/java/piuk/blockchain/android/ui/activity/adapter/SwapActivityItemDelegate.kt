@@ -63,31 +63,29 @@ private class SwapActivityItemViewHolder(
                     it.source.displayTicker,
                     it.destination.displayTicker
                 )
-                if (tx.state.isPending) {
-                    when {
-                        tx.state.isPending -> icon.setTransactionIsConfirming()
-                        tx.state.hasFailed -> icon.setTransactionHasFailed()
-                        else -> {
-                            icon.setImageResource(R.drawable.ic_tx_swap)
-                            icon.setAssetIconColours(
-                                tintColor = assetResources.assetTint(it.source),
-                                filterColor = assetResources.assetFilter(it.source)
-                            )
-                        }
-                    }
-                    txRoot.setOnClickListener {
-                        onAccountClicked(
-                            tx.currencyPair.source, tx.txId, CryptoActivityType.SWAP
+                when {
+                    tx.state.isPending -> icon.setTransactionIsConfirming()
+                    tx.state.hasFailed -> icon.setTransactionHasFailed()
+                    else -> {
+                        icon.setImageResource(R.drawable.ic_tx_swap)
+                        icon.setAssetIconColours(
+                            tintColor = assetResources.assetTint(it.source),
+                            filterColor = assetResources.assetFilter(it.source)
                         )
                     }
                 }
-
-                setTextColours(tx.state.isPending)
-
-                assetBalanceCrypto.text = tx.value.toStringWithSymbol()
-                assetBalanceFiat.text = tx.fiatValue.toStringWithSymbol()
-                assetBalanceFiat.visible()
+                txRoot.setOnClickListener {
+                    onAccountClicked(
+                        tx.currencyPair.source, tx.txId, CryptoActivityType.SWAP
+                    )
+                }
             }
+
+            setTextColours(tx.state.isPending)
+
+            assetBalanceCrypto.text = tx.value.toStringWithSymbol()
+            assetBalanceFiat.text = tx.fiatValue.toStringWithSymbol()
+            assetBalanceFiat.visible()
         }
     }
 

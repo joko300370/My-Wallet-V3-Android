@@ -1,8 +1,8 @@
 package info.blockchain.wallet.payload;
 
-import info.blockchain.api.BitcoinApi;
-import info.blockchain.api.bitcoin.data.BalanceDto;
-import info.blockchain.api.bitcoin.data.MultiAddress;
+import com.blockchain.api.NonCustodialBitcoinService;
+import com.blockchain.api.bitcoin.data.BalanceDto;
+import com.blockchain.api.bitcoin.data.MultiAddress;
 import info.blockchain.wallet.ImportedAddressHelper;
 import info.blockchain.wallet.WalletApiMockedResponseTest;
 import info.blockchain.wallet.exceptions.HDWalletException;
@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
 
 public final class PayloadManagerTest extends WalletApiMockedResponseTest {
 
-    private final BitcoinApi bitcoinApi = mock(BitcoinApi.class);
+    private final NonCustodialBitcoinService bitcoinApi = mock(NonCustodialBitcoinService.class);
 
     private PayloadManager payloadManager;
 

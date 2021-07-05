@@ -2,7 +2,7 @@ package piuk.blockchain.androidcore.data.payload
 
 import com.blockchain.annotations.BurnCandidate
 import com.blockchain.logging.CrashLogger
-import info.blockchain.api.ApiException
+import com.blockchain.api.ApiException
 import info.blockchain.wallet.exceptions.DecryptionException
 import info.blockchain.wallet.exceptions.HDWalletException
 import info.blockchain.wallet.keys.SigningKey

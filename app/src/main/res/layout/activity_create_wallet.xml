@@ -22,15 +22,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
-            android:paddingTop="16dp">
+            android:paddingTop="@dimen/small_margin">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/emailLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginRight="16dp"
+                android:layout_marginLeft="@dimen/small_margin"
+                android:layout_marginTop="@dimen/small_margin"
+                android:layout_marginRight="@dimen/small_margin"
                 android:hint="@string/email"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -50,9 +50,9 @@
                 android:id="@+id/passwordLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginRight="16dp"
+                android:layout_marginLeft="@dimen/small_margin"
+                android:layout_marginTop="@dimen/small_margin"
+                android:layout_marginRight="@dimen/small_margin"
                 android:hint="@string/password"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -82,13 +82,14 @@
                 android:id="@+id/confirmPasswordLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginRight="16dp"
+                android:layout_marginLeft="@dimen/small_margin"
+                android:layout_marginTop="@dimen/tiny_margin"
+                android:layout_marginRight="@dimen/small_margin"
                 android:hint="@string/confirm_password"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/entropy_container">
+                app:layout_constraintTop_toBottomOf="@+id/entropy_container"
+                app:passwordToggleEnabled="true">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/wallet_pass_confirm"
@@ -118,9 +119,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/very_small_margin"
+                android:layout_marginTop="@dimen/standard_margin"
                 android:layout_marginEnd="@dimen/standard_margin"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginTop="@dimen/standard_margin"
                 app:layout_constraintStart_toEndOf="@id/wallet_password_checkbox"
                 app:layout_constraintTop_toBottomOf="@id/confirmPasswordLayout"
                 tools:text="@string/password_disclaimer" />

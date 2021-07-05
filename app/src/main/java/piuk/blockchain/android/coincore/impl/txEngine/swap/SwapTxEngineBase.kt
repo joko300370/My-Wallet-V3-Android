@@ -119,7 +119,7 @@ abstract class SwapTxEngineBase(
     private fun buildConfirmations(pendingTx: PendingTx, pricedQuote: PricedQuote): PendingTx =
         pendingTx.copy(
             confirmations = listOfNotNull(
-                TxConfirmationValue.NewSwapExchange(
+                TxConfirmationValue.SwapExchange(
                     CryptoValue.fromMajor(sourceAsset, BigDecimal.ONE),
                     CryptoValue.fromMajor(target.asset, pricedQuote.price.toBigDecimal())
                 ),
@@ -167,7 +167,7 @@ abstract class SwapTxEngineBase(
             minLimit = minLimit(pricedQuote.price)
         ).apply {
             addOrReplaceOption(
-                TxConfirmationValue.NewSwapExchange(
+                TxConfirmationValue.SwapExchange(
                     CryptoValue.fromMajor(sourceAsset, BigDecimal.ONE),
                     CryptoValue.fromMajor(target.asset, pricedQuote.price.toBigDecimal())
                 )

@@ -113,7 +113,7 @@ open class CustodialTradingAccount(
 
     override val activity: Single<ActivitySummaryList>
         get() = custodialWalletManager.getAllOrdersFor(asset).mapList { orderToSummary(it) }
-            .zipWith(custodialWalletManager.getRecurringBuyOrdersFor(asset).mapList { orderToSummary(it) })
+            .zipWith(custodialWalletManager.getRecurringBuyOrders().mapList { orderToSummary(it) })
             .flatMap { (buySellList, recurringBuyList) ->
                 appendTradeActivity(custodialWalletManager, asset, buySellList + recurringBuyList)
             }
@@ -129,8 +129,7 @@ open class CustodialTradingAccount(
     override val isDefault: Boolean =
         false // Default is, presently, only ever a non-custodial account.
 
-    override
-    val sourceState: Single<TxSourceState>
+    override val sourceState: Single<TxSourceState>
         get() = Singles.zip(
             accountBalance,
             actionableBalance
@@ -161,9 +160,11 @@ open class CustodialTradingAccount(
                 }
                 val receive = AssetAction.Receive
                 setOfNotNull(
-                    activity, send, swap, sell, interest, receive
+                    AssetAction.Buy, sell, swap, send, receive, interest, activity
                 )
             }
+
+    override val hasStaticAddress: Boolean = false
 
     private fun appendTransferActivity(
         custodialWalletManager: CustodialWalletManager,
@@ -236,13 +237,21 @@ open class CustodialTradingAccount(
     private fun orderToSummary(order: RecurringBuyTransaction): ActivitySummaryItem =
         RecurringBuyActivitySummaryItem(
             exchangeRates = exchangeRates,
-            cryptoCurrency = order.destinationValue.currency,
+            cryptoCurrency = order.destinationMoney.currency,
             txId = order.id,
             timeStampMs = order.insertedAt.time,
             account = this,
             value = order.originMoney,
+            destinationMoney = order.destinationMoney,
             state = order.state,
-            destinationValue = order.destinationValue
+            failureReason = order.failureReason,
+            nextPayment = order.nextPayment,
+            insertedAt = order.insertedAt,
+            period = order.period,
+            paymentMethodId = order.paymentMethodId.orEmpty(),
+            paymentMethodType = order.paymentMethod,
+            fee = order.fee,
+            originMoney = order.originMoney
         )
 
     // Stop gap filter, until we finalise which item we wish to display to the user.

@@ -296,7 +296,7 @@ class TransactionFlowCustomiserImpl(
         }
 
     override fun confirmCtaText(state: TransactionState): String {
-        val amount = state.pendingTx?.amount?.toStringWithSymbol() ?: ""
+        val amount = state.pendingTx?.amount?.toStringWithSymbol().orEmpty()
 
         return when (state.action) {
             AssetAction.Send -> resources.getString(
@@ -478,7 +478,7 @@ class TransactionFlowCustomiserImpl(
         return when (state.action) {
             AssetAction.Swap,
             AssetAction.Send -> resources.getString(R.string.common_receive)
-            AssetAction.Sell -> resources.getString(R.string.sell)
+            AssetAction.Sell -> resources.getString(R.string.common_sell)
             AssetAction.FiatDeposit -> resources.getString(R.string.common_deposit)
             AssetAction.Withdraw,
             AssetAction.InterestWithdraw -> resources.getString(R.string.withdraw_target_select_title)
@@ -625,8 +625,6 @@ class TransactionFlowCustomiserImpl(
         state: TransactionState
     ): EnterAmountWidget =
         when (state.action) {
-            AssetAction.ViewActivity,
-            AssetAction.Summary -> throw IllegalStateException()
             AssetAction.Send,
             AssetAction.InterestDeposit,
             AssetAction.InterestWithdraw,
@@ -635,6 +633,9 @@ class TransactionFlowCustomiserImpl(
             AssetAction.Receive -> SmallBalanceView(ctx).also { frame.addView(it) }
             AssetAction.Withdraw,
             AssetAction.FiatDeposit -> AccountInfoBank(ctx).also { frame.addView(it) }
+            AssetAction.ViewActivity,
+            AssetAction.Summary,
+            AssetAction.Buy -> throw IllegalStateException("${state.action} is not supported in enter amount")
         }
 
     override fun installEnterAmountUpperSlotView(
@@ -807,6 +808,7 @@ class TransactionFlowCustomiserImpl(
                 AssetAction.ViewActivity -> R.string.common_activity
                 AssetAction.Receive -> R.string.common_receive
                 AssetAction.Summary -> R.string.common_summary
+                AssetAction.Buy -> R.string.common_buy
             }
         )
 
@@ -820,6 +822,9 @@ class TransactionFlowCustomiserImpl(
     ): ConfirmSheetWidget =
         when (state.action) {
             AssetAction.Swap -> SwapInfoHeaderView(ctx).also { frame.addView(it) }
+            AssetAction.FiatDeposit,
+            AssetAction.Withdraw ->
+                SimpleInfoHeaderView(ctx, false).also { frame.addView(it) }
             else -> SimpleInfoHeaderView(ctx).also { frame.addView(it) }
         }
 

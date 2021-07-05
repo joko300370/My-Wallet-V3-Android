@@ -2,7 +2,6 @@ package piuk.blockchain.android.ui.transactionflow
 
 import androidx.annotation.CallSuper
 import androidx.annotation.UiThread
-import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.reactivex.Scheduler
@@ -200,7 +199,6 @@ class TransactionFlow(
     }
 }
 
-@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
 class TransactionFlowIntentMapper(
     private val sourceAccount: BlockchainAccount,
     private val target: TransactionTarget,
@@ -230,8 +228,9 @@ class TransactionFlowIntentMapper(
             }
             AssetAction.Receive,
             AssetAction.ViewActivity,
-            AssetAction.Summary -> throw IllegalStateException(
-                "Flows for Receive, ViewActivity and Summary not supported"
+            AssetAction.Summary,
+            AssetAction.Buy -> throw IllegalStateException(
+                "Flows for Buy, Receive, ViewActivity and Summary not supported"
             )
         }
 

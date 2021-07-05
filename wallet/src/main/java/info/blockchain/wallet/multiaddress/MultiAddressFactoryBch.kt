@@ -1,13 +1,13 @@
 package info.blockchain.wallet.multiaddress
 
-import info.blockchain.api.BitcoinApi
-import info.blockchain.api.bitcoin.data.MultiAddress
+import com.blockchain.api.NonCustodialBitcoinService
+import com.blockchain.api.bitcoin.data.MultiAddress
 import info.blockchain.wallet.payload.data.XPubs
 import info.blockchain.wallet.payload.data.legacyXpubAddresses
 
 import retrofit2.Call
 
-class MultiAddressFactoryBch(bitcoinApi: BitcoinApi) : MultiAddressFactory(bitcoinApi) {
+class MultiAddressFactoryBch(bitcoinApi: NonCustodialBitcoinService) : MultiAddressFactory(bitcoinApi) {
 
     override fun getMultiAddress(
         xpubs: List<XPubs>,
@@ -16,11 +16,11 @@ class MultiAddressFactoryBch(bitcoinApi: BitcoinApi) : MultiAddressFactory(bitco
         context: List<String>?
     ): Call<MultiAddress> {
         return bitcoinApi.getMultiAddress(
-            BitcoinApi.BITCOIN_CASH,
+            NonCustodialBitcoinService.BITCOIN_CASH,
             xpubs.legacyXpubAddresses(),
             emptyList(),
             context?.joinToString("|"),
-            BitcoinApi.BalanceFilter.RemoveUnspendable,
+            NonCustodialBitcoinService.BalanceFilter.RemoveUnspendable,
             limit,
             offset)
     }

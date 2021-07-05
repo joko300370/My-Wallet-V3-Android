@@ -21,7 +21,6 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.ui.urllinks.URL_XLM_MIN_BALANCE
-import kotlinx.android.synthetic.main.item_send_confirm_xlm_memo.view.*
 import piuk.blockchain.android.R
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.databinding.ItemSendConfirmXlmMemoBinding
@@ -104,7 +103,7 @@ private class XlmMemoItemViewHolder(
                 with(confirmDetailsMemoInput) {
                     if (text?.isNotEmpty() == true) {
                         requestFocus()
-                        setSelection(confirm_details_memo_input.text?.length ?: 0)
+                        setSelection(confirmDetailsMemoInput.text?.length ?: 0)
                     }
                     setupOnDoneListener(model, item)
                     setupMemoSaving(model, item)
@@ -126,7 +125,7 @@ private class XlmMemoItemViewHolder(
 
         setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE && v.text.isNotEmpty()) {
-                if (itemView.confirm_details_memo_spinner.selectedItemPosition == TEXT_INDEX) {
+                if (binding.confirmDetailsMemoSpinner.selectedItemPosition == TEXT_INDEX) {
                     model.process(
                         TransactionIntent.ModifyTxOption(item.copy(text = v.text.toString()))
                     )
@@ -150,23 +149,23 @@ private class XlmMemoItemViewHolder(
     ) {
         installUpdateThrottle { newText ->
             if (text?.isNotEmpty() == true) {
-                if (itemView.confirm_details_memo_spinner.selectedItemPosition == TEXT_INDEX) {
+                if (binding.confirmDetailsMemoSpinner.selectedItemPosition == TEXT_INDEX) {
                     if (haveContentsChanged(newText?.toString(), item.text)) {
-                            model.process(
-                                TransactionIntent.ModifyTxOption(item.copy(text = text.toString()))
+                        model.process(
+                            TransactionIntent.ModifyTxOption(item.copy(text = text.toString()))
+                        )
+                    }
+                } else {
+                    if (haveContentsChanged(newText?.toString(), item.id?.toString())) {
+                        model.process(
+                            TransactionIntent.ModifyTxOption(
+                                item.copy(id = text.toString().toLong())
                             )
-                        }
-                    } else {
-                        if (haveContentsChanged(newText?.toString(), item.id?.toString())) {
-                            model.process(
-                                TransactionIntent.ModifyTxOption(
-                                    item.copy(id = text.toString().toLong())
-                                )
-                            )
-                        }
+                        )
                     }
                 }
             }
+        }
     }
 
     private fun AppCompatSpinner.setupSpinner() {
@@ -213,14 +212,16 @@ private class XlmMemoItemViewHolder(
         text?.toString() == currentText && previousText != currentText
 
     private fun EditText.configureForSelection(selection: Int) {
-        if (selection == TEXT_INDEX) {
-            confirm_details_memo_input.hint =
-                context.getString(R.string.send_confirm_memo_text_hint)
-            confirm_details_memo_input.inputType = InputType.TYPE_CLASS_TEXT
-        } else {
-            confirm_details_memo_input.hint =
-                context.getString(R.string.send_confirm_memo_id_hint)
-            confirm_details_memo_input.inputType = InputType.TYPE_CLASS_NUMBER
+        binding.confirmDetailsMemoInput.apply {
+            if (selection == TEXT_INDEX) {
+                hint =
+                    context.getString(R.string.send_confirm_memo_text_hint)
+                inputType = InputType.TYPE_CLASS_TEXT
+            } else {
+                hint =
+                    context.getString(R.string.send_confirm_memo_id_hint)
+                inputType = InputType.TYPE_CLASS_NUMBER
+            }
         }
     }
 

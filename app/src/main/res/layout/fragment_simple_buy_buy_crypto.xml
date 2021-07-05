@@ -22,26 +22,26 @@
             android:layout_margin="@dimen/tiny_margin">
 
             <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/crypto_icon"
+                android:layout_width="@dimen/large_margin"
+                android:layout_height="@dimen/large_margin"
+                android:layout_marginEnd="@dimen/size_huge"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:srcCompat="@drawable/vector_bitcoin_colored" />
+
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/buy_icon"
                 android:layout_width="@dimen/standard_margin"
                 android:layout_height="@dimen/standard_margin"
-                android:layout_marginStart="@dimen/medium_margin"
+                android:layout_marginStart="@dimen/standard_margin"
                 android:background="@drawable/buy_currency_background"
                 app:layout_constraintBottom_toBottomOf="@+id/crypto_icon"
                 app:layout_constraintStart_toStartOf="@+id/crypto_icon"
                 app:layout_constraintTop_toTopOf="@+id/crypto_icon"
                 app:srcCompat="@drawable/ic_tx_buy"
                 app:tint="@color/btc" />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/crypto_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/size_huge"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:srcCompat="@drawable/vector_bitcoin_colored" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/crypto_text"
@@ -50,6 +50,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/standard_margin"
                 android:layout_marginTop="@dimen/tiny_margin"
+                android:textColor="@color/grey_900"
                 app:layout_constraintBottom_toTopOf="@+id/guideline"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintVertical_bias="1.0"
@@ -73,6 +74,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/guideline"
                 tools:text="$6,389.31 USD" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/price_delta"
+                style="@style/Text.Light.14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/smallest_margin"
+                android:textColor="@color/green_600"
+                app:layout_constraintBottom_toBottomOf="@+id/crypto_exchange_rate"
+                app:layout_constraintStart_toEndOf="@+id/crypto_exchange_rate"
+                app:layout_constraintTop_toTopOf="@+id/crypto_exchange_rate"
+                tools:text="+12.3" />
 
             <View
                 style="@style/Separator"
@@ -170,18 +183,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/payment_method_title"
             app:srcCompat="@drawable/ic_add_payment_method" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/undefined_payment_text"
-            style="@style/Text.Semibold.16"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/small_margin"
-            android:text="@string/select_payment_method"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/payment_method_icon"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:visibility="gone" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/payment_method_title"

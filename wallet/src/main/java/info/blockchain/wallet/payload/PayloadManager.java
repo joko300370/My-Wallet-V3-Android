@@ -25,9 +25,9 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import info.blockchain.api.ApiException;
-import info.blockchain.api.BitcoinApi;
-import info.blockchain.api.bitcoin.data.BalanceDto;
+import com.blockchain.api.ApiException;
+import com.blockchain.api.NonCustodialBitcoinService;
+import com.blockchain.api.bitcoin.data.BalanceDto;
 import info.blockchain.balance.CryptoValue;
 import info.blockchain.wallet.BlockchainFramework;
 import info.blockchain.wallet.api.WalletApi;
@@ -75,7 +75,7 @@ public class PayloadManager {
     private String password;
 
     private final WalletApi walletApi;
-    private final BitcoinApi bitcoinApi;
+    private final NonCustodialBitcoinService bitcoinApi;
 
     // Bitcoin
     private final MultiAddressFactory multiAddressFactory;
@@ -85,7 +85,7 @@ public class PayloadManager {
 
     public PayloadManager(
         WalletApi walletApi,
-        BitcoinApi bitcoinApi,
+        NonCustodialBitcoinService bitcoinApi,
         MultiAddressFactory multiAddressFactory,
         BalanceManagerBtc balanceManagerBtc,
         BalanceManagerBch balanceManagerBch

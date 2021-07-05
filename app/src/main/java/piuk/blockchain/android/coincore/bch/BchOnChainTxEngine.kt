@@ -5,6 +5,7 @@ import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
+import info.blockchain.wallet.api.dust.data.DustInput
 import info.blockchain.wallet.bch.BchMainNetParams
 import info.blockchain.wallet.exceptions.HDWalletException
 import info.blockchain.wallet.keys.SigningKey
@@ -16,6 +17,8 @@ import info.blockchain.wallet.util.FormatsUtil
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.Singles
+import org.bitcoinj.core.Transaction
+import org.spongycastle.util.encoders.Hex
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.CryptoAddress
 import piuk.blockchain.android.coincore.FeeLevel
@@ -26,6 +29,8 @@ import piuk.blockchain.android.coincore.TxResult
 import piuk.blockchain.android.coincore.TxValidationFailure
 import piuk.blockchain.android.coincore.ValidationState
 import piuk.blockchain.android.coincore.copyAndPut
+import piuk.blockchain.android.coincore.impl.txEngine.BitPayClientEngine
+import piuk.blockchain.android.coincore.impl.txEngine.EngineTransaction
 import piuk.blockchain.android.coincore.impl.txEngine.OnChainTxEngineBase
 import piuk.blockchain.android.coincore.updateTxValidity
 import piuk.blockchain.android.ui.transactionflow.flow.FeeInfo
@@ -53,7 +58,7 @@ class BchOnChainTxEngine(
 ) : OnChainTxEngineBase(
     requireSecondPassword,
     walletPreferences
-) {
+), BitPayClientEngine {
 
     private val bchSource: BchCryptoWalletAccount by unsafeLazy {
         sourceAccount as BchCryptoWalletAccount
@@ -92,7 +97,7 @@ class BchOnChainTxEngine(
         return Singles.zip(
             sourceAccount.accountBalance.map { it as CryptoValue },
             getUnspentApiResponse(bchSource.xpubAddress),
-            getDynamicFeePerKb(pendingTx)
+            getDynamicFeePerKb()
         ) { balance, coins, feePerKb ->
             updatePendingTx(amount, balance, pendingTx, feePerKb, coins)
         }.onErrorReturn {
@@ -153,12 +158,9 @@ class BchOnChainTxEngine(
         )
     }
 
-    private fun getDynamicFeePerKb(pendingTx: PendingTx): Single<CryptoValue> =
+    private fun getDynamicFeePerKb(): Single<CryptoValue> =
         feeManager.bchFeeOptions
             .map { feeOptions ->
-                check(pendingTx.feeSelection.selectedLevel == FeeLevel.Regular) {
-                    "Fee level ${pendingTx.feeSelection.selectedLevel} is not supported by BCH"
-                }
                 feeToCrypto(feeOptions.regularFee)
             }.singleOrError()
 
@@ -196,8 +198,8 @@ class BchOnChainTxEngine(
     private fun buildConfirmations(pendingTx: PendingTx): PendingTx =
         pendingTx.copy(
             confirmations = listOfNotNull(
-                TxConfirmationValue.NewFrom(sourceAccount, sourceAsset),
-                TxConfirmationValue.NewTo(
+                TxConfirmationValue.From(sourceAccount, sourceAsset),
+                TxConfirmationValue.To(
                     txTarget, AssetAction.Send, sourceAccount
                 ),
                 TxConfirmationValue.CompoundNetworkFee(
@@ -210,7 +212,7 @@ class BchOnChainTxEngine(
                     } else null,
                     feeLevel = pendingTx.feeSelection.selectedLevel
                 ),
-                TxConfirmationValue.NewTotal(
+                TxConfirmationValue.Total(
                     totalWithFee = (pendingTx.amount as CryptoValue).plus(
                         pendingTx.feeAmount as CryptoValue
                     ),
@@ -218,15 +220,6 @@ class BchOnChainTxEngine(
                         .plus(pendingTx.feeAmount.toFiat(exchangeRates, userFiat))
                 )
             )
-        )
-
-    override fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
-        TxConfirmationValue.FeeSelection(
-            feeDetails = getFeeState(pendingTx),
-            exchange = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
-            selectedLevel = pendingTx.feeSelection.selectedLevel,
-            availableLevels = AVAILABLE_FEE_LEVELS,
-            asset = sourceAsset
         )
 
     override fun doValidateAll(pendingTx: PendingTx): Single<PendingTx> =
@@ -245,27 +238,23 @@ class BchOnChainTxEngine(
         }
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
-        Singles.zip(
-            getBchChangeAddress(),
-            getBchKeys(pendingTx, secondPassword)
-        ).flatMap { (changeAddress, keys) ->
-            sendDataManager.submitBchPayment(
-                pendingTx.unspentOutputBundle,
-                keys,
-                FormatsUtil.makeFullBitcoinCashAddress(bchTarget.address),
-                changeAddress,
-                pendingTx.feeAmount.toBigInteger(),
-                pendingTx.amount.toBigInteger()
-            ).singleOrError()
-        }.doOnSuccess {
-            incrementBchReceiveAddress(pendingTx)
-        }.doOnError { e ->
-            Timber.e("BCH Send failed: $e")
-        }.onErrorResumeNext {
-            Single.error(TransactionError.ExecutionFailed)
-        }.map {
-            TxResult.HashedTxResult(it, pendingTx.amount)
-        }
+        doPrepareTransaction(pendingTx)
+            .flatMap { (tx, dustInput) ->
+                doSignTransaction(tx, pendingTx, secondPassword).map { it to dustInput }
+            }.flatMap { (engineTx, dustInput) ->
+                val bchPreparedTx = engineTx as BchPreparedTx
+                dustInput?.let {
+                    sendDataManager.submitBchPayment(bchPreparedTx.bchTx, it)
+                }
+            }.doOnSuccess {
+                doOnTransactionSuccess(pendingTx)
+            }.doOnError { e ->
+                doOnTransactionFailed(pendingTx, e)
+            }.onErrorResumeNext {
+                Single.error(TransactionError.ExecutionFailed)
+            }.map {
+                TxResult.HashedTxResult(it, pendingTx.amount)
+            }
 
     private fun getBchChangeAddress(): Single<String> {
         val position = bchDataManager.getAccountMetadataList()
@@ -320,6 +309,50 @@ class BchOnChainTxEngine(
         private val AVAILABLE_FEE_LEVELS = setOf(FeeLevel.Regular)
         private val MAX_BCH_AMOUNT = 2_100_000_000_000_000L.toBigInteger()
     }
+
+    class BchPreparedTx(
+        val bchTx: Transaction
+    ) : EngineTransaction {
+        override val encodedMsg: String
+            get() = String(Hex.encode(bchTx.bitcoinSerialize()))
+        override val msgSize: Int = bchTx.messageSize
+        override val txHash: String = bchTx.hashAsString
+    }
+
+    override fun doOnTransactionSuccess(pendingTx: PendingTx) {
+        incrementBchReceiveAddress(pendingTx)
+    }
+
+    override fun doOnTransactionFailed(pendingTx: PendingTx, e: Throwable) {
+        Timber.e("BCH Send failed: $e")
+    }
+
+    override fun doSignTransaction(
+        tx: Transaction,
+        pendingTx: PendingTx,
+        secondPassword: String
+    ): Single<EngineTransaction> =
+        getBchKeys(pendingTx, secondPassword).map { keys ->
+            BchPreparedTx(
+                sendDataManager.getSignedBchTransaction(
+                    tx,
+                    keys
+                )
+            )
+        }
+
+    override fun doPrepareTransaction(
+        pendingTx: PendingTx
+    ): Single<Pair<Transaction, DustInput?>> =
+        getBchChangeAddress().flatMap {
+            sendDataManager.getBchTransaction(
+                pendingTx.unspentOutputBundle,
+                FormatsUtil.makeFullBitcoinCashAddress(bchTarget.address),
+                it,
+                pendingTx.feeAmount.toBigInteger(),
+                pendingTx.amount.toBigInteger()
+            ).firstOrError()
+        }
 }
 
 private val PendingTx.totalSent: Money

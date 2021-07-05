@@ -1,6 +1,7 @@
 package piuk.blockchain.android.ui.customviews
 
 import android.content.Context
+import android.content.res.Resources
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
@@ -9,6 +10,7 @@ import androidx.annotation.StringRes
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.ViewIntroHeaderBinding
 import piuk.blockchain.android.util.visibleIf
+import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
 
 class IntroHeaderView @JvmOverloads constructor(
@@ -38,6 +40,12 @@ class IntroHeaderView @JvmOverloads constructor(
                 introHeaderLabel.text = label
                 introHeaderIcon.setImageDrawable(icon)
                 introHeaderSeparator.visibleIf { showSeparator }
+
+                try {
+                    introHeaderParent.background = context.getResolvedDrawable(R.drawable.ic_info_banner_background)
+                } catch (e: Resources.NotFoundException) {
+                    introHeaderParent.setBackgroundColor(context.getResolvedColor(R.color.white))
+                }
             }
             attributes.recycle()
         }

@@ -18,7 +18,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity.RESULT_CANCELED
 import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import androidx.appcompat.widget.AppCompatEditText
-import androidx.databinding.DataBindingUtil
 import com.blockchain.koin.scopedInject
 import com.blockchain.koin.scopedInjectActivity
 import com.blockchain.ui.password.SecondPasswordHandler
@@ -61,6 +60,7 @@ import piuk.blockchain.android.util.StringUtils
 import piuk.blockchain.android.util.ViewUtils
 import piuk.blockchain.android.util.copyHashOnLongClick
 import piuk.blockchain.android.util.gone
+import piuk.blockchain.android.util.invisible
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.data.api.EnvironmentConfig
@@ -69,6 +69,10 @@ import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 
 internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(),
     PinEntryView, BiometricsEnrollmentBottomSheet.Host {
+
+    private var _binding: FragmentPinEntryBinding? = null
+    private val binding: FragmentPinEntryBinding
+        get() = _binding!!
 
     private val pinEntryPresenter: PinEntryPresenter by scopedInject()
     private val environmentConfig: EnvironmentConfig by inject()
@@ -83,7 +87,6 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         get() = _pinBoxList
 
     private var materialProgressDialog: MaterialProgressDialog? = null
-    private var binding: FragmentPinEntryBinding? = null
     private var listener: OnPinEntryFragmentInteractionListener? = null
     private val clearPinNumberRunnable = ClearPinNumberRunnable()
     private var isPaused = false
@@ -101,18 +104,23 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_pin_entry, container, false)
+    ): View {
+        _binding = FragmentPinEntryBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         // Set title state
         if (presenter.isCreatingNewPin) {
-            binding?.titleBox?.setText(R.string.create_pin)
+            binding.titleBox.setText(R.string.create_pin)
         } else {
-            binding?.titleBox?.setText(R.string.pin_entry)
+            binding.titleBox.setText(R.string.pin_entry)
             presenter.fetchInfoMessage()
         }
 
-        binding?.let {
+        binding.let {
             _pinBoxList.add(it.pinBox0)
             _pinBoxList.add(it.pinBox1)
             _pinBoxList.add(it.pinBox2)
@@ -120,7 +128,7 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         }
 
         showConnectionDialogIfNeeded()
-        binding?.swipeHintLayout?.setOnClickListener { listener?.onSwipePressed() }
+        binding.swipeHintLayout.setOnClickListener { listener?.onSwipePressed() }
 
         presenter.onViewReady()
         presenter.checkForceUpgradeStatus(BuildConfig.VERSION_NAME)
@@ -128,11 +136,11 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         if (arguments != null) {
             val showSwipeHint = requireArguments().getBoolean(KEY_SHOW_SWIPE_HINT)
             if (!showSwipeHint) {
-                binding?.swipeHintLayout?.visibility = View.INVISIBLE
+                binding.swipeHintLayout.invisible()
             }
         }
 
-        binding?.keyboard?.setPadClickedListener(object :
+        binding.keyboard.setPadClickedListener(object :
             PinEntryKeypad.OnPinEntryPadClickedListener {
             override fun onNumberClicked(number: String) {
                 presenter.onPadClicked(number)
@@ -152,12 +160,10 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
             )
         }
 
-        binding?.textViewVersionCode?.text = getVersionText()
-        binding?.pinEntryLogout?.setOnClickListener {
+        binding.textViewVersionCode.text = getVersionText()
+        binding.pinEntryLogout.setOnClickListener {
             presenter.resetApp()
         }
-
-        return binding?.root
     }
 
     private fun getVersionText() = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
@@ -685,13 +691,14 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
     override fun onDestroy() {
         dismissProgressDialog()
         super.onDestroy()
+        _binding = null
     }
 
     @Thunk
     internal fun dismissFingerprintDialog() {
         // Hide if fingerprint unlock has become unavailable
         if (!presenter.ifShouldShowFingerprintLogin) {
-            binding?.fingerprintLogo?.visibility = View.GONE
+            binding.fingerprintLogo.gone()
         }
     }
 
@@ -714,21 +721,17 @@ internal class PinEntryFragment : BaseFragment<PinEntryView, PinEntryPresenter>(
         appUtil.restartAppWithVerifiedPin(LauncherActivity::class.java, isAfterWalletCreation)
     }
 
-    override fun createPresenter(): PinEntryPresenter {
-        return pinEntryPresenter
-    }
+    override fun createPresenter(): PinEntryPresenter = pinEntryPresenter
 
     override fun setupCommitHashView() {
-        binding?.debugCommitHash?.apply {
+        binding.debugCommitHash.apply {
             visibleIf { BuildConfig.COMMIT_HASH.isNotEmpty() }
             text = BuildConfig.COMMIT_HASH
             copyHashOnLongClick(requireContext())
         }
     }
 
-    override fun getMvpView(): PinEntryView {
-        return this
-    }
+    override fun getMvpView(): PinEntryView = this
 
     internal interface OnPinEntryFragmentInteractionListener {
         fun onSwipePressed()

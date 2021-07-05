@@ -8,8 +8,9 @@ interface InternalFeatureFlagApi {
     fun getAll(): Map<GatedFeature, Boolean>
 }
 
-enum class GatedFeature(val readableName: String) {
+enum class GatedFeature(val readableName: String, val enabledForCompanyInternalBuild: Boolean = false) {
     ADD_SUB_WALLET_ADDRESSES("Create BTC sub-wallets"),
-    SINGLE_SIGN_ON("Enable New SSO Flow"), // If true, the new login flow will be used
-    RECURRING_BUYS("Enable recurring buys")
+    RECURRING_BUYS("Enable recurring buys", true),
+    ACCOUNT_RECOVERY("Enable New Account Recovery Flow"),
+    FULL_SCREEN_TXS("Enable full screen tx flow")
 }

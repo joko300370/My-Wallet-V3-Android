@@ -654,9 +654,6 @@
     <string name="airdrop_sheet_stx_body">Possui sua identidade e dados digitais com centenas de aplicativos descentralizados criados com o Blockstack.</string>
     <string name="airdrop_sheet_stx_where_are_my_stacks_title">Onde estão minhas pilhas?</string>
     <string name="airdrop_sheet_stx_where_are_my_stacks">As pilhas (STX) são armazenadas na sua Carteira Blockchain. Observe que o saldo não é transferível no momento.</string>
-    <string name="custody_intro_title">Sua Carteira de Custódia.</string>
-    <string name="custody_intro_body_1">Quando você compra criptografia, armazenamos seus fundos com segurança em uma Carteira de negociação criptográfica. Esses fundos são armazenados por nós em seu nome. Você pode mantê-los em segurança conosco ou transferi-los para sua Carteira virtual sem custódia para possuir e armazenar você mesmo.</string>
-    <string name="custody_intro_body_2">Se você deseja trocar ou enviar esses fundos, é necessário transferi-los para sua Carteira Bitcoin.</string>
     <string name="backup_before_send_title">Faça backup da sua carteira</string>
     <string name="backup_before_send_body">Sua frase de backup permitirá recuperar sua criptografia se você perder o acesso à sua carteira.
 
@@ -868,7 +865,6 @@
     <string name="xlm_memo_id">ID da nota</string>
     <string name="airdrop_activity_title">Airdrops</string>
     <string name="simple_buy_intro_title">Bem-vindo ao Blockchain</string>
-    <string name="simple_buy_buy_crypto">Comprar Crypto</string>
     <string name="simple_buy_instructions_to_buy">Podemos ajudá-lo a comprar em apenas algumas etapas simples.</string>
     <string name="simple_buy_intro_main_button_action">Comprar Crypto agora</string>
     <string name="simple_buy_deposit_my_crypto">Conheça a Wallet</string>
@@ -949,8 +945,6 @@
     <string name="buy_max">Comprar Max</string>
     <string name="bank_wire_transfer">Transferencia bancária</string>
     <string name="credit_or_debit_card">Cartão de crédito ou débito</string>
-    <string name="add_credit_or_debit_card">Adicione um cartão de crédito ou débito</string>
-    <string name="select_payment_method">Selecione um método de pagamento</string>
     <string name="payment_method_limit">Limite de %1$s</string>
     <string name="order_details">detalhes do pedido</string>
     <string name="purchase_bank_note">Assim que recebermos seus fundos, iniciaremos seu pedido de compra de %1$s . Observe que seu valor final pode mudar para a atividade de mercado devida. Podem ser aplicadas taxas.</string>
@@ -1259,8 +1253,7 @@ se disponível. Isso permite que restaure a sua carteira e perder este dispositi
     <string name="interest_dashboard_verify_point_three_title">Ganhe juros</string>
     <string name="interest_dashboard_verify_point_three_label">Transfira para sua conta de juros e receba pagamentos de juros mensais.</string>
     <string name="interest_summary_disclaimer_label">Use a carteira da Web para retirar seus fundos</string>
-    <string name="buy">Comprar</string>
-    <string name="sell">Vender</string>
+    <string name="common_buy">Comprar</string>
     <string name="buy_and_sell">Compra venda</string>
     <string name="buy_with_cash">Compre com dinheiro ou cartão.</string>
     <string name="select_crypto_you_want">Selecione a criptografia que deseja comprar.</string>

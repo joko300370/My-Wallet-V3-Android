@@ -34,7 +34,7 @@ import timber.log.Timber
 class FiatFundsDetailSheet : SlidingModalBottomDialog<DialogSheetFiatFundsDetailBinding>() {
 
     interface Host : SlidingModalBottomDialog.Host {
-        fun gotoActivityFor(account: BlockchainAccount)
+        fun goToActivityFor(account: BlockchainAccount)
         fun showFundsKyc()
         fun startBankTransferWithdrawal(fiatAccount: FiatAccount)
         fun startDepositFlow(fiatAccount: FiatAccount)
@@ -101,7 +101,7 @@ class FiatFundsDetailSheet : SlidingModalBottomDialog<DialogSheetFiatFundsDetail
             fundsActivityHolder.setOnClickListener {
                 analytics.logEvent(fiatAssetAction(AssetDetailsAnalytics.FIAT_ACTIVITY_CLICKED, account.fiatCurrency))
                 dismiss()
-                host.gotoActivityFor(account)
+                host.goToActivityFor(account)
             }
         }
     }

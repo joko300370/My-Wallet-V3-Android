@@ -32,22 +32,8 @@ class CreateWalletPresenter(
     private val formatChecker: FormatChecker
 ) : BasePresenter<CreateWalletView>() {
 
-    var passwordStrength = 0
-
     override fun onViewReady() {
         // No-op
-    }
-
-    fun calculateEntropy(password: String) {
-        passwordStrength = PasswordUtil.getStrength(password).roundToInt()
-        view.setEntropyStrength(passwordStrength)
-
-        when (passwordStrength) {
-            in 0..25 -> view.setEntropyLevel(0)
-            in 26..50 -> view.setEntropyLevel(1)
-            in 51..75 -> view.setEntropyLevel(2)
-            in 76..100 -> view.setEntropyLevel(3)
-        }
     }
 
     fun validateCredentials(email: String, password1: String, password2: String): Boolean =
@@ -64,7 +50,7 @@ class CreateWalletPresenter(
             password1 != password2 -> {
                 view.showError(R.string.password_mismatch_error); false
             }
-            !passwordStrength.isStrongEnough() -> {
+            !PasswordUtil.getStrength(password1).roundToInt().isStrongEnough() -> {
                 view.warnWeakPassword(email, password1); false
             }
             else -> true

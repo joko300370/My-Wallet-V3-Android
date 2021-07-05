@@ -6,6 +6,7 @@ import info.blockchain.balance.FiatValue
 import info.blockchain.balance.Money
 import io.reactivex.Completable
 import io.reactivex.Single
+import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.coincore.BankAccount
 import piuk.blockchain.android.coincore.FeeLevel
 import piuk.blockchain.android.coincore.FeeSelection
@@ -69,19 +70,17 @@ class FiatDepositTxEngine(
         return Single.just(
             pendingTx.copy(
                 confirmations = listOfNotNull(
-                    TxConfirmationValue.From(sourceAccount.label),
-                    TxConfirmationValue.To(txTarget.label),
-                    if (!pendingTx.isOpenBankingCurrency()) {
-                        TxConfirmationValue.EstimatedDepositCompletion
-                    } else {
-                        null
-                    },
-                    TxConfirmationValue.FiatTxFee(
-                        fee = pendingTx.feeAmount
+                    TxConfirmationValue.PaymentMethod(
+                        sourceAccount.label,
+                        (sourceAccount as LinkedBankAccount).accountNumber,
+                        (sourceAccount as LinkedBankAccount).accountType,
+                        AssetAction.FiatDeposit
                     ),
-                    TxConfirmationValue.Total(
-                        total = pendingTx.amount
-                    )
+                    TxConfirmationValue.To(txTarget, AssetAction.FiatDeposit),
+                    if (!pendingTx.isOpenBankingCurrency()) {
+                        TxConfirmationValue.EstimatedCompletion
+                    } else null,
+                    TxConfirmationValue.Amount(pendingTx.amount, true)
                 )
             )
         )
@@ -127,9 +126,7 @@ class FiatDepositTxEngine(
             walletManager.startBankTransfer(
                 it.address, pendingTx.amount, pendingTx.amount.currencyCode, if (pendingTx.isOpenBankingCurrency()) {
                     YAPILY_DEEPLINK_PAYMENT_APPROVAL_URL
-                } else {
-                    null
-                }
+                } else null
             )
         }.map {
             TxResult.HashedTxResult(it, pendingTx.amount)

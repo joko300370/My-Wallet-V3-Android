@@ -24,10 +24,9 @@ sealed class AuthNewLoginIntents : MviIntent<AuthNewLoginState> {
     ) : AuthNewLoginIntents() {
         override fun reduce(oldState: AuthNewLoginState): AuthNewLoginState =
             oldState.copy(
-                items = oldState.items + AuthNewLoginLastLogin(browserIdentity.lastUsed),
+                items = oldState.items + AuthNewLoginLastLogin(message.timestamp),
                 browserIdentity = browserIdentity,
-                message = message,
-                lastUsed = browserIdentity.lastUsed
+                message = message
             )
     }
 

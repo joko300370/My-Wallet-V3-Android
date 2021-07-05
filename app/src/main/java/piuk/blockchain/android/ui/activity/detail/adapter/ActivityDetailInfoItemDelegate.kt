@@ -9,6 +9,8 @@ import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.multiaddress.TransactionSummary
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.ItemListInfoRowBinding
+import piuk.blockchain.android.simplebuy.toHumanReadableRecurringBuy
+import piuk.blockchain.android.simplebuy.toHumanReadableRecurringDate
 import piuk.blockchain.android.ui.activity.detail.Action
 import piuk.blockchain.android.ui.activity.detail.ActivityDetailsType
 import piuk.blockchain.android.ui.activity.detail.Amount
@@ -19,14 +21,18 @@ import piuk.blockchain.android.ui.activity.detail.BuyPurchaseAmount
 import piuk.blockchain.android.ui.activity.detail.Created
 import piuk.blockchain.android.ui.activity.detail.Description
 import piuk.blockchain.android.ui.activity.detail.Fee
+import piuk.blockchain.android.ui.activity.detail.FeeAmount
 import piuk.blockchain.android.ui.activity.detail.FeeForTransaction
 import piuk.blockchain.android.ui.activity.detail.From
 import piuk.blockchain.android.ui.activity.detail.HistoricValue
 import piuk.blockchain.android.ui.activity.detail.NetworkFee
+import piuk.blockchain.android.ui.activity.detail.NextPayment
+import piuk.blockchain.android.ui.activity.detail.RecurringBuyFrequency
 import piuk.blockchain.android.ui.activity.detail.SellCryptoWallet
 import piuk.blockchain.android.ui.activity.detail.SellPurchaseAmount
 import piuk.blockchain.android.ui.activity.detail.SwapReceiveAmount
 import piuk.blockchain.android.ui.activity.detail.To
+import piuk.blockchain.android.ui.activity.detail.TotalCostAmount
 import piuk.blockchain.android.ui.activity.detail.TransactionId
 import piuk.blockchain.android.ui.activity.detail.Value
 import piuk.blockchain.android.ui.activity.detail.XlmMemo
@@ -65,6 +71,7 @@ private class InfoItemViewHolder(private val binding: ItemListInfoRowBinding) : 
     private fun getHeaderForType(infoType: ActivityDetailsType): String =
         when (infoType) {
             is Created -> context.getString(R.string.activity_details_created)
+            is NextPayment -> context.getString(R.string.recurring_buy_details_next_payment)
             is Amount -> context.getString(R.string.activity_details_amount)
             is Fee -> context.getString(R.string.activity_details_fee)
             is Value -> context.getString(R.string.activity_details_value)
@@ -87,6 +94,8 @@ private class InfoItemViewHolder(private val binding: ItemListInfoRowBinding) : 
             is FeeForTransaction -> context.getString(R.string.activity_details_transaction_fee)
             is BuyFee -> context.getString(R.string.activity_details_buy_fees)
             is BuyPurchaseAmount -> context.getString(R.string.activity_details_buy_purchase_amount)
+            is TotalCostAmount -> context.getString(R.string.recurring_buy_details_total_cost)
+            is FeeAmount -> context.getString(R.string.recurring_buy_details_fees)
             is SellPurchaseAmount -> context.getString(R.string.common_total)
             is TransactionId -> context.getString(R.string.activity_details_buy_tx_id)
             is BuyCryptoWallet,
@@ -98,12 +107,17 @@ private class InfoItemViewHolder(private val binding: ItemListInfoRowBinding) : 
                 (infoType.feeValue as CryptoValue).currency.displayTicker
             )
             is XlmMemo -> context.getString(R.string.xlm_memo_text)
+            is RecurringBuyFrequency -> context.getString(R.string.recurring_buy_details_recurring)
             else -> context.getString(R.string.empty)
         }
 
     private fun getValueForType(infoType: ActivityDetailsType): String =
         when (infoType) {
             is Created -> infoType.date.toFormattedString()
+            is NextPayment -> infoType.date.toFormattedString()
+            is RecurringBuyFrequency -> "${
+                infoType.frequency.toHumanReadableRecurringBuy(context)
+            } ${infoType.frequency.toHumanReadableRecurringDate(context)}"
             is Amount -> infoType.value.toStringWithSymbol()
             is Fee -> infoType.feeValue?.toStringWithSymbol() ?: context.getString(
                 R.string.activity_details_fee_load_fail
@@ -134,6 +148,8 @@ private class InfoItemViewHolder(private val binding: ItemListInfoRowBinding) : 
             }
             is BuyFee -> infoType.feeValue.toStringWithSymbol()
             is BuyPurchaseAmount -> infoType.fundedFiat.toStringWithSymbol()
+            is TotalCostAmount -> infoType.fundedFiat.toStringWithSymbol()
+            is FeeAmount -> infoType.fundedFiat.toStringWithSymbol()
             is TransactionId -> infoType.txId
             is BuyCryptoWallet -> context.getString(
                 R.string.custodial_wallet_default_label_2, infoType.crypto.displayTicker

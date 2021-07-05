@@ -185,6 +185,13 @@ internal interface Nabu {
         @Header("authorization") authorization: String
     ): Completable
 
+    @POST("$NABU_RESET_USER/{userId}")
+    fun resetUserKyc(
+        @Path("userId") userId: String,
+        @Body jwt: NabuJwt,
+        @Header("authorization") authorization: String
+    ): Completable
+
     @PUT(NABU_REGISTER_CAMPAIGN)
     fun registerCampaign(
         @Body campaignRequest: RegisterCampaignRequest,

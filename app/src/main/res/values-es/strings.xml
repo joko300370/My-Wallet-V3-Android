@@ -653,9 +653,6 @@ Euros/Dolares</string>
     <string name="airdrop_sheet_stx_body">Adquiera su identidad y datos digitales con cientos de aplicaciones descentralizadas creadas con Blockstack.</string>
     <string name="airdrop_sheet_stx_where_are_my_stacks_title">¿Dónde están mis pilas?</string>
     <string name="airdrop_sheet_stx_where_are_my_stacks">Las pilas (STX) se almacenan en su billetera Blockchain. Tenga en cuenta que el saldo actualmente no es transferible.</string>
-    <string name="custody_intro_title">Su billetera de custodia.</string>
-    <string name="custody_intro_body_1">Cuando compra crypto, almacenamos sus fondos de forma segura para usted en una billetera Crypto Trading. Nosotros almacenamos estos fondos en su nombre. Puede mantenerlos a salvo con nosotros o transferirlos a su billetera sin custodia para que los posea y almacene.</string>
-    <string name="custody_intro_body_2">Si desea intercambiar o enviar estos fondos, debe transferirlos a su billetera bitcoin.</string>
     <string name="backup_before_send_title">Copia de seguridad de su billetera</string>
     <string name="backup_before_send_body">Su frase de respaldo le permitirá recuperar su criptografía si pierde el acceso a su billetera.
 
@@ -867,7 +864,6 @@ Euros/Dolares</string>
     <string name="xlm_memo_id">ID de memorando</string>
     <string name="airdrop_activity_title">Gotas de aire</string>
     <string name="simple_buy_intro_title">Bienvenido a Blockchain</string>
-    <string name="simple_buy_buy_crypto">Comprar Crypto</string>
     <string name="simple_buy_instructions_to_buy">Podemos ayudarle a comprar en pocos y sencillos pasos.</string>
     <string name="simple_buy_intro_main_button_action">Comprar Crypto ahora</string>
     <string name="simple_buy_deposit_my_crypto">Busque en su monedero</string>
@@ -948,8 +944,6 @@ Euros/Dolares</string>
     <string name="buy_max">Comprar Max</string>
     <string name="bank_wire_transfer">Transferencia bancaria</string>
     <string name="credit_or_debit_card">Tarjeta de crédito o débito</string>
-    <string name="add_credit_or_debit_card">Agregar una tarjeta de crédito o débito</string>
-    <string name="select_payment_method">Seleccione un método de pago</string>
     <string name="payment_method_limit">Límite %1$s</string>
     <string name="order_details">Detalles del pedido</string>
     <string name="purchase_bank_note">Una vez que recibamos sus fondos, comenzaremos su orden de compra de %1$s . Tenga en cuenta que su cantidad final puede cambiar a la actividad de mercado debida. Se pueden aplicar tarifas.</string>
@@ -1256,8 +1250,7 @@ Esto le permitirá restaurar su Wallet si perdiera este dispositivo.</string>
     <string name="interest_dashboard_verify_point_three_title">Ganar intereses</string>
     <string name="interest_dashboard_verify_point_three_label">Transfiera a su Cuenta de Intereses y obtenga Pagos de Intereses mensuales.</string>
     <string name="interest_summary_disclaimer_label">Utilice la billetera web para retirar sus fondos</string>
-    <string name="buy">Comprar</string>
-    <string name="sell">Vender</string>
+    <string name="common_buy">Comprar</string>
     <string name="buy_and_sell">Compra y Venda</string>
     <string name="buy_with_cash">Compre en efectivo o con tarjeta.</string>
     <string name="select_crypto_you_want">Seleccione la criptomoneda que desea comprar.</string>

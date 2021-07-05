@@ -654,9 +654,6 @@
     <string name="airdrop_sheet_stx_body">Имейте свою цифровую идентификацию и данные с сотнями децентрализованных приложений, созданных с Blockstack.</string>
     <string name="airdrop_sheet_stx_where_are_my_stacks_title">Где мои стеки?</string>
     <string name="airdrop_sheet_stx_where_are_my_stacks">Стеки (STX) хранятся в вашем кошельке Blockchain. Обратите внимание, что баланс в настоящее время не подлежит передаче.</string>
-    <string name="custody_intro_title">Ваш Хранитель Кошелек.</string>
-    <string name="custody_intro_body_1">Когда вы покупаете crypto, мы надежно храним ваши средства в кошельке Crypto Trading. Эти средства хранятся нами от вашего имени. Вы можете хранить их в безопасности у нас или перевести на свой кошелек, не связанный с тюремным заключением, для хранения и хранения.</string>
-    <string name="custody_intro_body_2">Если вы хотите обменять или отправить эти средства, вам необходимо перевести их на свой биткойн-кошелек.</string>
     <string name="backup_before_send_title">Сделайте резервную копию вашего кошелька</string>
     <string name="backup_before_send_body">Ваша резервная фраза позволит вам восстановить криптографию, если вы потеряете доступ к своему кошельку.
 
@@ -868,7 +865,6 @@
     <string name="xlm_memo_id">Memo ID</string>
     <string name="airdrop_activity_title">Airdrops</string>
     <string name="simple_buy_intro_title">Добро пожаловать в блокчейн</string>
-    <string name="simple_buy_buy_crypto">Купить Крипто</string>
     <string name="simple_buy_instructions_to_buy">Мы можем помочь вам купить всего за несколько простых шагов.</string>
     <string name="simple_buy_intro_main_button_action">Купить Crypto сейчас</string>
     <string name="simple_buy_deposit_my_crypto">Тур кошелек</string>
@@ -949,8 +945,6 @@
     <string name="buy_max">Купить Макс</string>
     <string name="bank_wire_transfer">Банковский перевод</string>
     <string name="credit_or_debit_card">Кредитная или дебетовая карта</string>
-    <string name="add_credit_or_debit_card">Добавить кредитную или дебетовую карту</string>
-    <string name="select_payment_method">Выберите способ оплаты</string>
     <string name="payment_method_limit">%1$s лимит</string>
     <string name="order_details">Информация для заказа</string>
     <string name="purchase_bank_note">Как только мы получим ваши средства, мы начнем ваш заказ на покупку %1$s . Обратите внимание, что ваша окончательная сумма может измениться в зависимости от рыночной активности. Может взиматься плата.</string>
@@ -1260,8 +1254,7 @@
     <string name="interest_dashboard_verify_point_three_title">Зарабатывайте проценты</string>
     <string name="interest_dashboard_verify_point_three_label">Переводите на свой процентный счет и получайте ежемесячные процентные выплаты.</string>
     <string name="interest_summary_disclaimer_label">Используйте веб-кошелек для вывода средств</string>
-    <string name="buy">купить</string>
-    <string name="sell">Продать</string>
+    <string name="common_buy">купить</string>
     <string name="buy_and_sell">Купи продай</string>
     <string name="buy_with_cash">Купить наличными или картой.</string>
     <string name="select_crypto_you_want">Выберите криптовалюту, которую хотите купить.</string>

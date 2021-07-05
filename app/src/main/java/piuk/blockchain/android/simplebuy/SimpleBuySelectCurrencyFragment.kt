@@ -12,7 +12,7 @@ import info.blockchain.wallet.api.data.Settings.Companion.UNIT_FIAT
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import org.koin.android.ext.android.inject
 import piuk.blockchain.android.databinding.FragmentSimpleBuyCurrencySelectionBinding
 import piuk.blockchain.android.ui.base.mvi.MviBottomSheet

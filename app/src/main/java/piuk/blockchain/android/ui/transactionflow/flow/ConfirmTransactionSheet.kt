@@ -27,8 +27,7 @@ class ConfirmTransactionSheet : TransactionFlowSheet<DialogTxFlowConfirmBinding>
     private val stringUtils: StringUtils by inject()
     private val exchangeRates: ExchangeRates by scopedInject()
     private val prefs: CurrencyPrefs by scopedInject()
-    private val mapper: TxConfirmReadOnlyMapper by scopedInject()
-    private val mapperNewCheckout: TxConfirmReadOnlyMapperNewCheckout by scopedInject()
+    private val mapper: TxConfirmReadOnlyMapperCheckout by scopedInject()
     private val customiser: TransactionConfirmationCustomisations by inject()
     private val assetResources: AssetResources by scopedInject()
 
@@ -41,7 +40,6 @@ class ConfirmTransactionSheet : TransactionFlowSheet<DialogTxFlowConfirmBinding>
             activityContext = requireActivity(),
             analytics = analyticsHooks,
             mapper = mapper,
-            mapperNewCheckout = mapperNewCheckout,
             selectedCurrency = prefs.selectedFiatCurrency,
             exchangeRates = exchangeRates,
             assetResources = assetResources

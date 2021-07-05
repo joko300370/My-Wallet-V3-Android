@@ -1,5 +1,6 @@
 package com.blockchain.notifications;
 
+import com.blockchain.logging.CrashLogger;
 import com.blockchain.preferences.NotificationPrefs;
 import com.google.firebase.iid.FirebaseInstanceId;
 
@@ -31,12 +32,20 @@ public class NotificationTokenManagerTest extends RxTest {
     @Mock private NotificationPrefs prefs;
     @Mock private FirebaseInstanceId firebaseInstanceId;
     @Mock private RxBus rxBus;
+    @Mock private CrashLogger crashLogger;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        subject = new NotificationTokenManager(notificationService, payloadManager, prefs, firebaseInstanceId, rxBus);
+        subject = new NotificationTokenManager(
+            notificationService,
+            payloadManager,
+            prefs,
+            firebaseInstanceId,
+            rxBus,
+            crashLogger
+        );
     }
 
     @Test

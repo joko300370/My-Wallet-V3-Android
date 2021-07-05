@@ -189,6 +189,8 @@ internal class BtcCryptoWalletAccount(
             else -> throw java.lang.IllegalStateException("Unknown wallet type")
         }
 
+    override val hasStaticAddress: Boolean = false
+
     val xpubs: XPubs
         get() = when (internalAccount) {
             is Account -> internalAccount.xpubs

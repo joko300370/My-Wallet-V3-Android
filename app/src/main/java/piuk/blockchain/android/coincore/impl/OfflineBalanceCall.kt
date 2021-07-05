@@ -1,6 +1,6 @@
 package piuk.blockchain.android.coincore.impl
 
-import info.blockchain.api.BitcoinApi
+import com.blockchain.api.NonCustodialBitcoinService
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.payload.BalanceCall
@@ -11,7 +11,7 @@ import java.lang.IllegalStateException
 import java.math.BigInteger
 
 class OfflineBalanceCall(
-    private val bitcoinApi: BitcoinApi
+    private val bitcoinApi: NonCustodialBitcoinService
 ) {
     fun getBalanceOfAddresses(
         asset: CryptoCurrency,

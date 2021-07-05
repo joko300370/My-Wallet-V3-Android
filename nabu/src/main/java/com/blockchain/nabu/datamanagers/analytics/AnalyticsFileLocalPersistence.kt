@@ -2,7 +2,7 @@ package com.blockchain.nabu.datamanagers.analytics
 
 import android.content.Context
 import com.blockchain.nabu.filesystem.QueueFile
-import info.blockchain.api.NabuAnalyticsEvent
+import com.blockchain.api.NabuAnalyticsEvent
 import io.reactivex.Completable
 import io.reactivex.Single
 import kotlinx.serialization.decodeFromString

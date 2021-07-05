@@ -14,6 +14,8 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import com.blockchain.logging.CrashLogger
 import com.blockchain.nabu.models.data.YodleeAttributes
 import com.blockchain.notifications.analytics.Analytics
 import com.google.gson.Gson
@@ -28,6 +30,8 @@ import piuk.blockchain.android.simplebuy.yodlee.FastLinkMessage
 import piuk.blockchain.android.simplebuy.yodlee.MessageData
 import piuk.blockchain.android.simplebuy.yodlee.SiteData
 import piuk.blockchain.android.ui.base.setupToolbar
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.ui.linkbank.BankAuthFlowNavigator
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
@@ -43,6 +47,7 @@ class YodleeWebViewFragment : Fragment(), FastLinkInterfaceHandler.FastLinkListe
         get() = _binding!!
 
     private val analytics: Analytics by inject()
+    private val crashLogger: CrashLogger by inject()
     private var isViewLoaded: Boolean = false
 
     private val attributes: YodleeAttributes by lazy {
@@ -117,14 +122,16 @@ class YodleeWebViewFragment : Fragment(), FastLinkInterfaceHandler.FastLinkListe
 
     private fun loadYodlee() {
         requireActivity().runOnUiThread {
-            updateViewsVisibility(true)
-            with(binding) {
-                yodleeWebview.clearCache(true)
-                yodleeStatusLabel.text = getString(R.string.yodlee_connection_title)
-                yodleeSubtitle.text = getString(R.string.yodlee_connection_subtitle)
-                yodleeWebview.gone()
-                yodleeRetry.gone()
-                yodleeWebview.postUrl(attributes.fastlinkUrl, yodleeQuery.toByteArray())
+            if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                updateViewsVisibility(true)
+                with(binding) {
+                    yodleeWebview.clearCache(true)
+                    yodleeStatusLabel.text = getString(R.string.yodlee_connection_title)
+                    yodleeSubtitle.text = getString(R.string.yodlee_connection_subtitle)
+                    yodleeWebview.gone()
+                    yodleeRetry.gone()
+                    yodleeWebview.postUrl(attributes.fastlinkUrl, yodleeQuery.toByteArray())
+                }
             }
         }
         isViewLoaded = true
@@ -132,9 +139,11 @@ class YodleeWebViewFragment : Fragment(), FastLinkInterfaceHandler.FastLinkListe
 
     override fun flowSuccess(providerAccountId: String, accountId: String) {
         analytics.logEvent(SimpleBuyAnalytics.ACH_SUCCESS)
-        navigator().launchBankLinking(
-            accountProviderId = providerAccountId, accountId = accountId, bankId = linkingBankId
-        )
+        requireActivity().runOnUiThread {
+            navigator().launchBankLinking(
+                accountProviderId = providerAccountId, accountId = accountId, bankId = linkingBankId
+            )
+        }
     }
 
     override fun flowError(error: FastLinkInterfaceHandler.FastLinkFlowError, reason: String?) {
@@ -168,8 +177,14 @@ class YodleeWebViewFragment : Fragment(), FastLinkInterfaceHandler.FastLinkListe
     }
 
     override fun pageFinishedLoading() {
-        binding.yodleeWebview.visible()
-        updateViewsVisibility(false)
+        try {
+            binding.yodleeWebview.visible()
+            updateViewsVisibility(false)
+        } catch (e: NullPointerException) {
+            crashLogger.logException(e, "Underlying binding is null")
+            toast(getString(R.string.common_error), ToastCustom.TYPE_ERROR)
+            navigator().bankAuthCancelled()
+        }
     }
 
     private fun updateViewsVisibility(visible: Boolean) {

@@ -108,6 +108,7 @@ class LauncherPresenterTest {
         whenever(wallet.sharedKey).thenReturn(SHARED_KEY)
         whenever(mockSettings.isEmailVerified).thenReturn(true)
         whenever(mockSettings.currency).thenReturn("USD")
+        whenever(notificationTokenManager.resendNotificationToken()).thenReturn(Completable.complete())
 
         // Act
         subject.onViewReady()
@@ -176,6 +177,7 @@ class LauncherPresenterTest {
         whenever(wallet.sharedKey).thenReturn(SHARED_KEY)
         whenever(mockSettings.isEmailVerified).thenReturn(true)
         whenever(mockSettings.currency).thenReturn("USD")
+        whenever(notificationTokenManager.resendNotificationToken()).thenReturn(Completable.complete())
 
         // Act
         subject.onViewReady()
@@ -231,6 +233,7 @@ class LauncherPresenterTest {
         whenever(wallet.sharedKey).thenReturn(SHARED_KEY)
         whenever(mockSettings.isEmailVerified).thenReturn(true)
         whenever(mockSettings.currency).thenReturn("USD")
+        whenever(notificationTokenManager.resendNotificationToken()).thenReturn(Completable.complete())
 
         // Act
         subject.onViewReady()

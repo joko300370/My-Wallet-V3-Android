@@ -34,6 +34,7 @@ import piuk.blockchain.android.ui.customviews.account.PendingBalanceAccountDecor
 import piuk.blockchain.android.ui.customviews.account.StatusDecorator
 import piuk.blockchain.android.ui.customviews.account.addViewToBottomWithConstraints
 import piuk.blockchain.android.ui.customviews.account.removePossibleBottomView
+import piuk.blockchain.android.ui.transactionflow.analytics.InterestAnalytics
 import piuk.blockchain.android.ui.transfer.analytics.TransferAnalyticsEvent
 import piuk.blockchain.android.util.context
 import piuk.blockchain.android.util.setAssetIconColours
@@ -208,7 +209,13 @@ class AssetActionsSheet :
                 getString(R.string.dashboard_asset_actions_deposit_dsc, asset.displayTicker),
                 asset, action
             ) {
-                goToInterestDeposit()
+                processAction(AssetAction.InterestDeposit)
+                analytics.logEvent(
+                    InterestAnalytics.InterestDepositClicked(
+                        currency = asset.networkTicker,
+                        origin = LaunchOrigin.CURRENCY_PAGE
+                    )
+                )
             }
             AssetAction.InterestWithdraw -> AssetActionItem(
                 getString(R.string.common_withdraw),
@@ -216,7 +223,13 @@ class AssetActionsSheet :
                 getString(R.string.dashboard_asset_actions_withdraw_dsc, asset.displayTicker),
                 asset, action
             ) {
-                goToInterestWithdraw()
+                processAction(AssetAction.InterestWithdraw)
+                analytics.logEvent(
+                    InterestAnalytics.InterestWithdrawalClicked(
+                        currency = asset.networkTicker,
+                        origin = LaunchOrigin.CURRENCY_PAGE
+                    )
+                )
             }
             AssetAction.Sell -> AssetActionItem(
                 getString(R.string.common_sell),
@@ -227,20 +240,20 @@ class AssetActionsSheet :
                 logActionEvent(AssetDetailsAnalytics.SELL_CLICKED, asset)
                 processAction(AssetAction.Sell)
             }
+            AssetAction.Buy -> AssetActionItem(
+                getString(R.string.common_buy),
+                R.drawable.ic_tx_buy,
+                getString(R.string.dashboard_asset_actions_buy_dsc, asset.displayTicker),
+                asset, action
+            ) {
+                processAction(AssetAction.Buy)
+            }
             AssetAction.Withdraw -> throw IllegalStateException("Cannot Withdraw a non-fiat currency")
             AssetAction.FiatDeposit -> throw IllegalStateException("Cannot Deposit a non-fiat currency to Fiat")
         }
 
     private fun logActionEvent(event: AssetDetailsAnalytics, asset: CryptoCurrency) {
         analytics.logEvent(assetActionEvent(event, asset.networkTicker))
-    }
-
-    private fun goToInterestDeposit() {
-        model.process(HandleActionIntent(AssetAction.InterestDeposit))
-    }
-
-    private fun goToInterestWithdraw() {
-        model.process(HandleActionIntent(AssetAction.InterestWithdraw))
     }
 
     private fun goToSummary() {

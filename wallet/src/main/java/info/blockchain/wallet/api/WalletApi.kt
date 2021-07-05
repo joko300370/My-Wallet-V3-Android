@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
-import info.blockchain.api.ApiException
+import com.blockchain.api.ApiException
 import info.blockchain.wallet.ApiCode
 import info.blockchain.wallet.api.data.Settings
 import info.blockchain.wallet.api.data.Status
@@ -19,7 +19,8 @@ import java.net.URLEncoder
 
 class WalletApi(
     private val explorerInstance: WalletExplorerEndpoints,
-    private val apiCode: ApiCode
+    private val apiCode: ApiCode,
+    private val captchaSiteKey: String
 ) {
     fun updateFirebaseNotificationToken(
         token: String,
@@ -248,12 +249,14 @@ class WalletApi(
             true
         )
 
-    fun sendEmailForVerification(sessionId: String, email: String): Single<ResponseBody> {
+    fun sendEmailForVerification(sessionId: String, email: String, captcha: String): Single<ResponseBody> {
         return explorerInstance.sendEmailForVerification(
             sessionId.withBearerPrefix(),
             "send-guid-reminder",
             getApiCode(),
-            email
+            email,
+            captcha,
+            captchaSiteKey
         )
     }
 

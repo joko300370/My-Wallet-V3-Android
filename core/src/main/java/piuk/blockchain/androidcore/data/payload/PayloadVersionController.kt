@@ -1,7 +1,7 @@
 package piuk.blockchain.androidcore.data.payload
 
-import info.blockchain.api.WalletSettingsService
-import info.blockchain.api.wallet.data.WalletSettingsDto
+import com.blockchain.api.WalletSettingsService
+import com.blockchain.api.wallet.data.WalletSettingsDto
 import io.reactivex.Single
 import java.util.Locale
 

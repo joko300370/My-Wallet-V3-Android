@@ -25,7 +25,7 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.RETURNS_DEEP_STUBS
 import com.blockchain.android.testutils.rxInit
 import com.blockchain.logging.CrashLogger
-import info.blockchain.api.BitcoinApi
+import com.blockchain.api.NonCustodialBitcoinService
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.keys.SigningKey
@@ -45,7 +45,7 @@ class PayloadDataManagerTest {
     private val payloadService: PayloadService = mock()
     private val payloadManager: PayloadManager = mock(defaultAnswer = RETURNS_DEEP_STUBS)
     private val privateKeyFactory: PrivateKeyFactory = mock()
-    private val bitcoinApi: BitcoinApi = mock()
+    private val bitcoinApi: NonCustodialBitcoinService = mock()
 
     private val crashLogger: CrashLogger = mock()
     private val rxBus = RxBus()

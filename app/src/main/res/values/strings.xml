@@ -38,6 +38,7 @@
     <string name="common_try_again">Try Again</string>
     <string name="common_oops">Oops! Something went wrong.</string>
     <string name="common_sell">Sell</string>
+    <string name="common_buy">Buy</string>
     <string name="common_search">Search</string>
     <string name="common_approve">Approve</string>
     <string name="common_deny">Deny</string>
@@ -241,6 +242,9 @@
     <string name="receive_address_to_share">Share this receive address for sending? If so, be
         advised that other applications may be able to look at this information.
     </string>
+
+    <string name="receive_rotating_address_title">Did you know?</string>
+    <string name="receive_rotating_address_desc">For added security, we create a new %1$s address for every request you make. Each unique address is linked to your %2$s.</string>
 
     <string name="guid_to_clipboard">Copy your Wallet ID to the clipboard? If so, be advised that
         other applications may be able to look at this information.
@@ -766,6 +770,7 @@
     <string name="dashboard_asset_actions_swap_dsc">Exchange %1$s for Another Crypto</string>
     <string name="dashboard_asset_actions_deposit_dsc">Add %1$s to your Interest Account</string>
     <string name="dashboard_asset_actions_withdraw_dsc">Withdraw %1$s from your Interest Account</string>
+    <string name="dashboard_asset_actions_buy_dsc">Add %1$s to your Trading Account</string>
     <string name="dashboard_asset_actions_summary_title">Interest Summary</string>
     <string name="dashboard_asset_actions_summary_dsc">View your accrued %1$s Interest</string>
     <string name="dashboard_asset_actions_interest_dsc_failed">Could not load Interest details</string>
@@ -953,9 +958,8 @@
     <string name="airdrop_sheet_xlm_title" translatable="false">Stellar (XLM)</string>
 
     <!-- custody wallet intro sheet -->
-    <string name="custody_intro_title">Your Custody Wallet.</string>
-    <string name="custody_intro_body_1">When you buy crypto, we store your funds securely for you in a Crypto Trading Wallet. These funds are stored by us on your behalf. You can keep them safe with us or transfer them to your non-custodial Wallet to own and store yourself.</string>
-    <string name="custody_intro_body_2">If you want to swap or send these funds you need to transfer them to your bitcoin Wallet.</string>
+    <string name="custody_intro_title_1">Your Trading Account</string>
+    <string name="custody_intro_body">When you buy crypto, we store your funds securely on your behalf in a crypto Trading Account. You can keep them safe with us or transfer them to your Private Key (or non-custodial) Wallet to own and store yourself.</string>
 
     <!-- force backup before send sheet -->
     <string name="backup_before_send_title">Backup Your Wallet</string>
@@ -1278,7 +1282,6 @@
 
     <!--Simple buy-->
     <string name="simple_buy_intro_title">Welcome to Blockchain</string>
-    <string name="simple_buy_buy_crypto">Buy Crypto</string>
     <string name="simple_buy_own_crypto">Own Crypto in a Few Minutes</string>
     <string name="simple_buy_instructions_to_buy">We can help you buy in just a few simple steps.</string>
     <string name="simple_buy_verify_your_identity">Verify your identity and buy crypto</string>
@@ -1292,7 +1295,6 @@
     <string name="payment_methods">Payment Methods</string>
     <string name="payment_method">Payment Method</string>
     <string name="simple_buy_enter_amount">Enter amount</string>
-    <string name="simple_buy_buy_crypto_title">Buy Crypto</string>
     <string name="simple_buy_select_currency">Select Your Currency</string>
     <string name="change_currency">Change Currency</string>
     <string name="simple_buy_verify_email_instruction">We sent an email to %1$s with a verification link. Didn’t get it? Check your spam folder.</string>
@@ -1318,8 +1320,6 @@
     <string name="credit_or_debit_card">Credit or Debit Card</string>
     <string name="instantly_buy_crypto_with_card">Instantly buy crypto with any Visa or Mastercard.</string>
     <string name="send_funds_directly_from_your_bank">Send funds directly from your bank to your Blockchain Wallet. Once we receive the manual transfer, use that cash to buy crypto.</string>
-    <string name="add_credit_or_debit_card">Add a Credit or Debit Card</string>
-    <string name="select_payment_method">Select a Payment Method</string>
     <string name="payment_method_limit">%1$s Limit</string>
     <string name="payment_method_type_account_info">%1$s Account %2$s</string>
     <string name="checkout">Checkout</string>
@@ -1474,6 +1474,7 @@
     <string name="activity_details_title_swap">Swap</string>
     <string name="activity_details_title_deposit">Transfer</string>
     <string name="activity_details_title_interest_earned">Interest Earned</string>
+    <string name="activity_details_title_recurring_buy">Recurring Buy</string>
     <string name="activity_details_title_withdraw">Withdrawal</string>
     <string name="activity_details_label_confirming">Confirming</string>
     <string name="activity_details_label_waiting_on_funds">Waiting on Funds</string>
@@ -1540,7 +1541,6 @@
     <string name="withdraw_confirmation_success_message">We are sending the cash now. Expect the cash to hit your bank on %1$s. Check the status of your Withdrawal at anytime from your Activity Screen</string>
     <string name="withdraw_interest_confirmation_success_message">Your %1$s will be available in your %2$s within 2 days.</string>
     <string name="withdraw_target_select_title">Withdraw to…</string>
-    <string name="withdraw_confirmation_eta">Funds Will Arrive by</string>
     <string name="add_a_bank">Add a Bank</string>
     <string name="fiat_funds_detail_activity_title">Activity</string>
     <string name="fiat_funds_detail_activity_details">View All Transactions</string>
@@ -1719,8 +1719,6 @@
     <string name="interest_error_desc">An error occurred while loading Interest Account details.\nPlease check your internet connection and try again or Contact Support if the issue persists.</string>
 
     <!-- Buy & Sell -->
-    <string name="buy">Buy</string>
-    <string name="sell">Sell</string>
     <string name="buy_and_sell">Buy &amp; Sell</string>
     <string name="buy_with_cash">Buy with Cash or Card.</string>
     <string name="select_crypto_you_want">Select the crypto you want to buy.</string>
@@ -2040,7 +2038,10 @@
     <string name="checkout_item_price_blurb">Blockchain.com provides the best market price we receive and applies a spread. <annotation link="learn_more">Learn more</annotation></string>
     <string name="checkout_item_price_fee">Blockchain.com requires a fee when paying with a card. <annotation link="learn_more">Learn more</annotation></string>
     <string name="checkout_item_private_key_wallet_explanation">%s Private Key wallets, send, and receive are not supported at this time.</string>
-    <string name="checkout_item_deposit_to">Deposit to</string>
+    <string name="checkout_item_deposit_to">Deposit To</string>
+    <string name="checkout_item_withdraw_to">Withdraw To</string>
+    <string name="checkout_item_fee_to">Withdraw Fee</string>
+    <string name="checkout_item_account_number">Ending in %s</string>
     <string name="checkout_item_send_to">Send to</string>
     <string name="checkout_item_sale">Sale amount</string>
     <string name="checkout_item_network_fee">%s Network fee</string>
@@ -2090,15 +2091,25 @@
     <string name="open_email_cta">Open Email App</string>
     <string name="login_wallet_id_text">Wallet: %s</string>
     <string name="login_password_hint">Password</string>
-    <string name="forgot_password_label">Forgot password?</string>
+    <string name="forgot_password_label">Trouble logging in?</string>
     <string name="two_factor_auth_title">Authorize login</string>
     <string name="two_factor_code_hint">2FA code</string>
     <string name="invalid_two_fa_code">Invalid 2FA code</string>
     <string name="auth_required">Authorization required, please check your email.</string>
+    <string name="lost_2fa_notice">Lost access to your 2FA device? <annotation link="reset_2fa">Reset your 2FA</annotation></string>
     <string name="hardware_key_hint">Verify with your |HARDWARE KEY|</string>
     <string name="tap_hardware_key_label">Tap |HARDWARE KEY| to verify</string>
     <string name="second_password_hint">Second password</string>
-    <string name="second_password_notice">We’re moving away from 2nd passwords. Enable 2FA under security settings. </string>
+    <string name="second_password_notice">We’re moving away from 2nd passwords. Enable 2FA under security settings. <annotation link="learn_more">Learn more</annotation></string>
+
+    <!-- Account Recovery -->
+    <string name="account_recover_title">Verify your account</string>
+    <string name="enter_recovery_phrase_desc">Enter your twelve word Secret Private Key Recovery Phrase to complete login.</string>
+    <string name="enter_recovery_phrase_hint">Enter your secret recovery phrase</string>
+    <string name="recovery_phrase_word_count_error">The Recovery Phrase must be exactly 12 words</string>
+    <string name="reset_account_notice">Can’t find your recovery phrase? <annotation link="reset_account">Reset your account</annotation></string>
+    <string name="reset_kyc_notice">For your security, you may have to re-verify your identity before accessing your trading or interest account.\n<annotation link="learn_more">Learn more</annotation></string>
+    <string name="reset_kyc_failed">Restoring account failed. Please try again.</string>
 
     <!-- Recurring buy screens -->
     <string name="recurring_buy_toolbar">Recurring Buys</string>
@@ -2146,7 +2157,21 @@
     <string name="recurring_buy_cancelled_toast">Recurring buy cancelled</string>
     <string name="recurring_buy_cancelled_error_toast">Oops! There was an issue cancelling your recurring buy. Please try again later.</string>
     <string name="recurring_buy_cancel_dialog_desc">Are you sure you want to cancel this Recurring Buy?</string>
-    <string name="recurring_buy_activity_failed">Failed. Low balance.</string>
     <string name="recurring_buy_activity_pending">Pending</string>
+    <string name="recurring_buy_details_next_payment">Next Payment</string>
+    <string name="recurring_buy_details_recurring">Recurring</string>
+    <string name="recurring_buy_details_total_cost">Total Cost</string>
+    <string name="recurring_buy_details_fees">Fees</string>
+    <string name="activity_details_label_btn_cash">Add Cash</string>
+
+    <string name="recurring_buy_short_error">Failed</string>
+    <string name="recurring_buy_insufficient_funds_short_error">Failed. Low Balance</string>
+
+    <string name="recurring_buy_insufficient_funds_error">Your payment method has insufficient funds. Add more to complete the recurring buy.</string>
+    <string name="recurring_buy_internal_server_error">There has been an error with your purchase. We will retry shortly.</string>
+    <string name="recurring_buy_final_attempt_error">There has been an error with your purchase. <annotation link="contact_support_link">Contact support</annotation> for more information.</string>
+    <string name="recurring_buy_beneficiary_error">Your selected payment method is not active. Please use another.</string>
+    <string name="recurring_buy_limits_exceed_error">Your account has exceeded its trading limits. <annotation link="contact_support_link">Contact support</annotation> for more information.</string>
+    <string name="recurring_buy_generic_error">There has been an error with your purchase. <annotation link="contact_support_link">Contact support</annotation> for more information.</string>
     <string name="fee_calculated_at_checkout">Calculated at checkout</string>
 </resources>

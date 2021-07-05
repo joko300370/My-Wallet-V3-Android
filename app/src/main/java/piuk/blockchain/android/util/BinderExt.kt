@@ -9,9 +9,16 @@ import piuk.blockchain.android.coincore.TransactionTarget
 fun Bundle.putAccount(key: String, account: BlockchainAccount) =
     putBinder(key, ParamBinder(account))
 
+fun Bundle.putTarget(key: String, account: TransactionTarget) =
+    putBinder(key, ParamBinder(account))
+
 @Suppress("UNCHECKED_CAST")
 fun Bundle.getAccount(key: String): BlockchainAccount? =
     (getBinder(key) as? ParamBinder<BlockchainAccount>)?.account
+
+@Suppress("UNCHECKED_CAST")
+fun Bundle.getTarget(key: String): TransactionTarget? =
+    (getBinder(key) as? ParamBinder<TransactionTarget>)?.account
 
 fun Intent.putAccount(key: String, account: BlockchainAccount) =
     this.putExtra(key, Bundle().apply { putBinder(key, ParamBinder(account)) })

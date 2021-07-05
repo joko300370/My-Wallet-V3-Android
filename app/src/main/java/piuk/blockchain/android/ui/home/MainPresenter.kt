@@ -46,6 +46,7 @@ import piuk.blockchain.android.simplebuy.SimpleBuyState
 import piuk.blockchain.android.simplebuy.SimpleBuySyncFactory
 import piuk.blockchain.android.sunriver.CampaignLinkState
 import piuk.blockchain.android.thepit.PitLinking
+import piuk.blockchain.android.ui.auth.newlogin.SecureChannelManager
 import piuk.blockchain.android.ui.base.MvpPresenter
 import piuk.blockchain.android.ui.base.MvpView
 import piuk.blockchain.android.ui.kyc.settings.KycStatusHelper
@@ -55,7 +56,6 @@ import piuk.blockchain.android.ui.linkbank.BankPaymentApproval
 import piuk.blockchain.android.ui.linkbank.fromPreferencesValue
 import piuk.blockchain.android.ui.linkbank.toPreferencesValue
 import piuk.blockchain.android.ui.upsell.KycUpgradePromptManager
-import piuk.blockchain.android.ui.auth.newlogin.SecureChannelManager
 import piuk.blockchain.androidcore.data.access.AccessState
 import piuk.blockchain.androidcore.data.exchangerate.ExchangeRateDataManager
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
@@ -276,7 +276,7 @@ class MainPresenter internal constructor(
 
         compositeDisposable += custodialWalletManager.updateOpenBankingConsent(
             bankLinkingPrefs.getDynamicOneTimeTokenUrl(), consentToken
-        )
+        ).observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = {
                     if (deepLinkState.bankAuthFlow == BankAuthFlowState.BANK_APPROVAL_PENDING) {
@@ -306,10 +306,10 @@ class MainPresenter internal constructor(
         ) { transferDetails ->
             transferDetails.status != BankTransferStatus.PENDING
         }.start()
+            .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
                 view?.handleApprovalDepositInProgress(paymentData.orderValue)
-            }
-            .subscribeBy(
+            }.subscribeBy(
                 onSuccess = {
                     when (it) {
                         is PollResult.FinalResult -> {

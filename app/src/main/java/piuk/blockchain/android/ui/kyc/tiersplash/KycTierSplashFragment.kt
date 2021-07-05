@@ -13,15 +13,15 @@ import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavDirections
 import com.blockchain.koin.scopedInject
+import com.blockchain.nabu.models.responses.nabu.KycTierLevel
+import com.blockchain.nabu.models.responses.nabu.KycTierState
+import com.blockchain.nabu.models.responses.nabu.KycTiers
+import com.blockchain.nabu.models.responses.nabu.Tier
 import com.blockchain.notifications.analytics.Analytics
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.KYCAnalyticsEvents
 import com.blockchain.notifications.analytics.kycTierStart
 import com.blockchain.notifications.analytics.logEvent
-import com.blockchain.nabu.models.responses.nabu.KycTierLevel
-import com.blockchain.nabu.models.responses.nabu.KycTierState
-import com.blockchain.nabu.models.responses.nabu.KycTiers
-import com.blockchain.nabu.models.responses.nabu.Tier
 import com.blockchain.ui.extensions.throttledClicks
 import com.blockchain.ui.urllinks.URL_CONTACT_SUPPORT
 import com.blockchain.ui.urllinks.URL_LEARN_MORE_REJECTED
@@ -33,20 +33,19 @@ import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
 import piuk.blockchain.android.databinding.FragmentKycTierSplashBinding
+import piuk.blockchain.android.ui.customviews.ToastCustom
+import piuk.blockchain.android.ui.customviews.toast
+import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
 import piuk.blockchain.android.ui.kyc.hyperlinks.renderSingleLink
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.kyc.navhost.KycProgressListener
 import piuk.blockchain.android.ui.kyc.navigate
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
-import piuk.blockchain.android.ui.transactionflow.TransactionFlow
-import piuk.blockchain.android.util.setImageDrawable
-import piuk.blockchain.androidcoreui.ui.base.BaseFragment
-import piuk.blockchain.android.ui.customviews.ToastCustom
-import piuk.blockchain.android.ui.customviews.toast
-import piuk.blockchain.android.ui.kyc.ParentActivityDelegate
+import piuk.blockchain.android.ui.transactionflow.TransactionLauncher
 import piuk.blockchain.android.util.gone
-import piuk.blockchain.android.util.inflate
+import piuk.blockchain.android.util.setImageDrawable
 import piuk.blockchain.android.util.visible
+import piuk.blockchain.androidcoreui.ui.base.BaseFragment
 import timber.log.Timber
 
 class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPresenter>(),
@@ -54,6 +53,8 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
 
     private val presenter: KycTierSplashPresenter by scopedInject()
     private val analytics: Analytics by inject()
+    private val txLauncher: TransactionLauncher by inject()
+
     private val progressListener: KycProgressListener by ParentActivityDelegate(
         this
     )
@@ -293,14 +294,11 @@ class KycTierSplashFragment : BaseFragment<KycTierSplashView, KycTierSplashPrese
     }
 
     private fun startSwap() {
-        TransactionFlow(
-            action = AssetAction.Swap
-        ).apply {
-            startFlow(
-                fragmentManager = childFragmentManager,
-                host = this@KycTierSplashFragment
-            )
-        }
+        txLauncher.startFlow(
+            action = AssetAction.Swap,
+            fragmentManager = childFragmentManager,
+            flowHost = this@KycTierSplashFragment
+        )
     }
 
     override fun onPause() {

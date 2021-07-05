@@ -10,6 +10,7 @@ import piuk.blockchain.android.databinding.SimpleBuyPaymentMethodChooserBinding
 import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
 import piuk.blockchain.android.ui.adapters.DelegationAdapter
 import piuk.blockchain.android.ui.base.SlidingModalBottomDialog
+import piuk.blockchain.android.ui.customviews.BlockchainListDividerDecor
 import piuk.blockchain.android.util.visibleIf
 import piuk.blockchain.androidcore.utils.helperfunctions.unsafeLazy
 import java.io.Serializable
@@ -25,14 +26,16 @@ class PaymentMethodChooserBottomSheet : SlidingModalBottomDialog<SimpleBuyPaymen
         SimpleBuyPaymentMethodChooserBinding.inflate(inflater, container, false)
 
     override fun initControls(binding: SimpleBuyPaymentMethodChooserBinding) {
-        binding.recycler.adapter =
-            PaymentMethodsAdapter(
-                paymentMethods
-                    .map {
-                        it.toPaymentMethodItem()
-                    })
-
-        binding.recycler.layoutManager = LinearLayoutManager(context)
+        binding.recycler.apply {
+            adapter =
+                PaymentMethodsAdapter(
+                    paymentMethods
+                        .map {
+                            it.toPaymentMethodItem()
+                        })
+            addItemDecoration(BlockchainListDividerDecor(requireContext()))
+            layoutManager = LinearLayoutManager(context)
+        }
         val isShowingPaymentMethods = paymentMethods.all { it.canUsedForPaying() }
 
         binding.addPaymentMethod.visibleIf { isShowingPaymentMethods }

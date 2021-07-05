@@ -654,7 +654,7 @@ class LiveCustodialWalletManager(
                         paymentMethod.currency == fiatCurrency
                     ) {
                         availablePaymentMethods.add(
-                            PaymentMethod.UndefinedFunds(
+                            PaymentMethod.UndefinedBankAccount(
                                 paymentMethod.currency,
                                 PaymentLimits(
                                     paymentMethod.limits.min, paymentMethod.limits.max, paymentMethod.currency
@@ -713,11 +713,11 @@ class LiveCustodialWalletManager(
             Single.just(emptyList())
         }
 
-    override fun getRecurringBuyOrdersFor(crypto: CryptoCurrency): Single<List<RecurringBuyTransaction>> =
+    override fun getRecurringBuyOrders(): Single<List<RecurringBuyTransaction>> =
         if (features.isFeatureEnabled(GatedFeature.RECURRING_BUYS)) {
             authenticator.authenticate { sessionToken ->
                 nabuService.getRecurringBuysTransactions(
-                    sessionToken, crypto.networkTicker
+                    sessionToken
                 ).map { list ->
                     list.map {
                         it.toRecurringBuyTransaction()
@@ -1115,7 +1115,7 @@ class LiveCustodialWalletManager(
     private fun BankInfoResponse.toBank(): Bank =
         Bank(
             id = id,
-            name = accountName ?: bankName ?: "",
+            name = name.takeIf { it?.isNotEmpty() == true } ?: accountName.orEmpty(),
             state = state.toBankState(),
             currency = currency,
             account = accountNumber ?: "****",

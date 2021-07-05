@@ -151,10 +151,14 @@ class LauncherPresenter(
                 }
             }
                 .doOnSuccess {
+                    notificationTokenManager.registerAuthEvent()
                     accessState.isLoggedIn = true
                     analytics.logEvent(LoginAnalyticsEvent)
                 }
-                .doOnSuccess { notificationTokenManager.registerAuthEvent() }
+                .flatMap { emailVerifShouldLaunched ->
+                    notificationTokenManager.resendNotificationToken().onErrorComplete()
+                        .toSingle { emailVerifShouldLaunched }
+                }
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe { view.updateProgressVisibility(true) }
                 .subscribeBy(

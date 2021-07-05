@@ -46,7 +46,7 @@ import timber.log.Timber
 
 class ActivitiesFragment :
     HomeScreenMviFragment<ActivitiesModel, ActivitiesIntent, ActivitiesState, FragmentActivitiesBinding>(),
-    AccountSelectSheet.SelectionHost {
+    AccountSelectSheet.SelectionHost, CryptoActivityDetailsBottomSheet.Host {
 
     override val model: ActivitiesModel by scopedInject()
 
@@ -295,6 +295,10 @@ class ActivitiesFragment :
 
     override fun onAccountSelected(account: BlockchainAccount) {
         model.process(AccountSelectedIntent(account, false))
+    }
+
+    override fun onAddCash(currency: String) {
+        navigator().launchFiatDeposit(currency)
     }
 
     // SlidingModalBottomDialog.Host

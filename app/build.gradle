@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs'
 apply plugin: 'com.novoda.build-properties'
@@ -33,6 +33,13 @@ android {
             storePassword buildProperties.secrets['keyPassword'].string
             keyPassword buildProperties.secrets['keyPassword'].string
             keyAlias buildProperties.secrets['debugKeyAlias'].string
+        }
+
+        prodInternal {
+            storeFile file('blockchainInternalKey.keystore')
+            storePassword buildProperties.secrets['keyPasswordInternal'].string
+            keyPassword buildProperties.secrets['keyPasswordInternal'].string
+            keyAlias buildProperties.secrets['internalKeyAlias'].string
         }
     }
     compileSdkVersion Versions.compileSdk
@@ -69,20 +76,7 @@ android {
                 'ru',
                 'tr'
     }
-    buildTypes {
-        release {
-            debuggable false
-            minifyEnabled true
-            zipAlignEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            multiDexEnabled true
-        }
-        debug {
-            multiDexEnabled true
-            buildConfigBoolean "SKIP_VERIFF_KYC", false
-        }
-    }
+
     bundle {
         language {
             // Specifies that the app bundle should not support
@@ -108,11 +102,11 @@ android {
         envProd {
             dimension "environment"
             manifestPlaceholders = [
-                    BACKUP_API_KEY: buildProperties.secrets['prodGoogleBackupApiKey'].string,
+                    BACKUP_API_KEY     : buildProperties.secrets['prodGoogleBackupApiKey'].string,
                     DYNAMIC_LINK_HOST  : buildProperties.secrets['prodDynamicLink'].string,
                     DYNAMIC_LINK_HOST_2: buildProperties.secrets['prodDynamicLink2'].string,
-                    LOGIN_LINK_HOST: buildProperties.secrets['prodLoginLink'].string,
-                    LOGIN_LINK_HOST_2: buildProperties.secrets['prodLoginLink2'].string
+                    LOGIN_LINK_HOST    : buildProperties.secrets['prodLoginLink'].string,
+                    LOGIN_LINK_HOST_2  : buildProperties.secrets['prodLoginLink2'].string
             ]
             buildConfigString "EXPLORER_URL", buildProperties.secrets['prodExplorer']
             buildConfigString "API_URL", buildProperties.secrets['prodApiServer']
@@ -130,15 +124,57 @@ android {
             buildConfigField "String", "COMMIT_HASH", "\"\""
             buildConfigString "SIFT_ACCOUNT_ID", buildProperties.secrets['prodSiftAccount']
             buildConfigString "SIFT_BEACON_KEY", buildProperties.secrets['prodSiftBeaconId']
+            buildConfigString "RECAPTCHA_SITE_KEY", buildProperties.secrets['captchaProdSiteKey']
+        }
+        envInternalProd {
+            dimension "environment"
+            manifestPlaceholders = [
+                    BACKUP_API_KEY     : buildProperties.secrets['prodGoogleBackupApiKey'].string,
+                    DYNAMIC_LINK_HOST  : buildProperties.secrets['prodDynamicLink'].string,
+                    DYNAMIC_LINK_HOST_2: buildProperties.secrets['prodDynamicLink2'].string,
+                    LOGIN_LINK_HOST    : buildProperties.secrets['prodLoginLink'].string,
+                    LOGIN_LINK_HOST_2  : buildProperties.secrets['prodLoginLink2'].string
+            ]
+            buildConfigString "EXPLORER_URL", buildProperties.secrets['prodExplorer']
+            buildConfigString "API_URL", buildProperties.secrets['prodApiServer']
+            buildConfigString "EVERYPAY_HOST_URL", buildProperties.secrets['prodEverypayHost']
+            buildConfigString "ETHEREUM_WEBSOCKET_URL", buildProperties.secrets['prodEthWebsocket']
+            buildConfigString "BITCOIN_CASH_WEBSOCKET_URL", buildProperties.secrets['prodBchWebsocket']
+            buildConfigString "STATUS_API_URL", buildProperties.secrets['prodApiStatus']
+            buildConfigString "NABU_WEBSOCKET_URL", buildProperties.secrets['prodNabuWebsocket']
+            buildConfigString "HORIZON_URL", buildProperties.secrets['prodHorizonUrl']
+            buildConfigString "PIT_LINKING_URL", buildProperties.secrets['prodPitDoLink']
+            buildConfigString "PIT_LAUNCHING_URL", buildProperties.secrets['prodPitLaunch']
+            buildConfigString "COINS_WEBSOCKET_URL", buildProperties.secrets['prodCoinsWebsocket']
+            buildConfigField "String", "ENVIRONMENT", '"env_prod"'
+            buildConfigField "String", "VERSION_NAME_SUFFIX", "\"" + versionNameSuffix + "\""
+            buildConfigField "String", "COMMIT_HASH", "\"\""
+            buildConfigString "SIFT_ACCOUNT_ID", buildProperties.secrets['prodSiftAccount']
+            buildConfigString "SIFT_BEACON_KEY", buildProperties.secrets['prodSiftBeaconId']
+            buildConfigString "RECAPTCHA_SITE_KEY", buildProperties.secrets['captchaProdSiteKey']
+
+            applicationId "com.blockchain.wallet.internal"
+            resValue "string", "app_name", "BlockInternal"
+
+            def ciVersionCode = System.getenv("BITRISE_BUILD_NUMBER")
+            if (ciVersionCode != null) {
+                versionCode = ciVersionCode.toInteger()
+                versionName = ciVersionCode
+                versionNameSuffix = ".$ciVersionCode"
+            } else {
+                versionCode = 1
+                versionName = 1
+                versionNameSuffix = ".local"
+            }
         }
         envDev {
             dimension "environment"
             manifestPlaceholders = [
-                    BACKUP_API_KEY: buildProperties.secrets['devGoogleBackupApiKey'].string,
+                    BACKUP_API_KEY     : buildProperties.secrets['devGoogleBackupApiKey'].string,
                     DYNAMIC_LINK_HOST  : buildProperties.secrets['devDynamicLink'].string,
                     DYNAMIC_LINK_HOST_2: buildProperties.secrets['devDynamicLink2'].string,
-                    LOGIN_LINK_HOST: buildProperties.secrets['devLoginLink'].string,
-                    LOGIN_LINK_HOST_2: buildProperties.secrets['devLoginLink2'].string
+                    LOGIN_LINK_HOST    : buildProperties.secrets['devLoginLink'].string,
+                    LOGIN_LINK_HOST_2  : buildProperties.secrets['devLoginLink2'].string
             ]
             buildConfigString "EXPLORER_URL", buildProperties.secrets['devExplorer']
             buildConfigString "API_URL", buildProperties.secrets['devApiServer']
@@ -156,6 +192,7 @@ android {
             buildConfigField "String", "VERSION_NAME_SUFFIX", "\"" + versionNameSuffix + "\""
             buildConfigString "SIFT_ACCOUNT_ID", buildProperties.secrets['devSiftAccount']
             buildConfigString "SIFT_BEACON_KEY", buildProperties.secrets['devSiftBeaconId']
+            buildConfigString "RECAPTCHA_SITE_KEY", buildProperties.secrets['captchaDevSiteKey']
 
             versionNameSuffix '-dev'
             applicationId "piuk.blockchain.android.dev"
@@ -164,11 +201,11 @@ android {
         envStaging {
             dimension "environment"
             manifestPlaceholders = [
-                    BACKUP_API_KEY: buildProperties.secrets['stagingGoogleBackupApiKey'].string,
+                    BACKUP_API_KEY     : buildProperties.secrets['stagingGoogleBackupApiKey'].string,
                     DYNAMIC_LINK_HOST  : buildProperties.secrets['stagingDynamicLink'].string,
                     DYNAMIC_LINK_HOST_2: buildProperties.secrets['stagingDynamicLink2'].string,
-                    LOGIN_LINK_HOST: buildProperties.secrets['stagingLoginLink'].string,
-                    LOGIN_LINK_HOST_2: buildProperties.secrets['stagingLoginLink2'].string
+                    LOGIN_LINK_HOST    : buildProperties.secrets['stagingLoginLink'].string,
+                    LOGIN_LINK_HOST_2  : buildProperties.secrets['stagingLoginLink2'].string
             ]
             buildConfigString "EXPLORER_URL", buildProperties.secrets['stagingExplorer']
             buildConfigString "API_URL", buildProperties.secrets['stagingApiServer']
@@ -186,10 +223,27 @@ android {
             buildConfigField "String", "VERSION_NAME_SUFFIX", "\"" + versionNameSuffix + "\""
             buildConfigString "SIFT_ACCOUNT_ID", buildProperties.secrets['stagingSiftAccount']
             buildConfigString "SIFT_BEACON_KEY", buildProperties.secrets['stagingSiftBeaconId']
+            buildConfigString "RECAPTCHA_SITE_KEY", buildProperties.secrets['captchaStagingSiteKey']
 
             versionNameSuffix '-staging'
             applicationId "piuk.blockchain.android.staging"
             resValue "string", "app_name", "BlockStaging"
+        }
+    }
+
+    buildTypes {
+        release {
+            productFlavors.envInternalProd.signingConfig signingConfigs.prodInternal
+            debuggable false
+            minifyEnabled true
+            zipAlignEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            multiDexEnabled true
+        }
+        debug {
+            multiDexEnabled true
+            buildConfigBoolean "SKIP_VERIFF_KYC", false
         }
     }
 
@@ -228,7 +282,6 @@ android {
     }
 
     buildFeatures {
-        dataBinding true
         viewBinding true
     }
 
@@ -252,10 +305,6 @@ android {
 
 kapt {
     useBuildCache = true
-}
-
-androidExtensions {
-    experimental = true
 }
 
 dependencies {
@@ -305,6 +354,7 @@ dependencies {
     }
     implementation Libraries.googlePlayServicesAuth
     implementation Libraries.googlePlaces
+    implementation Libraries.googleServicesReCaptcha
     implementation Libraries.biometricsApi
 
     implementation Libraries.gson

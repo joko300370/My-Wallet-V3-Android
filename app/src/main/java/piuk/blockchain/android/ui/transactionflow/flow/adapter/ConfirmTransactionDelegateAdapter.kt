@@ -8,8 +8,7 @@ import piuk.blockchain.android.ui.adapters.AdapterDelegatesManager
 import piuk.blockchain.android.ui.adapters.DelegationAdapter
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalytics
 import piuk.blockchain.android.ui.transactionflow.engine.TransactionModel
-import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapper
-import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapperNewCheckout
+import piuk.blockchain.android.ui.transactionflow.flow.TxConfirmReadOnlyMapperCheckout
 import piuk.blockchain.android.util.StringUtils
 
 class ConfirmTransactionDelegateAdapter(
@@ -17,8 +16,7 @@ class ConfirmTransactionDelegateAdapter(
     activityContext: Activity,
     model: TransactionModel,
     analytics: TxFlowAnalytics,
-    mapper: TxConfirmReadOnlyMapper,
-    mapperNewCheckout: TxConfirmReadOnlyMapperNewCheckout,
+    mapper: TxConfirmReadOnlyMapperCheckout,
     exchangeRates: ExchangeRates,
     selectedCurrency: String,
     assetResources: AssetResources
@@ -27,12 +25,12 @@ class ConfirmTransactionDelegateAdapter(
         // Add all necessary AdapterDelegate objects here
         with(delegatesManager) {
             // New checkout screens:
-            addAdapterDelegate(SimpleConfirmationCheckoutDelegate(mapperNewCheckout))
-            addAdapterDelegate(ComplexConfirmationCheckoutDelegate(mapperNewCheckout))
-            addAdapterDelegate(ExpandableSimpleConfirmationCheckout(mapperNewCheckout))
-            addAdapterDelegate(ExpandableComplexConfirmationCheckout(mapperNewCheckout))
-            addAdapterDelegate(CompoundExpandableFeeConfirmationCheckoutDelegate(mapperNewCheckout))
-            addAdapterDelegate(ConfirmInfoItemDelegate(mapper))
+            addAdapterDelegate(SimpleConfirmationCheckoutDelegate(mapper))
+            addAdapterDelegate(ComplexConfirmationCheckoutDelegate(mapper))
+            addAdapterDelegate(ExpandableSimpleConfirmationCheckout(mapper))
+            addAdapterDelegate(ExpandableComplexConfirmationCheckout(mapper))
+            addAdapterDelegate(CompoundExpandableFeeConfirmationCheckoutDelegate(mapper))
+
             addAdapterDelegate(ConfirmNoteItemDelegate(model))
             addAdapterDelegate(ConfirmXlmMemoItemDelegate(model, stringUtils, activityContext))
             addAdapterDelegate(ConfirmAgreementWithTAndCsItemDelegate(model, stringUtils, activityContext))
@@ -47,8 +45,6 @@ class ConfirmTransactionDelegateAdapter(
             addAdapterDelegate(LargeTransactionWarningItemDelegate(model))
             addAdapterDelegate(InvoiceCountdownTimerDelegate())
             addAdapterDelegate(ConfirmInfoItemValidationStatusDelegate())
-            addAdapterDelegate(ConfirmInfoItemFeeOptionDelegate(model, analytics, stringUtils, assetResources))
-            addAdapterDelegate(ConfirmNetworkFeeItemDelegate(stringUtils, assetResources))
         }
     }
 }

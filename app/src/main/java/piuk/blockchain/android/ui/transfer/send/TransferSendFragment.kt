@@ -15,7 +15,7 @@ import piuk.blockchain.android.ui.customviews.account.CellDecorator
 import piuk.blockchain.android.ui.customviews.account.DefaultCellDecorator
 import piuk.blockchain.android.ui.home.HomeNavigator
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
-import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionLauncher
 import piuk.blockchain.android.ui.transactionflow.analytics.SendAnalyticsEvent
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalyticsAccountType
 import piuk.blockchain.android.ui.transfer.AccountSelectorFragment
@@ -24,7 +24,7 @@ import piuk.blockchain.android.ui.transfer.analytics.TransferAnalyticsEvent
 class TransferSendFragment : AccountSelectorFragment(), DialogFlow.FlowHost {
 
     private val analytics: Analytics by inject()
-    private var flow: TransactionFlow? = null
+    private val txLauncher: TransactionLauncher by inject()
 
     override val fragmentAction: AssetAction
         get() = AssetAction.Send
@@ -77,15 +77,12 @@ class TransferSendFragment : AccountSelectorFragment(), DialogFlow.FlowHost {
     }
 
     private fun startTransactionFlow(fromAccount: CryptoAccount) {
-        flow = TransactionFlow(
+        txLauncher.startFlow(
             sourceAccount = fromAccount,
-            action = AssetAction.Send
-        ).apply {
-            startFlow(
-                fragmentManager = childFragmentManager,
-                host = this@TransferSendFragment
-            )
-        }
+            action = AssetAction.Send,
+            fragmentManager = childFragmentManager,
+            flowHost = this@TransferSendFragment
+        )
     }
 
     override fun doOnEmptyList() {
@@ -94,7 +91,6 @@ class TransferSendFragment : AccountSelectorFragment(), DialogFlow.FlowHost {
     }
 
     override fun onFlowFinished() {
-        flow = null
         refreshItems()
     }
 

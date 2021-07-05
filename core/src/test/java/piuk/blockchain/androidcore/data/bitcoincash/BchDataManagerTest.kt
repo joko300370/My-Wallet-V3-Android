@@ -12,7 +12,7 @@ import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.verifyNoMoreInteractions
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.api.BitcoinApi
+import com.blockchain.api.NonCustodialBitcoinService
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.coin.GenericMetadataAccount
 import info.blockchain.wallet.coin.GenericMetadataWallet
@@ -53,7 +53,7 @@ class BchDataManagerTest {
     private val payloadDataManager: PayloadDataManager = mock()
     private var bchDataStore: BchDataStore = mock(defaultAnswer = Mockito.RETURNS_DEEP_STUBS)
     private val crashLogger: CrashLogger = mock()
-    private val bitcoinApi: BitcoinApi = mock()
+    private val bitcoinApi: NonCustodialBitcoinService = mock()
     private val defaultLabels: DefaultLabels = mock()
     private val metadataManager: MetadataManager = mock()
     private val rxBus = RxBus()

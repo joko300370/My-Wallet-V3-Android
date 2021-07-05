@@ -25,6 +25,7 @@ enum class CryptoActivityType {
     CUSTODIAL_TRANSFER,
     SWAP,
     SELL,
+    RECURRING_BUY,
     UNKNOWN
 }
 

@@ -15,6 +15,7 @@ import com.blockchain.nabu.models.data.FiatWithdrawalFeeAndLimit
 import com.blockchain.nabu.models.data.LinkBankTransfer
 import com.blockchain.nabu.models.data.LinkedBank
 import com.blockchain.nabu.models.data.RecurringBuy
+import com.blockchain.nabu.models.data.RecurringBuyFrequency
 import com.blockchain.nabu.models.data.RecurringBuyState
 import com.blockchain.nabu.models.responses.interest.InterestActivityItemResponse
 import com.blockchain.nabu.models.responses.interest.InterestAttributes
@@ -146,7 +147,7 @@ interface CustodialWalletManager {
 
     fun getAllOrdersFor(crypto: CryptoCurrency): Single<BuyOrderList>
 
-    fun getRecurringBuyOrdersFor(crypto: CryptoCurrency): Single<RecurringBuyTransactions>
+    fun getRecurringBuyOrders(): Single<RecurringBuyTransactions>
 
     fun getBuyOrder(orderId: String): Single<BuySellOrder>
 
@@ -444,10 +445,18 @@ enum class TransactionState {
     FAILED
 }
 
-enum class RecurringBuyActivityState {
+enum class RecurringBuyTransactionState {
     PENDING,
     FAILED,
     COMPLETED,
+    UNKNOWN
+}
+
+enum class RecurringBuyErrorState {
+    INSUFFICIENT_FUNDS,
+    BLOCKED_BENEFICIARY_ID,
+    INTERNAL_SERVER_ERROR,
+    TRADING_LIMITS_EXCEED,
     UNKNOWN
 }
 
@@ -571,13 +580,13 @@ sealed class PaymentMethod(
         override val isEligible: Boolean
     ) : PaymentMethod(FUNDS_PAYMENT_ID, limits, FUNDS_PAYMENT_METHOD_ORDER, isEligible)
 
-    data class UndefinedFunds(
+    data class UndefinedBankAccount(
         val fiatCurrency: String,
         override val limits: PaymentLimits,
         override val isEligible: Boolean
     ) :
         PaymentMethod(
-            UNDEFINED_FUNDS_PAYMENT_ID, limits, UNDEFINED_FUNDS_PAYMENT_METHOD_ORDER, isEligible
+            UNDEFINED_BANK_ACCOUNT_ID, limits, UNDEFINED_BANK_ACCOUNT_METHOD_ORDER, isEligible
         ),
         UndefinedPaymentMethod {
         override val paymentMethodType: PaymentMethodType
@@ -659,7 +668,7 @@ sealed class PaymentMethod(
         this is Card || this is Funds || this is Bank
 
     fun canBeAdded(): Boolean =
-        this is UndefinedBankTransfer || this is UndefinedFunds || this is UndefinedCard
+        this is UndefinedBankTransfer || this is UndefinedBankAccount || this is UndefinedCard
 
     open fun detailedLabel(): String = ""
 
@@ -670,16 +679,15 @@ sealed class PaymentMethod(
     companion object {
         const val UNDEFINED_CARD_PAYMENT_ID = "UNDEFINED_CARD_PAYMENT_ID"
         const val FUNDS_PAYMENT_ID = "FUNDS_PAYMENT_ID"
-        const val UNDEFINED_FUNDS_PAYMENT_ID = "UNDEFINED_FUNDS_PAYMENT_ID"
+        const val UNDEFINED_BANK_ACCOUNT_ID = "UNDEFINED_BANK_ACCOUNT_ID"
         const val UNDEFINED_BANK_TRANSFER_PAYMENT_ID = "UNDEFINED_BANK_TRANSFER_PAYMENT_ID"
 
-        private const val UNDEFINED_PAYMENT_METHOD_ORDER = 0
-        private const val FUNDS_PAYMENT_METHOD_ORDER = 1
-        private const val UNDEFINED_FUNDS_PAYMENT_METHOD_ORDER = 2
-        private const val CARD_PAYMENT_METHOD_ORDER = 3
-        private const val UNDEFINED_CARD_PAYMENT_METHOD_ORDER = 4
-        private const val BANK_PAYMENT_METHOD_ORDER = 5
-        private const val UNDEFINED_BANK_TRANSFER_METHOD_ORDER = 6
+        private const val FUNDS_PAYMENT_METHOD_ORDER = 0
+        private const val CARD_PAYMENT_METHOD_ORDER = 1
+        private const val BANK_PAYMENT_METHOD_ORDER = 2
+        private const val UNDEFINED_CARD_PAYMENT_METHOD_ORDER = 3
+        private const val UNDEFINED_BANK_TRANSFER_METHOD_ORDER = 4
+        private const val UNDEFINED_BANK_ACCOUNT_METHOD_ORDER = 5
     }
 }
 
@@ -821,8 +829,14 @@ data class RecurringBuyOrder(
 data class RecurringBuyTransaction(
     val id: String,
     val recurringBuyId: String,
-    val state: RecurringBuyActivityState,
-    val originMoney: Money,
-    val destinationValue: CryptoValue,
+    val state: RecurringBuyTransactionState,
+    val failureReason: RecurringBuyErrorState?,
+    val originMoney: FiatValue,
+    val destinationMoney: CryptoValue,
+    val paymentMethod: PaymentMethodType,
+    val paymentMethodId: String?,
+    val fee: FiatValue,
+    val period: RecurringBuyFrequency,
+    val nextPayment: Date,
     val insertedAt: Date
 )

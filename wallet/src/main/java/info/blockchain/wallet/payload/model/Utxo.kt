@@ -1,7 +1,7 @@
 package info.blockchain.wallet.payload.model
 
-import info.blockchain.api.bitcoin.data.UnspentOutputDto
-import info.blockchain.api.bitcoin.data.XpubDto
+import com.blockchain.api.bitcoin.data.UnspentOutputDto
+import com.blockchain.api.bitcoin.data.XpubDto
 import info.blockchain.wallet.payload.data.XPub
 import info.blockchain.wallet.payload.data.XPubs
 import java.math.BigInteger

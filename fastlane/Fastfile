@@ -181,8 +181,17 @@ platform :android do
 
       sh("echo \"--------------Copying Debug Signing Key--------------\"")
       sh("cp ../../tmp/credentials/blockchainDebugKey.keystore ../app")
+
+      sh("echo \"--------------Copying Dogfood Signing Key--------------\"")
+      sh("cp ../../tmp/credentials/blockchainInternalKey.keystore ../app")
     end
 
+    desc "Cleanup the credentials repository"
+    lane :ci_credentials_cleanup do
+
+      sh("echo \"--------------Deleting Credentials Repo--------------\"")
+      sh("rm -r ../../tmp/credentials")
+    end
 
     desc "Upload to AppCenter."
     lane :ci_upload_to_appcenter do | options |

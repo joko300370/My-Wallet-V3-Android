@@ -12,8 +12,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
-import info.blockchain.api.BitcoinApi;
-import info.blockchain.api.bitcoin.data.BalanceDto;
+import com.blockchain.api.NonCustodialBitcoinService;
+import com.blockchain.api.bitcoin.data.BalanceDto;
 import info.blockchain.wallet.bip44.HDAccount;
 import info.blockchain.wallet.bip44.HDAddress;
 import info.blockchain.wallet.bip44.HDWallet;
@@ -165,9 +165,9 @@ public class WalletBody {
                 label = defaultAccountName + " " + (i + 1);
             }
             if (createV4)
-                addAccount(label, HD.getLegacyAccount(i), HD.getSegwitAccount(i), i);
+                addAccount(label, HD.getLegacyAccount(i), HD.getSegwitAccount(i));
             else
-                addAccount(label, HD.getLegacyAccount(i), null, i);
+                addAccount(label, HD.getLegacyAccount(i), null);
         }
 
         setSeedHex(this.HD.getSeedHex());
@@ -248,14 +248,10 @@ public class WalletBody {
         for (Account account : getAccounts()) {
             int index = getAccounts().indexOf(account);
             AccountV4 accountV4 = account.upgradeToV4();
-            HDAccount hdAccount = HD.getSegwitAccount(index);
+            HDAccount legacyHdAccount = HD.getLegacyAccount(index);
 
             accountV4.derivationForType(Derivation.LEGACY_TYPE).setCache(
-                AddressCache.Companion.forAccountWithIndex(
-                    hdAccount,
-                    index,
-                    Derivation.SEGWIT_BECH32_PURPOSE
-                )
+                AddressCache.Companion.setCachedXPubs(legacyHdAccount)
             );
             addSegwitDerivation(accountV4, index);
             upgradedAccounts.add(accountV4);
@@ -303,14 +299,13 @@ public class WalletBody {
         HDAccount legacyAccount = HD.getLegacyAccount(accountIndex);
         HDAccount segwitAccount = HD.getSegwitAccount(accountIndex);
 
-        return addAccount(label, legacyAccount, segwitAccount, accountIndex);
+        return addAccount(label, legacyAccount, segwitAccount);
     }
 
     public Account addAccount(
         String label,
         @Nonnull HDAccount legacyAccount,
-        @Nullable HDAccount segWit,
-        int index
+        @Nullable HDAccount segWit
     ) {
         Account accountBody;
 
@@ -320,17 +315,12 @@ public class WalletBody {
             Derivation legacy = Derivation.create(
                 legacyAccount.getXPriv(),
                 legacyAccount.getXpub(),
-                AddressCache.Companion.forAccountWithIndex(
-                    legacyAccount, index, Derivation.LEGACY_PURPOSE)
+                AddressCache.Companion.setCachedXPubs(legacyAccount)
             );
             Derivation segwit = Derivation.createSegwit(
                 segWit.getXPriv(),
                 segWit.getXpub(),
-                AddressCache.Companion.forAccountWithIndex(
-                    segWit,
-                    index,
-                    Derivation.SEGWIT_BECH32_PURPOSE
-                )
+                AddressCache.Companion.setCachedXPubs(segWit)
             );
 
             derivations.add(legacy);
@@ -357,7 +347,7 @@ public class WalletBody {
     public static WalletBody recoverFromMnemonic(
         String mnemonic,
         String defaultAccountName,
-        BitcoinApi bitcoinApi,
+        NonCustodialBitcoinService bitcoinApi,
         boolean recoverV4
     ) throws Exception {
         return recoverFromMnemonic(
@@ -374,7 +364,7 @@ public class WalletBody {
         String mnemonic,
         String passphrase,
         String defaultAccountName,
-        BitcoinApi bitcoinApi,
+        NonCustodialBitcoinService bitcoinApi,
         boolean recoverV4
     ) throws Exception {
         return recoverFromMnemonic(
@@ -392,7 +382,7 @@ public class WalletBody {
         String passphrase,
         String defaultAccountName,
         int walletSize,
-        BitcoinApi bitcoinApi,
+        NonCustodialBitcoinService bitcoinApi,
         boolean recoverV4
     ) throws Exception {
         int wrapperVersion = recoverV4 ? WalletWrapper.V4 : WalletWrapper.V3;
@@ -460,9 +450,9 @@ public class WalletBody {
             HDAccount segwitAccount = segwitAccounts.get(i);
             Account account;
             if (!recoverV4) {
-                account = walletBody.addAccount(label, legacyAccount, null, i);
+                account = walletBody.addAccount(label, legacyAccount, null);
             } else {
-                account = walletBody.addAccount(label, legacyAccount, segwitAccount, i);
+                account = walletBody.addAccount(label, legacyAccount, segwitAccount);
             }
 
             if (wrapperVersion == WalletWrapper.V4) {
@@ -484,7 +474,7 @@ public class WalletBody {
         int walletSize,
         int trySize,
         int currentGap,
-        BitcoinApi bitcoinApi,
+        NonCustodialBitcoinService bitcoinApi,
         HDWallet bip44Wallet,
         int purpose
     ) throws Exception {
@@ -497,10 +487,10 @@ public class WalletBody {
         }
 
         Response<Map<String, BalanceDto>> exe = bitcoinApi.getBalance(
-            BitcoinApi.BITCOIN,
+            NonCustodialBitcoinService.BITCOIN,
             purpose == Derivation.LEGACY_PURPOSE ? xpubs : Collections.emptyList(),
             purpose == Derivation.SEGWIT_BECH32_PURPOSE ? xpubs : Collections.emptyList(),
-            BitcoinApi.BalanceFilter.RemoveUnspendable
+            NonCustodialBitcoinService.BalanceFilter.RemoveUnspendable
         ).execute();
 
         if (!exe.isSuccessful()) {

@@ -10,15 +10,15 @@ import piuk.blockchain.android.ui.linkbank.FiatTransactionState
 class FiatTransactionBottomSheet : SlidingModalBottomDialog<DialogSheetFiatTransactionBinding>() {
 
     private val fiatCurrency: String by lazy {
-        arguments?.getString(KEY_CURRENCY, "") ?: ""
+        arguments?.getString(KEY_CURRENCY, "").orEmpty()
     }
 
     private val title: String by lazy {
-        arguments?.getString(KEY_TITLE, "") ?: ""
+        arguments?.getString(KEY_TITLE, "").orEmpty()
     }
 
     private val subtitle: String by lazy {
-        arguments?.getString(KEY_SUBTITLE, "") ?: ""
+        arguments?.getString(KEY_SUBTITLE, "").orEmpty()
     }
 
     private val transactionState: FiatTransactionState by lazy {
@@ -41,10 +41,7 @@ class FiatTransactionBottomSheet : SlidingModalBottomDialog<DialogSheetFiatTrans
                     title, subtitle, fiatCurrency
                 )
             }
-
-            transactionProgressView.onCtaClick {
-                dismiss()
-            }
+            transactionProgressView.onCtaClick { dismiss() }
         }
     }
 

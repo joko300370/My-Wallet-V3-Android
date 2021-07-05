@@ -95,24 +95,25 @@ class LoginModelTest {
         // Arrange
         val email = "test@gmail.com"
         val sessionId = "sessionId"
+        val captcha = "captcha"
         whenever(interactor.obtainSessionId(email)).thenReturn(
             Single.just(
                 "{token: $sessionId}".toResponseBody("application/json".toMediaTypeOrNull())
             )
         )
-        whenever(interactor.sendEmailForVerification(sessionId, email)).thenReturn(
+        whenever(interactor.sendEmailForVerification(sessionId, email, captcha)).thenReturn(
             Completable.complete()
         )
 
         val testState = model.state.test()
-        model.process(LoginIntents.ObtainSessionIdForEmail(email))
+        model.process(LoginIntents.ObtainSessionIdForEmail(email, captcha))
 
         // Assert
         testState.assertValues(
             LoginState(),
-            LoginState(email = email, currentStep = LoginStep.GET_SESSION_ID),
-            LoginState(email = email, sessionId = sessionId, currentStep = LoginStep.SEND_EMAIL),
-            LoginState(email = email, sessionId = sessionId, currentStep = LoginStep.VERIFY_DEVICE)
+            LoginState(email = email, captcha = captcha, currentStep = LoginStep.GET_SESSION_ID),
+            LoginState(email = email, sessionId = sessionId, captcha = captcha, currentStep = LoginStep.SEND_EMAIL),
+            LoginState(email = email, sessionId = sessionId, captcha = captcha, currentStep = LoginStep.VERIFY_DEVICE)
         )
     }
 
@@ -120,38 +121,19 @@ class LoginModelTest {
     fun `fail to create session ID`() {
         // Arrange
         val email = "test@gmail.com"
+        val captcha = "captcha"
         whenever(interactor.obtainSessionId(email)).thenReturn(
             Single.error(Exception())
         )
 
         val testState = model.state.test()
-        model.process(LoginIntents.ObtainSessionIdForEmail(email))
+        model.process(LoginIntents.ObtainSessionIdForEmail(email, captcha))
 
         // Assert
         testState.assertValues(
             LoginState(),
-            LoginState(email = email, currentStep = LoginStep.GET_SESSION_ID),
-            LoginState(email = email, currentStep = LoginStep.SHOW_SESSION_ERROR)
-        )
-    }
-
-    @Test
-    fun `send email successfully`() {
-        // Arrange
-        val email = "test@gmail.com"
-        val sessionId = "sessionId"
-        whenever(interactor.sendEmailForVerification(sessionId, email)).thenReturn(
-            Completable.complete()
-        )
-
-        val testState = model.state.test()
-        model.process(LoginIntents.SendEmail(sessionId, email))
-
-        // Assert
-        testState.assertValues(
-            LoginState(),
-            LoginState(email = email, sessionId = sessionId, currentStep = LoginStep.SEND_EMAIL),
-            LoginState(email = email, sessionId = sessionId, currentStep = LoginStep.VERIFY_DEVICE)
+            LoginState(email = email, captcha = captcha, currentStep = LoginStep.GET_SESSION_ID),
+            LoginState(email = email, captcha = captcha, currentStep = LoginStep.SHOW_SESSION_ERROR)
         )
     }
 
@@ -160,18 +142,30 @@ class LoginModelTest {
         // Arrange
         val email = "test@gmail.com"
         val sessionId = "sessionId"
-        whenever(interactor.sendEmailForVerification(sessionId, email)).thenReturn(
+        val captcha = "captcha"
+        whenever(interactor.obtainSessionId(email)).thenReturn(
+            Single.just(
+                "{token: $sessionId}".toResponseBody("application/json".toMediaTypeOrNull())
+            )
+        )
+        whenever(interactor.sendEmailForVerification(sessionId, email, captcha)).thenReturn(
             Completable.error(Throwable())
         )
 
         val testState = model.state.test()
-        model.process(LoginIntents.SendEmail(sessionId, email))
+        model.process(LoginIntents.ObtainSessionIdForEmail(email, captcha))
 
         // Assert
         testState.assertValues(
             LoginState(),
-            LoginState(email = email, sessionId = sessionId, currentStep = LoginStep.SEND_EMAIL),
-            LoginState(email = email, sessionId = sessionId, currentStep = LoginStep.SHOW_EMAIL_ERROR)
+            LoginState(email = email, captcha = captcha, currentStep = LoginStep.GET_SESSION_ID),
+            LoginState(email = email, sessionId = sessionId, captcha = captcha, currentStep = LoginStep.SEND_EMAIL),
+            LoginState(
+                email = email,
+                sessionId = sessionId,
+                captcha = captcha,
+                currentStep = LoginStep.SHOW_EMAIL_ERROR
+            )
         )
     }
 }

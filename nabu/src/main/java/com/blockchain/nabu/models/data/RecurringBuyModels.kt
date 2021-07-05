@@ -26,6 +26,8 @@ data class RecurringBuy(
     val recurringBuyFrequency: RecurringBuyFrequency,
     val nextPaymentDate: Date,
     val paymentMethodType: PaymentMethodType,
+    val paymentMethodId: String?,
     val amount: FiatValue,
-    val asset: CryptoCurrency
+    val asset: CryptoCurrency,
+    val createDate: Date
 )

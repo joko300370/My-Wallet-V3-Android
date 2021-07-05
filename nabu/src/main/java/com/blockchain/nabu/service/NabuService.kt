@@ -202,6 +202,15 @@ class NabuService(retrofit: Retrofit) {
         authorization = "Bearer ${offlineToken.token}"
     ).wrapErrorMessage()
 
+    internal fun resetUserKyc(
+        offlineToken: NabuOfflineTokenResponse,
+        jwt: String
+    ): Completable = service.resetUserKyc(
+        offlineToken.userId,
+        NabuJwt(jwt),
+        authorization = "Bearer ${offlineToken.token}"
+    ).wrapErrorMessage()
+
     internal fun registerCampaign(
         sessionToken: NabuSessionTokenResponse,
         campaignRequest: RegisterCampaignRequest,
@@ -722,10 +731,14 @@ class NabuService(retrofit: Retrofit) {
 
     fun getRecurringBuysTransactions(
         sessionToken: NabuSessionTokenResponse,
-        currency: String? = null
+        recurringBuyId: String? = null,
+        currency: String? = null,
+        limit: Int? = null
     ) = service.fetchRecurringBuysTransactions(
         authorization = sessionToken.authHeader,
-        assetTicker = currency
+        recurringBuyId = recurringBuyId,
+        assetTicker = currency,
+        limit = limit
     ).wrapErrorMessage()
 
     companion object {

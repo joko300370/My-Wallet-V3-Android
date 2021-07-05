@@ -266,9 +266,9 @@ class InterestWithdrawTradingTxEngineTest {
         subject.doBuildConfirmations(mockPendingTx)
             .test()
             .assertValue { pTx ->
-                pTx.confirmations.find { it is TxConfirmationValue.NewFrom } != null &&
-                    pTx.confirmations.find { it is TxConfirmationValue.NewTo } != null &&
-                    pTx.confirmations.find { it is TxConfirmationValue.NewTotal } != null
+                pTx.confirmations.find { it is TxConfirmationValue.From } != null &&
+                    pTx.confirmations.find { it is TxConfirmationValue.To } != null &&
+                    pTx.confirmations.find { it is TxConfirmationValue.Total } != null
             }
             .assertNoErrors()
             .assertComplete()

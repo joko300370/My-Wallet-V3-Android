@@ -10,6 +10,7 @@ import com.blockchain.koin.scopedInject
 import com.blockchain.nabu.models.responses.nabu.KycTierState
 import com.blockchain.notifications.analytics.AnalyticsEvents
 import com.blockchain.notifications.analytics.logEvent
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.campaign.CampaignType
 import piuk.blockchain.android.coincore.AssetAction
@@ -18,7 +19,7 @@ import piuk.blockchain.android.ui.customviews.ToastCustom
 import piuk.blockchain.android.ui.customviews.dialogs.MaterialProgressDialog
 import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
-import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionLauncher
 import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.androidcore.utils.helperfunctions.consume
@@ -33,6 +34,7 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
         ActivityKycStatusBinding.inflate(layoutInflater)
     }
 
+    private val txLauncher: TransactionLauncher by inject()
     private val presenter: KycStatusPresenter by scopedInject()
     private val campaignType by unsafeLazy { intent.getSerializableExtra(EXTRA_CAMPAIGN_TYPE) as CampaignType }
     private var progressDialog: MaterialProgressDialog? = null
@@ -62,14 +64,11 @@ class KycStatusActivity : BaseMvpActivity<KycStatusView, KycStatusPresenter>(), 
     }
 
     private fun startSwapFlow() {
-        TransactionFlow(
-            action = AssetAction.Swap
-        ).apply {
-            startFlow(
-                fragmentManager = supportFragmentManager,
-                host = this@KycStatusActivity
-            )
-        }
+        txLauncher.startFlow(
+            action = AssetAction.Swap,
+            fragmentManager = supportFragmentManager,
+            flowHost = this@KycStatusActivity
+        )
     }
 
     override fun renderUi(kycState: KycTierState) {

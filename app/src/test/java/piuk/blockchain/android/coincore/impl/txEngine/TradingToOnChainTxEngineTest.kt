@@ -158,7 +158,7 @@ class TradingToOnChainTxEngineTest {
         }
 
         val feesAndLimits = CryptoWithdrawalFeeAndLimit(minLimit = 5000.toBigInteger(), fee = BigInteger.ONE)
-        whenever(walletManager.fetchCryptoWithdrawFeeAndMinLimit(ASSET, Product.TRADE))
+        whenever(walletManager.fetchCryptoWithdrawFeeAndMinLimit(ASSET, Product.BUY))
             .thenReturn(Single.just(feesAndLimits))
 
         subject.start(
@@ -189,7 +189,7 @@ class TradingToOnChainTxEngineTest {
 
         verify(sourceAccount, atLeastOnce()).asset
         verify(currencyPrefs).selectedFiatCurrency
-        verify(walletManager).fetchCryptoWithdrawFeeAndMinLimit(ASSET, Product.TRADE)
+        verify(walletManager).fetchCryptoWithdrawFeeAndMinLimit(ASSET, Product.BUY)
 
         noMoreInteractions(sourceAccount, txTarget)
     }

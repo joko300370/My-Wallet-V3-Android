@@ -17,6 +17,7 @@ enum class LoginStep {
 
 data class LoginState(
     val email: String = "",
+    val captcha: String = "",
     val sessionId: String = "",
     val currentStep: LoginStep = LoginStep.SELECT_METHOD,
     val shouldRestartApp: Boolean = false

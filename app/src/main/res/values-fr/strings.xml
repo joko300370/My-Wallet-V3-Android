@@ -654,9 +654,6 @@
     <string name="airdrop_sheet_stx_body">Possédez votre identité numérique et vos données avec des centaines d\'applications décentralisées construites avec Blockstack.</string>
     <string name="airdrop_sheet_stx_where_are_my_stacks_title">Où sont mes piles?</string>
     <string name="airdrop_sheet_stx_where_are_my_stacks">Les piles (STX) sont stockées dans votre portefeuille Blockchain. Veuillez noter que le solde est actuellement non transférable.</string>
-    <string name="custody_intro_title">Votre portefeuille de garde.</string>
-    <string name="custody_intro_body_1">Lorsque vous achetez de la crypto, nous stockons vos fonds en toute sécurité pour vous dans un portefeuille de trading de crypto. Ces fonds sont stockés par nous en votre nom. Vous pouvez les garder en sécurité avec nous ou les transférer sur votre portefeuille non-gardien pour posséder et stocker vous-même.</string>
-    <string name="custody_intro_body_2">Si vous souhaitez échanger ou envoyer ces fonds, vous devez les transférer sur votre portefeuille Bitcoin.</string>
     <string name="backup_before_send_title">Sauvegardez votre portefeuille</string>
     <string name="backup_before_send_body">Votre phrase de sauvegarde vous permettra de récupérer votre crypto si vous perdez l\'accès à votre portefeuille.
 
@@ -868,7 +865,6 @@
     <string name="xlm_memo_id">ID mémo</string>
     <string name="airdrop_activity_title">Airdrops</string>
     <string name="simple_buy_intro_title">Bienvenue sur Blockchain</string>
-    <string name="simple_buy_buy_crypto">Acheter de la Crypto</string>
     <string name="simple_buy_instructions_to_buy">Nous pouvons vous aider à acheter en quelques étapes simples.</string>
     <string name="simple_buy_intro_main_button_action">Achetez de la Crypto maintenant</string>
     <string name="simple_buy_deposit_my_crypto">Visite du Wallet</string>
@@ -949,8 +945,6 @@
     <string name="buy_max">Acheter Max</string>
     <string name="bank_wire_transfer">Virement bancaire</string>
     <string name="credit_or_debit_card">Carte de crédit ou de débit</string>
-    <string name="add_credit_or_debit_card">Ajouter une Carte de Crédit ou Débit</string>
-    <string name="select_payment_method">Choisissez une méthode de paiement</string>
     <string name="payment_method_limit">Limite de %1$s</string>
     <string name="order_details">détails de la commande</string>
     <string name="purchase_bank_note">Une fois que nous aurons reçu vos fonds, nous commencerons votre commande d\'achat %1$s . Notez que votre montant final peut changer en fonction de l\'activité du marché. Des frais peuvent s\'appliquer.</string>
@@ -1260,8 +1254,7 @@ Veuillez réessayer plus tard.</string>
     <string name="interest_dashboard_verify_point_three_title">Gagnez de l\'intérêt</string>
     <string name="interest_dashboard_verify_point_three_label">Transférez à votre compte d\'intérêt et recevez des paiements d\'intérêts mensuels.</string>
     <string name="interest_summary_disclaimer_label">Utilisez le portefeuille Web pour retirer vos fonds</string>
-    <string name="buy">Acheter</string>
-    <string name="sell">Vendre</string>
+    <string name="common_buy">Acheter</string>
     <string name="buy_and_sell">Acheter vendre</string>
     <string name="buy_with_cash">Achetez avec de l\'argent ou une carte.</string>
     <string name="select_crypto_you_want">Sélectionnez la crypto que vous souhaitez acheter.</string>

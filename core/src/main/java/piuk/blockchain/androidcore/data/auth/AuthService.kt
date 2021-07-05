@@ -1,6 +1,6 @@
 package piuk.blockchain.androidcore.data.auth
 
-import info.blockchain.api.ApiException
+import com.blockchain.api.ApiException
 import info.blockchain.wallet.api.WalletApi
 import info.blockchain.wallet.api.data.Status
 import info.blockchain.wallet.api.data.WalletOptions
@@ -160,10 +160,11 @@ class AuthService(private val walletApi: WalletApi, rxBus: RxBus) {
      *
      * @param sessionId The token for the current session
      * @param email The user's email
+     * @param captcha Captcha token
      * @return A [Single] wrapping the result
      */
-    fun sendEmailForDeviceVerification(sessionId: String, email: String): Single<ResponseBody> =
+    fun sendEmailForDeviceVerification(sessionId: String, email: String, captcha: String): Single<ResponseBody> =
         rxPinning.callSingle {
-            walletApi.sendEmailForVerification(sessionId, email)
+            walletApi.sendEmailForVerification(sessionId, email, captcha)
         }
 }

@@ -10,7 +10,7 @@ import piuk.blockchain.android.ui.adapters.AdapterDelegate
 class AddFundsDelegate : AdapterDelegate<PaymentMethodItem> {
 
     override fun isForViewType(items: List<PaymentMethodItem>, position: Int): Boolean =
-        items[position].paymentMethod is PaymentMethod.UndefinedFunds
+        items[position].paymentMethod is PaymentMethod.UndefinedBankAccount
 
     override fun onCreateViewHolder(parent: ViewGroup): RecyclerView.ViewHolder =
         ViewHolder(

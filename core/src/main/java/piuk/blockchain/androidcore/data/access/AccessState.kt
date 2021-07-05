@@ -81,9 +81,7 @@ internal class AccessStateImpl(
         set(loggedIn) {
             logIn()
             field = loggedIn
-            if (this.isLoggedIn) {
-                rxBus.emitEvent(AuthEvent::class.java, AuthEvent.LOGIN)
-            } else {
+            if (!this.isLoggedIn) {
                 rxBus.emitEvent(AuthEvent::class.java, AuthEvent.LOGOUT)
             }
         }

@@ -44,7 +44,7 @@ class BitPayInvoiceTarget(
                 FormatsUtil.getPaymentRequestUrl(linkData)
                     .replace(INVOICE_PREFIX, "")
 
-            return bitPayDataManager.getRawPaymentRequest(invoiceId = invoiceId)
+            return bitPayDataManager.getRawPaymentRequest(invoiceId = invoiceId, currencyCode = asset.networkTicker)
                 .map { rawRequest ->
                     BitPayInvoiceTarget(
                         asset = asset,

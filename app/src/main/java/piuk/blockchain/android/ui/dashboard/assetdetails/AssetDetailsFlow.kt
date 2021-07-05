@@ -50,6 +50,7 @@ class AssetDetailsFlow(
         fun goToInterestWithdraw(fromAccount: InterestAccount)
         fun goToSummary(account: SingleAccount, asset: CryptoCurrency)
         fun goToInterestDashboard()
+        fun goToBuy(asset: CryptoCurrency)
     }
 
     private var currentStep: AssetDetailsStep = AssetDetailsStep.ZERO
@@ -202,6 +203,12 @@ class AssetDetailsFlow(
                 assetFlowHost.goToInterestWithdraw(
                     fromAccount = account
                 )
+            }
+            AssetAction.Buy -> {
+                newState.asset?.let {
+                    assetFlowHost.goToBuy(it.asset)
+                    finishFlow()
+                }
             }
             else -> throw IllegalStateException("${newState.hostAction} is not supported in this flow")
         }

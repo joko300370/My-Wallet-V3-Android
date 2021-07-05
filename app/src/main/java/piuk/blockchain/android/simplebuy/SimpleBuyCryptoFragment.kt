@@ -19,8 +19,8 @@ import com.blockchain.nabu.datamanagers.UndefinedPaymentMethod
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.PaymentMethodType
 import com.blockchain.nabu.models.data.RecurringBuyFrequency
 import com.blockchain.preferences.CurrencyPrefs
-import com.blockchain.utils.to12HourFormat
 import com.blockchain.utils.isLastDayOfTheMonth
+import com.blockchain.utils.to12HourFormat
 import com.bumptech.glide.Glide
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.FiatValue
@@ -40,6 +40,7 @@ import piuk.blockchain.android.ui.base.setupToolbar
 import piuk.blockchain.android.ui.customviews.CurrencyType
 import piuk.blockchain.android.ui.customviews.FiatCryptoViewConfiguration
 import piuk.blockchain.android.ui.customviews.PrefixedOrSuffixedEditText
+import piuk.blockchain.android.ui.dashboard.asDeltaPercent
 import piuk.blockchain.android.ui.dashboard.sheets.WireTransferAccountDetailsBottomSheet
 import piuk.blockchain.android.ui.kyc.navhost.KycNavHostActivity
 import piuk.blockchain.android.ui.linkbank.BankAuthActivity
@@ -103,7 +104,7 @@ class SimpleBuyCryptoFragment :
         super.onViewCreated(view, savedInstanceState)
 
         activity.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
-        activity.setupToolbar(R.string.simple_buy_buy_crypto_title)
+        activity.setupToolbar(getString(R.string.tx_title_buy, cryptoCurrency))
 
         model.process(SimpleBuyIntent.FlowCurrentScreen(FlowScreen.ENTER_AMOUNT))
         model.process(
@@ -119,9 +120,7 @@ class SimpleBuyCryptoFragment :
             }
         }
 
-        binding.btnContinue.setOnClickListener {
-            startBuy()
-        }
+        binding.btnContinue.setOnClickListener { startBuy() }
 
         binding.paymentMethodDetailsRoot.setOnClickListener {
             showPaymentMethodsBottomSheet(
@@ -253,8 +252,9 @@ class SimpleBuyCryptoFragment :
             binding.cryptoText.setText(assetResources.assetNameRes(it))
         }
 
-        newState.exchangePrice?.let {
-            binding.cryptoExchangeRate.text = it.toStringWithSymbol()
+        newState.exchangePriceWithDelta?.let {
+            binding.cryptoExchangeRate.text = it.price.toStringWithSymbol()
+            binding.priceDelta.asDeltaPercent(it.delta)
         }
 
         newState.maxFiatAmount.takeIf { it.currencyCode == currencyPrefs.selectedFiatCurrency }?.let {
@@ -266,7 +266,7 @@ class SimpleBuyCryptoFragment :
         } else {
             newState.selectedPaymentMethodDetails?.let {
                 renderDefinedPaymentMethod(it)
-            } ?: renderUndefinedPaymentMethod()
+            }
         }
 
         binding.btnContinue.isEnabled = canContinue(newState)
@@ -373,7 +373,6 @@ class SimpleBuyCryptoFragment :
             paymentMethod.visible()
             paymentMethodSeparator.visible()
             paymentMethodDetailsRoot.visible()
-            undefinedPaymentText.gone()
             paymentMethodTitle.visible()
             paymentMethodLimit.visible()
         }
@@ -395,19 +394,6 @@ class SimpleBuyCryptoFragment :
                     setTextColor(requireContext().getResolvedColor(R.color.grey_800))
                 }
             }
-        }
-    }
-
-    private fun renderUndefinedPaymentMethod() {
-        with(binding) {
-            paymentMethodIcon.setImageResource(R.drawable.ic_add_payment_method)
-            undefinedPaymentText.text = getString(R.string.select_payment_method)
-            paymentMethod.visible()
-            paymentMethodSeparator.visible()
-            paymentMethodDetailsRoot.visible()
-            undefinedPaymentText.visible()
-            paymentMethodTitle.gone()
-            paymentMethodLimit.gone()
         }
     }
 

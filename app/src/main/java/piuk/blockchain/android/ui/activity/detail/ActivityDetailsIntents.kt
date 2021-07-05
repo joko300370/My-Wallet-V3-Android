@@ -1,6 +1,8 @@
 package piuk.blockchain.android.ui.activity.detail
 
 import com.blockchain.nabu.datamanagers.OrderState
+import com.blockchain.nabu.datamanagers.RecurringBuyErrorState
+import com.blockchain.nabu.datamanagers.RecurringBuyTransactionState
 import com.blockchain.nabu.datamanagers.TransactionType
 import com.blockchain.nabu.datamanagers.custodialwalletimpl.OrderType
 import info.blockchain.balance.CryptoCurrency
@@ -9,6 +11,7 @@ import piuk.blockchain.android.coincore.CustodialInterestActivitySummaryItem
 import piuk.blockchain.android.coincore.CustodialTradingActivitySummaryItem
 import piuk.blockchain.android.coincore.CustodialTransferActivitySummaryItem
 import piuk.blockchain.android.coincore.NonCustodialActivitySummaryItem
+import piuk.blockchain.android.coincore.RecurringBuyActivitySummaryItem
 import piuk.blockchain.android.coincore.TradeActivitySummaryItem
 import piuk.blockchain.android.ui.activity.CryptoActivityType
 import piuk.blockchain.android.ui.base.mvi.MviIntent
@@ -72,6 +75,52 @@ class LoadCustodialTradingHeaderDataIntent(
             totalConfirmations = 0
         )
     }
+}
+
+class LoadRecurringBuyDetailsHeaderDataIntent(
+    private val recurringBuyItem: RecurringBuyActivitySummaryItem
+) : ActivityDetailsIntents() {
+    override fun reduce(oldState: ActivityDetailState): ActivityDetailState {
+        return oldState.copy(
+            recurringBuyId = recurringBuyItem.txId,
+            transactionType = TransactionSummary.TransactionType.RECURRING_BUY,
+            amount = if (recurringBuyItem.destinationMoney.isPositive) {
+                recurringBuyItem.destinationMoney
+            } else {
+                recurringBuyItem.originMoney
+            },
+            isPending = recurringBuyItem.state == RecurringBuyTransactionState.PENDING,
+            isPendingExecution = recurringBuyItem.state == RecurringBuyTransactionState.PENDING,
+            isError = recurringBuyItem.state == RecurringBuyTransactionState.FAILED,
+            isFeeTransaction = false,
+            confirmations = 0,
+            totalConfirmations = 0,
+            recurringBuyError = recurringBuyItem.failureReason ?: RecurringBuyErrorState.UNKNOWN,
+            recurringBuyState = recurringBuyItem.state,
+            recurringBuyPaymentMethodType = recurringBuyItem.paymentMethodType,
+            recurringBuyOriginCurrency = recurringBuyItem.originMoney.currencyCode
+        )
+    }
+}
+
+object DeleteRecurringBuy : ActivityDetailsIntents() {
+    override fun reduce(oldState: ActivityDetailState): ActivityDetailState = oldState
+}
+
+object RecurringBuyDeletedSuccessfully : ActivityDetailsIntents() {
+    override fun reduce(oldState: ActivityDetailState): ActivityDetailState =
+        oldState.copy(
+            recurringBuyId = null,
+            hasDeleteError = false,
+            isError = false
+        )
+}
+
+object RecurringBuyDeleteError : ActivityDetailsIntents() {
+    override fun reduce(oldState: ActivityDetailState): ActivityDetailState =
+        oldState.copy(
+            hasDeleteError = true
+        )
 }
 
 class LoadCustodialInterestHeaderDataIntent(

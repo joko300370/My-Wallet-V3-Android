@@ -5,15 +5,16 @@ import com.blockchain.preferences.WalletStatus
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
 import info.blockchain.balance.Money
+import info.blockchain.wallet.api.dust.data.DustInput
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
+import org.bitcoinj.core.Transaction
+import org.spongycastle.util.encoders.Hex
 import piuk.blockchain.android.coincore.BlockchainAccount
 import piuk.blockchain.android.coincore.FeeLevel
-import piuk.blockchain.android.coincore.FeeState
 import piuk.blockchain.android.coincore.PendingTx
 import piuk.blockchain.android.coincore.TransactionTarget
-import piuk.blockchain.android.coincore.TxConfirmation
 import piuk.blockchain.android.coincore.TxConfirmationValue
 import piuk.blockchain.android.coincore.TxEngine
 import piuk.blockchain.android.coincore.TxResult
@@ -44,7 +45,13 @@ interface EngineTransaction {
 }
 
 interface BitPayClientEngine {
-    fun doPrepareTransaction(pendingTx: PendingTx, secondPassword: String): Single<EngineTransaction>
+    fun doPrepareTransaction(pendingTx: PendingTx): Single<Pair<Transaction, DustInput?>>
+    fun doSignTransaction(
+        tx: Transaction,
+        pendingTx: PendingTx,
+        secondPassword: String
+    ): Single<EngineTransaction>
+
     fun doOnTransactionSuccess(pendingTx: PendingTx)
     fun doOnTransactionFailed(pendingTx: PendingTx, e: Throwable)
 }
@@ -57,9 +64,10 @@ class BitpayTxEngine(
 ) : TxEngine() {
 
     override fun assertInputsValid() {
-        // Only support non-custodial BTC bitpay at this time
+        // Only support non-custodial BTC & BCH bitpay at this time
+        val supportedCryptoCurrencies = listOf(CryptoCurrency.BTC, CryptoCurrency.BCH)
+        check(supportedCryptoCurrencies.contains(sourceAsset))
         check(sourceAccount is CryptoNonCustodialAccount)
-        check(sourceAsset == CryptoCurrency.BTC)
         check(txTarget is BitPayInvoiceTarget)
         require(assetEngine is BitPayClientEngine)
         assetEngine.assertInputsValid()
@@ -104,13 +112,7 @@ class BitpayTxEngine(
                 pTx.addOrReplaceOption(
                     TxConfirmationValue.BitPayCountdown(timeRemainingSecs()),
                     true
-                ).run {
-                    if (hasOption(TxConfirmation.FEE_SELECTION)) {
-                        addOrReplaceOption(makeFeeSelectionOption(pTx))
-                    } else {
-                        this
-                    }
-                }
+                )
             }
 
     override fun doRefreshConfirmations(pendingTx: PendingTx): Single<PendingTx> =
@@ -150,17 +152,6 @@ class BitpayTxEngine(
         refreshConfirmations(true)
     }
 
-    // BitPay invoices _always_ require priority fees, so replace the option as defined by the
-    // underlying asset engine.
-    private fun makeFeeSelectionOption(pendingTx: PendingTx): TxConfirmationValue.FeeSelection =
-        TxConfirmationValue.FeeSelection(
-            feeDetails = FeeState.FeeDetails(pendingTx.feeAmount),
-            exchange = pendingTx.feeAmount.toFiat(exchangeRates, userFiat),
-            selectedLevel = pendingTx.feeSelection.selectedLevel,
-            availableLevels = setOf(FeeLevel.Priority),
-            asset = sourceAsset
-        )
-
     // Don't set the amount here, it is fixed so we can do it in the confirmation building step
     override fun doUpdateAmount(amount: Money, pendingTx: PendingTx): Single<PendingTx> =
         Single.just(pendingTx)
@@ -193,9 +184,13 @@ class BitpayTxEngine(
             }
 
     override fun doExecute(pendingTx: PendingTx, secondPassword: String): Single<TxResult> =
-        executionClient.doPrepareTransaction(pendingTx, secondPassword)
-            .flatMap { preparedTx ->
-                doExecuteTransaction(bitpayInvoice.invoiceId, preparedTx)
+        executionClient.doPrepareTransaction(pendingTx)
+            .flatMap { (tx, _) ->
+                doVerifyTransaction(bitpayInvoice.invoiceId, tx)
+            }.flatMap { txVerified ->
+                executionClient.doSignTransaction(txVerified, pendingTx, secondPassword)
+            }.flatMap { engineTx ->
+                doExecuteTransaction(bitpayInvoice.invoiceId, engineTx)
             }.doOnSuccess {
                 walletPrefs.setBitPaySuccess()
                 analytics.logEvent(BitPayEvent.TxSuccess(pendingTx.amount as CryptoValue))
@@ -207,14 +202,31 @@ class BitpayTxEngine(
                 TxResult.HashedTxResult(it, pendingTx.amount)
             }
 
+    private fun doVerifyTransaction(
+        invoiceId: String,
+        tx: Transaction
+    ): Single<Transaction> =
+        bitPayDataManager.paymentVerificationRequest(
+            invoiceId,
+            BitPaymentRequest(
+                sourceAsset.networkTicker,
+                listOf(
+                    BitPayTransaction(
+                        String(Hex.encode(tx.bitcoinSerialize())),
+                        tx.messageSize
+                    )
+                )
+            )
+        ).andThen(Single.just(tx))
+
     private fun doExecuteTransaction(
         invoiceId: String,
         tx: EngineTransaction
     ): Single<String> =
-        bitPayDataManager.paymentVerificationRequest(
+        bitPayDataManager.paymentSubmitRequest(
             invoiceId,
             BitPaymentRequest(
-                CryptoCurrency.BTC.networkTicker,
+                sourceAsset.networkTicker,
                 listOf(
                     BitPayTransaction(
                         tx.encodedMsg,
@@ -222,24 +234,7 @@ class BitpayTxEngine(
                     )
                 )
             )
-        ).flatMap {
-            Single.timer(3, TimeUnit.SECONDS)
-        }.flatMap {
-            bitPayDataManager.paymentSubmitRequest(
-                invoiceId,
-                BitPaymentRequest(
-                    CryptoCurrency.BTC.networkTicker,
-                    listOf(
-                        BitPayTransaction(
-                            tx.encodedMsg,
-                            tx.msgSize
-                        )
-                    )
-                )
-            )
-        }.map {
-            tx.txHash
-        }
+        ).andThen(Single.just(tx.txHash))
 
     companion object {
         private const val TIMEOUT_STOP = 2

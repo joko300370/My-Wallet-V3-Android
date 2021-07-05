@@ -2,6 +2,7 @@ package piuk.blockchain.androidcore.data.payments
 
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.wallet.api.dust.DustService
+import info.blockchain.wallet.api.dust.data.DustInput
 import info.blockchain.wallet.exceptions.TransactionHashApiException
 import info.blockchain.wallet.keys.SigningKey
 import info.blockchain.wallet.payload.data.XPubs
@@ -11,10 +12,10 @@ import info.blockchain.wallet.payment.Payment
 import info.blockchain.wallet.payment.SpendableUnspentOutputs
 import io.reactivex.Observable
 import io.reactivex.Single
-import org.bitcoinj.core.Transaction
 import piuk.blockchain.androidcore.utils.annotations.WebRequest
 import java.math.BigInteger
 import java.util.HashMap
+import org.bitcoinj.core.Transaction
 
 class PaymentService(
     private val payment: Payment,
@@ -25,33 +26,9 @@ class PaymentService(
      * Submits a BTC payment to a specified Bitcoin address and returns the transaction hash if
      * successful
      *
-     * @param unspentOutputBundle UTXO object
-     * @param keys A List of elliptic curve keys
-     * @param toAddress The Bitcoin address to send the funds to
-     * @param changeAddress A change address
-     * @param bigIntFee The specified fee amount
-     * @param bigIntAmount The actual transaction amount
+     * @param signedTx signed object
      * @return An [Observable] wrapping a [String] where the String is the transaction hash
      */
-    @WebRequest
-    internal fun submitBtcPayment(
-        unspentOutputBundle: SpendableUnspentOutputs,
-        keys: List<SigningKey>,
-        toAddress: String,
-        changeAddress: String,
-        bigIntFee: BigInteger,
-        bigIntAmount: BigInteger
-    ): Observable<String> = Observable.fromCallable {
-
-        val tx = signAngGetBtcTx(unspentOutputBundle, keys, toAddress, changeAddress, bigIntFee, bigIntAmount)
-        val response = payment.publishBtcSimpleTransaction(tx).execute()
-
-        when {
-            response.isSuccessful -> tx.hashAsString
-            else -> throw TransactionHashApiException.fromResponse(tx.hashAsString, response)
-        }
-    }
-
     @WebRequest
     internal fun submitBtcPayment(
         signedTx: Transaction
@@ -63,9 +40,36 @@ class PaymentService(
         }
     }
 
-    internal fun signAngGetBtcTx(
+    /**
+     * Sign a BTC transaction returns a signed transaction
+     *
+     * @param tx unsigned object
+     * @param keys A List of elliptic curve keys
+     * @return An [Transaction]
+     */
+    internal fun signBtcTx(
+        tx: Transaction,
+        keys: List<SigningKey>
+    ): Transaction {
+        payment.signBtcTransaction(
+            tx,
+            keys
+        )
+        return tx
+    }
+
+    /**
+     * Get a BTC Transaction to a specified Bitcoin address and returns the transaction.
+     *
+     * @param unspentOutputBundle UTXO object
+     * @param toAddress The Bitcoin Cash address to send the funds to
+     * @param changeAddress A change address
+     * @param bigIntFee The specified fee amount
+     * @param bigIntAmount The actual transaction amount
+     * @return A [Transaction]
+     */
+    internal fun getBtcTx(
         unspentOutputBundle: SpendableUnspentOutputs,
-        keys: List<SigningKey>,
         toAddress: String,
         changeAddress: String,
         bigIntFee: BigInteger,
@@ -74,38 +78,69 @@ class PaymentService(
         val receivers = HashMap<String, BigInteger>()
         receivers[toAddress] = bigIntAmount
 
-        val tx = payment.makeBtcSimpleTransaction(
+        return payment.makeBtcSimpleTransaction(
             unspentOutputBundle.spendableOutputs,
             receivers,
             bigIntFee,
             changeAddress
         )
-
-        payment.signBtcTransaction(tx, keys)
-        return tx
     }
 
     /**
      * Submits a BCH payment to a specified Bitcoin Cash address and returns the transaction hash if
      * successful
      *
-     * @param unspentOutputBundle UTXO object
-     * @param keys A List of elliptic curve keys
-     * @param toAddress The Bitcoin Cash address to send the funds to
-     * @param changeAddress A change address
-     * @param bigIntFee The specified fee amount
-     * @param bigIntAmount The actual transaction amount
+     * @param signedTx signed object
      * @return An [Observable] wrapping a [String] where the String is the transaction hash
      */
     @WebRequest
     internal fun submitBchPayment(
+        signedTx: Transaction,
+        dustInput: DustInput
+    ): Single<String> =
+        Single.fromCallable {
+            val response = payment.publishBchTransaction(signedTx, dustInput.lockSecret).execute()
+            when {
+                response.isSuccessful -> signedTx.txId.toString()
+                else -> throw TransactionHashApiException.fromResponse(signedTx.txId.toString(), response)
+            }
+        }
+
+    /**
+     * Sign a BCH transaction returns a signed transaction
+     *
+     * @param tx unsigned object
+     * @param keys A List of elliptic curve keys
+     * @return A [Transaction] signed
+     */
+    internal fun signBchTx(
+        tx: Transaction,
+        keys: List<SigningKey>
+    ): Transaction {
+        payment.signBchTransaction(
+            tx,
+            keys
+        )
+        return tx
+    }
+
+    /**
+     * Get a BCH Transaction to a specified Bitcoin Cash address and returns the transaction.
+     *
+     * @param unspentOutputBundle UTXO object
+     * @param toAddress The Bitcoin Cash address to send the funds to
+     * @param changeAddress A change address
+     * @param bigIntFee The specified fee amount
+     * @param bigIntAmount The actual transaction amount
+     * @return An [Observable] wrapping the [Transaction]
+     */
+    internal fun getBchTx(
         unspentOutputBundle: SpendableUnspentOutputs,
-        keys: List<SigningKey>,
         toAddress: String,
         changeAddress: String,
         bigIntFee: BigInteger,
         bigIntAmount: BigInteger
-    ): Observable<String> = dustService.getDust(CryptoCurrency.BCH)
+    ): Observable<Pair<Transaction, DustInput?>> = dustService.getDust(CryptoCurrency.BCH)
         .flatMapObservable {
             val receivers = HashMap<String, BigInteger>()
             receivers[toAddress] = bigIntAmount
@@ -117,19 +152,7 @@ class PaymentService(
                 changeAddress,
                 it
             )
-
-            payment.signBchTransaction(
-                tx,
-                keys
-            )
-
-            return@flatMapObservable Observable.fromCallable {
-                val response = payment.publishBchTransaction(tx, it.lockSecret).execute()
-                when {
-                    response.isSuccessful -> tx.txId.toString()
-                    else -> throw TransactionHashApiException.fromResponse(tx.txId.toString(), response)
-                }
-            }
+            Observable.fromCallable { tx to it }
         }
 
     /**

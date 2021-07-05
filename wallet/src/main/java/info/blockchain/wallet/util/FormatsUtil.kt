@@ -24,6 +24,7 @@ object FormatsUtil {
     private val ignoreCaseEthPattern = Pattern.compile("(?i)^(0x)?[0-9a-f]{40}$")
     private val lowerCaseEthPattern = Pattern.compile("^(0x)?[0-9a-f]{40}$")
     private val upperCaseEthPattern = Pattern.compile("^(0x)?[0-9A-F]{40}$")
+    private const val FIELD_PAYMENT_REQUEST_URL = "r="
 
     @JvmStatic
     fun isBitcoinUri(s: String): Boolean {
@@ -37,14 +38,10 @@ object FormatsUtil {
 
     @JvmStatic
     fun getPaymentRequestUrl(s: String): String {
-        return try {
-            val uri = BitcoinURI(s)
-            if (uri.paymentRequestUrl != null) {
-                uri.paymentRequestUrl
-            } else {
-                ""
-            }
-        } catch (e: BitcoinURIParseException) {
+        return if (s.contains(FIELD_PAYMENT_REQUEST_URL)) {
+            val startPaymentUrlPosition = s.indexOf(FIELD_PAYMENT_REQUEST_URL) + FIELD_PAYMENT_REQUEST_URL.length
+            return s.substring(startPaymentUrlPosition)
+        } else {
             ""
         }
     }
@@ -161,6 +158,7 @@ object FormatsUtil {
     }
 
     const val BTC_PREFIX = "bitcoin:"
+    const val BCH_PREFIX = "bitcoincash:"
 
     fun toDisambiguatedBtcAddress(
         address: String

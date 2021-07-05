@@ -14,6 +14,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import org.koin.android.ext.android.inject
 import piuk.blockchain.android.R
 import piuk.blockchain.android.databinding.FragmentLoginBinding
 import piuk.blockchain.android.ui.auth.PinEntryActivity
@@ -24,12 +25,17 @@ import piuk.blockchain.android.ui.launcher.LauncherActivity
 import piuk.blockchain.android.ui.scan.QrExpected
 import piuk.blockchain.android.ui.scan.QrScanActivity
 import piuk.blockchain.android.ui.scan.QrScanActivity.Companion.getRawScanData
+import piuk.blockchain.android.ui.start.ManualPairingActivity
+import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
+import piuk.blockchain.androidcore.data.api.EnvironmentConfig
 import timber.log.Timber
 
 class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState, FragmentLoginBinding>() {
 
     override val model: LoginModel by scopedInject()
+
+    private val environmentConfig: EnvironmentConfig by inject()
 
     private val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build()
 
@@ -37,8 +43,14 @@ class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState, Fragment
         GoogleSignIn.getClient(requireContext(), gso)
     }
 
+    private val recaptchaClient: GoogleReCaptchaClient by lazy {
+        GoogleReCaptchaClient(requireActivity())
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        recaptchaClient.initReCaptcha()
 
         with(binding) {
             backButton.setOnClickListener {
@@ -58,9 +70,9 @@ class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState, Fragment
                 })
             }
             continueButton.setOnClickListener {
-                loginEmailText.text?.let { emailInputText ->
+                binding.loginEmailText.text?.let { emailInputText ->
                     if (emailInputText.isNotBlank()) {
-                        model.process(LoginIntents.ObtainSessionIdForEmail(emailInputText.toString()))
+                        verifyReCaptcha(emailInputText.toString())
                     }
                 }
             }
@@ -70,7 +82,21 @@ class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState, Fragment
             continueWithGoogleButton.setOnClickListener {
                 startActivityForResult(googleSignInClient.signInIntent, RC_SIGN_IN)
             }
+            if (environmentConfig.isRunningInDebugMode()) {
+                manualPairingButton.apply {
+                    setOnClickListener {
+                        startActivity(Intent(context, ManualPairingActivity::class.java))
+                    }
+                    isEnabled = true
+                    visible()
+                }
+            }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        recaptchaClient.close()
     }
 
     override fun initBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentLoginBinding =
@@ -114,7 +140,7 @@ class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState, Fragment
             try {
                 val task = GoogleSignIn.getSignedInAccountFromIntent(data)
                 task.result.email?.let { email ->
-                    model.process(LoginIntents.ObtainSessionIdForEmail(email))
+                    verifyReCaptcha(email)
                 } ?: toast(R.string.login_google_email_not_found, ToastCustom.TYPE_GENERAL)
             } catch (apiException: ApiException) {
                 Timber.e(apiException)
@@ -147,6 +173,20 @@ class LoginFragment : MviFragment<LoginModel, LoginIntents, LoginState, Fragment
                 .addToBackStack(VerifyDeviceFragment::class.simpleName)
                 .commitAllowingStateLoss()
         }
+    }
+
+    private fun verifyReCaptcha(selectedEmail: String) {
+        recaptchaClient.verifyForLogin(
+            onSuccess = { response ->
+                model.process(
+                    LoginIntents.ObtainSessionIdForEmail(
+                        selectedEmail = selectedEmail,
+                        captcha = response.tokenResult
+                    )
+                )
+            },
+            onError = { toast(R.string.common_error, ToastCustom.TYPE_ERROR) }
+        )
     }
 
     private val emailRegex = Regex(

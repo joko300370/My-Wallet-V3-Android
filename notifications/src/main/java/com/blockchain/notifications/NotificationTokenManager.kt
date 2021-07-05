@@ -1,6 +1,7 @@
 package com.blockchain.notifications
 
 import android.annotation.SuppressLint
+import com.blockchain.logging.CrashLogger
 import com.blockchain.preferences.NotificationPrefs
 import com.google.common.base.Optional
 import com.google.firebase.iid.FirebaseInstanceId
@@ -18,7 +19,8 @@ class NotificationTokenManager(
     private val payloadManager: PayloadManager,
     private val prefs: NotificationPrefs,
     private val firebaseInstanceId: FirebaseInstanceId,
-    private val rxBus: RxBus
+    private val rxBus: RxBus,
+    private val crashLogger: CrashLogger
 ) {
 
     /**
@@ -37,6 +39,7 @@ class NotificationTokenManager(
                 Observable.create { subscriber ->
                     FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener { instanceIdResult ->
                         val newToken = instanceIdResult.token
+                        prefs.firebaseToken = newToken
                         subscriber.onNext(Optional.of(newToken))
                         subscriber.onComplete()
                     }
@@ -70,17 +73,10 @@ class NotificationTokenManager(
         loginObservable
             .subscribeOn(Schedulers.io())
             .flatMapCompletable { authEvent ->
-                if (authEvent == AuthEvent.LOGIN) {
-                    val storedToken = prefs.firebaseToken
-                    if (storedToken.isNotEmpty()) {
-                        return@flatMapCompletable sendFirebaseToken(storedToken)
-                    } else {
-                        return@flatMapCompletable resendNotificationToken()
-                    }
-                } else if (authEvent == AuthEvent.FORGET) {
-                    return@flatMapCompletable revokeAccessToken()
+                if (authEvent == AuthEvent.FORGET) {
+                    revokeAccessToken()
                 } else {
-                    return@flatMapCompletable Completable.complete()
+                    Completable.complete()
                 }
             }
             .subscribe({
@@ -124,14 +120,20 @@ class NotificationTokenManager(
      * If no stored notification token exists, it will be refreshed
      * and will be handled appropriately by FcmCallbackService
      */
-    private fun resendNotificationToken(): Completable {
+    fun resendNotificationToken(): Completable {
         return storedFirebaseToken
             .flatMapCompletable { optional ->
                 if (optional.isPresent) {
-                    return@flatMapCompletable sendFirebaseToken(optional.get())
+                    sendFirebaseToken(optional.get())
                 } else {
-                    return@flatMapCompletable Completable.complete()
+                    Completable.complete()
                 }
+            }
+            .doOnError { throwable ->
+                crashLogger.logException(
+                    throwable = throwable,
+                    logMsg = "Failed to resend the Firebase token for notifications"
+                )
             }
     }
 

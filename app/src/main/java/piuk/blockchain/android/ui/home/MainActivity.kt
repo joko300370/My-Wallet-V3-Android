@@ -86,7 +86,8 @@ import piuk.blockchain.android.ui.swap.SwapFragment
 import piuk.blockchain.android.ui.thepit.PitLaunchBottomDialog
 import piuk.blockchain.android.ui.thepit.PitPermissionsActivity
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
-import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.ui.transactionflow.analytics.InterestAnalytics
+import piuk.blockchain.android.ui.transactionflow.TransactionLauncher
 import piuk.blockchain.android.ui.transactionflow.analytics.SwapAnalyticsEvents
 import piuk.blockchain.android.ui.transfer.TransferFragment
 import piuk.blockchain.android.ui.transfer.analytics.TransferAnalyticsEvent
@@ -102,6 +103,7 @@ import piuk.blockchain.android.util.visible
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedColor
 import piuk.blockchain.androidcoreui.utils.extensions.getResolvedDrawable
 import timber.log.Timber
+import java.net.URLDecoder
 
 class MainActivity : MvpActivity<MainView, MainPresenter>(),
     HomeNavigator,
@@ -120,6 +122,8 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     private val qrProcessor: QrScanResultProcessor by scopedInject()
     private val assetResources: AssetResources by scopedInject()
     private val mwaFF: FeatureFlag by inject(mwaFeatureFlag)
+    private val txLauncher: TransactionLauncher by inject()
+
     private val compositeDisposable = CompositeDisposable()
 
     private var isMWAEnabled: Boolean = false
@@ -317,9 +321,9 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         activityResultAction = {
             when (requestCode) {
                 QrScanActivity.SCAN_URI_RESULT -> {
-                    val scanData = data.getRawScanData()
-                    if (resultCode == RESULT_OK && scanData != null) {
-                        presenter.processScanResult(scanData)
+                    data.getRawScanData()?.let {
+                        val decodeData = URLDecoder.decode(it, "UTF-8")
+                        if (resultCode == RESULT_OK) presenter.processScanResult(decodeData)
                     }
                 }
                 SETTINGS_EDIT,
@@ -569,16 +573,13 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onSuccess = { sourceAccount ->
-                        TransactionFlow(
+                        txLauncher.startFlow(
                             sourceAccount = sourceAccount,
                             target = targetAddress,
-                            action = AssetAction.Send
-                        ).apply {
-                            startFlow(
-                                fragmentManager = currentFragment.childFragmentManager,
-                                host = this@MainActivity
-                            )
-                        }
+                            action = AssetAction.Send,
+                            fragmentManager = currentFragment.childFragmentManager,
+                            flowHost = this@MainActivity
+                        )
                     },
                     onError = { Timber.e("Unable to select source account for scan") }
                 )
@@ -666,19 +667,13 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
             val swapFragment = SwapFragment.newInstance()
             replaceContentFragment(swapFragment)
         } else if (sourceAccount != null) {
-            val transactionFlow =
-                TransactionFlow(
-                    sourceAccount = sourceAccount,
-                    target = destinationAccount ?: NullCryptoAccount(),
-                    action = AssetAction.Swap
-                )
-
-            transactionFlow.apply {
-                startFlow(
-                    fragmentManager = supportFragmentManager,
-                    host = this@MainActivity
-                )
-            }
+            txLauncher.startFlow(
+                sourceAccount = sourceAccount,
+                target = destinationAccount ?: NullCryptoAccount(),
+                action = AssetAction.Swap,
+                fragmentManager = supportFragmentManager,
+                flowHost = this@MainActivity
+            )
         }
     }
 
@@ -687,8 +682,10 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
     }
 
     private fun startDashboardFragment() {
-        val fragment = DashboardFragment.newInstance()
-        replaceContentFragment(fragment)
+        runOnUiThread {
+            val fragment = DashboardFragment.newInstance()
+            replaceContentFragment(fragment)
+        }
     }
 
     override fun resumeSimpleBuyKyc() {
@@ -714,10 +711,12 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         launchInterestDashboard()
     }
 
-    private fun launchInterestDashboard() =
+    private fun launchInterestDashboard() {
         startActivityForResult(
             InterestDashboardActivity.newInstance(this), INTEREST_DASHBOARD
         )
+        analytics.logEvent(InterestAnalytics.InterestClicked)
+    }
 
     private fun startActivitiesFragment(account: BlockchainAccount? = null) {
         setCurrentTabItem(ITEM_ACTIVITY)
@@ -812,10 +811,10 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         }
     }
 
-    override fun launchSimpleBuySell(viewType: BuySellFragment.BuySellViewType) {
+    override fun launchSimpleBuySell(viewType: BuySellFragment.BuySellViewType, asset: CryptoCurrency?) {
         setCurrentTabItem(ITEM_BUY_SELL)
 
-        val buySellFragment = BuySellFragment.newInstance(viewType)
+        val buySellFragment = BuySellFragment.newInstance(viewType, asset)
         replaceContentFragment(buySellFragment)
     }
 
@@ -933,6 +932,13 @@ class MainActivity : MvpActivity<MainView, MainPresenter>(),
         ToastCustom.makeText(
             this, getString(R.string.open_banking_deeplink_error), Toast.LENGTH_LONG, ToastCustom.TYPE_ERROR
         )
+    }
+
+    override fun launchFiatDeposit(currency: String) {
+        runOnUiThread {
+            gotoDashboard()
+            launchDashboardFlow(AssetAction.FiatDeposit, currency)
+        }
     }
 
     override fun onFlowFinished() {

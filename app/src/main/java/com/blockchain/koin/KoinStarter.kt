@@ -15,7 +15,7 @@ import com.blockchain.koin.modules.xlmModule
 import com.blockchain.network.modules.apiModule
 import com.blockchain.network.modules.okHttpModule
 import com.blockchain.notifications.koin.notificationModule
-import info.blockchain.api.blockchainApiModule
+import com.blockchain.api.blockchainApiModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin

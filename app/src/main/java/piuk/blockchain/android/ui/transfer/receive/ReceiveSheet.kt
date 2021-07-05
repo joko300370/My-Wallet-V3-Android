@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.blockchain.koin.scopedInject
@@ -21,13 +22,14 @@ import piuk.blockchain.android.ui.base.mvi.MviBottomSheet
 import piuk.blockchain.android.ui.customviews.toast
 import piuk.blockchain.android.ui.transactionflow.analytics.TxFlowAnalyticsAccountType
 import piuk.blockchain.android.ui.transfer.analytics.TransferAnalyticsEvent
+import piuk.blockchain.android.ui.transfer.receive.plugin.ReceiveInfoView
 import piuk.blockchain.android.ui.transfer.receive.plugin.ReceiveMemoView
 import piuk.blockchain.android.util.getAccount
+import piuk.blockchain.android.util.gone
 import piuk.blockchain.android.util.invisible
 import piuk.blockchain.android.util.putAccount
 import piuk.blockchain.android.util.visible
 import piuk.blockchain.android.util.visibleIf
-import java.lang.IllegalStateException
 
 internal class ReceiveSheet : MviBottomSheet<ReceiveModel, ReceiveIntent, ReceiveState, DialogReceiveBinding>() {
     override val model: ReceiveModel by scopedInject()
@@ -49,6 +51,9 @@ internal class ReceiveSheet : MviBottomSheet<ReceiveModel, ReceiveIntent, Receiv
             copyButton.isEnabled = false
             progressbar.visible()
             qrImage.invisible()
+            shareBack.setOnClickListener {
+                model.process(ClearShareList)
+            }
         }
     }
 
@@ -111,14 +116,33 @@ internal class ReceiveSheet : MviBottomSheet<ReceiveModel, ReceiveIntent, Receiv
 
     private fun setCustomSlot(newState: ReceiveState) {
         when {
-            newState.address.memo != null -> ReceiveMemoView(requireContext())
+            newState.shouldShowXlmMemo() -> ReceiveMemoView(requireContext()).also {
+                it.updateAddress(newState.address)
+            }
+            newState.shouldShowRotatingAddressInfo() -> ReceiveInfoView(requireContext()).also {
+                it.update(newState.account) {
+                    binding.customisationSlots.findViewById<ConstraintLayout>(R.id.receive_info_parent)?.gone()
+                }
+            }
             // TODO: SEGWIT LEGACY SELECTOR
             else -> null
         }?.let {
-            binding.customised.addView(it)
-            it.updateAddress(newState.address)
+            // only add view once if it doesn't exist
+            if (it.shouldAddInfoView() || it.shouldAddMemoView()) {
+                binding.customisationSlots.addView(it)
+            }
         }
     }
+
+    private fun ConstraintLayout.shouldAddInfoView() =
+        this is ReceiveInfoView && binding.customisationSlots.findViewById<ConstraintLayout>(
+            R.id.receive_info_parent
+        ) == null
+
+    private fun ConstraintLayout.shouldAddMemoView() =
+        this is ReceiveMemoView && binding.customisationSlots.findViewById<ConstraintLayout>(
+            R.id.receive_memo_parent
+        ) == null
 
     private fun shareAddress() {
         activity.run {

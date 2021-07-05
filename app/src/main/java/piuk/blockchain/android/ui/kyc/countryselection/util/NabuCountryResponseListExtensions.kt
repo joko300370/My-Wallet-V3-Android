@@ -3,7 +3,7 @@ package piuk.blockchain.android.ui.kyc.countryselection.util
 import android.os.Parcelable
 import com.blockchain.nabu.models.responses.nabu.NabuRegion
 import kotlinx.android.parcel.IgnoredOnParcel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 private const val asciiOffset = 0x41
 private const val flagOffset = 0x1F1E6

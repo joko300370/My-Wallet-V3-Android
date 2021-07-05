@@ -1,6 +1,8 @@
 package info.blockchain.wallet.payload;
 
-import info.blockchain.api.BitcoinApi;
+import com.blockchain.api.NonCustodialBitcoinService;
+import com.blockchain.api.bitcoin.BitcoinApiInterface;
+
 import info.blockchain.wallet.BaseIntegTest;
 import info.blockchain.wallet.BlockchainFramework;
 import info.blockchain.wallet.api.WalletApi;
@@ -20,10 +22,14 @@ public final class PayloadManagerIntegTest extends BaseIntegTest {
 
     private PayloadManager payloadManager;
 
+    // TODO: replace with real key once required for tests
+    private final String siteKey = "site-key";
+
     @Before
     public void setup() {
-        final BitcoinApi bitcoinApi = new BitcoinApi(
-                BlockchainFramework.getRetrofitApiInstance(),
+        final BitcoinApiInterface api = BlockchainFramework.getRetrofitApiInstance().create(BitcoinApiInterface.class);
+        final NonCustodialBitcoinService bitcoinApi = new NonCustodialBitcoinService(
+                api,
                 BlockchainFramework.getApiCode()
         );
         payloadManager = new PayloadManager(
@@ -32,7 +38,8 @@ public final class PayloadManagerIntegTest extends BaseIntegTest {
                         "https://explorer.staging.blockchain.info/",
                         getOkHttpClient()
                     ).create(WalletExplorerEndpoints.class),
-                    BlockchainFramework::getApiCode
+                    BlockchainFramework::getApiCode,
+                    siteKey
                 ),
                 bitcoinApi,
                 new MultiAddressFactory(bitcoinApi),

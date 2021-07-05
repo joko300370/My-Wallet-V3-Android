@@ -1,6 +1,6 @@
 package info.blockchain.wallet
 
-import info.blockchain.api.BitcoinApi
+import com.blockchain.api.NonCustodialBitcoinService
 import info.blockchain.wallet.bch.BchMainNetParams
 import info.blockchain.wallet.crypto.DeterministicAccount
 import info.blockchain.wallet.crypto.DeterministicWallet
@@ -25,7 +25,7 @@ open class BitcoinCashWallet : DeterministicWallet {
     private lateinit var multiAddressFactoryBch: MultiAddressFactoryBch
 
     private constructor(
-        bitcoinApi: BitcoinApi,
+        bitcoinApi: NonCustodialBitcoinService,
         params: NetworkParameters,
         coinPath: String,
         passphrase: String
@@ -34,7 +34,7 @@ open class BitcoinCashWallet : DeterministicWallet {
     }
 
     private constructor(
-        bitcoinApi: BitcoinApi,
+        bitcoinApi: NonCustodialBitcoinService,
         params: NetworkParameters,
         coinPath: String,
         entropyHex: String,
@@ -44,7 +44,7 @@ open class BitcoinCashWallet : DeterministicWallet {
     }
 
     private constructor(
-        bitcoinApi: BitcoinApi,
+        bitcoinApi: NonCustodialBitcoinService,
         params: NetworkParameters,
         coinPath: String,
         mnemonic: List<String>,
@@ -53,11 +53,11 @@ open class BitcoinCashWallet : DeterministicWallet {
         setupApi(bitcoinApi)
     }
 
-    private constructor(bitcoinApi: BitcoinApi, params: NetworkParameters) : super(params) {
+    private constructor(bitcoinApi: NonCustodialBitcoinService, params: NetworkParameters) : super(params) {
         setupApi(bitcoinApi)
     }
 
-    private fun setupApi(bitcoinApi: BitcoinApi) {
+    private fun setupApi(bitcoinApi: NonCustodialBitcoinService) {
         this.balanceManager = BalanceManagerBch(bitcoinApi)
         this.multiAddressFactoryBch = MultiAddressFactoryBch(bitcoinApi)
     }
@@ -285,7 +285,7 @@ open class BitcoinCashWallet : DeterministicWallet {
 
         @Synchronized
         fun create(
-            bitcoinApi: BitcoinApi,
+            bitcoinApi: NonCustodialBitcoinService,
             params: NetworkParameters,
             coinPath: String
         ): BitcoinCashWallet {
@@ -294,7 +294,7 @@ open class BitcoinCashWallet : DeterministicWallet {
 
         @Synchronized
         fun create(
-            bitcoinApi: BitcoinApi,
+            bitcoinApi: NonCustodialBitcoinService,
             params: NetworkParameters,
             coinPath: String,
             passphrase: String
@@ -304,7 +304,7 @@ open class BitcoinCashWallet : DeterministicWallet {
 
         @Synchronized
         fun restore(
-            bitcoinApi: BitcoinApi,
+            bitcoinApi: NonCustodialBitcoinService,
             params: NetworkParameters,
             coinPath: String,
             entropyHex: String,
@@ -315,7 +315,7 @@ open class BitcoinCashWallet : DeterministicWallet {
 
         @Synchronized
         fun restore(
-            bitcoinApi: BitcoinApi,
+            bitcoinApi: NonCustodialBitcoinService,
             coinPath: String,
             mnemonic: List<String>,
             passphrase: String
@@ -326,7 +326,7 @@ open class BitcoinCashWallet : DeterministicWallet {
 
         @Synchronized
         fun createWatchOnly(
-            bitcoinApi: BitcoinApi,
+            bitcoinApi: NonCustodialBitcoinService,
             params: NetworkParameters
         ): BitcoinCashWallet {
             return BitcoinCashWallet(bitcoinApi, params)

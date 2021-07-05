@@ -54,7 +54,10 @@ data class AccountV3(
         val legacyDerivation = Derivation(
             Derivation.LEGACY_TYPE,
             Derivation.LEGACY_PURPOSE,
-            xpriv, legacyXpub, addressCache, addressLabels
+            xpriv,
+            legacyXpub,
+            addressCache,
+            addressLabels
         )
         val derivations = mutableListOf(legacyDerivation)
         return AccountV4(label, legacyDerivation.type, isArchived, derivations)

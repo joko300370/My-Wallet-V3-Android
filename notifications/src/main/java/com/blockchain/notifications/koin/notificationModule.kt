@@ -27,7 +27,8 @@ val notificationModule = module {
                 payloadManager = get(),
                 prefs = get(),
                 firebaseInstanceId = get(),
-                rxBus = get()
+                rxBus = get(),
+                crashLogger = get()
             )
         }
     }

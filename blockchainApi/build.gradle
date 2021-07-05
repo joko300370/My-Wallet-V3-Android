@@ -16,6 +16,7 @@ dependencies {
     implementation Libraries.retrofitRxJavaAdapter
     implementation Libraries.kotlinJson
     implementation Libraries.retrofitKotlinJsonConverter
+    implementation Libraries.androidXAnnotations
 
     implementation Libraries.koin
 

@@ -90,7 +90,7 @@
 }
 
 # Specific to Blockchain
--keep class android.support.design.widget.NavigationView { *; }
+-keep class com.google.android.material.navigation.NavigationView { *; }
 
 # Retrolambda
 -dontwarn java.lang.invoke.*
@@ -169,10 +169,7 @@
 -keep public class info.blockchain.wallet.prices.data.** { *; }
 -keep public class com.blockchain.nabu.api.** { *; }
 -keep public class com.blockchain.nabu.models.** { *; }
--keepclasseswithmembernames class android.support.v4.widget.DrawerLayout { *; }
-
-# Kotlinx serialisation
--keep public class info.blockchain.api.** { *; }
+-keepclasseswithmembernames class androidx.drawerlayout.widget.DrawerLayout { *; }
 
 # Javapoet
 -dontwarn com.squareup.javapoet.**
@@ -231,25 +228,21 @@
 # XLM
 -keep public class org.stellar.sdk.responses.** { *; }
 
-# Kotlin serialization
--keepattributes *Annotation*, InnerClasses
+# Kotlinx serialisation
+-keep public class com.blockchain.api.** { *; }
+
+-keepattributes *Annotation*, InnerClasses, AnnotationDefault
 -dontnote kotlinx.serialization.AnnotationsKt # core serialization annotations
 
 # kotlinx-serialization-json specific. Add this if you have java.lang.NoClassDefFoundError kotlinx.serialization.json.JsonObjectSerializer
--keepclassmembers class kotlinx.serialization.json.** {
+-keepclassmembers class kotlinx.serialization.** {
     *** Companion;
 }
--keepclasseswithmembers class kotlinx.serialization.json.** {
+-keepclasseswithmembers class kotlinx.serialization.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 
 -keep public class com.mukesh.countrypicker.** { *; }
 
-# Change here com.yourcompany.yourpackage
-#-keep,includedescriptorclasses class com.yourcompany.yourpackage.**$$serializer { *; } # <-- change package name to your app's
-#-keepclassmembers class com.yourcompany.yourpackage.** { # <-- change package name to your app's
-#    *** Companion;
-#}
-#-keepclasseswithmembers class com.yourcompany.yourpackage.** { # <-- change package name to your app's
-#    kotlinx.serialization.KSerializer serializer(...);
-#}
+-keep public class com.blockchain.preferences.** { *; }
+-keep public class piuk.blockchain.android.ui.auth.newlogin.** { *; }

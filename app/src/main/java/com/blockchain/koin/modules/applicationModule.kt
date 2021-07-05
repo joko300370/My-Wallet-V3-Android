@@ -99,6 +99,9 @@ import piuk.blockchain.android.ui.recover.RecoverFundsPresenter
 import piuk.blockchain.android.ui.auth.newlogin.SecureChannelManager
 import piuk.blockchain.android.ui.pairingcode.PairingModel
 import piuk.blockchain.android.ui.pairingcode.PairingState
+import piuk.blockchain.android.ui.recover.AccountRecoveryInteractor
+import piuk.blockchain.android.ui.recover.AccountRecoveryModel
+import piuk.blockchain.android.ui.recover.AccountRecoveryState
 import piuk.blockchain.android.ui.sell.BuySellFlowNavigator
 import piuk.blockchain.android.ui.settings.SettingsPresenter
 import piuk.blockchain.android.ui.transfer.receive.ReceiveIntentHelper
@@ -350,6 +353,26 @@ val applicationModule = module {
                 payloadDataManager = get(),
                 backupWalletUtil = get(),
                 walletStatus = get()
+            )
+        }
+
+        factory {
+            AccountRecoveryModel(
+                initialState = AccountRecoveryState(),
+                mainScheduler = AndroidSchedulers.mainThread(),
+                environmentConfig = get(),
+                crashLogger = get(),
+                interactor = get()
+            )
+        }
+
+        factory {
+            AccountRecoveryInteractor(
+                payloadDataManager = get(),
+                prefs = get(),
+                metadataInteractor = get(),
+                metadataDerivation = MetadataDerivation(),
+                nabuDataManager = get()
             )
         }
 

@@ -3,6 +3,7 @@ package piuk.blockchain.androidcore.data.payments
 import com.blockchain.logging.LastTxUpdater
 import info.blockchain.balance.CryptoCurrency
 import info.blockchain.balance.CryptoValue
+import info.blockchain.wallet.api.dust.data.DustInput
 import info.blockchain.wallet.keys.SigningKey
 import info.blockchain.wallet.payload.data.XPubs
 import info.blockchain.wallet.payload.model.Utxo
@@ -29,94 +30,111 @@ class SendDataManager(
     private val rxPinning: RxPinning = RxPinning(rxBus)
 
     /**
-     * Submits a Bitcoin payment to a specified BTC address and returns the transaction hash if
+     * Submits a BTC payment to a specified Bitcoin address and returns the transaction hash if
      * successful
      *
-     * @param unspentOutputBundle UTXO object
-     * @param keys A List of elliptic curve keys
-     * @param toAddress The address to send the funds to
-     * @param changeAddress A change address
-     * @param bigIntFee The specified fee amount
-     * @param bigIntAmount The actual transaction amount
+     * @param signedTx signed object
      * @return An [Observable] wrapping a [String] where the String is the transaction hash
      */
     fun submitBtcPayment(
-        unspentOutputBundle: SpendableUnspentOutputs,
-        keys: List<SigningKey>,
-        toAddress: String,
-        changeAddress: String,
-        bigIntFee: BigInteger,
-        bigIntAmount: BigInteger
-    ): Observable<String> {
-        return rxPinning.call<String> {
-            paymentService.submitBtcPayment(
-                unspentOutputBundle,
-                keys,
-                toAddress,
-                changeAddress,
-                bigIntFee,
-                bigIntAmount
-            )
-        }.logLastTx()
-            .applySchedulers()
-    }
-
-    fun submitBtcPayment(
         signedTx: Transaction
     ): Single<String> =
-        rxPinning.callSingle<String> {
+        rxPinning.callSingle {
             paymentService.submitBtcPayment(
                 signedTx
             )
         }.logLastTx()
             .applySchedulers()
 
-    fun createAndSignBtcTransaction(
+    /**
+     * Sign a BTC transaction returns a signed transaction
+     *
+     * @param tx unsigned object
+     * @param keys A List of elliptic curve keys
+     * @return An [Transaction]
+     */
+    fun getSignedBtcTransaction(
+        tx: Transaction,
+        keys: List<SigningKey>
+    ): Transaction {
+        return paymentService.signBtcTx(tx, keys)
+    }
+
+    /**
+     * Get a BTC Transaction to a specified Bitcoin address and returns the transaction.
+     *
+     * @param unspentOutputBundle UTXO object
+     * @param toAddress The Bitcoin Cash address to send the funds to
+     * @param changeAddress A change address
+     * @param bigIntFee The specified fee amount
+     * @param bigIntAmount The actual transaction amount
+     * @return A [Transaction]
+     */
+    fun getBtcTransaction(
         unspentOutputBundle: SpendableUnspentOutputs,
-        keys: List<SigningKey>,
         toAddress: String,
         changeAddress: String,
         bigIntFee: BigInteger,
         bigIntAmount: BigInteger
     ): Transaction {
-        return paymentService.signAngGetBtcTx(
-            unspentOutputBundle, keys, toAddress, changeAddress, bigIntFee, bigIntAmount
+        return paymentService.getBtcTx(
+            unspentOutputBundle, toAddress, changeAddress, bigIntFee, bigIntAmount
         )
     }
 
     /**
-     * Submits a Bitcoin Cash payment to a specified BCH address and returns the transaction hash if
+     * Submits a BCH payment to a specified Bitcoin Cash address and returns the transaction hash if
      * successful
      *
-     * @param unspentOutputBundle UTXO object
-     * @param keys A List of elliptic curve keys
-     * @param toAddress The address to send the funds to
-     * @param changeAddress A change address
-     * @param bigIntFee The specified fee amount
-     * @param bigIntAmount The actual transaction amount
+     * @param signedTx signed object
      * @return An [Observable] wrapping a [String] where the String is the transaction hash
      */
     fun submitBchPayment(
+        signedTx: Transaction,
+        dustInput: DustInput
+    ): Single<String> =
+        rxPinning.callSingle {
+            paymentService.submitBchPayment(
+                signedTx,
+                dustInput
+            )
+        }.logLastTx()
+            .applySchedulers()
+
+    /**
+     * Sign a BCH transaction returns a signed transaction
+     *
+     * @param tx unsigned object
+     * @param keys A List of elliptic curve keys
+     * @return A [Transaction] signed
+     */
+    fun getSignedBchTransaction(
+        tx: Transaction,
+        keys: List<SigningKey>
+    ): Transaction {
+        return paymentService.signBchTx(tx, keys)
+    }
+
+    /**
+     * Get a BCH Transaction to a specified Bitcoin Cash address and returns the transaction.
+     *
+     * @param unspentOutputBundle UTXO object
+     * @param toAddress The Bitcoin Cash address to send the funds to
+     * @param changeAddress A change address
+     * @param bigIntFee The specified fee amount
+     * @param bigIntAmount The actual transaction amount
+     * @return An [Observable] wrapping the [Transaction]
+     */
+    fun getBchTransaction(
         unspentOutputBundle: SpendableUnspentOutputs,
-        keys: List<SigningKey>,
         toAddress: String,
         changeAddress: String,
         bigIntFee: BigInteger,
         bigIntAmount: BigInteger
-    ): Observable<String> {
-
-        return rxPinning.call<String> {
-            paymentService.submitBchPayment(
-                unspentOutputBundle,
-                keys,
-                toAddress,
-                changeAddress,
-                bigIntFee,
-                bigIntAmount
-            )
-        }.logLastTx()
-            .applySchedulers()
-    }
+    ): Observable<Pair<Transaction, DustInput?>> =
+        paymentService.getBchTx(
+            unspentOutputBundle, toAddress, changeAddress, bigIntFee, bigIntAmount
+        )
 
     /**
      * Returns an [Utxo] object containing all the unspent outputs for a given

@@ -63,7 +63,7 @@ import piuk.blockchain.android.ui.linkbank.BankAuthSource
 import piuk.blockchain.android.ui.sell.BuySellFragment
 import piuk.blockchain.android.ui.settings.BankLinkingHost
 import piuk.blockchain.android.ui.transactionflow.DialogFlow
-import piuk.blockchain.android.ui.transactionflow.TransactionFlow
+import piuk.blockchain.android.ui.transactionflow.TransactionLauncher
 import piuk.blockchain.android.ui.transactionflow.analytics.SwapAnalyticsEvents
 import piuk.blockchain.android.ui.transfer.analytics.TransferAnalyticsEvent
 import piuk.blockchain.android.util.launchUrlInBrowser
@@ -93,6 +93,7 @@ class DashboardFragment :
     private val currencyPrefs: CurrencyPrefs by inject()
     private val coincore: Coincore by scopedInject()
     private val assetResources: AssetResources by scopedInject()
+    private val txLauncher: TransactionLauncher by inject()
 
     private val theAdapter: DashboardDelegateAdapter by lazy {
         DashboardDelegateAdapter(
@@ -638,7 +639,7 @@ class DashboardFragment :
         }
     }
 
-    override fun gotoActivityFor(account: BlockchainAccount) =
+    override fun goToActivityFor(account: BlockchainAccount) =
         navigator().performAssetActionFor(AssetAction.ViewActivity, account)
 
     override fun goToInterestDeposit(toAccount: InterestAccount) {
@@ -655,19 +656,20 @@ class DashboardFragment :
     }
 
     override fun goToSellFrom(account: CryptoAccount) {
-        TransactionFlow(
+        txLauncher.startFlow(
             sourceAccount = account,
-            action = AssetAction.Sell
-        ).apply {
-            startFlow(
-                fragmentManager = childFragmentManager,
-                host = this@DashboardFragment
-            )
-        }
+            action = AssetAction.Sell,
+            fragmentManager = childFragmentManager,
+            flowHost = this@DashboardFragment
+        )
     }
 
     override fun goToInterestDashboard() {
         navigator().startInterestDashboard()
+    }
+
+    override fun goToBuy(asset: CryptoCurrency) {
+        navigator().launchSimpleBuySell(BuySellFragment.BuySellViewType.TYPE_BUY, asset)
     }
 
     override fun startBackupForTransfer() {

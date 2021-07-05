@@ -7,8 +7,8 @@ object Versions {
     const val targetSdk = 30
     const val compileSdk = 30
 
-    const val versionCode = 647
-    const val versionName = "8.8.2"
+    const val versionCode = 654
+    const val versionName = "8.8.5"
     const val buildTools = "29.0.2"
 
     // Build tools and languages
@@ -29,7 +29,7 @@ object Versions {
     const val design = "1.1.0"
     const val preference = "1.1.0"
     const val dynamicanimation = "1.0.0"
-    const val annotations = "1.1.0"
+    const val annotations = "1.2.0"
     const val constraintLayout = "2.0.4"
     const val multidex = "2.0.1"
     const val desugaring = "1.1.5"
@@ -42,6 +42,7 @@ object Versions {
     const val googleServices = "17.1.0"
     const val googleServicesAuth = "19.0.0"
     const val googleServicesPlaces = "17.0.0"
+    const val googleServicesReCaptcha = "16.0.0"
     const val googlePlayCore = "1.8.2"
     const val firebaseMessaging = "20.2.0"
     const val firebaseCore = "17.4.2"
@@ -150,7 +151,7 @@ object Libraries {
     const val design = "com.google.android.material:material:${Versions.design}"
     const val v14 = "androidx.preference:preference:${Versions.preference}"
     const val dynamicAnims = "androidx.dynamicanimation:dynamicanimation:${Versions.dynamicanimation}"
-    const val annotations = "androidx.annotations:annotations:${Versions.annotations}"
+    const val androidXAnnotations = "androidx.annotation:annotation:${Versions.annotations}"
     const val constraintLayout = "androidx.constraintlayout:constraintlayout:${Versions.constraintLayout}"
     const val multidex = "androidx.multidex:multidex:${Versions.multidex}"
     const val desugaring = "com.android.tools:desugar_jdk_libs:${Versions.desugaring}"
@@ -178,6 +179,8 @@ object Libraries {
         "com.google.android.gms:play-services-auth:${Versions.googleServicesAuth}"
     const val googlePlaces =
         "com.google.android.gms:play-services-places:${Versions.googleServicesPlaces}"
+    const val googleServicesReCaptcha =
+        "com.google.android.gms:play-services-recaptcha:${Versions.googleServicesReCaptcha}"
     const val googlePlayCore = "com.google.android.play:core:${Versions.googlePlayCore}"
     const val biometricsApi = "androidx.biometric:biometric:${Versions.biometrics}"
 

@@ -4,7 +4,7 @@ import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.anyOrNull
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
-import info.blockchain.api.BitcoinApi
+import com.blockchain.api.NonCustodialBitcoinService
 import info.blockchain.wallet.MockedResponseTest
 import info.blockchain.wallet.multiaddress.TransactionSummary.TransactionType
 import info.blockchain.wallet.payload.data.XPub
@@ -20,7 +20,7 @@ import retrofit2.Response
 
 class MultiAddressFactoryTest : MockedResponseTest() {
 
-    private val bitcoinApi: BitcoinApi = mock()
+    private val bitcoinApi: NonCustodialBitcoinService = mock()
     private val subject = MultiAddressFactory(bitcoinApi)
 
     private val dormantAddress = "1jH7K4RJrQBXijtLj1JpzqPRhR7MdFtaW"

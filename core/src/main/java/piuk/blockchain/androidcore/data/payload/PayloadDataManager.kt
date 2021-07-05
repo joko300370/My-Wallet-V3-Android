@@ -2,7 +2,7 @@ package piuk.blockchain.androidcore.data.payload
 
 import com.blockchain.annotations.MoveCandidate
 import com.blockchain.logging.CrashLogger
-import info.blockchain.api.BitcoinApi
+import com.blockchain.api.NonCustodialBitcoinService
 import info.blockchain.balance.CryptoValue
 import info.blockchain.wallet.bip44.HDWalletFactory
 import info.blockchain.wallet.exceptions.DecryptionException
@@ -51,7 +51,7 @@ class WalletUpgradeFailure(
 
 class PayloadDataManager internal constructor(
     private val payloadService: PayloadService,
-    private val bitcoinApi: BitcoinApi,
+    private val bitcoinApi: NonCustodialBitcoinService,
     @MoveCandidate("Move this down to the PayloadManager layer, with the other crypto tools")
     private val privateKeyFactory: PrivateKeyFactory,
     private val payloadManager: PayloadManager,

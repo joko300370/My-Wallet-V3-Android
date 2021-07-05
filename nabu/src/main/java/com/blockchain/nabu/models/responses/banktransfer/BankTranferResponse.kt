@@ -121,7 +121,7 @@ data class OpenBankingTokenBody(
 
 data class BankInfoResponse(
     val id: String,
-    val bankName: String?,
+    val name: String?,
     val accountName: String?,
     val currency: String,
     val state: String,

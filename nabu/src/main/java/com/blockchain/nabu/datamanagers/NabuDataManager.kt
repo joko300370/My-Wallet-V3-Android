@@ -20,7 +20,7 @@ import com.blockchain.nabu.service.RetailWalletTokenService
 import com.blockchain.nabu.stores.NabuSessionTokenStore
 import com.blockchain.utils.Optional
 import com.blockchain.veriff.VeriffApplicantAndToken
-import info.blockchain.api.ApiException
+import com.blockchain.api.ApiException
 import info.blockchain.balance.CryptoCurrency
 import io.reactivex.Completable
 import io.reactivex.Maybe
@@ -116,6 +116,8 @@ interface NabuDataManager {
     fun invalidateToken()
 
     fun currentToken(offlineToken: NabuOfflineTokenResponse): Single<NabuSessionTokenResponse>
+
+    fun resetUserKyc(): Completable
 
     fun linkWalletWithMercury(offlineTokenResponse: NabuOfflineTokenResponse): Single<String>
 
@@ -359,6 +361,14 @@ internal class NabuDataManagerImpl(
                 .map { (it as Optional.Some).element }
                 .singleOrError()
         }
+
+    override fun resetUserKyc(): Completable {
+        return requestJwt().flatMapCompletable { jwt ->
+            nabuService.getAuthToken(jwt).flatMapCompletable { response ->
+                nabuService.resetUserKyc(response, jwt)
+            }
+        }
+    }
 
     override fun linkWalletWithMercury(offlineTokenResponse: NabuOfflineTokenResponse): Single<String> =
         authenticate(offlineTokenResponse) {

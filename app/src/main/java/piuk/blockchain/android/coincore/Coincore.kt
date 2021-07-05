@@ -3,6 +3,8 @@ package piuk.blockchain.android.coincore
 import com.blockchain.logging.CrashLogger
 import com.blockchain.wallet.DefaultLabels
 import info.blockchain.balance.CryptoCurrency
+import info.blockchain.balance.percentageDelta
+import info.blockchain.wallet.prices.TimeAgo
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
@@ -11,6 +13,7 @@ import io.reactivex.rxkotlin.zipWith
 import piuk.blockchain.android.coincore.alg.AlgoCryptoWalletAccount
 import piuk.blockchain.android.coincore.impl.AllWalletsAccount
 import piuk.blockchain.android.coincore.impl.TxProcessorFactory
+import piuk.blockchain.android.ui.sell.ExchangePriceWithDelta
 import piuk.blockchain.android.ui.transfer.AccountsSorter
 import piuk.blockchain.androidcore.data.payload.PayloadDataManager
 import timber.log.Timber
@@ -194,6 +197,14 @@ class Coincore internal constructor(
             target,
             action
         )
+
+    fun getExchangePriceWithDelta(cryptoCurrency: CryptoCurrency): Single<ExchangePriceWithDelta> =
+        this[cryptoCurrency].exchangeRate().zipWith(
+            this[cryptoCurrency].historicRate(TimeAgo.ONE_DAY.epoch)
+        ).map { (currentPrice, price24h) ->
+            val price = currentPrice.percentageDelta(price24h)
+            ExchangePriceWithDelta(currentPrice.price(), price)
+        }
 
     @Suppress("SameParameterValue")
     private fun allAccounts(includeArchived: Boolean = false): Observable<SingleAccount> =
